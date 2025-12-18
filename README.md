@@ -1,1 +1,31 @@
 # FluxForge
+
+UWNR Flux-Wire–Driven Neutron Spectrum Reconstruction Tool. This repository
+provides a pure-Python package and CLI that converts HPGe-derived wire activities
+into reaction rates, constructs response matrices from dosimetry cross sections,
+and infers neutron flux spectra with generalized least squares and Monte Carlo
+uncertainty propagation.
+
+## Features
+- Activation and decay helpers for converting net peak areas to activities and
+  reaction rates.
+- Response matrix construction for groupwise cross sections and number densities.
+- GLS spectrum adjustment with optional non-negativity enforcement.
+- Iterative GRAVEL and MLEM unfolding options for prior-free spectrum recovery.
+- Monte Carlo uncertainty propagation to estimate percentile bands on inferred
+  spectra.
+- Argparse-based CLI with ``build-response``, ``infer-spectrum``, ``validate``,
+  and ``report`` commands.
+
+## Getting started
+The project avoids external dependencies to simplify offline execution. Install
+it in editable mode (setuptools is bundled with Python) and invoke the CLI:
+
+```bash
+pip install -e .
+python -m fluxforge.cli.app --help
+```
+
+Synthetic validation and inference routines expect JSON inputs; see
+``src/fluxforge/cli/app.py`` for the expected schemas and adjust to your UWNR
+data formats.
