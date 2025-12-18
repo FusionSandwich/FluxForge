@@ -29,3 +29,12 @@ python -m fluxforge.cli.app --help
 Synthetic validation and inference routines expect JSON inputs; see
 ``src/fluxforge/cli/app.py`` for the expected schemas and adjust to your UWNR
 data formats.
+
+## Example data
+The `src/fluxforge/examples/fe_cd_rafm_1` folder contains a concrete
+Fe58(n,γ)→Fe59 activation-wire example derived from a Cd-covered RAFM wire
+measurement (live time 43.2 ks, dead time 0.1%). The JSON files mirror the
+CLI schemas for group boundaries, cross sections, number densities, measured
+gamma lines, and an illustrative prior spectrum. Swap in dosimetry-grade
+cross sections (e.g., IRDFF-II) and geometry-specific number densities before
+using the example for physics conclusions.
