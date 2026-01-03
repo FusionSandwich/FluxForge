@@ -1,51 +1,83 @@
 {
-  "id": "Fe-Cd-RAFM-1@0cm",
-  "description": "Fe58(n,gamma) activation of RAFM wire with Cd cover; activities reported at measurement date.",
-  "segments": [
-    {"duration_s": 21600.0, "relative_power": 1.0}
-  ],
-  "reactions": [
-    {
-      "reaction_id": "fe58_ng_fe59",
-      "half_life_s": 3844368.0,
-      "gamma_lines": [
-        {
-          "net_counts": 860.0,
-          "live_time_s": 43200.0,
-          "efficiency": 0.0010,
-          "gamma_intensity": 0.0102,
-          "half_life_s": 3844368.0,
-          "cooling_time_s": 172800.0,
-          "dead_time_fraction": 0.001
-        },
-        {
-          "net_counts": 4567.0,
-          "live_time_s": 43200.0,
-          "efficiency": 0.0012,
-          "gamma_intensity": 0.0308,
-          "half_life_s": 3844368.0,
-          "cooling_time_s": 172800.0,
-          "dead_time_fraction": 0.001
-        },
-        {
-          "net_counts": 22892.0,
-          "live_time_s": 43200.0,
-          "efficiency": 0.0015,
-          "gamma_intensity": 0.5650,
-          "half_life_s": 3844368.0,
-          "cooling_time_s": 172800.0,
-          "dead_time_fraction": 0.001
-        },
-        {
-          "net_counts": 15351.0,
-          "live_time_s": 43200.0,
-          "efficiency": 0.0015,
-          "gamma_intensity": 0.4320,
-          "half_life_s": 3844368.0,
-          "cooling_time_s": 172800.0,
-          "dead_time_fraction": 0.001
-        }
-      ]
+  "metadata": {
+    "schema_name": "fluxforge.activation_measurements",
+    "schema_version": "0.1.0",
+    "created_at": "2026-01-03T02:11:55.816850+00:00",
+    "units": {
+      "duration_s": "s",
+      "relative_power": "unitless",
+      "net_counts": "counts",
+      "live_time_s": "s",
+      "efficiency": "unitless",
+      "gamma_intensity": "unitless",
+      "half_life_s": "s",
+      "cooling_time_s": "s",
+      "dead_time_fraction": "unitless"
+    },
+    "normalization": {
+      "basis": "gamma_line_activity",
+      "description": "Measured net counts are normalized by efficiency and intensity to recover activity."
+    },
+    "library_versions": {
+      "fluxforge": "0.1.0",
+      "python": "3.11.12"
+    },
+    "checksums": {
+      "payload_sha256": "7c47b7b4a7f44c8e3f07b9a80fbcfd8e38c99b9f43521b693443fbabac503d3f"
     }
-  ]
+  },
+  "data": {
+    "id": "Fe-Cd-RAFM-1@0cm",
+    "description": "Fe58(n,gamma) activation of RAFM wire with Cd cover; activities reported at measurement date.",
+    "segments": [
+      {
+        "duration_s": 21600.0,
+        "relative_power": 1.0
+      }
+    ],
+    "reactions": [
+      {
+        "reaction_id": "fe58_ng_fe59",
+        "half_life_s": 3844368.0,
+        "gamma_lines": [
+          {
+            "net_counts": 860.0,
+            "live_time_s": 43200.0,
+            "efficiency": 0.001,
+            "gamma_intensity": 0.0102,
+            "half_life_s": 3844368.0,
+            "cooling_time_s": 172800.0,
+            "dead_time_fraction": 0.001
+          },
+          {
+            "net_counts": 4567.0,
+            "live_time_s": 43200.0,
+            "efficiency": 0.0012,
+            "gamma_intensity": 0.0308,
+            "half_life_s": 3844368.0,
+            "cooling_time_s": 172800.0,
+            "dead_time_fraction": 0.001
+          },
+          {
+            "net_counts": 22892.0,
+            "live_time_s": 43200.0,
+            "efficiency": 0.0015,
+            "gamma_intensity": 0.565,
+            "half_life_s": 3844368.0,
+            "cooling_time_s": 172800.0,
+            "dead_time_fraction": 0.001
+          },
+          {
+            "net_counts": 15351.0,
+            "live_time_s": 43200.0,
+            "efficiency": 0.0015,
+            "gamma_intensity": 0.432,
+            "half_life_s": 3844368.0,
+            "cooling_time_s": 172800.0,
+            "dead_time_fraction": 0.001
+          }
+        ]
+      }
+    ]
+  }
 }

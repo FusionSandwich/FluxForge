@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from fluxforge.core.artifacts import extract_payload
 from fluxforge.core.response import EnergyGroupStructure, ReactionCrossSection, build_response_matrix
 from fluxforge.physics.activation import GammaLineMeasurement, IrradiationSegment, reaction_rate_from_activity, weighted_activity
 from fluxforge.solvers.gls import gls_adjust
@@ -13,7 +14,7 @@ def test_fe_cd_example_cli_flow():
     boundaries = json.loads((EXAMPLE_DIR / "boundaries.json").read_text())
     cross_sections = json.loads((EXAMPLE_DIR / "cross_sections.json").read_text())
     number_densities = json.loads((EXAMPLE_DIR / "number_densities.json").read_text())
-    measurements = json.loads((EXAMPLE_DIR / "measurements.json").read_text())
+    measurements = extract_payload(json.loads((EXAMPLE_DIR / "measurements.json").read_text()))
     prior_flux = json.loads((EXAMPLE_DIR / "prior_flux.json").read_text())
 
     groups = EnergyGroupStructure(boundaries)

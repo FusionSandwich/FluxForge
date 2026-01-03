@@ -7,6 +7,15 @@ import json
 from pathlib import Path
 from typing import List, Optional
 
+from fluxforge.core.artifacts import (
+    GLS_SPECTRUM_SCHEMA,
+    MEASUREMENTS_SCHEMA,
+    RESPONSE_SCHEMA,
+    build_artifact,
+    compute_correlation,
+    extract_payload,
+    validate_artifact,
+)
 from fluxforge.core.response import EnergyGroupStructure, ReactionCrossSection, build_response_matrix
 from fluxforge.physics.activation import GammaLineMeasurement, IrradiationSegment, reaction_rate_from_activity, weighted_activity
 from fluxforge.solvers.gls import gls_adjust
@@ -14,6 +23,14 @@ from fluxforge.solvers.gls import gls_adjust
 
 def _load_json(path: Path):
     return json.loads(path.read_text())
+
+
+def _load_artifact_payload(path: Path, schema: dict) -> dict:
+    payload = _load_json(path)
+    if isinstance(payload, dict) and "metadata" in payload and "data" in payload:
+        validate_artifact(payload, schema)
+        return payload["data"]
+    return payload
 
 
 def cmd_build_response(args: argparse.Namespace) -> None:
@@ -29,23 +46,34 @@ def cmd_build_response(args: argparse.Namespace) -> None:
         number_density_values.append(float(number_densities[reaction_id]))
 
     response = build_response_matrix(reactions, groups, number_density_values)
-    output_data = {
-        "matrix": response.matrix,
-        "reactions": response.reactions,
-        "boundaries": response.energy_groups.boundaries_eV,
-    }
-    Path(args.output).write_text(json.dumps(output_data, indent=2))
+    artifact = build_artifact(
+        RESPONSE_SCHEMA,
+        {
+            "matrix": response.matrix,
+            "reactions": response.reactions,
+            "boundaries_eV": response.energy_groups.boundaries_eV,
+        },
+        units={
+            "matrix": "cm^-1",
+            "boundaries_eV": "eV",
+        },
+        normalization={
+            "basis": "number_density_scaled",
+            "description": "Response rows equal sigma_g multiplied by target number density.",
+        },
+    )
+    Path(args.output).write_text(json.dumps(artifact, indent=2))
     print(f"Wrote response matrix to {args.output}")
 
 
 def cmd_infer_spectrum(args: argparse.Namespace) -> None:
-    response_data = _load_json(args.response_file)
+    response_data = _load_artifact_payload(args.response_file, RESPONSE_SCHEMA)
     response_matrix = response_data["matrix"]
-    boundaries = response_data["boundaries"]
+    boundaries = response_data.get("boundaries_eV") or response_data.get("boundaries")
     reactions = response_data["reactions"]
     groups = EnergyGroupStructure([float(b) for b in boundaries])
 
-    measurements_data = _load_json(args.measurements_file)
+    measurements_data = _load_artifact_payload(args.measurements_file, MEASUREMENTS_SCHEMA)
     half_life_map = {rx["reaction_id"]: float(rx["half_life_s"]) for rx in measurements_data["reactions"]}
     segments = [IrradiationSegment(**seg) for seg in measurements_data["segments"]]
 
@@ -59,7 +87,8 @@ def cmd_infer_spectrum(args: argparse.Namespace) -> None:
         rate_uncertainties.append(rate_estimate.uncertainty)
 
     if args.prior_flux_file:
-        prior_flux = [float(v) for v in _load_json(args.prior_flux_file)]
+        prior_flux_payload = extract_payload(_load_json(args.prior_flux_file))
+        prior_flux = [float(v) for v in prior_flux_payload]
     else:
         avg_response = sum(sum(row) for row in response_matrix) / max(len(response_matrix) * len(response_matrix[0]), 1)
         prior_flux = [sum(measured_rates) / max(avg_response, 1e-12) for _ in range(groups.group_count)]
@@ -67,19 +96,36 @@ def cmd_infer_spectrum(args: argparse.Namespace) -> None:
     measurement_cov = [[(rate_uncertainties[i] ** 2) if i == j else 0.0 for j in range(len(measured_rates))] for i in range(len(measured_rates))]
 
     solution = gls_adjust(response_matrix, measured_rates, measurement_cov, prior_flux, prior_cov)
-    result = {
+    result_payload = {
         "boundaries_eV": boundaries,
         "reactions": reactions,
         "flux": solution.flux,
         "covariance": solution.covariance,
+        "correlation": compute_correlation(solution.covariance),
         "chi2": solution.chi2,
+        "covariance_storage": GLS_SPECTRUM_SCHEMA["covariance_storage"],
     }
-    Path(args.output).write_text(json.dumps(result, indent=2))
+    artifact = build_artifact(
+        GLS_SPECTRUM_SCHEMA,
+        result_payload,
+        units={
+            "boundaries_eV": "eV",
+            "flux": "n/cm^2/s",
+            "covariance": "(n/cm^2/s)^2",
+            "correlation": "unitless",
+            "chi2": "unitless",
+        },
+        normalization={
+            "basis": "groupwise_flux",
+            "description": "Flux values represent groupwise average flux per energy bin.",
+        },
+    )
+    Path(args.output).write_text(json.dumps(artifact, indent=2))
     print(f"Saved inferred spectrum to {args.output}")
 
 
 def cmd_validate(args: argparse.Namespace) -> None:
-    response_data = _load_json(args.response_file)
+    response_data = _load_artifact_payload(args.response_file, RESPONSE_SCHEMA)
     r = response_data["matrix"]
     phi_true = [float(v) for v in _load_json(args.truth_flux_file)]
     y = [sum(row[i] * phi_true[i] for i in range(len(phi_true))) for row in r]
