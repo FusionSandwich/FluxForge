@@ -122,7 +122,7 @@ def read_hpge_report(filepath: Union[str, Path]) -> HPGeReport:
     for line in content.splitlines():
         if "Energy" in line and "Ch" in line:
             numbers = FLOAT_RE.findall(line)
-            if len(numbers) >= 3:
+            if len(numbers) >= 2:
                 calibration["energy"] = [float(n) for n in numbers[:3]]
         if ":" in line:
             key, value = line.split(":", 1)
