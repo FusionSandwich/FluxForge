@@ -53,7 +53,9 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=OptimizeWarning)
 
 # Add MCNP_ALARA_Workflow to path for nuclear_data module
-_workflow_dir = Path(__file__).parent.parent / "MCNP_ALARA_Workflow"
+EXAMPLES_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = EXAMPLES_DIR.parents[2]
+_workflow_dir = ROOT_DIR / "MCNP_ALARA_Workflow"
 if str(_workflow_dir) not in sys.path:
     sys.path.insert(0, str(_workflow_dir))
 
