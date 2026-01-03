@@ -63,14 +63,16 @@ LN2 = np.log(2)
 # ==============================================================================
 # PATHS AND CONFIGURATION
 # ==============================================================================
-BASE_DIR = Path(__file__).parent.resolve()
-RAW_SPEC_DIR = BASE_DIR / 'rafm_irradiation_ldrd' / 'raw_gamma_spec' / 'flux_wires'
-PROCESSED_DIR = BASE_DIR / 'rafm_irradiation_ldrd' / 'irradiation_QG_processed' / 'flux_wires'
-OUTPUT_DIR = BASE_DIR / 'flux_unfolding_results'
-ALARA_OUTPUT_DIR = BASE_DIR / 'MCNP_ALARA_Workflow' / 'alara_output_fendl3_new'
-EFFICIENCY_CSV = BASE_DIR / 'rafm_analysis' / 'eff.csv'
-MCNP_SPECTRUM_CSV = BASE_DIR / 'MCNP_ALARA_Workflow' / 'spectrum_vit_j.csv'
-RAFM3_DATA_DIR = BASE_DIR / 'MCNP_ALARA_Workflow' / 'Experimental_Data' / 'RAFM3'
+SCRIPT_DIR = Path(__file__).parent.resolve()
+EXAMPLES_DIR = SCRIPT_DIR.parent
+ROOT_DIR = EXAMPLES_DIR.parents[2]
+RAW_SPEC_DIR = ROOT_DIR / 'rafm_irradiation_ldrd' / 'raw_gamma_spec' / 'flux_wires'
+PROCESSED_DIR = ROOT_DIR / 'rafm_irradiation_ldrd' / 'irradiation_QG_processed' / 'flux_wires'
+OUTPUT_DIR = ROOT_DIR / 'flux_unfolding_results'
+ALARA_OUTPUT_DIR = ROOT_DIR / 'MCNP_ALARA_Workflow' / 'alara_output_fendl3_new'
+EFFICIENCY_CSV = EXAMPLES_DIR / 'eff.csv'
+MCNP_SPECTRUM_CSV = ROOT_DIR / 'MCNP_ALARA_Workflow' / 'spectrum_vit_j.csv'
+RAFM3_DATA_DIR = ROOT_DIR / 'MCNP_ALARA_Workflow' / 'Experimental_Data' / 'RAFM3'
 
 # Irradiation parameters
 IRRADIATION_START = datetime(2025, 8, 4, 13, 0, 0)  # August 4, 2025 at 1:00 PM

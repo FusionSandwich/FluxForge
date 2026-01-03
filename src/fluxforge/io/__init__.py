@@ -19,6 +19,13 @@ from fluxforge.io.genie import (
     discover_spectrum_pairs,
     load_spectrum_pair,
 )
+from fluxforge.io.hpge import HPGeReport, read_hpge_report
+from fluxforge.io.csv_readers import (
+    EfficiencyExport,
+    FluxWireTiming,
+    read_efficiency_export,
+    read_flux_wire_timing_csv,
+)
 from fluxforge.io.artifacts import (
     read_artifact,
     write_artifact,
@@ -57,6 +64,13 @@ __all__ = [
     'SpectrumPair',
     'discover_spectrum_pairs',
     'load_spectrum_pair',
+    # CSV/HPGe exports
+    'EfficiencyExport',
+    'FluxWireTiming',
+    'read_efficiency_export',
+    'read_flux_wire_timing_csv',
+    'HPGeReport',
+    'read_hpge_report',
     # Artifact I/O
     'read_artifact',
     'write_artifact',
