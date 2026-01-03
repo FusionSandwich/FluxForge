@@ -18,6 +18,14 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 
 from fluxforge.io.spe import GammaSpectrum
+from fluxforge.io.metadata import qc_flags_for_spectrum
+
+
+def _parse_number(value: str) -> Optional[float]:
+    try:
+        return float(value.replace(",", ""))
+    except ValueError:
+        return None
 
 
 # ============================================================================
@@ -25,9 +33,11 @@ from fluxforge.io.spe import GammaSpectrum
 # ============================================================================
 
 ENERGY_CAL_RE = re.compile(r"\b([ABC])\s*=\s*([+-]?\d+\.?\d*E[+-]?\d+)", re.IGNORECASE)
-LIVE_TIME_RE = re.compile(r"Elapsed Live Time:\s*([\d.]+)", re.IGNORECASE)
-REAL_TIME_RE = re.compile(r"Elapsed Real Time:\s*([\d.]+)", re.IGNORECASE)
+LIVE_TIME_RE = re.compile(r"Elapsed Live Time:\s*([\d.,]+)", re.IGNORECASE)
+REAL_TIME_RE = re.compile(r"Elapsed Real Time:\s*([\d.,]+)", re.IGNORECASE)
 START_TIME_RE = re.compile(r"Acquisition Started:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
+ACQ_DATE_RE = re.compile(r"Acquisition Date:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
+ID_RE = re.compile(r"^\s*ID:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 SAMPLE_ID_RE = re.compile(r"Sample(?:\s+ID)?:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 DETECTOR_RE = re.compile(r"Detector(?:\s+Name)?:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 
@@ -76,33 +86,42 @@ def parse_genie_header(filepath: Union[str, Path]) -> Dict[str, Any]:
     # Extract live time
     match = LIVE_TIME_RE.search(content)
     if match:
-        header['live_time'] = float(match.group(1))
+        parsed = _parse_number(match.group(1))
+        if parsed is not None:
+            header['live_time'] = parsed
     
     # Extract real time
     match = REAL_TIME_RE.search(content)
     if match:
-        header['real_time'] = float(match.group(1))
+        parsed = _parse_number(match.group(1))
+        if parsed is not None:
+            header['real_time'] = parsed
     
     # Extract start time
-    match = START_TIME_RE.search(content)
-    if match:
+    for match in (START_TIME_RE.search(content), ACQ_DATE_RE.search(content)):
+        if not match:
+            continue
         time_str = match.group(1).strip()
         for fmt in [
             '%m/%d/%Y %H:%M:%S',
             '%d/%m/%Y %H:%M:%S',
             '%Y-%m-%d %H:%M:%S',
             '%m-%d-%Y %H:%M:%S %p',
+            '%d-%b-%Y %H:%M',
         ]:
             try:
                 header['start_time'] = datetime.strptime(time_str, fmt)
                 break
             except ValueError:
                 continue
+        if header['start_time'] is not None:
+            break
     
-    # Extract sample ID
-    match = SAMPLE_ID_RE.search(content)
-    if match:
-        header['sample_id'] = match.group(1).strip()
+    # Extract sample ID / report ID
+    for match in (SAMPLE_ID_RE.search(content), ID_RE.search(content)):
+        if match:
+            header['sample_id'] = match.group(1).strip()
+            break
     
     # Extract detector ID
     match = DETECTOR_RE.search(content)
@@ -193,6 +212,15 @@ def read_genie_spectrum(filepath: Union[str, Path]) -> GammaSpectrum:
     for i, coef in enumerate(coefficients):
         energies += coef * (channels.astype(float) ** i)
     
+    qc_flags = qc_flags_for_spectrum(
+        spectrum_id=header['sample_id'] or filepath.stem,
+        live_time=header['live_time'],
+        real_time=header['real_time'],
+        start_time=header['start_time'],
+        calibration={'energy': coefficients},
+        detector_id=header['detector_id'],
+    )
+
     return GammaSpectrum(
         counts=counts,
         channels=channels,
@@ -206,6 +234,7 @@ def read_genie_spectrum(filepath: Union[str, Path]) -> GammaSpectrum:
         metadata={
             'format': 'genie2000',
             'source_file': str(filepath),
+            'qc_flags': qc_flags,
         },
     )
 
