@@ -198,3 +198,54 @@ SCHEMAS: Dict[str, Dict[str, Any]] = {
 def schema_as_yaml(schema: Dict[str, Any]) -> str:
     """Return a YAML representation (JSON is valid YAML)."""
     return json.dumps(schema, indent=2)
+
+
+def validate_artifact(
+    payload: Dict[str, Any],
+    *,
+    require_definitions: bool = True,
+    require_normalization: bool = True,
+) -> list[str]:
+    """Return a list of validation errors for a FluxForge artifact payload."""
+    errors: list[str] = []
+    schema_id = payload.get("schema")
+    if not schema_id:
+        return ["Missing schema identifier."]
+
+    schema = next((s for s in SCHEMAS.values() if s.get("properties", {}).get("schema", {}).get("const") == schema_id), None)
+    if schema is None:
+        return [f"Unknown schema identifier: {schema_id}."]
+
+    required = schema.get("required", [])
+    for key in required:
+        if key not in payload:
+            errors.append(f"Missing required field: {key}.")
+
+    provenance = payload.get("provenance")
+    if provenance is None:
+        errors.append("Missing provenance block.")
+    else:
+        if "units" not in provenance:
+            errors.append("Missing provenance units.")
+        if require_normalization and "normalization" not in provenance:
+            errors.append("Missing provenance normalization.")
+        if require_definitions and "definitions" not in provenance:
+            errors.append("Missing provenance definitions.")
+
+    return errors
+
+
+def validate_or_raise(
+    payload: Dict[str, Any],
+    *,
+    require_definitions: bool = True,
+    require_normalization: bool = True,
+) -> None:
+    """Raise ValueError if the artifact payload fails validation."""
+    errors = validate_artifact(
+        payload,
+        require_definitions=require_definitions,
+        require_normalization=require_normalization,
+    )
+    if errors:
+        raise ValueError("Artifact validation failed: " + "; ".join(errors))

@@ -2,3 +2,18 @@ __pycache__/
 *.pyc
 .env
 .venv
+
+# OpenMC statepoint files
+statepoint.*.h5
+summary.h5
+particle_restart.h5
+
+# MCNP output and test files
+outp*
+mctal*
+meshtal*
+runtpe*
+srctp*
+*.i
+*.o
+

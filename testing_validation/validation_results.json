@@ -1,0 +1,81 @@
+{
+  "Neutron-Unfolding": [
+    {
+      "repo": "Neutron-Unfolding",
+      "test_name": "data_files",
+      "passed": false,
+      "correlation": 0.0,
+      "max_relative_error": 0.0,
+      "notes": "Test data files not found",
+      "details": {}
+    }
+  ],
+  "SpecKit": [
+    {
+      "repo": "SpecKit",
+      "test_name": "xs_file_reading",
+      "passed": true,
+      "correlation": 1.0,
+      "max_relative_error": 0.0,
+      "notes": "Loaded prior.txt: 114 energy points",
+      "details": {
+        "file": "/filespace/s/smandych/CAE/projects/ALARA/testing/SpecKit/Example/prior.txt",
+        "n_points": 114
+      }
+    },
+    {
+      "repo": "SpecKit",
+      "test_name": "gradient_descent_synthetic",
+      "passed": false,
+      "correlation": -0.13134839093145587,
+      "max_relative_error": 0.0,
+      "notes": "Synthetic exponential spectrum reconstruction",
+      "details": {
+        "iterations": 5000,
+        "chi2": 7.027146821328754e+23
+      }
+    }
+  ],
+  "gamma_spec_analysis": [
+    {
+      "repo": "gamma_spec_analysis",
+      "test_name": "SPE_atr_sample_1",
+      "passed": true,
+      "correlation": 1.0,
+      "max_relative_error": 0.0,
+      "notes": "Read 16384 channels",
+      "details": {
+        "file": "/filespace/s/smandych/CAE/projects/ALARA/testing/gamma_spec_analysis/test_data/atr_sample_1.Spe",
+        "channels": 16384
+      }
+    },
+    {
+      "repo": "gamma_spec_analysis",
+      "test_name": "SPE_Y_88_raised_1",
+      "passed": true,
+      "correlation": 1.0,
+      "max_relative_error": 0.0,
+      "notes": "Read 8192 channels",
+      "details": {
+        "file": "/filespace/s/smandych/CAE/projects/ALARA/testing/gamma_spec_analysis/test_data/Y_88_raised_1.Spe",
+        "channels": 8192
+      }
+    },
+    {
+      "repo": "gamma_spec_analysis",
+      "test_name": "SPE_Co_60_raised_1",
+      "passed": true,
+      "correlation": 1.0,
+      "max_relative_error": 0.0,
+      "notes": "Read 8192 channels",
+      "details": {
+        "file": "/filespace/s/smandych/CAE/projects/ALARA/testing/gamma_spec_analysis/test_data/Co_60_raised_1.Spe",
+        "channels": 8192
+      }
+    }
+  ],
+  "pyunfold": [
+    {
+      "repo": "pyunfold",
+      "test_name": "dagostini_two_peaks",
+      "passed": 

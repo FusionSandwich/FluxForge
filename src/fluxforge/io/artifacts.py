@@ -61,8 +61,21 @@ def make_spectrum_file(
         "live_time": "s",
         "real_time": "s",
     }
+    definitions = {
+        "counts": "raw counts per channel",
+        "channels": "adc channel index",
+        "energies": "calibrated energy in keV (null if unknown)",
+        "live_time": "detector live time",
+        "real_time": "clock time",
+        "start_time": "ISO-8601 start time when available",
+    }
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"counts": "raw"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"counts": "raw"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     return {
         "schema": _schema_id("spectrum_file"),
         "spectrum": spectrum.to_dict(),
@@ -100,8 +113,22 @@ def make_peak_report(
         "area": "counts",
         "live_time_s": "s",
     }
+    definitions = {
+        "channel": "peak centroid channel",
+        "energy_keV": "peak centroid energy",
+        "amplitude": "peak height",
+        "raw_counts": "peak height in raw spectrum",
+        "sigma_keV": "gaussian sigma",
+        "area": "net peak area",
+        "live_time_s": "spectrum live time",
+    }
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"peaks": "raw"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"peaks": "raw"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     return {
         "schema": _schema_id("peak_report"),
         "spectrum_id": spectrum_id,
@@ -146,8 +173,22 @@ def make_line_activities(
         "activity_unc_Bq": "Bq",
         "half_life_s": "s",
     }
+    definitions = {
+        "energy_keV": "gamma line energy",
+        "net_counts": "net peak counts",
+        "activity_Bq": "activity at count time unless corrected",
+        "activity_unc_Bq": "1-sigma uncertainty on activity_Bq",
+        "efficiency": "full-energy peak efficiency at energy",
+        "emission_probability": "gamma emission probability",
+        "half_life_s": "half-life for decay correction",
+    }
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"activity": "per-line"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"activity": "per-line"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     return {
         "schema": _schema_id("line_activities"),
         "spectrum_id": spectrum_id,
@@ -179,8 +220,18 @@ def make_reaction_rates(
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     units = {"rate": "reactions/s", "uncertainty": "reactions/s", "half_life_s": "s"}
+    definitions = {
+        "rate": "reaction rate at EOI per reaction",
+        "uncertainty": "1-sigma uncertainty on rate",
+        "half_life_s": "half-life used for decay correction",
+    }
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"rates": "per-reaction"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"rates": "per-reaction"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     payload = {
         "schema": _schema_id("reaction_rates"),
         "rates": list(rates),
@@ -215,8 +266,17 @@ def make_response_bundle(
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     units = {"matrix": "barn", "boundaries_eV": "eV"}
+    definitions = {
+        "matrix": "response matrix with rows as reactions and columns as energy groups",
+        "boundaries_eV": "energy group boundaries in eV",
+    }
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"matrix": "number_density_applied"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"matrix": "number_density_applied"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     return {
         "schema": _schema_id("response_bundle"),
         "matrix": matrix,
@@ -259,8 +319,19 @@ def make_unfold_result(
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     units = {"flux": "a.u.", "covariance": "a.u.^2", "boundaries_eV": "eV"}
+    definitions = {
+        "flux": "group-integrated flux per energy bin",
+        "covariance": "covariance of group-integrated flux",
+        "chi2": "chi^2 of measured vs predicted rates",
+        "boundaries_eV": "energy group boundaries in eV",
+    }
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"flux": "per-group"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"flux": "per-group"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     return {
         "schema": _schema_id("unfold_result"),
         "boundaries_eV": boundaries_eV,
@@ -310,8 +381,18 @@ def make_validation_bundle(
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     units = {"truth_flux": "a.u.", "predicted_flux": "a.u.", "residuals": "a.u."}
+    definitions = {
+        "truth_flux": "reference flux for comparison",
+        "predicted_flux": "unfolded flux",
+        "residuals": "predicted_flux - truth_flux",
+    }
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"metrics": "comparison"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"metrics": "comparison"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     return {
         "schema": _schema_id("validation_bundle"),
         "metrics": metrics,
@@ -353,8 +434,14 @@ def make_report_bundle(
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     units = {"summary": "mixed"}
+    definitions = {"summary": "aggregate summary across artifacts"}
     hashes = {"source": hash_file(source_path)} if source_path else None
-    provenance = build_provenance(units=units, normalization={"report": "aggregate"}, source_hashes=hashes)
+    provenance = build_provenance(
+        units=units,
+        normalization={"report": "aggregate"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
     payload = {
         "schema": _schema_id("report_bundle"),
         "summary": summary,

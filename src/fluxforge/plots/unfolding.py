@@ -224,6 +224,165 @@ def plot_spectrum_comparison(
     return fig, ax
 
 
+def plot_spectrum_uncertainty_bands(
+    result: "UnfoldingResult",
+    confidence_levels: List[float] = [0.68, 0.95],
+    title: str = "Unfolded Neutron Spectrum with Uncertainty Bands",
+    xlabel: str = "Energy (MeV)",
+    ylabel: str = "Flux per unit lethargy (n/cm²/s)",
+    log_x: bool = True,
+    log_y: bool = True,
+    energy_units: str = "MeV",
+    lethargy_plot: bool = True,
+    colors: Optional[List[str]] = None,
+    figsize: Tuple[float, float] = (10, 7),
+    save_path: Optional[Union[str, Path]] = None,
+    ax: Optional[Any] = None,
+) -> Any:
+    """
+    Plot spectrum with multiple confidence level uncertainty bands.
+    
+    Creates publication-quality plot with:
+    - Central estimate (solid line)
+    - 1-sigma (68%) confidence band 
+    - 2-sigma (95%) confidence band
+    
+    This implements capability G1.1 for spectrum uncertainty visualization.
+    
+    Parameters
+    ----------
+    result : UnfoldingResult
+        Unfolding result object with flux and uncertainty
+    confidence_levels : List[float]
+        Confidence levels for bands (default: 68%, 95%)
+    title : str
+        Plot title
+    xlabel, ylabel : str
+        Axis labels
+    log_x, log_y : bool
+        Use logarithmic axes
+    energy_units : str
+        'MeV' or 'eV'
+    lethargy_plot : bool
+        Plot as E*φ(E) (flux per unit lethargy)
+    colors : List[str], optional
+        Colors for confidence bands (from outer to inner)
+    figsize : tuple
+        Figure size
+    save_path : str or Path, optional
+        Save figure to path
+    ax : matplotlib.axes.Axes, optional
+        Existing axes to plot on
+    
+    Returns
+    -------
+    fig, ax
+        Matplotlib figure and axes
+    
+    Examples
+    --------
+    >>> result = spectrum_unfolder.unfold(method='gravel')
+    >>> fig, ax = plot_spectrum_uncertainty_bands(
+    ...     result,
+    ...     confidence_levels=[0.68, 0.95, 0.99],
+    ...     save_path="spectrum_uncertainty.png"
+    ... )
+    """
+    if not HAS_MATPLOTLIB:
+        raise ImportError("matplotlib required for plotting")
+    
+    from scipy import stats
+    
+    apply_plot_style()
+    
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.get_figure()
+    
+    # Default colors: outer bands lighter
+    if colors is None:
+        colors = ["#ffcccc", "#ff9999", "#ff6666"]  # Light to dark red
+    
+    # Get energy midpoints
+    energies = result.energy_midpoints.copy()
+    if energy_units.lower() == "mev":
+        energies = energies / 1e6
+    
+    # Prepare flux for plotting
+    flux = result.flux.copy()
+    flux_unc = result.flux_uncertainty.copy() if len(result.flux_uncertainty) > 0 else np.zeros_like(flux)
+    
+    if lethargy_plot:
+        # E * φ(E) representation
+        flux = result.energy_midpoints * flux
+        flux_unc = result.energy_midpoints * flux_unc
+    
+    # Sort confidence levels from largest to smallest (outer bands first)
+    sorted_levels = sorted(confidence_levels, reverse=True)
+    
+    # Plot uncertainty bands from outer to inner
+    for i, cl in enumerate(sorted_levels):
+        # Convert confidence level to z-score (number of sigmas)
+        z = stats.norm.ppf((1 + cl) / 2)
+        
+        color = colors[i % len(colors)]
+        label = f"{cl*100:.0f}% confidence"
+        
+        lower = np.maximum(flux - z * flux_unc, 1e-30)
+        upper = flux + z * flux_unc
+        
+        ax.fill_between(
+            energies, lower, upper,
+            color=color,
+            alpha=0.6,
+            label=label,
+            edgecolor="none"
+        )
+    
+    # Plot central estimate
+    ax.plot(
+        energies, flux,
+        color="#d62728",  # Red
+        linewidth=2,
+        label=f"Best estimate ({result.method})"
+    )
+    
+    # Formatting
+    if log_x:
+        ax.set_xscale("log")
+    if log_y:
+        ax.set_yscale("log")
+    
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.legend(loc="best")
+    ax.grid(True, alpha=0.3, which="both")
+    
+    # Add statistics annotation
+    stats_text = (
+        f"Method: {result.method}\n"
+        f"χ²/dof = {result.chi_squared:.3f}\n"
+        f"Iterations: {result.iterations}"
+    )
+    ax.text(
+        0.98, 0.02, stats_text,
+        transform=ax.transAxes,
+        fontsize=10,
+        verticalalignment="bottom",
+        horizontalalignment="right",
+        bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.8)
+    )
+    
+    plt.tight_layout()
+    
+    if save_path:
+        fig.savefig(save_path, dpi=300, bbox_inches="tight")
+    
+    return fig, ax
+
+
 def plot_spectrum_ratio(
     result: "UnfoldingResult",
     reference_flux: np.ndarray,

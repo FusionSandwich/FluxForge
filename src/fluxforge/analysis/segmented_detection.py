@@ -17,7 +17,7 @@ from scipy.ndimage import gaussian_filter1d
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
-from .peakfit import GaussianPeak, PeakFitResult, fit_single_peak
+from .peakfit import GaussianPeak, PeakFitResult, fit_single_peak, five_point_smooth
 
 
 # ============================================================================
@@ -62,6 +62,7 @@ class SegmentedDetectionConfig:
     sigma_low: float = 3.0
     sigma_mid: float = 2.0
     sigma_high: float = 2.0
+    smooth_method: str = "gaussian"
     
     # Detection parameters for each region
     params_low: RegionParams = field(default_factory=lambda: RegionParams(
@@ -242,10 +243,14 @@ def detect_peaks_segmented(
         region_counts = counts[mask]
         
         # Apply smoothing for peak detection
-        if sigma > 0:
-            smoothed = gaussian_filter1d(region_counts, sigma=sigma)
-        else:
+        if config.smooth_method == "gaussian":
+            smoothed = gaussian_filter1d(region_counts, sigma=sigma) if sigma > 0 else region_counts
+        elif config.smooth_method == "five_point":
+            smoothed = five_point_smooth(region_counts) if len(region_counts) >= 5 else region_counts
+        elif config.smooth_method == "none":
             smoothed = region_counts
+        else:
+            raise ValueError(f"Unknown smoothing method: {config.smooth_method}")
         
         # Find peaks
         peak_local_idx, _ = find_peaks(smoothed, **params.to_dict())

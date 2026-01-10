@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-01-10T14:10:25.507789",
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "pass_rate": "100.0%"
+  },
+  "results": [
+    {
+      "goal_id": "GOAL-1",
+      "description": "Produce isotope activities with uncertainty from HPGe data",
+      "status": "PASS",
+      "details": "Computed 1 activities with uncertainties",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-2",
+      "description": "Convert activities to EOI reaction rates with irradiation history",
+      "status": "PASS",
+      "details": "Computed 1 reaction rates with multi-segment history",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-3",
+      "description": "Build response matrix from dosimetry cross sections",
+      "status": "PASS",
+      "details": "Built 1\u00d73 response matrix",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-4a",
+      "description": "GLS/STAYSL-like covariance-based adjustment",
+      "status": "PASS",
+      "details": "\u03c7\u00b2 = 1.2405, flux = ['1.991', '1.500']",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-4b",
+      "description": "GRAVEL iterative unfolding",
+      "status": "PASS",
+      "details": "Converged in 10 iterations, max rel. error = 0.79%",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-4c",
+      "description": "MLEM iterative unfolding",
+      "status": "PASS",
+      "details": "Converged: True, iterations: 9",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-5",
+      "description": "Posterior spectra with covariance and \u03c7\u00b2 diagnostics",
+      "status": "PASS",
+      "details": "\u03c7\u00b2/dof = 0.248, covariance 3\u00d73",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-6",
+      "description": "Artifacts include provenance (units, definitions, hashes)",
+      "status": "PASS",
+      "details": "Artifact has 3 unit definitions",
+      "error": null
+    },
+    {
+      "goal_id": "GOAL-7",
+      "description": "End-to-end workflow with Fe-Cd-RAFM-1 experimental data",
+      "status": "PASS",
+      "details": "Unfolded 3-group spectrum, \u03c7\u00b2 = 18.4013",
+      "error": null
+    },
+    {
+      "goal_id": "CAP-A1",
+      "description": "Spectrum I/O (SPE/CHN/CNF readers)",
+      "status": "PASS",
+      "details": "SPE reader available",
+      "error": null
+    },
+    {
+      "goal_id": "CAP-B",
+      "description": "Peak detection and fitting",
+      "status": "PASS",
+      "details": "Peak fitting classes available",
+      "error": null
+    },
+    {
+      "goal_id": "CAP-E1",
+      "description": "IRDFF cross-section database",
+      "status": "PASS",
+      "details": "36 reactions available",
+      "error": null
+    }
+  ]
+}

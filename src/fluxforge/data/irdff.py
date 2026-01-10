@@ -30,6 +30,12 @@ from urllib.error import URLError, HTTPError
 
 import numpy as np
 
+# NumPy 2.0 renamed trapz to trapezoid - provide compatibility
+try:
+    _trapezoid = np.trapezoid
+except AttributeError:
+    _trapezoid = np.trapz
+
 # Try to import CrossSection from local module
 try:
     from fluxforge.data.crosssections import CrossSection
@@ -267,14 +273,14 @@ class IRDFFCrossSection:
                 weight_fine = 1.0 / e_fine
             
             # Weighted average
-            numerator = np.trapz(sigma_fine * weight_fine, e_fine)
-            denominator = np.trapz(weight_fine, e_fine)
+            numerator = _trapezoid(sigma_fine * weight_fine, e_fine)
+            denominator = _trapezoid(weight_fine, e_fine)
             
             if denominator > 0:
                 group_xs[g] = numerator / denominator
                 # Approximate uncertainty (average in group)
                 unc_fine = np.interp(e_fine, self.energies, self.uncertainties)
-                group_unc[g] = np.sqrt(np.trapz((unc_fine * weight_fine)**2, e_fine)) / denominator
+                group_unc[g] = np.sqrt(_trapezoid((unc_fine * weight_fine)**2, e_fine)) / denominator
         
         return group_xs, group_unc
 
@@ -556,6 +562,16 @@ class IRDFFDatabase:
                 "target": "In-115", "product": "In-116m", "mt": 102, "threshold": 0.0,
                 "energies": [1e-5, 0.0253, 0.1, 0.5, 1, 1.457, 10, 100, 1e3, 1e4, 1e5, 1e6],
                 "xs": [1015, 162, 81.5, 36.4, 25.7, 30000, 6.4, 2.0, 0.6, 0.05, 0.01, 0.003],  # 1.457 eV resonance
+            },
+            "Au-197(n,g)Au-198": {
+                "target": "Au-197", "product": "Au-198", "mt": 102, "threshold": 0.0,
+                "energies": [1e-5, 0.0253, 0.1, 0.5, 1, 4.9, 10, 100, 1e3, 1e4, 1e5, 1e6, 5e6, 10e6],
+                "xs": [558, 98.65, 49.5, 22.1, 15.6, 30000, 5.0, 1.5, 0.5, 0.08, 0.02, 0.005, 0.002, 0.001],  # 4.9 eV resonance
+            },
+            "Na-23(n,g)Na-24": {
+                "target": "Na-23", "product": "Na-24", "mt": 102, "threshold": 0.0,
+                "energies": [1e-5, 0.0253, 0.1, 0.5, 1, 10, 100, 1e3, 1e4, 1e5, 1e6, 5e6, 10e6],
+                "xs": [3.0, 0.530, 0.27, 0.12, 0.085, 0.027, 0.008, 0.003, 0.0006, 0.0002, 0.00007, 0.00003, 0.00001],
             },
             
             # Fast threshold reactions (n,p)

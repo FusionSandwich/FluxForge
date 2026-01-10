@@ -1,5 +1,6 @@
 import pytest
 
+from fluxforge.core.schemas import validate_artifact
 from fluxforge.io.artifacts import (
     read_line_activities,
     read_peak_report,
@@ -40,8 +41,10 @@ def test_spectrum_file_roundtrip(tmp_path):
     output = tmp_path / "spectrum.json"
     write_spectrum_file(output, spectrum)
     payload = read_spectrum_file(output)
+    assert validate_artifact(payload) == []
     assert payload["spectrum"]["counts"] == [10.0, 20.0, 30.0]
     assert payload["spectrum"]["live_time"] == 12.0
+    assert payload["provenance"]["definitions"]["counts"] == "raw counts per channel"
     assert payload["provenance"]["units"]["energies"] == "keV"
 
 
@@ -64,7 +67,9 @@ def test_peak_report_roundtrip(tmp_path):
     output = tmp_path / "peaks.json"
     write_peak_report(output, spectrum_id="demo", live_time_s=10.0, peaks=peaks)
     payload = read_peak_report(output)
+    assert validate_artifact(payload) == []
     assert payload["peaks"][0]["energy_keV"] == 511.0
+    assert payload["provenance"]["definitions"]["area"] == "net peak area"
     assert payload["provenance"]["units"]["live_time_s"] == "s"
 
 
@@ -86,7 +91,9 @@ def test_line_activities_roundtrip(tmp_path):
     output = tmp_path / "activities.json"
     write_line_activities(output, spectrum_id="demo", lines=lines)
     payload = read_line_activities(output)
+    assert validate_artifact(payload) == []
     assert payload["lines"][0]["activity_Bq"] == 5.0
+    assert payload["provenance"]["definitions"]["activity_Bq"] == "activity at count time unless corrected"
     assert payload["provenance"]["units"]["activity_Bq"] == "Bq"
 
 
@@ -99,7 +106,9 @@ def test_reaction_rates_roundtrip(tmp_path):
     output = tmp_path / "rates.json"
     write_reaction_rates(output, rates=rates, segments=segments)
     payload = read_reaction_rates(output)
+    assert validate_artifact(payload) == []
     assert payload["rates"][0]["rate"] == 1.5
+    assert payload["provenance"]["definitions"]["rate"] == "reaction rate at EOI per reaction"
     assert payload["provenance"]["units"]["rate"] == "reactions/s"
 
 
@@ -113,7 +122,9 @@ def test_response_bundle_roundtrip(tmp_path):
         boundaries_eV=[0.0, 1.0, 2.0],
     )
     payload = read_response_bundle(output)
+    assert validate_artifact(payload) == []
     assert payload["matrix"][0][0] == 1.0
+    assert payload["provenance"]["definitions"]["matrix"] == "response matrix with rows as reactions and columns as energy groups"
     assert payload["provenance"]["units"]["boundaries_eV"] == "eV"
 
 
@@ -130,7 +141,9 @@ def test_unfold_result_roundtrip(tmp_path):
         method="gls",
     )
     payload = read_unfold_result(output)
+    assert validate_artifact(payload) == []
     assert payload["flux"] == [1.2]
+    assert payload["provenance"]["definitions"]["flux"] == "group-integrated flux per energy bin"
     assert payload["provenance"]["units"]["flux"] == "a.u."
 
 
@@ -145,7 +158,9 @@ def test_validation_bundle_roundtrip(tmp_path):
         residuals=[0.1, -0.1],
     )
     payload = read_validation_bundle(output)
+    assert validate_artifact(payload) == []
     assert payload["metrics"]["mae"] == 0.1
+    assert payload["provenance"]["definitions"]["residuals"] == "predicted_flux - truth_flux"
     assert payload["provenance"]["units"]["residuals"] == "a.u."
 
 
@@ -154,5 +169,7 @@ def test_report_bundle_roundtrip(tmp_path):
     output = tmp_path / "report.json"
     write_report_bundle(output, summary={"peak_count": 3}, inputs={"peaks_file": "peaks.json"})
     payload = read_report_bundle(output)
+    assert validate_artifact(payload) == []
     assert payload["summary"]["peak_count"] == 3
+    assert payload["provenance"]["definitions"]["summary"] == "aggregate summary across artifacts"
     assert payload["provenance"]["units"]["summary"] == "mixed"

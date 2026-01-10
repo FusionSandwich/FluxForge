@@ -5,6 +5,7 @@ Modules:
 - io: Spectrum file I/O (SPE, Genie-2000)
 - data: Efficiency models, cross sections
 - analysis: Peak fitting, detection, isotope matching
+- corrections: Physics corrections (coincidence, self-absorption)
 - physics: Activation calculations
 - solvers: Spectrum unfolding (GLS, GRAVEL, MLEM)
 - workflows: Complete analysis pipelines
@@ -29,6 +30,7 @@ from fluxforge.analysis import (
     match_peaks_three_tier,
     build_gamma_database,
 )
+from fluxforge.corrections import CoincidenceCorrector
 
 __all__ += [
     # I/O
@@ -44,4 +46,25 @@ __all__ += [
     'detect_peaks_segmented',
     'match_peaks_three_tier',
     'build_gamma_database',
+    # Corrections
+    'CoincidenceCorrector',
 ]
+
+# TRIGA-specific modules
+try:
+    from fluxforge.triga import (
+        CdRatioMeasurement,
+        FluxParameters,
+        CdRatioAnalyzer,
+        TRIGAk0Workflow,
+        TRIGAIrradiationParams,
+    )
+    __all__ += [
+        'CdRatioMeasurement',
+        'FluxParameters',
+        'CdRatioAnalyzer',
+        'TRIGAk0Workflow',
+        'TRIGAIrradiationParams',
+    ]
+except ImportError:
+    pass  # TRIGA module not available

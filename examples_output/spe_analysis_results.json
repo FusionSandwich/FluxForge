@@ -1,0 +1,33 @@
+{
+  "file": "/filespace/s/smandych/CAE/projects/ALARA/testing/gamma_spec_analysis/test_data/Co_60_raised_1.Spe",
+  "calibration": {
+    "energy": [
+      0.323476,
+      0.365473
+    ],
+    "shape": [
+      3.0,
+      1.60415,
+      0.0020411,
+      -3.76697e-07
+    ]
+  },
+  "peaks": [
+    {
+      "name": "1173 keV",
+      "centroid": 3209.6812878097853,
+      "fwhm": 5.203809267644884,
+      "area_raw": 187930.97466689188,
+      "area_corrected": 192788.06712522448,
+      "correction_factor": 1.025845087362218
+    },
+    {
+      "name": "1332 keV",
+      "centroid": 3645.4342796751794,
+      "fwhm": 5.504820336159382,
+      "area_raw": 172034.97036403973,
+      "area_corrected": 176971.66295072093,
+      "correction_factor": 1.028695866754502
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+================================================================================
+FLUXFORGE CAPABILITY AUDIT REPORT
+================================================================================
+
+SUMMARY: 45 capabilities audited
+  ✅ IMPLEMENTED: 16 (35.6%)
+  🔶 PARTIAL: 3 (6.7%)
+  ❌ MISSING: 26 (57.8%)
+  📋 PLANNED: 0 (0.0%)
+
+────────────────────────────────────────────────────────────────────────────────
+Stage A: HPGe Spectrum Ingestion
+────────────────────────────────────────────────────────────────────────────────
+
+  [A1.1] ✅ Read SPE gamma-spectroscopy format
+      Module: fluxforge.io.spe
+      Notes: SPE reader fully implemented
+
+  [A1.2] 🔶 Read CHN format
+      Module: fluxforge.io.hpge
+      Notes: Generic HPGe reader exists, CHN format partial
+      Reference: testing/irrad_spectroscopy
+
+  [A1.3] ❌ Read CNF format
+      Notes: CNF (Canberra) format not implemented
+      Reference: testing/hdtv for CNF support
+
+  [A1.4] ❌ Read N42/IEC format
+      Notes: N42 XML format not implemented
+
+  [A1.5] ✅ Background estimation (SNIP)
+      Module: fluxforge.analysis.peakfit
+
+  [A1.6] ✅ Dead-time validation
+      Module: fluxforge.io.spe
+      Notes: GammaSpectrum.dead_time_fraction property
+
+────────────────────────────────────────────────────────────────────────────────
+Stage B: Peak Detection & Fitting
+────────────────────────────────────────────────────────────────────────────────
+
+  [B1.1] 🔶 Automated peak finding with tunable sensitivity
+      Module: fluxforge.analysis.peakfit
+      Notes: Basic peak finding exists, needs sensitivity tuning
+      Reference: testing/peakingduck for advanced peak finding
+
+  [B1.2] ✅ Gaussian peak fitting
+      Module: fluxforge.analysis.peakfit
+
+  [B1.3] ❌ Peak tailing terms (Hypermet)
+      Notes: Only Gaussian implemented, need Hypermet/EMG
+      Reference: testing/hdtv has advanced peak shapes
+
+  [B1.4] 🔶 Multiplet handling
+      Notes: Basic multiplet awareness, needs constrained fitting
+      Reference: testing/hdtv
+
+  [B1.5] ✅ Peak fit covariance output
+      Module: fluxforge.analysis.peakfit
+
+────────────────────────────────────────────────────────────────────────────────
+Stage C: Efficiency & Activity
+────────────────────────────────────────────────────────────────────────────────
+
+  [C1.1] ✅ Efficiency curve fitting
+      Module: fluxforge.data.efficiency
+
+  [C1.2] ❌ Activity calculation from peak area
+      Module: fluxforge.physics.activation
+
+  [C1.3] ❌ Weighted activity from multiple gamma lines
+      Module: fluxforge.physics.activation
+
+  [C1.4] ❌ Coincidence summing corrections
+      Notes: Not yet implemented
+      Reference: testing/actigamma
+
+────────────────────────────────────────────────────────────────────────────────
+Stage D: Reaction Rates
+────────────────────────────────────────────────────────────────────────────────
+
+  [D1.1] ❌ Irradiation history model (multi-segment)
+      Module: fluxforge.physics.activation
+
+  [D1.2] ❌ Decay during irradiation/cooling/counting
+      Module: fluxforge.physics.activation
+
+  [D1.3] ❌ EOI reaction rate calculation
+      Module: fluxforge.physics.activation
+
+────────────────────────────────────────────────────────────────────────────────
+Stage E: Response Matrix
+────────────────────────────────────────────────────────────────────────────────
+
+  [E1.1] ❌ Energy group structure definition
+      Module: fluxforge.core.response
+
+  [E1.2] ❌ Response matrix construction
+      Module: fluxforge.core.response
+
+  [E1.3] ✅ IRDFF cross sections
+      Module: fluxforge.data.irdff
+
+  [E1.4] ❌ Self-shielding corrections
+      Notes: Self-shielding not implemented
+      Reference: STAYSL documentation
+
+  [E1.5] ❌ Cadmium cover corrections
+      Notes: Cd cover corrections not implemented
+
+────────────────────────────────────────────────────────────────────────────────
+Stage F: Unfolding Solvers
+────────────────────────────────────────────────────────────────────────────────
+
+  [F1.1] ❌ GLS spectrum adjustment (STAYSL-like)
+      Module: fluxforge.solvers.gls
+
+  [F1.2] ❌ GRAVEL iterative unfolding
+      Module: fluxforge.solvers.iterative
+      Reference: testing/Neutron-Unfolding/gravel.py
+
+  [F1.3] ❌ MLEM iterative unfolding
+      Module: fluxforge.solvers.iterative
+      Reference: testing/Neutron-Unfolding/mlem.py
+
+  [F1.4] ❌ Bayesian MCMC unfolding
+      Notes: MCMC solver not implemented
+      Reference: testing/Neutron-Spectrometry
+
+  [F1.5] ❌ Gradient-descent solver (SAND-II style)
+      Notes: Gradient solver not implemented
+      Reference: testing/SpecKit/src/neutron_spectrum_solver.py
+
+  [F1.6] ✅ Positivity constraints
+      Module: fluxforge.solvers.gls
+      Notes: GLS enforces non-negativity
+
+  [F1.7] ✅ Chi-square diagnostics
+      Module: fluxforge.solvers.gls
+      Notes: GLSSolution.chi2 available
+
+────────────────────────────────────────────────────────────────────────────────
+Stage G: Plotting & Reporting
+────────────────────────────────────────────────────────────────────────────────
+
+  [G1.1] ❌ Spectrum with uncertainty bands
+      Module: fluxforge.plots.unfolding
+
+  [G1.2] ✅ Prior vs posterior overlay
+      Module: fluxforge.plots.unfolding
+
+  [G1.3] ✅ Residual/pull plots
+      Notes: In examples/generate_plots.py
+
+  [G1.4] ✅ Covariance/correlation heatmaps
+      Notes: In examples/generate_plots.py
+
+  [G1.5] ✅ Parity plot (predicted vs measured)
+      Notes: In examples/generate_plots.py
+
+────────────────────────────────────────────────────────────────────────────────
+Stage H: Model Comparison
+────────────────────────────────────────────────────────────────────────────────
+
+  [H1.1] ❌ OpenMC statepoint ingestion
+      Notes: OpenMC integration not implemented
+
+  [H1.2] ❌ MCNP tally ingestion
+      Notes: MCNP integration not implemented
+
+  [H1.3] ❌ ALARA input generation
+      Notes: ALARA workflow not implemented
+
+  [H1.4] ❌ ALARA output parsing
+      Notes: ALARA workflow not implemented
+
+────────────────────────────────────────────────────────────────────────────────
+Stage I: TRIGA / k0-NAA
+────────────────────────────────────────────────────────────────────────────────
+
+  [I1.1] ❌ Cd-ratio calculations
+      Notes: Cd-ratio not implemented
+
+  [I1.2] ❌ f and alpha parameter fitting
+      Notes: Spectral parameter fitting not implemented
+
+  [I1.3] ❌ k0-standardization module
+      Notes: k0-NAA not implemented
+
+────────────────────────────────────────────────────────────────────────────────
+Stage J: Artifacts & Provenance
+────────────────────────────────────────────────────────────────────────────────
+
+  [J1.1] ✅ JSON artifact output
+      Module: fluxforge.io.artifacts
+
+  [J1.2] ✅ Provenance metadata
+      Module: fluxforge.core.provenance
+
+  [J1.3] ✅ Unit metadata validation
+      Module: fluxforge.core.schemas
+
+================================================================================
+END OF AUDIT REPORT
+================================================================================

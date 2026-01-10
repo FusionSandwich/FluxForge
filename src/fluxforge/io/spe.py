@@ -353,14 +353,18 @@ def _parse_dollar_spe(content: str, filename: str) -> GammaSpectrum:
                 start_channel = int(range_parts[0])
                 end_channel = int(range_parts[1])
             
-            # Remaining lines are counts
+            # Remaining lines are counts - handle both single value per line
+            # and multiple values per line (space-separated)
             for line in data_lines[1:]:
                 line = line.strip()
                 if line:
-                    try:
-                        counts.append(float(line))
-                    except ValueError:
-                        continue
+                    # Split by whitespace to handle multiple values per line
+                    values = line.split()
+                    for val in values:
+                        try:
+                            counts.append(float(val))
+                        except ValueError:
+                            continue
     
     counts = np.array(counts)
     channels = np.arange(start_channel, start_channel + len(counts))
@@ -370,7 +374,13 @@ def _parse_dollar_spe(content: str, filename: str) -> GammaSpectrum:
     if '$ENER_FIT' in sections and sections['$ENER_FIT']:
         coeffs = []
         for line in sections['$ENER_FIT']:
-            coeffs.extend([float(x) for x in line.split() if x])
+            for x in line.split():
+                if not x: continue
+                try:
+                    coeffs.append(float(x))
+                except ValueError:
+                    # Skip non-numeric tokens like 'keV'
+                    continue
         calibration['energy'] = coeffs
     
     if '$MCA_CAL' in sections and sections['$MCA_CAL']:
@@ -379,14 +389,24 @@ def _parse_dollar_spe(content: str, filename: str) -> GammaSpectrum:
         if len(mca_lines) > 1:
             coeffs = []
             for line in mca_lines[1:]:
-                coeffs.extend([float(x) for x in line.split() if x])
+                for x in line.split():
+                    if not x: continue
+                    try:
+                        coeffs.append(float(x))
+                    except ValueError:
+                        continue
             if 'energy' not in calibration:
                 calibration['energy'] = coeffs
     
     if '$SHAPE_CAL' in sections and sections['$SHAPE_CAL']:
         coeffs = []
         for line in sections['$SHAPE_CAL']:
-            coeffs.extend([float(x) for x in line.split() if x])
+            for x in line.split():
+                if not x: continue
+                try:
+                    coeffs.append(float(x))
+                except ValueError:
+                    continue
         calibration['shape'] = coeffs
     
     # Collect metadata

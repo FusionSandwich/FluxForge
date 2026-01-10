@@ -1,0 +1,402 @@
+FLUXFORGE — MASTER DEVELOPMENT PLAN (CONSOLIDATED)
+HPGe-driven flux-wire / foil activation analysis • Neutron spectrum unfolding • Model validation
+OpenMC 0.15.3 (CE transport ± depletion) vs MCNP6.3 + ALARA (group activation)
+
+Prepared: 2026-01-02
+Scope: End-to-end, reproducible pipeline from raw HPGe spectra to (a) unfolded/group spectra with covariance
+and (b) rigorous model-to-experiment comparisons for TRIGA irradiations (flux wires/foils + larger samples).
+
+------------------------------------------------------------------------------
+0. HOW TO USE THIS DOCUMENT
+------------------------------------------------------------------------------
+- Treat this as the single source of truth for the FluxForge backlog, architecture, and QA criteria.
+- Each subsection is written to map cleanly into GitHub Epics/Issues.
+- The pipeline must be artifact-driven:
+    • every stage emits machine-readable outputs (JSON/YAML + CSV + NPZ/HDF5),
+    • plus a short human summary,
+    • plus provenance (hashes, versions, settings).
+- No GUI is required for initial development. Design the core so a GUI can be added later.
+
+------------------------------------------------------------------------------
+1. PURPOSE AND SUCCESS CRITERIA
+------------------------------------------------------------------------------
+FluxForge shall implement an end-to-end workflow to infer neutron spectra and integral spectral parameters from
+activation monitors measured by HPGe gamma spectroscopy, and use those results to validate transport +
+activation workflows (OpenMC vs MCNP+ALARA) against experiment.
+
+1.1 Definition of done (project-level)
+1) From raw HPGe spectra (or peak reports), produce isotope activities with full uncertainty propagation and QA/QC.
+2) Convert activities to end-of-irradiation (EOI) reaction rates using explicit irradiation history (multi-segment).
+3) Build a response matrix R[i,g] using dosimetry cross sections, sample compositions, and corrections.
+4) Unfold/adjust neutron spectra using multiple solver families:
+     - GLS / STAYSL-like (covariance-based),
+     - iterative (MLEM / GRAVEL) cross-checks,
+     - Bayesian (optional high-value),
+     - SpecKit/SAND-II-style regularized gradient descent (deterministic).
+5) Produce posterior spectra with covariance/correlation plus paper-style diagnostics (χ², pulls, influence).
+6) Ingest OpenMC and MCNP(+ALARA) outputs, collapse to common group structures, and compare predicted rates/
+   activities vs experiment with clear metrics (C/E, parity, residuals).
+7) Output a reproducible “run bundle” per analysis run:
+     - config + CLI invocation
+     - input hashes
+     - nuclear-data versions + checksums
+     - all intermediate artifacts
+     - final report (HTML/PDF) and machine summary (JSON) suitable for CI/regression tests
+
+------------------------------------------------------------------------------
+2. EXTERNAL REFERENCE REPOSITORIES (FEATURE INSPIRATIONS TO REPRODUCE INTERNALLY)
+------------------------------------------------------------------------------
+Policy: FluxForge implements capabilities internally (no copying UIs; avoid calling external repos at runtime).
+These repos are used strictly as references for algorithms, data-model patterns, and QA/plot conventions.
+
+2.1 HPGe spectrum I/O, peak finding, and fitting
+- SpecKit: https://github.com/lifangchen2021/SpecKit
+    • Modular activation-unfolding workflow, regularized adjustment, uncertainty bands, “paper-style” outputs.
+- HDTV: https://github.com/janmayer/hdtv
+    • Peak-shape breadth + robust fitting habits; ROOT histogram ingestion patterns.
+- gamma_spec_analysis: https://github.com/py1sl/gamma_spec_analysis/tree/main
+    • Lightweight activation-style starting point for spectrum I/O + basic peak workflow.
+- peakingduck: https://github.com/fispact/peakingduck
+    • Modern peak-candidate detection and background handling (SNIP example; windowed methods; multiplet logic).
+- irrad_spectroscopy: https://github.com/SiLab-Bonn/irrad_spectroscopy
+    • Isotope/gamma-line databases and identification routines; useful patterns for activation spectroscopy.
+
+2.2 Activation → forward gamma synthesis (closure tests)
+- actigamma: https://github.com/fispact/actigamma
+    • Forward modeling of gamma lines/spectra from inventories; useful for end-to-end closure tests.
+
+2.3 Spectrum unfolding / adjustment solver references
+- Neutron-Unfolding: https://github.com/tylerdolezal/Neutron-Unfolding
+    • GRAVEL/MLEM variants, diagnostics, solver patterns.
+- Neutron-Spectrometry: https://github.com/kildealab/Neutron-Spectrometry
+    • MLEM stopping criteria patterns, uncertainty sampling visualization.
+
+2.4 Non-GitHub reference (methodology parity target)
+- STAYSL / STAY’SL methodology (PNNL / dosimetry spectrum adjustment): replicate the methodology and key
+  diagnostics (GLS adjustment, self-shielding/cover corrections, covariance handling) where applicable.
+
+------------------------------------------------------------------------------
+3. END-TO-END ARCHITECTURE (PIPELINE + CANONICAL ARTIFACTS)
+------------------------------------------------------------------------------
+3.1 Pipeline stages (A → H)
+Stage A — Spectrum ingest
+  Inputs: raw spectra (CNF/CHN/SPE/N42/CSV/ROOT) + metadata
+  Outputs: SpectrumFile (counts vs channel/energy + validated metadata)
+
+Stage B — Peak finding & fitting
+  Inputs: SpectrumFile + calibration priors
+  Outputs: PeakReport (peaks, ROIs, fit parameters, full covariance, QC flags)
+
+Stage C — Efficiency / corrections → line activities
+  Inputs: PeakReport + detector model (efficiency, resolution) + gamma libraries
+  Outputs: LineActivities (activity per gamma line at count time + uncertainty components)
+
+Stage D — Time-history engine → EOI activities + reaction rates
+  Inputs: LineActivities + irradiation history + cooling/counting windows
+  Outputs: ReactionRates (EOI activity and inferred reaction rate per monitor reaction)
+
+Stage E — Response construction
+  Inputs: monitor definitions + dosimetry cross sections + group structure + corrections
+  Outputs: ResponseBundle (R matrix, σ_eff, corrections, covariances, diagnostics)
+
+Stage F — Unfolding / adjustment
+  Inputs: ReactionRates + ResponseBundle + PriorSpectrum (optional) + covariances
+  Outputs: UnfoldResult (posterior flux, covariance/correlation, diagnostics, predicted rates)
+
+Stage G — Model comparison / validation
+  Inputs: OpenMC statepoints, MCNP tallies, ALARA inputs/outputs + UnfoldResult
+  Outputs: ValidationBundle (transport-only, activation-only, end-to-end closure tests)
+
+Stage H — Reporting and archival
+  Inputs: all artifacts above
+  Outputs: ReportBundle (plots, tables, configs, hashes, versions, machine summary)
+
+3.2 Core data model (recommended objects)
+- SpectrumFile: counts vs channel (and/or energy), live/real time, dead time, start time, detector id, sample id.
+- Peak, ROI, PeakReport: peak centroids, net areas, fit model, covariance, multiplet memberships, QC flags.
+- DetectorModel: energy calibration, resolution FWHM(E), efficiency curve ε(E) with parameter covariance.
+- DecayData: half-lives, gamma yields, branching, parent-daughter chains (versioned).
+- Sample: composition, mass/areal density, geometry, covers (Cd), container/shielding parameters.
+- IrradiationHistory: time segments (power/flux scaling), interruptions, cooling and counting windows.
+- MonitorReaction: target isotope + MT, product nuclide(s), gamma lines used, interference map.
+- GroupStructure: energy boundaries, lethargy widths, labels, plotting helpers.
+- ResponseMatrix / ResponseBundle: R[i,g], σ_g,eff, correction factors and their uncertainties.
+- PriorSpectrum: OpenMC/MCNP-derived group spectrum (plus covariance if available/assumed).
+- AdjustmentResult / UnfoldResult: posterior spectrum, covariance/correlation, residuals, χ², leverage/influence.
+- ValidationResult / ValidationBundle: C/E tables, closure metrics, cross-workflow consistency checks.
+
+3.3 Canonical I/O formats (strict)
+- JSON or YAML: metadata (units, conventions, library versions, processing options).
+- CSV: tabular artifacts (peaks, line activities, reaction rates, monitor tables).
+- NPZ or HDF5: arrays (spectra vectors, response matrices, covariance/correlation matrices).
+- Every artifact must embed:
+    • units and definitions (group-integrated vs group-averaged; per energy vs per lethargy),
+    • normalization basis (per source particle / per fission / per watt, etc.),
+    • provenance (hashes + version strings).
+- Round-trip tests (import → export) must preserve values within numerical tolerance.
+
+------------------------------------------------------------------------------
+4. CAPABILITY BACKLOG (IMPLEMENTATION EPICS)
+------------------------------------------------------------------------------
+Epic A — Spectrum ingestion, metadata validation, and QA/QC
+A1. File format support
+- Read: SPE/CHN/CNF, N42, common CSV exports; optional ROOT histograms via pure-Python reader.
+- Parse and validate metadata: live/real time, dead-time fraction, start time, detector id, calibration provenance.
+- Background spectrum library support (blank runs) + subtraction rules.
+
+A2. Automated QC flags
+- Gain shift / energy drift checks vs reference lines.
+- Saturation/pileup indicators; missing/invalid metadata detection.
+- Configurable acceptance rules (hard fail vs warn vs auto-exclude).
+
+A3. Preprocessing tools
+- Rebinning, smoothing (controlled), dead-time corrections, energy calibration application.
+- Background estimation options: SNIP variants, AsLS/airPLS, morphological top-hat, wavelet baselines.
+
+Epic B — Peak candidate detection, ROI segmentation, multiplets
+B1. Candidate peak detection (robust on low-count spectra)
+- Algorithms: derivative/DoG filters, CWT maxima, significance tests vs local noise; tunable false-positive control.
+- Windowed local methods (to capture peaks across dynamic ranges).
+- Candidate scoring and ranking (deterministic).
+
+B2. ROI and multiplet handling
+- Group candidates using resolution model FWHM(E); auto-build ROIs.
+- Global multiplet fitting: shared width/shape parameters; shared local background.
+
+B3. “Peak report” artifact for regression tests
+- Machine-readable peak report: ROIs, fits, covariance, QC flags; used as downstream input and for CI tests.
+
+Epic C — Peak fitting models, efficiency calibration, activity inference
+C1. Peak-shape library + fitting backends
+- Peak shapes: Gaussian, Voigt, EMG, Hypermet-like (tail + step), constrained multi-Gaussian for partial resolution.
+- Backends: Poisson likelihood (preferred at low counts), weighted least squares.
+- Return: fit covariance, residuals, goodness-of-fit; automatic instability flags (ill-conditioned covariance, etc.).
+
+C2. Detector calibration models
+- Energy calibration model with uncertainty (poly or spline, with covariance).
+- Resolution model FWHM(E) used as a constraint during fits.
+- Full-energy peak efficiency curve ε(E) with covariance; multi-source fitting + outlier logic.
+
+C3. Line activity computation
+For each gamma line:
+- Correct net counts for dead time and counting interval.
+- Compute activity at a reference time using ε(E), I_γ, and decay corrections.
+- Optional corrections (configurable): coincidence summing, self-attenuation of gammas, geometry corrections.
+
+C4. Combine multiple lines per isotope
+- Weighted combination with consistency checks (pulls/outliers); report per-line contributions.
+
+Epic D — Irradiation history engine + reaction rate inference
+D1. Time-history model (piecewise-constant, multi-segment)
+- Supports arbitrary time stamps, interruptions/pulses, repeated counts per sample.
+- Exact decay during irradiation + cooling + counting (avoid one-factor shortcuts unless explicitly enabled).
+
+D2. Reaction-rate inference
+- Compute EOI activity and infer reaction rate per monitor reaction.
+- Support simple parent/daughter build-in/out where needed.
+- Optional target depletion/burnup logic (off by default; enable when warranted).
+
+D3. Uncertainty propagation
+- Propagate: peak fit + counting stats + efficiency covariance + nuclear data + time-history inputs.
+- Preserve correlation structure where available (e.g., shared efficiency systematic).
+
+Epic E — Nuclear data management (decay, gamma yields, dosimetry XS)
+E1. Data packages and provenance
+- Bundle decay + gamma libraries (ENSDF-derived or equivalent) with explicit versioning and checksums.
+- Bundle/produce dosimetry cross sections for monitor reactions (IRDFF-II style), with covariance support:
+    • minimum: diagonal uncertainties
+    • target: full covariance matrices (where available)
+
+E2. Processing utilities
+- Tools to collapse continuous-energy cross sections to chosen group structures.
+- Utilities to manage temperature/processing assumptions; embed provenance in outputs.
+
+Epic F — Group structures, self-shielding, covers, and response matrix build
+F1. Group structures
+- Built-ins: 10g/31g/50g/100g/175g plus user-defined.
+- Conversions between structures must conserve integrals; plotting must be explicit about normalization.
+
+F2. Self-shielding corrections (monitor + sample dependent)
+- Geometry-aware approximations (slab/cylinder minimum); parameterized by thickness, density, composition.
+- Uncertainty models for correction factors (bounds, sampling).
+
+F3. Cadmium cover corrections
+- Cd transmission/cutoff model; thickness/density/composition; uncertainty handling.
+- Explicit reporting of correction factors and their impact on inferred spectrum.
+
+F4. Response matrix construction
+- Construct R[i,g] = N_i * σ_i,g,eff * (correction factors)
+- Support multiple products/branches and multiple gamma lines; interference maps.
+- Diagnostics: matrix visualization, condition number/rank checks, stabilization options for ill-conditioning.
+- Response uncertainty handling (nuisance propagation or augmented covariance).
+
+Epic G — Unfolding / spectrum adjustment solvers (multiple families)
+G1. GLS / STAYSL-like adjustment (core “gold standard”)
+Inputs: y (measured reaction rates), V_y, R, φ0 (prior), V_φ0, (optional) response uncertainty model
+Capabilities:
+- Full covariance treatment (measurement + prior; optional response as nuisance).
+- Positivity enforcement (log-parameterization or constrained optimization).
+- Smoothness regularization (optional) with documented priors/penalties.
+Outputs:
+- posterior flux φ, covariance V_φ, correlation matrix
+- diagnostics: χ², reduced χ², per-monitor pulls, influence/leverage, predicted vs measured rates
+
+G2. Iterative unfolding cross-checks
+- MLEM and GRAVEL implementations with consistent diagnostics and plotting.
+- Robust stopping criteria:
+    • fixed iteration caps
+    • relative change thresholds
+    • objective-based stopping (MLEM-STOP-like logic to avoid noise blow-up)
+- Uncertainty estimation via Monte Carlo sampling and/or ensemble runs.
+
+G3. Bayesian unfolding (optional, high value)
+- Positivity + smoothness priors; MCMC (or equivalent) posterior sampling.
+- Convergence diagnostics (R-hat, ESS) + posterior predictive checks.
+- Outputs: posterior summaries (mean/median), credible intervals, covariance/correlation estimates.
+
+G4. SpecKit/SAND-II-style deterministic regularized solver
+- Gradient-based minimization of χ²(y − Rφ) + log-smoothness penalties.
+- Line-search/backtracking and explicit stopping criteria.
+- Multi-start ensembles (flat, Maxwellian+1/E, OpenMC prior, MCNP prior) to detect local minima and provide
+  practical uncertainty proxies.
+
+Epic H — TRIGA-specific spectral parameter modules (high value)
+H1. Cd-ratio + (f, α) characterization
+- Compute Cd-ratios using bare vs Cd-covered monitors.
+- Infer thermal-to-epithermal ratio f and epithermal shape factor α with uncertainties.
+- Provide position-by-position plots and tables for reactor characterization.
+
+H2. k₀-standardization module (k₀-NAA style)
+- Maintain internal k₀ constants database for common monitors:
+    • k₀ factors, resonance integrals, Q₀(α), Westcott g(T), recommended lines
+- Implement canonical k₀ workflow: net peak → activity → saturation activity → reaction rate.
+- Cross-check hooks:
+    • compare k₀-derived parameters vs unfolded spectrum integrals
+    • compare vs OpenMC/MCNP group-collapsed thermal/epithermal components
+
+Epic I — OpenMC, MCNP, and ALARA integration + model validation
+I1. OpenMC (0.15.3) ingestion
+- Read statepoint tallies (mesh/cell), uncertainties, normalization.
+- Collapse continuous-energy flux to selected group structures.
+- Compute predicted reaction rates/activities using the same monitor definitions and irradiation history.
+- Export standardized PriorSpectrum and model-predicted ReactionRates artifacts.
+
+I2. MCNP6.3 ingestion
+- Parse MCTAL/MESHTAL/OUTP flux tallies with energy bins; map to exact group boundaries.
+- Support direct ingestion of group flux files intended for ALARA, when available.
+
+I3. ALARA interface
+- Generate ALARA decks programmatically: materials, irradiation schedule, flux file refs, decay times.
+- Parse ALARA outputs (activities, inventories, uncertainties) and map to monitor products/lines.
+
+I4. Cross-workflow consistency checks (must-have)
+- Transport-only: OpenMC vs MCNP group flux at the wire/sample volumes before activation.
+- Activation-only: given identical group flux, FluxForge activation math must match ALARA within tolerance.
+- End-to-end closure: from model-predicted inventories, forward-calc expected gamma lines/spectrum and compare
+  to measured HPGe results (line presence, intensities, residuals).
+
+Epic J — Plotting, reporting, and reproducibility
+J1. Required “paper-style” plot set
+- Prior vs posterior spectrum overlay; uncertainty band (1σ and/or 95% CI); linear + log y-axis.
+- Residuals/pulls per monitor with χ² contributions.
+- Predicted vs measured reaction rates (parity) with uncertainty bars.
+- Posterior covariance + correlation heatmaps.
+- Convergence traces (iterative / gradient) and stopping-criterion diagnostics.
+- Cd-ratio + thermal/epithermal decomposition plots when applicable.
+
+J2. Report bundle per run
+- Config + CLI invocation; input hashes (spectra, peak reports, model outputs).
+- Nuclear data versions, processing parameters, checksums.
+- All intermediate artifacts and all plots; export HTML + PDF (DOCX optional for thesis packaging).
+- Machine-readable summary JSON for CI/regression gating.
+
+Epic K — Validation, benchmarks, and regression tests
+K1. Synthetic unit/integration benchmarks
+- Generate synthetic rates from a known spectrum; add noise; unfold; verify recovery (mean + uncertainty bands).
+- Stress tests: ill-conditioned response matrices, missing monitors, wrong priors, sparse counts.
+
+K2. Experimental benchmark locking (thesis)
+- Freeze at least one full irradiation dataset as a regression target (inputs + expected outputs).
+- Standard metrics: per-monitor C/E, pulls, reduced χ², spectrum-integral comparisons across energy regions.
+
+Epic L — Repository structure and developer workflow
+L1. Proposed package layout
+fluxforge/
+  io/           (spectrum + model readers/writers; canonical formats)
+  hpge/         (peak finding, fitting, calibration, efficiency)
+  activation/   (decay, irradiation history, reaction rates)
+  nuclear_data/ (libraries, covariance handling, processing tools)
+  response/     (group structures, self-shielding, Cd covers, response matrix)
+  unfold/       (GLS, MLEM, GRAVEL, Bayesian, gradient solver)
+  validate/     (OpenMC/MCNP/ALARA comparisons; closure tests)
+  report/       (plots + report bundle generation)
+  cli/          (command-line entry points)
+  examples/     (worked examples + tutorial configs)
+  tests/        (unit + integration + regression)
+
+L2. CLI entry points (illustrative)
+- fluxforge ingest ...
+- fluxforge peaks ...
+- fluxforge activity ...
+- fluxforge rates ...
+- fluxforge response ...
+- fluxforge unfold ...
+- fluxforge compare ...
+- fluxforge report ...
+
+L3. Engineering requirements
+- Deterministic outputs (seeded RNG for MC sampling).
+- Comprehensive logging; clear error messages; strict unit checking.
+- CI that runs at least:
+    • synthetic unfold benchmark,
+    • one locked experimental regression test (if feasible on CI hardware),
+    • round-trip I/O tests for canonical artifacts.
+
+------------------------------------------------------------------------------
+5. CRITICAL PITFALLS AND REQUIRED GUARDRAILS
+------------------------------------------------------------------------------
+These are “must-prevent” failure modes; implement checks and explicit reporting.
+
+- Timebase errors:
+    • live time vs real time confusion
+    • dead-time correction applied twice or not at all
+- Normalization drift:
+    • per-source-particle vs per-fission vs per-watt mismatch (OpenMC vs MCNP)
+- Unit/definition drift:
+    • group-integrated vs group-averaged flux
+    • per energy vs per lethargy conventions
+- Library inconsistency:
+    • mixing XS libraries/temperatures between transport and activation
+- Ignoring Cd covers / self-shielding:
+    • systematic bias for Cd-covered monitors and resonance-sensitive reactions
+- Peak interference + summing:
+    • unresolved multiplets and coincidence summing bias beyond stated uncertainties
+- Solver over-regularization:
+    • smooth spectra that fail residual diagnostics; require residual/pull checks in reports
+- Ill-conditioned response matrices:
+    • require conditioning checks, warnings, and documented stabilization options
+
+------------------------------------------------------------------------------
+6. IMPLEMENTATION SEQUENCE (PRACTICAL BUILD ORDER)
+------------------------------------------------------------------------------
+Suggested order that supports continuous “vertical slices” and early validation:
+
+1) Canonical artifact formats + provenance + minimal CLI skeleton (L2) + unit/definition enforcement.
+2) Stage A/B: spectrum ingest + peak candidate detection + robust fitting (PeakReport artifacts).
+3) Stage C/D: efficiency + decay + time-history engine → ReactionRates (with uncertainty).
+4) Stage E/F: response matrix + GLS solver → first unfolded spectra + diagnostics.
+5) Stage I: OpenMC/MCNP ingestion + basic compare (transport-only first; then activation-only).
+6) Stage J: report bundle automation + paper-style plot set.
+7) Iterative/Bayesian/SpecKit-like solvers + TRIGA k₀ module + closure tests + regression locking.
+
+------------------------------------------------------------------------------
+7. APPENDIX — GITHUB REPO LINKS (QUICK COPY LIST)
+------------------------------------------------------------------------------
+https://github.com/lifangchen2021/SpecKit
+https://github.com/janmayer/hdtv
+https://github.com/py1sl/gamma_spec_analysis/tree/main
+https://github.com/fispact/actigamma
+https://github.com/SiLab-Bonn/irrad_spectroscopy
+https://github.com/fispact/peakingduck
+https://github.com/tylerdolezal/Neutron-Unfolding
+https://github.com/kildealab/Neutron-Spectrometry

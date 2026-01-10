@@ -1,0 +1,42 @@
+{
+  "file": "/filespace/s/smandych/CAE/projects/ALARA/FluxForge/src/fluxforge/examples/flux_wire/Co-Cd-RAFM-1_25cm.ASC",
+  "calibration": [
+    0.541,
+    0.498,
+    2.605e-07
+  ],
+  "co60_candidates": [
+    {
+      "channel": 2245,
+      "energy": 1119.8639265125
+    },
+    {
+      "channel": 2315,
+      "energy": 1154.8070781124998
+    },
+    {
+      "channel": 2351,
+      "energy": 1172.7788358604998
+    },
+    {
+      "channel": 2481,
+      "energy": 1237.6824715405
+    },
+    {
+      "channel": 2566,
+      "energy": 1280.1242247379998
+    },
+    {
+      "channel": 2669,
+      "energy": 1331.5586876405
+    },
+    {
+      "channel": 2760,
+      "energy": 1377.0053848
+    },
+    {
+      "channel": 2775,
+      "energy": 1384.4970128125
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+Flux Forge Feature Requirements
+for HPGe-Driven Flux-Wire Unfolding
+and OpenMC vs MCNP6.3-ALARA Validation
+Gap checklist (assume no existing capabilities)
+Prepared: 2026-01-03
+
+1. Purpose and Success Criteria
+This document defines the full set of capabilities Flux Forge should implement to support an end-to-end workflow for unfolding neutron spectra from flux-wire / foil activation measured by HPGe gamma spectroscopy in a TRIGA reactor. It also defines the features required to directly compare and validate two computational workflows against experimental data:
+  (i) OpenMC 0.15.3 (continuous-energy transport and tallies, optional built-in activation/depletion tools), and
+ (ii) MCNP6.3 + ALARA activation (group flux tallies + ALARA irradiation/decay).
+
+The goal is to reproduce paper-style unfolded spectra and diagnostics (uncertainty bands, residuals, and goodness-of-fit), and to enable rigorous model-to-experiment validation for thesis irradiations.
+Success criteria
+From raw HPGe spectra (or peak reports), produce isotope-specific activities with full uncertainty propagation and traceable QA/QC.
+Convert activities to end-of-irradiation (EOI) reaction rates using an explicit irradiation history model (multi-segment).
+Perform spectrum adjustment/unfolding using multiple solver families (least-squares/GLS, iterative unfolding, Bayesian MCMC).
+Produce an adjusted neutron spectrum with covariance, and standard diagnostics (chi-square, residuals, monitor influence).
+Ingest OpenMC and MCNP outputs, collapse to a common group structure, compute predicted reaction rates/activities, and compare against experiment.
+Generate publication-quality plots matching activation unfolding literature (group spectra with uncertainty bands, residual plots, covariance/correlation heatmaps).
+Provide reproducible run artifacts: configuration file, input data hashes, versioned nuclear data, and a single report bundle per analysis run.
+2. End-to-End Architecture (Modules and Data Flow)
+Flux Forge should be organized as a pipeline with explicit intermediate products. Each stage must have a machine-readable output (JSON/YAML + CSV/NPZ) and a human report summary.
+2.1 Pipeline overview
+Stage A: HPGe spectrum ingestion and peak analysis -> photopeak areas + uncertainties.
+Stage B: Efficiency / calibration / corrections -> per-line activity at count time.
+Stage C: Decay corrections + irradiation history -> activity at EOI + reaction rates.
+Stage D: Response construction -> group cross sections, self-shielding and cover factors, response matrix.
+Stage E: Spectrum adjustment / unfolding -> posterior spectrum + covariance + diagnostics.
+Stage F: Model comparison -> OpenMC vs MCNP6.3-ALARA predictions vs experiment; sensitivity and closure tests.
+Stage G: Reporting -> plots, tables, archived inputs, and validation summary.
+2.2 Data model requirements (core objects)
+SpectrumFile: raw counts vs channel; metadata (live time, real time, dead time, detector id, sample id).
+Peak: centroid energy, net area, fit covariance, background model, multiplet membership, flags.
+DetectorModel: energy calibration, resolution model (FWHM), full-energy peak efficiency curve with covariance.
+DecayData: half-lives, gamma emission probabilities, branching, parent-daughter chains.
+Sample: material, mass/areal density, geometry parameters, cover (Cd/others), container/shielding parameters.
+IrradiationHistory: time segments (power/flux scaling), irradiation duration, cooling time, counting time windows.
+MonitorReaction: reaction definition (target isotope, MT), product nuclide(s), gamma lines used, interference map.
+GroupStructure: energy boundaries, lethargy widths, group labels (thermal/epithermal/fast), plotting helpers.
+ResponseMatrix: R[i,g] mapping group flux to reaction rate for monitor i; includes corrections (self-shielding, cover).
+PriorSpectrum: a priori group flux from OpenMC/MCNP; includes covariance if available/assumed.
+AdjustmentResult: posterior flux, covariance, correlations, residuals, chi-square, per-monitor pulls.
+2.3 Canonical I/O and interchange formats
+Define a Flux Forge canonical file format for (a) spectra/peaks/activities, (b) reaction rates, (c) group flux spectra, and (d) covariance matrices (recommend: JSON metadata + NPZ arrays).
+Import/export bridges for: OpenMC statepoint tallies, MCNP meshtal/tally outputs, ALARA group flux files, and ALARA results tables.
+Strict unit metadata embedded in every object (flux, reaction rate, activity) and validated at runtime.
+Round-trip tests: import then export should preserve values to within numerical tolerance.
+3. HPGe Data Analysis Capabilities (Raw Spectrum to Activities)
+3.1 Spectrum ingestion and preprocessing
+Read common gamma-spectroscopy formats (CNF/CHN/SPE/N42/IEC) and/or standardized CSV exports.
+Read ROOT histogram formats (TH1/TH2) via a pure-Python reader (e.g., uproot) for HDTV-style workflows and MCNP post-processing.
+Validate metadata (live time vs real time; dead-time fraction; energy calibration provenance).
+Background estimation options (SNIP-style, polynomial, rolling-window).
+Automated QC flags: saturation, gain shift, pile-up indicators, missing metadata.
+3.2 Peak detection, fitting, and deconvolution
+Automated peak finding with tunable sensitivity and false-positive control (supports low-count spectra).
+Peak fitting models: Gaussian with tailing term; optional Voigt; constrained multiplet fitting.
+Energy-dependent resolution model (FWHM(E)) used as a prior/constraint during fitting.
+Robust background handling during fit (local background under ROI, multi-ROI fit).
+Output full fit covariance and goodness-of-fit per peak (chi-square or likelihood).
+Multiplet handling: shared width parameters; shared background; interference reporting.
+Implement a modular peakfinding pipeline with explicit stages: smoothing → baseline/background → candidate peaks → ROI segmentation → multi-peak fitting → QC (mirrors peakingduck-style workflow, without GUI).
+Background/baseline algorithms beyond basic SNIP: adaptive SNIP variants, asymmetric least-squares (AsLS/airPLS), morphological (top-hat), and wavelet baseline options (choose per-spectrum or auto-select).
+Candidate peak detection options: second-derivative/DoG filters, continuous wavelet transform (CWT) maxima, and significance testing against local noise estimates; expose controls for false-positive rate.
+Peak-shape library for activation HPGe: Hypermet-style peak (Gaussian + step + exponential tail), exponentially-modified Gaussian (EMG), Voigt, and constrained multi-Gaussian for partially-resolved multiplets (HDTV-like breadth).
+Global multiplet fitting: automatically group nearby candidates using FWHM(E) and fit as a single constrained model; report interference fractions and parameter correlations per line.
+Robust fitting backends: Poisson likelihood (preferred at low counts) and weighted least squares; enforce bounds/priors on width vs energy and tail parameters to stabilize fits.
+Automatic outlier handling and model selection: AIC/BIC-based selection for peak-shape choice and multiplet size; flag unstable fits (ill-conditioned covariance, high leverage points).
+Write a machine-readable 'peak report' artifact per spectrum (ROI list + fitted parameters + covariance + QC flags) to support downstream activity inference and regression tests.
+3.3 Efficiency calibration and activity derivation
+Absolute full-energy peak efficiency curve fitting vs energy with uncertainty covariance.
+Support multiple calibration sources/lines; outlier detection and weighting.
+Activity calculation per line: A = NetPeakRate / (epsilon(E) * I_gamma).
+Combine multiple gamma lines per isotope using weighted averaging and consistency checks.
+Optional corrections (enable per experiment): coincidence summing, self-attenuation of gammas, geometry corrections.
+3.4 Uncertainty propagation and QA/QC
+Propagate peak-area uncertainty (counting statistics + fit covariance).
+Propagate efficiency curve uncertainty using its parameter covariance.
+Propagate nuclear data uncertainty (I_gamma, half-life) with option to treat as correlated systematics.
+Audit trail for each derived activity: peaks used, peaks rejected, and rejection reasons.
+QA plots: fitted peaks overlay, residuals, efficiency curve with confidence band, line-by-line consistency.
+4. Activities to Reaction Rates (Time-History Corrected)
+4.1 Irradiation history model
+Piecewise-constant history: multiple irradiation segments with different power/flux scaling.
+Exact decay during irradiation, cooling, and counting windows (no single-factor shortcuts unless selected).
+Support multiple count intervals and repeated measurements for the same sample.
+Support pulsed/interruptions with arbitrary time stamps.
+Output saturation and decay correction factors per product nuclide.
+4.2 Reaction rate inference and reporting
+Compute EOI activity and infer reaction rate (or saturated activity) per reaction monitor.
+Support product build-in/out and simple chains when needed (parent-daughter).
+Support burnup of target isotope (optional but available).
+Per-monitor tables: EOI activity, reaction rate, uncertainty, lines used, QC flags.
+5. Nuclear Data, Response Construction, and Corrections
+5.1 Nuclear data libraries (decay, gamma yields, cross sections)
+Decay and gamma emission libraries with versioning (ENSDF-derived or equivalent).
+Dosimetry/monitor cross sections (including IRDFF-II style reactions) in group and continuous forms.
+Cross section covariance support (at minimum diagonal; ideally full covariance matrices).
+Utilities to produce group-averaged cross sections from continuous-energy data for a given group structure.
+Data provenance recorded in every run report (library versions, processing parameters, checksums).
+5.2 Group structures and energy bin management
+Define and store multiple group structures (10g, 31g, 50g, 100g; user-defined).
+Physics-aware grouping (resonances, thresholds, thermal region).
+Convert/aggregate spectra between group structures while conserving group integrals.
+Consistent plotting conventions (group midpoint, lethargy normalization, or group-integrated flux).
+5.3 Self-shielding and cover corrections (STAYSL parity targets)
+Self-shielding corrections for foils/wires and larger samples (geometry-aware; at least slab/cylinder approximations).
+Cadmium cover correction factors (thickness, density, composition; temperature effects optional).
+Ability to compute corrected effective cross sections used in the response matrix.
+Explicit reporting of correction factors per monitor and their impact on inferred flux.
+Uncertainty models for these corrections (parameter bounds and optional sampling).
+5.4 Response matrix construction
+Construct R[i,g] = N_i * sigma_i,g,eff * (optional physics factors) with clear axis semantics.
+Include monitor-specific number of target atoms N_i (from mass, enrichment, isotopic composition).
+Support summing of branches and multiple products when required.
+Diagnostics: response matrix visualization, condition number, rank checks.
+Uncertainty in response (from cross section covariance, correction uncertainty, and N_i uncertainty).
+5.5 TRIGA spectral parameters (f, alpha) and Cd-ratio multi-monitor support (recommended)
+Implement Cd-ratio for multi-monitor calculations (bare vs Cd-covered monitors).
+Compute thermal-to-epithermal flux ratio f and epithermal shape factor alpha, with uncertainties.
+Compute auxiliary parameters commonly reported in TRIGA characterization studies (e.g., Phi_th, Phi_e, U_th, U_e).
+Support k0-standardization style monitor sets and reporting (useful for cross-checking thermal/epithermal decomposition).
+Add a full k₀-standardization module (k₀-NAA) to infer TRIGA spectral parameters and to provide an independent, monitor-based flux characterization path alongside unfolding.
+Maintain an internal k₀ constants database for common monitors/flux wires: k₀ factors, resonance integrals/Er, Q₀(α) form, Westcott g-factors (temperature dependence), and recommended gamma lines with intensities/half-lives.
+Implement the canonical k₀ workflow: counts → net peak area → activity at EOI → saturation activity → reaction rate; include dead-time, self-attenuation, coincidence summing options, and detector efficiency covariance in the uncertainty budget.
+Implement Cd-ratio formalism for bare vs Cd-covered monitors, including corrections: cadmium transmission/cutoff, epithermal self-shielding, thermal self-shielding, and any geometry-specific perturbation factors used in the referenced TRIGA k₀ studies.
+Solve for epithermal shape factor α and thermal-to-epithermal flux ratio f using multi-monitor fits (log-linear regression where applicable) with full uncertainty propagation; report Φ_th and Φ_e (or equivalent) with confidence intervals.
+Cross-validation hooks: (i) compare k₀-derived f/α/Φ_th/Φ_e to values implied by the unfolded group spectrum; (ii) compare to OpenMC and MCNP group-collapsed flux components at the wire locations under identical group boundaries.
+Provide plots and tables for channel/position characterization: f and alpha by irradiation position, with uncertainty bars.
+6. Unfolding / Spectrum Adjustment Solvers (Multiple Families)
+6.1 Generalized least squares (GLS) spectrum adjustment (STAYSL-like)
+GLS adjustment using measured reaction rates y, prior spectrum phi0, and response matrix R.
+Full covariance matrices: V_y (measurement), V_phi0 (prior), and optionally response uncertainty via nuisance propagation.
+Positivity constraints (e.g., log-flux parametrization) and regularization (smoothness priors).
+Diagnostics: chi-square, reduced chi-square, residuals/pulls per monitor, influence metrics, leverage.
+Outputs: posterior spectrum phi, covariance V_phi, correlation matrix, predicted reaction rates.
+6.2 Iterative unfolding (MLEM, GRAVEL) for cross-checking
+MLEM unfolding with multiple stopping criteria (fixed iterations, relative change, likelihood plateau).
+GRAVEL-type iterative unfolding (including damping/relaxation).
+Robust initialization options (flat, prior-based, informed by thermal/fast split).
+Uncertainty estimation by Monte Carlo sampling (measurement noise + optional nuclear data sampling).
+Standardized solver comparison plots and run summaries.
+6.3 Bayesian unfolding (MCMC) for rigorous posterior uncertainty
+Bayesian model for reaction rates with a prior on spectrum shape (smoothness + positivity).
+MCMC sampling and convergence diagnostics (R-hat, ESS, trace plots).
+Posterior predictive checks: predicted rates vs measured rates with credible intervals.
+Outputs: posterior mean/median spectrum, credible intervals per group, posterior covariance/correlation.
+Configurable likelihood/priors/hyperparameters recorded in the report.
+6.4 SpecKit-style gradient-descent spectrum adjustment (SAND-II family)
+Implement a deterministic, gradient-based spectrum adjustment solver similar in spirit to SAND-II / iterative spectral adjustment: minimize χ²(y − Rφ) with regularization on spectrum smoothness (e.g., second-difference penalty on log φ) and enforce positivity.
+Support learning-rate control, line-search/backtracking, and explicit stopping criteria: target reduced χ² window, relative parameter change, and overfitting guardrails (stop when residual structure disappears but χ² stalls).
+Allow multiple initializations (flat spectrum, Maxwellian + 1/E epithermal, OpenMC prior, MCNP prior) and ensemble runs; use the ensemble spread as a practical uncertainty proxy and to detect local minima.
+Provide the same diagnostics as GLS/STAYSL: per-reaction pulls, χ² contributions, spectrum smoothness metrics, and sensitivity to regularization strength.
+Expose solver knobs in config (learning rate, regularization weight, max iterations) and log the full iteration trace for reproducibility and paper-style convergence plots.
+Optionally emulate SpecKit’s workflow packaging: separate modules for nuclear data ingestion, response-matrix build, solver, and plotting/report generation (all internal to Flux Forge).
+7. Plotting, Reporting, and Reproducibility (Paper-Style Outputs)
+7.1 Required plots
+Unfolded spectrum vs energy group (linear and log y-axis), with uncertainty band (1-sigma and/or 95% CI).
+Prior vs posterior spectrum overlay (OpenMC prior, MCNP prior, adjusted spectrum).
+Reaction rate residuals/pulls per monitor, including chi-square contributions.
+Posterior covariance and correlation matrix heatmaps.
+Predicted vs measured reaction rates (parity plot) with uncertainty bars.
+If using Cd-covered monitors: thermal/epithermal decomposition and Cd-ratio diagnostics.
+7.2 Report bundle contents (single-run artifact)
+Run configuration (YAML/JSON) and command-line invocation.
+Input data hashes for spectra, peak reports, and model outputs.
+Nuclear data versions + processing parameters + checksums.
+All intermediate products (peaks, activities, reaction rates, corrections, matrices).
+All plots (vector PDF + PNG) and a summary report (HTML/PDF).
+Machine-readable summary (JSON) for CI/regression testing.
+8. Model Comparison: OpenMC 0.15.3 vs MCNP6.3-ALARA
+8.1 Common requirements for fair comparisons
+Common energy group structure for comparison (even if transport is continuous-energy).
+Consistent material definitions (isotopic composition, densities, temperatures).
+Consistent irradiation history and normalization (power history, source normalization, or flux normalization).
+Consistent activation cross sections / reaction definitions (same MT and library versions where possible).
+Consistent spatial sampling region (wire volume definition, mesh resolution, averaging conventions).
+Explicit treatment of self-shielding and covers in both workflows (implemented and recorded).
+8.2 OpenMC ingestion and activation comparison features
+Read OpenMC statepoint tallies and compute group-integrated/group-averaged flux.
+Support mesh/cell tallies covering each flux wire volume and larger RAFM samples; handle normalization.
+Compute reaction rates directly from tallies + group cross sections, and/or optionally interface to OpenMC activation tools.
+Export OpenMC-predicted reaction rates and activities for the exact irradiation/counting schedule.
+Per-monitor comparison tables and plots: Experiment vs OpenMC for rates and activities.
+8.3 MCNP6.3 + ALARA ingestion and comparison features
+Read MCNP energy-dependent flux tallies (F4/Fmesh with energy bins) and/or ALARA-style group flux outputs.
+Convert MCNP tallies into the same GroupStructure used for unfolding (bin edges must match exactly).
+Generate ALARA input decks programmatically (materials, irradiation schedule, flux file references, decay times).
+Parse ALARA outputs (activities, reaction rates, uncertainties) and map products back to monitor reactions/gamma lines.
+Per-monitor comparison tables and plots: Experiment vs MCNP+ALARA for rates and activities.
+8.4 Cross-workflow consistency checks (must-have)
+Transport-only cross-check: compare OpenMC vs MCNP group flux at wire locations before activation.
+Activation-only cross-check: using the same group flux, verify Flux Forge rate/activity calculations match ALARA within tolerance.
+End-to-end closure: from model-predicted activities, forward-calculate expected gamma lines and compare with measured spectra.
+Sensitivity tools: vary group structure, self-shielding, and nuclear data choices; quantify effects on unfolded spectrum.
+Versioned regression tests: lock at least one benchmark irradiation (inputs + expected outputs) for CI.
+9. Critical Pitfalls to Prevent (Required Guardrails)
+Timebase mistakes: live time vs real time; dead-time correction applied twice or not at all.
+Normalization mistakes: per-source-particle vs per-fission vs per-watt scaling mismatches between OpenMC and MCNP.
+Unit/definition drift: group-integrated vs group-averaged flux; per energy vs per lethargy; cm^-2 s^-1 conventions.
+Library inconsistency: mixing cross section libraries or temperatures between transport and activation.
+Ignoring cover/self-shielding: Cd-covered monitors and resonance reactions become systematically biased.
+Peak interference and summing: unresolved multiplets or coincidence summing can bias activities beyond stated uncertainties.
+Over-regularization: solvers that produce smooth spectra but fail residual diagnostics; require residual checks in reports.
+Ill-conditioned response matrices: require condition-number checks and warning thresholds; provide stabilization options.
+10. Validation and Testing Plan
+10.1 Unit tests
+Peak fitting on synthetic spectra (single peaks and multiplets).
+Efficiency fit covariance propagation check.
+Decay correction analytic test cases, including simple chains.
+Group collapse conservation tests (integrals and normalization).
+GLS solver synthetic recovery tests (with covariance PSD checks).
+Iterative solver convergence/stopping tests.
+Bayesian solver convergence and posterior predictive checks.
+10.2 Integration tests
+Synthetic end-to-end: generate rates from a known spectrum, add noise, unfold, and verify recovery.
+OpenMC integration: load a statepoint, collapse flux, compute rates/activities, generate report.
+MCNP/ALARA integration: parse representative outputs, generate/parse ALARA decks/results, generate report.
+Reproducibility: same inputs should yield stable outputs (document any nondeterminism).
+10.3 Experimental validation metrics
+Reaction-rate agreement: per-monitor percent error and normalized residuals (pulls).
+Spectrum agreement: compare adjusted spectra against model priors (OpenMC and MCNP) using band overlap and integrated metrics.
+Consistency across isotopes/reactions: multi-line and multi-reaction consistency; identify systematic outliers.
+Goodness-of-fit: reduced chi-square for GLS; posterior predictive p-values for Bayesian; stability vs iteration for MLEM/GRAVEL.
+11. Suggested Implementation Order (High-Leverage First)
+Implement core data model + configuration + report bundle skeleton.
+HPGe peak fitting + efficiency curve + activity inference with QA/QC.
+Irradiation history + decay correction + reaction rate inference.
+Group structures + nuclear data ingestion (decay + cross sections) + response matrix build.
+GLS spectrum adjustment with covariance + diagnostics (STAYSL-like core).
+OpenMC ingest + model-to-experiment comparisons.
+MCNP/ALARA ingest + ALARA deck generation/parsing + comparisons.
+Iterative solvers (MLEM/GRAVEL) + solver comparison harness.
+Bayesian MCMC solver + posterior predictive checks.
+Self-shielding and cover correction refinement + TRIGA f/alpha characterization modules.
+k₀-standardization integration (f/α/Φth/Φe inference) + report templates to cross-check unfolded and modeled spectra.
+SpecKit-style gradient-descent solver + ensemble uncertainty workflow + reproducibility harness for paper-style figures.
+HDTV-inspired peak-shape library + ROOT histogram ingest + regression tests on representative UWNR activation spectra.
+12. Capability Mapping from Reference Projects (Implement Internally)
+12.1 Neutron-Spectrometry (kildealab) - expected features to replicate
+MLEM unfolding implementation with clear iteration controls and stopping criteria.
+Response matrix construction conventions and input/output formats for monitor reactions and energy groups.
+Solver diagnostics: convergence traces, residuals vs monitors, and spectrum comparison plots.
+CLI-style workflow patterns (configuration-driven runs) that produce reproducible outputs.
+12.2 Neutron-Unfolding (tylerdolezal) - expected features to replicate
+GRAVEL-type unfolding and damping/relaxation controls for stability.
+Alternative iterative implementations (MLEM variants) for solver cross-checking.
+Plotting patterns for unfolded spectra and basic residual reporting.
+12.3 peakingduck (fispact) - expected features to replicate
+Automated peak search suitable for activation gamma spectra (many lines, varied intensities).
+SNIP-style background estimation concepts and robust ROI processing.
+Lightweight QC output that flags problematic spectra/regions.
+Implement SNIP with configurable window growth, clipping, and iteration count; support per-energy adaptive parameters to handle Compton continua and low-energy rise.
+Add peak-candidate post-processing: merge/split nearby candidates, enforce minimum peak separation based on FWHM(E), and compute per-peak significance (SNR) and curvature metrics.
+Provide an optional machine-learning peak-candidate mode (peakingduck includes an NN-based approach): implement a small 1D CNN/Transformer-lite classifier for peak/no-peak windows, but keep it optional and fully reproducible (model + training recipe).
+Emit peakingduck-like machine-readable outputs: peak list + ROIs + background model + QC flags; make it a first-class artifact for downstream activity inference and solver regression tests.
+Add spectrum-level QC heuristics commonly needed for activation spectra: gain-shift detection, saturation/pile-up flags, and automatic rejection/holdout of suspect spectra for sensitivity studies.
+12.4 actigamma (fispact) - expected features to replicate
+Forward gamma spectrum synthesis from nuclide inventories/activities (line list -> spectrum), for closure tests and QA.
+Gamma-line bookkeeping (branching ratios, coincident lines) and report-style outputs.
+Comparison overlays between predicted and measured spectra (residuals and feature-level differences).
+12.5 STAY'SL parity target - capabilities to match as closely as possible
+Generalized least squares spectral adjustment with full covariance propagation (measurement + prior + nuclear data).
+Output of adjusted spectrum with covariance/correlation, and predicted reaction rates with uncertainties.
+Diagnostics commonly used in spectral adjustment: chi-square contributions, per-reaction pulls, and leverage/influence measures.
+Correction-factor infrastructure for self-shielding and covers (often referenced as SHIELD/BCF-style concepts).
+Ability to use different priors (flat, calculated, or user-supplied) and assess sensitivity to prior assumptions.
+12.6 Curated 'reverse spectrum' references (awesome-nuclear list)
+Collect and implement canonical formulations for 'activation foil unfolding' and 'spectrum adjustment' methods, including documentation-style examples that users can reproduce with Flux Forge.
+Maintain a small set of benchmark problems (TRIGA-like) that mirror the plots and diagnostic conventions used in the literature.
+12.7 SpecKit (lifangchen2021) - expected features to replicate (core-only)
+Replicate SpecKit’s modular structure: nuclear-data preprocessing → response matrix build → spectrum solver → standard plots/reports; keep everything CLI/config driven (no GUI dependency).
+Implement SpecKit-style solver controls explicitly in the API: learning rate, iteration limit, χ² target window, and regularization strength; store the full convergence history to match paper-style figures.
+Add a 'solver ensemble' runner (many randomized initial spectra / perturbed inputs) to quantify robustness and to create uncertainty envelopes around the unfolded spectrum.
+Provide the same outputs highlighted in the SpecKit paper: unfolded spectrum with uncertainty band, predicted vs measured reaction rates, and convergence curves (χ² vs iteration; parameter change).
+Include an example dataset + notebook/script that reproduces at least one figure from the SpecKit paper as a regression test target.
+12.8 HDTV (janmayer) - expected features to replicate (core-only, no GUI)
+Implement HDTV-like spectrum handling: robust calibration model (energy vs channel) with drift diagnostics; per-spectrum metadata integrity checks; and standardized export formats (peak tables, activity tables).
+Adopt HDTV-inspired peak-shape fitting breadth (ROOT-style functions but implemented internally): Gaussian + step background, exponential tailing, multiplet fitting with shared resolution, and flexible background models.
+Support direct analysis of ROOT histogram files (via uproot) to enable workflow reuse from HDTV without bringing in the full framework; keep the core fitting engine independent of ROOT at runtime.
+Add MCNP and OpenMC linkage utilities needed for your TRIGA campaign: (i) map MCNP energy-bin tallies and/or MCTAL outputs into Flux Forge group structures; (ii) map OpenMC statepoint tallies similarly; (iii) produce consistent, comparable tables/plots.
+Provide an 'experiment template' that encodes UWNR/TRIGA-specific conventions (detector naming, counting geometry, common monitors, typical irradiation/counting schedules) so your thesis datasets can be processed reproducibly.
+13. References (papers and project context)
+Key papers provided in this project context (for method replication and plot targets):
+Di Luzio, M. et al. (2017). Measurement of the neutron flux parameters f and alpha at the Pavia TRIGA Mark II reactor. Journal of Radioanalytical and Nuclear Chemistry, 312, 75-80. (s10967-017-5191-4)
+Menezes, M.A.B.C. et al. (2023). Characterization of irradiation channels in the carousel of TRIGA Mark I IPR-R1 research reactor, Brazil, aiming at the application of k0-standardization method of neutron activation analysis. Journal of Radioanalytical and Nuclear Chemistry, 332, 3445-3456. (s10967-022-08688-1)
+Chiesa, D. et al. (2020). Neutron flux measurements and spectrum characterization at TRIGA Mark II irradiation facilities (includes Bayesian unfolding via MCMC/JAGS). The European Physical Journal Plus, 135:349. (s13360-020-00334-7)
+Additional standards/data sources to incorporate (as internal data packages or optional downloads):
+IRDFF-II dosimetry reaction library and covariance data for common activation monitors.
+ASTM dosimetry practice standards relevant to monitor reactions and spectral adjustment (commonly referenced alongside STAYSL workflows).
+Key software references added for feature parity planning:
+Chen, L.-F. (2025). SpecKit: An integrated toolkit for neutron spectrum unfolding using activation reactions. SoftwareX 32, 102456. (1-s2.0-S2352711025004224-main)
+HDTV (High Definition TV) gamma-spectroscopy analysis framework (Python package; ROOT-based fitting and spectrum handling).
+peakingduck and actigamma (fispact) documentation and source code for activation-spectrum peakfinding and forward gamma synthesis.
+Neutron-Spectrometry (kildealab) and Neutron-Unfolding (tylerdolezal) repositories for response-matrix + unfolding patterns and benchmark conventions.
