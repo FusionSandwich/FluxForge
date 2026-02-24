@@ -1,0 +1,83 @@
+/groupspace/cnerg/users/smandych/miniforge3/envs/parastell_env/lib/python3.11/site-packages/keras/src/export/tf2onnx_lib.py:8: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
+  if not hasattr(np, "object"):
+/groupspace/cnerg/users/smandych/miniforge3/envs/parastell_env/lib/python3.11/site-packages/keras/src/layers/core/dense.py:106: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(activity_regularizer=activity_regularizer, **kwargs)
+2026-01-10 21:48:16.649449: E external/local_xla/xla/stream_executor/cuda/cuda_platform.cc:51] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+
+
+======================================================================
+FLUXFORGE NAA-ANN COMPARISON WITH NAA-ANN-1
+Selenium Concentration Prediction from Gamma Spectra
+======================================================================
+
+----------------------------------------------------------------------
+STEP 1: Loading Data
+----------------------------------------------------------------------
+Loaded 216 samples from RID composition data
+Loaded 10216 NAA-ANN-1 results
+  Train samples: 10150
+  Test samples: 66
+
+----------------------------------------------------------------------
+STEP 2: Preparing FluxForge Dataset
+----------------------------------------------------------------------
+  Loading spectra and creating patches...
+  Prepared 200 samples
+  Feature dimension: 600
+  Se concentration range: 0.463 - 1.110 ppm
+
+----------------------------------------------------------------------
+STEP 3: Training FluxForge NAA-ANN Model
+----------------------------------------------------------------------
+  Training samples: 160
+  Test samples: 40
+
+[1m1/2[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 28ms/step
+[1m2/2[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 25ms/step
+  Model trained using: tensorflow
+
+----------------------------------------------------------------------
+STEP 4: Comparing Predictions
+----------------------------------------------------------------------
+
+FluxForge NAA-ANN Performance:
+  MAE:        0.0920 ppm
+  RMSE:       0.1313 ppm
+  Mean Ratio: 0.8924
+  R²:         -0.6290
+
+NAA-ANN-1 Published Performance (on their test set):
+  MAE:        0.0116 ppm
+  RMSE:       0.0145 ppm
+  Mean Ratio: 1.0008
+  R²:         0.9792
+
+----------------------------------------------------------------------
+STEP 5: Generating Comparison Plots
+----------------------------------------------------------------------
+Saved comparison plot to: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/output/naa_ann_comparison.png
+Saved comparison plot to: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/output/naa_ann1_published_results.png
+
+======================================================================
+COMPARISON SUMMARY
+======================================================================
+
+Dataset: RID Selenium Concentration (253 spectra)
+Task: Predict Se concentration from HPGe gamma spectrum patches
+
+Metric               FluxForge       NAA-ANN-1      
+--------------------------------------------------
+R²                   -0.6290           0.9792
+RMSE (ppm)           0.1313           0.0145
+Mean Ratio           0.8924           1.0008
+
+Notes:
+- FluxForge model backend: TensorFlow/Keras
+- NAA-ANN-1 uses TensorFlow 2.2 with patch-based architecture
+- Both methods demonstrate feasibility of ANN for NAA
+- Full FluxForge NAA-ANN would include data augmentation
+
+======================================================================
+WORKFLOW COMPLETE
+======================================================================
+

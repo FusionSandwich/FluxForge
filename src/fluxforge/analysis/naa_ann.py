@@ -1124,3 +1124,168 @@ class NAAANNAnalyzer:
             self.analyze_spectrum(spec, elements, spec_id)
             for spec, spec_id in zip(spectra, ids)
         ]
+
+
+# =============================================================================
+# NAA-ANN-1 (4e) Parity Utilities
+# =============================================================================
+
+
+@dataclass
+class NAAANN4eDataset:
+    """Container for the NAA-ANN-1 4e dataset."""
+
+    features: np.ndarray
+    labels: np.ndarray
+    label_min: np.ndarray
+    label_max: np.ndarray
+    sample_ids: List[str]
+
+
+def _load_naa_ann4e_tables(zip_path: Union[str, Path]) -> Tuple["pd.DataFrame", "pd.DataFrame"]:
+    import pandas as pd
+    import zipfile
+
+    zip_path = Path(zip_path)
+    with zipfile.ZipFile(zip_path) as zf:
+        with zf.open("4e_in_data.csv") as f_data:
+            real = pd.read_csv(f_data, sep=";")
+        with zf.open("4e_in_synthetic.csv") as f_synth:
+            synth = pd.read_csv(f_synth, sep=";")
+    return real, synth
+
+
+def _load_naa_ann4e_counts(
+    zip_path: Union[str, Path],
+    max_files: Optional[int] = None,
+) -> Tuple[np.ndarray, List[str]]:
+    import zipfile
+
+    zip_path = Path(zip_path)
+    with zipfile.ZipFile(zip_path) as zf:
+        data_files = [
+            name for name in zf.namelist()
+            if name.endswith(".dat") and (name.startswith("4e_data_") or name.startswith("4e_synth_"))
+        ]
+        data_files = sorted(data_files)
+        if max_files is not None:
+            data_files = data_files[:max_files]
+
+        spectra = []
+        for name in data_files:
+            with zf.open(name) as f:
+                spectra.append(np.loadtxt(f, usecols=[-1]))
+
+    return np.vstack(spectra), [Path(name).stem for name in data_files]
+
+
+def _preprocess_naa_ann4e_features(
+    features: np.ndarray,
+    peak_cap: float = 10000.0,
+) -> np.ndarray:
+    features = np.asarray(features, dtype=float)
+    capped = features.copy()
+    over = capped > peak_cap
+    if np.any(over):
+        capped[over] = peak_cap + np.power(capped[over], 0.2)
+    col_max = np.max(capped, axis=0)
+    return capped / (0.0001 + col_max)
+
+
+def load_naa_ann4e_dataset(
+    zip_path: Union[str, Path],
+    max_files: Optional[int] = None,
+) -> NAAANN4eDataset:
+    """
+    Load the NAA-ANN-1 4e dataset from the provided ZIP file.
+    """
+    import pandas as pd
+
+    real, synth = _load_naa_ann4e_tables(zip_path)
+    spectra, names = _load_naa_ann4e_counts(zip_path, max_files=max_files)
+
+    label_cols = ["Se", "UNC", "LOD"]
+    exp_cols = ["SAMPLE MASS", "FILL", "CMP"]
+
+    exp = pd.concat([real[label_cols + exp_cols], synth[label_cols + exp_cols]], axis=0)
+    exp = exp.reset_index(drop=True)
+    if max_files is not None:
+        exp = exp.iloc[:spectra.shape[0]]
+
+    exp[label_cols] = exp[label_cols].apply(pd.to_numeric, errors="coerce")
+    exp[exp_cols] = exp[exp_cols].apply(pd.to_numeric, errors="coerce")
+    exp[label_cols] = exp[label_cols].fillna(0.0)
+    exp[exp_cols] = exp[exp_cols].fillna(0.0)
+
+    labels = exp[label_cols].to_numpy(dtype=float)
+    features = np.column_stack([
+        exp[exp_cols].to_numpy(dtype=float),
+        spectra,
+    ])
+
+    label_min = labels.min(axis=0)
+    label_max = labels.max(axis=0)
+
+    return NAAANN4eDataset(
+        features=features,
+        labels=labels,
+        label_min=label_min,
+        label_max=label_max,
+        sample_ids=names,
+    )
+
+
+def prepare_naa_ann4e_dataset(
+    dataset: NAAANN4eDataset,
+    peak_cap: float = 10000.0,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Preprocess and normalize features and labels.
+    """
+    features = _preprocess_naa_ann4e_features(dataset.features, peak_cap=peak_cap)
+    denom = np.where(dataset.label_max - dataset.label_min > 0, dataset.label_max - dataset.label_min, 1.0)
+    labels = (dataset.labels - dataset.label_min) / denom
+    return features, labels
+
+
+def split_naa_ann4e_dataset(
+    features: np.ndarray,
+    labels: np.ndarray,
+    n_real: int = 216,
+    n_train_real: int = 150,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Apply the NAA-ANN-1 split: first 150 real + all synthetic for training,
+    real samples 151-216 for testing (index 150 excluded).
+    """
+    n_total = features.shape[0]
+    train_idx = list(range(0, n_train_real)) + list(range(n_real, n_total))
+    test_idx = list(range(n_train_real + 1, n_real))
+
+    X_train = features[train_idx]
+    y_train = labels[train_idx]
+    X_test = features[test_idx]
+    y_test = labels[test_idx]
+
+    return X_train, y_train, X_test, y_test
+
+
+def build_naa_ann4e_model(
+    input_dim: int,
+    n_outputs: int = 3,
+    activation: str = "gelu",
+    dropout_rate: float = 0.01,
+):
+    """
+    Build the reference-style dense ANN for the 4e dataset.
+    """
+    if not HAS_TENSORFLOW:
+        raise RuntimeError("TensorFlow is required to build the NAA-ANN model.")
+
+    x_in = layers.Input(shape=(input_dim,), name="naa_ann_input")
+    head = x_in[:, :min(100, input_dim)]
+    x = layers.Dense(20, activation=activation)(head)
+    x = layers.Dropout(dropout_rate)(x)
+    x = layers.Dense(5, activation=activation)(x)
+    outputs = [layers.Dense(1, name=f"target_{i}")(x) for i in range(n_outputs)]
+    return Model(x_in, outputs)

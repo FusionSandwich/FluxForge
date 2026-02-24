@@ -51,3 +51,59 @@ def test_calculate_k0_parameters_empty():
     params = calculate_k0_parameters({}, {})
     assert params.f == 0.0
     assert params.alpha == 0.0
+
+
+def test_k0_correction_factors():
+    """Correction factors should scale concentrations as expected."""
+    from fluxforge.analysis.k0_naa import K0Calculator, K0Measurement, K0Parameters
+    
+    flux_params = K0Parameters(f=20.0, alpha=0.0)
+    
+    au_meas = K0Measurement(
+        product_isotope='Au-198',
+        net_peak_area=1e6,
+        peak_area_unc=1e4,
+        efficiency=0.01,
+        t_irr=3600,
+        t_decay=3600,
+        t_count=3600,
+        sample_mass=0.001,
+        g_th=1.0,
+        g_ep=1.0,
+        cd_factor=1.0,
+    )
+    
+    calc = K0Calculator(flux_params, au_meas)
+    
+    meas = K0Measurement(
+        product_isotope='Co-60',
+        net_peak_area=5e4,
+        peak_area_unc=5e2,
+        efficiency=0.005,
+        t_irr=3600,
+        t_decay=3600,
+        t_count=3600,
+        sample_mass=0.1,
+        g_th=1.0,
+        g_ep=1.0,
+        cd_factor=1.0,
+    )
+    
+    baseline = calc.calculate_concentration(meas)
+    
+    meas_cd = K0Measurement(
+        product_isotope='Co-60',
+        net_peak_area=5e4,
+        peak_area_unc=5e2,
+        efficiency=0.005,
+        t_irr=3600,
+        t_decay=3600,
+        t_count=3600,
+        sample_mass=0.1,
+        g_th=1.0,
+        g_ep=1.0,
+        cd_factor=2.0,
+    )
+    scaled = calc.calculate_concentration(meas_cd)
+    
+    assert scaled.concentration_ug_g == pytest.approx(baseline.concentration_ug_g / 2.0, rel=1e-6)

@@ -637,6 +637,12 @@ class K0Measurement:
         Sample mass (g)
     gamma_energy_keV : float
         Gamma energy for this measurement (keV)
+    g_th : float
+        Thermal self-shielding factor (G_th)
+    g_ep : float
+        Epithermal self-shielding factor (G_ep)
+    cd_factor : float
+        Cadmium correction factor (F_cd)
     """
     product_isotope: str
     net_peak_area: float
@@ -648,6 +654,9 @@ class K0Measurement:
     t_count: float = 0.0
     sample_mass: float = 1.0
     gamma_energy_keV: float = 0.0
+    g_th: float = 1.0
+    g_ep: float = 1.0
+    cd_factor: float = 1.0
 
 
 @dataclass
@@ -750,6 +759,8 @@ class K0Calculator:
         self.au_measurement = au_measurement
         self._au_specific_count_rate = None
         self._au_Q0_alpha = None
+        self._au_g_factor = 1.0
+        self._au_cd_factor = 1.0
         
         if au_measurement is not None:
             self._calculate_au_reference()
@@ -780,6 +791,8 @@ class K0Calculator:
         self._au_Q0_alpha = calculate_Q0_alpha(
             au_data.Q0, self.flux_params.alpha, au_data.E_res_eV
         )
+        self._au_g_factor = self.au_measurement.g_th + self.au_measurement.g_ep * self._au_Q0_alpha
+        self._au_cd_factor = self.au_measurement.cd_factor
     
     def calculate_concentration(
         self,
@@ -824,6 +837,8 @@ class K0Calculator:
         
         # Specific count rate for the sample peak
         R_a = measurement.net_peak_area / (SDC * measurement.efficiency * measurement.sample_mass)
+        g_factor_a = measurement.g_th + measurement.g_ep * Q0_alpha
+        R_a_corr = R_a / (measurement.cd_factor * g_factor_a)
         
         if use_relative and self._au_specific_count_rate is not None:
             # Relative method using Au reference
@@ -831,10 +846,11 @@ class K0Calculator:
             # where G(α) = (f + Q0(α)_Au) / (f + Q0(α)_a)
             
             flux_ratio = (self.flux_params.f + self._au_Q0_alpha) / (self.flux_params.f + Q0_alpha)
+            R_au_corr = self._au_specific_count_rate / (self._au_cd_factor * self._au_g_factor)
             
             # Mass fraction (g/g)
             concentration = (
-                R_a / self._au_specific_count_rate *
+                R_a_corr / R_au_corr *
                 1.0 / nuclide_data.k0_Au *
                 flux_ratio
             )
@@ -846,7 +862,7 @@ class K0Calculator:
                 raise ValueError("Need phi_thermal for absolute method")
             
             flux_factor = self.flux_params.phi_thermal * (self.flux_params.f + Q0_alpha) / self.flux_params.f
-            concentration = R_a / (nuclide_data.k0_Au * flux_factor)
+            concentration = R_a_corr / (nuclide_data.k0_Au * flux_factor)
         
         # Convert to μg/g (ppm)
         concentration_ug_g = concentration * 1e6
@@ -968,6 +984,9 @@ def create_k0_measurement_from_peak(
     t_decay: float,
     t_count: float,
     sample_mass: float,
+    g_th: float = 1.0,
+    g_ep: float = 1.0,
+    cd_factor: float = 1.0,
     tolerance_keV: float = 2.0,
 ) -> Optional[K0Measurement]:
     """
@@ -983,6 +1002,8 @@ def create_k0_measurement_from_peak(
         Timing parameters (s)
     sample_mass : float
         Sample mass (g)
+    g_th, g_ep, cd_factor : float
+        Optional correction factors (self-shielding, Cd)
     tolerance_keV : float
         Energy matching tolerance
         
@@ -1019,4 +1040,7 @@ def create_k0_measurement_from_peak(
         t_count=t_count,
         sample_mass=sample_mass,
         gamma_energy_keV=energy,
+        g_th=g_th,
+        g_ep=g_ep,
+        cd_factor=cd_factor,
     )

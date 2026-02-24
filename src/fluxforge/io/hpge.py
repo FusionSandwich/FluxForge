@@ -562,7 +562,7 @@ def chn_to_hpge_report(chn_spectrum: CHNSpectrum, report_id: Optional[str] = Non
 def read_hpge_spectrum(
     filepath: Union[str, Path],
     format_hint: Optional[str] = None,
-) -> Union[HPGeReport, CHNSpectrum]:
+) -> Union[HPGeReport, CHNSpectrum, "GammaSpectrum"]:
     """
     Read HPGe spectrum file with automatic format detection.
     
@@ -570,6 +570,8 @@ def read_hpge_spectrum(
     - Genie/LabSOCS TXT exports (.txt, .rpt)
     - CHN binary format (.chn)
     - SPE format (delegates to io.spe)
+    - CNF format (delegates to io.cnf)
+    - IEC format (delegates to io.iec)
     
     Parameters
     ----------
@@ -580,7 +582,7 @@ def read_hpge_spectrum(
         
     Returns
     -------
-    HPGeReport or CHNSpectrum
+    HPGeReport, CHNSpectrum, or GammaSpectrum
         Parsed spectrum data
     """
     filepath = Path(filepath)
@@ -594,6 +596,12 @@ def read_hpge_spectrum(
         # Delegate to SPE reader
         from fluxforge.io.spe import read_spe_file
         return read_spe_file(filepath)
+    elif format_hint == 'cnf' or suffix == '.cnf':
+        from fluxforge.io.cnf import read_cnf_file
+        return read_cnf_file(filepath)
+    elif format_hint == 'iec' or suffix == '.iec':
+        from fluxforge.io.iec import read_iec_file
+        return read_iec_file(filepath)
     else:
         # Try to detect format
         try:
@@ -605,6 +613,20 @@ def read_hpge_spectrum(
         # Try text report
         try:
             return read_hpge_report(filepath)
+        except Exception:
+            pass
+
+        # Try CNF
+        try:
+            from fluxforge.io.cnf import read_cnf_file
+            return read_cnf_file(filepath)
+        except Exception:
+            pass
+
+        # Try IEC
+        try:
+            from fluxforge.io.iec import read_iec_file
+            return read_iec_file(filepath)
         except Exception:
             pass
         

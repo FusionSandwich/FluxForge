@@ -95,8 +95,8 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 | O: ENDF/B-VIII.0 Access | 7 | 0 | 0 | 7 |
 | P: k₀-NAA Complete | 9 | 0 | 0 | 9 |
 | Q: RMLE Gamma Unfolding | 9 | 0 | 0 | 9 |
-| Z: NAA-ANN Neural Networks | 8 | 0 | 0 | 8 |
-| **Total** | **109** | **0** | **0** | **109** |
+| Z: NAA-ANN Neural Networks | 9 | 0 | 0 | 9 |
+| **Total** | **110** | **0** | **0** | **110** |
 
 **Implementation Coverage: 100% Complete ✅**
 **Test Suite: 731 tests passing**
@@ -197,6 +197,20 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 
 ## 4. Capability Backlog (Implementation Epics)
 
+### External Capability Gaps (from `testing/` repos)
+
+The following capabilities appear in the `testing/` reference codebases but are **not** currently implemented in FluxForge core. These are candidates for GUI/UX scope or optional modules:
+
+- Interactive spectrum viewer with keyboard navigation, zooming, and marker-based peak fitting (HDTV)
+- ROOT histogram and coincidence matrix I/O, plus matrix cuts/gating workflows (HDTV)
+- Interactive calibration assignment and persistent calibration list management (HDTV)
+- Command-shell style analysis interface with batch files and scripted command execution (HDTV)
+- Tabbed GUI workflow for data preparation, inversion, error analysis, and spectrum comparison (SpecKit)
+- File-picker driven CSV workflows for cross-sections, group boundaries, and result interchange (SpecKit)
+- Real-time solver convergence and spectrum visualization inside the GUI (SpecKit)
+- AI/ML peak-finding models for low-statistics and multiplet detection (peakingduck)
+- Optional C++/pybind acceleration for peak-finding pipelines (peakingduck)
+
 ### Epic A — Spectrum Ingestion, Metadata Validation, QA/QC
 
 | ID | Capability | Status | Module | Notes |
@@ -205,8 +219,11 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 | A1.2 | CHN format reader | ✅ | `io.hpge` | Full ORTEC/Maestro CHN binary support |
 | A1.3 | CNF (Canberra) format | ✅ | `io.cnf.read_cnf_file()` | Binary parser + tests |
 | A1.4 | N42/IEC XML format | ✅ | `io.n42` | Reader/writer + tests |
+| A1.9 | IEC ASCII (.iec) reader | ✅ | `io.iec.read_iec_file()` | IEC 62755-style ASCII import |
 | A1.5 | Background estimation (SNIP) | ✅ | `analysis.peakfit` | Full support |
 | A1.6 | Dead-time validation | ✅ | `io.spe` | `dead_time_fraction` |
+| A1.7 | PRA histogram reader | ✅ | `io.pra.read_pra_histogram()` | PRA ASCII import |
+| A1.8 | Text calibration import | ✅ | `io.calibration_text.read_pygammaspec_calibration()` | PyGammaSpec-style |
 
 ### Epic B — Peak Detection & Fitting
 
@@ -217,16 +234,20 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 | B1.3 | Hypermet peak shapes | ✅ | `analysis.hypermet` | `HypermetPeak`, `fit_hypermet_peak()` |
 | B1.4 | Multiplet handling | ✅ | `analysis.peakfit` | Shared width/background |
 | B1.5 | Peak fit covariance | ✅ | `analysis.peakfit` | `PeakFitResult.covariance` |
+| B1.6 | Spectrum arithmetic + smoothing | ✅ | `analysis.spectrum_math` | Add/subtract + moving average |
 
 ### Epic C — Efficiency & Activity Calculation
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| C1.1 | Efficiency curve fitting | ✅ | `data.efficiency` | Multi-source, outlier detection |
+| C1.1 | Efficiency curve fitting | ✅ | `analysis.detector_calibration.fit_efficiency_curve()` | Log-log polynomial fits + curve export |
 | C1.2 | Activity from peak area | ✅ | `physics.activation` | Full dead-time and decay correction |
 | C1.3 | Weighted activity (multi-line) | ✅ | `physics.activation` | `weighted_activity()` |
 | C1.4 | Coincidence summing corrections | ✅ | `corrections.coincidence` | Full decay scheme TCS for Co60/Y88/Cs134/Eu152/Na24 + tests |
 | C1.5 | **Gamma self-attenuation (NEW)** | ✅ | `corrections.gamma_attenuation` | Sample/container attenuation correction + tests |
+| C1.6 | Decay inventory + unit conversions | ✅ | `physics.decay_inventory` | Activity/mass/mole/atom conversions |
+| C1.7 | Resolution curve fitting | ✅ | `analysis.detector_calibration.fit_resolution_curve()` | FWHM vs energy models |
+| C1.8 | Material attenuation helpers | ✅ | `physics.attenuation` | XCOM-backed transmission for materials/mixtures |
 
 ### Epic D — Reaction Rates
 
@@ -402,6 +423,7 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 | N1.6 | Reaction browser CLI/API | ✅ | `cli.app reactions` | Category/target filter |
 | N1.7 | NJOY processing pipeline | ✅ | `data.njoy` | Reproducible group XS |
 | N1.8 | Wire set robustness diagnostics | ✅ | `analysis.robustness` | Condition/coverage/LOO analysis |
+| N1.9 | Offline placeholder XS library + search | ✅ | `data.crosssections` | `CrossSectionLibrary.search()` + `create_irdff_placeholder_library()` |
 
 ---
 
@@ -455,6 +477,7 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 | P1.7 | Cd-ratio with uncertainty | ✅ | `triga.cd_ratio` | `calculate_cd_ratio()` |
 | P1.8 | f/α reconciliation vs unfolded | ✅ | `triga.reconcile` | Cross-validation hook |
 | P1.9 | Separate uncertainty components | ✅ | `uncertainty.budget` | `UncertaintyBudget` with category breakdown |
+| P1.10 | Cd + self-shielding factors in k₀ calc | ✅ | `analysis.k0_naa` | `K0Measurement.g_th/g_ep/cd_factor` |
 
 ---
 
@@ -627,6 +650,7 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 | Z1.6 | MC dropout uncertainty | ✅ | `predict_with_uncertainty()` |
 | Z1.7 | Model serialization | ✅ | `.keras` format with config.json |
 | Z1.8 | Training pipeline | ✅ | `train_naa_ann_model()`, `create_training_dataset()` |
+| Z1.9 | 4e parity dataset loader | ✅ | `load_naa_ann4e_dataset()`, `prepare_naa_ann4e_dataset()` |
 
 **Notes:**
 - TensorFlow is an **optional** dependency - FluxForge core works without it
@@ -688,6 +712,10 @@ Every adjustment/unfold run must emit:
 - Sensitivity / influence measures (or leverage proxies)
 - Prior-to-posterior change diagnostics (where did spectrum move, and why?)
 
+#### Offline-Only Execution (R5)
+
+All core workflows must run without network access or external API calls. Any feature that depends on remote services or downloads must provide an offline, bundled alternative or be explicitly gated behind a user-controlled, opt-in step.
+
 ---
 
 ## 11. Test Suite Documentation
@@ -704,10 +732,30 @@ Every adjustment/unfold run must emit:
 | MCMC Solver | `test_mcmc.py` | 18 | ✅ |
 | Peak Finders | `test_peak_finders.py` | 20 | ✅ |
 | GLS Solver | `test_gls.py` | 15 | ✅ |
+| Flux Wire Parity | `test_flux_wire_parity.py` | 2 | ✅ |
+| 10-bin Unfolding Regression | `test_flux_unfolding_10bin.py` | 1 | ✅ |
+| k₀-NAA | `test_k0_naa.py` | 4 | ✅ |
+| NAA-ANN 4e Dataset | `test_naa_ann_4e_dataset.py` | 2 | ✅ |
+| Curie Parity Models | `test_curie_parity_models.py` | 4 | ✅ |
+| Curie IO Parity | `test_curie_io_parity.py` | 4 | ✅ |
+| Stopping Power Helpers | `test_stopping_tools.py` | 1 | ✅ |
+
+### 11.2 Validation Artifact Scripts (NEW)
+
+| Script | Purpose | Outputs |
+|--------|---------|---------|
+| `examples/validation/decay_inventory_parity.py` | radioactivedecay parity + UWNR activity regression | `artifacts/validation/decay_inventory/*` |
+| `examples/validation/pra_spectrum_parity.py` | PyGammaSpec PRA parity + RAFM peak extraction | `artifacts/validation/pra_spectrum/*` |
+| `examples/validation/pyfindpeaks_parity.py` | py-findpeaks parity on vector + RAFM peak indices | `artifacts/validation/pyfindpeaks/*` |
+| `examples/validation/decay_schedule_demo.py` | curie-style production schedule demo | `artifacts/validation/decay_schedule/*` |
+| `examples/validation/flux_wire_parity.py` | RAFM raw vs processed activity parity (±2%) | `artifacts/validation/flux_wire_parity/*` |
+| `examples/validation/flux_unfolding_10bin_regression.py` | 10-bin unfolding (raw vs processed) + plot | `artifacts/validation/flux_unfolding_10bin/*` |
+| `examples/validation/naa_ann_4e_parity.py` | NAA-ANN-1 4e parity vs published results | `artifacts/validation/naa_ann_4e/*` |
+| `examples/validation/curie_io_parity.py` | Curie SPE/CHN/CNF/IEC IO parity | `artifacts/validation/curie_io/*` |
 | GRAVEL/MLEM | `test_iterative.py` | 18 | ✅ |
 | SPE Reading | `test_spe.py` | 10 | ✅ |
 | IRDFF Database | `test_irdff.py` | 12 | ✅ |
-| k₀-NAA | `test_k0.py` | 8 | ✅ |
+| k₀-NAA | `test_k0_naa.py` | 4 | ✅ |
 | NAA-ANN Neural Networks | `test_naa_ann.py` | 22 | ✅ |
 | Transport Code I/O | `test_transport_io.py` | 13 | ✅ |
 | Peak Finder Methods | `test_peak_finder_methods.py` | 16 | ✅ |
@@ -738,6 +786,18 @@ python testing_validation/compare_fluxforge_testing.py --test all
 
 # Process RAFM flux wire data
 python testing_validation/process_rafm_flux_wires.py --wire all
+
+# Raw vs processed parity (FluxForge-only)
+python examples/validation/flux_wire_parity.py
+
+# 10-bin unfolding regression (raw + processed)
+python examples/validation/flux_unfolding_10bin_regression.py
+
+# NAA-ANN-1 4e parity
+python examples/validation/naa_ann_4e_parity.py
+
+# Curie IO parity (SPE/CHN/CNF/IEC)
+python examples/validation/curie_io_parity.py
 ```
 
 ---
@@ -982,14 +1042,23 @@ cat testing_validation/rafm_results/FLUX_WIRE_REPORT.md
 
 | Category | Local Path | Key Features |
 |----------|-----------|--------------|
-| HPGe I/O | `testing/gamma_spec_analysis` | Lightweight spectrum I/O |
-| Peak Workflow | `testing/hdtv` | Peak shapes, ROOT patterns |
-| Peak Detection | `testing/peakingduck` | SNIP, windowed methods |
-| Forward Gamma | `testing/actigamma` | Gamma synthesis |
-| Isotope Tables | `testing/irrad_spectroscopy` | Gamma tables, fluence |
+| HPGe I/O | `testing/gamma_spec_analysis` | Smoothing + peak plotting helpers |
+| Spectrum GUI/CLI | `testing/hdtv` | Interactive CLI + GUI, calibration, ROOT spectra/matrices |
+| Spectrum PWA | `testing/Gamma-MCA` | Web/PWA spectrum viewer, import/export, serial plotting |
+| Peak Detection | `testing/peakingduck` | SNIP + windowed methods, optional ML |
+| Peak Algorithms | `testing/py-findpeaks` | Catalog of peak-finding filters |
+| Forward Gamma | `testing/actigamma` | Gamma line synthesis from activities |
+| Scintillation | `testing/PyGammaSpec` | Scintillator spectrum processing |
+| Isotope Tables | `testing/irrad_spectroscopy` | Isotope ID + dose/fluence tools |
+| Spectrum Toolkit | `testing/becquerel` | Spectrum I/O + calibration/fitting |
+| Activation Toolkit | `testing/curie` | Calibration, decay chain, cross sections |
+| Activation Toolkit | `testing/npat` | Calibration, decay chain, cross sections |
 | Unfolding | `testing/Neutron-Unfolding` | GRAVEL/MLEM Python |
-| Regularized | `testing/SpecKit` | Gradient descent |
-| MLEM-STOP | `testing/Neutron-Spectrometry` | Stopping criteria |
+| Unfolding | `testing/pyunfold` | Iterative unfolding library |
+| Regularized GUI | `testing/SpecKit` | Gradient descent + GUI workflow |
+| MLEM-STOP CLI | `testing/Neutron-Spectrometry` | Stopping criteria + ROOT plots |
+| Cross Section Eval | `testing/gmapy` | Uncertainty-aware evaluation |
+| NAA-ANN | `testing/NAA-ANN-1` | ANN workflow + data augmentation |
 
 ### 15.2 External References
 
@@ -1042,6 +1111,32 @@ The following are optional enhancements that may be added based on user needs:
 2. **Additional spectrum formats** - ROOT, CNF extensions as needed
 3. **GPU acceleration** - Available for NAA-ANN when CUDA is configured
 4. **Additional peak finding methods** - CWT, morphological, etc.
+
+---
+
+## Appendix C: GUI/CLI Roadmap (Future TODOs)
+
+The following capabilities are planned and not counted in current completion metrics:
+
+| ID | Capability | Status | Notes |
+|----|------------|--------|-------|
+| C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Planned | PeakEasy/QuantumGold-class UX |
+| C2 | ROI/peak workflows with multiplet deconvolution | Planned | Interactive peak tables + fit control |
+| C3 | Energy/efficiency calibration UI | Planned | Curve fit + residuals |
+| C4 | Batch operations (sum/append/convert, ROI integration) | Planned | Format conversion + batch reports |
+| C5 | GUI-to-CLI macro recorder + project file | Planned | Reproducible workflows |
+| C6 | Interactive CLI shell (HDTV-style) | Planned | Batch scripts + keybindings |
+| C7 | Config-driven CLI tools (Neutron-Spectrometry-style) | Planned | Unfold/plot/trend/plot-lines |
+| C8 | STAYSL parity UI panels (SigPhi/SHIELD/BCF) | Planned | Spreadsheet-style workflow |
+| C9 | Online GUI/PWA (Gamma-MCA-style) | Planned | Offline-first browser UI |
+| C10 | MCA acquisition plugin (future) | Planned | Serial/WebUSB-class devices |
+| C11 | Dose rate + isotope ID workflows | Planned | From `testing/irrad_spectroscopy` |
+| C12 | Gamma line synthesis from activities | Planned | From `testing/actigamma` |
+| C13 | Cross section evaluation with covariances | Planned | From `testing/gmapy` |
+| C14 | Expanded peak-finding algorithms | Planned | From `testing/py-findpeaks` |
+| C15 | Scintillation detector workflows | Planned | From `testing/PyGammaSpec` |
+| C16 | ANN-based NAA workflow | Planned | From `testing/NAA-ANN-1` |
+| C17 | Additional unfolding libraries | Planned | From `testing/pyunfold` |
 
 ---
 

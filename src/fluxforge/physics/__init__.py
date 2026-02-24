@@ -43,6 +43,25 @@ from fluxforge.physics.neutron_corrections import (
     ATOMIC_WEIGHTS,
     CD_CUTOFF_ENERGY,
 )
+from fluxforge.physics.decay_library import (
+    DecayDataset,
+    normalize_nuclide_label as normalize_decay_label,
+)
+from fluxforge.physics.decay_inventory import (
+    DecayInventory,
+    DecayNetwork,
+    CountObservation,
+    ProductionSegment,
+    schedule_from_rates,
+    evolve_with_schedule,
+    fit_schedule_scale,
+)
+from fluxforge.physics.attenuation import (
+    AttenuationMaterial,
+    get_material,
+    attenuation_factor,
+    mixture_attenuation_factor,
+)
 
 __all__ = [
     # activation
@@ -84,4 +103,19 @@ __all__ = [
     "RESONANCE_INTEGRALS",
     "ATOMIC_WEIGHTS",
     "CD_CUTOFF_ENERGY",
+    # decay library/inventory
+    "DecayDataset",
+    "normalize_decay_label",
+    "DecayInventory",
+    "DecayNetwork",
+    "CountObservation",
+    "ProductionSegment",
+    "schedule_from_rates",
+    "evolve_with_schedule",
+    "fit_schedule_scale",
+    # attenuation
+    "AttenuationMaterial",
+    "get_material",
+    "attenuation_factor",
+    "mixture_attenuation_factor",
 ]

@@ -20,6 +20,8 @@ import sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # Add FluxForge to path
@@ -573,7 +575,13 @@ def main():
     print(f"{'Mean Ratio':<20} {metrics['fluxforge']['mean_ratio']:.4f}{'':<10} {naaann1_metrics['fluxforge']['mean_ratio']:.4f}")
     
     print("\nNotes:")
-    print("- FluxForge uses sklearn MLP (TensorFlow not available)")
+    if backend == "tensorflow":
+        backend_note = "TensorFlow/Keras"
+    elif backend == "sklearn":
+        backend_note = "sklearn MLP"
+    else:
+        backend_note = "numpy ridge regression"
+    print(f"- FluxForge model backend: {backend_note}")
     print("- NAA-ANN-1 uses TensorFlow 2.2 with patch-based architecture")
     print("- Both methods demonstrate feasibility of ANN for NAA")
     print("- Full FluxForge NAA-ANN would include data augmentation")

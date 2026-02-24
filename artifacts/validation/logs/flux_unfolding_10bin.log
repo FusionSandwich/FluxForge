@@ -1,0 +1,9 @@
+TensorFlow not available. NAA-ANN features will be limited.
+Saved plot to /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/artifacts/validation/flux_unfolding_10bin/unfolding_comparison.png
+{
+  "processed_reactions": 10,
+  "raw_reactions": 10,
+  "model_spectrum": "/groupspace/cnerg/users/smandych/projects/ALARA/rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/spectrum_vit_j.csv",
+  "processed_gls_chi2": 417.26438752034665,
+  "raw_gls_chi2": 455.3198762948159
+}

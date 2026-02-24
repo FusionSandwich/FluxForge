@@ -187,6 +187,11 @@ class EfficiencyCurve:
             log_eff_high = sum(c * log_e_high**i for i, c in enumerate(high_coeffs))
             efficiency[high_mask] = np.exp(log_eff_high)
         
+        elif form == 'semi_empirical_hpge':
+            from fluxforge.analysis.efficiency_models import semi_empirical_efficiency
+            coeffs = self.parameters.get('coefficients', [])
+            efficiency = semi_empirical_efficiency(energy, coeffs)
+
         else:
             raise ValueError(f"Unknown functional form: {form}")
         
@@ -241,6 +246,18 @@ class EfficiencyCurve:
                 fill_value=(cal_uncertainties[0], cal_uncertainties[-1])
             )
             return interp(np.atleast_1d(energy)).squeeze()
+        
+        elif model_type == 'covariance':
+            if self.model_type == 'functional' and self.parameters.get('form') == 'semi_empirical_hpge':
+                from fluxforge.analysis.efficiency_models import semi_empirical_efficiency_uncertainty
+                coeffs = self.parameters.get('coefficients', [])
+                covariance = np.array(self.uncertainty_model.get('covariance', []))
+                abs_unc = semi_empirical_efficiency_uncertainty(energy, coeffs, covariance)
+                eff = self._efficiency_functional(np.atleast_1d(energy))
+                rel_unc = np.zeros_like(eff, dtype=float)
+                mask = eff > 0
+                rel_unc[mask] = abs_unc[mask] / eff[mask]
+                return rel_unc.squeeze()
         
         return 0.05 * np.ones_like(np.atleast_1d(energy)).squeeze()
     

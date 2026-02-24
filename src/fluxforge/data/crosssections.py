@@ -346,6 +346,69 @@ class CrossSectionLibrary:
     def filter_by_mt(self, mt: int) -> List[CrossSection]:
         """Get all cross sections with given MT number."""
         return [xs for xs in self.cross_sections.values() if xs.mt_number == mt]
+
+    def search(
+        self,
+        target: Optional[str] = None,
+        outgoing: Optional[str] = None,
+        product: Optional[str] = None,
+    ) -> List[CrossSection]:
+        """
+        Search library by reaction components.
+
+        Parameters
+        ----------
+        target : str, optional
+            Target nuclide label (e.g., 'Au-197')
+        outgoing : str, optional
+            Outgoing particle shorthand (e.g., 'g', 'γ', 'p', '2n', 'f')
+        product : str, optional
+            Product nuclide label (e.g., 'Au-198')
+        """
+        results = []
+        for xs in self.cross_sections.values():
+            parts = _parse_reaction_label(xs.reaction)
+            if target and parts.target != target:
+                continue
+            if outgoing and not _match_outgoing(parts.outgoing, outgoing):
+                continue
+            if product and parts.product != product:
+                continue
+            results.append(xs)
+        return results
+
+
+@dataclass
+class ReactionParts:
+    target: str
+    incident: str
+    outgoing: str
+    product: str
+
+
+REACTION_RE = re.compile(r"^(?P<target>[^(]+)\((?P<incident>[^,]+),(?P<outgoing>[^)]+)\)(?P<product>.*)$")
+
+
+def _parse_reaction_label(label: str) -> ReactionParts:
+    match = REACTION_RE.match(label)
+    if not match:
+        return ReactionParts(target=label, incident="", outgoing="", product="")
+    return ReactionParts(
+        target=match.group("target"),
+        incident=match.group("incident"),
+        outgoing=match.group("outgoing"),
+        product=match.group("product"),
+    )
+
+
+def _match_outgoing(value: str, query: str) -> bool:
+    if value == query:
+        return True
+    if query.lower() in ("g", "gamma") and value in ("γ", "g"):
+        return True
+    if value.lower() == query.lower():
+        return True
+    return False
     
     def save(self, filepath: Union[str, Path]) -> None:
         """Save library to JSON file."""

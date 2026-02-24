@@ -523,6 +523,73 @@ class ScipyPeakFinder:
         return self.find(spectrum)
 
 
+class DirectScipyPeakFinder:
+    """
+    Direct wrapper around scipy.signal.find_peaks.
+    """
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def find(self, spectrum: np.ndarray) -> List[PeakInfo]:
+        indices, _ = signal.find_peaks(spectrum, **self.kwargs)
+        return [PeakInfo(index=int(idx), value=float(spectrum[int(idx)])) for idx in indices]
+
+    def find_peaks(self, spectrum: np.ndarray) -> List[PeakInfo]:
+        return self.find(spectrum)
+
+
+class WaveletPeakFinder:
+    """
+    Continuous wavelet peak finder (scipy.signal.find_peaks_cwt).
+    """
+
+    def __init__(
+        self,
+        widths: Optional[np.ndarray] = None,
+        min_snr: float = 1.0,
+        noise_perc: float = 10.0,
+    ):
+        self.widths = widths if widths is not None else np.arange(1, 8)
+        self.min_snr = min_snr
+        self.noise_perc = noise_perc
+
+    def find(self, spectrum: np.ndarray) -> List[PeakInfo]:
+        indices = signal.find_peaks_cwt(
+            spectrum,
+            self.widths,
+            min_snr=self.min_snr,
+            noise_perc=self.noise_perc,
+        )
+        peaks = [
+            PeakInfo(index=int(idx), value=float(spectrum[int(idx)]))
+            for idx in indices
+        ]
+        return peaks
+
+    def find_peaks(self, spectrum: np.ndarray) -> List[PeakInfo]:
+        return self.find(spectrum)
+
+
+class RelativeExtremaPeakFinder:
+    """
+    Relative extrema peak finder (scipy.signal.argrelextrema).
+    """
+
+    def __init__(self, order: int = 3):
+        self.order = order
+
+    def find(self, spectrum: np.ndarray) -> List[PeakInfo]:
+        indices = signal.argrelextrema(spectrum, np.greater, order=self.order)[0]
+        return [
+            PeakInfo(index=int(idx), value=float(spectrum[int(idx)]))
+            for idx in indices
+        ]
+
+    def find_peaks(self, spectrum: np.ndarray) -> List[PeakInfo]:
+        return self.find(spectrum)
+
+
 def refine_peak_centroids(
     spectrum: np.ndarray,
     peaks: List[PeakInfo],

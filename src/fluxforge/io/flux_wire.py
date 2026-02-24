@@ -93,14 +93,15 @@ NUCLIDE_LINE_RE = re.compile(
 
 # ROI/Peak data line
 # "  1173.0   99.85    1173.13    28,478 ± 169      11,202 ± 520    Co60@1173.2    5.94E-03"
+# Some exports include a space after '@' (e.g., "In115m@ 336.")
 PEAK_LINE_RE = re.compile(
-    r"^\s*([\d.]+)\s+"           # ROI centroid (channel or energy)
-    r"([\d.]+)\s+"               # Radiation intensity %
-    r"([\d.]+)\s+"               # Center energy (keV)
-    r"([\d,]+)\s*[±�\s]+(\d+)\s+"  # Gross counts ± unc
-    r"([\d,]+)\s*[±�\s]+(\d+)\s+"  # Net counts ± unc
-    r"(\w+@[\d.]+)\s+"           # Assignment (nuclide@energy)
-    r"([0-9.E+-]+)",             # Activity
+    r"^\s*([\d.]+)\s+"            # ROI centroid (channel or energy)
+    r"([\d.]+)\s+"                # Radiation intensity %
+    r"([\d.]+)\s+"                # Center energy (keV)
+    r"([\d,]+)\s*[±�\s]+([\d,]+)\s+"  # Gross counts ± unc
+    r"([\d,]+)\s*[±�\s]+([\d,]+)\s+"  # Net counts ± unc
+    r"(\w+@\s*[\d.]+)\s+"         # Assignment (nuclide@energy)
+    r"([0-9.E+-]+)",              # Activity
     re.IGNORECASE
 )
 
@@ -692,10 +693,10 @@ def read_processed_txt(filepath: Union[str, Path]) -> FluxWireData:
                 'rad_int': float(match.group(2)),
                 'center_keV': float(match.group(3)),
                 'gross_counts': _parse_number(match.group(4)) or 0,
-                'gross_unc': int(match.group(5)),
+                'gross_unc': int(_parse_number(match.group(5)) or 0),
                 'net_counts': _parse_number(match.group(6)) or 0,
-                'net_unc': int(match.group(7)),
-                'assignment': match.group(8),
+                'net_unc': int(_parse_number(match.group(7)) or 0),
+                'assignment': match.group(8).replace(" ", ""),
                 'activity': float(match.group(9)),
             }
             current_nuclide.peaks.append(peak)

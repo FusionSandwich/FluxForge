@@ -78,8 +78,37 @@ from fluxforge.analysis.peak_finders import (
     WindowPeakFinder,
     ChunkedPeakFinder,
     ScipyPeakFinder,
+    DirectScipyPeakFinder,
+    WaveletPeakFinder,
+    RelativeExtremaPeakFinder,
     refine_peak_centroids,
     merge_nearby_peaks,
+)
+
+from fluxforge.analysis.spectrum_math import (
+    add_spectra,
+    subtract_spectra,
+    moving_average,
+)
+
+from fluxforge.analysis.line_search import (
+    LineMatch,
+    search_decay_lines,
+    list_nuclide_lines,
+)
+from fluxforge.analysis.spectroscopy_tools import (
+    PeakCandidate,
+    PeakFitSummary,
+    prominence_peaks,
+    fit_gaussian_baseline,
+)
+from fluxforge.analysis.detector_calibration import (
+    EfficiencyPoint,
+    EfficiencyFit,
+    ResolutionCurve,
+    ResolutionFit,
+    fit_efficiency_curve,
+    fit_resolution_curve,
 )
 
 from fluxforge.analysis.flux_wire_analysis import (
@@ -225,8 +254,24 @@ __all__ = [
     'WindowPeakFinder',
     'ChunkedPeakFinder',
     'ScipyPeakFinder',
+    'DirectScipyPeakFinder',
+    'WaveletPeakFinder',
+    'RelativeExtremaPeakFinder',
     'refine_peak_centroids',
     'merge_nearby_peaks',
+    # Spectrum math
+    'add_spectra',
+    'subtract_spectra',
+    'moving_average',
+    # Line search
+    'LineMatch',
+    'search_decay_lines',
+    'list_nuclide_lines',
+    # Spectroscopy tools
+    'PeakCandidate',
+    'PeakFitSummary',
+    'prominence_peaks',
+    'fit_gaussian_baseline',
     # Flux wire analysis
     'FLUX_WIRE_NUCLIDES',
     'ELEMENT_TO_ISOTOPES',
@@ -289,4 +334,3 @@ if _HAS_NAA_ANN:
         'train_naa_ann_model',
         'HAS_TENSORFLOW',
     ])
-

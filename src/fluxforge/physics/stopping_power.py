@@ -15,7 +15,12 @@ from dataclasses import dataclass, field
 from typing import Optional, Union, List, Tuple, Dict, Any
 from enum import Enum
 import numpy as np
-from numpy.typing import NDArray
+try:
+    from numpy.typing import NDArray
+except ImportError:  # Fallback for older numpy
+    class NDArray:  # type: ignore
+        def __class_getitem__(cls, item):
+            return np.ndarray
 
 
 class Projectile(Enum):

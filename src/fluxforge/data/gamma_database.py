@@ -17,34 +17,22 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 
 
-# Path to actigamma data (if installed)
-ACTIGAMMA_DATA_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "..", "..", "..", "..", "..", 
-    "testing", "actigamma", "actigamma", "data",
-    "lines_decay_2012.min.json"
-)
-
 # Alternative paths to search for actigamma data
 def find_actigamma_data():
     """Search for actigamma data in various locations."""
+    env_root = os.environ.get("FLUXFORGE_DATA")
     search_paths = [
-        # Relative to this file going up to project root
-        os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                     "..", "..", "..", "..", "..",
-                     "testing", "actigamma", "actigamma", "data",
-                     "lines_decay_2012.min.json"),
         # Common installation paths
-        os.path.expanduser("~/.fluxforge/data/lines_decay_2012.min.json"),
-        "/usr/share/fluxforge/data/lines_decay_2012.min.json",
+        Path("~/.fluxforge/data/lines_decay_2012.min.json").expanduser(),
+        Path("/usr/share/fluxforge/data/lines_decay_2012.min.json"),
         # Try environment variable
-        os.path.join(os.environ.get("FLUXFORGE_DATA", ""), "lines_decay_2012.min.json"),
+        Path(env_root) / "lines_decay_2012.min.json" if env_root else None,
         # Try finding in actigamma package
     ]
     
     for path in search_paths:
-        if path and os.path.exists(path):
-            return path
+        if path and Path(path).exists():
+            return str(path)
     
     # Try to find actigamma via import
     try:

@@ -197,6 +197,45 @@ class TestDerivativePeakFinder:
         assert len(peaks) >= 2
 
 
+class TestWaveletPeakFinder:
+    """Tests for WaveletPeakFinder."""
+
+    def test_wavelet_finds_peaks(self):
+        from fluxforge.analysis.peak_finders import WaveletPeakFinder
+
+        spectrum = generate_synthetic_spectrum(noise_scale=0.0)
+        finder = WaveletPeakFinder()
+        peaks = finder.find_peaks(spectrum)
+
+        assert len(peaks) >= 2
+
+
+class TestRelativeExtremaPeakFinder:
+    """Tests for RelativeExtremaPeakFinder."""
+
+    def test_relative_extrema_finds_peaks(self):
+        from fluxforge.analysis.peak_finders import RelativeExtremaPeakFinder
+
+        spectrum = generate_synthetic_spectrum(noise_scale=0.0)
+        finder = RelativeExtremaPeakFinder(order=5)
+        peaks = finder.find_peaks(spectrum)
+
+        assert len(peaks) >= 2
+
+
+class TestDirectScipyPeakFinder:
+    """Tests for DirectScipyPeakFinder."""
+
+    def test_direct_finder_basic(self):
+        from fluxforge.analysis.peak_finders import DirectScipyPeakFinder
+
+        spectrum = generate_synthetic_spectrum(noise_scale=0.0)
+        finder = DirectScipyPeakFinder()
+        peaks = finder.find_peaks(spectrum)
+
+        assert len(peaks) >= 2
+
+
 class TestSecondDifferencePeakFinder:
     """Tests for SecondDifferencePeakFinder."""
     

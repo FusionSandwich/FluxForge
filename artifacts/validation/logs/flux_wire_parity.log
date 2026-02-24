@@ -1,0 +1,11 @@
+TensorFlow not available. NAA-ANN features will be limited.
+Flux wire parity summary:
+{
+  "comparisons": 17,
+  "missing": [],
+  "ratio_mean": 0.9996700440245182,
+  "ratio_std": 0.005684793986775623,
+  "max_abs_diff_pct": 1.4595766006082256
+}
+Saved /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/artifacts/validation/flux_wire_parity/raw_vs_processed_parity.csv
+Saved /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/artifacts/validation/flux_wire_parity/summary.json

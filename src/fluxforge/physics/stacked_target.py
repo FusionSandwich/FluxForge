@@ -15,7 +15,12 @@ from dataclasses import dataclass, field
 from typing import Optional, Union, List, Dict, Any, Tuple
 from pathlib import Path
 import numpy as np
-from numpy.typing import NDArray
+try:
+    from numpy.typing import NDArray
+except ImportError:  # Fallback for older numpy
+    class NDArray:  # type: ignore
+        def __class_getitem__(cls, item):
+            return np.ndarray
 
 from .stopping_power import (
     Material, Projectile, STANDARD_MATERIALS,

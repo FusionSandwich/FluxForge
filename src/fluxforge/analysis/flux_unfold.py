@@ -28,6 +28,7 @@ from fluxforge.analysis.flux_wire_analysis import (
     ELEMENT_TO_ISOTOPES,
     FluxWireAnalysisResult,
     analyze_flux_wire,
+    analyze_flux_wire_targeted,
     get_sample_element,
     get_expected_isotopes,
 )
@@ -453,6 +454,104 @@ def extract_reactions_from_processed(
             decay_time_s=decay_time_s,
         )
         # Add flux as extra attribute
+        rxn.flux = flux
+        rxn.flux_type = flux_type
+        
+        reactions.append(rxn)
+    
+    return reactions
+
+
+def extract_reactions_from_raw(
+    raw_data: FluxWireData,
+    reference_data: Optional[FluxWireData] = None,
+    sample_mass_mg: Optional[float] = None,
+    irradiation_time_s: float = 3600.0,
+    decay_time_s: float = 0.0,
+    calculate_flux: bool = True,
+    peak_threshold: float = 0.0,
+) -> List[FluxWireReaction]:
+    """
+    Extract reaction information from raw flux wire spectra.
+    
+    This uses targeted peak extraction and optional processed references
+    to align energy calibration, efficiency, and resolution.
+    """
+    if raw_data.has_spectrum is False:
+        return []
+    
+    # Apply reference calibration/efficiency if provided
+    if reference_data is not None:
+        if reference_data.energy_calibration:
+            raw_data.energy_calibration = reference_data.energy_calibration
+            raw_data.spectrum.calibration['energy'] = reference_data.energy_calibration
+            raw_data.spectrum.energies = raw_data.channel_to_energy(raw_data.spectrum.channels)
+        if reference_data.efficiency is not None:
+            raw_data.efficiency = reference_data.efficiency
+        if reference_data.resolution:
+            raw_data.resolution = reference_data.resolution
+    
+    # Targeted analysis for activities
+    analysis = analyze_flux_wire_targeted(
+        data=raw_data,
+        reference_data=reference_data,
+        peak_threshold=peak_threshold,
+    )
+    
+    sample_element = get_sample_element(raw_data.sample_id)
+    reactions: List[FluxWireReaction] = []
+    
+    for isotope, activity in analysis.nuclide_activities.items():
+        activity_bq = activity.get('activity_bq', 0.0)
+        activity_unc = activity.get('activity_unc_bq', activity_bq * 0.1)
+        
+        # Get half-life
+        half_life_s = FLUX_WIRE_NUCLIDES.get(isotope, {}).get('half_life_s', 0.0)
+        
+        # Get reaction ID
+        reaction_id = get_reaction_id(isotope, sample_element)
+        
+        # Calculate number of target atoms
+        isotope_fraction = get_isotope_fraction(reaction_id, sample_element or '')
+        n_atoms = calculate_n_atoms(
+            element=sample_element or 'Co',
+            mass_mg=sample_mass_mg,
+            isotope_fraction=isotope_fraction,
+        )
+        
+        # Calculate reaction rate
+        if half_life_s > 0 and n_atoms > 0 and activity_bq > 0:
+            rate = activity_to_reaction_rate(
+                activity_bq=activity_bq,
+                n_atoms=n_atoms,
+                half_life_s=half_life_s,
+                irradiation_time_s=irradiation_time_s,
+                decay_time_s=decay_time_s,
+                live_time_s=raw_data.live_time,
+            )
+            rate_unc = rate * (activity_unc / activity_bq) if activity_bq > 0 else 0.0
+        else:
+            rate = 0.0
+            rate_unc = 0.0
+        
+        # Calculate flux from reaction rate
+        flux = 0.0
+        flux_type = 'unknown'
+        if calculate_flux and rate > 0:
+            flux, flux_type = reaction_rate_to_flux(rate, reaction_id)
+        
+        rxn = FluxWireReaction(
+            sample_id=raw_data.sample_id,
+            reaction_id=reaction_id,
+            isotope=isotope,
+            activity_bq=activity_bq,
+            activity_unc_bq=activity_unc,
+            reaction_rate=rate,
+            reaction_rate_unc=rate_unc,
+            n_atoms=n_atoms,
+            irradiation_time_s=irradiation_time_s,
+            decay_time_s=decay_time_s,
+        )
         rxn.flux = flux
         rxn.flux_type = flux_type
         

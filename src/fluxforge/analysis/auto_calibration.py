@@ -7,7 +7,12 @@ Automatic energy calibration by matching peaks to known isotope lines.
 from dataclasses import dataclass, field
 from typing import Optional, List, Tuple, Dict, Any
 import numpy as np
-from numpy.typing import NDArray
+try:
+    from numpy.typing import NDArray
+except ImportError:  # Fallback for older numpy
+    class NDArray:  # type: ignore
+        def __class_getitem__(cls, item):
+            return np.ndarray
 
 
 # Known calibration isotopes with prominent gamma lines
