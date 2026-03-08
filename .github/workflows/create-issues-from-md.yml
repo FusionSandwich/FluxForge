@@ -1,0 +1,87 @@
+name: Create Issues from Markdown Files
+
+on:
+  push:
+    branches:
+      - copilot/add-md-files-as-issues
+    paths:
+      - '.github/workflows/create-issues-from-md.yml'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create issues from Markdown files
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const issuesDir = 'examples/RAFM_irradiation/issues';
+            const files = fs.readdirSync(issuesDir)
+              .filter(f => f.endsWith('.md'))
+              .sort();
+
+            // Get existing issues to avoid duplicates
+            const existingIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'all',
+                per_page: 100,
+              }
+            );
+            const existingTitles = new Set(existingIssues.map(i => i.title));
+
+            let created = 0;
+            let skipped = 0;
+
+            for (const file of files) {
+              const filePath = path.join(issuesDir, file);
+              const content = fs.readFileSync(filePath, 'utf8');
+              const lines = content.split('\n');
+
+              // Extract title from first heading line
+              const titleLine = lines[0] || '';
+              const title = titleLine.replace(/^#+\s*/, '').trim();
+              const body = content;
+
+              if (!title) {
+                console.log(`Skipping ${file}: no title found`);
+                continue;
+              }
+
+              if (existingTitles.has(title)) {
+                console.log(`Skipping "${title}": issue already exists`);
+                skipped++;
+                continue;
+              }
+
+              try {
+                const issue = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: title,
+                  body: body,
+                });
+                console.log(`Created issue #${issue.data.number}: ${title}`);
+                existingTitles.add(title);
+                created++;
+                // Small delay to avoid rate limiting
+                await new Promise(r => setTimeout(r, 500));
+              } catch (err) {
+                console.error(`Failed to create issue for "${title}": ${err.message}`);
+              }
+            }
+
+            console.log(`\nSummary: ${created} issues created, ${skipped} skipped (already exist).`);
