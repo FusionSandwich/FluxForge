@@ -53,13 +53,14 @@ jobs:
               const content = fs.readFileSync(filePath, 'utf8');
               const lines = content.split('\n');
 
-              // Extract title from first heading line
-              const titleLine = lines[0] || '';
-              const title = titleLine.replace(/^#+\s*/, '').trim();
+              // Extract title from the first heading line (search all lines)
+              const headingLine = lines.find(l => /^#+\s+\S/.test(l)) || '';
+              const title = headingLine.replace(/^#+\s*/, '').trim();
               const body = content;
 
               if (!title) {
-                console.log(`Skipping ${file}: no title found`);
+                console.log(`Skipping ${file}: no heading/title found`);
+                skipped++;
                 continue;
               }
 
