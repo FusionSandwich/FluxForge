@@ -3,8 +3,10 @@ name: Create Issues from Markdown Files
 on:
   push:
     branches:
-      - copilot/add-md-files-as-issues
+      - main
+      - add_gui
     paths:
+      - 'examples/RAFM_irradiation/issues/*.md'
       - '.github/workflows/create-issues-from-md.yml'
   workflow_dispatch:
 
