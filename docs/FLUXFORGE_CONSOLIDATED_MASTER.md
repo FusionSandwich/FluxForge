@@ -3,8 +3,8 @@
 **HPGe-driven flux-wire / foil activation analysis • Neutron spectrum unfolding • Model validation**  
 **OpenMC 0.15.3 (CE transport ± depletion) vs MCNP6.3 + ALARA (group activation)**
 
-**Version:** 3.0  
-**Last Updated:** 2026-01-10  
+**Version:** 3.1  
+**Last Updated:** 2026-03-08  
 **Scope:** End-to-end, reproducible pipeline from raw HPGe spectra to (a) unfolded/group spectra with covariance and (b) rigorous model-to-experiment comparisons for TRIGA irradiations (flux wires/foils + larger samples).
 
 ---
@@ -199,7 +199,7 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 
 ### External Capability Gaps (from `testing/` repos)
 
-The following capabilities appear in the `testing/` reference codebases but are **not** currently implemented in FluxForge core. These are candidates for GUI/UX scope or optional modules:
+The remaining external gaps are now primarily **workflow, UI, and optional integration** features. Analytical parity items from the `testing/` repositories are tracked in Epics R through Z below.
 
 - Interactive spectrum viewer with keyboard navigation, zooming, and marker-based peak fitting (HDTV)
 - ROOT histogram and coincidence matrix I/O, plus matrix cuts/gating workflows (HDTV)
@@ -210,6 +210,8 @@ The following capabilities appear in the `testing/` reference codebases but are 
 - Real-time solver convergence and spectrum visualization inside the GUI (SpecKit)
 - AI/ML peak-finding models for low-statistics and multiplet detection (peakingduck)
 - Optional C++/pybind acceleration for peak-finding pipelines (peakingduck)
+- Guided educational NAA workflow and report packaging for comparator-standard assignments
+
 
 ### Epic A — Spectrum Ingestion, Metadata Validation, QA/QC
 
@@ -235,6 +237,13 @@ The following capabilities appear in the `testing/` reference codebases but are 
 | B1.4 | Multiplet handling | ✅ | `analysis.peakfit` | Shared width/background |
 | B1.5 | Peak fit covariance | ✅ | `analysis.peakfit` | `PeakFitResult.covariance` |
 | B1.6 | Spectrum arithmetic + smoothing | ✅ | `analysis.spectrum_math` | Add/subtract + moving average |
+| B1.7 | Derivative & Top-hat peak search | Planned | `analysis.peak_finders` | First/second derivative and top-hat filtering (QG parity) |
+| B1.8 | Quadratic smoothing | Planned | `analysis.spectrum_math` | Savitzky-Golay / quadratic pre-filters (QG parity) |
+| B1.9 | Dynamic ROI sizing | Planned | `analysis.peakfit` | ROI width scaled automatically by FWHM(E) resolution calibration |
+| B1.10 | Multicomponent deconvolution | Planned | `analysis.deconvolution` | Weighted NLLS for overlapping multiplets (QG parity) |
+| B1.11 | Library-directed multiplet seeding | Planned | `analysis.deconvolution` | Deconvolution seeded using expected library line energies |
+| B1.12 | Linear continuum background | Planned | `analysis.peakfit` | Local subtraction via linear interpolation between ROI edges |
+| B1.13 | AI/ML peak detection | Planned | `analysis.peak_finders` | Optional ML-driven peak finding (peakingduck integration) |
 
 ### Epic C — Efficiency & Activity Calculation
 
@@ -248,6 +257,8 @@ The following capabilities appear in the `testing/` reference codebases but are 
 | C1.6 | Decay inventory + unit conversions | ✅ | `physics.decay_inventory` | Activity/mass/mole/atom conversions |
 | C1.7 | Resolution curve fitting | ✅ | `analysis.detector_calibration.fit_resolution_curve()` | FWHM vs energy models |
 | C1.8 | Material attenuation helpers | ✅ | `physics.attenuation` | XCOM-backed transmission for materials/mixtures |
+| C1.9 | ROI-directed operation mode | Planned | `physics.activation` | Direct activity from ROIs skipping library search (QG parity) |
+| C1.10 | Zero-count MDA reporting | Planned | `physics.mda` | Decision thresholds and bounds even for missing peaks (QG parity) |
 
 ### Epic D — Reaction Rates
 
@@ -285,11 +296,11 @@ The following capabilities appear in the `testing/` reference codebases but are 
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| G1.1 | Spectrum with uncertainty bands | ✅ | `examples/generate_plots.py` |
-| G1.2 | Prior vs posterior overlay | ✅ | Implemented |
-| G1.3 | Residual/pull plots | ✅ | Implemented |
-| G1.4 | Covariance/correlation heatmaps | ✅ | Implemented |
-| G1.5 | Parity plot | ✅ | Implemented |
+| G1.1 | Spectrum with uncertainty bands | ✅ | `fluxforge plots --example` / `plots.master_suite` |
+| G1.2 | Prior vs posterior overlay | ✅ | `plots.master_suite` |
+| G1.3 | Residual/pull plots | ✅ | `plots.unfolding.plot_residuals_pulls()` |
+| G1.4 | Covariance/correlation heatmaps | ✅ | `plots.unfolding.plot_covariance_correlation_heatmaps()` |
+| G1.5 | Parity plot | ✅ | `plots.unfolding.plot_measured_vs_predicted()` |
 
 ### Epic H — Model Comparison (OpenMC/MCNP)
 
@@ -660,6 +671,31 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 ---
 
+## 9j. Instructional NAA Workflow
+
+**Goal:** Add a guided comparator-standard neutron activation analysis workflow that can directly support the calculations, plots, identifications, and report artifacts required for general instructional settings and comparator-standard assignments.
+
+This module is specifically intended to cover: common standard feature identification (e.g., Na-22), energy calibration (e.g., Ba-133/Co-60), calibrated plotting for multiple irradiated samples, single-element and standard identification, comparator-based mass estimation from known references, cadmium-wrap interpretation, minimum detectable concentration analysis, and export of a report-ready summary bundle.
+
+| ID | Capability | Status | Notes |
+|----|------------|--------|-------|
+| AA1.1 | Teaching-spectrum import | Planned | Support generic ASC and similar station exports with metadata capture for count time, gain, HV, and geometry |
+| AA1.2 | Calibration source feature templates | Planned | Built-in annotated references for common tuning sources, including photopeaks, annihilation peak, Compton edge, escape, and backscatter features |
+| AA1.3 | Uncertainty-aware energy calibration report | Partial | Core calibration exists; add fit covariance, residual linearity plots, and peak-energy prediction intervals for reporting |
+| AA1.4 | Reference-assisted isotope identification | Planned | Match candidate isotopes using standard nuclear data libraries, energy windows, relative intensities, half-lives, and required line-accounting rules |
+| AA1.5 | Batch calibrated spectrum plotting | Planned | Generate counts-vs-energy figures for unknowns and standards with uncertainty bars and labeled major peaks |
+| AA1.6 | Comparator-standard mass estimation | Planned | Implement decay-corrected comparator equations using a known standard's mass/composition, count times, efficiencies, and branching ratios |
+| AA1.7 | Single-element sample identity solver | Planned | Rank sample identities and require all strong expected lines to be present or explicitly justified as absent |
+| AA1.8 | Standard-type classification | Planned | Compare unknowns against supported standard libraries and reference spectra to identify the standard category |
+| AA1.9 | Irradiation / decay / counting time planner | Planned | Use $A(t)=N\sigma\phi\left(1-e^{-\lambda t_{irr}}\right)e^{-\lambda t_d}$ and count-statistics models to study short-lived vs long-lived isotope timing tradeoffs |
+| AA1.10 | Cadmium-wrap interpretation workflow | Partial | Core Cd-cover physics exists; add comparison outputs for thermal suppression, epithermal emphasis, and resonance-sensitive monitor interpretation |
+| AA1.11 | Minimum detectable concentration calculator | Planned | Add MDA, critical level, and detection limit calculations with background, efficiency, gamma yield, and sample mass terms |
+| AA1.12 | Analysis report bundle + checklist export | Planned | Export abstract prompts, instrument settings, uncertainty tables, figure packs, and configuration checklist artifacts |
+| AA1.13 | Instrument-settings provenance capture | Planned | Require amplifier gain, shaping, HV, MCA calibration, live/real time, and count geometry in every instructional run bundle |
+| AA1.14 | Quantitative discussion helpers | Planned | Auto-generate supporting tables for earlier-count sensitivity, isotope half-life classes, and detector-limit drivers for discussion sections |
+
+---
+
 ## 10. Critical Pitfalls and Guardrails
 
 ### 10.1 Existing Guardrails
@@ -716,13 +752,29 @@ Every adjustment/unfold run must emit:
 
 All core workflows must run without network access or external API calls. Any feature that depends on remote services or downloads must provide an offline, bundled alternative or be explicitly gated behind a user-controlled, opt-in step.
 
+#### Instructional NAA Identification Guardrail (R6)
+
+For educational and survey isotope identification, FluxForge must not accept a nuclide assignment from a single line alone unless the run explicitly records why corroborating lines are absent (low efficiency, overlap, short half-life, low branching ratio, or cutoff energy range).
+
+#### Comparator Quantification Guardrail (R7)
+
+Mass or concentration estimates for unknown samples must record the comparator standard, irradiation equivalence assumption, counting geometry, decay reference time, gamma line used, and every applied correction factor. If any of these are missing, the result must be labeled **qualitative only**.
+
+#### Calibration Extrapolation Guardrail (R8)
+
+Any peak identification outside the convex hull of calibration peaks must be labeled **extrapolated** and accompanied by the propagated energy uncertainty from the fit covariance.
+
+#### Detection-Limit Guardrail (R9)
+
+Claims that an element is "not present" are forbidden. The system must instead report either **not detected above decision threshold** or a quantitative upper bound derived from the adopted detection-limit model.
+
 ---
 
 ## 11. Test Suite Documentation
 
 ### 11.1 Test Summary
 
-**Current Status:** 136+ tests passing
+**Current Status:** 827 tests passing
 
 | Test Category | File | Tests | Status |
 |---------------|------|-------|--------|
@@ -736,22 +788,18 @@ All core workflows must run without network access or external API calls. Any fe
 | 10-bin Unfolding Regression | `test_flux_unfolding_10bin.py` | 1 | ✅ |
 | k₀-NAA | `test_k0_naa.py` | 4 | ✅ |
 | NAA-ANN 4e Dataset | `test_naa_ann_4e_dataset.py` | 2 | ✅ |
-| Curie Parity Models | `test_curie_parity_models.py` | 4 | ✅ |
-| Curie IO Parity | `test_curie_io_parity.py` | 4 | ✅ |
+| Reference Model Parity | `test_reference_model_parity.py` | 4 | ✅ |
+| Spectrum IO Parity | `test_spectrum_io_parity.py` | 4 | ✅ |
+| Unfolding External Baseline Parity | `test_unfolding_parity_baseline.py` | 2 | ✅ |
 | Stopping Power Helpers | `test_stopping_tools.py` | 1 | ✅ |
 
 ### 11.2 Validation Artifact Scripts (NEW)
 
 | Script | Purpose | Outputs |
 |--------|---------|---------|
-| `examples/validation/decay_inventory_parity.py` | radioactivedecay parity + UWNR activity regression | `artifacts/validation/decay_inventory/*` |
-| `examples/validation/pra_spectrum_parity.py` | PyGammaSpec PRA parity + RAFM peak extraction | `artifacts/validation/pra_spectrum/*` |
-| `examples/validation/pyfindpeaks_parity.py` | py-findpeaks parity on vector + RAFM peak indices | `artifacts/validation/pyfindpeaks/*` |
-| `examples/validation/decay_schedule_demo.py` | curie-style production schedule demo | `artifacts/validation/decay_schedule/*` |
 | `examples/validation/flux_wire_parity.py` | RAFM raw vs processed activity parity (±2%) | `artifacts/validation/flux_wire_parity/*` |
 | `examples/validation/flux_unfolding_10bin_regression.py` | 10-bin unfolding (raw vs processed) + plot | `artifacts/validation/flux_unfolding_10bin/*` |
-| `examples/validation/naa_ann_4e_parity.py` | NAA-ANN-1 4e parity vs published results | `artifacts/validation/naa_ann_4e/*` |
-| `examples/validation/curie_io_parity.py` | Curie SPE/CHN/CNF/IEC IO parity | `artifacts/validation/curie_io/*` |
+| `examples/validation/spectrum_io_parity.py` | SPE/CHN/CNF/IEC IO parity from stored baselines | `artifacts/validation/spectrum_io/*` |
 | GRAVEL/MLEM | `test_iterative.py` | 18 | ✅ |
 | SPE Reading | `test_spe.py` | 10 | ✅ |
 | IRDFF Database | `test_irdff.py` | 12 | ✅ |
@@ -781,11 +829,8 @@ python -m pytest tests/ --cov=fluxforge --cov-report=html
 **Location:** `/testing_validation/`
 
 ```bash
-# Run comparison framework
-python testing_validation/compare_fluxforge_testing.py --test all
-
-# Process RAFM flux wire data
-python testing_validation/process_rafm_flux_wires.py --wire all
+# Run the external-reference comparison framework
+python testing_validation/compare_fluxforge_against_testing.py
 
 # Raw vs processed parity (FluxForge-only)
 python examples/validation/flux_wire_parity.py
@@ -793,11 +838,8 @@ python examples/validation/flux_wire_parity.py
 # 10-bin unfolding regression (raw + processed)
 python examples/validation/flux_unfolding_10bin_regression.py
 
-# NAA-ANN-1 4e parity
-python examples/validation/naa_ann_4e_parity.py
-
-# Curie IO parity (SPE/CHN/CNF/IEC)
-python examples/validation/curie_io_parity.py
+# Spectrum IO parity (SPE/CHN/CNF/IEC)
+python examples/validation/spectrum_io_parity.py
 ```
 
 ---
@@ -1137,11 +1179,18 @@ The following capabilities are planned and not counted in current completion met
 | C15 | Scintillation detector workflows | Planned | From `testing/PyGammaSpec` |
 | C16 | ANN-based NAA workflow | Planned | From `testing/NAA-ANN-1` |
 | C17 | Additional unfolding libraries | Planned | From `testing/pyunfold` |
+| C18 | Guided instructional NAA workflow | Planned | End-to-end educational NAA path from calibration to analysis report |
+| C19 | Calibration wizard for standard sources | Planned | Annotated feature picking, residuals, and covariance-aware fit review |
+| C20 | Reference-assisted isotope ID workspace | Planned | Candidate ranking with line-accounting and half-life checks |
+| C21 | Comparator-standard mass worksheet | Planned | Reference-driven mass/concentration estimation with uncertainty propagation |
+| C22 | Irradiation / decay / count-time planner | Planned | Short-lived vs long-lived isotope timing studies |
+| C23 | MDA detection-limit worksheet | Planned | Report-ready detection thresholds and upper bounds |
+| C24 | Analysis checklist + figure-pack export | Planned | Abstract prompts, settings tables, plots, and completion checklist |
 
 ---
 
-**Document Version:** 3.0  
-**Last Updated:** 2026-01-10  
+**Document Version:** 3.1  
+**Last Updated:** 2026-03-08  
 **Prepared by:** FluxForge Development Team
 **Test Suite:** 740 tests passing, 0 skipped
 **GPU Support:** NVIDIA T600, CUDA 12.5.1, cuDNN 9

@@ -199,9 +199,13 @@ Add pipeline orchestration and neutron-dosimetry views.
   - peak-finder filter.
 
 ### C. Peak workflows
-- Peak search (configurable).
-- Multi-peak fitting + deconvolution for overlapped peaks.
+- Peak search (configurable filtering: first/second derivative, top-hat, optional AI/ML).
+- Dynamic ROI sizing linked to theoretical FWHM resolution calibration.
+- Multi-peak fitting + weighted NLLS deconvolution for overlapped peaks.
+- Library-directed (auto-seed from lines) and ROI-directed (manual ROI) operation modes.
+- Linear continuum background subtraction between ROI edges.
 - Negative channel counts display support for background subtraction scenarios (where relevant).
+- Robust MDA reporting capabilities (even for zero-count expectations).
 
 ### D. Calibration workflows
 - Energy calibration editor (interactive).
@@ -346,6 +350,10 @@ FluxForge is primarily analysis-scale, but interactive UX benefits from fast ker
 
 ## Implementation Phases
 
+0. **Headless plotting baseline (implemented)**:
+   - `fluxforge plots --example` generates the core master-plan plots (G1.1-G1.5)
+     without opening windows (Agg backend), so SSH sessions can validate plotting
+     capability before interactive GUI work.
 1. **UI skeleton + spectrum viewer (read-only)** + artifact export.
 2. **Annotations + ROI + peak tools** (interactive fit panel).
 3. **Calibration UI** (energy + efficiency) + exportable calibration artifacts.

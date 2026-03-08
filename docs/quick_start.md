@@ -2,6 +2,104 @@
 
 ## Running Flux Spectrum Analysis
 
+### RAFM Background-Subtracted Ingest
+
+For RAFM irradiation campaigns, use the explicit `rafm_25cm` profile. It supplies the shared background file plus the shared 25 cm detector efficiency and resolution defaults, while each raw `.ASC` file keeps its own header energy calibration (`A + B*Ch + C*Ch^2`) unless you override it.
+
+```bash
+python -m fluxforge.cli.app ingest-batch \
+  --input-dir examples/RAFM_irradiation/raw_gamma_spec \
+  --profile rafm_25cm \
+  --background-scale-mode live \
+  --output-dir examples/RAFM_irradiation/results/spectrum_artifacts \
+  --background-adjusted-dir examples/RAFM_irradiation/results/background_adjusted \
+  --final-corrected-dir examples/RAFM_irradiation/results/final_corrected
+```
+
+Notes:
+- Background subtraction is enabled by default in `ingest`.
+- `ingest-batch --profile rafm_25cm` applies the same measured background file and shared detector efficiency defaults to every spectrum in the input directory tree.
+- If no background file is provided, FluxForge emits a warning and continues.
+- Negative bins from subtraction are retained in stored spectra and in uncertainty propagation.
+- SNIP now uses an internal offset working copy instead of clipping RAFM background-subtracted counts before background estimation.
+- Background-adjusted outputs are written as channel tables under the directory passed to `--background-adjusted-dir`.
+- Final corrected channel tables can also be written with `--save-final-corrected` or `--final-corrected-dir` when efficiency coefficients are available.
+
+### RAFM Gold-Standard Validation Workflow
+
+Run the full self-contained RAFM example workflow:
+
+```bash
+cd FluxForge
+PYTHONPATH=src python examples/RAFM_irradiation/run_validation.py
+```
+
+This workflow:
+- analyzes every committed raw RAFM and flux-wire spectrum with the shared `background.ASC`
+- uses the bundled `rafm_25cm` detector profile while preserving each raw `.ASC` file's own `A + B*Ch + C*Ch^2` calibration
+- compares matched raw/QG pairs against the committed QG gold-standard dataset
+- writes per-spectrum JSON artifacts, count tables, comparison CSVs, and plots under `examples/RAFM_irradiation/results/`
+- computes flux-wire Cd ratios and unfolds the neutron spectrum with `DISCRETE`, `GLS`, `GRAVEL`, and `MLEM`
+
+If you want the workflow to complete and write the bundle even when validation thresholds are violated:
+
+```bash
+cd FluxForge
+PYTHONPATH=src python examples/RAFM_irradiation/run_validation.py --no-fail
+```
+
+Single-spectrum example with both exports:
+
+```bash
+python -m fluxforge.cli.app ingest \
+  --input examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC \
+  --profile rafm_25cm \
+  --output examples/RAFM_irradiation/results/spectrum_artifacts/RAFM4/RAFM4-B_15dEOI.json \
+  --save-background-adjusted examples/RAFM_irradiation/results/background_adjusted/RAFM4/RAFM4-B_15dEOI_background_adjusted.csv \
+  --save-final-corrected examples/RAFM_irradiation/results/final_corrected/RAFM4/RAFM4-B_15dEOI_final_corrected.csv
+```
+
+### Manual Peak Inspection Over SSH
+
+If you want to inspect a calibrated gamma spectrum and choose peak ends manually before the GUI exists, export a spectrum plot and optionally overlay manual ROIs from a CSV or JSON file.
+
+Example ROI CSV:
+
+```csv
+label,left_keV,right_keV,isotope
+Sc47_main,158.6,160.1,Sc47
+Sc48_175,174.7,176.2,Sc48
+```
+
+Plot the calibrated spectrum in energy space with background subtraction applied:
+
+```bash
+python -m fluxforge.cli.app spectrum-plot \
+  --input examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC \
+  --profile rafm_25cm \
+  --background-subtracted \
+  --manual-peaks-file examples/RAFM_irradiation/manual_peaks_ti.csv \
+  --output examples/RAFM_irradiation/results/plots/manual/Ti-RAFM-1a_25cm_manual.png \
+  --save-peak-report examples/RAFM_irradiation/results/manual/Ti-RAFM-1a_25cm_manual_peaks.json
+```
+
+Notes:
+- `spectrum-plot` always applies energy calibration to the x-axis.
+- `--background-subtracted` switches the plotted y-values from raw counts to measured-background-subtracted counts.
+- Manual ROIs can be provided in either energy or channel space.
+- `--save-peak-report` turns the manual ROI definitions into a FluxForge peak-report artifact that can be passed into later activity steps.
+
+You can also create the manual peak report without writing a plot:
+
+```bash
+python -m fluxforge.cli.app peaks \
+  --spectrum-file examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC \
+  --profile rafm_25cm \
+  --background-subtracted \
+  --manual-peaks-file examples/RAFM_irradiation/manual_peaks_ti.csv \
+  --output examples/RAFM_irradiation/results/manual/Ti-RAFM-1a_25cm_manual_peaks.json
+```
+
 ### Basic Example: Fe-Cd-RAFM-1 Single Foil
 
 Generate flux spectrum from experimental data:
@@ -31,7 +129,7 @@ python -m pytest tests/test_master_plan_goals.py -v
 python -m pytest tests/test_pipeline_validation.py -v
 ```
 
-**Expected Results:** 83 of 85 tests pass
+Run these from the `FluxForge/` repo root. In the full environment from [environment.yml](/filespace/s/smandych/CAE/projects/ALARA/FluxForge/environment.yml), TensorFlow and `h5py` are installed so optional-library tests do not skip for missing dependencies.
 
 ### Example Workflow in Python
 
