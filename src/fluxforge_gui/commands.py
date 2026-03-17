@@ -1,7 +1,5 @@
 """Desktop GUI shell for FluxForge.
 
-SYNC_MARKER_TEMP
-
 The GUI is intentionally CLI-first:
 - Every button maps to an existing ``fluxforge`` subcommand handler.
 - The equivalent CLI command is shown in the run log.
@@ -9,143 +7,16 @@ The GUI is intentionally CLI-first:
 """
 
 from __future__ import annotations
-
-import contextlib
-import io
-import json
-import shlex
 from argparse import Namespace
-from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, Iterable, Optional
-import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-from tkinter.scrolledtext import ScrolledText
+from tkinter import messagebox
 
 import numpy as np
-from scipy import optimize
-
-try:
-    from matplotlib.backends.backend_tkagg import (
-        FigureCanvasTkAgg,
-        NavigationToolbar2Tk,
-    )
-    from matplotlib.figure import Figure
-except ImportError:  # pragma: no cover - optional GUI plotting dependency
-    FigureCanvasTkAgg = None
-    NavigationToolbar2Tk = None
-    Figure = None
-
-from fluxforge.analysis.flux_wire_analysis import (
-    _covell_style_local_continuum_counts,
-    _gilmore_moving_minimum_counts,
-    _standards_tiered_counts,
-)
-from fluxforge.analysis.detector_calibration import (
-    EfficiencyPoint,
-    fit_efficiency_curve,
-)
-from fluxforge.analysis.peak_finders import (
-    PEAK_FINDER_METHODS,
-    find_peaks_multi_method,
-    get_peak_finder,
-)
-from fluxforge.analysis.peakfit import (
-    fit_hypermet_peak,
-    fit_multiple_peaks,
-    fit_single_peak,
-)
 from fluxforge.cli import app as cli_app
-from fluxforge.data.efficiency import CALIBRATION_SOURCES, EfficiencyCurve
-from fluxforge.data.flux_wire_catalog import (
-    get_flux_wire_catalog_entry,
-    list_flux_wire_isotopes,
-)
-from fluxforge.data.irdff_access import get_default_library
-from fluxforge.data.nndc import get_nuclear_data
-from fluxforge.data.gamma_database import get_database
-from fluxforge.data.nuclear_data_sources import (
-    load_gamma_identification_source,
-    summarize_nuclear_data_source,
-)
-from fluxforge.io.artifacts import (
-    read_k0_analysis_bundle,
-    read_line_activities,
-    read_peak_report,
-    read_report_bundle,
-    read_reaction_rates,
-    read_spectrum_file,
-    read_unfold_result,
-    read_validation_bundle,
-    write_peak_report,
-    write_report_bundle,
-    write_spectrum_file,
-)
-from fluxforge.io.spe import GammaSpectrum
 from fluxforge.physics.decay_chain import DecayChain
 from fluxforge.physics.stacked_target import StackedTarget
-from fluxforge.physics.stopping_power import Projectile, STANDARD_MATERIALS
-from fluxforge.triga.cd_ratio import STANDARD_MONITORS
-from fluxforge_gui.constants import (
-    ALLOWED_REACTION_CATEGORIES,
-    GUI_BUFFER_OPERATIONS,
-    GUI_PEAK_COUNTING_METHODS,
-    GUI_PEAK_IDENTIFICATION_METHODS,
-    GUI_RAFM_COUNTING_METHODS,
-    GUI_UNFOLD_METHODS,
-    GUI_UNFOLD_MLEM_CONVERGENCE_MODES,
-)
-from fluxforge_gui.models import (
-    GuiCalibrationFit,
-    GuiCalibrationPoint,
-    GuiDiagnosticPlot,
-    GuiDiagnosticSeries,
-    GuiEfficiencyCalibrationPoint,
-    GuiManualRegion,
-    GuiPeakCountingResult,
-    GuiSpectrumPeak,
-    GuiSpectrumPreview,
-    GuiSpectrumSeries,
-)
-from fluxforge_gui.presets import (
-    build_standards_preset_values,
-    get_gui_data_source_choices,
-    get_gui_profile_choices,
-    get_standards_gui_presets,
-)
-from fluxforge_gui.reporting import (
-    build_gui_astm_e2005_preview,
-    build_gui_astm_e261_preview,
-    build_gui_astm_e262_preview,
-    build_gui_astm_e3376_preview,
-    build_gui_k0_preview,
-    build_gui_report_preview,
-    discover_gui_validation_report_inputs,
-    render_gui_activity_result,
-    render_gui_rate_result,
-    render_gui_unfold_result,
-    render_gui_validation_result,
-    summarize_gui_activity_result,
-    summarize_gui_rate_result,
-    summarize_gui_unfold_result,
-    summarize_gui_validation_result,
-)
-from fluxforge_gui.spectrum_ops import (
-    _coerce_path_tokens,
-    _series_to_spectrum,
-    auto_detect_gui_peaks,
-    build_calibration_residual_plot,
-    build_efficiency_fit_diagnostic_plot,
-    build_gui_spectrum_preview,
-    build_peak_count_diagnostic_plot,
-    combine_gui_spectrum_series,
-    count_gui_peak,
-    fit_gui_constrained_multiplet,
-    fit_gui_energy_calibration,
-    parse_gui_constraint_matrix,
-    render_gui_spectrum_preview,
-    save_gui_spectrum_preview_image,
-)
+from fluxforge.physics.stopping_power import Projectile
+from fluxforge_gui.constants import GUI_RAFM_COUNTING_METHODS
 
 
 class CommandsMixin:
@@ -188,11 +59,20 @@ class CommandsMixin:
             self.stacked_summary.set("Stack calculation produced no energy points.")
             return
         summary_lines = [
-            f"Foil {item.foil_index + 1}: Ein {item.energy_in_MeV:.3f} MeV, Emean {item.energy_mean_MeV:.3f} MeV, Eout {item.energy_out_MeV:.3f} MeV"
+            (
+                f"Foil {item.foil_index + 1}: "
+                f"Ein {item.energy_in_MeV:.3f} MeV, "
+                f"Emean {item.energy_mean_MeV:.3f} MeV, "
+                f"Eout {item.energy_out_MeV:.3f} MeV"
+            )
             for item in energies[:6]
         ]
         self.stacked_summary.set(
-            f"Solved {len(energies)} foil position(s) for {self.stacked_projectile.get()} at {self.stacked_beam_energy.get()} MeV. "
+            (
+                f"Solved {len(energies)} foil position(s) for "
+                f"{self.stacked_projectile.get()} at "
+                f"{self.stacked_beam_energy.get()} MeV. "
+            )
             + " | ".join(summary_lines)
         )
 
@@ -243,8 +123,10 @@ class CommandsMixin:
         )
         self.decay_summary.set(
             (
-                f"Decay chain solved for {parent} → {daughter}. Final parent activity {parent_final:.3f} Bq, "
-                f"final daughter activity {daughter_final:.3f} Bq, peak daughter activity {peak_daughter:.3f} Bq."
+                f"Decay chain solved for {parent} → {daughter}. "
+                f"Final parent activity {parent_final:.3f} Bq, "
+                f"final daughter activity {daughter_final:.3f} Bq, "
+                f"peak daughter activity {peak_daughter:.3f} Bq."
             )
         )
 
@@ -387,7 +269,13 @@ class CommandsMixin:
             y_log=self.preview_y_scale.get() == "log",
             validate=self.ingest_validate.get(),
         )
-        tokens = ["spectrum-plot", "--input", str(args.input), "--output", str(args.output)]
+        tokens = [
+            "spectrum-plot",
+            "--input",
+            str(args.input),
+            "--output",
+            str(args.output),
+        ]
         if args.profile:
             tokens.extend(["--profile", args.profile])
         if args.background_file:

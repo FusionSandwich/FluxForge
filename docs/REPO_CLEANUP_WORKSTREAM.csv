@@ -1,0 +1,475 @@
+folder_bucket,path,line_count,review_status,suggested_action,accuracy_risk,duplicate_findings,required_tests_before,required_tests_after
+.github,.github/workflows/create-issues-from-md.yml,91,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+.github,.github/workflows/quality-checks.yml,161,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+README.md,README.md,72,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+docs,docs/ASTM_standards/ASTM_Implementation_Plan.md,59,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/ASTM_standards/astm_e261_workflow.md,148,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/FLUXFORGE_CONSOLIDATED_MASTER.md,1226,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/GUI_CAPABILITY_PROGRAM.md,92,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/GUI_PLAN.md,573,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/PR_DRAFT_warning_fix_native_gui.md,42,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/capability_gap_analysis.md,262,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/experimental_results_summary.md,225,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/fluxforge_inl_peak_roi_activity_requirements.md,838,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/gui_feature_mapping.md,90,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/k0_workflow.md,118,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/rafm_parity_and_standards_dev_notes.md,137,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/standards_workflow_matrix.md,144,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/testing_gui_survey.md,103,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/legacy_plans/testing_repo_capability_matrix.md,119,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/master_plan.md,634,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/recovery/2026-03-17/app_recovered.py,1,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/recovery/2026-03-17/app_recovered_311.py,1,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/recovery/2026-03-17/app_recovered_39.py,1,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/archive/roadmap.md,272,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/literature/peakeasy_capabilities_and_algorithms_for_fluxforge.md,683,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/theory/methods_and_analysis.md,17,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/tutorials/0_quick_start.md,355,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/tutorials/1_getting_started.md,24,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/tutorials/duplicate_audit_2026-03-17.md,45,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/tutorials/repo_cleanup_and_style.md,123,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/workflows/inl_workflow.md,17,baseline-captured,keep,medium,none flagged yet,lint + path/reference checks,lint + path/reference checks
+docs,docs/workflows/qg_workflow.md,11,baseline-captured,keep,medium,none flagged yet,lint + path/reference checks,lint + path/reference checks
+environment.yml,environment.yml,24,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+examples,examples/RAFM_irradiation/RAFM_processing_plan.md,239,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/_compare_common.py,35,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/compare_astm_e2005_to_qg.py,284,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/compare_astm_e262_to_qg.py,126,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/compare_astm_e3376_to_qg.py,83,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/compare_astm_to_qg.py,113,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/compare_inl_workflow_to_qg.py,98,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/compare_peak_count_methods.py,1300,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/count_parity_llm_handoff.md,350,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/01_background_subtraction_core.md,15,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/02_gamma_spectrum_uncertainty_field.md,15,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/03_negative_bin_hybrid_policy.md,15,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/04_cli_ingest_background_and_overrides.md,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/05_loader_override_precedence.md,14,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/06_hpge_pipeline_background_integration.md,15,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/07_flux_wire_pipeline_background_integration.md,15,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/08_rafm_validation_tests.md,18,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/09_user_docs_and_quick_start_updates.md,14,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/100_GUI_Validation_Covariance_Heatmap.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/101_GUI_Pipeline_Irradiation_History_Forms.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/102_GUI_Pipeline_Reaction_Rate_Table.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/103_GUI_Pipeline_Unfold_Solver_Config.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/104_GUI_Batch_Conversion_Summing_UI.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/105_GUI_Export_HTML_PDF_Bundle.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/106_GUI_Packaging_PyInstaller_Release.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/107_ASTM_E844_Dosimetry_Metadata_Models.md,29,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/108_ASTM_E261_Reaction_Rate_Math.md,26,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/109_ASTM_E261_E844_Unit_Tests.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/10_rafm_25cm_preset_profile.md,17,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/110_ASTM_E261_E844_Workflow_Example.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/111_IEC61452_Energy_FWHM_Calibration.md,22,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/112_ASTM_E3376_Efficiency_Curve_Fit.md,22,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/113_IEC61452_Corrections_TCS_PileUp.md,18,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/114_TECDOC2026_Facility_Characterization.md,20,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/115_TECDOC2026_Activation_Corrections.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/116_TECDOC2026_Mass_Fraction_Solver.md,21,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/117_TRS487_Traceability_Provenance_Engine.md,11,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/118_TRS487_Blank_Interference_Correction.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/11_flux_wire_parity_background_fixture.md,15,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/12_snip_signed_background_estimation.md,16,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/13_full_conda_test_environment.md,16,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/14_rafm4_phase2_whale_timing.md,14,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/15_per_sample_qg_comparison_reports.md,21,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/16_generic_peak_recovery_and_identification.md,18,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/17_uncertainty_propagation_audit.md,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/18_measurement_time_activity_parity.md,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/19_hpge_profile_low_energy_efficiency.md,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/20_sc48_qg_export_inconsistency.md,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/21_flux_wire_catalog_data_module.md,20,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/22_data_backed_branching_uncertainty.md,20,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/23_flux_unfold_data_externalization.md,31,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/24_line_level_efficiency_activity_diagnostics.md,33,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/25_qg_internal_consistency_audit.md,20,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/26_peak_area_audit_against_qg_counts.md,17,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/27_rafm25cm_detector_profile_bias.md,23,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/28_crowded_region_isotope_mismatch.md,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/29_qg_peak_gross_net_energy_side_by_side.md,22,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/30_flux_wire_raw_count_parity_split.md,21,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/31_flux_wire_gross_count_protocol_gap.md,17,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/32_background_energy_alignment_before_subtraction.md,13,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/33_broad_peak_comparison_roi.md,18,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/34_manual_roi_spectrum_inspection.md,31,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/35_keep_main_rafm_workflow_automatic.md,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/36_generic_flux_wire_comparison_window_scoring.md,34,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/37_AA1.11_Minimum_detectable_concentration_calculator.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/37_generic_rafm_count_background_model.md,24,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/38_AA1.12_Analysis_report_bundle___checklist_export.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/39_AA1.13_Instrument_settings_provenance_capture.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/40_AA1.14_Quantitative_discussion_helpers.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/41_AA1.1_Teaching_spectrum_import.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/42_AA1.2_Calibration_source_feature_templates.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/43_AA1.4_Reference_assisted_isotope_identification.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/44_AA1.5_Batch_calibrated_spectrum_plotting.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/45_AA1.6_Comparator_standard_mass_estimation.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/46_AA1.7_Single_element_sample_identity_solver.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/47_AA1.8_Standard_type_classification.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/48_AA1.9_Irradiation___decay___counting_time_planner.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/49_B1.10_Multicomponent_deconvolution.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/50_B1.11_Library_directed_multiplet_seeding.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/51_B1.12_Linear_continuum_background.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/52_B1.13_AI_ML_peak_detection.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/53_B1.7_Derivative___Top_hat_peak_search.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/54_B1.8_Quadratic_smoothing.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/55_B1.9_Dynamic_ROI_sizing.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/56_C1.10_Zero_count_MDA_reporting.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/57_C1.9_ROI_directed_operation_mode.md,9,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/58_C10_MCA_acquisition_plugin__future_.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/59_C11_Dose_rate___isotope_ID_workflows.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/60_C12_Gamma_line_synthesis_from_activities.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/61_C13_Cross_section_evaluation_with_covariances.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/62_C14_Expanded_peak_finding_algorithms.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/63_C15_Scintillation_detector_workflows.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/64_C16_ANN_based_NAA_workflow.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/65_C17_Additional_unfolding_libraries.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/66_C18_Guided_instructional_NAA_workflow.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/67_C19_Calibration_wizard_for_standard_sources.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/68_C1_Desktop_GUI_spectrum_viewer__pan_zoom__overlays__ROI_edit_.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/69_C20_Reference_assisted_isotope_ID_workspace.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/70_C21_Comparator_standard_mass_worksheet.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/71_C22_Irradiation___decay___count_time_planner.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/72_C23_MDA_detection_limit_worksheet.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/73_C24_Analysis_checklist___figure_pack_export.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/74_C2_ROI_peak_workflows_with_multiplet_deconvolution.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/75_C3_Energy_efficiency_calibration_UI.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/76_C4_Batch_operations__sum_append_convert__ROI_integration_.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/77_C5_GUI_to_CLI_macro_recorder___project_file.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/78_C6_Interactive_CLI_shell__HDTV_style_.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/79_C7_Config_driven_CLI_tools__Neutron_Spectrometry_style_.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/80_C8_STAYSL_parity_UI_panels__SigPhi_SHIELD_BCF_.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/81_C9_Online_GUI_PWA__Gamma_MCA_style_.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/82_GUI_Core_DearPyGui_App_Loop.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/83_GUI_Core_Thread_Worker_Non_Blocking.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/84_GUI_Core_CLI_Macro_Transcript_Panel.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/85_GUI_Ingest_Project_Workspace_Wizard.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/86_GUI_Ingest_Spectrum_File_Picker.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/87_GUI_Viewer_Base_Canvas_Pan_Zoom.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/88_GUI_Viewer_Multi_Spectrum_Overlay.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/88_generic_targeted_library_selector.md,26,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/89_GUI_Viewer_Interactive_Cursor_Readout.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/90_GUI_Viewer_Selectable_Point_Annotations.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/91_GUI_Viewer_Manual_ROI_Click_Drag.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/92_GUI_Peaks_Search_Configuration_Panel.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/93_GUI_Peaks_Linear_Continuum_UI.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/94_GUI_Peaks_Multiplet_Deconvolution_Plotting.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/95_GUI_Peaks_Results_Data_Grid.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/96_GUI_Calib_Energy_Sliders_Fit_View.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/97_GUI_Calib_Efficiency_Standard_Lines.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/98_GUI_Calib_Resolution_FWHM_Curve.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/issues/99_GUI_Validation_Calculated_Expected_Parity.md,8,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/results/method_benchmark/method_summary.md,38,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/results/tables/flux_wire_count_disagreement_summary.md,41,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/results/validation_summary.md,34,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/results_benchmark_qg_alias_check/method_benchmark/method_summary.md,15,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/run_validation.py,98,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/RAFM_irradiation/test_read_qg.py,1,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/cadmium_cover_correction_example.py,296,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/complete_flux_unfolding.py,754,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/complete_flux_wire_workflow.py,427,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/complete_naa_workflow.py,418,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/endf_mf33_covariance_demo.py,86,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/epic_features_demo.py,426,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/flux_wire_unfolding_comparison.py,754,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/flux_wire_unfolding_demo.py,516,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/gamma_poisson_rmle_demo.py,89,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/generate_flux_spectrum.py,442,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/generate_plots.py,720,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/manual_peak_inspection/README.md,74,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/naa_ann_comparison.py,628,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/njoy_processing_example.py,280,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/nuclear_data_interface_example.py,395,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/reactor_dosimetry_workflow.py,862,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/run_comprehensive_benchmark.py,621,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/run_full_demo.py,351,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/sigphi_saturation_demo.py,69,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/spectroscopy_data/152Eu_peaks.yaml,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/spectroscopy_data/152Eu_point_source.yaml,44,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/spectroscopy_data/background_peaks.yaml,11,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/staysl_interop_demo.py,277,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/staysl_reporting_demo.py,320,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/test_flux_wire_analysis.py,621,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/triga_k0naa_workflow.py,774,baseline-captured,refactor,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/unfolding_benchmark/README.md,57,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/unfolding_benchmark/reference_gravel.py,54,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/unfolding_benchmark/reference_mlem.py,41,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/unfolding_benchmark/run_benchmark.py,400,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+examples,examples/validation/attenuation_demo.py,21,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/calibration_fit_demo.py,48,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/compare_peakfinder_reference.py,31,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/compare_pra_reference_peaks.py,40,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/cross_section_demo.py,24,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/flux_unfolding_10bin_regression.py,309,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/flux_wire_parity.py,192,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/iec_read_demo.py,34,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/validation/spectrum_io_parity.py,93,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+examples,examples/verify_real_data.py,185,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+pyproject.toml,pyproject.toml,69,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+setup.cfg,setup.cfg,44,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/__init__.py,72,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/_tensorflow_env.py,85,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/analysis/__init__.py,381,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/astm_e2005.py,201,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/astm_e261.py,299,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/astm_e262.py,534,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/astm_e3376.py,61,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/attenuation_tools.py,74,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/auto_calibration.py,419,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/detector_calibration.py,175,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/efficiency_models.py,112,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/ensdf_matching.py,597,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/flux_unfold.py,1118,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/flux_wire_analysis.py,2792,baseline-captured,split,high,hotspot-size,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/flux_wire_selection.py,978,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/hpge_processor.py,687,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/k0_naa.py,1123,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/k0_physics.py,13,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/k0_workflow.py,1395,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/line_search.py,85,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/naa_ann.py,1330,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/peak_finders.py,1081,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/peakfit.py,2095,baseline-captured,split,high,hotspot-size,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/robustness.py,572,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/segmented_detection.py,477,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/spectroscopy_tools.py,111,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/spectrum_math.py,403,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/analysis/stopping_tools.py,40,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/cli/__init__.py,2,baseline-captured,keep,medium,none flagged yet,tests/test_cli_app.py,tests/test_cli_app.py
+src/fluxforge,src/fluxforge/cli/app.py,3501,baseline-captured,split,medium,3.5k-line CLI monolith that should be grouped by subcommand family,tests/test_cli_app.py,tests/test_cli_app.py
+src/fluxforge,src/fluxforge/core/__init__.py,50,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/linalg.py,175,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/prior_covariance.py,541,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/provenance.py,341,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/response.py,61,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/runtime.py,44,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/sample.py,477,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/schemas.py,421,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/spectrum_ops.py,637,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/core/validation.py,524,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/corrections/__init__.py,12,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/corrections/coincidence.py,536,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/corrections/covers.py,1216,baseline-captured,refactor,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/corrections/gamma_attenuation.py,556,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/corrections/self_shielding.py,523,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/data/__init__.py,228,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/attenuation_components.py,116,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/crosssections.py,768,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/efficiency.py,629,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/efficiency_models.py,279,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/elements.py,307,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/endf_covariance.py,815,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/flux_wire_catalog.py,83,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/flux_wire_unfolding.py,90,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/gamma_database.py,505,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/irdff.py,1710,baseline-captured,split,high,hotspot-size,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/irdff_access.py,949,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/isotope_names.py,93,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/k0_library.py,539,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/kayzero_k0.py,1192,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/materials.py,827,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/njoy.py,644,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/nndc.py,571,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/nuclear_data.py,675,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/nuclear_data_sources.py,432,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/rafm_decay.py,46,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/rafm_profile.py,71,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/thermal_scattering.py,512,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/data/xcom.py,921,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/evaluation/gma_workflow.py,665,baseline-captured,refactor,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/examples/README.md,68,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+src/fluxforge,src/fluxforge/examples/__init__.py,14,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+src/fluxforge,src/fluxforge/examples/flux_wire/batch_compare_spectra.py,1551,baseline-captured,split,low,hotspot-size,lint + path/reference checks,lint + path/reference checks
+src/fluxforge,src/fluxforge/examples/flux_wire/flux_wire_spectrum_analysis.py,3021,baseline-captured,split,low,hotspot-size,lint + path/reference checks,lint + path/reference checks
+src/fluxforge,src/fluxforge/examples/rafm_workflow.py,4212,baseline-captured,split,low,hotspot-size,lint + path/reference checks,lint + path/reference checks
+src/fluxforge,src/fluxforge/io/__init__.py,229,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/alara.py,1026,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/artifacts.py,960,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/calibration_text.py,77,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/cnf.py,515,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/csv_readers.py,211,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/flux_wire.py,921,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/genie.py,554,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/hpge.py,657,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/iec.py,176,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/interop.py,572,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/mcnp.py,639,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/metadata.py,65,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/n42.py,706,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/openmc.py,526,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/pra.py,126,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/spe.py,687,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/io/spectrum_export.py,536,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/k0_physics.py,60,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/physics/__init__.py,132,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/activation.py,202,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/attenuation.py,103,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/decay_chain.py,538,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/decay_inventory.py,483,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/decay_library.py,123,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/dose.py,395,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/gamma_spectrum.py,859,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/neutron_corrections.py,784,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/nuclides.py,517,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/sigphi.py,540,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/stacked_target.py,524,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/physics/stopping_power.py,587,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/plots/__init__.py,75,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/plots/activation.py,928,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/plots/master_suite.py,346,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/plots/spectrum_inspection.py,116,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/plots/unfolding.py,1102,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/reporting/__init__.py,703,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/solvers/__init__.py,77,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/advanced.py,676,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/advanced_unfolding.py,682,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/gls.py,465,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/iterative.py,507,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/mcmc.py,405,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/regularized.py,567,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/rmle.py,1170,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/solvers/test_statistics.py,662,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/triga/__init__.py,85,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/triga/cd_ratio.py,690,baseline-captured,refactor,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/triga/k0.py,1078,baseline-captured,refactor,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/triga/reconcile.py,611,baseline-captured,refactor,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/uncertainty/__init__.py,2,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/uncertainty/budget.py,703,baseline-captured,refactor,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/uncertainty/mc.py,39,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/unfold/__init__.py,37,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/unfold/_types.py,62,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/unfold/gamma_rmle.py,236,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/unfold/neutron_ibu.py,314,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/validation/__init__.py,9,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/validation/metrics.py,75,baseline-captured,keep,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/validation/transport_comparison.py,674,baseline-captured,refactor,high,none flagged yet,targeted domain tests + full regression subset,targeted domain tests + full regression subset
+src/fluxforge,src/fluxforge/workflows/__init__.py,41,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/workflows/activation_pipeline.py,593,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/workflows/astm_inl_dosimetry.py,170,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/workflows/batch_processing.py,527,baseline-captured,keep,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge,src/fluxforge/workflows/spectrum_unfolding.py,802,baseline-captured,refactor,medium,none flagged yet,relevant targeted tests,relevant targeted tests
+src/fluxforge_gui,src/fluxforge_gui/__init__.py,6,baseline-captured,keep,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/app.py,2133,baseline-captured,split,medium,mechanical split left a duplicated import header and a 2k+ line shell module,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/commands.py,1078,baseline-captured,split,medium,large command dispatch module with copied imports and handler density,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/constants.py,22,baseline-captured,keep,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/models.py,152,baseline-captured,keep,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/mpl_helpers.py,51,baseline-captured,keep,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/parity_registry.py,176,baseline-captured,keep,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/presets.py,180,baseline-captured,keep,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/reporting.py,982,baseline-captured,refactor,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/spectrum_ops.py,979,baseline-captured,refactor,medium,none flagged yet,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/ui_builder.py,2440,baseline-captured,split,medium,large mixed-responsibility widget builder with copied imports,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+testing_validation,testing_validation/compare_fluxforge_against_testing.py,329,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/conftest.py,12,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/gui_desktop_driver.py,692,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/gui_probe.py,130,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_activation.py,43,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_activation_pipeline_basics.py,41,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_activation_plots.py,310,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_alara.py,368,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_alara_io.py,67,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_artifacts_io.py,378,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_astm_e2005.py,113,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_astm_e261.py,119,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_astm_e262.py,169,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_astm_e3376.py,88,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_attenuation.py,32,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_calibration_text.py,27,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_cli_app.py,1465,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_cnf_io.py,320,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_coincidence.py,45,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_coincidence_correction.py,33,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_covers.py,670,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_crosssection_library.py,29,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_csv_readers.py,44,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_data_reference_modules.py,239,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_decay_inventory.py,42,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_decay_schedule.py,48,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_detector_calibration.py,54,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_endf_covariance.py,491,baseline-captured,keep,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_epic_implementations.py,775,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_fe_cd_example.py,73,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_flux_unfolding_10bin.py,60,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_flux_wire_analysis.py,45,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_flux_wire_parity.py,228,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_gamma_attenuation.py,333,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_genie_overrides.py,122,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_gls.py,27,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_gui_app.py,686,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_gui_desktop_native.py,93,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_gui_native_app.py,80,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_gui_parity_registry.py,39,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_hypermet.py,304,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_iec_io.py,32,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_interop.py,260,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_io_metadata.py,61,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_irdff.py,414,baseline-captured,keep,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_irdff_access.py,339,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_isotope_name_helpers.py,40,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_iterative.py,136,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_k0_naa.py,115,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_k0_physics.py,33,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_k0_workflow.py,319,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_kayzero_k0.py,293,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_line_search.py,14,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_master_plan_goals.py,772,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_master_plot_suite.py,113,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_mcmc.py,357,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_mcnp_io.py,154,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_mctal_io.py,302,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_n42.py,178,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_naa_ann.py,381,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_naa_ann_4e_dataset.py,39,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_neutron_corrections.py,205,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_njoy.py,333,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_no_external_repo_paths.py,71,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_nuclear_data.py,419,baseline-captured,keep,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_nuclear_data_sources.py,91,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_openmc_io.py,235,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_peak_background.py,26,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_peak_count_method_benchmark.py,65,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_peak_finder_methods.py,342,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_peak_finders.py,257,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_pipeline_validation.py,997,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_pra_io.py,40,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_prior_covariance.py,385,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_rafm_background_integration.py,111,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_rafm_workflow.py,398,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_reconcile.py,450,baseline-captured,keep,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_reference_model_parity.py,91,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_reporting.py,280,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_rmle.py,611,baseline-captured,refactor,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_robustness.py,400,baseline-captured,keep,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_sample_model.py,23,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_self_shielding.py,205,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_sigphi.py,344,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_solvers_advanced.py,170,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_spectroscopy_tools.py,29,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_spectrum_io_parity.py,77,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_spectrum_math.py,164,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_standards_workflows.py,71,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_stopping_tools.py,18,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_tensorflow_env.py,28,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_transport_comparison_dataclasses.py,47,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_transport_io.py,244,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_uncertainty_budget.py,121,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_uncertainty_mc.py,37,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_unfold.py,410,baseline-captured,keep,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_unfold_optional_modules.py,151,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_unfolding_parity_baseline.py,96,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tests,tests/test_validation.py,507,baseline-captured,keep,low,fixture/setup consolidation candidate,relevant targeted tests,relevant targeted tests
+tests,tests/test_validation_metrics.py,23,baseline-captured,keep,low,none flagged yet,relevant targeted tests,relevant targeted tests
+tools,tools/build_native_bundle.py,108,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+tools,tools/build_offline_wheelhouse.py,59,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+tools,tools/github_issues/create_issues.py,36,baseline-captured,refactor,low,contains workstation-specific absolute paths,lint + path/reference checks,lint + path/reference checks
+tools,tools/github_issues/generate_detailed_standards_issues.py,209,baseline-captured,refactor,low,contains workstation-specific absolute paths,lint + path/reference checks,lint + path/reference checks
+tools,tools/github_issues/generate_granular_gui_issues.py,155,baseline-captured,refactor,low,contains workstation-specific absolute paths,lint + path/reference checks,lint + path/reference checks
+tools,tools/github_issues/generate_gui_issues.py,63,baseline-captured,refactor,low,contains workstation-specific absolute paths,lint + path/reference checks,lint + path/reference checks
+tools,tools/github_issues/generate_standards_issues.py,133,baseline-captured,refactor,low,contains workstation-specific absolute paths,lint + path/reference checks,lint + path/reference checks
+tools,tools/github_issues/rename_issues.py,33,baseline-captured,refactor,low,contains workstation-specific absolute paths,lint + path/reference checks,lint + path/reference checks
+tools,tools/pyinstaller_launch_cli.py,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+tools,tools/pyinstaller_launch_gui.py,19,baseline-captured,keep,low,none flagged yet,lint + path/reference checks,lint + path/reference checks
+src/fluxforge_gui,src/fluxforge_gui/split_app.py,0,removed-from-runtime,delete,medium,removed as dev-only runtime clutter,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/_sync_probe.txt,0,removed-from-runtime,delete,medium,removed as dev-only runtime clutter,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py
+src/fluxforge_gui,src/fluxforge_gui/xyz.txt,0,removed-from-runtime,delete,medium,removed as dev-only runtime clutter,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py,tests/test_gui_app.py; tests/test_gui_native_app.py; tests/test_gui_desktop_native.py

@@ -25,17 +25,16 @@ This document tracks active cleanup steps for FluxForge repository deduplication
   - Flake8 baseline settings (PEP8-focused)
 
 ## Current Audit Snapshot (2026-03-17)
-- Branch under active cleanup review: `chore/repo-cleanup-phase1-safety-20260317`
-- Latest pushed implementation baseline:
-  - `e75ce05` `Fix GUI render warnings and add native desktop acceptance`
+- Branch under active cleanup review: `chore/folder-audit-native-gui-review-20260317`
+- Starting branch baseline:
+  - `fc2b4c4` `Refresh cleanup audit baseline`
 - Current broad lint snapshot:
-  - `1036` flake8 findings across `src/fluxforge_gui`, `src/fluxforge`, `tests`, and `tools`
+  - `475` flake8 findings across the current review buckets (`src/fluxforge_gui`, `src/fluxforge/cli`, `src/fluxforge/analysis`, `src/fluxforge/data`, `tests`, and `tools`)
 - Highest-payoff folder buckets from the current audit:
-  - `src/fluxforge_gui`: `310` findings after the first support-module cleanup pass, still dominated by dead imports and line length after the app split
+  - `src/fluxforge_gui`: `90` findings after the first GUI-folder cleanup pass; the dead-import and unused-local debt in `app.py`, `ui_builder.py`, and `commands.py` is now removed, and the remaining debt is primarily line length in `app.py`, `ui_builder.py`, and `reporting.py`
   - `src/fluxforge/cli`: `30` findings, all in the `3501`-line `app.py` monolith
   - `src/fluxforge/analysis`: `116` findings, including several real code issues (`F821`, `E731`, unused state)
-  - `src/fluxforge/data`: `77` findings, concentrated in `kayzero_k0.py`, `nuclear_data_sources.py`, and `irdff.py`
-  - `tests`: `161` findings, mostly import-order bootstrap patterns plus duplicated test-only helpers
+  - `src/fluxforge/data` + `tests` + `tools`: `239` findings, concentrated in `kayzero_k0.py`, `nuclear_data_sources.py`, `irdff.py`, and older test bootstrap modules
 - Largest active source files:
   - `src/fluxforge_gui/ui_builder.py`: `2540` lines
   - `src/fluxforge_gui/app.py`: `2176` lines
@@ -43,9 +42,12 @@ This document tracks active cleanup steps for FluxForge repository deduplication
   - `src/fluxforge/cli/app.py`: `3501` lines
   - `src/fluxforge/analysis/flux_wire_analysis.py`: `2792` lines
 - Additional cleanup hotspots outside the main packages:
-  - `src/fluxforge_gui/split_app.py` is a developer-only splitter script and had a hard-coded absolute path before this audit pass.
+  - `docs/REPO_CLEANUP_WORKSTREAM.csv` now records the folder-by-folder keep/refactor/split/archive/delete queue.
+  - `src/fluxforge_gui/split_app.py`, `_sync_probe.txt`, and `xyz.txt` have been removed from the shipped GUI package.
   - `tools/github_issues/*.py` still use hard-coded local filesystem paths.
   - `examples/` and parts of `docs/` still contain workstation-specific absolute paths that should be converted to repo-relative usage or clearly marked as local-only examples.
+  - Native screenshot evidence now has a committed Linux baseline under `tests/data/gui_review_baselines/linux/` plus a review-gallery manifest.
+  - The latest native Linux evidence bundle is reproducible under `artifacts/gui_review/current_linux/` and currently matches all six baseline checkpoints.
 
 ## Verified Earlier Cleanup Work
 - Completed: Archived recovered GUI files and removed them from active source tree.
@@ -56,6 +58,7 @@ This document tracks active cleanup steps for FluxForge repository deduplication
 - Completed: Added regression coverage for dedup targets (k0 helpers, isotope parsing, N42 parsing, metadata/CSV QC).
 - Completed: Updated important project documents/configs, including `setup.cfg`, `environment.yml`, and `README.md`.
 - Completed: Re-ran targeted and full test suites after each phase; current suite status is green aside from expected environment-data skips.
+- Completed: First GUI-folder cleanup pass removed duplicated split-module import headers, preserved `fluxforge_gui.app` compatibility re-exports, and kept native desktop acceptance green.
 
 ## Phase 2 Completed (2026-03-17)
 - Added canonical shared module: `src/fluxforge/k0_physics.py`.
@@ -95,6 +98,14 @@ This document tracks active cleanup steps for FluxForge repository deduplication
    - Mark developer-only scripts explicitly.
    - Keep shipped docs and examples runnable from a clean checkout.
 
+## New Supporting Tooling On This Branch
+- `tools/qa/build_cleanup_inventory.py`
+  - regenerates `docs/REPO_CLEANUP_WORKSTREAM.csv` and `docs/REPO_CLEANUP_WORKSTREAM.md`
+- `tools/qa/run_native_gui_evidence.py`
+  - runs the real desktop GUI driver, saves screenshots/artifacts, and writes `run.json`
+- `tools/qa/build_gui_review_gallery.py`
+  - builds `review_gallery/index.html` from a captured evidence bundle plus platform baselines
+
 ## Formatting and Audit Commands
 Run from repository root.
 
@@ -109,3 +120,4 @@ python -m pytest -q
 - Smaller GUI and CLI module boundaries with less copied import boilerplate.
 - PEP8/flake8 debt reduced in staged, reviewable slices instead of one large reformat-only diff.
 - Regression coverage stays green after each folder-level cleanup pass.
+- Native GUI evidence remains reproducible, with reviewable screenshots and gallery output after GUI-affecting changes.

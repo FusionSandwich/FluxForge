@@ -1,7 +1,5 @@
 """Desktop GUI shell for FluxForge.
 
-SYNC_MARKER_TEMP
-
 The GUI is intentionally CLI-first:
 - Every button maps to an existing ``fluxforge`` subcommand handler.
 - The equivalent CLI command is shown in the run log.
@@ -17,45 +15,25 @@ import shlex
 from argparse import Namespace
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-from tkinter.scrolledtext import ScrolledText
+from tkinter import filedialog, messagebox
 
 import numpy as np
-from scipy import optimize
 
 try:
-    from matplotlib.backends.backend_tkagg import (
-        FigureCanvasTkAgg,
-        NavigationToolbar2Tk,
-    )
     from matplotlib.figure import Figure
 except ImportError:  # pragma: no cover - optional GUI plotting dependency
-    FigureCanvasTkAgg = None
-    NavigationToolbar2Tk = None
     Figure = None
-
-from fluxforge.analysis.flux_wire_analysis import (
-    _covell_style_local_continuum_counts,
-    _gilmore_moving_minimum_counts,
-    _standards_tiered_counts,
-)
 from fluxforge.analysis.detector_calibration import (
     EfficiencyPoint,
     fit_efficiency_curve,
-)
-from fluxforge.analysis.peak_finders import (
-    PEAK_FINDER_METHODS,
-    find_peaks_multi_method,
-    get_peak_finder,
 )
 from fluxforge.analysis.peakfit import (
     fit_hypermet_peak,
     fit_multiple_peaks,
     fit_single_peak,
 )
-from fluxforge.cli import app as cli_app
 from fluxforge.core.runtime import offline_mode_enabled
 from fluxforge.data.efficiency import CALIBRATION_SOURCES, EfficiencyCurve
 from fluxforge.data.flux_wire_catalog import (
@@ -64,7 +42,6 @@ from fluxforge.data.flux_wire_catalog import (
 )
 from fluxforge.data.irdff_access import get_default_library
 from fluxforge.data.nndc import get_nuclear_data
-from fluxforge.data.gamma_database import get_database
 from fluxforge.data.nuclear_data_sources import (
     load_gamma_identification_source,
     summarize_nuclear_data_source,
@@ -72,30 +49,17 @@ from fluxforge.data.nuclear_data_sources import (
 from fluxforge.io.artifacts import (
     read_k0_analysis_bundle,
     read_line_activities,
-    read_peak_report,
     read_report_bundle,
     read_reaction_rates,
     read_response_bundle,
-    read_spectrum_file,
     read_unfold_result,
     read_validation_bundle,
-    write_peak_report,
     write_report_bundle,
     write_spectrum_file,
 )
-from fluxforge.io.spe import GammaSpectrum
-from fluxforge.physics.decay_chain import DecayChain
-from fluxforge.physics.stacked_target import StackedTarget
-from fluxforge.physics.stopping_power import Projectile, STANDARD_MATERIALS
 from fluxforge.triga.cd_ratio import STANDARD_MONITORS
-from fluxforge_gui.constants import (
-    ALLOWED_REACTION_CATEGORIES,
-    GUI_BUFFER_OPERATIONS,
-    GUI_PEAK_COUNTING_METHODS,
-    GUI_PEAK_IDENTIFICATION_METHODS,
-    GUI_UNFOLD_METHODS,
-    GUI_UNFOLD_MLEM_CONVERGENCE_MODES,
-)
+from fluxforge_gui import constants as gui_constants
+from fluxforge_gui import presets as gui_presets
 from fluxforge_gui.models import (
     GuiCalibrationFit,
     GuiCalibrationPoint,
@@ -110,8 +74,6 @@ from fluxforge_gui.models import (
 )
 from fluxforge_gui.presets import (
     build_standards_preset_values,
-    get_gui_data_source_choices,
-    get_gui_profile_choices,
     get_standards_gui_presets,
 )
 from fluxforge_gui.reporting import (
@@ -147,10 +109,12 @@ from fluxforge_gui.spectrum_ops import (
     render_gui_spectrum_preview,
     save_gui_spectrum_preview_image,
 )
-
-
-from .ui_builder import UiBuilderMixin
 from .commands import CommandsMixin
+from .ui_builder import UiBuilderMixin
+
+
+ALLOWED_REACTION_CATEGORIES = gui_constants.ALLOWED_REACTION_CATEGORIES
+get_gui_profile_choices = gui_presets.get_gui_profile_choices
 
 
 class FluxForgeGui(UiBuilderMixin, CommandsMixin):
@@ -2024,7 +1988,6 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             )
             return
         payload = read_response_bundle(path)
-        matrix = payload.get("matrix", [])
         reactions = payload.get("reactions", [])
         boundaries = payload.get("boundaries_eV", [])
         group_count = max(len(boundaries) - 1, 0)

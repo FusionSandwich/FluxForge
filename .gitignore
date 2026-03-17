@@ -26,3 +26,5 @@ examples/output/
 examples/RAFM_irradiation/results_tmp_*/
 examples/RAFM_irradiation/results_qg_*/
 
+# Native GUI review artifacts
+artifacts/gui_review/

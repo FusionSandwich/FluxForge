@@ -19,7 +19,13 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from fluxforge_gui.app import FluxForgeGui
-from fluxforge.io.artifacts import write_peak_report, write_spectrum_file
+from fluxforge.io.artifacts import (
+    write_peak_report,
+    write_report_bundle,
+    write_spectrum_file,
+    write_unfold_result,
+    write_validation_bundle,
+)
 from fluxforge.io.spe import GammaSpectrum
 
 
@@ -290,6 +296,11 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         cli_plot_output = output_dir / "cli_spectrum_plot.png"
         roi_output = output_dir / "manual_rois.json"
         peak_report_output = output_dir / "manual_peak_report.json"
+        response_output = output_dir / "response.json"
+        unfold_output = output_dir / "unfold.json"
+        validation_output = output_dir / "validation.json"
+        k0_report_output = output_dir / "k0_report.json"
+        k0_text_output = output_dir / "k0_report.txt"
         plots_output_dir = output_dir / "plot_suite"
 
         write_spectrum_file(
@@ -315,6 +326,41 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
                 }
             ],
         )
+        response_output.write_text(
+            json.dumps(
+                {
+                    "schema": "fluxforge.response_bundle.v1",
+                    "matrix": [[1.0, 0.1], [0.2, 0.9]],
+                    "reactions": ["Au-197(n,g)", "Ti-46(n,p)"],
+                    "boundaries_eV": [1e-5, 1e-3, 1.0],
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        write_unfold_result(
+            unfold_output,
+            boundaries_eV=[1e-5, 1e-3, 1.0],
+            reactions=["Au-197(n,g)", "Ti-46(n,p)"],
+            flux=[3.0, 1.0],
+            covariance=[[0.05, 0.0], [0.0, 0.02]],
+            chi2=0.35,
+            method="gls",
+            diagnostics={"iterations": 12, "converged": True},
+        )
+        write_validation_bundle(
+            validation_output,
+            metrics={"mae": 0.02, "rmse": 0.03, "chi2": 0.8},
+            truth_flux=[1.0, 2.0, 3.0],
+            predicted_flux=[1.1, 1.9, 2.8],
+            residuals=[0.1, -0.1, -0.2],
+        )
+        k0_text_output.write_text("desktop k0 review report\n", encoding="utf-8")
+        write_report_bundle(
+            k0_report_output,
+            summary={"element_count": 1, "mode": "desktop-review"},
+            text_report={"path": k0_text_output.name, "format": "text/plain"},
+        )
 
         app.preview_input.set(str(spectrum_input))
         app.preview_peaks.set(str(peaks_input))
@@ -322,6 +368,11 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         app.preview_roi_file.set(str(roi_output))
         app.preview_manual_peak_report.set(str(peak_report_output))
         app.preview_plot_title.set("FluxForge Native Desktop Acceptance")
+        app.response_output.set(str(response_output))
+        app.unfold_response.set(str(response_output))
+        app.unfold_output.set(str(unfold_output))
+        app.compare_output.set(str(validation_output))
+        app.k0_report_output.set(str(k0_report_output))
         app.plots_output_dir.set(str(plots_output_dir))
 
         _pump(root, 0.4)
@@ -497,7 +548,15 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             description="clipboard capture for spectrum plot",
         )
         evidence["artifacts"].extend(
-            [str(cli_plot_output), str(roi_output), str(peak_report_output)]
+            [
+                str(cli_plot_output),
+                str(roi_output),
+                str(peak_report_output),
+                str(response_output),
+                str(unfold_output),
+                str(validation_output),
+                str(k0_report_output),
+            ]
         )
         evidence["cli_commands"]["spectrum_plot"] = root.clipboard_get()
         log_step(
@@ -505,6 +564,72 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             command=root.clipboard_get(),
             last_cli=app.last_cli_command,
         )
+
+        _click_notebook_tab(root, backend, app.notebook, "8. Standards")
+        app.standards_preset.set("k0-NAA")
+        _pump(root, 0.1)
+        apply_preset_btn = _find_widget_by_text(
+            root, "Apply Preset to GUI", {"TButton", "Button"}
+        )
+        _click_widget(root, backend, apply_preset_btn)
+        _wait_for(
+            root,
+            lambda: app.standards_data_source.get() == "k0_naa_monitors",
+            timeout=5.0,
+            description="k0 standards preset",
+        )
+        standards_shot = _take_screenshot(
+            root, backend, output_dir, "04-standards-preset.png"
+        )
+        evidence["screenshots"].append(str(standards_shot))
+        log_step(
+            "standards_preset",
+            preset=app.standards_preset.get(),
+            data_source=app.standards_data_source.get(),
+            status=app.standards_source_summary.get(),
+        )
+
+        _click_notebook_tab(root, backend, app.notebook, "6. Unfold")
+        load_response_btn = _find_widget_by_text(
+            root, "Load Response Summary", {"TButton", "Button"}
+        )
+        load_unfold_btn = _find_widget_by_text(root, "Load Result", {"TButton", "Button"})
+        _click_widget(root, backend, load_response_btn)
+        _wait_for(
+            root,
+            lambda: "Loaded response bundle" in app.response_status.get(),
+            timeout=5.0,
+            description="response summary load",
+        )
+        _click_widget(root, backend, load_unfold_btn)
+        _wait_for(
+            root,
+            lambda: "Method: GLS" in app.unfold_summary.get(),
+            timeout=5.0,
+            description="unfold preview load",
+        )
+        log_step(
+            "unfold_preview",
+            response_status=app.response_status.get(),
+            unfold_summary=app.unfold_summary.get(),
+        )
+
+        _click_notebook_tab(root, backend, app.notebook, "7. Compare")
+        load_compare_btn = _find_widget_by_text(
+            root, "Load Summary", {"TButton", "Button"}
+        )
+        _click_widget(root, backend, load_compare_btn)
+        _wait_for(
+            root,
+            lambda: "MAE" in app.compare_summary.get(),
+            timeout=5.0,
+            description="compare summary load",
+        )
+        compare_shot = _take_screenshot(
+            root, backend, output_dir, "05-unfold-compare.png"
+        )
+        evidence["screenshots"].append(str(compare_shot))
+        log_step("compare_summary", summary=app.compare_summary.get())
 
         _click_notebook_tab(root, backend, app.notebook, "10. Report")
         example_checkbox = _find_widget_by_text(
@@ -537,7 +662,7 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             timeout=5.0,
             description="clipboard capture for plot suite",
         )
-        report_shot = _take_screenshot(root, backend, output_dir, "04-report-plots.png")
+        report_shot = _take_screenshot(root, backend, output_dir, "06-report-plots.png")
         evidence["screenshots"].append(str(report_shot))
         evidence["artifacts"].append(str(plots_output_dir))
         evidence["cli_commands"]["plot_suite"] = root.clipboard_get()

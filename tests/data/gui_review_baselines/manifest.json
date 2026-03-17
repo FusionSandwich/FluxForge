@@ -1,0 +1,86 @@
+{
+  "platforms": {
+    "linux": {
+      "window_geometry": "1400x900",
+      "checkpoints": [
+        {
+          "name": "01-launch.png",
+          "label": "Launch shell",
+          "scenario": "app-shell",
+          "review_note": "Top-level notebook tabs, toolbar, and log panel should be visible without clipped chrome."
+        },
+        {
+          "name": "02-spectrum-loaded.png",
+          "label": "Spectrum preview loaded",
+          "scenario": "spectrum-preview",
+          "review_note": "Primary spectrum, peak marker, and control rail should be readable after preview load."
+        },
+        {
+          "name": "03-roi-calibration.png",
+          "label": "ROI and calibration editor",
+          "scenario": "spectrum-editing",
+          "review_note": "ROI table, calibration editor controls, and fit summary should be visible and aligned."
+        },
+        {
+          "name": "04-standards-preset.png",
+          "label": "Standards preset",
+          "scenario": "standards-k0",
+          "review_note": "The standards tab should show the k0-oriented preset state and source summary cleanly."
+        },
+        {
+          "name": "05-unfold-compare.png",
+          "label": "Unfold and compare summaries",
+          "scenario": "unfold-compare",
+          "review_note": "Response, unfold, and compare summaries should render clearly with no clipped controls."
+        },
+        {
+          "name": "06-report-plots.png",
+          "label": "Report plot suite",
+          "scenario": "report",
+          "review_note": "The report tab should show plot-suite controls and final status without overlapping widgets."
+        }
+      ]
+    },
+    "windows": {
+      "window_geometry": "1400x900",
+      "checkpoints": [
+        {
+          "name": "01-launch.png",
+          "label": "Launch shell",
+          "scenario": "app-shell",
+          "review_note": "Match the Linux checkpoint, with special attention to Windows font/DPI clipping."
+        },
+        {
+          "name": "02-spectrum-loaded.png",
+          "label": "Spectrum preview loaded",
+          "scenario": "spectrum-preview",
+          "review_note": "The spectrum preview should remain readable under Windows fonts and widget metrics."
+        },
+        {
+          "name": "03-roi-calibration.png",
+          "label": "ROI and calibration editor",
+          "scenario": "spectrum-editing",
+          "review_note": "ROI and calibration controls should not clip or shift under Windows layout differences."
+        },
+        {
+          "name": "04-standards-preset.png",
+          "label": "Standards preset",
+          "scenario": "standards-k0",
+          "review_note": "Windows run should surface the same standards/k0 state without hidden controls."
+        },
+        {
+          "name": "05-unfold-compare.png",
+          "label": "Unfold and compare summaries",
+          "scenario": "unfold-compare",
+          "review_note": "Summaries and plots should stay aligned with no DPI-induced clipping."
+        },
+        {
+          "name": "06-report-plots.png",
+          "label": "Report plot suite",
+          "scenario": "report",
+          "review_note": "The report workflow should remain readable and reviewable under Windows rendering."
+        }
+      ]
+    }
+  }
+}

@@ -59,7 +59,7 @@ def test_native_desktop_gui_workflow_generates_evidence(tmp_path):
 
     assert result["status"] == "ok"
     assert result["offline_mode"] is True
-    assert len(result["screenshots"]) >= 4
+    assert len(result["screenshots"]) >= 6
     for screenshot in result["screenshots"]:
         assert Path(screenshot).exists()
 
@@ -68,6 +68,10 @@ def test_native_desktop_gui_workflow_generates_evidence(tmp_path):
         assert artifact.exists()
     assert any(path.name == "gui_preview_native.png" for path in artifact_paths)
     assert any(path.name == "cli_spectrum_plot.png" for path in artifact_paths)
+    assert any(path.name == "response.json" for path in artifact_paths)
+    assert any(path.name == "unfold.json" for path in artifact_paths)
+    assert any(path.name == "validation.json" for path in artifact_paths)
+    assert any(path.name == "k0_report.json" for path in artifact_paths)
     assert any(path.name == "plot_suite" and path.is_dir() for path in artifact_paths)
 
     spectrum_cli = result["cli_commands"]["spectrum_plot"]
@@ -82,4 +86,7 @@ def test_native_desktop_gui_workflow_generates_evidence(tmp_path):
     assert steps["load_preview"]["spectrum_label"]
     assert steps["roi_edit"]["roi_count"] == 1
     assert steps["calibration"]["point_count"] == 2
+    assert steps["standards_preset"]["data_source"] == "k0_naa_monitors"
+    assert "Method: GLS" in steps["unfold_preview"]["unfold_summary"]
+    assert "MAE" in steps["compare_summary"]["summary"]
     assert steps["run_plot_suite"]["plot_count"] >= 1
