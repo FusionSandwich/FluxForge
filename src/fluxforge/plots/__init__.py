@@ -5,6 +5,8 @@ from fluxforge.plots.unfolding import (
     plot_spectrum_ratio,
     plot_spectrum_with_ratio,
     plot_spectrum_uncertainty_bands,
+    plot_residuals_pulls,
+    plot_covariance_correlation_heatmaps,
     plot_response_matrix,
     plot_cross_section_comparison,
     plot_convergence,
@@ -27,12 +29,23 @@ from fluxforge.plots.activation import (
     SOURCE_COLORS,
 )
 
+from fluxforge.plots.master_suite import (
+    MasterPlotInputs,
+    generate_master_plan_plots,
+    load_example_plot_inputs,
+    load_plot_inputs_from_artifacts,
+    normalize_plot_formats,
+)
+from fluxforge.plots.spectrum_inspection import plot_gamma_spectrum
+
 __all__ = [
     # Unfolding plots
     'plot_spectrum_comparison',
     'plot_spectrum_ratio',
     'plot_spectrum_with_ratio',
     'plot_spectrum_uncertainty_bands',
+    'plot_residuals_pulls',
+    'plot_covariance_correlation_heatmaps',
     'plot_response_matrix',
     'plot_cross_section_comparison',
     'plot_convergence',
@@ -51,4 +64,11 @@ __all__ = [
     'MATERIAL_COLORS',
     'COOLING_COLORS',
     'SOURCE_COLORS',
+    # Master plot suite helpers
+    'MasterPlotInputs',
+    'generate_master_plan_plots',
+    'load_example_plot_inputs',
+    'load_plot_inputs_from_artifacts',
+    'normalize_plot_formats',
+    'plot_gamma_spectrum',
 ]

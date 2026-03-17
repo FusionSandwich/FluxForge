@@ -1,5 +1,7 @@
 """FluxForge analysis module for gamma spectroscopy."""
 
+from importlib import import_module
+
 from fluxforge.analysis.peakfit import (
     GaussianPeak,
     PeakFitResult,
@@ -39,6 +41,31 @@ from fluxforge.analysis.k0_naa import (
     get_k0_data,
     identify_isotope_from_gamma,
     create_k0_measurement_from_peak,
+)
+
+from fluxforge.analysis.k0_workflow import (
+    CAPABILITY_FLAGS as K0_CAPABILITY_FLAGS,
+    PeakObservation,
+    aggregate_k0_analysis_bundles,
+    analyze_k0_observations,
+    build_k0_report_payload,
+    build_detector_characterization,
+    build_facility_characterization,
+    classify_peak_observation,
+    evaluate_k0_qaqc,
+    evaluate_detector_characterization,
+    peak_report_to_observations,
+    resolve_governed_libraries,
+)
+
+from fluxforge.analysis.astm_e261 import (
+    analyze_astm_e261_plan,
+    equivalent_irradiation_duration_s,
+    target_atom_count,
+)
+
+from fluxforge.analysis.astm_e262 import (
+    analyze_astm_e262_plan,
 )
 
 from fluxforge.analysis.segmented_detection import (
@@ -87,6 +114,8 @@ from fluxforge.analysis.peak_finders import (
 
 from fluxforge.analysis.spectrum_math import (
     add_spectra,
+    nonnegative_counts_for_algorithm,
+    subtract_measured_background,
     subtract_spectra,
     moving_average,
 )
@@ -113,7 +142,6 @@ from fluxforge.analysis.detector_calibration import (
 
 from fluxforge.analysis.flux_wire_analysis import (
     FLUX_WIRE_NUCLIDES,
-    ELEMENT_TO_ISOTOPES,
     FluxWireAnalysisResult,
     analyze_flux_wire,
     compare_raw_vs_processed,
@@ -168,22 +196,17 @@ from fluxforge.analysis.robustness import (
     estimate_optimal_wire_count,
 )
 
-# NAA-ANN imports (optional - requires TensorFlow)
-try:
-    from fluxforge.analysis.naa_ann import (
-        NAAANNConfig,
-        NAAANNResult,
-        AugmentationConfig,
-        SpectralAugmentor,
-        NAAANNModel,
-        NAAANNAnalyzer,
-        create_training_dataset,
-        train_naa_ann_model,
-        HAS_TENSORFLOW,
-    )
-    _HAS_NAA_ANN = True
-except ImportError:
-    _HAS_NAA_ANN = False
+_NAA_ANN_EXPORTS = (
+    'NAAANNConfig',
+    'NAAANNResult',
+    'AugmentationConfig',
+    'SpectralAugmentor',
+    'NAAANNModel',
+    'NAAANNAnalyzer',
+    'create_training_dataset',
+    'train_naa_ann_model',
+    'HAS_TENSORFLOW',
+)
 
 __all__ = [
     # Peak fitting
@@ -229,6 +252,12 @@ __all__ = [
     'get_data_source',
     'create_matching_databases',
     'HAS_PACEENSDF',
+    # Spectrum math
+    'add_spectra',
+    'subtract_spectra',
+    'subtract_measured_background',
+    'nonnegative_counts_for_algorithm',
+    'moving_average',
     # k0-NAA
     'K0Parameters',
     'K0NuclideData',
@@ -245,6 +274,22 @@ __all__ = [
     'get_k0_data',
     'identify_isotope_from_gamma',
     'create_k0_measurement_from_peak',
+    'K0_CAPABILITY_FLAGS',
+    'PeakObservation',
+    'classify_peak_observation',
+    'evaluate_detector_characterization',
+    'peak_report_to_observations',
+    'resolve_governed_libraries',
+    'analyze_astm_e261_plan',
+    'analyze_astm_e262_plan',
+    'equivalent_irradiation_duration_s',
+    'target_atom_count',
+    'build_detector_characterization',
+    'build_facility_characterization',
+    'analyze_k0_observations',
+    'aggregate_k0_analysis_bundles',
+    'evaluate_k0_qaqc',
+    'build_k0_report_payload',
     # Advanced peak finders
     'PeakInfo',
     'snip_background',
@@ -259,10 +304,6 @@ __all__ = [
     'RelativeExtremaPeakFinder',
     'refine_peak_centroids',
     'merge_nearby_peaks',
-    # Spectrum math
-    'add_spectra',
-    'subtract_spectra',
-    'moving_average',
     # Line search
     'LineMatch',
     'search_decay_lines',
@@ -274,7 +315,6 @@ __all__ = [
     'fit_gaussian_baseline',
     # Flux wire analysis
     'FLUX_WIRE_NUCLIDES',
-    'ELEMENT_TO_ISOTOPES',
     'FluxWireAnalysisResult',
     'analyze_flux_wire',
     'compare_raw_vs_processed',
@@ -321,16 +361,20 @@ __all__ = [
     'estimate_optimal_wire_count',
 ]
 
-# Add NAA-ANN exports if available
-if _HAS_NAA_ANN:
-    __all__.extend([
-        'NAAANNConfig',
-        'NAAANNResult',
-        'AugmentationConfig',
-        'SpectralAugmentor',
-        'NAAANNModel',
-        'NAAANNAnalyzer',
-        'create_training_dataset',
-        'train_naa_ann_model',
-        'HAS_TENSORFLOW',
-    ])
+__all__.extend(_NAA_ANN_EXPORTS)
+
+
+def __getattr__(name):
+    if name in _NAA_ANN_EXPORTS:
+        _naa_ann = import_module("fluxforge.analysis.naa_ann")
+
+        for export_name in _NAA_ANN_EXPORTS:
+            if hasattr(_naa_ann, export_name):
+                globals()[export_name] = getattr(_naa_ann, export_name)
+        if name in globals():
+            return globals()[name]
+    raise AttributeError(f"module 'fluxforge.analysis' has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(globals()) | set(__all__))

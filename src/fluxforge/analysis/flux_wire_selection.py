@@ -557,17 +557,17 @@ def analyze_wire_combination(
     
     if not has_thermal:
         recommendations.append(
-            "⚠️ No thermal reaction. Consider adding Co, Au, or In for thermal flux monitoring."
+            "WARNING No thermal reaction. Consider adding Co, Au, or In for thermal flux monitoring."
         )
     
     if not has_fast:
         recommendations.append(
-            "⚠️ No fast threshold reactions. Consider adding Ti, Ni, or Fe for fast flux."
+            "WARNING No fast threshold reactions. Consider adding Ti, Ni, or Fe for fast flux."
         )
     
     if len(wires) < 3:
         recommendations.append(
-            "⚠️ Fewer than 3 wires. INL recommends at least Ti-Fe-Co as baseline."
+            "WARNING Fewer than 3 wires. INL recommends at least Ti-Fe-Co as baseline."
         )
     
     if len(thresholds) < 3:
@@ -580,7 +580,7 @@ def analyze_wire_combination(
     inl_baseline = {"TI", "FE", "CO"}
     if inl_baseline.issubset(wire_set):
         recommendations.append(
-            "✓ Includes INL baseline {Ti, Fe, Co} - robust against a priori uncertainty."
+            "OK Includes INL baseline {Ti, Fe, Co} - robust against a priori uncertainty."
         )
     
     return WireCombinationScore(

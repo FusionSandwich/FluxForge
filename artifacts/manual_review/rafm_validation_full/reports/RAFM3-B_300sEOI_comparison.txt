@@ -1,0 +1,80 @@
+Sample: RAFM3-B_300sEOI
+Raw file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/RAFM3/RAFM3-B_300sEOI.ASC
+QG file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-B_300sEOI.txt
+Sample group: RAFM3
+Irradiation phase: phase1_rabbit_tube
+Schedule source: sample_schedule.phase1
+Decay label: 300s
+Decay time (s): 360.0
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+QG peaks not identified by FluxForge
+------------------------------------
+- none
+
+Matched energies with isotope mismatch
+--------------------------------------
+- none
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- none
+
+Peak gross-count parity failures
+--------------------------------
+- none
+
+Isotope activity parity failures
+--------------------------------
+- none
+
+Line-level diagnostic flags
+---------------------------
+- W187 @ 685.79 keV | bucket=gamma_library_mismatch | rel_count=+0.000 | rel_line_activity=+0.000 | eff_ratio=0.774
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- Fe59 @ 141.26 keV | stage=eoi | rel_dev=1.395 | consensus=5.545e+04 Bq
+- Fe59 @ 197.92 keV | stage=eoi | rel_dev=0.377 | consensus=5.545e+04 Bq
+- Mn56 @ 2112.81 keV | stage=eoi | rel_dev=0.281 | consensus=7.075e+05 Bq
+- Mn56 @ 2959.49 keV | stage=eoi | rel_dev=0.647 | consensus=7.075e+05 Bq
+- V52 @ 1530.23 keV | stage=eoi | rel_dev=0.386 | consensus=4.73e+06 Bq
+- W187 @ 511.47 keV | stage=eoi | rel_dev=31.669 | consensus=9.299e+04 Bq
+- W187 @ 551.46 keV | stage=eoi | rel_dev=0.250 | consensus=9.299e+04 Bq
+- W187 @ 622.79 keV | stage=eoi | rel_dev=45.524 | consensus=9.299e+04 Bq
+- W187 @ 773.00 keV | stage=eoi | rel_dev=0.279 | consensus=9.299e+04 Bq
+- W187 @ 863.31 keV | stage=eoi | rel_dev=4.306 | consensus=9.299e+04 Bq
+
+Measurement QC review flags
+---------------------------
+- none
+
+QG internal consistency flags
+-----------------------------
+- W187 | header=3.641e+04 Bq | line range=(6919, 4.677e+04) Bq | max rel deviation=0.810
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- none
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- Fe59 @ 141.26 keV | net=366.00 +/- 153.52
+- Fe59 @ 197.92 keV | net=617.00 +/- 240.79
+- Ta182 @ 223.11 keV | net=4456.00 +/- 411.59
+- W187 @ 511.47 keV | net=3465.32 +/- 152.32
+- W187 @ 622.79 keV | net=7336.00 +/- 317.46
+- Sb124 @ 727.05 keV | net=564.50 +/- 139.57
+- W187 @ 863.31 keV | net=208.50 +/- 86.00
+- Fe59 @ 1293.22 keV | net=2444.51 +/- 99.97
+- Co60 @ 1333.27 keV | net=831.50 +/- 66.74
+- V52 @ 1530.23 keV | net=160.50 +/- 55.15
+- Mn56 @ 2522.00 keV | net=603.70 +/- 24.70
+- Mn56 @ 2657.08 keV | net=393.83 +/- 19.85
+- Mn56 @ 2959.49 keV | net=92.00 +/- 11.79
+

@@ -1,0 +1,273 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{setspace}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\begin{document}
+
+\begin{center}
+{\small \textbf{Designation: E2005--21}\par}
+\vspace{0.5em}
+{\Large \textbf{Standard Guide for}\par}
+\vspace{0.25em}
+{\Large \textbf{Benchmark Testing of Reactor Dosimetry in Standard and}\par}
+{\Large \textbf{Reference Neutron Fields}\par}
+\end{center}
+
+This standard is issued under the fixed designation E2005; the number immediately following the designation indicates the year of original adoption or, in the case of revision, the year of last revision. A number in parentheses indicates the year of last reapproval. A superscript epsilon ($\epsilon$) indicates an editorial change since the last revision or reapproval.
+
+\section*{1.\ Scope}
+
+\textbf{1.1} This guide covers facilities and procedures for benchmarking neutron measurements and calculations. Particular sections of the guide discuss: the use of well-characterized benchmark neutron fields to calibrate integral neutron sensors; the use of certified-neutron-fluence standards to calibrate radiometric counting equipment or to determine interlaboratory measurement consistency; development of special benchmark fields to test neutron transport calculations; use of well-known fission spectra to benchmark spectrum-averaged cross sections; and the use of benchmarked data and calculations to determine the uncertainties in derived neutron dosimetry results.
+
+\textbf{1.2} The values stated in SI units are to be regarded as standard. No other units of measurement are included in this standard.
+
+\textbf{1.3} This standard does not purport to address all of the safety concerns, if any, associated with its use. It is the responsibility of the user of this standard to establish appropriate safety, health, and environmental practices and determine the applicability of regulatory limitations prior to use.
+
+\textbf{1.4} This international standard was developed in accordance with internationally recognized principles on standardization established in the Decision on Principles for the Development of International Standards, Guides and Recommendations issued by the World Trade Organization Technical Barriers to Trade (TBT) Committee.
+
+\section*{2.\ Referenced Documents}
+
+\textbf{2.1 ASTM Standards:\textsuperscript{2}}
+
+\begin{description}[leftmargin=2.2cm,style=nextline]
+\item[E170] Terminology Relating to Radiation Measurements and Dosimetry
+\item[E261] Practice for Determining Neutron Fluence, Fluence Rate, and Spectra by Radioactivation Techniques
+\item[E263] Test Method for Measuring Fast-Neutron Reaction Rates by Radioactivation of Iron
+\item[E264] Test Method for Measuring Fast-Neutron Reaction Rates by Radioactivation of Nickel
+\item[E265] Test Method for Measuring Reaction Rates and Fast-Neutron Fluences by Radioactivation of Sulfur-32
+\item[E266] Test Method for Measuring Fast-Neutron Reaction Rates by Radioactivation of Aluminum
+\item[E343] Test Method for Measuring Reaction Rates by Analysis of Molybdenum-99 Radioactivity From Fission Dosimeters (Withdrawn 2002)\textsuperscript{3}
+\item[E393] Test Method for Measuring Reaction Rates by Analysis of Barium-140 From Fission Dosimeters
+\item[E482] Guide for Application of Neutron Transport Methods for Reactor Vessel Surveillance
+\item[E523] Test Method for Measuring Fast-Neutron Reaction Rates by Radioactivation of Copper
+\item[E526] Test Method for Measuring Fast-Neutron Reaction Rates by Radioactivation of Titanium
+\item[E704] Test Method for Measuring Reaction Rates by Radioactivation of Uranium-238
+\item[E705] Test Method for Measuring Reaction Rates by Radioactivation of Neptunium-237
+\item[E854] Test Method for Application and Analysis of Solid State Track Recorder (SSTR) Monitors for Reactor Surveillance
+\item[E910] Test Method for Application and Analysis of Helium Accumulation Fluence Monitors for Reactor Vessel Surveillance
+\item[E1297] Test Method for Measuring Fast-Neutron Reaction Rates by Radioactivation of Niobium
+\item[E2006] Guide for Benchmark Testing of Light Water Reactor Calculations
+\end{description}
+
+\textsuperscript{2} For referenced ASTM standards, visit the ASTM website, \url{www.astm.org}, or contact ASTM Customer Service at \href{mailto:service@astm.org}{service@astm.org}. For Annual Book of ASTM Standards volume information, refer to the standard's Document Summary page on the ASTM website.
+
+\textsuperscript{3} The last approved version of this historical standard is referenced on \url{www.astm.org}.
+
+\section*{3.\ Significance and Use}
+
+\textbf{3.1} This guide describes approaches for using neutron fields with well known characteristics to perform calibrations of neutron sensors, to intercompare different methods of dosimetry, and to corroborate procedures used to derive neutron field information from measurements of neutron sensor response.
+
+\textbf{3.2} This guide discusses only selected standard and reference neutron fields which are appropriate for benchmark testing of light-water reactor dosimetry. The Standard Fields considered here include neutron source environments that closely approximate: (a) the unscattered neutron spectra from ${}^{252}\mathrm{Cf}$ spontaneous fission; and (b) the ${}^{235}\mathrm{U}$ thermal neutron induced fission. These standard fields were chosen for their spectral similarity to the high energy region $(E > 2\ \mathrm{MeV})$ of reactor spectra. The various categories of benchmark fields are defined in Terminology E170.
+
+\textbf{3.3} There are other well known neutron fields that have been designed to mock up special environments, such as pressure vessel mockups in which it is possible to make dosimetry measurements inside of the steel volume of the ``vessel.'' When such mockups are suitably characterized, they are also referred to as benchmark fields. A variety of these engineering benchmark fields have been developed, or pressed into service, to improve the accuracy of neutron dosimetry measurement techniques. These special benchmark experiments are discussed in Guide E2006, and in Refs.~(1)\textsuperscript{4} and (2).
+
+\textsuperscript{4} The boldface numbers given in parentheses refer to a list of references at the end of the text.
+
+\section*{4.\ Neutron Field Benchmarking}
+
+\textbf{4.1} To accomplish neutron field ``benchmarking,'' one must perform irradiations in a well-characterized neutron environment, with the required level of accuracy established by a sufficient quantity and quality of results supported by a rigorous uncertainty analysis. What constitutes sufficient results and their required accuracy level frequently depends upon the situation. For example:
+
+\begin{enumerate}[label=4.1.\arabic*]
+\item Benchmarking to test the capabilities of a new dosimeter;
+\item Benchmarking to ensure long-term stability, or continuity, of procedures that are influenced by changes of personnel and equipment;
+\item Benchmarking measurements that will serve as the basis of intercomparison of results from different laboratories;
+\item Benchmarking to determine the accuracy of newly established benchmark fields; and
+\item Benchmarking to validate certain ASTM standard methods or practices which derive exposure parameters (for example, fluence $> 1\ \mathrm{MeV}$ or dpa) from dosimetry measurements and calculations.
+\end{enumerate}
+
+\section*{5.\ Description of Standard and Reference Fields}
+
+\textbf{5.1} There are a few facilities which can provide certified ``free field'' fluence irradiations. The following provides a list of such facilities. The emphasis is on facilities that have a long-lived commitment to development, maintenance, research, and international interlaboratory comparison calibrations. As such, discussion is limited to recently existing facilities.
+
+\textbf{5.2 ${}^{252}$Cf Fission Spectrum---Standard Neutron Field:}
+
+\textbf{5.2.1} The standard fission-spectrum fluence from a suitably encapsulated ${}^{252}\mathrm{Cf}$ source is characterized by its source strength, the distance from the source, and the irradiation time. In the U.S., neutron source emission rate calibrations are all referenced to source calibrations at the National Institute of Standards and Technology (NIST) accomplished by the MnSO$_4$ technique (3). Corrections for neutron absorption, scattering, and other than point-geometry conditions may, by careful experimental design, be held to less than $3\%$. Associated uncertainties for the NIST ${}^{252}\mathrm{Cf}$ irradiation facility are discussed in Ref.~(4). The principal uncertainties, which only total about $2.5\%$, come from the source strength determination, scattering corrections, and distance measurements. Extensive details of standard field characteristics and values of measured and calculated spectrum-averaged cross sections are all given in a compendium, see Ref.~(5).
+
+\textbf{5.2.2} The NIST ${}^{252}\mathrm{Cf}$ sources have a very nearly unperturbed spontaneous fission spectrum, because of the lightweight encapsulations, fabricated at the Oak Ridge National Laboratory (ORNL), see Ref.~(6).
+
+\textbf{5.2.3} For a comprehensive view of the calibration and use of a special (32 mg) ${}^{252}\mathrm{Cf}$ source employed to measure the spectrum-averaged cross section of the ${}^{93}\mathrm{Nb}(n,n')$ reaction, see Ref.~(7).
+
+\textbf{5.3 ${}^{235}$U Fission Spectrum---Standard Neutron Field:}
+
+\textbf{5.3.1} Because ${}^{235}\mathrm{U}$ fission is the principal source of neutrons in present nuclear reactors, the ${}^{235}\mathrm{U}$ fission spectrum is a fundamental neutron field for benchmark referencing or dosimetry accomplished in reactor environments. This remains true even for low-enrichment cores which have up to $30\%$ burnup.
+
+\textbf{5.3.2} There are currently two ${}^{235}\mathrm{U}$ standard fission spectrum facilities, one in the thermal column of the NIST Research Reactor (8) and one at CEN/SCK, Mol, Belgium (9).
+
+\textbf{5.3.3} A standard ${}^{235}\mathrm{U}$ neutron field is obtained by driving (fissioning) ${}^{235}\mathrm{U}$ in a field of thermal neutrons. Therefore, the fluence rate depends upon the power level of the driving reactor, which is frequently not well known or particularly stable. Time dependent fluence rate, or total fluence, monitoring is necessary in the ${}^{235}\mathrm{U}$ field. Certified fluence irradiations are monitored with the ${}^{58}\mathrm{Ni}(n,p){}^{58}\mathrm{Co}$ activation reaction. The fluence-monitor calibration must be benchmarked.
+
+\textbf{5.3.4} For ${}^{235}\mathrm{U}$, as for ${}^{252}\mathrm{Cf}$ irradiations, small (nominally $< 3\%$) scattering and absorption corrections are necessary. In addition, for ${}^{235}\mathrm{U}$, gradient corrections of the measured fluence which do not simply depend upon distance are necessary. The scattering and gradient corrections are determined by Monte Carlo calculations. Field characteristics of the NIST ${}^{235}\mathrm{U}$ Fission Spectrum Facility and associated measured and calculated cross sections are given in Ref.~(5).
+
+\textbf{5.4} There are several additional facilities that can provide free field fluence irradiations that qualify as reference fields (10, 11). The following is a list of some of the facilities that have characterized reference fields:
+
+\begin{enumerate}[label=5.4.\arabic*]
+\item Annular Core Research Reactor (ACRR) Central Cavity---Reference Neutron Field (12, 13),
+\item ACRR Lead-Boron Cavity Insert---Reference Neutron Field (13),
+\item YAYOI fast neutron field---Reference Neutron Field (14, 15, 16) [no longer operational],
+\item SIGMA-SIGMA neutron field---Reference Neutron Field (14, 15) [no longer operational],
+\item LR0-Rez neutron field---Reference Neutron Field (10),
+\item TRIGA-JSI neutron field---Reference Neutron Field (10).
+\end{enumerate}
+
+\section*{6.\ Applications of Benchmark Fields}
+
+\textbf{6.1 Notation---Reaction Rate, Fluence Rate, and Fluence---} The notation employed in this section will follow that in E261 (Standard Practice for Determining Neutron Fluence Rate, and Spectra by Radioactivation Techniques) except as noted. The reaction rate, $R$, for some neutron-nuclear reaction $\{\text{reactions}/[(\text{dosimeter target nucleus})(\text{second})]\}$ is given by:
+\begin{equation}
+R = \int_{0}^{\infty} \sigma(E)\,\phi(E)\,dE
+\tag{1}
+\end{equation}
+or:
+\begin{equation}
+R = \bar{\sigma}\,\phi
+\tag{2}
+\end{equation}
+where:
+\begin{align*}
+\sigma(E) &= \text{the dosimeter reaction cross section at energy } E \text{ (typically of the order of } 10^{-24}\ \mathrm{cm}^2\text{),} \\
+\phi(E) &= \text{the differential neutron fluence rate, that is the fluence per unit time and unit energy} \\
+&\quad \text{for neutrons with energies between } E \text{ and } E + dE \\
+&\quad \text{(neutrons cm}^{-2}\text{s}^{-1}\text{ MeV}^{-1}\text{),} \\
+\phi &= \text{the total fluence rate (neutrons cm}^{-2}\text{s}^{-1}\text{), the integral of } \phi(E) \text{ over all } E,\text{ and} \\
+\bar{\sigma} &= \text{the spectral-averaged value of } \sigma(E)\text{, that is, } R/\phi.
+\end{align*}
+
+\textit{NOTE 1---} Neutron fluence and fluence rate are defined formally in Terminology E170 under the listing ``particle fluence.'' Fluence is just the time integral of the fluence rate over the time interval of interest. The fluence rate is also called the flux or flux density in many papers and books on neutron transport theory.
+
+\textbf{6.1.1} The reaction rate is found experimentally using an active instrument such as a fission chamber (see Ref.~(17)) or a passive dosimeter such as a solid state track recorder (see Test Method E854), a helium accumulation fluence monitor (see Test Method E910), or a radioactivation dosimeter (see Practice E261). For the radioactivation method, there are also separate standards for many particularly important dosimetry nuclides; for example, see Test Methods E263, E264, E265, E266, E343, E393, E523, E526, E704, E705, and E1297.
+
+\textbf{6.2 Fluence Rate Transfer:} Note that if one determines $\phi = R/\bar{\sigma}$ from Eq.~2, then the uncertainty in $\phi$ will be a propagation of the uncertainties in both $R$ and $\bar{\sigma}$. The uncertainty in $\bar{\sigma}$ is frequently large, leading to a less accurate determination of $\phi$ than desired. However, if one can make an additional irradiation of the same type of dosimeter in a standard neutron field with known fluence rate, then one may apply Eq.~2 to both irradiations and write
+\begin{equation}
+\phi_A = \phi_B \left(\frac{R_A}{R_B}\right)\left(\frac{\bar{\sigma}_B}{\bar{\sigma}_A}\right)
+\tag{3}
+\end{equation}
+where ``A'' denotes the field of interest and ``B'' denotes the standard neutron field benchmark. In Eq.~3 the ratios of spectral-average cross section, $\bar{\sigma}_A/\bar{\sigma}_B$, will have a small uncertainty if the spectral shapes $\phi_A(E)$ and $\phi_B(E)$ are fairly similar. There may also be important cancellation of poorly known factors in the ratio $R_A/R_B$, which will contribute to the better accuracy of Eq.~3. Whether $\phi$ is better determined by Eq.~3 or Eq.~2 must be evaluated on a case-by-case basis. Often the fluence rate from Eq.~3 is substantially more accurate and provides a very useful validation of other dosimetry. The use of a benchmark neutron field irradiation and Eq.~3 is called fluence rate transfer.
+
+\textbf{6.2.1 Certified Fluence or Fluence Rate Irradiations---} The primary benefit from carefully made irradiations in a standard neutron field is that of knowing the neutron fluence rate. Consider the case of a lightly encapsulated ${}^{252}\mathrm{Cf}$ sintered-oxide bead, which has an emission rate known to about $\pm 1.5\%$ by calibration in a manganese bath (MnSO$_4$ solution). Further, consider a dosimeter pair irradiated in compensated beam geometry (with each member of the pair equidistant from, and on opposite sides of, the ${}^{252}\mathrm{Cf}$ source). For such an irradiation in a large room (where very little room return occurs), the fluence rate---with a ${}^{252}\mathrm{Cf}$ fission spectrum---is known to within $\pm 3\%$ from the source strength, and the average distance of the dosimeter pair from the center of the source. Questions concerning in- and out-scattering by source encapsulation, source and foil holders, and foil thicknesses may be accurately investigated by Monte Carlo calculations. There is no other neutron-irradiation situation that can approach this level of accuracy in determination of the fluence or fluence rate.
+
+\textbf{6.2.2 Fluence Transfer Calibrations of Reference Fields---} The benefit of irradiating with a source of known emission rate is lost when one must consider reactor cores or, even, thermal-neutron-fissioned ${}^{235}\mathrm{U}$ sources. When the latter are carefully constructed to provide for an unmoderated ${}^{235}\mathrm{U}$ fission neutron spectrum, this mentioned disadvantage can be circumvented by a process called fluence transfer. As explained briefly in 6.2, this process is basically as follows. A gamma-counter (spectrometer) geometry is chosen to enable proper counting of the activities of a particular isotopic reaction, for example, ${}^{58}\mathrm{Ni}(n,p){}^{58}\mathrm{Co}$, after irradiation in either a ${}^{252}\mathrm{Cf}$ or ${}^{235}\mathrm{U}$ field. Then the ${}^{252}\mathrm{Cf}$ irradiation is accomplished and the nickel foil counted. From this, a ratio of the dosimeter response divided by the ${}^{252}\mathrm{Cf}$ certified fluence is determined. Subsequently, an identical nickel is irradiated in the ${}^{235}\mathrm{U}$ spectrum and that foil is counted with the same counter geometry. Within the knowledge of the ratio of the spectrum-averaged cross sections in the two spectra, knowledge of the counter response to the recent irradiation yields the average ${}^{235}\mathrm{U}$ fluence. Note, the average fluence is measured. The thermal fluence rate at the ${}^{235}\mathrm{U}$ sources may not have been constant over the time of the irradiation, but that time is assumed to be short relative to the 70-day half-life of the ${}^{58}\mathrm{Co}$, which monitors the fast neutron fluence throughout the irradiation. The method of calibration is termed fluence rate transfer because it is fluence rate which is determined, and there is no need to determine the absolute radioactivity of the dosimeters. Relative response of the same counter geometry is the only requirement.
+
+\textbf{6.2.3 Reactor Irradiations---} In principle, the same fluence-transfer procedures can be applied to more complex irradiations. However, there are certain other situations which must be considered and weighed to determine if fluence transfer or reaction rate determination is the better method. Also, remember that error estimation can be examined by using both methods.
+
+\begin{enumerate}[label=6.2.3.\arabic*]
+\item If radioactivation dosimeters are employed for long-term irradiations in a power reactor, the fluence at a dosimeter location can be determined by the method explained in 9.7, Long Term Irradiations, of Practice E261, taking into account the relative power level changes over the course of the irradiation. There may be practical problems, however. In particular, if the measured activity does not have a sufficiently long half-life, it cannot provide a correct measure of the fluence. Expressed another way, if the dosimeter exposure time is more than about 3.5 times the half-life of the radioactive isotopic activity, the dosimeter does not ``remember'' the early part of the irradiation history.
+\item Another problem is that of the available isotopic reactions that monitor fast neutron fluence: only two have sufficiently long half-lives and respond over a reasonable energy range (1 MeV to 6 MeV) to monitor multi-year power-reactor irradiation cycles. They are the ${}^{137}\mathrm{Cs}$ fission product (from the ${}^{238}\mathrm{U}(n,f)$ or ${}^{237}\mathrm{Np}(n,f)$ reactions) or the ${}^{93}\mathrm{Nb}(n,n')$ reaction with its ${}^{93m}\mathrm{Nb}$ 16-year half-life. In both cases, it is essential that some benchmarking to a reference neutron field be accomplished to ensure that the radioactive products are being adequately determined for use in Eq.~3 (5). A brief explanation of cesium and niobium counting follows:
+\item \textbf{Determining the Activity of ${}^{137}$Cs in a Background of Other Fission Products---} The standard test methods for analysis of radioactivation of ${}^{238}\mathrm{U}$ and ${}^{237}\mathrm{Np}$ dosimeters are described in Test Methods E704 and E705. However, for about three years after ${}^{238}\mathrm{U}$ or ${}^{237}\mathrm{Np}$ are irradiated, the signal-to-background ratio (or the ratio of the net area under the 661.7 keV photopeak of ${}^{137}\mathrm{Cs}$ to the background) is rather low, varying from a value of near 1.0 to about 3.5. Furthermore, there are various interference peaks of time-dependent intensity in the background spectra, both above and below the photopeak. For ${}^{237}\mathrm{Np}$ dosimeters, the inherent ${}^{233}\mathrm{Pa}$ gamma background is an additional difficulty. For these reasons, it is advisable to validate ${}^{137}\mathrm{Cs}$ fission product counting by use of a certified fluence irradiation in a suitable reference neutron field.
+\item \textbf{Determining the Activity of ${}^{93m}$Nb---} The ${}^{93}\mathrm{Nb}(n,n'){}^{93m}\mathrm{Nb}$ reaction as a fast-neutron dosimeter also presents some special problems. The products to be counted are soft X-rays. These same soft-energy X-rays may be fluoresced by tantalum impurities in the niobium dosimeter. Test Method E1297 describes the standard test method and its limitations. Validation by a reference neutron field irradiation is advisable because of the unusual techniques required in the measurement of radioactivation for this nuclide.
+\end{enumerate}
+
+\section*{7.\ Spectral Indexes}
+
+\textbf{7.1} A spectral index, $S_{a/b} = R_a/R_b$, is the ratio of the reaction rates of two isotopes in the same neutron field. Usually these are chosen to be isotopes with markedly different spectral response, that is, significantly different threshold energies and median response energies. In any designated spectrum where the ``a'' and ``b'' dosimeters are exposed to the same $\phi$, this ratio is identical to the ratio of their spectrum-averaged cross sections. The double ratio, $C_{a/b}$, of the calculated spectral index, $S_{\mathrm{cal}}$, to the measured spectral index, $S_{\mathrm{meas}}$, is often one of the most accurate experimental tests of the calculated neutron energy spectrum:
+\begin{equation}
+C_{a/b} = \frac{(S_{a/b})_{\mathrm{cal}}}{(S_{a/b})_{\mathrm{meas}}}
+\tag{4}
+\end{equation}
+
+\textbf{7.2} The same reaction cross section data employed in the calculation should be employed in deriving the experimental reaction rates. Then the uncertainty in the double ratio $C_{a/b}$ tends to be low, because of cancellation of reaction cross section biases and some experimental biases, such as the efficiency biases in the reaction counting apparatus. The departure of the double ratio $C_{a/b}$ from unity may be used as a validation test of transport cross section data (especially iron inelastic scattering cross section data) in calculations of neutron transport through reactor pressure vessels and related benchmark or reference neutron fields (18). Similarly, if the transport cross section data is considered to be well known for some case of interest, the $C_{a/b}$ ratio may be taken as a test of the transport calculation method itself or of other input data to which the spectrum is sensitive.
+
+\section*{8.\ Precision and Bias}
+
+\textit{NOTE 2---} Measurement uncertainty is described by a precision and bias statement in this practice. Another acceptable approach is to use Type A and B uncertainty components (see ISO/BIPM Guide in the Expression of Uncertainty in Measurement and Refs.~(19, 20)). This Type A/B uncertainty specification is now used in International Organization for Standardization (ISO) standards, and this approach can be expected to play a more prominent role in future uncertainty analyses.
+
+\textbf{8.1} The information content of uncertainty statements determines, to a large extent, the value of the effort. A common deficiency in many statements of uncertainty is that they do not convey all the pertinent information. One pitfall is oversimplification, for example, the practice of obliterating all the identifiable components of the uncertainty by combining them into an overall uncertainty, just for the sake of simplicity.
+
+\textbf{8.2} Error propagation with integral detectors is complex because such detectors do not measure neutron fluence directly, and because the same measured detector responses from which a neutron fluence is derived are also used to help establish the neutron spectrum required for that fluence derivation.
+
+\textbf{8.3} Many ``measured'' dosimetry results are actually derived quantities because the observed raw data must be corrected, by a series of multiplicative correction factors, to compensate for other than ideal circumstances during the measurement. It is not always clear, after data corrections have been made and averages taken, just how the uncertainties were taken into account. Therefore, special attention should be given to discussion of uncertainty contributions when they are comparable to, or larger than, the normally considered statistical uncertainties. Furthermore, benchmark procedures owe their effectiveness to strong correlations which can exist between the measurements in the benchmark fields and in the study fields. Other correlations can also exist among the measurements in each of those types of fields. It is, therefore, vital to identify those uncertainties which are correlated, between fields, among measurements, and in some cases where it may be ambiguous, those uncertainties which are uncorrelated. For example, differential cross section data and multigroup neutron spectra are generally assumed to be uncorrelated. However, when a spectrum is used to derive new spectrum-averaged cross sections for a new multigroup structure with considerably fewer groups, the new multigroup cross sections and multigroup spectrum are no longer uncorrelated.
+
+\textbf{8.4 Precautions to Help Reduce Uncertainties in Measurements:}
+
+\begin{enumerate}[label=8.4.\arabic*]
+\item The spectral differences between the benchmark and study fields may lead to a significantly different response from impurities in the dosimeters. For example, $0.03\%$ ${}^{235}\mathrm{U}$ in a ${}^{238}\mathrm{U}$ dosimeter or $0.012\%$ ${}^{239}\mathrm{Pu}$ impurity in a ${}^{237}\mathrm{Np}$ dosimeter, will produce less than $1\%$ of the response in an unscattered fission-neutron field, but $5$ to $10\%$ of the response in a more thermalized reactor leakage spectrum.
+\item There can be, and frequently are, unpredictable differences in dosimetry instrumentation for routine versus nonroutine measurements. This is more often true when the time between calibration and use is either long or spans periods when the equipment is moved, changed, or more than trivially readjusted. A quality assurance program for a counting laboratory should include adequate and timely calibrations.
+\item Frequently, study fields require more and different dosimeter encapsulations than those used in a standard field. Such encapsulations lead to perturbations which can, in turn, lead to significant systematic uncertainties.
+\item Uncertainties associated with dosimeter positioning are almost always larger at study fields because of less readily available access to measurement locations. The radial location of the in-vessel surveillance capsule is known in commercial plants to about $\pm 0.6\ \mathrm{cm}$, which corresponds to about $9\%$ difference in the fast fluence rate.
+\item Perturbations due to scattering effects in the immediate environment of the dosimeter are at least as significant in the study field as they are in the standard field. However, they are usually not as easy to investigate or to understand in the study field.
+\item Time limitations can be an underlying factor contributing to systematic uncertainties. In-the-field measurements almost always suffer from lack of the thoroughness that characterizes benchmark or calibration measurements.
+\end{enumerate}
+
+\section*{9.\ Documentation}
+
+\textbf{9.1} All facets of the experiments must be documented to ensure that the overall results and related uncertainties, and where possible correlations among parameters, accurately reflect the conditions under which the measurements were carried out. For example, the quality assurance requirements for solid state track recorder (SSTR) dosimetry for reactor surveillance are covered in detail in an appendix of Test Method E854.
+
+\textbf{9.2} As a minimum for benchmark experiments, documentation should include:
+
+\begin{enumerate}[label=9.2.\arabic*]
+\item Information about the origin and purity of materials used to fabricate the dosimetry.
+\item Details of encapsulation or thermal-neutron shields used.
+\item Irradiation Loading Configurations---Several issues are important here: positioning of individual dosimeters relative to fluence rate gradients; positioning relative to other dosimeters and positioning or holding devices which may perturb the fluence; and critical distances which relate to the definition of fluence magnitudes.
+\item Specification of the irradiation details with emphasis on interruptions, power level changes, and consideration of whether or not knowledge of absolute power level is important for the interpretation of the dosimeters.
+\item Specification of the procedures used to analyze the dosimeters. In particular, attention should be given to possible biases which frequently mask the reproducibility.
+\item Details of the analysis of the dosimeters. These must include details about equipment and methods calibrations. It should also indicate where procedures or parameters may create correlations among variables or results.
+\item Final dosimetry results and associated uncertainties including estimates of identifiable correlations.
+\item Documentation about what benchmark referencing has been done. Furthermore, when benchmark referencing has influenced the calibration of instrumentation (for example, the overall efficiency scale of a gamma counter), the documentation should explain what routine recalibration activities are carried out to ensure that current operation is tied to the benchmarking effort.
+\item When benchmarking is accomplished relative to the ${}^{235}\mathrm{U}$ fission spectrum, there should be documentation and attention to consistent use of the specific form of the ${}^{235}\mathrm{U}$ spectrum. This applies both to transport calculations and to the derivation of ${}^{235}\mathrm{U}$ fission spectrum-averaged cross sections. Neutron transport calculations for the analysis of reactor surveillance should use a fission neutron source spectrum which is consistent with the guidelines set forth in Guide E482.
+\end{enumerate}
+
+\section*{10.\ Keywords}
+
+\textbf{10.1} activation dosimetry; benchmark neutron field; certified-neutron-fluence standards; fluence-transfer; neutron dosimetry; radiometric dosimetry; reference neutron field; standard neutron field; uncertainties
+
+\section*{REFERENCES}
+
+\begin{enumerate}[label=(\arabic*)]
+\item NUREG/CR-3391, Vol 4, R5 ``Compendium of Benchmark Neutron Fields for Pressure Vessel Surveillance Dosimetry,'' LWR Pressure Vessel Surveillance Dosimetry Improvement Program, Quarterly Progress Report October 1983--December 1983.
+
+\item McElroy, W. N. and Karn, F.B.K., Eds., \textit{PSF Blind Test SSC, SPVC, and SVBC Physics-Dosimetry-Metallurgy Data Packages}, HEDL-7449, Hanford Engineering Development Laboratory, Richland, WA, February 1984.
+
+\item McGarry, E. D. and Boswell, E. W., \textit{Neutron Source Strength Calibrations}, NBS Special Publication 250-18, U.S. Department of Commerce, National Institute of Standards and Technology, U.S. Government Printing Office, Washington, DC, 1988.
+
+\item Lamaze, G. P., and Grundl, J. A., \textit{Activation Foil Irradiation with Californium Fission Sources}, NBS Special Publication 250-13, U.S. Department of Commerce, National Institute of Standards and Technology, U.S. Government Printing Office, Washington, DC, 1988.
+
+\item Grundl, J. A., and Eisenhauer, C. M., \textit{Compendium of Benchmark Neutron Fields for Reactor Dosimetry}, NBSIR 85-3151, National Bureau of Standards, Gaithersburg, MD, January 1986.
+
+\item Williams, L. C., Bigelow, J. E., and Knauer, J. B., Jr., ``Equipment and Techniques for Remote Fabrication and Calibration of Physically Small, High Intensity ${}^{252}\mathrm{Cf}$ Neutron Sources,'' \textit{Proceedings of the 24th Conference on Remote Systems Technology}, 1976, pp.~165--172.
+
+\item Williams, J. G., et al., ``Measurements of Fission Spectrum Averaged Cross Sections for the ${}^{93}\mathrm{Nb}(n,n'){}^{93m}\mathrm{Nb}$ Reaction,'' \textit{Reactor Dosimetry: Methods, Applications, and Standardization}, STP-1001, Farrar/Lippincott, Eds., May 1989.
+
+\item McGarry, E. D., Eisenhauer, C. M., Gilliam, D. M., Grundl, J., and Lamaze, G. P., ``The U.S. U-235 Fission Spectrum Standard Neutron Field Revisited,'' in \textit{Proceedings, Fifth ASTM-EURATOM Symposium on Reactor Dosimetry}, Geesthacht, Germany, September 1984.
+
+\item Fabry, A., et al., ``The MOL Cavity Fission Spectrum Standard Neutron Field and Its Applications,'' in \textit{Proceedings of the 4th ASTM-Euratom Symposium on Reactor Dosimetry}, NUREG/CP-0029, Nuclear Regulatory Commission, Washington, DC, July 1982.
+
+\item Trkov, A., Griffin, P. J., Simakov, S. P., Greenwood, L. R., Zolotarev, K. I., Capote, R., et al., ``IRDFF-II: A New Neutron Metrology Library,'' \textit{Nuclear Data Sheets}, Vol.~163, pp.~1--108, 2020. Online, available: \url{https://doi.org/10.1016/j.nds.2019.12.001}
+
+\item \textit{Compilation of Nuclear Data Experimetns for Radiation Characterizations (CoNDERC)}, edited by Gilbert, M., and Sublet, J.-C., International Atomic Energy Agency Report INDC(NDS)-0764, 2018. Online, available: \url{https://www-nds.iaea.org/publications/indc/indc-nds-0764.pdf}. Calculated spectra available at \url{https://www-nds.iaea.org/conderc/spectra}
+
+\item Griffin, P. J., Luker, S. M., Cooper, P. J., Vehar, D. W., DePriest, K. R., and Holm, C. V., ``Characterization of ACRR Reference Benchmark Field,'' in \textit{Reactor Dosimetry in the 21st Century: Proceedings of the 11th International Symposium on Reactor Dosimetry}, Wagemans/Abderrahim/D'hondt/De Raedt, Eds., June 2003.
+
+\item Williams, J. G., Griffin, P. J., King, D. B., Vehar, D. W., Schnauber, T., Luker, S. M., and DePriest, K. R., ``Simultaneous Evaluation of Neutron Spectra and 1-MeV-Equivalent (Si) Fluences at SPR-III and ACRR,'' \textit{IEEE Transactions on Nuclear Science}, Vol.~54, No.~6, pp.~2296--2303, December 2007.
+
+\item INDC (SEC)-54/L + DOS, \textit{IAEA Program on Benchmark Neutron Fields Applications for Reactor Dosimetry}, July 1976.
+
+\item \textit{Neutron Cross Sections for Reactor Dosimetry}, Vol.~1, IAEA, Vienna, p.~101, 1978.
+
+\item Wakabayashi, H., Saito, I., Tamura, T., and Shigehiro, A. N., ``Operational Experiences of Fast Neutron Source Reactor `YAYOI' as Pulsed Reactor,'' \textit{Journal of Nuclear Science and Technology}, Vol.~18, pp.~545--557, 1981. Online, available: \url{https://www.tandfonline.com/doi/pdf/10.1080/18811248.1981.9733288}
+
+\item Grundl, J. A., Gilliam, D. M., Dudey, N. D., and Popek, R. J., ``Measurement of Absolute Fission Rates,'' \textit{Nuclear Technology}, 25, 1975.
+
+\item Nico, J. S., Adams, J. M., Eisenhauer, C. M., Gilliam, D. M., and Grundl, J. A., ``${}^{252}\mathrm{Cf}$ Neutron Transport Through an Iron Sphere,'' \textit{Reactor Dosimetry}, World Scientific Publishing, July 1997.
+
+\item ``Evaluation of measurement data---Guide to the expression of uncertainty in measurement,'' Joint Committee for Guides in Metrology, JCGM 100:2008 (corrected version 2010), 2010. Online, available: \url{https://www.bipm.org/en/publications/guides/gum.html}
+
+\item Taylor, B. N., and Kuyatt, C. E., \textit{Guideline for Evaluating and Expressing the Uncertainty of NIST Measurement Results}, NIST Technical Note 1297, National Institute of Standards and Technology, Gaithersburg, MD, 1994.
+\end{enumerate}
+
+\bigskip
+
+ASTM International takes no position respecting the validity of any patent rights asserted in connection with any item mentioned in this standard. Users of this standard are expressly advised that determination of the validity of any such patent rights, and the risk of infringement of such rights, are entirely their own responsibility.
+
+This standard is subject to revision at any time by the responsible technical committee and must be reviewed every five years and if not revised, either reapproved or withdrawn. Your comments are invited either for revision of this standard or for additional standards and should be addressed to ASTM International Headquarters. Your comments will receive careful consideration at a meeting of the responsible technical committee, which you may attend. If you feel that your comments have not received a fair hearing you should make your views known to the ASTM Committee on Standards, at the address shown below.
+
+This standard is copyrighted by ASTM International, 100 Barr Harbor Drive, PO Box C700, West Conshohocken, PA 19428-2959, United States. Individual reprints (single or multiple copies) of this standard may be obtained by contacting ASTM at the above address or at 610-832-9585 (phone), 610-832-9555 (fax), or \href{mailto:service@astm.org}{service@astm.org} (e-mail); or through the ASTM website (\url{www.astm.org}). Permission rights to photocopy the standard may also be secured from the Copyright Clearance Center, 222 Rosewood Drive, Danvers, MA 01923, Tel: (978) 646-2600; \url{http://www.copyright.com/}.
+
+\end{document}

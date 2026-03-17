@@ -1,0 +1,368 @@
+{
+  "irradiation_info": {
+    "phase1": {
+      "description": "3-second irradiation (RAFM3 only)",
+      "duration_seconds": 3,
+      "duration_alara": "3 s"
+    },
+    "phase2": {
+      "description": "2-hour irradiation (all samples)",
+      "start": "2025-08-04T13:00:00",
+      "end": "2025-08-04T15:00:00",
+      "duration_seconds": 7200,
+      "duration_alara": "2 h"
+    }
+  },
+  "rafm3_samples": {
+    "A": {
+      "sample": "A",
+      "material": "EUROFER97_2",
+      "tally": "tally_85244",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_start": "2025-07-31T09:17:18",
+        "irradiation_end": "2025-07-31T09:17:21",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "category": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m",
+            "measurement_time": "2025-07-31T09:23:21"
+          },
+          {
+            "label": "24h",
+            "category": "24h",
+            "seconds": 91972.0,
+            "alara_format": "25.5478 h",
+            "measurement_time": "2025-08-01T10:50:13"
+          },
+          {
+            "label": "4d",
+            "category": "4d",
+            "seconds": 341206.0,
+            "alara_format": "3.9491 d",
+            "measurement_time": "2025-08-04T08:04:07"
+          }
+        ]
+      },
+      "phase2": null
+    },
+    "B": {
+      "sample": "B",
+      "material": "EUROFER97_3",
+      "tally": "tally_85234",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_start": "2025-07-31T09:30:33",
+        "irradiation_end": "2025-07-31T09:30:36",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "category": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m",
+            "measurement_time": "2025-07-31T09:36:36"
+          },
+          {
+            "label": "2h",
+            "category": "2h",
+            "seconds": 7222.0,
+            "alara_format": "2.0061 h",
+            "measurement_time": "2025-07-31T11:30:58"
+          },
+          {
+            "label": "24h",
+            "category": "24h",
+            "seconds": 94803.0,
+            "alara_format": "26.3342 h",
+            "measurement_time": "2025-08-01T11:50:39"
+          },
+          {
+            "label": "4d",
+            "category": "4d",
+            "seconds": 344033.0,
+            "alara_format": "3.9819 d",
+            "measurement_time": "2025-08-04T09:04:29"
+          }
+        ]
+      },
+      "phase2": null
+    },
+    "C": {
+      "sample": "C",
+      "material": "EUROFER97_4",
+      "tally": "tally_85224",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_start": "2025-07-31T09:44:59",
+        "irradiation_end": "2025-07-31T09:45:02",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "category": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m",
+            "measurement_time": "2025-07-31T09:51:02"
+          },
+          {
+            "label": "2h",
+            "category": "2h",
+            "seconds": 9645.0,
+            "alara_format": "2.6792 h",
+            "measurement_time": "2025-07-31T12:25:47"
+          },
+          {
+            "label": "24h",
+            "category": "24h",
+            "seconds": 97565.0,
+            "alara_format": "27.1014 h",
+            "measurement_time": "2025-08-01T12:51:07"
+          },
+          {
+            "label": "4d",
+            "category": "4d",
+            "seconds": 346788.0,
+            "alara_format": "4.0137 d",
+            "measurement_time": "2025-08-04T10:04:50"
+          }
+        ]
+      },
+      "phase2": null
+    },
+    "N": {
+      "sample": "N",
+      "material": "CNA",
+      "tally": "tally_85214",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_start": "2025-07-31T09:55:32",
+        "irradiation_end": "2025-07-31T09:55:35",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "category": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m",
+            "measurement_time": "2025-07-31T10:01:35"
+          },
+          {
+            "label": "2h",
+            "category": "2h",
+            "seconds": 9996.0,
+            "alara_format": "2.7767 h",
+            "measurement_time": "2025-07-31T12:42:11"
+          },
+          {
+            "label": "24h",
+            "category": "24h",
+            "seconds": 100557.0,
+            "alara_format": "27.9325 h",
+            "measurement_time": "2025-08-01T13:51:32"
+          },
+          {
+            "label": "4d",
+            "category": "4d",
+            "seconds": 349778.0,
+            "alara_format": "4.0484 d",
+            "measurement_time": "2025-08-04T11:05:13"
+          }
+        ]
+      },
+      "phase2": null
+    }
+  },
+  "flux_wires": {
+    "CU-RAFM-1": {
+      "wire_name": "CU-RAFM-1",
+      "base_name": "CU-RAFM-1",
+      "category": "thermal",
+      "reaction": "Cu-63(n,g)Cu-64 [bare]",
+      "products": [
+        "cu64"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-07T11:40:00",
+      "cooldown_seconds": 247200.0,
+      "cooldown_alara": "2.8611 d",
+      "cooldown_days": 2.861111111111111,
+      "cooldown_hours": 68.66666666666667
+    },
+    "Co-Cd-RAFM-1_25cm": {
+      "wire_name": "Co-Cd-RAFM-1_25cm",
+      "base_name": "Co-Cd-RAFM-1",
+      "category": "epithermal",
+      "reaction": "Co-59(n,g)Co-60 [Cd]",
+      "products": [
+        "co60"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-28T12:55:00",
+      "cooldown_seconds": 2066100.0,
+      "cooldown_alara": "23.9132 d",
+      "cooldown_days": 23.913194444444443,
+      "cooldown_hours": 573.9166666666666
+    },
+    "Co-RAFM-1_25cm": {
+      "wire_name": "Co-RAFM-1_25cm",
+      "base_name": "Co-RAFM-1",
+      "category": "thermal",
+      "reaction": "Co-59(n,g)Co-60 [bare]",
+      "products": [
+        "co60"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-27T15:41:00",
+      "cooldown_seconds": 1989660.0,
+      "cooldown_alara": "23.0285 d",
+      "cooldown_days": 23.028472222222224,
+      "cooldown_hours": 552.6833333333333
+    },
+    "In-Cd-RAFM-1_25cm": {
+      "wire_name": "In-Cd-RAFM-1_25cm",
+      "base_name": "In-Cd-RAFM-1",
+      "category": "fast",
+      "reaction": "In-113,115(n,n')In-113m,115m",
+      "products": [
+        "in113m",
+        "in115m"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-07T08:40:00",
+      "cooldown_seconds": 236400.0,
+      "cooldown_alara": "2.7361 d",
+      "cooldown_days": 2.736111111111111,
+      "cooldown_hours": 65.66666666666667
+    },
+    "Ni-RAFM-1_25cm": {
+      "wire_name": "Ni-RAFM-1_25cm",
+      "base_name": "Ni-RAFM-1",
+      "category": "fast",
+      "reaction": "Ni-58(n,p)Co-58",
+      "products": [
+        "co58"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-27T09:58:00",
+      "cooldown_seconds": 1969080.0,
+      "cooldown_alara": "22.7903 d",
+      "cooldown_days": 22.790277777777778,
+      "cooldown_hours": 546.9666666666667
+    },
+    "Sc-Cd-RAFM-1_25cm": {
+      "wire_name": "Sc-Cd-RAFM-1_25cm",
+      "base_name": "Sc-Cd-RAFM-1",
+      "category": "epithermal",
+      "reaction": "Sc-45(n,g)Sc-46 [Cd]",
+      "products": [
+        "sc46"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-27T11:21:00",
+      "cooldown_seconds": 1974060.0,
+      "cooldown_alara": "22.8479 d",
+      "cooldown_days": 22.847916666666666,
+      "cooldown_hours": 548.35
+    },
+    "Sc-RAFM-1_25cm": {
+      "wire_name": "Sc-RAFM-1_25cm",
+      "base_name": "Sc-RAFM-1",
+      "category": "thermal",
+      "reaction": "Sc-45(n,g)Sc-46 [bare]",
+      "products": [
+        "sc46"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-27T13:18:00",
+      "cooldown_seconds": 1981080.0,
+      "cooldown_alara": "22.9292 d",
+      "cooldown_days": 22.929166666666667,
+      "cooldown_hours": 550.3
+    },
+    "Ti-RAFM-1_25cm": {
+      "wire_name": "Ti-RAFM-1_25cm",
+      "base_name": "Ti-RAFM-1",
+      "category": "fast",
+      "reaction": "Ti-46,47,48(n,p)Sc-46,47,48",
+      "products": [
+        "sc46",
+        "sc47",
+        "sc48"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-12T11:04:00",
+      "cooldown_seconds": 677040.0,
+      "cooldown_alara": "7.8361 d",
+      "cooldown_days": 7.836111111111111,
+      "cooldown_hours": 188.06666666666666
+    },
+    "Ti-RAFM-1a_25cm": {
+      "wire_name": "Ti-RAFM-1a_25cm",
+      "base_name": "Ti-RAFM-1a",
+      "category": "fast",
+      "reaction": "Ti-46,47,48(n,p)Sc-46,47,48",
+      "products": [
+        "sc46",
+        "sc47",
+        "sc48"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-12T15:07:00",
+      "cooldown_seconds": 691620.0,
+      "cooldown_alara": "8.0049 d",
+      "cooldown_days": 8.004861111111111,
+      "cooldown_hours": 192.11666666666667
+    },
+    "Ti-RAFM-1b_25cm": {
+      "wire_name": "Ti-RAFM-1b_25cm",
+      "base_name": "Ti-RAFM-1b",
+      "category": "fast",
+      "reaction": "Ti-46,47,48(n,p)Sc-46,47,48",
+      "products": [
+        "sc46",
+        "sc47",
+        "sc48"
+      ],
+      "irradiation_start": "2025-08-04T13:00:00",
+      "irradiation_end": "2025-08-04T15:00:00",
+      "irradiation_seconds": 7200,
+      "irradiation_time": "2 h",
+      "measurement_time": "2025-08-13T10:49:00",
+      "cooldown_seconds": 762540.0,
+      "cooldown_alara": "8.8257 d",
+      "cooldown_days": 8.825694444444444,
+      "cooldown_hours": 211.81666666666666
+    }
+  }
+}

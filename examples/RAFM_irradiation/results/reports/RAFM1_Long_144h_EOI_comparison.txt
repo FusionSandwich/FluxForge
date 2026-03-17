@@ -1,0 +1,103 @@
+Sample: RAFM1_Long_144h_EOI
+Raw file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/RAFM1/RAFM1_Long_144h_EOI.ASC
+QG file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/RAFM1/RAFM1_Long_144h_EOI.txt
+Sample group: RAFM1
+Irradiation phase: n/a
+Schedule source: n/a
+Decay label: n/a
+Decay time (s): n/a
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+QG peaks not identified by FluxForge
+------------------------------------
+- none
+
+Matched energies with isotope mismatch
+--------------------------------------
+- none
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- none
+
+Peak gross-count parity failures
+--------------------------------
+- none
+
+Isotope activity parity failures
+--------------------------------
+- none
+
+Line-level diagnostic flags
+---------------------------
+- none
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- Fe59 @ 144.67 keV | stage=count_start | rel_dev=32.192 | consensus=8.728e+05 Bq
+- Sb124 @ 602.92 keV | stage=count_start | rel_dev=0.801 | consensus=4826 Bq
+- Sb124 @ 639.23 keV | stage=count_start | rel_dev=1770.213 | consensus=4826 Bq
+- Sb124 @ 739.65 keV | stage=count_start | rel_dev=365.454 | consensus=4826 Bq
+- Sb124 @ 792.72 keV | stage=count_start | rel_dev=51.932 | consensus=4826 Bq
+- Sb124 @ 1045.06 keV | stage=count_start | rel_dev=2.886 | consensus=4826 Bq
+- Sb124 @ 1328.66 keV | stage=count_start | rel_dev=58.575 | consensus=4826 Bq
+- Sb124 @ 2096.35 keV | stage=count_start | rel_dev=0.627 | consensus=4826 Bq
+- Ta182 @ 103.38 keV | stage=count_start | rel_dev=1.997 | consensus=8979 Bq
+- Ta182 @ 1228.81 keV | stage=count_start | rel_dev=0.278 | consensus=8979 Bq
+- W187 @ 202.97 keV | stage=count_start | rel_dev=772.305 | consensus=3.37e+04 Bq
+- W187 @ 479.86 keV | stage=count_start | rel_dev=0.273 | consensus=3.37e+04 Bq
+- W187 @ 511.38 keV | stage=count_start | rel_dev=54.635 | consensus=3.37e+04 Bq
+- W187 @ 551.69 keV | stage=count_start | rel_dev=0.531 | consensus=3.37e+04 Bq
+- W187 @ 772.72 keV | stage=count_start | rel_dev=0.594 | consensus=3.37e+04 Bq
+
+Measurement QC review flags
+---------------------------
+- dead_time_review | dead_time=23.24% | threshold=15.00% | Dead time exceeds configured review threshold; manual high-rate review recommended.
+
+QG internal consistency flags
+-----------------------------
+- none
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- 564.44 keV | net=74627.89 +/- 543.39 | sig=137.34
+- 739.86 keV | net=6741.34 +/- 405.17 | sig=16.64
+- 1460.71 keV | net=2976.64 +/- 133.74 | sig=22.26
+- 2615.05 keV | net=300.50 +/- 21.09 | sig=14.25
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- Ta182 @ 103.38 keV | net=11591.50 +/- 1555.09
+- Fe59 @ 144.67 keV | net=959324.50 +/- 3481.88
+- Fe59 @ 192.70 keV | net=83306.50 +/- 2048.94
+- W187 @ 202.97 keV | net=111671.50 +/- 2626.61
+- Cr51 @ 320.58 keV | net=11754007.72 +/- 3540.02
+- Fe59 @ 335.37 keV | net=4879.78 +/- 752.08
+- W187 @ 479.86 keV | net=11938.50 +/- 576.54
+- W187 @ 511.38 keV | net=25773.50 +/- 569.68
+- W187 @ 551.69 keV | net=1636.50 +/- 386.82
+- Sb124 @ 602.92 keV | net=16446.05 +/- 457.78
+- W187 @ 618.47 keV | net=3006.96 +/- 431.90
+- Sb124 @ 639.23 keV | net=17638.00 +/- 398.90
+- W187 @ 685.88 keV | net=18971.55 +/- 405.28
+- Sb124 @ 739.65 keV | net=3871.50 +/- 375.78
+- W187 @ 772.72 keV | net=918.91 +/- 308.17
+- Sb124 @ 792.72 keV | net=3037.00 +/- 881.17
+- Co58 @ 810.91 keV | net=10317.00 +/- 370.85
+- Mn54 @ 834.82 keV | net=73548.36 +/- 503.29
+- Tb154m @ 876.35 keV | net=661.00 +/- 305.78
+- Sb124 @ 1045.06 keV | net=463.00 +/- 207.67
+- Fe59 @ 1099.25 keV | net=665814.88 +/- 883.96
+- Co60 @ 1173.24 keV | net=68697.21 +/- 368.81
+- Ta182 @ 1228.81 keV | net=919.50 +/- 190.90
+- Fe59 @ 1291.72 keV | net=450012.38 +/- 697.69
+- Sb124 @ 1328.66 keV | net=5430.83 +/- 152.51
+- Co60 @ 1332.22 keV | net=63603.31 +/- 315.65
+- Sb124 @ 1690.72 keV | net=2205.80 +/- 67.36
+- Sb124 @ 2096.35 keV | net=119.78 +/- 34.45
+

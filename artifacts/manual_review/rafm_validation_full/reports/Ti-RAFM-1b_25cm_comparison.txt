@@ -1,0 +1,63 @@
+Sample: Ti-RAFM-1b_25cm
+Raw file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1b_25cm.ASC
+QG file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1b_25cm.txt
+Sample group: flux_wires
+Irradiation phase: phase2_whale_tube
+Schedule source: sample_schedule.flux_wires
+Decay label: n/a
+Decay time (s): 762540.0
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+QG peaks not identified by FluxForge
+------------------------------------
+- none
+
+Matched energies with isotope mismatch
+--------------------------------------
+- none
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- none
+
+Peak gross-count parity failures
+--------------------------------
+- none
+
+Isotope activity parity failures
+--------------------------------
+- none
+
+Line-level diagnostic flags
+---------------------------
+- none
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- Sc46 @ 889.16 keV | stage=eoi | rel_dev=0.286 | consensus=444.6 Bq
+- Sc46 @ 1120.33 keV | stage=eoi | rel_dev=0.399 | consensus=444.6 Bq
+- Sc48 @ 983.35 keV | stage=eoi | rel_dev=89.168 | consensus=5818 Bq
+- Sc48 @ 1311.86 keV | stage=eoi | rel_dev=101.750 | consensus=5818 Bq
+
+Measurement QC review flags
+---------------------------
+- none
+
+QG internal consistency flags
+-----------------------------
+- Sc48 | header=8658 Bq | line range=(127.6, 1.45e+04) Bq | max rel deviation=0.985
+- Sc46 | header=466.2 Bq | line range=(292.7, 573.5) Bq | max rel deviation=0.372
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- none
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- Ti51 @ 320.21 keV | net=2045.00 +/- 294.56
+

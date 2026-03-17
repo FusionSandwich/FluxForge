@@ -1,0 +1,2 @@
+Comparing QG activity reporting vs strict ASTM E261 formulas for 12 samples.
+================================================================================

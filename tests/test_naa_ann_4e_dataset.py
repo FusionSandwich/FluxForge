@@ -6,12 +6,10 @@ import pytest
 from fluxforge.analysis.naa_ann import load_naa_ann4e_dataset, prepare_naa_ann4e_dataset
 
 
-DATA_ZIP = Path(
-    "testing/NAA-ANN-1/data augmentation code/versions/2022-04-27/NAA2 data augmentation output 4e.zip"
-)
+DATA_ZIP = Path(__file__).resolve().parent / "data" / "naa_ann" / "NAA2 data augmentation output 4e.zip"
 
 
-@pytest.mark.skipif(not DATA_ZIP.exists(), reason="NAA-ANN-1 4e dataset zip not available.")
+@pytest.mark.skipif(not DATA_ZIP.exists(), reason="External 4e reference dataset zip not available.")
 def test_load_naa_ann4e_dataset_shapes():
     dataset = load_naa_ann4e_dataset(DATA_ZIP, max_files=5)
     assert dataset.features.shape[0] == 5
@@ -21,7 +19,7 @@ def test_load_naa_ann4e_dataset_shapes():
     assert len(dataset.sample_ids) == 5
 
 
-@pytest.mark.skipif(not DATA_ZIP.exists(), reason="NAA-ANN-1 4e dataset zip not available.")
+@pytest.mark.skipif(not DATA_ZIP.exists(), reason="External 4e reference dataset zip not available.")
 def test_prepare_naa_ann4e_dataset_normalization():
     dataset = load_naa_ann4e_dataset(DATA_ZIP, max_files=5)
     features, labels = prepare_naa_ann4e_dataset(dataset)

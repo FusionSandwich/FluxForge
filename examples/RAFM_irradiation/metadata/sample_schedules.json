@@ -1,0 +1,220 @@
+{
+  "schedules": {
+    "A": {
+      "sample": "A",
+      "material": "EUROFER97_2",
+      "tally": "tally_85244",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_end_str": "2025-07-31 09:17:21",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m"
+          },
+          {
+            "label": "24h",
+            "seconds": 91972.0,
+            "alara_format": "25.5478 h"
+          },
+          {
+            "label": "4d",
+            "seconds": 341206.0,
+            "alara_format": "3.9491 d"
+          }
+        ]
+      },
+      "phase2": {
+        "irradiation_time": "2 h",
+        "irradiation_seconds": 7200,
+        "cooling_times": [
+          {
+            "label": "15d",
+            "seconds": 1377400.0,
+            "alara_format": "15.9421 d"
+          }
+        ],
+        "delay_from_phase1_seconds": 358959.0,
+        "delay_from_phase1_alara": "4.1546 d"
+      }
+    },
+    "B": {
+      "sample": "B",
+      "material": "EUROFER97_3",
+      "tally": "tally_85234",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_end_str": "2025-07-31 09:30:36",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m"
+          },
+          {
+            "label": "2h",
+            "seconds": 7222.0,
+            "alara_format": "2.0061 h"
+          },
+          {
+            "label": "24h",
+            "seconds": 94803.0,
+            "alara_format": "26.3342 h"
+          },
+          {
+            "label": "4d",
+            "seconds": 344033.0,
+            "alara_format": "3.9819 d"
+          }
+        ]
+      },
+      "phase2": {
+        "irradiation_time": "2 h",
+        "irradiation_seconds": 7200,
+        "cooling_times": [
+          {
+            "label": "15d",
+            "seconds": 1381531.0,
+            "alara_format": "15.9899 d"
+          }
+        ],
+        "delay_from_phase1_seconds": 358164.0,
+        "delay_from_phase1_alara": "4.1454 d"
+      }
+    },
+    "C": {
+      "sample": "C",
+      "material": "EUROFER97_4",
+      "tally": "tally_85224",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_end_str": "2025-07-31 09:45:02",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m"
+          },
+          {
+            "label": "2h",
+            "seconds": 9645.0,
+            "alara_format": "2.6792 h"
+          },
+          {
+            "label": "24h",
+            "seconds": 97565.0,
+            "alara_format": "27.1014 h"
+          },
+          {
+            "label": "4d",
+            "seconds": 346788.0,
+            "alara_format": "4.0137 d"
+          }
+        ]
+      },
+      "phase2": {
+        "irradiation_time": "2 h",
+        "irradiation_seconds": 7200,
+        "cooling_times": [
+          {
+            "label": "15d",
+            "seconds": 1385628.0,
+            "alara_format": "16.0374 d"
+          }
+        ],
+        "delay_from_phase1_seconds": 357298.0,
+        "delay_from_phase1_alara": "4.1354 d"
+      }
+    },
+    "N": {
+      "sample": "N",
+      "material": "CNA",
+      "tally": "tally_85214",
+      "phase1": {
+        "irradiation_time": "3 s",
+        "irradiation_seconds": 3,
+        "irradiation_end_str": "2025-07-31 09:55:35",
+        "cooling_times": [
+          {
+            "label": "300s",
+            "seconds": 360.0,
+            "alara_format": "6.00 m"
+          },
+          {
+            "label": "2h",
+            "seconds": 9996.0,
+            "alara_format": "2.7767 h"
+          },
+          {
+            "label": "24h",
+            "seconds": 100557.0,
+            "alara_format": "27.9325 h"
+          },
+          {
+            "label": "4d",
+            "seconds": 349778.0,
+            "alara_format": "4.0484 d"
+          }
+        ]
+      },
+      "phase2": {
+        "irradiation_time": "2 h",
+        "irradiation_seconds": 7200,
+        "cooling_times": [
+          {
+            "label": "15d",
+            "seconds": 1389711.0,
+            "alara_format": "16.0846 d"
+          }
+        ],
+        "delay_from_phase1_seconds": 356665.0,
+        "delay_from_phase1_alara": "4.1281 d"
+      }
+    }
+  },
+  "geometry": {
+    "A": {
+      "tally": "tally_85244",
+      "material": "EUROFER97_2",
+      "mesh_type": "cylindrical",
+      "radius_cm": 0.075,
+      "height_cm": 1.0,
+      "volume_cm3": 0.017671458676442587
+    },
+    "B": {
+      "tally": "tally_85234",
+      "material": "EUROFER97_3",
+      "mesh_type": "cylindrical",
+      "radius_cm": 0.22,
+      "height_cm": 0.5,
+      "volume_cm3": 0.076026542216873
+    },
+    "C": {
+      "tally": "tally_85224",
+      "material": "EUROFER97_4",
+      "mesh_type": "cylindrical",
+      "radius_cm": 0.25,
+      "height_cm": 0.6,
+      "volume_cm3": 0.11780972450961724
+    },
+    "N": {
+      "tally": "tally_85214",
+      "material": "CNA",
+      "mesh_type": "cylindrical",
+      "radius_cm": 0.3,
+      "height_cm": 0.8,
+      "volume_cm3": 0.22619467105846514
+    }
+  },
+  "irradiation": {
+    "phase1_duration_s": 3,
+    "phase1_offset_before_300s_s": 360,
+    "phase2_duration_s": 7200,
+    "phase2_start": "2025-08-04 13:00:00",
+    "phase2_end": "2025-08-04 15:00:00"
+  }
+}

@@ -279,12 +279,12 @@ def gls_update_numpy(
             from scipy.sparse.linalg import spsolve
             
             V_inn_sparse = csc_matrix(V_inn)
-            RTV_phi = (R @ V_phi).T
+            RV_phi = R @ V_phi
             
-            # Solve V_inn @ K.T = R @ V_phi
-            K_T = np.zeros_like(RTV_phi)
+            # Solve V_inn @ K.T = R @ V_phi for each posterior column.
+            K_T = np.zeros_like(RV_phi)
             for j in range(K_T.shape[1]):
-                K_T[:, j] = spsolve(V_inn_sparse, RTV_phi[:, j])
+                K_T[:, j] = spsolve(V_inn_sparse, RV_phi[:, j])
             K = K_T.T
         except ImportError:
             # Fall back to dense
@@ -434,9 +434,10 @@ def spectrum_averaged_cross_section(
         E_grid = np.linspace(E_low, E_high, n_points)
         sigma_vals = np.array([sigma(E) for E in E_grid])
         flux_vals = np.array([flux(E) for E in E_grid])
+        trapezoid = getattr(np, "trapezoid", np.trapz)
         
-        numerator = np.trapz(sigma_vals * flux_vals, E_grid)
-        denominator = np.trapz(flux_vals, E_grid)
+        numerator = trapezoid(sigma_vals * flux_vals, E_grid)
+        denominator = trapezoid(flux_vals, E_grid)
         
         if denominator <= 0:
             return 0.0, np.inf

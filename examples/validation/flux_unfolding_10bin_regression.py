@@ -26,6 +26,8 @@ from fluxforge.analysis.flux_unfold import (
 )
 from fluxforge.io.flux_wire import read_processed_txt, read_raw_asc, FluxWireData
 
+PROFILE_NAME = "rafm_25cm"
+
 
 def normalize_sample_id(sample_id: str) -> str:
     text = sample_id.strip().replace(" ", "")
@@ -45,9 +47,18 @@ def load_processed(proc_dir: Path) -> Dict[str, FluxWireData]:
 def load_raw(raw_dir: Path) -> Dict[str, FluxWireData]:
     raw: Dict[str, FluxWireData] = {}
     for path in sorted(raw_dir.glob("*.ASC")):
-        data = read_raw_asc(path)
+        if path.name.lower() == "background.asc":
+            continue
+        data = read_raw_asc(path, profile_name=PROFILE_NAME)
         raw[normalize_sample_id(data.sample_id)] = data
     return raw
+
+
+def load_background(raw_dir: Path):
+    background_path = raw_dir / "background.ASC"
+    if not background_path.exists():
+        return None
+    return read_raw_asc(background_path, profile_name=PROFILE_NAME).spectrum
 
 
 def load_model_spectrum(path: Path) -> Optional[Dict[str, np.ndarray]]:
@@ -140,6 +151,7 @@ class UnfoldingResults:
 def run_unfolding_regression(proc_dir: Path, raw_dir: Path, model_path: Path) -> UnfoldingResults:
     processed = load_processed(proc_dir)
     raw = load_raw(raw_dir)
+    background = load_background(raw_dir)
     
     keys = sorted(set(processed.keys()) & set(raw.keys()))
     if not keys:
@@ -165,6 +177,8 @@ def run_unfolding_regression(proc_dir: Path, raw_dir: Path, model_path: Path) ->
                 reference_data=proc,
                 irradiation_time_s=8 * 3600,
                 decay_time_s=4 * 3600,
+                background_spectrum=background,
+                profile_name=PROFILE_NAME,
             )
         )
     

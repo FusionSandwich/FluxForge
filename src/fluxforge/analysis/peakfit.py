@@ -98,7 +98,7 @@ class GaussianPeak:
 @dataclass
 class HypermetPeak:
     """
-    Representation of a Hypermet peak (Theuerkauf model from hdtv).
+    Representation of a Hypermet peak (Theuerkauf model).
     
     The Hypermet function is a Gaussian with optional:
     - Left exponential tail (low-energy tailing from incomplete charge collection)
@@ -1402,17 +1402,198 @@ def fit_multiple_peaks(
     list of PeakFitResult
         Fitting results for each peak
     """
-    # For well-separated peaks, fit individually
-    results = []
-    
-    for peak_ch in sorted(peak_channels):
-        result = fit_single_peak(
-            channels, counts, peak_ch,
-            fit_width=fit_width,
-            background_model=background_model
+    if not peak_channels:
+        return []
+
+    if background_model not in {"linear", "constant"}:
+        return [
+            fit_single_peak(
+                channels,
+                counts,
+                peak_ch,
+                fit_width=fit_width,
+                background_model=background_model,
+            )
+            for peak_ch in sorted(peak_channels)
+        ]
+
+    peak_channels = sorted(int(ch) for ch in peak_channels)
+    idxs = [int(np.argmin(np.abs(channels - peak_ch))) for peak_ch in peak_channels]
+    ch_lo = max(0, min(idxs) - fit_width)
+    ch_hi = min(len(channels), max(idxs) + fit_width + 1)
+
+    x = channels[ch_lo:ch_hi].astype(float)
+    y = counts[ch_lo:ch_hi].astype(float)
+    weights = 1.0 / np.maximum(np.sqrt(np.maximum(y, 0.0)), 1.0)
+
+    if x.size < max(7, 3 * len(peak_channels)):
+        return [
+            fit_single_peak(
+                channels,
+                counts,
+                peak_ch,
+                fit_width=fit_width,
+                background_model=background_model,
+            )
+            for peak_ch in peak_channels
+        ]
+
+    bg_left = float(np.mean(y[: min(3, len(y))]))
+    bg_right = float(np.mean(y[-min(3, len(y)) :]))
+    x_span = max(float(x[-1] - x[0]), 1.0)
+    bg_slope = (bg_right - bg_left) / x_span
+    bg_intercept = bg_left - bg_slope * x[0]
+    bg_level = 0.5 * (bg_left + bg_right)
+
+    local_half_width = max(2, fit_width // 3)
+    sigma_guess = max(1.0, fit_width / 4.0)
+
+    refined_centroids: List[float] = []
+    amplitude_guesses: List[float] = []
+    for peak_ch in peak_channels:
+        mask = (x >= peak_ch - local_half_width) & (x <= peak_ch + local_half_width)
+        if np.any(mask):
+            x_local = x[mask]
+            y_local = y[mask]
+            idx_local = int(np.argmax(y_local))
+            centroid_guess = float(x_local[idx_local])
+            amplitude_guess = max(float(y_local[idx_local] - bg_level), 1.0)
+        else:
+            centroid_guess = float(peak_ch)
+            idx_local = int(np.argmin(np.abs(x - peak_ch)))
+            amplitude_guess = max(float(y[idx_local] - bg_level), 1.0)
+        refined_centroids.append(centroid_guess)
+        amplitude_guesses.append(amplitude_guess)
+
+    def _continuum(params: np.ndarray) -> np.ndarray:
+        if background_model == "linear":
+            return params[-2] * x + params[-1]
+        return np.full_like(x, params[-1], dtype=float)
+
+    if share_sigma:
+        def model(x_vals: np.ndarray, *params: float) -> np.ndarray:
+            sigma = params[-3]
+            total = params[-2] * x_vals + params[-1] if background_model == "linear" else np.full_like(x_vals, params[-1], dtype=float)
+            for i in range(len(peak_channels)):
+                total = total + gaussian(x_vals, params[2 * i], params[2 * i + 1], sigma)
+            return total
+
+        p0: List[float] = []
+        bounds_lower: List[float] = []
+        bounds_upper: List[float] = []
+        for amp_guess, centroid_guess in zip(amplitude_guesses, refined_centroids):
+            p0.extend([amp_guess, centroid_guess])
+            bounds_lower.extend([0.0, centroid_guess - max(2.0, fit_width / 2.0)])
+            bounds_upper.extend([np.inf, centroid_guess + max(2.0, fit_width / 2.0)])
+        p0.append(sigma_guess)
+        bounds_lower.append(0.5)
+        bounds_upper.append(float(max(fit_width, 2.0 * sigma_guess)))
+        if background_model == "linear":
+            p0.extend([bg_slope, bg_intercept])
+            bounds_lower.extend([-np.inf, -np.inf])
+            bounds_upper.extend([np.inf, np.inf])
+        else:
+            p0.append(bg_level)
+            bounds_lower.append(0.0)
+            bounds_upper.append(np.inf)
+    else:
+        def model(x_vals: np.ndarray, *params: float) -> np.ndarray:
+            bg_offset = 3 * len(peak_channels)
+            total = params[bg_offset] * x_vals + params[bg_offset + 1] if background_model == "linear" else np.full_like(x_vals, params[bg_offset], dtype=float)
+            for i in range(len(peak_channels)):
+                offset = 3 * i
+                total = total + gaussian(x_vals, params[offset], params[offset + 1], params[offset + 2])
+            return total
+
+        p0 = []
+        bounds_lower = []
+        bounds_upper = []
+        for amp_guess, centroid_guess in zip(amplitude_guesses, refined_centroids):
+            p0.extend([amp_guess, centroid_guess, sigma_guess])
+            bounds_lower.extend([0.0, centroid_guess - max(2.0, fit_width / 2.0), 0.5])
+            bounds_upper.extend([np.inf, centroid_guess + max(2.0, fit_width / 2.0), float(max(fit_width, 2.0 * sigma_guess))])
+        if background_model == "linear":
+            p0.extend([bg_slope, bg_intercept])
+            bounds_lower.extend([-np.inf, -np.inf])
+            bounds_upper.extend([np.inf, np.inf])
+        else:
+            p0.append(bg_level)
+            bounds_lower.append(0.0)
+            bounds_upper.append(np.inf)
+
+    try:
+        popt, pcov = optimize.curve_fit(
+            model,
+            x,
+            y,
+            p0=p0,
+            sigma=1.0 / weights,
+            absolute_sigma=True,
+            bounds=(bounds_lower, bounds_upper),
+            maxfev=20000,
         )
-        results.append(result)
-    
+        perr = np.sqrt(np.diag(pcov))
+        success = True
+        message = "Fit converged"
+    except Exception:
+        return [
+            fit_single_peak(
+                channels,
+                counts,
+                peak_ch,
+                fit_width=fit_width,
+                background_model=background_model,
+            )
+            for peak_ch in peak_channels
+        ]
+
+    y_fit = model(x, *popt)
+    residuals = y - y_fit
+    chi_sq = float(np.sum((residuals * weights) ** 2))
+    dof = int(len(y) - len(popt))
+    continuum = _continuum(np.asarray(popt, dtype=float))
+
+    results: List[PeakFitResult] = []
+    for i, peak_ch in enumerate(peak_channels):
+        if share_sigma:
+            amp = float(popt[2 * i])
+            centroid = float(popt[2 * i + 1])
+            sigma = float(popt[-3])
+            amp_unc = float(perr[2 * i])
+            cent_unc = float(perr[2 * i + 1])
+            sigma_unc = float(perr[-3])
+        else:
+            offset = 3 * i
+            amp = float(popt[offset])
+            centroid = float(popt[offset + 1])
+            sigma = float(popt[offset + 2])
+            amp_unc = float(perr[offset])
+            cent_unc = float(perr[offset + 1])
+            sigma_unc = float(perr[offset + 2])
+
+        peak = GaussianPeak(
+            centroid=centroid,
+            amplitude=amp,
+            sigma=sigma,
+            centroid_unc=cent_unc,
+            amplitude_unc=amp_unc,
+            sigma_unc=sigma_unc,
+        )
+        results.append(
+            PeakFitResult(
+                peak=peak,
+                background=continuum.copy(),
+                background_model=background_model,
+                residuals=residuals.copy(),
+                chi_squared=chi_sq,
+                dof=dof,
+                fit_region=(int(x[0]), int(x[-1])),
+                covariance=pcov,
+                success=success,
+                message=message,
+            )
+        )
+
     return results
 
 
@@ -1536,7 +1717,7 @@ def peak_report(
 
 
 # =============================================================================
-# Hypermet Peak Fitting (Theuerkauf model inspired by hdtv)
+# Hypermet Peak Fitting 
 # =============================================================================
 
 def hypermet_function(

@@ -3,11 +3,11 @@ from pathlib import Path
 
 from fluxforge.io.pra import read_pra_histogram, pra_to_gamma_spectrum, read_pra_as_spectrum
 
-ROOT = Path(__file__).resolve().parents[2]
+TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
 def test_read_pra_histogram():
-    path = ROOT / "testing/PyGammaSpec/docs/utils/background.txt"
+    path = TEST_DATA_DIR / "pygammaspec" / "utils" / "background.txt"
     hist = read_pra_histogram(path, live_time_s=25851)
 
     assert hist.channels.size > 10
@@ -17,7 +17,7 @@ def test_read_pra_histogram():
 
 
 def test_pra_to_spectrum_roundtrip():
-    path = ROOT / "testing/PyGammaSpec/docs/utils/background.txt"
+    path = TEST_DATA_DIR / "pygammaspec" / "utils" / "background.txt"
     hist = read_pra_histogram(path, live_time_s=25851)
     spectrum = pra_to_gamma_spectrum(hist, spectrum_id="background")
 
@@ -28,7 +28,7 @@ def test_pra_to_spectrum_roundtrip():
 
 
 def test_read_pra_as_spectrum():
-    path = ROOT / "testing/PyGammaSpec/docs/utils/background.txt"
+    path = TEST_DATA_DIR / "pygammaspec" / "utils" / "background.txt"
     spectrum = read_pra_as_spectrum(path, live_time_s=25851)
 
     assert spectrum.counts.size > 10

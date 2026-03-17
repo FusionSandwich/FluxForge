@@ -200,11 +200,11 @@ class CrossSection:
         sigma = self.evaluate(spectrum_energies)
         
         # Simple trapezoidal integration
-        rate = np.trapz(sigma * spectrum_flux, spectrum_energies)
+        rate = np.trapezoid(sigma * spectrum_flux, spectrum_energies)
         
         # Uncertainty (assuming uncorrelated uncertainties)
         sigma_unc = self.uncertainty_at(spectrum_energies)
-        rate_unc = np.sqrt(np.trapz((sigma_unc * spectrum_flux)**2, spectrum_energies))
+        rate_unc = np.sqrt(np.trapezoid((sigma_unc * spectrum_flux)**2, spectrum_energies))
         
         return rate, rate_unc
     
@@ -259,11 +259,11 @@ class CrossSection:
                 weights = 1.0 / e_fine
             
             # Weighted average
-            total_weight = np.trapz(weights, e_fine)
+            total_weight = np.trapezoid(weights, e_fine)
             if total_weight > 0:
-                group_xs[g] = np.trapz(sigma_fine * weights, e_fine) / total_weight
+                group_xs[g] = np.trapezoid(sigma_fine * weights, e_fine) / total_weight
                 group_unc[g] = np.sqrt(
-                    np.trapz((sigma_unc_fine * weights)**2, e_fine)
+                    np.trapezoid((sigma_unc_fine * weights)**2, e_fine)
                 ) / total_weight
         
         return group_xs, group_unc

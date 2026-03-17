@@ -663,4 +663,4 @@ if __name__ == "__main__":
     # Summary
     print("\n" + workflow.summary())
     
-    print("\n✅ gma_workflow module tests passed!")
+    print("\n[OK] gma_workflow module tests passed!")

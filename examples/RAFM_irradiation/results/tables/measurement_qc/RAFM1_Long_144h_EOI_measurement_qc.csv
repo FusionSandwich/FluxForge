@@ -1,0 +1,2 @@
+sample_id,sample_group,check,dead_time_pct,threshold_pct,live_time_s,real_time_s,max_peak_significance,max_peak_gross_counts,flag_review,note
+RAFM1_Long_144h_EOI,RAFM1,dead_time_review,23.2409381663113,15.0,3600.0,4690.0,3320.326116192206,12142571.75,True,Dead time exceeds configured review threshold; manual high-rate review recommended.

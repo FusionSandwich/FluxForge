@@ -543,7 +543,7 @@ def main():
     
     passed_count = 0
     for name, passed, message in results:
-        status = "✓ PASS" if passed else "✗ FAIL"
+        status = "OK PASS" if passed else "FAIL FAIL"
         print(f"  {status}: {name}")
         print(f"         {message}")
         if passed:

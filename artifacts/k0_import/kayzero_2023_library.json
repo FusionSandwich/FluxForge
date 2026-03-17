@@ -1,0 +1,8034 @@
+{
+  "library_id": "fluxforge.k0.kayzero.2023",
+  "version": "2023",
+  "scope": "Kayzero-derived governed k0 library imported from user-supplied text sidecar files with explicit unresolved-field reporting.",
+  "status": "imported_complete",
+  "provenance_note": "Imported from /tmp/KayWinV410.zip. Current importer uses uk0/uQ0/uT12/MDcode/FCd text files and, when available, the companion IRI_MB1/IRI_MB2/IRI_MB3 text tables packaged alongside the Kayzero binary libraries, plus a small bundled ENDF/B-VIII decay-line supplement for residual primary gamma intensities. Opaque LB1/LB2 payloads are not decoded directly; see the companion import report for any remaining unresolved fields.",
+  "records": {
+    "Ag-108": {
+      "product_isotope": "Ag-108",
+      "target_isotope": "Ag-107",
+      "element": "Ag",
+      "gamma_energy_keV": 434.0,
+      "gamma_intensity": 0.00499,
+      "half_life_s": 142.20000000000002,
+      "k0_Au": 0.00159,
+      "k0_unc_percent": 1.8,
+      "Q0": 2.9,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 38.5,
+      "sigma_0_barn": 33.1,
+      "I0_barn": 95.99,
+      "isotopic_abundance": 0.518,
+      "atomic_mass_g_mol": 107.87,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          618.77,
+          0.0026
+        ],
+        [
+          632.99,
+          0.0175
+        ]
+      ]
+    },
+    "Ag-109m": {
+      "product_isotope": "Ag-109m",
+      "target_isotope": "Pd-108",
+      "element": "Pd",
+      "gamma_energy_keV": 88.0,
+      "gamma_intensity": 0.037,
+      "half_life_s": 39.6,
+      "k0_Au": 0.00171,
+      "k0_unc_percent": 0.0,
+      "Q0": 26.6,
+      "Q0_unc_percent": 1.7,
+      "E_res_eV": 39.7,
+      "sigma_0_barn": 8.66,
+      "I0_barn": 230.35600000000002,
+      "isotopic_abundance": 0.265,
+      "atomic_mass_g_mol": 106.42,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:14; gamma_intensity_source:endfb8_decay",
+      "additional_gammas": []
+    },
+    "Ag-110": {
+      "product_isotope": "Ag-110",
+      "target_isotope": "Ag-109",
+      "element": "Ag",
+      "gamma_energy_keV": 657.5,
+      "gamma_intensity": 0.045,
+      "half_life_s": 24.599999999999998,
+      "k0_Au": 0.0306,
+      "k0_unc_percent": 0.4,
+      "Q0": 18.4,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 6.08,
+      "sigma_0_barn": 89.0,
+      "I0_barn": 1637.6,
+      "isotopic_abundance": 0.482,
+      "atomic_mass_g_mol": 107.87,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ag-110m": {
+      "product_isotope": "Ag-110m",
+      "target_isotope": "Ag-109",
+      "element": "Ag",
+      "gamma_energy_keV": 657.8,
+      "gamma_intensity": 0.946,
+      "half_life_s": 21582720.0,
+      "k0_Au": 0.035,
+      "k0_unc_percent": 0.7,
+      "Q0": 16.7,
+      "Q0_unc_percent": 4.2,
+      "E_res_eV": 6.08,
+      "sigma_0_barn": 3.97,
+      "I0_barn": 66.299,
+      "isotopic_abundance": 0.482,
+      "atomic_mass_g_mol": 107.87,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          133.33,
+          0.000729
+        ],
+        [
+          221.08,
+          0.00068
+        ],
+        [
+          446.81,
+          0.0375
+        ],
+        [
+          620.36,
+          0.0281
+        ],
+        [
+          626.26,
+          0.00214
+        ],
+        [
+          677.62,
+          0.10400000000000001
+        ],
+        [
+          687.01,
+          0.0644
+        ],
+        [
+          706.68,
+          0.163
+        ],
+        [
+          744.27,
+          0.047
+        ],
+        [
+          763.94,
+          0.222
+        ],
+        [
+          818.03,
+          0.073
+        ],
+        [
+          884.68,
+          0.726
+        ],
+        [
+          937.49,
+          0.34299999999999997
+        ],
+        [
+          1384.3,
+          0.243
+        ],
+        [
+          1475.79,
+          0.0401
+        ],
+        [
+          1505.04,
+          0.13
+        ],
+        [
+          1562.3,
+          0.0103
+        ]
+      ]
+    },
+    "Al-28": {
+      "product_isotope": "Al-28",
+      "target_isotope": "Al-27",
+      "element": "Al",
+      "gamma_energy_keV": 1778.9,
+      "gamma_intensity": 1.0,
+      "half_life_s": 134.484,
+      "k0_Au": 0.0175,
+      "k0_unc_percent": 0.8,
+      "Q0": 0.71,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 11800.0,
+      "sigma_0_barn": 0.226,
+      "I0_barn": 0.16046,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 26.98,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ar-41": {
+      "product_isotope": "Ar-41",
+      "target_isotope": "Ar-40",
+      "element": "Ar",
+      "gamma_energy_keV": 1293.6,
+      "gamma_intensity": 0.991,
+      "half_life_s": 6559.2,
+      "k0_Au": 0.0332,
+      "k0_unc_percent": 0.0,
+      "Q0": 0.63,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 31000.0,
+      "sigma_0_barn": 0.66,
+      "I0_barn": 0.4158,
+      "isotopic_abundance": 0.996,
+      "atomic_mass_g_mol": 39.95,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          271.64,
+          0.991
+        ],
+        [
+          782.64,
+          0.991
+        ]
+      ]
+    },
+    "As-76": {
+      "product_isotope": "As-76",
+      "target_isotope": "As-75",
+      "element": "As",
+      "gamma_energy_keV": 559.1,
+      "gamma_intensity": 0.45,
+      "half_life_s": 94464.0,
+      "k0_Au": 0.0483,
+      "k0_unc_percent": 1.6,
+      "Q0": 13.6,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 106.0,
+      "sigma_0_barn": 3.86,
+      "I0_barn": 52.495999999999995,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 74.92,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          472.86,
+          0.000501
+        ],
+        [
+          563.26,
+          0.011899999999999999
+        ],
+        [
+          571.6,
+          0.0014000000000000002
+        ],
+        [
+          657.06,
+          0.0616
+        ],
+        [
+          665.4,
+          0.00377
+        ],
+        [
+          727.28,
+          0.000186
+        ],
+        [
+          740.14,
+          0.00115
+        ],
+        [
+          771.78,
+          0.00121
+        ],
+        [
+          867.67,
+          0.00132
+        ],
+        [
+          882.21,
+          0.000558
+        ],
+        [
+          980.95,
+          0.000423
+        ],
+        [
+          1129.92,
+          0.00125
+        ],
+        [
+          1213.0,
+          0.014199999999999999
+        ],
+        [
+          1216.14,
+          0.0341
+        ],
+        [
+          1228.66,
+          0.011399999999999999
+        ],
+        [
+          1439.27,
+          0.00268
+        ],
+        [
+          1453.81,
+          0.00107
+        ],
+        [
+          1533.07,
+          0.000243
+        ],
+        [
+          1787.74,
+          0.00297
+        ],
+        [
+          1870.06,
+          0.000561
+        ],
+        [
+          2096.33,
+          0.00575
+        ],
+        [
+          2110.87,
+          0.00331
+        ],
+        [
+          2429.14,
+          0.000327
+        ],
+        [
+          2655.41,
+          0.00043999999999999996
+        ],
+        [
+          2669.95,
+          2.7e-06
+        ]
+      ]
+    },
+    "Au-198": {
+      "product_isotope": "Au-198",
+      "target_isotope": "Au-197",
+      "element": "Au",
+      "gamma_energy_keV": 411.8,
+      "gamma_intensity": 0.955,
+      "half_life_s": 232848.0,
+      "k0_Au": 1.0,
+      "k0_unc_percent": 0.0,
+      "Q0": 15.7,
+      "Q0_unc_percent": 1.8,
+      "E_res_eV": 5.65,
+      "sigma_0_barn": 98.7,
+      "I0_barn": 1549.59,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 196.97,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          675.89,
+          0.008020000000000001
+        ],
+        [
+          1087.69,
+          0.00159
+        ]
+      ]
+    },
+    "Au-199": {
+      "product_isotope": "Au-199",
+      "target_isotope": "Pt-198",
+      "element": "Pt",
+      "gamma_energy_keV": 208.2,
+      "gamma_intensity": 0.0836,
+      "half_life_s": 271209.6,
+      "k0_Au": 0.000226,
+      "k0_unc_percent": 1.0,
+      "Q0": 17.0,
+      "Q0_unc_percent": 1.8,
+      "E_res_eV": 106.0,
+      "sigma_0_barn": 3.58,
+      "I0_barn": 60.86,
+      "isotopic_abundance": 0.072,
+      "atomic_mass_g_mol": 195.08,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:13; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          158.38,
+          0.368
+        ]
+      ]
+    },
+    "Ba-131": {
+      "product_isotope": "Ba-131",
+      "target_isotope": "Ba-130",
+      "element": "Ba",
+      "gamma_energy_keV": 496.3,
+      "gamma_intensity": 0.43700000000000006,
+      "half_life_s": 993600.0,
+      "k0_Au": 6.19e-05,
+      "k0_unc_percent": 1.3,
+      "Q0": 21.3,
+      "Q0_unc_percent": 1.4,
+      "E_res_eV": 88.3,
+      "sigma_0_barn": 7.54,
+      "I0_barn": 160.602,
+      "isotopic_abundance": 0.00106,
+      "atomic_mass_g_mol": 137.33,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          92.27,
+          0.00637
+        ],
+        [
+          123.78,
+          0.29100000000000004
+        ],
+        [
+          128.13,
+          0.00015900000000000002
+        ],
+        [
+          133.58,
+          0.0218
+        ],
+        [
+          137.33,
+          0.00031800000000000003
+        ],
+        [
+          157.14,
+          0.00199
+        ],
+        [
+          216.05,
+          0.19899999999999998
+        ],
+        [
+          239.61,
+          0.0241
+        ],
+        [
+          246.85,
+          0.00596
+        ],
+        [
+          249.41,
+          0.0281
+        ],
+        [
+          294.47,
+          0.00159
+        ],
+        [
+          323.24,
+          9.939999999999999e-05
+        ],
+        [
+          351.15,
+          0.0011799999999999998
+        ],
+        [
+          368.92,
+          0.000299
+        ],
+        [
+          373.19,
+          0.133
+        ],
+        [
+          403.99,
+          0.0129
+        ],
+        [
+          427.54,
+          0.000994
+        ],
+        [
+          451.39,
+          0.000417
+        ],
+        [
+          461.19,
+          0.000596
+        ],
+        [
+          462.61,
+          0.000398
+        ],
+        [
+          480.38,
+          0.00337
+        ],
+        [
+          486.46,
+          0.018799999999999997
+        ],
+        [
+          572.65,
+          0.00159
+        ],
+        [
+          584.97,
+          0.012199999999999999
+        ],
+        [
+          620.04,
+          0.015700000000000002
+        ],
+        [
+          674.39,
+          0.0012900000000000001
+        ],
+        [
+          696.43,
+          0.00146
+        ],
+        [
+          797.44,
+          0.000199
+        ],
+        [
+          831.53,
+          0.00218
+        ],
+        [
+          914.0,
+          0.00043700000000000005
+        ],
+        [
+          923.8,
+          0.006959999999999999
+        ],
+        [
+          954.58,
+          0.000337
+        ],
+        [
+          968.86,
+          0.000337
+        ],
+        [
+          1046.85,
+          0.00199
+        ],
+        [
+          1047.58,
+          0.0118
+        ],
+        [
+          1170.63,
+          1.59e-05
+        ]
+      ]
+    },
+    "Ba-133m": {
+      "product_isotope": "Ba-133m",
+      "target_isotope": "Ba-132",
+      "element": "Ba",
+      "gamma_energy_keV": 275.9,
+      "gamma_intensity": 0.18,
+      "half_life_s": 140040.0,
+      "k0_Au": 2.27e-06,
+      "k0_unc_percent": 0.0,
+      "Q0": 5.6,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 143.0,
+      "sigma_0_barn": 0.84,
+      "I0_barn": 4.704,
+      "isotopic_abundance": 0.00101,
+      "atomic_mass_g_mol": 137.33,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ba-139": {
+      "product_isotope": "Ba-139",
+      "target_isotope": "Ba-138",
+      "element": "Ba",
+      "gamma_energy_keV": 165.9,
+      "gamma_intensity": 0.22,
+      "half_life_s": 4983.6,
+      "k0_Au": 0.00105,
+      "k0_unc_percent": 0.7,
+      "Q0": 0.88,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 15700.0,
+      "sigma_0_barn": 0.435,
+      "I0_barn": 0.3828,
+      "isotopic_abundance": 0.717,
+      "atomic_mass_g_mol": 137.33,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          1254.68,
+          0.000302
+        ],
+        [
+          1420.53,
+          0.00302
+        ]
+      ]
+    },
+    "Br-80": {
+      "product_isotope": "Br-80",
+      "target_isotope": "Br-79",
+      "element": "Br",
+      "gamma_energy_keV": 616.6,
+      "gamma_intensity": 0.0669,
+      "half_life_s": 1060.8,
+      "k0_Au": 0.00692,
+      "k0_unc_percent": 0.3,
+      "Q0": 12.1,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 69.3,
+      "sigma_0_barn": 7.81,
+      "I0_barn": 94.50099999999999,
+      "isotopic_abundance": 0.507,
+      "atomic_mass_g_mol": 79.9,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:9; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          511.0,
+          0.052000000000000005
+        ],
+        [
+          639.92,
+          0.00252
+        ],
+        [
+          665.94,
+          0.0108
+        ],
+        [
+          704.37,
+          0.00193
+        ],
+        [
+          1256.79,
+          0.000791
+        ]
+      ]
+    },
+    "Br-82": {
+      "product_isotope": "Br-82",
+      "target_isotope": "Br-81",
+      "element": "Br",
+      "gamma_energy_keV": 554.3,
+      "gamma_intensity": 0.7040000000000001,
+      "half_life_s": 127080.0,
+      "k0_Au": 0.0238,
+      "k0_unc_percent": 1.1,
+      "Q0": 19.3,
+      "Q0_unc_percent": 3.0,
+      "E_res_eV": 152.0,
+      "sigma_0_barn": 0.208,
+      "I0_barn": 4.0144,
+      "isotopic_abundance": 0.493,
+      "atomic_mass_g_mol": 79.9,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          92.2,
+          0.00745
+        ],
+        [
+          100.9,
+          0.000686
+        ],
+        [
+          137.41,
+          0.00156
+        ],
+        [
+          221.5,
+          0.0225
+        ],
+        [
+          273.5,
+          0.00842
+        ],
+        [
+          401.1,
+          0.0009080000000000001
+        ],
+        [
+          606.3,
+          0.0126
+        ],
+        [
+          619.1,
+          0.433
+        ],
+        [
+          698.4,
+          0.27899999999999997
+        ],
+        [
+          735.6,
+          0.000712
+        ],
+        [
+          776.5,
+          0.8320000000000001
+        ],
+        [
+          827.8,
+          0.237
+        ],
+        [
+          951.9,
+          0.00387
+        ],
+        [
+          1007.4,
+          0.0131
+        ],
+        [
+          1044.0,
+          0.272
+        ],
+        [
+          1072.5,
+          0.000686
+        ],
+        [
+          1081.2,
+          0.005869999999999999
+        ],
+        [
+          1317.5,
+          0.27
+        ],
+        [
+          1474.9,
+          0.163
+        ],
+        [
+          1650.3,
+          0.00831
+        ],
+        [
+          1779.6,
+          0.00109
+        ]
+      ]
+    },
+    "Ca-47": {
+      "product_isotope": "Ca-47",
+      "target_isotope": "Ca-46",
+      "element": "Ca",
+      "gamma_energy_keV": 1297.1,
+      "gamma_intensity": 0.7490000000000001,
+      "half_life_s": 391910.4,
+      "k0_Au": 9.54e-07,
+      "k0_unc_percent": 1.7,
+      "Q0": 1.3,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 2925.0,
+      "sigma_0_barn": 0.62,
+      "I0_barn": 0.806,
+      "isotopic_abundance": 4e-05,
+      "atomic_mass_g_mol": 40.08,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          489.21,
+          0.0674
+        ],
+        [
+          807.85,
+          0.0688
+        ]
+      ]
+    },
+    "Ca-49": {
+      "product_isotope": "Ca-49",
+      "target_isotope": "Ca-48",
+      "element": "Ca",
+      "gamma_energy_keV": 3084.4,
+      "gamma_intensity": 0.9209999999999999,
+      "half_life_s": 523.08,
+      "k0_Au": 0.000101,
+      "k0_unc_percent": 0.9,
+      "Q0": 0.45,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 1330000.0,
+      "sigma_0_barn": 1.12,
+      "I0_barn": 0.5040000000000001,
+      "isotopic_abundance": 0.00187,
+      "atomic_mass_g_mol": 40.08,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          855.92,
+          0.0012900000000000001
+        ],
+        [
+          987.48,
+          0.0007630000000000001
+        ],
+        [
+          1144.9,
+          0.00111
+        ],
+        [
+          1288.24,
+          0.000737
+        ],
+        [
+          1409.02,
+          0.00625
+        ],
+        [
+          2228.62,
+          0.00192
+        ],
+        [
+          2371.96,
+          0.00487
+        ]
+      ]
+    },
+    "Cd-115": {
+      "product_isotope": "Cd-115",
+      "target_isotope": "Cd-114",
+      "element": "Cd",
+      "gamma_energy_keV": 527.9,
+      "gamma_intensity": 0.275,
+      "half_life_s": 192456.0,
+      "k0_Au": 0.000477,
+      "k0_unc_percent": 1.3,
+      "Q0": 32.4,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 207.0,
+      "sigma_0_barn": 0.23,
+      "I0_barn": 7.452,
+      "isotopic_abundance": 0.287,
+      "atomic_mass_g_mol": 112.41,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          231.45,
+          0.00738
+        ],
+        [
+          260.91,
+          0.019299999999999998
+        ],
+        [
+          267.0,
+          0.000919
+        ],
+        [
+          328.36,
+          3.29e-05
+        ],
+        [
+          363.91,
+          6.0899999999999996e-05
+        ],
+        [
+          492.36,
+          0.0802
+        ]
+      ]
+    },
+    "Ce-141": {
+      "product_isotope": "Ce-141",
+      "target_isotope": "Ce-140",
+      "element": "Ce",
+      "gamma_energy_keV": 145.4,
+      "gamma_intensity": 0.483,
+      "half_life_s": 2808864.0,
+      "k0_Au": 0.00366,
+      "k0_unc_percent": 0.9,
+      "Q0": 0.83,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 7200.0,
+      "sigma_0_barn": 0.574,
+      "I0_barn": 0.47641999999999995,
+      "isotopic_abundance": 0.885,
+      "atomic_mass_g_mol": 140.12,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ce-143": {
+      "product_isotope": "Ce-143",
+      "target_isotope": "Ce-142",
+      "element": "Ce",
+      "gamma_energy_keV": 293.3,
+      "gamma_intensity": 0.42,
+      "half_life_s": 119160.0,
+      "k0_Au": 0.000689,
+      "k0_unc_percent": 0.5,
+      "Q0": 1.2,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 1540.0,
+      "sigma_0_barn": 0.974,
+      "I0_barn": 1.1687999999999998,
+      "isotopic_abundance": 0.111,
+      "atomic_mass_g_mol": 140.12,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          231.58,
+          0.0202
+        ],
+        [
+          350.66,
+          0.0335
+        ],
+        [
+          371.3,
+          0.00021
+        ],
+        [
+          389.49,
+          0.000293
+        ],
+        [
+          433.0,
+          0.00134
+        ],
+        [
+          447.41,
+          0.000671
+        ],
+        [
+          490.38,
+          0.0196
+        ],
+        [
+          587.13,
+          0.00243
+        ],
+        [
+          664.58,
+          0.0525
+        ],
+        [
+          721.96,
+          0.0512
+        ],
+        [
+          791.16,
+          0.000167
+        ],
+        [
+          880.41,
+          0.00924
+        ],
+        [
+          937.79,
+          0.000335
+        ],
+        [
+          1103.09,
+          0.00364
+        ],
+        [
+          1324.56,
+          0.000126
+        ]
+      ]
+    },
+    "Cl-38": {
+      "product_isotope": "Cl-38",
+      "target_isotope": "Cl-37",
+      "element": "Cl",
+      "gamma_energy_keV": 1642.7,
+      "gamma_intensity": 0.31,
+      "half_life_s": 2234.4,
+      "k0_Au": 0.00197,
+      "k0_unc_percent": 1.4,
+      "Q0": 0.69,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 13700.0,
+      "sigma_0_barn": 0.445,
+      "I0_barn": 0.30705,
+      "isotopic_abundance": 0.242,
+      "atomic_mass_g_mol": 35.45,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          2167.68,
+          0.42
+        ],
+        [
+          3810.27,
+          0.000256
+        ]
+      ]
+    },
+    "Co-60": {
+      "product_isotope": "Co-60",
+      "target_isotope": "Co-59",
+      "element": "Co",
+      "gamma_energy_keV": 1332.5,
+      "gamma_intensity": 1.0,
+      "half_life_s": 166345920.0,
+      "k0_Au": 1.32,
+      "k0_unc_percent": 0.5,
+      "Q0": 1.993,
+      "Q0_unc_percent": 3.0,
+      "E_res_eV": 136.0,
+      "sigma_0_barn": 17.1,
+      "I0_barn": 34.0803,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 58.93,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          1173.24,
+          0.9990000000000001
+        ],
+        [
+          2505.74,
+          2e-08
+        ]
+      ]
+    },
+    "Co-60m": {
+      "product_isotope": "Co-60m",
+      "target_isotope": "Co-59",
+      "element": "Co",
+      "gamma_energy_keV": 1332.5,
+      "gamma_intensity": 0.0025,
+      "half_life_s": 628.2,
+      "k0_Au": 0.00175,
+      "k0_unc_percent": 1.4,
+      "Q0": 2.0,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 136.0,
+      "sigma_0_barn": 20.0,
+      "I0_barn": 40.0,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 58.93,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          826.36,
+          5.79e-05
+        ]
+      ]
+    },
+    "Cr-51": {
+      "product_isotope": "Cr-51",
+      "target_isotope": "Cr-50",
+      "element": "Cr",
+      "gamma_energy_keV": 320.1,
+      "gamma_intensity": 0.0983,
+      "half_life_s": 2393280.0,
+      "k0_Au": 0.00262,
+      "k0_unc_percent": 0.5,
+      "Q0": 0.53,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 7530.0,
+      "sigma_0_barn": 15.2,
+      "I0_barn": 8.056,
+      "isotopic_abundance": 0.0435,
+      "atomic_mass_g_mol": 52.0,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Cs-134": {
+      "product_isotope": "Cs-134",
+      "target_isotope": "Cs-133",
+      "element": "Cs",
+      "gamma_energy_keV": 795.9,
+      "gamma_intensity": 0.853,
+      "half_life_s": 65147508.0,
+      "k0_Au": 0.371,
+      "k0_unc_percent": 1.1,
+      "Q0": 12.1,
+      "Q0_unc_percent": 3.0,
+      "E_res_eV": 9.97,
+      "sigma_0_barn": 30.4,
+      "I0_barn": 367.84,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 132.91,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:9; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          475.36,
+          0.0146
+        ],
+        [
+          563.23,
+          0.0839
+        ],
+        [
+          569.31,
+          0.154
+        ],
+        [
+          604.71,
+          0.975
+        ],
+        [
+          801.95,
+          0.0873
+        ],
+        [
+          1038.59,
+          0.01
+        ],
+        [
+          1167.94,
+          0.018000000000000002
+        ],
+        [
+          1365.18,
+          0.0304
+        ]
+      ]
+    },
+    "Cs-134m": {
+      "product_isotope": "Cs-134m",
+      "target_isotope": "Cs-133",
+      "element": "Cs",
+      "gamma_energy_keV": 127.4,
+      "gamma_intensity": 0.126,
+      "half_life_s": 10486.8,
+      "k0_Au": 0.00574,
+      "k0_unc_percent": 1.2,
+      "Q0": 12.1,
+      "Q0_unc_percent": 3.0,
+      "E_res_eV": 9.97,
+      "sigma_0_barn": 2.74,
+      "I0_barn": 33.154,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 132.91,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Cu-64": {
+      "product_isotope": "Cu-64",
+      "target_isotope": "Cu-63",
+      "element": "Cu",
+      "gamma_energy_keV": 1345.8,
+      "gamma_intensity": 0.00483,
+      "half_life_s": 45720.0,
+      "k0_Au": 0.000498,
+      "k0_unc_percent": 0.9,
+      "Q0": 1.14,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 1040.0,
+      "sigma_0_barn": 3.98,
+      "I0_barn": 4.5371999999999995,
+      "isotopic_abundance": 0.692,
+      "atomic_mass_g_mol": 63.55,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          511.0,
+          0.379
+        ]
+      ]
+    },
+    "Cu-66": {
+      "product_isotope": "Cu-66",
+      "target_isotope": "Cu-65",
+      "element": "Cu",
+      "gamma_energy_keV": 1039.2,
+      "gamma_intensity": 0.07400000000000001,
+      "half_life_s": 307.2,
+      "k0_Au": 0.00186,
+      "k0_unc_percent": 0.5,
+      "Q0": 1.06,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 766.0,
+      "sigma_0_barn": 2.48,
+      "I0_barn": 2.6288,
+      "isotopic_abundance": 0.308,
+      "atomic_mass_g_mol": 63.55,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          833.58,
+          0.0016
+        ]
+      ]
+    },
+    "Dy-165": {
+      "product_isotope": "Dy-165",
+      "target_isotope": "Dy-164",
+      "element": "Dy",
+      "gamma_energy_keV": 361.7,
+      "gamma_intensity": 0.008409999999999999,
+      "half_life_s": 8402.4,
+      "k0_Au": 0.0836,
+      "k0_unc_percent": 0.7,
+      "Q0": 0.19,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 224.0,
+      "sigma_0_barn": 1070.0,
+      "I0_barn": 203.3,
+      "isotopic_abundance": 0.282,
+      "atomic_mass_g_mol": 162.5,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          94.7,
+          0.0358
+        ],
+        [
+          279.76,
+          0.00498
+        ],
+        [
+          456.08,
+          0.00042500000000000003
+        ],
+        [
+          479.62,
+          0.00043999999999999996
+        ],
+        [
+          515.47,
+          0.000362
+        ],
+        [
+          545.83,
+          0.0016200000000000001
+        ],
+        [
+          565.7,
+          0.0012900000000000001
+        ],
+        [
+          575.55,
+          0.000787
+        ],
+        [
+          620.63,
+          0.000974
+        ],
+        [
+          633.42,
+          0.00567
+        ],
+        [
+          660.08,
+          0.00026599999999999996
+        ],
+        [
+          694.09,
+          0.000115
+        ],
+        [
+          715.33,
+          0.0053300000000000005
+        ],
+        [
+          995.09,
+          0.000545
+        ],
+        [
+          1055.76,
+          0.000312
+        ],
+        [
+          1079.62,
+          0.000916
+        ]
+      ]
+    },
+    "Dy-165m": {
+      "product_isotope": "Dy-165m",
+      "target_isotope": "Dy-164",
+      "element": "Dy",
+      "gamma_energy_keV": 515.5,
+      "gamma_intensity": 0.015600000000000001,
+      "half_life_s": 75.41999999999999,
+      "k0_Au": 0.0925,
+      "k0_unc_percent": 0.0,
+      "Q0": 0.25,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 224.0,
+      "sigma_0_barn": 1700.0,
+      "I0_barn": 425.0,
+      "isotopic_abundance": 0.282,
+      "atomic_mass_g_mol": 162.5,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          153.8,
+          0.00245
+        ],
+        [
+          361.67,
+          0.00544
+        ]
+      ]
+    },
+    "Er-171": {
+      "product_isotope": "Er-171",
+      "target_isotope": "Er-170",
+      "element": "Er",
+      "gamma_energy_keV": 308.3,
+      "gamma_intensity": 0.644,
+      "half_life_s": 27057.6,
+      "k0_Au": 0.0104,
+      "k0_unc_percent": 1.4,
+      "Q0": 4.42,
+      "Q0_unc_percent": 3.3,
+      "E_res_eV": 129.0,
+      "sigma_0_barn": 8.85,
+      "I0_barn": 39.117,
+      "isotopic_abundance": 0.149,
+      "atomic_mass_g_mol": 167.26,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          111.39,
+          0.204
+        ],
+        [
+          116.69,
+          0.0229
+        ],
+        [
+          124.05,
+          0.0909
+        ],
+        [
+          175.38,
+          0.00089
+        ],
+        [
+          210.27,
+          7.000000000000001e-05
+        ],
+        [
+          210.92,
+          0.00641
+        ],
+        [
+          237.17,
+          0.00302
+        ],
+        [
+          277.19,
+          0.00579
+        ],
+        [
+          295.67,
+          0.289
+        ],
+        [
+          371.98,
+          0.00256
+        ],
+        [
+          419.72,
+          0.00083
+        ],
+        [
+          425.02,
+          0.000224
+        ],
+        [
+          559.27,
+          0.00046600000000000005
+        ],
+        [
+          621.06,
+          0.00089
+        ],
+        [
+          670.66,
+          0.00252
+        ],
+        [
+          675.96,
+          0.0028499999999999997
+        ],
+        [
+          732.45,
+          0.0009750000000000001
+        ],
+        [
+          783.78,
+          0.0023899999999999998
+        ],
+        [
+          796.44,
+          0.0064
+        ],
+        [
+          907.83,
+          0.00634
+        ],
+        [
+          913.13,
+          0.00077
+        ]
+      ]
+    },
+    "Eu-152": {
+      "product_isotope": "Eu-152",
+      "target_isotope": "Eu-151",
+      "element": "Eu",
+      "gamma_energy_keV": 1408.0,
+      "gamma_intensity": 0.20800000000000002,
+      "half_life_s": 427289904.0,
+      "k0_Au": 9.36,
+      "k0_unc_percent": 0.6,
+      "Q0": 1.25,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 0.448,
+      "sigma_0_barn": 6810.0,
+      "I0_barn": 8512.5,
+      "isotopic_abundance": 0.478,
+      "atomic_mass_g_mol": 151.96,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          121.78,
+          0.28300000000000003
+        ],
+        [
+          147.96,
+          0.000395
+        ],
+        [
+          244.69,
+          0.075
+        ],
+        [
+          251.61,
+          0.000625
+        ],
+        [
+          269.83,
+          8.13e-05
+        ],
+        [
+          270.53,
+          1.95e-05
+        ],
+        [
+          271.13,
+          0.000729
+        ],
+        [
+          295.93,
+          0.00441
+        ],
+        [
+          315.17,
+          0.000504
+        ],
+        [
+          324.81,
+          0.00075
+        ],
+        [
+          329.42,
+          0.00122
+        ],
+        [
+          340.46,
+          0.000275
+        ],
+        [
+          344.29,
+          0.26
+        ],
+        [
+          357.12,
+          4.79e-05
+        ],
+        [
+          367.8,
+          0.008579999999999999
+        ],
+        [
+          411.12,
+          0.0222
+        ],
+        [
+          416.05,
+          0.000974
+        ],
+        [
+          443.89,
+          0.0279
+        ],
+        [
+          443.98,
+          0.0028499999999999997
+        ],
+        [
+          488.61,
+          0.004079999999999999
+        ],
+        [
+          493.51,
+          0.00026599999999999996
+        ],
+        [
+          503.41,
+          0.0015199999999999999
+        ],
+        [
+          511.0,
+          0.00052
+        ],
+        [
+          520.24,
+          0.0005369999999999999
+        ],
+        [
+          534.26,
+          0.000429
+        ],
+        [
+          564.01,
+          0.00458
+        ],
+        [
+          566.42,
+          0.0012900000000000001
+        ],
+        [
+          586.3,
+          0.00461
+        ],
+        [
+          656.48,
+          0.00145
+        ],
+        [
+          674.7,
+          0.00168
+        ],
+        [
+          678.59,
+          0.00469
+        ],
+        [
+          688.67,
+          0.00865
+        ],
+        [
+          712.86,
+          0.000958
+        ],
+        [
+          719.33,
+          0.000594
+        ],
+        [
+          719.42,
+          0.00266
+        ],
+        [
+          764.9,
+          0.0018
+        ],
+        [
+          768.95,
+          0.000729
+        ],
+        [
+          778.92,
+          0.13
+        ],
+        [
+          810.45,
+          0.00333
+        ],
+        [
+          841.58,
+          0.00165
+        ],
+        [
+          867.38,
+          0.042
+        ],
+        [
+          919.39,
+          0.00438
+        ],
+        [
+          926.31,
+          0.00264
+        ],
+        [
+          930.59,
+          0.0007530000000000001
+        ],
+        [
+          964.11,
+          0.145
+        ],
+        [
+          1005.26,
+          0.00658
+        ],
+        [
+          1085.89,
+          0.0992
+        ],
+        [
+          1089.71,
+          0.017
+        ],
+        [
+          1109.19,
+          0.00183
+        ],
+        [
+          1112.07,
+          0.136
+        ],
+        [
+          1171.0,
+          0.000356
+        ],
+        [
+          1212.93,
+          0.0141
+        ],
+        [
+          1249.95,
+          0.0018599999999999999
+        ],
+        [
+          1292.78,
+          0.0010199999999999999
+        ],
+        [
+          1299.16,
+          0.016200000000000003
+        ],
+        [
+          1363.75,
+          0.000222
+        ],
+        [
+          1457.62,
+          0.0049499999999999995
+        ],
+        [
+          1528.12,
+          0.00291
+        ],
+        [
+          1605.63,
+          7.38e-05
+        ],
+        [
+          1608.44,
+          4.03e-05
+        ],
+        [
+          1635.24,
+          1.45e-06
+        ],
+        [
+          1769.07,
+          4.38e-05
+        ]
+      ]
+    },
+    "Eu-152m": {
+      "product_isotope": "Eu-152m",
+      "target_isotope": "Eu-151",
+      "element": "Eu",
+      "gamma_energy_keV": 841.6,
+      "gamma_intensity": 0.145,
+      "half_life_s": 33523.200000000004,
+      "k0_Au": 3.02,
+      "k0_unc_percent": 0.0,
+      "Q0": 1.2,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 0.448,
+      "sigma_0_barn": 2840.0,
+      "I0_barn": 3408.0,
+      "isotopic_abundance": 0.478,
+      "atomic_mass_g_mol": 151.96,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          121.78,
+          0.0782
+        ],
+        [
+          244.69,
+          0.000327
+        ],
+        [
+          271.13,
+          0.0007580000000000001
+        ],
+        [
+          344.29,
+          0.024300000000000002
+        ],
+        [
+          562.92,
+          0.00249
+        ],
+        [
+          688.67,
+          0.0009239999999999999
+        ],
+        [
+          703.56,
+          0.000678
+        ],
+        [
+          870.09,
+          0.00134
+        ],
+        [
+          963.36,
+          0.11900000000000001
+        ],
+        [
+          970.39,
+          0.00604
+        ],
+        [
+          995.84,
+          0.0009279999999999999
+        ],
+        [
+          1314.68,
+          7.2999999999999996e-06
+        ],
+        [
+          1388.98,
+          0.0077
+        ],
+        [
+          1411.69,
+          0.000451
+        ]
+      ]
+    },
+    "Eu-154": {
+      "product_isotope": "Eu-154",
+      "target_isotope": "Eu-153",
+      "element": "Eu",
+      "gamma_energy_keV": 723.3,
+      "gamma_intensity": 0.196,
+      "half_life_s": 271174456.8,
+      "k0_Au": 0.446,
+      "k0_unc_percent": 1.5,
+      "Q0": 5.66,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 5.8,
+      "sigma_0_barn": 305.0,
+      "I0_barn": 1726.3,
+      "isotopic_abundance": 0.522,
+      "atomic_mass_g_mol": 151.96,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          123.1,
+          0.40399999999999997
+        ],
+        [
+          131.54,
+          0.000206
+        ],
+        [
+          134.85,
+          9.93e-05
+        ],
+        [
+          146.03,
+          0.000258
+        ],
+        [
+          156.25,
+          9.93e-05
+        ],
+        [
+          188.27,
+          0.00227
+        ],
+        [
+          232.08,
+          0.000212
+        ],
+        [
+          247.97,
+          0.0659
+        ],
+        [
+          301.25,
+          9.93e-05
+        ],
+        [
+          305.12,
+          0.000178
+        ],
+        [
+          315.6,
+          4.61e-05
+        ],
+        [
+          322.04,
+          0.000674
+        ],
+        [
+          346.75,
+          0.000302
+        ],
+        [
+          397.15,
+          0.000302
+        ],
+        [
+          401.31,
+          0.00208
+        ],
+        [
+          403.54,
+          0.00027
+        ],
+        [
+          444.51,
+          0.00507
+        ],
+        [
+          468.07,
+          0.000567
+        ],
+        [
+          478.29,
+          0.00216
+        ],
+        [
+          511.97,
+          0.000327
+        ],
+        [
+          518.01,
+          0.00040300000000000004
+        ],
+        [
+          557.63,
+          0.00256
+        ],
+        [
+          582.06,
+          0.008409999999999999
+        ],
+        [
+          591.81,
+          0.0483
+        ],
+        [
+          602.85,
+          0.000372
+        ],
+        [
+          613.34,
+          0.0009229999999999999
+        ],
+        [
+          625.26,
+          0.00314
+        ],
+        [
+          649.55,
+          0.000716
+        ],
+        [
+          664.67,
+          0.000291
+        ],
+        [
+          668.85,
+          0.000298
+        ],
+        [
+          676.59,
+          0.0014000000000000002
+        ],
+        [
+          692.48,
+          0.0168
+        ],
+        [
+          715.83,
+          0.0017499999999999998
+        ],
+        [
+          756.8,
+          0.0433
+        ],
+        [
+          800.39,
+          0.000322
+        ],
+        [
+          815.58,
+          0.0046300000000000004
+        ],
+        [
+          845.42,
+          0.0055000000000000005
+        ],
+        [
+          850.68,
+          0.00229
+        ],
+        [
+          873.23,
+          0.114
+        ],
+        [
+          880.54,
+          0.000629
+        ],
+        [
+          892.78,
+          0.00462
+        ],
+        [
+          904.1,
+          0.00823
+        ],
+        [
+          924.56,
+          0.000625
+        ],
+        [
+          996.33,
+          0.10300000000000001
+        ],
+        [
+          1004.77,
+          0.179
+        ],
+        [
+          1047.36,
+          0.00134
+        ],
+        [
+          1118.29,
+          0.00104
+        ],
+        [
+          1128.51,
+          0.00266
+        ],
+        [
+          1140.75,
+          0.00216
+        ],
+        [
+          1160.34,
+          0.000516
+        ],
+        [
+          1188.56,
+          0.0008160000000000001
+        ],
+        [
+          1241.39,
+          0.00131
+        ],
+        [
+          1245.83,
+          0.008960000000000001
+        ],
+        [
+          1274.54,
+          0.354
+        ],
+        [
+          1289.93,
+          0.000113
+        ],
+        [
+          1408.31,
+          0.00023300000000000003
+        ],
+        [
+          1493.8,
+          0.006540000000000001
+        ],
+        [
+          1537.9,
+          0.000496
+        ],
+        [
+          1596.58,
+          0.0183
+        ],
+        [
+          1673.62,
+          0.00012200000000000001
+        ]
+      ]
+    },
+    "F-20": {
+      "product_isotope": "F-20",
+      "target_isotope": "F-19",
+      "element": "F",
+      "gamma_energy_keV": 1633.6,
+      "gamma_intensity": 1.0,
+      "half_life_s": 11.16,
+      "k0_Au": 0.000998,
+      "k0_unc_percent": 1.2,
+      "Q0": 2.2,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 44700.0,
+      "sigma_0_barn": 0.0095,
+      "I0_barn": 0.020900000000000002,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 19.0,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Fe-59": {
+      "product_isotope": "Fe-59",
+      "target_isotope": "Fe-58",
+      "element": "Fe",
+      "gamma_energy_keV": 1099.3,
+      "gamma_intensity": 0.565,
+      "half_life_s": 3844800.0,
+      "k0_Au": 7.77e-05,
+      "k0_unc_percent": 0.5,
+      "Q0": 0.975,
+      "Q0_unc_percent": 1.0,
+      "E_res_eV": 637.0,
+      "sigma_0_barn": 1.31,
+      "I0_barn": 1.27725,
+      "isotopic_abundance": 0.0028,
+      "atomic_mass_g_mol": 55.85,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; kayzero_fcd:1.002; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          142.65,
+          0.0102
+        ],
+        [
+          192.35,
+          0.0308
+        ],
+        [
+          335.0,
+          0.0027
+        ],
+        [
+          1291.6,
+          0.43200000000000005
+        ],
+        [
+          1481.56,
+          0.0005899999999999999
+        ]
+      ]
+    },
+    "Ga-72": {
+      "product_isotope": "Ga-72",
+      "target_isotope": "Ga-71",
+      "element": "Ga",
+      "gamma_energy_keV": 630.0,
+      "gamma_intensity": 0.249,
+      "half_life_s": 50760.0,
+      "k0_Au": 0.0149,
+      "k0_unc_percent": 0.0,
+      "Q0": 6.69,
+      "Q0_unc_percent": 1.2,
+      "E_res_eV": 154.0,
+      "sigma_0_barn": 4.57,
+      "I0_barn": 30.573300000000003,
+      "isotopic_abundance": 0.399,
+      "atomic_mass_g_mol": 69.72,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          112.58,
+          0.00187
+        ],
+        [
+          230.84,
+          0.000229
+        ],
+        [
+          289.39,
+          0.0019
+        ],
+        [
+          336.69,
+          0.00107
+        ],
+        [
+          381.54,
+          0.00268
+        ],
+        [
+          449.83,
+          0.000936
+        ],
+        [
+          587.55,
+          0.00121
+        ],
+        [
+          601.02,
+          0.0555
+        ],
+        [
+          735.6,
+          0.00366
+        ],
+        [
+          786.52,
+          0.032
+        ],
+        [
+          810.23,
+          0.02
+        ],
+        [
+          834.09,
+          0.956
+        ],
+        [
+          861.15,
+          0.009130000000000001
+        ],
+        [
+          878.52,
+          0.0007199999999999999
+        ],
+        [
+          894.34,
+          0.09880000000000001
+        ],
+        [
+          924.66,
+          0.0014199999999999998
+        ],
+        [
+          938.27,
+          0.000767
+        ],
+        [
+          939.58,
+          0.0025800000000000003
+        ],
+        [
+          970.67,
+          0.011000000000000001
+        ],
+        [
+          999.93,
+          0.00799
+        ],
+        [
+          1050.85,
+          0.0695
+        ],
+        [
+          1215.21,
+          0.00791
+        ],
+        [
+          1231.03,
+          0.014499999999999999
+        ],
+        [
+          1260.06,
+          0.011200000000000002
+        ],
+        [
+          1276.83,
+          0.015700000000000002
+        ],
+        [
+          1464.1,
+          0.0352
+        ],
+        [
+          1568.28,
+          0.002
+        ],
+        [
+          1571.69,
+          0.00822
+        ],
+        [
+          1596.75,
+          0.0425
+        ],
+        [
+          1629.94,
+          0.000325
+        ],
+        [
+          1680.86,
+          0.00842
+        ],
+        [
+          1711.18,
+          0.00045
+        ],
+        [
+          1861.08,
+          0.0525
+        ],
+        [
+          1877.85,
+          0.00231
+        ],
+        [
+          2109.55,
+          0.0104
+        ],
+        [
+          2201.7,
+          0.258
+        ],
+        [
+          2491.09,
+          0.0766
+        ],
+        [
+          2507.86,
+          0.128
+        ],
+        [
+          2514.95,
+          0.00249
+        ],
+        [
+          2621.48,
+          0.00132
+        ],
+        [
+          2844.14,
+          0.0042
+        ]
+      ]
+    },
+    "Gd-153": {
+      "product_isotope": "Gd-153",
+      "target_isotope": "Gd-152",
+      "element": "Gd",
+      "gamma_energy_keV": 97.4,
+      "gamma_intensity": 0.275,
+      "half_life_s": 20770560.0,
+      "k0_Au": 0.00586,
+      "k0_unc_percent": 1.4,
+      "Q0": 0.77,
+      "Q0_unc_percent": 15.0,
+      "E_res_eV": 16.7,
+      "sigma_0_barn": 811.0,
+      "I0_barn": 624.47,
+      "isotopic_abundance": 0.002,
+      "atomic_mass_g_mol": 157.25,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          103.18,
+          0.195
+        ],
+        [
+          172.85,
+          0.000285
+        ]
+      ]
+    },
+    "Gd-159": {
+      "product_isotope": "Gd-159",
+      "target_isotope": "Gd-158",
+      "element": "Gd",
+      "gamma_energy_keV": 363.5,
+      "gamma_intensity": 0.11,
+      "half_life_s": 66816.0,
+      "k0_Au": 0.000849,
+      "k0_unc_percent": 1.6,
+      "Q0": 29.9,
+      "Q0_unc_percent": 3.1,
+      "E_res_eV": 48.2,
+      "sigma_0_barn": 2.34,
+      "I0_barn": 69.966,
+      "isotopic_abundance": 0.248,
+      "atomic_mass_g_mol": 157.25,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          210.65,
+          0.000177
+        ],
+        [
+          226.02,
+          0.0021
+        ],
+        [
+          305.55,
+          0.0005920000000000001
+        ],
+        [
+          348.13,
+          0.00216
+        ],
+        [
+          580.78,
+          0.000616
+        ]
+      ]
+    },
+    "Gd-161": {
+      "product_isotope": "Gd-161",
+      "target_isotope": "Gd-160",
+      "element": "Gd",
+      "gamma_energy_keV": 314.9,
+      "gamma_intensity": 0.22899999999999998,
+      "half_life_s": 219.60000000000002,
+      "k0_Au": 0.00103,
+      "k0_unc_percent": 0.0,
+      "Q0": 3.83,
+      "Q0_unc_percent": 1.9,
+      "E_res_eV": 480.0,
+      "sigma_0_barn": 1.51,
+      "I0_barn": 5.7833000000000006,
+      "isotopic_abundance": 0.219,
+      "atomic_mass_g_mol": 157.25,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          102.31,
+          0.139
+        ],
+        [
+          165.21,
+          0.026000000000000002
+        ],
+        [
+          181.24,
+          0.0075
+        ],
+        [
+          258.63,
+          0.009899999999999999
+        ],
+        [
+          270.85,
+          0.0088
+        ],
+        [
+          283.55,
+          0.06
+        ],
+        [
+          338.08,
+          0.016
+        ],
+        [
+          360.94,
+          0.605
+        ],
+        [
+          480.13,
+          0.027000000000000003
+        ],
+        [
+          529.48,
+          0.0127
+        ]
+      ]
+    },
+    "Ge-75": {
+      "product_isotope": "Ge-75",
+      "target_isotope": "Ge-74",
+      "element": "Ge",
+      "gamma_energy_keV": 198.6,
+      "gamma_intensity": 0.0131,
+      "half_life_s": 4966.8,
+      "k0_Au": 6.15e-05,
+      "k0_unc_percent": 0.0,
+      "Q0": 1.57,
+      "Q0_unc_percent": 7.0,
+      "E_res_eV": 3540.0,
+      "sigma_0_barn": 0.306,
+      "I0_barn": 0.48042,
+      "isotopic_abundance": 0.365,
+      "atomic_mass_g_mol": 72.59,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          264.66,
+          0.11199999999999999
+        ],
+        [
+          270.17,
+          3.39e-05
+        ],
+        [
+          279.54,
+          5.6699999999999996e-05
+        ],
+        [
+          338.14,
+          4.51e-05
+        ],
+        [
+          353.02,
+          0.000202
+        ],
+        [
+          419.08,
+          0.00184
+        ],
+        [
+          468.77,
+          0.00222
+        ],
+        [
+          617.68,
+          0.0011200000000000001
+        ]
+      ]
+    },
+    "Ge-75m": {
+      "product_isotope": "Ge-75m",
+      "target_isotope": "Ge-74",
+      "element": "Ge",
+      "gamma_energy_keV": 139.7,
+      "gamma_intensity": 0.387,
+      "half_life_s": 47.7,
+      "k0_Au": 0.000573,
+      "k0_unc_percent": 0.9,
+      "Q0": 2.38,
+      "Q0_unc_percent": 1.6,
+      "E_res_eV": 3540.0,
+      "sigma_0_barn": 0.141,
+      "I0_barn": 0.33557999999999993,
+      "isotopic_abundance": 0.365,
+      "atomic_mass_g_mol": 72.59,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          121.12,
+          5.3400000000000004e-05
+        ],
+        [
+          136.0,
+          0.000183
+        ],
+        [
+          264.66,
+          0.000182
+        ]
+      ]
+    },
+    "Ge-77": {
+      "product_isotope": "Ge-77",
+      "target_isotope": "Ge-76",
+      "element": "Ge",
+      "gamma_energy_keV": 416.3,
+      "gamma_intensity": 0.20600000000000002,
+      "half_life_s": 40680.0,
+      "k0_Au": 3.06e-05,
+      "k0_unc_percent": 0.0,
+      "Q0": 12.9,
+      "Q0_unc_percent": 6.6,
+      "E_res_eV": 583.0,
+      "sigma_0_barn": 0.0455,
+      "I0_barn": 0.58695,
+      "isotopic_abundance": 0.078,
+      "atomic_mass_g_mol": 72.59,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          150.2,
+          0.000356
+        ],
+        [
+          156.36,
+          0.00759
+        ],
+        [
+          159.03,
+          0.00218
+        ],
+        [
+          177.31,
+          0.00168
+        ],
+        [
+          194.75,
+          0.0168
+        ],
+        [
+          208.71,
+          0.00891
+        ],
+        [
+          211.01,
+          0.29100000000000004
+        ],
+        [
+          215.48,
+          0.27
+        ],
+        [
+          219.1,
+          0.0013700000000000001
+        ],
+        [
+          254.65,
+          0.002
+        ],
+        [
+          264.42,
+          0.509
+        ],
+        [
+          267.88,
+          0.0028100000000000004
+        ],
+        [
+          313.49,
+          0.000193
+        ],
+        [
+          326.06,
+          0.000254
+        ],
+        [
+          337.53,
+          0.00218
+        ],
+        [
+          338.5,
+          0.00633
+        ],
+        [
+          350.05,
+          0.00015800000000000002
+        ],
+        [
+          367.37,
+          0.133
+        ],
+        [
+          398.99,
+          0.000914
+        ],
+        [
+          419.72,
+          0.0116
+        ],
+        [
+          430.53,
+          9.68e-05
+        ],
+        [
+          439.57,
+          0.0019
+        ],
+        [
+          444.49,
+          0.00016199999999999998
+        ],
+        [
+          461.34,
+          0.011899999999999999
+        ],
+        [
+          469.94,
+          7.65e-05
+        ],
+        [
+          475.43,
+          0.00936
+        ],
+        [
+          503.9,
+          0.0006619999999999999
+        ],
+        [
+          520.24,
+          0.0028100000000000004
+        ],
+        [
+          531.51,
+          0.00043799999999999997
+        ],
+        [
+          557.75,
+          0.00040800000000000005
+        ],
+        [
+          557.97,
+          0.152
+        ],
+        [
+          569.42,
+          0.000745
+        ],
+        [
+          582.51,
+          0.00738
+        ],
+        [
+          610.73,
+          0.000582
+        ],
+        [
+          613.81,
+          0.000841
+        ],
+        [
+          614.47,
+          0.00498
+        ],
+        [
+          624.69,
+          0.00172
+        ],
+        [
+          631.79,
+          0.0658
+        ],
+        [
+          634.46,
+          0.0196
+        ],
+        [
+          639.15,
+          0.000383
+        ],
+        [
+          659.67,
+          0.000291
+        ],
+        [
+          672.98,
+          0.00504
+        ],
+        [
+          673.63,
+          0.00126
+        ],
+        [
+          680.4,
+          0.000366
+        ],
+        [
+          685.18,
+          0.000633
+        ],
+        [
+          685.36,
+          0.000239
+        ],
+        [
+          698.51,
+          0.00216
+        ],
+        [
+          705.17,
+          0.0010199999999999999
+        ],
+        [
+          712.3,
+          0.00783
+        ],
+        [
+          714.33,
+          0.0676
+        ],
+        [
+          730.62,
+          0.000195
+        ],
+        [
+          743.6,
+          0.00167
+        ],
+        [
+          745.73,
+          0.00914
+        ],
+        [
+          749.83,
+          0.00835
+        ],
+        [
+          766.68,
+          0.0074199999999999995
+        ],
+        [
+          775.85,
+          0.000142
+        ],
+        [
+          781.23,
+          0.00958
+        ],
+        [
+          784.66,
+          0.0123
+        ],
+        [
+          789.0,
+          0.0009170000000000001
+        ],
+        [
+          794.3,
+          0.00262
+        ],
+        [
+          798.87,
+          0.00045400000000000003
+        ],
+        [
+          802.84,
+          0.000264
+        ],
+        [
+          810.32,
+          0.021400000000000002
+        ],
+        [
+          813.32,
+          0.00125
+        ],
+        [
+          823.18,
+          0.00567
+        ],
+        [
+          825.85,
+          0.00040800000000000005
+        ],
+        [
+          843.17,
+          0.00199
+        ],
+        [
+          857.57,
+          0.000291
+        ],
+        [
+          875.15,
+          0.0074
+        ],
+        [
+          889.11,
+          0.00013299999999999998
+        ],
+        [
+          896.47,
+          0.00115
+        ],
+        [
+          900.65,
+          0.00113
+        ],
+        [
+          906.95,
+          0.009000000000000001
+        ],
+        [
+          913.79,
+          0.0034899999999999996
+        ],
+        [
+          921.01,
+          0.000674
+        ],
+        [
+          923.04,
+          0.00653
+        ],
+        [
+          925.34,
+          0.006790000000000001
+        ],
+        [
+          926.05,
+          0.000607
+        ],
+        [
+          928.72,
+          0.00988
+        ],
+        [
+          939.2,
+          0.00268
+        ],
+        [
+          945.7,
+          0.000291
+        ],
+        [
+          946.04,
+          0.000293
+        ],
+        [
+          959.19,
+          0.000669
+        ],
+        [
+          966.62,
+          0.000356
+        ],
+        [
+          970.32,
+          0.000254
+        ],
+        [
+          985.73,
+          0.0009329999999999999
+        ],
+        [
+          996.49,
+          0.000996
+        ],
+        [
+          1052.83,
+          0.00029499999999999996
+        ],
+        [
+          1061.65,
+          0.0014099999999999998
+        ],
+        [
+          1080.67,
+          0.00227
+        ],
+        [
+          1085.08,
+          0.0571
+        ],
+        [
+          1104.16,
+          0.00032
+        ],
+        [
+          1114.75,
+          0.0009750000000000001
+        ],
+        [
+          1124.93,
+          0.00111
+        ],
+        [
+          1134.72,
+          0.00026
+        ],
+        [
+          1151.82,
+          0.00185
+        ],
+        [
+          1155.45,
+          0.000184
+        ],
+        [
+          1165.07,
+          0.00046300000000000003
+        ],
+        [
+          1186.33,
+          0.00035200000000000005
+        ],
+        [
+          1193.22,
+          0.024300000000000002
+        ],
+        [
+          1201.21,
+          0.00077
+        ],
+        [
+          1215.42,
+          0.0011899999999999999
+        ],
+        [
+          1234.5,
+          0.000264
+        ],
+        [
+          1242.16,
+          0.00377
+        ],
+        [
+          1263.84,
+          0.008020000000000001
+        ],
+        [
+          1279.93,
+          0.0016300000000000002
+        ],
+        [
+          1295.35,
+          0.000566
+        ],
+        [
+          1296.09,
+          0.000847
+        ],
+        [
+          1309.24,
+          0.00459
+        ],
+        [
+          1312.78,
+          0.0033900000000000002
+        ],
+        [
+          1319.64,
+          0.0028499999999999997
+        ],
+        [
+          1323.26,
+          0.000153
+        ],
+        [
+          1326.11,
+          0.000362
+        ],
+        [
+          1339.2,
+          0.0006479999999999999
+        ],
+        [
+          1358.18,
+          0.000275
+        ],
+        [
+          1368.29,
+          0.0318
+        ],
+        [
+          1452.47,
+          0.00113
+        ],
+        [
+          1454.5,
+          0.00035200000000000005
+        ],
+        [
+          1464.96,
+          0.000561
+        ],
+        [
+          1466.43,
+          0.000566
+        ],
+        [
+          1476.31,
+          0.00229
+        ],
+        [
+          1478.92,
+          0.0011899999999999999
+        ],
+        [
+          1478.98,
+          0.0008060000000000001
+        ],
+        [
+          1495.56,
+          0.004699999999999999
+        ],
+        [
+          1528.26,
+          0.00043799999999999997
+        ],
+        [
+          1538.74,
+          0.00135
+        ],
+        [
+          1569.41,
+          0.000541
+        ],
+        [
+          1573.66,
+          0.00621
+        ],
+        [
+          1709.79,
+          0.0028000000000000004
+        ],
+        [
+          1719.61,
+          0.00377
+        ],
+        [
+          1722.28,
+          0.000484
+        ],
+        [
+          1727.11,
+          0.0014000000000000002
+        ],
+        [
+          1735.66,
+          0.000362
+        ],
+        [
+          1784.6,
+          7.13e-05
+        ],
+        [
+          1792.47,
+          0.00045400000000000003
+        ],
+        [
+          1809.79,
+          0.00035999999999999997
+        ],
+        [
+          1846.35,
+          0.0016200000000000001
+        ],
+        [
+          1878.64,
+          0.00034700000000000003
+        ],
+        [
+          2000.08,
+          0.00529
+        ],
+        [
+          2037.79,
+          0.000582
+        ],
+        [
+          2077.16,
+          0.0022
+        ],
+        [
+          2089.65,
+          0.0032700000000000003
+        ],
+        [
+          2126.1,
+          0.00192
+        ],
+        [
+          2341.58,
+          0.00445
+        ],
+        [
+          2354.07,
+          4.58e-05
+        ]
+      ]
+    },
+    "Ge-77m": {
+      "product_isotope": "Ge-77m",
+      "target_isotope": "Ge-76",
+      "element": "Ge",
+      "gamma_energy_keV": 159.7,
+      "gamma_intensity": 0.1033296,
+      "half_life_s": 52.902,
+      "k0_Au": 2.45e-05,
+      "k0_unc_percent": 1.0,
+      "Q0": 8.75,
+      "Q0_unc_percent": 2.5,
+      "E_res_eV": 583.0,
+      "sigma_0_barn": 0.0966,
+      "I0_barn": 0.8452500000000001,
+      "isotopic_abundance": 0.078,
+      "atomic_mass_g_mol": 72.59,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:endfb8_decay",
+      "additional_gammas": [
+        [
+          194.75,
+          0.00482
+        ],
+        [
+          215.48,
+          0.20800000000000002
+        ],
+        [
+          398.99,
+          7.59e-05
+        ],
+        [
+          419.72,
+          0.000974
+        ],
+        [
+          614.47,
+          0.000413
+        ]
+      ]
+    },
+    "Hf-175": {
+      "product_isotope": "Hf-175",
+      "target_isotope": "Hf-174",
+      "element": "Hf",
+      "gamma_energy_keV": 343.4,
+      "gamma_intensity": 0.8690000000000001,
+      "half_life_s": 6048000.0,
+      "k0_Au": 0.00906,
+      "k0_unc_percent": 1.0,
+      "Q0": 0.78,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 29.6,
+      "sigma_0_barn": 549.0,
+      "I0_barn": 428.22,
+      "isotopic_abundance": 0.00162,
+      "atomic_mass_g_mol": 178.49,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          229.59,
+          0.00774
+        ],
+        [
+          432.75,
+          0.015700000000000002
+        ]
+      ]
+    },
+    "Hf-179m": {
+      "product_isotope": "Hf-179m",
+      "target_isotope": "Hf-178",
+      "element": "Hf",
+      "gamma_energy_keV": 214.3,
+      "gamma_intensity": 0.953,
+      "half_life_s": 18.6702,
+      "k0_Au": 0.177,
+      "k0_unc_percent": 0.2,
+      "Q0": 16.6,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 7.9,
+      "sigma_0_barn": 53.0,
+      "I0_barn": 879.8000000000001,
+      "isotopic_abundance": 0.273,
+      "atomic_mass_g_mol": 178.49,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:endfb8_decay",
+      "additional_gammas": []
+    },
+    "Hf-180m": {
+      "product_isotope": "Hf-180m",
+      "target_isotope": "Hf-179",
+      "element": "Hf",
+      "gamma_energy_keV": 332.3,
+      "gamma_intensity": 1.0,
+      "half_life_s": 19800.0,
+      "k0_Au": 0.000674,
+      "k0_unc_percent": 2.0,
+      "Q0": 14.4,
+      "Q0_unc_percent": 2.4,
+      "E_res_eV": 16.2,
+      "sigma_0_barn": 0.423,
+      "I0_barn": 6.0912,
+      "isotopic_abundance": 0.136,
+      "atomic_mass_g_mol": 178.49,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          215.25,
+          1.0
+        ],
+        [
+          443.14,
+          0.7909999999999999
+        ],
+        [
+          500.69,
+          0.20800000000000002
+        ]
+      ]
+    },
+    "Hf-181": {
+      "product_isotope": "Hf-181",
+      "target_isotope": "Hf-180",
+      "element": "Hf",
+      "gamma_energy_keV": 345.9,
+      "gamma_intensity": 0.15,
+      "half_life_s": 3662496.0,
+      "k0_Au": 0.00793,
+      "k0_unc_percent": 0.0,
+      "Q0": 2.52,
+      "Q0_unc_percent": 3.6,
+      "E_res_eV": 115.0,
+      "sigma_0_barn": 13.8,
+      "I0_barn": 34.776,
+      "isotopic_abundance": 0.351,
+      "atomic_mass_g_mol": 178.49,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          132.94,
+          0.358
+        ],
+        [
+          136.17,
+          0.0579
+        ],
+        [
+          475.87,
+          0.00612
+        ],
+        [
+          482.0,
+          0.8059999999999999
+        ],
+        [
+          614.94,
+          0.0025800000000000003
+        ],
+        [
+          618.58,
+          0.00040300000000000004
+        ]
+      ]
+    },
+    "Hg-197m": {
+      "product_isotope": "Hg-197m",
+      "target_isotope": "Hg-196",
+      "element": "Hg",
+      "gamma_energy_keV": 134.0,
+      "gamma_intensity": 0.341,
+      "half_life_s": 85680.0,
+      "k0_Au": 0.000499,
+      "k0_unc_percent": 1.0,
+      "Q0": 0.49,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 93.5,
+      "sigma_0_barn": 101.0,
+      "I0_barn": 49.49,
+      "isotopic_abundance": 0.0014,
+      "atomic_mass_g_mol": 200.59,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          164.95,
+          0.00266
+        ]
+      ]
+    },
+    "Hg-203": {
+      "product_isotope": "Hg-203",
+      "target_isotope": "Hg-202",
+      "element": "Hg",
+      "gamma_energy_keV": 279.2,
+      "gamma_intensity": 0.815,
+      "half_life_s": 4027103.9999999995,
+      "k0_Au": 0.011,
+      "k0_unc_percent": 1.7,
+      "Q0": 0.88,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 1960.0,
+      "sigma_0_barn": 4.35,
+      "I0_barn": 3.828,
+      "isotopic_abundance": 0.298,
+      "atomic_mass_g_mol": 200.59,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Hg-205": {
+      "product_isotope": "Hg-205",
+      "target_isotope": "Hg-204",
+      "element": "Hg",
+      "gamma_energy_keV": 203.7,
+      "gamma_intensity": 0.022000000000000002,
+      "half_life_s": 312.0,
+      "k0_Au": 6.91e-06,
+      "k0_unc_percent": 0.2,
+      "Q0": 1.98,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 64.47,
+      "sigma_0_barn": 0.43,
+      "I0_barn": 0.8513999999999999,
+      "isotopic_abundance": 0.068,
+      "atomic_mass_g_mol": 200.59,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ho-166": {
+      "product_isotope": "Ho-166",
+      "target_isotope": "Ho-165",
+      "element": "Ho",
+      "gamma_energy_keV": 1379.4,
+      "gamma_intensity": 0.009300000000000001,
+      "half_life_s": 96588.0,
+      "k0_Au": 0.00695,
+      "k0_unc_percent": 1.6,
+      "Q0": 10.9,
+      "Q0_unc_percent": 2.4,
+      "E_res_eV": 12.3,
+      "sigma_0_barn": 58.4,
+      "I0_barn": 636.5600000000001,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 164.93,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          184.41,
+          2e-05
+        ],
+        [
+          674.0,
+          0.0002
+        ],
+        [
+          705.32,
+          0.000146
+        ],
+        [
+          785.89,
+          0.00013299999999999998
+        ],
+        [
+          1581.88,
+          0.00181
+        ],
+        [
+          1662.45,
+          0.00115
+        ],
+        [
+          1749.96,
+          0.00025
+        ],
+        [
+          1830.53,
+          8e-05
+        ]
+      ]
+    },
+    "I-128": {
+      "product_isotope": "I-128",
+      "target_isotope": "I-127",
+      "element": "I",
+      "gamma_energy_keV": 442.9,
+      "gamma_intensity": 0.168,
+      "half_life_s": 1499.3999999999999,
+      "k0_Au": 0.0116,
+      "k0_unc_percent": 1.4,
+      "Q0": 24.4,
+      "Q0_unc_percent": 2.0,
+      "E_res_eV": 64.34,
+      "sigma_0_barn": 4.04,
+      "I0_barn": 98.576,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 126.9,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          526.57,
+          0.015700000000000002
+        ],
+        [
+          743.41,
+          0.00164
+        ],
+        [
+          969.49,
+          0.00407
+        ]
+      ]
+    },
+    "I-131": {
+      "product_isotope": "I-131",
+      "target_isotope": "Te-130",
+      "element": "Te",
+      "gamma_energy_keV": 364.5,
+      "gamma_intensity": 0.8079999999999999,
+      "half_life_s": 693014.4,
+      "k0_Au": 0.000867,
+      "k0_unc_percent": 0.8,
+      "Q0": 1.8,
+      "Q0_unc_percent": 5.8,
+      "E_res_eV": 2950.0,
+      "sigma_0_barn": 0.174,
+      "I0_barn": 0.3132,
+      "isotopic_abundance": 0.338,
+      "atomic_mass_g_mol": 127.6,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:16; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          177.21,
+          0.0025
+        ],
+        [
+          284.3,
+          0.0603
+        ],
+        [
+          318.08,
+          0.0008160000000000001
+        ],
+        [
+          325.78,
+          0.0023899999999999998
+        ],
+        [
+          502.99,
+          0.00345
+        ],
+        [
+          636.97,
+          0.075
+        ],
+        [
+          642.71,
+          0.0022500000000000003
+        ],
+        [
+          722.89,
+          0.0184
+        ]
+      ]
+    },
+    "In-113m": {
+      "product_isotope": "In-113m",
+      "target_isotope": "Sn-112",
+      "element": "Sn",
+      "gamma_energy_keV": 391.7,
+      "gamma_intensity": 0.6409999999999999,
+      "half_life_s": 5968.8,
+      "k0_Au": 5.99e-05,
+      "k0_unc_percent": 0.8,
+      "Q0": 48.4,
+      "Q0_unc_percent": 1.2,
+      "E_res_eV": 107.0,
+      "sigma_0_barn": 0.31,
+      "I0_barn": 15.004,
+      "isotopic_abundance": 0.0097,
+      "atomic_mass_g_mol": 118.71,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:14; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "In-114m": {
+      "product_isotope": "In-114m",
+      "target_isotope": "In-113",
+      "element": "In",
+      "gamma_energy_keV": 190.3,
+      "gamma_intensity": 0.154,
+      "half_life_s": 4277664.0,
+      "k0_Au": 0.00106,
+      "k0_unc_percent": 0.8,
+      "Q0": 24.2,
+      "Q0_unc_percent": 1.7,
+      "E_res_eV": 6.41,
+      "sigma_0_barn": 8.34,
+      "I0_barn": 201.828,
+      "isotopic_abundance": 0.043,
+      "atomic_mass_g_mol": 114.82,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          558.43,
+          0.0438
+        ],
+        [
+          725.24,
+          0.0433
+        ]
+      ]
+    },
+    "In-115m": {
+      "product_isotope": "In-115m",
+      "target_isotope": "Cd-114",
+      "element": "Cd",
+      "gamma_energy_keV": 336.2,
+      "gamma_intensity": 0.45799999999999996,
+      "half_life_s": 16092.0,
+      "k0_Au": 0.000773,
+      "k0_unc_percent": 1.7,
+      "Q0": 32.4,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 207.0,
+      "sigma_0_barn": 0.23,
+      "I0_barn": 7.452,
+      "isotopic_abundance": 0.287,
+      "atomic_mass_g_mol": 112.41,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          497.36,
+          0.00047
+        ]
+      ]
+    },
+    "In-116m": {
+      "product_isotope": "In-116m",
+      "target_isotope": "In-115",
+      "element": "In",
+      "gamma_energy_keV": 1097.3,
+      "gamma_intensity": 0.562,
+      "half_life_s": 3264.6,
+      "k0_Au": 1.6,
+      "k0_unc_percent": 1.3,
+      "Q0": 16.8,
+      "Q0_unc_percent": 1.9,
+      "E_res_eV": 1.56,
+      "sigma_0_barn": 154.0,
+      "I0_barn": 2587.2000000000003,
+      "isotopic_abundance": 0.957,
+      "atomic_mass_g_mol": 114.82,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          138.36,
+          0.0329
+        ],
+        [
+          355.4,
+          0.00819
+        ],
+        [
+          416.92,
+          0.3
+        ],
+        [
+          463.32,
+          0.00826
+        ],
+        [
+          818.73,
+          0.114
+        ],
+        [
+          972.54,
+          0.00454
+        ],
+        [
+          1293.59,
+          0.851
+        ],
+        [
+          1507.68,
+          0.09960000000000001
+        ],
+        [
+          1752.89,
+          0.0245
+        ]
+      ]
+    },
+    "Ir-192": {
+      "product_isotope": "Ir-192",
+      "target_isotope": "Ir-191",
+      "element": "Ir",
+      "gamma_energy_keV": 468.1,
+      "gamma_intensity": 0.47600000000000003,
+      "half_life_s": 6378652.800000001,
+      "k0_Au": 1.874,
+      "k0_unc_percent": 1.2,
+      "Q0": 3.7,
+      "Q0_unc_percent": 8.108108108,
+      "E_res_eV": 1.34,
+      "sigma_0_barn": 624.0,
+      "I0_barn": 2308.8,
+      "isotopic_abundance": 0.373,
+      "atomic_mass_g_mol": 192.22,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          136.34,
+          0.00181
+        ],
+        [
+          201.39,
+          0.00454
+        ],
+        [
+          205.8,
+          0.0325
+        ],
+        [
+          283.26,
+          0.00252
+        ],
+        [
+          295.96,
+          0.28300000000000003
+        ],
+        [
+          308.45,
+          0.293
+        ],
+        [
+          316.51,
+          0.831
+        ],
+        [
+          374.52,
+          0.0070799999999999995
+        ],
+        [
+          416.47,
+          0.00666
+        ],
+        [
+          484.65,
+          0.031200000000000002
+        ],
+        [
+          489.06,
+          0.00432
+        ],
+        [
+          588.58,
+          0.0446
+        ],
+        [
+          604.41,
+          0.0824
+        ],
+        [
+          612.47,
+          0.052300000000000006
+        ],
+        [
+          884.54,
+          0.0028299999999999996
+        ],
+        [
+          1061.54,
+          0.000523
+        ]
+      ]
+    },
+    "Ir-194": {
+      "product_isotope": "Ir-194",
+      "target_isotope": "Ir-193",
+      "element": "Ir",
+      "gamma_energy_keV": 328.4,
+      "gamma_intensity": 0.13,
+      "half_life_s": 69480.0,
+      "k0_Au": 0.1049,
+      "k0_unc_percent": 1.0,
+      "Q0": 13.2,
+      "Q0_unc_percent": 3.787878788,
+      "E_res_eV": 2.55,
+      "sigma_0_barn": 115.0,
+      "I0_barn": 1518.0,
+      "isotopic_abundance": 0.627,
+      "atomic_mass_g_mol": 192.22,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          293.55,
+          0.0252
+        ],
+        [
+          300.76,
+          0.0034999999999999996
+        ],
+        [
+          589.19,
+          0.0013700000000000001
+        ],
+        [
+          622.01,
+          0.00335
+        ],
+        [
+          645.16,
+          0.0115
+        ],
+        [
+          889.95,
+          0.000504
+        ],
+        [
+          938.71,
+          0.0059499999999999996
+        ],
+        [
+          1104.04,
+          0.000258
+        ],
+        [
+          1150.77,
+          0.00592
+        ],
+        [
+          1175.36,
+          0.0005949999999999999
+        ],
+        [
+          1183.5,
+          0.0030399999999999997
+        ],
+        [
+          1293.69,
+          0.00046199999999999995
+        ],
+        [
+          1468.91,
+          0.00188
+        ],
+        [
+          1622.15,
+          0.00063
+        ],
+        [
+          1805.74,
+          0.00032399999999999996
+        ]
+      ]
+    },
+    "K-42": {
+      "product_isotope": "K-42",
+      "target_isotope": "K-41",
+      "element": "K",
+      "gamma_energy_keV": 1524.7,
+      "gamma_intensity": 0.187,
+      "half_life_s": 44496.0,
+      "k0_Au": 0.000946,
+      "k0_unc_percent": 0.6,
+      "Q0": 0.87,
+      "Q0_unc_percent": 3.0,
+      "E_res_eV": 2960.0,
+      "sigma_0_barn": 1.38,
+      "I0_barn": 1.2006,
+      "isotopic_abundance": 0.0673,
+      "atomic_mass_g_mol": 39.1,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          312.35,
+          0.0034999999999999996
+        ],
+        [
+          899.21,
+          0.0005340000000000001
+        ],
+        [
+          1921.77,
+          0.000429
+        ]
+      ]
+    },
+    "La-140": {
+      "product_isotope": "La-140",
+      "target_isotope": "La-139",
+      "element": "La",
+      "gamma_energy_keV": 1596.2,
+      "gamma_intensity": 0.953,
+      "half_life_s": 144979.2,
+      "k0_Au": 0.134,
+      "k0_unc_percent": 1.1,
+      "Q0": 1.24,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 76.0,
+      "sigma_0_barn": 9.43,
+      "I0_barn": 11.6932,
+      "isotopic_abundance": 0.999,
+      "atomic_mass_g_mol": 138.91,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          109.4,
+          0.002
+        ],
+        [
+          131.11,
+          0.00438
+        ],
+        [
+          173.53,
+          0.0012900000000000001
+        ],
+        [
+          241.9,
+          0.00473
+        ],
+        [
+          266.55,
+          0.00451
+        ],
+        [
+          306.85,
+          0.00021
+        ],
+        [
+          328.76,
+          0.20600000000000002
+        ],
+        [
+          397.66,
+          0.00105
+        ],
+        [
+          432.53,
+          0.029900000000000003
+        ],
+        [
+          438.16,
+          0.0002
+        ],
+        [
+          444.8,
+          0.000239
+        ],
+        [
+          487.02,
+          0.45899999999999996
+        ],
+        [
+          618.33,
+          0.000599
+        ],
+        [
+          751.65,
+          0.0426
+        ],
+        [
+          815.78,
+          0.235
+        ],
+        [
+          867.82,
+          0.0558
+        ],
+        [
+          919.55,
+          0.0268
+        ],
+        [
+          925.18,
+          0.0703
+        ],
+        [
+          936.57,
+          0.000569
+        ],
+        [
+          950.85,
+          0.005410000000000001
+        ],
+        [
+          2083.56,
+          0.000115
+        ],
+        [
+          2348.19,
+          0.00849
+        ],
+        [
+          2464.36,
+          0.000171
+        ],
+        [
+          2521.72,
+          0.034300000000000004
+        ],
+        [
+          2547.39,
+          0.00104
+        ],
+        [
+          2899.75,
+          0.000658
+        ]
+      ]
+    },
+    "Lu-176m": {
+      "product_isotope": "Lu-176m",
+      "target_isotope": "Lu-175",
+      "element": "Lu",
+      "gamma_energy_keV": 88.4,
+      "gamma_intensity": 0.08893943,
+      "half_life_s": 13086.0,
+      "k0_Au": 0.0173,
+      "k0_unc_percent": 1.5,
+      "Q0": 34.8,
+      "Q0_unc_percent": 3.1,
+      "E_res_eV": 16.1,
+      "sigma_0_barn": 16.7,
+      "I0_barn": 581.16,
+      "isotopic_abundance": 0.974,
+      "atomic_mass_g_mol": 174.97,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:endfb8_decay",
+      "additional_gammas": []
+    },
+    "Lu-177": {
+      "product_isotope": "Lu-177",
+      "target_isotope": "Lu-176",
+      "element": "Lu",
+      "gamma_energy_keV": 208.4,
+      "gamma_intensity": 0.11,
+      "half_life_s": 581472.0,
+      "k0_Au": 0.0714,
+      "k0_unc_percent": 0.0,
+      "Q0": 1.67,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 0.158,
+      "sigma_0_barn": 2090.0,
+      "I0_barn": 3490.2999999999997,
+      "isotopic_abundance": 0.026,
+      "atomic_mass_g_mol": 174.97,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          112.95,
+          0.064
+        ],
+        [
+          136.7,
+          0.00048300000000000003
+        ],
+        [
+          249.65,
+          0.0021
+        ],
+        [
+          321.31,
+          0.00222
+        ]
+      ]
+    },
+    "Mg-27": {
+      "product_isotope": "Mg-27",
+      "target_isotope": "Mg-26",
+      "element": "Mg",
+      "gamma_energy_keV": 1014.4,
+      "gamma_intensity": 0.29100000000000004,
+      "half_life_s": 567.72,
+      "k0_Au": 9.8e-05,
+      "k0_unc_percent": 0.2,
+      "Q0": 0.64,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 257000.0,
+      "sigma_0_barn": 0.0364,
+      "I0_barn": 0.023296,
+      "isotopic_abundance": 0.11,
+      "atomic_mass_g_mol": 24.3,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          170.67,
+          0.00788
+        ],
+        [
+          843.76,
+          0.7290000000000001
+        ]
+      ]
+    },
+    "Mn-56": {
+      "product_isotope": "Mn-56",
+      "target_isotope": "Mn-55",
+      "element": "Mn",
+      "gamma_energy_keV": 846.8,
+      "gamma_intensity": 0.9890000000000001,
+      "half_life_s": 9284.400000000001,
+      "k0_Au": 0.496,
+      "k0_unc_percent": 0.6,
+      "Q0": 1.053,
+      "Q0_unc_percent": 3.0,
+      "E_res_eV": 468.0,
+      "sigma_0_barn": 13.3,
+      "I0_barn": 14.0049,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 54.94,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          1238.32,
+          0.000989
+        ],
+        [
+          1810.77,
+          0.272
+        ],
+        [
+          2113.15,
+          0.142
+        ],
+        [
+          2522.91,
+          0.00985
+        ],
+        [
+          2657.58,
+          0.00653
+        ],
+        [
+          2959.96,
+          0.00306
+        ],
+        [
+          3369.72,
+          0.0017000000000000001
+        ],
+        [
+          1810.7,
+          0.272
+        ],
+        [
+          2113.1,
+          0.143
+        ]
+      ]
+    },
+    "Mo-101": {
+      "product_isotope": "Mo-101",
+      "target_isotope": "Mo-100",
+      "element": "Mo",
+      "gamma_energy_keV": 505.9,
+      "gamma_intensity": 0.11699999999999999,
+      "half_life_s": 876.5999999999999,
+      "k0_Au": 4.71e-05,
+      "k0_unc_percent": 1.9,
+      "Q0": 18.8,
+      "Q0_unc_percent": 4.0,
+      "E_res_eV": 672.0,
+      "sigma_0_barn": 0.2,
+      "I0_barn": 3.7600000000000002,
+      "isotopic_abundance": 0.0963,
+      "atomic_mass_g_mol": 95.94,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          191.94,
+          0.187
+        ],
+        [
+          212.03,
+          0.00508
+        ],
+        [
+          333.69,
+          0.00775
+        ],
+        [
+          398.99,
+          0.009000000000000001
+        ],
+        [
+          408.76,
+          0.016
+        ],
+        [
+          421.6,
+          0.00563
+        ],
+        [
+          448.7,
+          0.0069
+        ],
+        [
+          499.68,
+          0.0146
+        ],
+        [
+          512.85,
+          0.0175
+        ],
+        [
+          515.56,
+          0.00508
+        ],
+        [
+          566.66,
+          0.00733
+        ],
+        [
+          590.93,
+          0.163
+        ],
+        [
+          608.36,
+          0.010700000000000001
+        ],
+        [
+          642.8,
+          0.0123
+        ],
+        [
+          695.67,
+          0.07200000000000001
+        ],
+        [
+          701.96,
+          0.00375
+        ],
+        [
+          713.1,
+          0.0337
+        ],
+        [
+          733.07,
+          0.0026
+        ],
+        [
+          804.35,
+          0.00996
+        ],
+        [
+          871.14,
+          0.0181
+        ],
+        [
+          877.43,
+          0.0339
+        ],
+        [
+          883.52,
+          0.00695
+        ],
+        [
+          903.62,
+          0.002
+        ],
+        [
+          934.3,
+          0.0339
+        ],
+        [
+          1012.53,
+          0.128
+        ],
+        [
+          1018.82,
+          0.00638
+        ],
+        [
+          1161.04,
+          0.0397
+        ],
+        [
+          1186.68,
+          0.0103
+        ],
+        [
+          1199.97,
+          0.0175
+        ],
+        [
+          1251.16,
+          0.0461
+        ],
+        [
+          1304.03,
+          0.0277
+        ],
+        [
+          1346.13,
+          0.0103
+        ],
+        [
+          1355.9,
+          0.0166
+        ],
+        [
+          1394.83,
+          0.0060799999999999995
+        ],
+        [
+          1418.62,
+          0.00875
+        ],
+        [
+          1431.48,
+          0.00358
+        ],
+        [
+          1532.5,
+          0.059500000000000004
+        ],
+        [
+          1599.29,
+          0.0175
+        ],
+        [
+          1662.38,
+          0.00683
+        ],
+        [
+          1673.93,
+          0.0168
+        ],
+        [
+          1840.24,
+          0.0137
+        ]
+      ]
+    },
+    "Mo-99": {
+      "product_isotope": "Mo-99",
+      "target_isotope": "Mo-98",
+      "element": "Mo",
+      "gamma_energy_keV": 739.5,
+      "gamma_intensity": 0.12,
+      "half_life_s": 237384.0,
+      "k0_Au": 8.46e-05,
+      "k0_unc_percent": 0.7,
+      "Q0": 53.1,
+      "Q0_unc_percent": 6.3,
+      "E_res_eV": 241.0,
+      "sigma_0_barn": 0.131,
+      "I0_barn": 6.9561,
+      "isotopic_abundance": 0.241,
+      "atomic_mass_g_mol": 95.94,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          140.47,
+          0.044000000000000004
+        ],
+        [
+          181.07,
+          0.060700000000000004
+        ],
+        [
+          366.42,
+          0.0115
+        ],
+        [
+          411.5,
+          0.000145
+        ],
+        [
+          528.81,
+          0.000542
+        ],
+        [
+          777.92,
+          0.0434
+        ],
+        [
+          822.98,
+          0.00132
+        ]
+      ]
+    },
+    "Na-24": {
+      "product_isotope": "Na-24",
+      "target_isotope": "Na-23",
+      "element": "Na",
+      "gamma_energy_keV": 1368.6,
+      "gamma_intensity": 1.0,
+      "half_life_s": 53856.0,
+      "k0_Au": 0.0468,
+      "k0_unc_percent": 0.6,
+      "Q0": 0.59,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 3380.0,
+      "sigma_0_barn": 0.513,
+      "I0_barn": 0.30267,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 22.99,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          2753.99,
+          0.9990000000000001
+        ]
+      ]
+    },
+    "Nb-94m": {
+      "product_isotope": "Nb-94m",
+      "target_isotope": "Nb-93",
+      "element": "Nb",
+      "gamma_energy_keV": 871.0,
+      "gamma_intensity": 0.005,
+      "half_life_s": 375.59999999999997,
+      "k0_Au": 9.7e-05,
+      "k0_unc_percent": 1.6,
+      "Q0": 7.35,
+      "Q0_unc_percent": 2.7,
+      "E_res_eV": 574.0,
+      "sigma_0_barn": 0.863,
+      "I0_barn": 6.34305,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 92.91,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          702.63,
+          3.14e-05
+        ]
+      ]
+    },
+    "Nb-95": {
+      "product_isotope": "Nb-95",
+      "target_isotope": "Zr-94",
+      "element": "Zr",
+      "gamma_energy_keV": 765.8,
+      "gamma_intensity": 0.998,
+      "half_life_s": 3021408.0,
+      "k0_Au": 2.17e-06,
+      "k0_unc_percent": 1.5,
+      "Q0": 5.31,
+      "Q0_unc_percent": 3.3,
+      "E_res_eV": 6260.0,
+      "sigma_0_barn": 0.053,
+      "I0_barn": 0.28142999999999996,
+      "isotopic_abundance": 0.174,
+      "atomic_mass_g_mol": 91.22,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:6; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Nb-97": {
+      "product_isotope": "Nb-97",
+      "target_isotope": "Zr-96",
+      "element": "Zr",
+      "gamma_energy_keV": 657.9,
+      "gamma_intensity": 0.983,
+      "half_life_s": 4326.0,
+      "k0_Au": 1.24e-05,
+      "k0_unc_percent": 0.9,
+      "Q0": 251.6,
+      "Q0_unc_percent": 1.0,
+      "E_res_eV": 338.0,
+      "sigma_0_barn": 0.0213,
+      "I0_barn": 5.35908,
+      "isotopic_abundance": 0.028,
+      "atomic_mass_g_mol": 91.22,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:6; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          549.42,
+          0.000491
+        ],
+        [
+          1024.71,
+          0.0108
+        ],
+        [
+          1117.22,
+          0.000884
+        ],
+        [
+          1268.86,
+          0.00157
+        ],
+        [
+          1515.89,
+          0.00117
+        ]
+      ]
+    },
+    "Nb-97m": {
+      "product_isotope": "Nb-97m",
+      "target_isotope": "Zr-96",
+      "element": "Zr",
+      "gamma_energy_keV": 743.4,
+      "gamma_intensity": 0.98,
+      "half_life_s": 52.698,
+      "k0_Au": 1.24e-05,
+      "k0_unc_percent": 0.3,
+      "Q0": 251.6,
+      "Q0_unc_percent": 1.0,
+      "E_res_eV": 338.0,
+      "sigma_0_barn": 0.0213,
+      "I0_barn": 5.35908,
+      "isotopic_abundance": 0.028,
+      "atomic_mass_g_mol": 91.22,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:2; kayzero_fcd:0.997; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Nd-147": {
+      "product_isotope": "Nd-147",
+      "target_isotope": "Nd-146",
+      "element": "Nd",
+      "gamma_energy_keV": 531.0,
+      "gamma_intensity": 0.131,
+      "half_life_s": 948672.0,
+      "k0_Au": 0.000456,
+      "k0_unc_percent": 1.1,
+      "Q0": 2.0,
+      "Q0_unc_percent": 1.2,
+      "E_res_eV": 874.0,
+      "sigma_0_barn": 1.4,
+      "I0_barn": 2.8,
+      "isotopic_abundance": 0.172,
+      "atomic_mass_g_mol": 144.24,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          91.1,
+          0.27899999999999997
+        ],
+        [
+          120.49,
+          0.00395
+        ],
+        [
+          154.89,
+          0.000279
+        ],
+        [
+          196.64,
+          0.0020399999999999997
+        ],
+        [
+          275.38,
+          0.008
+        ],
+        [
+          319.42,
+          0.0195
+        ],
+        [
+          398.16,
+          0.00871
+        ],
+        [
+          410.52,
+          0.0013900000000000002
+        ],
+        [
+          439.91,
+          0.011899999999999999
+        ],
+        [
+          489.26,
+          0.00154
+        ],
+        [
+          589.36,
+          0.000458
+        ],
+        [
+          594.8,
+          0.00264
+        ],
+        [
+          680.46,
+          0.000195
+        ],
+        [
+          685.9,
+          0.008110000000000001
+        ]
+      ]
+    },
+    "Nd-149": {
+      "product_isotope": "Nd-149",
+      "target_isotope": "Nd-148",
+      "element": "Nd",
+      "gamma_energy_keV": 211.3,
+      "gamma_intensity": 0.272,
+      "half_life_s": 6220.8,
+      "k0_Au": 0.000526,
+      "k0_unc_percent": 0.0,
+      "Q0": 5.08,
+      "Q0_unc_percent": 2.5,
+      "E_res_eV": 236.0,
+      "sigma_0_barn": 2.31,
+      "I0_barn": 11.7348,
+      "isotopic_abundance": 0.0576,
+      "atomic_mass_g_mol": 144.24,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          114.31,
+          0.187
+        ],
+        [
+          155.84,
+          0.0605
+        ],
+        [
+          188.62,
+          0.0199
+        ],
+        [
+          192.0,
+          0.0059499999999999996
+        ],
+        [
+          198.91,
+          0.014499999999999999
+        ],
+        [
+          208.13,
+          0.0291
+        ],
+        [
+          229.57,
+          0.005
+        ],
+        [
+          240.2,
+          0.0395
+        ],
+        [
+          245.71,
+          0.0104
+        ],
+        [
+          258.06,
+          0.00381
+        ],
+        [
+          267.69,
+          0.0605
+        ],
+        [
+          270.15,
+          0.107
+        ],
+        [
+          294.79,
+          0.00582
+        ],
+        [
+          301.12,
+          0.0038
+        ],
+        [
+          310.93,
+          0.00519
+        ],
+        [
+          326.55,
+          0.0466
+        ],
+        [
+          349.22,
+          0.0147
+        ],
+        [
+          366.63,
+          0.00662
+        ],
+        [
+          384.66,
+          0.00335
+        ],
+        [
+          423.53,
+          0.0944
+        ],
+        [
+          443.52,
+          0.015
+        ],
+        [
+          540.5,
+          0.077
+        ],
+        [
+          556.41,
+          0.012
+        ],
+        [
+          654.81,
+          0.0733
+        ]
+      ]
+    },
+    "Nd-151": {
+      "product_isotope": "Nd-151",
+      "target_isotope": "Nd-150",
+      "element": "Nd",
+      "gamma_energy_keV": 255.7,
+      "gamma_intensity": 0.16699999999999998,
+      "half_life_s": 746.4,
+      "k0_Au": 0.000131,
+      "k0_unc_percent": 0.0,
+      "Q0": 12.3,
+      "Q0_unc_percent": 0.8,
+      "E_res_eV": 173.0,
+      "sigma_0_barn": 0.91,
+      "I0_barn": 11.193000000000001,
+      "isotopic_abundance": 0.0564,
+      "atomic_mass_g_mol": 144.24,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          116.71,
+          0.467
+        ],
+        [
+          138.87,
+          0.0775
+        ],
+        [
+          171.02,
+          0.0412
+        ],
+        [
+          175.09,
+          0.0765
+        ],
+        [
+          197.37,
+          0.00337
+        ],
+        [
+          263.53,
+          0.00795
+        ],
+        [
+          300.63,
+          0.0196
+        ],
+        [
+          320.19,
+          0.00902
+        ],
+        [
+          332.65,
+          0.0058
+        ],
+        [
+          347.18,
+          0.00428
+        ],
+        [
+          357.0,
+          0.0040999999999999995
+        ],
+        [
+          402.28,
+          0.0195
+        ],
+        [
+          407.61,
+          0.00458
+        ],
+        [
+          423.56,
+          0.0733
+        ],
+        [
+          460.66,
+          0.011000000000000001
+        ],
+        [
+          524.32,
+          0.00596
+        ],
+        [
+          550.01,
+          0.006730000000000001
+        ],
+        [
+          577.37,
+          0.00444
+        ],
+        [
+          585.32,
+          0.0158
+        ],
+        [
+          597.4,
+          0.00795
+        ],
+        [
+          658.64,
+          0.008409999999999999
+        ],
+        [
+          670.86,
+          0.00291
+        ],
+        [
+          677.89,
+          0.0262
+        ],
+        [
+          724.19,
+          0.0027500000000000003
+        ],
+        [
+          736.27,
+          0.0719
+        ],
+        [
+          739.13,
+          0.015300000000000001
+        ],
+        [
+          755.64,
+          0.0143
+        ],
+        [
+          797.51,
+          0.055
+        ],
+        [
+          840.9,
+          0.0106
+        ],
+        [
+          914.22,
+          0.012
+        ],
+        [
+          958.2,
+          0.005659999999999999
+        ],
+        [
+          1016.58,
+          0.0291
+        ],
+        [
+          1048.03,
+          0.008100000000000001
+        ],
+        [
+          1107.13,
+          0.004739999999999999
+        ],
+        [
+          1122.22,
+          0.0458
+        ],
+        [
+          1180.6,
+          0.153
+        ],
+        [
+          1314.83,
+          0.00366
+        ],
+        [
+          1618.04,
+          0.00383
+        ]
+      ]
+    },
+    "Ni-65": {
+      "product_isotope": "Ni-65",
+      "target_isotope": "Ni-64",
+      "element": "Ni",
+      "gamma_energy_keV": 1481.8,
+      "gamma_intensity": 0.235,
+      "half_life_s": 9061.2,
+      "k0_Au": 0.000127,
+      "k0_unc_percent": 0.6,
+      "Q0": 0.67,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 14200.0,
+      "sigma_0_barn": 1.67,
+      "I0_barn": 1.1189,
+      "isotopic_abundance": 0.0091,
+      "atomic_mass_g_mol": 58.69,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          366.38,
+          0.0461
+        ],
+        [
+          507.95,
+          0.0028699999999999997
+        ],
+        [
+          609.46,
+          0.0014000000000000002
+        ],
+        [
+          770.66,
+          0.000846
+        ],
+        [
+          852.81,
+          0.000751
+        ],
+        [
+          1115.52,
+          0.147
+        ],
+        [
+          1623.47,
+          0.00475
+        ],
+        [
+          1724.98,
+          0.00387
+        ]
+      ]
+    },
+    "Np-239": {
+      "product_isotope": "Np-239",
+      "target_isotope": "U-238",
+      "element": "U",
+      "gamma_energy_keV": 228.1,
+      "gamma_intensity": 0.107,
+      "half_life_s": 203644.8,
+      "k0_Au": 0.00276,
+      "k0_unc_percent": 0.7,
+      "Q0": 103.4,
+      "Q0_unc_percent": 1.3,
+      "E_res_eV": 16.9,
+      "sigma_0_barn": 2.9606695572445987,
+      "I0_barn": 306.1332322190915,
+      "isotopic_abundance": 0.992745,
+      "atomic_mass_g_mol": 238.03,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:3; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          99.52,
+          0.15
+        ],
+        [
+          103.73,
+          0.239
+        ],
+        [
+          106.13,
+          0.22699999999999998
+        ],
+        [
+          106.49,
+          0.000479
+        ],
+        [
+          116.93,
+          0.086
+        ],
+        [
+          120.97,
+          0.0298
+        ],
+        [
+          181.71,
+          0.00111
+        ],
+        [
+          209.75,
+          0.0331
+        ],
+        [
+          254.42,
+          0.000985
+        ],
+        [
+          272.85,
+          0.0007480000000000001
+        ],
+        [
+          277.6,
+          0.141
+        ],
+        [
+          285.46,
+          0.0074399999999999996
+        ],
+        [
+          315.88,
+          0.0159
+        ],
+        [
+          334.31,
+          0.0204
+        ],
+        [
+          503.98,
+          1.43e-05
+        ]
+      ]
+    },
+    "Os-185": {
+      "product_isotope": "Os-185",
+      "target_isotope": "Os-184",
+      "element": "Os",
+      "gamma_energy_keV": 646.1,
+      "gamma_intensity": 0.809,
+      "half_life_s": 8087040.0,
+      "k0_Au": 0.00643,
+      "k0_unc_percent": 1.5,
+      "Q0": 0.43,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 29565.0,
+      "sigma_0_barn": 3610.0,
+      "I0_barn": 1552.3,
+      "isotopic_abundance": 0.0002,
+      "atomic_mass_g_mol": 190.2,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          162.84,
+          0.00561
+        ],
+        [
+          234.15,
+          0.00416
+        ],
+        [
+          592.07,
+          0.013300000000000001
+        ],
+        [
+          717.42,
+          0.0412
+        ],
+        [
+          874.81,
+          0.0661
+        ],
+        [
+          880.26,
+          0.05
+        ]
+      ]
+    },
+    "Os-191": {
+      "product_isotope": "Os-191",
+      "target_isotope": "Os-190",
+      "element": "Os",
+      "gamma_energy_keV": 129.4,
+      "gamma_intensity": 0.256,
+      "half_life_s": 1330560.0,
+      "k0_Au": 0.00291,
+      "k0_unc_percent": 1.6,
+      "Q0": 2.03,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 114.0,
+      "sigma_0_barn": 3.9,
+      "I0_barn": 7.916999999999999,
+      "isotopic_abundance": 0.264,
+      "atomic_mass_g_mol": 190.2,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:9; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Os-193": {
+      "product_isotope": "Os-193",
+      "target_isotope": "Os-192",
+      "element": "Os",
+      "gamma_energy_keV": 387.5,
+      "gamma_intensity": 0.0126,
+      "half_life_s": 108396.0,
+      "k0_Au": 0.000173,
+      "k0_unc_percent": 1.5,
+      "Q0": 2.34,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 89.7,
+      "sigma_0_barn": 3.12,
+      "I0_barn": 7.3008,
+      "isotopic_abundance": 0.41,
+      "atomic_mass_g_mol": 190.2,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          107.02,
+          0.00636
+        ],
+        [
+          138.91,
+          0.0426
+        ],
+        [
+          154.77,
+          0.0003
+        ],
+        [
+          180.05,
+          0.00182
+        ],
+        [
+          181.8,
+          0.00193
+        ],
+        [
+          219.13,
+          0.0027700000000000003
+        ],
+        [
+          234.59,
+          0.000513
+        ],
+        [
+          251.61,
+          0.00216
+        ],
+        [
+          280.45,
+          0.0123
+        ],
+        [
+          288.82,
+          0.0014099999999999998
+        ],
+        [
+          298.83,
+          0.0018599999999999999
+        ],
+        [
+          321.59,
+          0.0128
+        ],
+        [
+          357.72,
+          9.88e-05
+        ],
+        [
+          361.85,
+          0.00295
+        ],
+        [
+          377.29,
+          0.0007109999999999999
+        ],
+        [
+          420.32,
+          0.00165
+        ],
+        [
+          440.98,
+          0.000916
+        ],
+        [
+          460.5,
+          0.0395
+        ],
+        [
+          484.31,
+          0.0016
+        ],
+        [
+          515.04,
+          0.000111
+        ],
+        [
+          525.2,
+          0.00015800000000000002
+        ],
+        [
+          532.06,
+          0.00083
+        ],
+        [
+          557.34,
+          0.013000000000000001
+        ],
+        [
+          573.2,
+          0.000193
+        ],
+        [
+          639.08,
+          7.5e-05
+        ],
+        [
+          695.09,
+          2.83e-05
+        ],
+        [
+          712.11,
+          0.000154
+        ],
+        [
+          784.24,
+          6.71e-06
+        ],
+        [
+          848.87,
+          4.34e-05
+        ],
+        [
+          874.27,
+          0.00017999999999999998
+        ],
+        [
+          891.26,
+          2.83e-05
+        ]
+      ]
+    },
+    "Pa-233": {
+      "product_isotope": "Pa-233",
+      "target_isotope": "Th-232",
+      "element": "Th",
+      "gamma_energy_keV": 300.1,
+      "gamma_intensity": 0.062,
+      "half_life_s": 2330208.0,
+      "k0_Au": 0.00437,
+      "k0_unc_percent": 0.3,
+      "Q0": 11.5,
+      "Q0_unc_percent": 3.6,
+      "E_res_eV": 54.4,
+      "sigma_0_barn": 7.26,
+      "I0_barn": 83.49,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 232.04,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:3; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          94.67,
+          0.102
+        ],
+        [
+          98.44,
+          0.16
+        ],
+        [
+          103.92,
+          0.0069099999999999995
+        ],
+        [
+          111.0,
+          0.06
+        ],
+        [
+          114.9,
+          0.02
+        ],
+        [
+          248.25,
+          0.00054
+        ],
+        [
+          258.46,
+          5.37e-05
+        ],
+        [
+          271.6,
+          0.0028299999999999996
+        ],
+        [
+          298.87,
+          0.000252
+        ],
+        [
+          312.01,
+          0.36
+        ],
+        [
+          340.59,
+          0.0416
+        ],
+        [
+          375.52,
+          0.00575
+        ],
+        [
+          398.66,
+          0.0118
+        ],
+        [
+          415.93,
+          0.015
+        ]
+      ]
+    },
+    "Pd-109": {
+      "product_isotope": "Pd-109",
+      "target_isotope": "Pd-108",
+      "element": "Pd",
+      "gamma_energy_keV": 647.3,
+      "gamma_intensity": 0.000243,
+      "half_life_s": 48456.0,
+      "k0_Au": 1.13e-05,
+      "k0_unc_percent": 0.5,
+      "Q0": 26.6,
+      "Q0_unc_percent": 1.7,
+      "E_res_eV": 39.7,
+      "sigma_0_barn": 8.66,
+      "I0_barn": 230.35600000000002,
+      "isotopic_abundance": 0.265,
+      "atomic_mass_g_mol": 106.42,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          103.84,
+          9.26e-06
+        ],
+        [
+          134.17,
+          1.32e-05
+        ],
+        [
+          311.37,
+          0.00032
+        ],
+        [
+          390.52,
+          9.26e-06
+        ],
+        [
+          412.97,
+          6.58e-05
+        ],
+        [
+          415.21,
+          0.000107
+        ],
+        [
+          423.91,
+          9.51e-06
+        ],
+        [
+          447.53,
+          8.3e-06
+        ],
+        [
+          454.24,
+          5.37e-06
+        ],
+        [
+          551.37,
+          6.089999999999999e-06
+        ],
+        [
+          558.08,
+          2.4299999999999998e-05
+        ],
+        [
+          602.52,
+          7.979999999999999e-05
+        ],
+        [
+          636.31,
+          9.979999999999999e-05
+        ],
+        [
+          701.89,
+          3.1e-05
+        ],
+        [
+          706.98,
+          1.59e-05
+        ],
+        [
+          724.34,
+          1.8699999999999999e-06
+        ],
+        [
+          736.69,
+          1.67e-05
+        ],
+        [
+          781.42,
+          0.000112
+        ]
+      ]
+    },
+    "Pd-109m": {
+      "product_isotope": "Pd-109m",
+      "target_isotope": "Pd-108",
+      "element": "Pd",
+      "gamma_energy_keV": 188.9,
+      "gamma_intensity": 0.551,
+      "half_life_s": 281.40000000000003,
+      "k0_Au": 0.000494,
+      "k0_unc_percent": 0.3,
+      "Q0": 25.0,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 39.7,
+      "sigma_0_barn": 0.2,
+      "I0_barn": 5.0,
+      "isotopic_abundance": 0.265,
+      "atomic_mass_g_mol": 106.42,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Pd-111m": {
+      "product_isotope": "Pd-111m",
+      "target_isotope": "Pd-110",
+      "element": "Pd",
+      "gamma_energy_keV": 172.2,
+      "gamma_intensity": 0.336,
+      "half_life_s": 19800.0,
+      "k0_Au": 1.07e-05,
+      "k0_unc_percent": 1.4,
+      "Q0": 11.9,
+      "Q0_unc_percent": 6.7,
+      "E_res_eV": 950.0,
+      "sigma_0_barn": 0.0138,
+      "I0_barn": 0.16422,
+      "isotopic_abundance": 0.117,
+      "atomic_mass_g_mol": 106.42,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          289.62,
+          0.0104
+        ],
+        [
+          357.82,
+          0.0042
+        ],
+        [
+          376.61,
+          0.00877
+        ],
+        [
+          391.18,
+          0.0537
+        ],
+        [
+          454.43,
+          0.011200000000000002
+        ],
+        [
+          525.5,
+          0.013000000000000001
+        ],
+        [
+          574.98,
+          0.0318
+        ],
+        [
+          632.5,
+          0.0356
+        ],
+        [
+          667.84,
+          0.00978
+        ],
+        [
+          694.13,
+          0.02
+        ],
+        [
+          762.07,
+          0.0126
+        ],
+        [
+          797.41,
+          0.0102
+        ],
+        [
+          1115.92,
+          0.011000000000000001
+        ],
+        [
+          1282.37,
+          0.0104
+        ],
+        [
+          1651.3,
+          0.007189999999999999
+        ],
+        [
+          1690.9,
+          0.0128
+        ]
+      ]
+    },
+    "Pm-149": {
+      "product_isotope": "Pm-149",
+      "target_isotope": "Nd-148",
+      "element": "Nd",
+      "gamma_energy_keV": 286.0,
+      "gamma_intensity": 0.0285,
+      "half_life_s": 191088.0,
+      "k0_Au": 6.1e-05,
+      "k0_unc_percent": 1.1,
+      "Q0": 5.08,
+      "Q0_unc_percent": 2.5,
+      "E_res_eV": 236.0,
+      "sigma_0_barn": 2.31,
+      "I0_barn": 11.7348,
+      "isotopic_abundance": 0.0576,
+      "atomic_mass_g_mol": 144.24,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:2; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          591.08,
+          0.000625
+        ],
+        [
+          808.07,
+          0.000137
+        ],
+        [
+          830.63,
+          0.000275
+        ],
+        [
+          833.52,
+          0.000275
+        ],
+        [
+          859.42,
+          0.000936
+        ]
+      ]
+    },
+    "Pm-151": {
+      "product_isotope": "Pm-151",
+      "target_isotope": "Nd-150",
+      "element": "Nd",
+      "gamma_energy_keV": 340.1,
+      "gamma_intensity": 0.22399999999999998,
+      "half_life_s": 102240.0,
+      "k0_Au": 0.000173,
+      "k0_unc_percent": 0.0,
+      "Q0": 12.3,
+      "Q0_unc_percent": 0.8,
+      "E_res_eV": 173.0,
+      "sigma_0_barn": 0.91,
+      "I0_barn": 11.193000000000001,
+      "isotopic_abundance": 0.0564,
+      "atomic_mass_g_mol": 144.24,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:2; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          99.99,
+          0.0252
+        ],
+        [
+          100.76,
+          0.000118
+        ],
+        [
+          101.9,
+          0.0129
+        ],
+        [
+          104.81,
+          0.0352
+        ],
+        [
+          139.28,
+          0.004699999999999999
+        ],
+        [
+          143.15,
+          0.00212
+        ],
+        [
+          147.52,
+          0.00159
+        ],
+        [
+          156.19,
+          0.00147
+        ],
+        [
+          162.9,
+          0.0084
+        ],
+        [
+          163.56,
+          0.015
+        ],
+        [
+          167.72,
+          0.0783
+        ],
+        [
+          177.15,
+          0.0358
+        ],
+        [
+          186.55,
+          0.00165
+        ],
+        [
+          201.94,
+          0.0085
+        ],
+        [
+          208.97,
+          0.0163
+        ],
+        [
+          227.14,
+          0.00308
+        ],
+        [
+          232.4,
+          0.0103
+        ],
+        [
+          236.74,
+          0.00192
+        ],
+        [
+          237.06,
+          0.00515
+        ],
+        [
+          240.06,
+          0.036000000000000004
+        ],
+        [
+          254.22,
+          0.00161
+        ],
+        [
+          258.09,
+          0.005410000000000001
+        ],
+        [
+          270.45,
+          0.00065
+        ],
+        [
+          275.18,
+          0.0661
+        ],
+        [
+          280.09,
+          0.0023699999999999997
+        ],
+        [
+          290.71,
+          0.00795
+        ],
+        [
+          302.05,
+          0.000134
+        ],
+        [
+          306.75,
+          0.00243
+        ],
+        [
+          323.91,
+          0.0121
+        ],
+        [
+          329.7,
+          0.00233
+        ],
+        [
+          344.87,
+          0.021
+        ],
+        [
+          379.81,
+          0.00941
+        ],
+        [
+          406.93,
+          0.00187
+        ],
+        [
+          410.73,
+          0.000626
+        ],
+        [
+          440.81,
+          0.015
+        ],
+        [
+          445.63,
+          0.04
+        ],
+        [
+          451.29,
+          0.0027900000000000004
+        ],
+        [
+          455.97,
+          0.00037400000000000004
+        ],
+        [
+          516.16,
+          0.0018
+        ],
+        [
+          564.89,
+          0.0034899999999999996
+        ],
+        [
+          574.95,
+          0.00117
+        ],
+        [
+          636.07,
+          0.0137
+        ],
+        [
+          654.1,
+          0.0023499999999999997
+        ],
+        [
+          669.05,
+          0.0028499999999999997
+        ],
+        [
+          671.19,
+          0.00874
+        ],
+        [
+          704.17,
+          0.00322
+        ],
+        [
+          717.67,
+          0.039900000000000005
+        ],
+        [
+          736.06,
+          0.00461
+        ],
+        [
+          740.88,
+          0.00020400000000000003
+        ],
+        [
+          752.79,
+          0.012199999999999999
+        ],
+        [
+          772.7,
+          0.00828
+        ],
+        [
+          785.02,
+          0.00202
+        ],
+        [
+          795.97,
+          0.00054
+        ],
+        [
+          807.82,
+          0.00482
+        ],
+        [
+          817.63,
+          0.00167
+        ],
+        [
+          817.66,
+          0.000896
+        ],
+        [
+          848.59,
+          0.00268
+        ],
+        [
+          877.51,
+          0.0009170000000000001
+        ],
+        [
+          883.71,
+          0.000479
+        ],
+        [
+          948.58,
+          0.0032
+        ],
+        [
+          953.4,
+          0.000795
+        ]
+      ]
+    },
+    "Pr-142": {
+      "product_isotope": "Pr-142",
+      "target_isotope": "Pr-141",
+      "element": "Pr",
+      "gamma_energy_keV": 1575.6,
+      "gamma_intensity": 0.037000000000000005,
+      "half_life_s": 68832.0,
+      "k0_Au": 0.00612,
+      "k0_unc_percent": 0.6,
+      "Q0": 1.51,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 296.0,
+      "sigma_0_barn": 11.2,
+      "I0_barn": 16.912,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 140.91,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Rb-86": {
+      "product_isotope": "Rb-86",
+      "target_isotope": "Rb-85",
+      "element": "Rb",
+      "gamma_energy_keV": 1077.0,
+      "gamma_intensity": 0.0877,
+      "half_life_s": 1609632.0,
+      "k0_Au": 0.000765,
+      "k0_unc_percent": 1.0,
+      "Q0": 14.8,
+      "Q0_unc_percent": 2.5,
+      "E_res_eV": 839.0,
+      "sigma_0_barn": 0.444,
+      "I0_barn": 6.5712,
+      "isotopic_abundance": 0.722,
+      "atomic_mass_g_mol": 85.47,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Rb-88": {
+      "product_isotope": "Rb-88",
+      "target_isotope": "Rb-87",
+      "element": "Rb",
+      "gamma_energy_keV": 898.0,
+      "gamma_intensity": 0.141,
+      "half_life_s": 1066.8000000000002,
+      "k0_Au": 0.000101,
+      "k0_unc_percent": 1.5,
+      "Q0": 23.3,
+      "Q0_unc_percent": 3.0,
+      "E_res_eV": 364.0,
+      "sigma_0_barn": 0.108,
+      "I0_barn": 2.5164,
+      "isotopic_abundance": 0.278,
+      "atomic_mass_g_mol": 85.47,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          1382.44,
+          0.00741
+        ],
+        [
+          1836.08,
+          0.214
+        ],
+        [
+          2677.92,
+          0.0195
+        ]
+      ]
+    },
+    "Re-186": {
+      "product_isotope": "Re-186",
+      "target_isotope": "Re-185",
+      "element": "Re",
+      "gamma_energy_keV": 137.2,
+      "gamma_intensity": 0.0848,
+      "half_life_s": 321235.2,
+      "k0_Au": 0.0433,
+      "k0_unc_percent": 0.7,
+      "Q0": 15.4,
+      "Q0_unc_percent": 2.5,
+      "E_res_eV": 3.4,
+      "sigma_0_barn": 106.0,
+      "I0_barn": 1632.4,
+      "isotopic_abundance": 0.374,
+      "atomic_mass_g_mol": 186.21,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          122.43,
+          0.006540000000000001
+        ],
+        [
+          630.36,
+          0.000235
+        ],
+        [
+          767.5,
+          0.000262
+        ]
+      ]
+    },
+    "Re-188": {
+      "product_isotope": "Re-188",
+      "target_isotope": "Re-187",
+      "element": "Re",
+      "gamma_energy_keV": 155.0,
+      "gamma_intensity": 0.149,
+      "half_life_s": 61236.0,
+      "k0_Au": 0.0777,
+      "k0_unc_percent": 0.6,
+      "Q0": 4.34,
+      "Q0_unc_percent": 6.4,
+      "E_res_eV": 41.1,
+      "sigma_0_barn": 73.2,
+      "I0_barn": 317.688,
+      "isotopic_abundance": 0.626,
+      "atomic_mass_g_mol": 186.21,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:9; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          322.95,
+          0.000157
+        ],
+        [
+          453.34,
+          0.0007040000000000001
+        ],
+        [
+          478.02,
+          0.0104
+        ],
+        [
+          633.08,
+          0.0125
+        ],
+        [
+          672.53,
+          0.00111
+        ],
+        [
+          824.39,
+          0.00012
+        ],
+        [
+          829.51,
+          0.004079999999999999
+        ],
+        [
+          931.36,
+          0.005620000000000001
+        ],
+        [
+          1132.39,
+          0.0008799999999999999
+        ],
+        [
+          1151.06,
+          0.000171
+        ],
+        [
+          1308.04,
+          0.000673
+        ],
+        [
+          1323.11,
+          9.24e-05
+        ],
+        [
+          1610.41,
+          0.000978
+        ],
+        [
+          1786.06,
+          0.000206
+        ],
+        [
+          1802.22,
+          0.00037400000000000004
+        ]
+      ]
+    },
+    "Re-188m": {
+      "product_isotope": "Re-188m",
+      "target_isotope": "Re-187",
+      "element": "Re",
+      "gamma_energy_keV": 106.0,
+      "gamma_intensity": 0.10815,
+      "half_life_s": 1116.0,
+      "k0_Au": 0.0015,
+      "k0_unc_percent": 1.6,
+      "Q0": 4.57,
+      "Q0_unc_percent": 6.4,
+      "E_res_eV": 41.1,
+      "sigma_0_barn": 2.05,
+      "I0_barn": 9.3685,
+      "isotopic_abundance": 0.626,
+      "atomic_mass_g_mol": 186.21,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:endfb8_decay",
+      "additional_gammas": []
+    },
+    "Rh-104": {
+      "product_isotope": "Rh-104",
+      "target_isotope": "Rh-103",
+      "element": "Rh",
+      "gamma_energy_keV": 555.8,
+      "gamma_intensity": 0.0199,
+      "half_life_s": 42.3,
+      "k0_Au": 0.0692,
+      "k0_unc_percent": 1.5,
+      "Q0": 6.75,
+      "Q0_unc_percent": 4.0,
+      "E_res_eV": 1.45,
+      "sigma_0_barn": 134.0,
+      "I0_barn": 904.5,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 102.91,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:19; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          358.0,
+          0.00016
+        ],
+        [
+          451.16,
+          6.159999999999999e-05
+        ],
+        [
+          452.13,
+          5.7600000000000004e-05
+        ],
+        [
+          459.31,
+          3.5799999999999996e-05
+        ],
+        [
+          460.28,
+          1.59e-05
+        ],
+        [
+          479.34,
+          2.8e-05
+        ],
+        [
+          487.49,
+          3.16e-05
+        ],
+        [
+          497.45,
+          2.5600000000000002e-05
+        ],
+        [
+          630.24,
+          9.9e-06
+        ],
+        [
+          767.78,
+          0.000112
+        ],
+        [
+          777.74,
+          6.19e-05
+        ],
+        [
+          785.89,
+          3.5799999999999996e-05
+        ],
+        [
+          1237.05,
+          0.0006569999999999999
+        ],
+        [
+          1238.02,
+          9.690000000000001e-05
+        ],
+        [
+          1265.23,
+          0.00012
+        ],
+        [
+          1341.72,
+          2.77e-05
+        ],
+        [
+          1793.85,
+          1.02e-05
+        ]
+      ]
+    },
+    "Rh-105": {
+      "product_isotope": "Rh-105",
+      "target_isotope": "Ru-104",
+      "element": "Ru",
+      "gamma_energy_keV": 306.1,
+      "gamma_intensity": 0.0512,
+      "half_life_s": 127296.0,
+      "k0_Au": 0.000101,
+      "k0_unc_percent": 1.5,
+      "Q0": 12.8,
+      "Q0_unc_percent": 2.7,
+      "E_res_eV": 495.0,
+      "sigma_0_barn": 0.497,
+      "I0_barn": 6.3616,
+      "isotopic_abundance": 0.187,
+      "atomic_mass_g_mol": 101.07,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:8; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          280.52,
+          0.00166
+        ],
+        [
+          319.22,
+          0.18
+        ]
+      ]
+    },
+    "Rh-105m": {
+      "product_isotope": "Rh-105m",
+      "target_isotope": "Ru-104",
+      "element": "Ru",
+      "gamma_energy_keV": 129.6,
+      "gamma_intensity": 0.2,
+      "half_life_s": 45.0,
+      "k0_Au": 9.2e-05,
+      "k0_unc_percent": 1.3,
+      "Q0": 12.8,
+      "Q0_unc_percent": 2.7,
+      "E_res_eV": 495.0,
+      "sigma_0_barn": 0.497,
+      "I0_barn": 6.3616,
+      "isotopic_abundance": 0.187,
+      "atomic_mass_g_mol": 101.07,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:2; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ru-103": {
+      "product_isotope": "Ru-103",
+      "target_isotope": "Ru-102",
+      "element": "Ru",
+      "gamma_energy_keV": 497.1,
+      "gamma_intensity": 0.8859999999999999,
+      "half_life_s": 3399840.0,
+      "k0_Au": 0.00689,
+      "k0_unc_percent": 0.4,
+      "Q0": 3.63,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 181.0,
+      "sigma_0_barn": 1.19,
+      "I0_barn": 4.3197,
+      "isotopic_abundance": 0.316,
+      "atomic_mass_g_mol": 101.07,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          294.95,
+          0.0025
+        ],
+        [
+          443.77,
+          0.0032500000000000003
+        ],
+        [
+          557.02,
+          0.00832
+        ],
+        [
+          610.3,
+          0.056299999999999996
+        ]
+      ]
+    },
+    "Ru-105": {
+      "product_isotope": "Ru-105",
+      "target_isotope": "Ru-104",
+      "element": "Ru",
+      "gamma_energy_keV": 469.4,
+      "gamma_intensity": 0.172,
+      "half_life_s": 15983.999999999998,
+      "k0_Au": 0.000326,
+      "k0_unc_percent": 1.4,
+      "Q0": 12.8,
+      "Q0_unc_percent": 2.7,
+      "E_res_eV": 495.0,
+      "sigma_0_barn": 0.497,
+      "I0_barn": 6.3616,
+      "isotopic_abundance": 0.187,
+      "atomic_mass_g_mol": 101.07,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          149.17,
+          0.0174
+        ],
+        [
+          262.85,
+          0.0649
+        ],
+        [
+          316.5,
+          0.11
+        ],
+        [
+          326.11,
+          0.0105
+        ],
+        [
+          330.8,
+          0.00658
+        ],
+        [
+          350.08,
+          0.0028499999999999997
+        ],
+        [
+          393.4,
+          0.037200000000000004
+        ],
+        [
+          413.48,
+          0.0222
+        ],
+        [
+          489.49,
+          0.005410000000000001
+        ],
+        [
+          499.25,
+          0.0202
+        ],
+        [
+          575.1,
+          0.008409999999999999
+        ],
+        [
+          652.76,
+          0.0030399999999999997
+        ],
+        [
+          656.25,
+          0.0202
+        ],
+        [
+          676.33,
+          0.155
+        ],
+        [
+          724.27,
+          0.466
+        ],
+        [
+          875.86,
+          0.024700000000000003
+        ],
+        [
+          877.78,
+          0.00466
+        ],
+        [
+          907.68,
+          0.00523
+        ],
+        [
+          969.46,
+          0.0208
+        ],
+        [
+          1017.49,
+          0.00318
+        ]
+      ]
+    },
+    "Ru-97": {
+      "product_isotope": "Ru-97",
+      "target_isotope": "Ru-96",
+      "element": "Ru",
+      "gamma_energy_keV": 215.7,
+      "gamma_intensity": 0.8590000000000001,
+      "half_life_s": 250560.0,
+      "k0_Au": 0.000225,
+      "k0_unc_percent": 0.5,
+      "Q0": 26.5,
+      "Q0_unc_percent": 3.5,
+      "E_res_eV": 776.0,
+      "sigma_0_barn": 0.229,
+      "I0_barn": 6.0685,
+      "isotopic_abundance": 0.0552,
+      "atomic_mass_g_mol": 101.07,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          324.49,
+          0.102
+        ],
+        [
+          569.31,
+          0.0089
+        ],
+        [
+          785.01,
+          0.000819
+        ]
+      ]
+    },
+    "S-37": {
+      "product_isotope": "S-37",
+      "target_isotope": "S-36",
+      "element": "S",
+      "gamma_energy_keV": 3103.4,
+      "gamma_intensity": 0.94,
+      "half_life_s": 303.0,
+      "k0_Au": 1.96e-06,
+      "k0_unc_percent": 1.8,
+      "Q0": 1.12,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 13.67,
+      "sigma_0_barn": 0.16,
+      "I0_barn": 0.17920000000000003,
+      "isotopic_abundance": 0.0002,
+      "atomic_mass_g_mol": 32.07,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Sb-122": {
+      "product_isotope": "Sb-122",
+      "target_isotope": "Sb-121",
+      "element": "Sb",
+      "gamma_energy_keV": 564.2,
+      "gamma_intensity": 0.7,
+      "half_life_s": 235353.6,
+      "k0_Au": 0.0438,
+      "k0_unc_percent": 1.5,
+      "Q0": 33.0,
+      "Q0_unc_percent": 3.5,
+      "E_res_eV": 13.1,
+      "sigma_0_barn": 6.27,
+      "I0_barn": 206.91,
+      "isotopic_abundance": 0.573,
+      "atomic_mass_g_mol": 121.75,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          692.89,
+          0.0381
+        ],
+        [
+          1140.59,
+          0.0075
+        ],
+        [
+          1257.26,
+          0.00805
+        ]
+      ]
+    },
+    "Sb-124": {
+      "product_isotope": "Sb-124",
+      "target_isotope": "Sb-123",
+      "element": "Sb",
+      "gamma_energy_keV": 1691.0,
+      "gamma_intensity": 0.47,
+      "half_life_s": 5201280.0,
+      "k0_Au": 0.0141,
+      "k0_unc_percent": 1.1,
+      "Q0": 28.8,
+      "Q0_unc_percent": 3.7,
+      "E_res_eV": 28.2,
+      "sigma_0_barn": 4.05,
+      "I0_barn": 116.64,
+      "isotopic_abundance": 0.427,
+      "atomic_mass_g_mol": 121.75,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:15; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          335.79,
+          0.000784
+        ],
+        [
+          444.0,
+          0.00192
+        ],
+        [
+          602.73,
+          0.977
+        ],
+        [
+          632.4,
+          0.000977
+        ],
+        [
+          645.86,
+          0.0737
+        ],
+        [
+          709.32,
+          0.013500000000000002
+        ],
+        [
+          713.78,
+          0.0227
+        ],
+        [
+          722.78,
+          0.109
+        ],
+        [
+          735.7,
+          0.00127
+        ],
+        [
+          790.7,
+          0.00738
+        ],
+        [
+          968.19,
+          0.0187
+        ],
+        [
+          1045.11,
+          0.0187
+        ],
+        [
+          1325.51,
+          0.0159
+        ],
+        [
+          1355.18,
+          0.0105
+        ],
+        [
+          1368.15,
+          0.026600000000000002
+        ],
+        [
+          1376.13,
+          0.00521
+        ],
+        [
+          1385.29,
+          0.000517
+        ],
+        [
+          1436.56,
+          0.0125
+        ],
+        [
+          1445.07,
+          0.0032500000000000003
+        ],
+        [
+          1488.88,
+          0.006939999999999999
+        ],
+        [
+          1526.4,
+          0.004
+        ],
+        [
+          1579.79,
+          0.00411
+        ],
+        [
+          2039.29,
+          0.000684
+        ],
+        [
+          2090.93,
+          0.054900000000000004
+        ],
+        [
+          2108.07,
+          0.000391
+        ],
+        [
+          2172.26,
+          9.77e-06
+        ],
+        [
+          2182.52,
+          0.000391
+        ],
+        [
+          2293.7,
+          0.00031
+        ],
+        [
+          2693.66,
+          0.0015
+        ]
+      ]
+    },
+    "Sb-124m": {
+      "product_isotope": "Sb-124m",
+      "target_isotope": "Sb-123",
+      "element": "Sb",
+      "gamma_energy_keV": 645.8,
+      "gamma_intensity": 0.25,
+      "half_life_s": 1212.0,
+      "k0_Au": 0.000143,
+      "k0_unc_percent": 0.0,
+      "Q0": 19.9,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 28.2,
+      "sigma_0_barn": 0.035,
+      "I0_barn": 0.6965,
+      "isotopic_abundance": 0.427,
+      "atomic_mass_g_mol": 121.75,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:9; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          498.4,
+          0.245
+        ],
+        [
+          602.73,
+          0.25
+        ],
+        [
+          1101.0,
+          0.005
+        ]
+      ]
+    },
+    "Sc-46": {
+      "product_isotope": "Sc-46",
+      "target_isotope": "Sc-45",
+      "element": "Sc",
+      "gamma_energy_keV": 889.3,
+      "gamma_intensity": 1.0,
+      "half_life_s": 7242912.0,
+      "k0_Au": 1.22,
+      "k0_unc_percent": 0.4,
+      "Q0": 0.43,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 5130.0,
+      "sigma_0_barn": 16.7,
+      "I0_barn": 7.180999999999999,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 44.96,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          1120.51,
+          1.0
+        ]
+      ]
+    },
+    "Sc-47": {
+      "product_isotope": "Sc-47",
+      "target_isotope": "Ca-46",
+      "element": "Ca",
+      "gamma_energy_keV": 159.4,
+      "gamma_intensity": 0.679,
+      "half_life_s": 289353.60000000003,
+      "k0_Au": 8.57e-07,
+      "k0_unc_percent": 1.6,
+      "Q0": 1.3,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 2925.0,
+      "sigma_0_barn": 0.62,
+      "I0_barn": 0.806,
+      "isotopic_abundance": 4e-05,
+      "atomic_mass_g_mol": 40.08,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:2; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Se-75": {
+      "product_isotope": "Se-75",
+      "target_isotope": "Se-74",
+      "element": "Se",
+      "gamma_energy_keV": 264.7,
+      "gamma_intensity": 0.591,
+      "half_life_s": 10349078.4,
+      "k0_Au": 0.00753,
+      "k0_unc_percent": 1.2,
+      "Q0": 11.0,
+      "Q0_unc_percent": 2.727272727,
+      "E_res_eV": 29.05,
+      "sigma_0_barn": 50.4,
+      "I0_barn": 554.4,
+      "isotopic_abundance": 0.009,
+      "atomic_mass_g_mol": 78.96,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          121.12,
+          0.172
+        ],
+        [
+          136.0,
+          0.59
+        ],
+        [
+          198.6,
+          0.015300000000000001
+        ],
+        [
+          279.54,
+          0.252
+        ],
+        [
+          303.92,
+          0.0108
+        ],
+        [
+          400.66,
+          0.115
+        ]
+      ]
+    },
+    "Se-77m": {
+      "product_isotope": "Se-77m",
+      "target_isotope": "Se-76",
+      "element": "Se",
+      "gamma_energy_keV": 162.0,
+      "gamma_intensity": 0.524,
+      "half_life_s": 17.358,
+      "k0_Au": 0.0249,
+      "k0_unc_percent": 0.5,
+      "Q0": 0.77,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 577.0,
+      "sigma_0_barn": 51.2,
+      "I0_barn": 39.42400000000001,
+      "isotopic_abundance": 0.09,
+      "atomic_mass_g_mol": 78.96,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Si-31": {
+      "product_isotope": "Si-31",
+      "target_isotope": "Si-30",
+      "element": "Si",
+      "gamma_energy_keV": 1266.2,
+      "gamma_intensity": 0.0007000000000000001,
+      "half_life_s": 9439.199999999999,
+      "k0_Au": 1.45e-07,
+      "k0_unc_percent": 0.7,
+      "Q0": 1.11,
+      "Q0_unc_percent": 6.0,
+      "E_res_eV": 2280.0,
+      "sigma_0_barn": 0.093,
+      "I0_barn": 0.10323,
+      "isotopic_abundance": 0.031,
+      "atomic_mass_g_mol": 29.09,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Sm-153": {
+      "product_isotope": "Sm-153",
+      "target_isotope": "Sm-152",
+      "element": "Sm",
+      "gamma_energy_keV": 103.2,
+      "gamma_intensity": 0.28300000000000003,
+      "half_life_s": 167400.0,
+      "k0_Au": 0.231,
+      "k0_unc_percent": 0.4,
+      "Q0": 14.4,
+      "Q0_unc_percent": 2.1,
+      "E_res_eV": 8.53,
+      "sigma_0_barn": 220.0,
+      "I0_barn": 3168.0,
+      "isotopic_abundance": 0.267,
+      "atomic_mass_g_mol": 150.36,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          96.88,
+          7.000000000000001e-05
+        ],
+        [
+          97.43,
+          0.00729
+        ],
+        [
+          151.63,
+          0.000114
+        ],
+        [
+          172.85,
+          0.000658
+        ],
+        [
+          424.43,
+          2.29e-05
+        ],
+        [
+          463.64,
+          0.000156
+        ],
+        [
+          531.44,
+          0.00064
+        ],
+        [
+          533.31,
+          0.00032
+        ],
+        [
+          539.06,
+          0.0002
+        ],
+        [
+          609.16,
+          0.000127
+        ]
+      ]
+    },
+    "Sm-155": {
+      "product_isotope": "Sm-155",
+      "target_isotope": "Sm-154",
+      "element": "Sm",
+      "gamma_energy_keV": 245.7,
+      "gamma_intensity": 0.0375,
+      "half_life_s": 1338.0,
+      "k0_Au": 0.000905,
+      "k0_unc_percent": 1.4,
+      "Q0": 4.3,
+      "Q0_unc_percent": 7.0,
+      "E_res_eV": 142.0,
+      "sigma_0_barn": 7.74,
+      "I0_barn": 33.282,
+      "isotopic_abundance": 0.227,
+      "atomic_mass_g_mol": 150.36,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          104.35,
+          0.75
+        ],
+        [
+          141.44,
+          0.0202
+        ],
+        [
+          522.52,
+          0.0015
+        ]
+      ]
+    },
+    "Sn-113": {
+      "product_isotope": "Sn-113",
+      "target_isotope": "Sn-112",
+      "element": "Sn",
+      "gamma_energy_keV": 255.1,
+      "gamma_intensity": 0.0182,
+      "half_life_s": 9944640.0,
+      "k0_Au": 1.95e-06,
+      "k0_unc_percent": 1.2,
+      "Q0": 48.4,
+      "Q0_unc_percent": 1.2,
+      "E_res_eV": 107.0,
+      "sigma_0_barn": 0.31,
+      "I0_barn": 15.004,
+      "isotopic_abundance": 0.0097,
+      "atomic_mass_g_mol": 118.71,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Sn-117m": {
+      "product_isotope": "Sn-117m",
+      "target_isotope": "Sn-116",
+      "element": "Sn",
+      "gamma_energy_keV": 158.5,
+      "gamma_intensity": 0.863,
+      "half_life_s": 1175040.0,
+      "k0_Au": 1.36e-05,
+      "k0_unc_percent": 1.0,
+      "Q0": 56.3,
+      "Q0_unc_percent": 1.9,
+      "E_res_eV": 128.0,
+      "sigma_0_barn": 0.00604,
+      "I0_barn": 0.340052,
+      "isotopic_abundance": 0.145,
+      "atomic_mass_g_mol": 118.71,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          156.02,
+          0.021
+        ]
+      ]
+    },
+    "Sn-123m": {
+      "product_isotope": "Sn-123m",
+      "target_isotope": "Sn-122",
+      "element": "Sn",
+      "gamma_energy_keV": 160.3,
+      "gamma_intensity": 0.856,
+      "half_life_s": 2403.6000000000004,
+      "k0_Au": 0.000102,
+      "k0_unc_percent": 0.5,
+      "Q0": 5.4,
+      "Q0_unc_percent": 2.5,
+      "E_res_eV": 424.0,
+      "sigma_0_barn": 0.147,
+      "I0_barn": 0.7938000000000001,
+      "isotopic_abundance": 0.0463,
+      "atomic_mass_g_mol": 118.71,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Sn-125": {
+      "product_isotope": "Sn-125",
+      "target_isotope": "Sn-124",
+      "element": "Sn",
+      "gamma_energy_keV": 1067.1,
+      "gamma_intensity": 0.09029999999999999,
+      "half_life_s": 832896.0,
+      "k0_Au": 4.64e-07,
+      "k0_unc_percent": 0.0,
+      "Q0": 17.2,
+      "Q0_unc_percent": 12.0,
+      "E_res_eV": 74.2,
+      "sigma_0_barn": 0.00421,
+      "I0_barn": 0.072412,
+      "isotopic_abundance": 0.0579,
+      "atomic_mass_g_mol": 118.71,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          332.04,
+          0.0134
+        ],
+        [
+          469.77,
+          0.0137
+        ],
+        [
+          800.23,
+          0.00993
+        ],
+        [
+          822.37,
+          0.039900000000000005
+        ],
+        [
+          893.3,
+          0.0027
+        ],
+        [
+          915.44,
+          0.0385
+        ],
+        [
+          1017.34,
+          0.0032700000000000003
+        ],
+        [
+          1089.17,
+          0.042800000000000005
+        ],
+        [
+          1349.38,
+          0.000605
+        ],
+        [
+          1419.63,
+          0.00454
+        ],
+        [
+          1889.4,
+          0.000687
+        ],
+        [
+          1982.47,
+          2.98e-05
+        ],
+        [
+          2001.75,
+          0.0179
+        ],
+        [
+          2275.29,
+          0.0016
+        ]
+      ]
+    },
+    "Sn-125m": {
+      "product_isotope": "Sn-125m",
+      "target_isotope": "Sn-124",
+      "element": "Sn",
+      "gamma_energy_keV": 331.9,
+      "gamma_intensity": 0.9690000000000001,
+      "half_life_s": 571.1999999999999,
+      "k0_Au": 0.000118,
+      "k0_unc_percent": 2.0,
+      "Q0": 60.1,
+      "Q0_unc_percent": 2.9,
+      "E_res_eV": 74.2,
+      "sigma_0_barn": 0.119,
+      "I0_barn": 7.1518999999999995,
+      "isotopic_abundance": 0.0579,
+      "atomic_mass_g_mol": 118.71,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          386.34,
+          0.000951
+        ],
+        [
+          589.78,
+          0.0020399999999999997
+        ],
+        [
+          840.93,
+          0.000679
+        ],
+        [
+          1017.34,
+          0.00098
+        ],
+        [
+          1403.68,
+          0.00699
+        ],
+        [
+          1483.71,
+          0.00184
+        ]
+      ]
+    },
+    "Sr-85": {
+      "product_isotope": "Sr-85",
+      "target_isotope": "Sr-84",
+      "element": "Sr",
+      "gamma_energy_keV": 514.0,
+      "gamma_intensity": 0.992,
+      "half_life_s": 5602176.0,
+      "k0_Au": 9.15e-05,
+      "k0_unc_percent": 0.9,
+      "Q0": 13.2,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 469.0,
+      "sigma_0_barn": 0.158,
+      "I0_barn": 2.0856,
+      "isotopic_abundance": 0.0056,
+      "atomic_mass_g_mol": 87.62,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Sr-85m": {
+      "product_isotope": "Sr-85m",
+      "target_isotope": "Sr-84",
+      "element": "Sr",
+      "gamma_energy_keV": 231.9,
+      "gamma_intensity": 0.841,
+      "half_life_s": 4057.7999999999997,
+      "k0_Au": 6.92e-05,
+      "k0_unc_percent": 0.0,
+      "Q0": 14.5,
+      "Q0_unc_percent": 2.3,
+      "E_res_eV": 469.0,
+      "sigma_0_barn": 0.61,
+      "I0_barn": 8.845,
+      "isotopic_abundance": 0.0056,
+      "atomic_mass_g_mol": 87.62,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          151.18,
+          0.12300000000000001
+        ]
+      ]
+    },
+    "Sr-87m": {
+      "product_isotope": "Sr-87m",
+      "target_isotope": "Sr-86",
+      "element": "Sr",
+      "gamma_energy_keV": 388.5,
+      "gamma_intensity": 0.821,
+      "half_life_s": 10090.800000000001,
+      "k0_Au": 0.00149,
+      "k0_unc_percent": 0.5,
+      "Q0": 4.11,
+      "Q0_unc_percent": 1.7,
+      "E_res_eV": 795.0,
+      "sigma_0_barn": 0.77,
+      "I0_barn": 3.1647000000000003,
+      "isotopic_abundance": 0.0986,
+      "atomic_mass_g_mol": 87.62,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ta-182": {
+      "product_isotope": "Ta-182",
+      "target_isotope": "Ta-181",
+      "element": "Ta",
+      "gamma_energy_keV": 222.1,
+      "gamma_intensity": 0.0759,
+      "half_life_s": 9884160.0,
+      "k0_Au": 0.0178,
+      "k0_unc_percent": 0.9,
+      "Q0": 33.3,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 10.4,
+      "sigma_0_barn": 20.4,
+      "I0_barn": 679.3199999999999,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 180.95,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          100.11,
+          0.139
+        ],
+        [
+          110.37,
+          0.000907
+        ],
+        [
+          113.67,
+          0.0191
+        ],
+        [
+          116.41,
+          0.00433
+        ],
+        [
+          152.42,
+          0.0717
+        ],
+        [
+          156.37,
+          0.0274
+        ],
+        [
+          179.39,
+          0.031400000000000004
+        ],
+        [
+          198.35,
+          0.0152
+        ],
+        [
+          229.31,
+          0.0362
+        ],
+        [
+          264.07,
+          0.0362
+        ],
+        [
+          928.0,
+          0.00607
+        ],
+        [
+          959.73,
+          0.00364
+        ],
+        [
+          1001.71,
+          0.02
+        ],
+        [
+          1044.41,
+          0.00227
+        ],
+        [
+          1113.43,
+          0.00437
+        ],
+        [
+          1121.3,
+          0.34700000000000003
+        ],
+        [
+          1157.31,
+          0.006750000000000001
+        ],
+        [
+          1180.81,
+          0.000842
+        ],
+        [
+          1189.04,
+          0.16399999999999998
+        ],
+        [
+          1221.41,
+          0.272
+        ],
+        [
+          1223.8,
+          0.0020399999999999997
+        ],
+        [
+          1231.02,
+          0.115
+        ],
+        [
+          1257.42,
+          0.0152
+        ],
+        [
+          1273.72,
+          0.0066300000000000005
+        ],
+        [
+          1289.15,
+          0.0139
+        ],
+        [
+          1342.74,
+          0.0026
+        ],
+        [
+          1373.83,
+          0.00231
+        ],
+        [
+          1387.39,
+          0.0007630000000000001
+        ],
+        [
+          1410.12,
+          0.000417
+        ],
+        [
+          1453.11,
+          0.00042500000000000003
+        ]
+      ]
+    },
+    "Tb-160": {
+      "product_isotope": "Tb-160",
+      "target_isotope": "Tb-159",
+      "element": "Tb",
+      "gamma_energy_keV": 879.4,
+      "gamma_intensity": 0.298,
+      "half_life_s": 6246720.0,
+      "k0_Au": 0.0942,
+      "k0_unc_percent": 0.9,
+      "Q0": 17.9,
+      "Q0_unc_percent": 3.8,
+      "E_res_eV": 18.1,
+      "sigma_0_barn": 24.0,
+      "I0_barn": 429.59999999999997,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 158.93,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          197.03,
+          0.051500000000000004
+        ],
+        [
+          215.64,
+          0.0395
+        ],
+        [
+          230.62,
+          0.000726
+        ],
+        [
+          298.58,
+          0.268
+        ],
+        [
+          309.56,
+          0.00856
+        ],
+        [
+          337.33,
+          0.0032400000000000003
+        ],
+        [
+          392.5,
+          0.013300000000000001
+        ],
+        [
+          432.78,
+          0.000166
+        ],
+        [
+          486.04,
+          0.000844
+        ],
+        [
+          682.33,
+          0.00567
+        ],
+        [
+          765.27,
+          0.02
+        ],
+        [
+          871.98,
+          0.00208
+        ],
+        [
+          962.3,
+          0.0983
+        ],
+        [
+          966.15,
+          0.25
+        ],
+        [
+          1002.87,
+          0.0102
+        ],
+        [
+          1069.01,
+          0.0009170000000000001
+        ],
+        [
+          1102.6,
+          0.00529
+        ],
+        [
+          1115.11,
+          0.015300000000000001
+        ],
+        [
+          1177.94,
+          0.152
+        ],
+        [
+          1199.9,
+          0.0231
+        ],
+        [
+          1251.31,
+          0.000982
+        ],
+        [
+          1271.86,
+          0.07490000000000001
+        ],
+        [
+          1299.63,
+          4.91e-05
+        ],
+        [
+          1312.14,
+          0.0291
+        ]
+      ]
+    },
+    "Tc-101": {
+      "product_isotope": "Tc-101",
+      "target_isotope": "Mo-100",
+      "element": "Mo",
+      "gamma_energy_keV": 306.8,
+      "gamma_intensity": 0.88,
+      "half_life_s": 852.0,
+      "k0_Au": 0.000373,
+      "k0_unc_percent": 1.3,
+      "Q0": 18.8,
+      "Q0_unc_percent": 4.0,
+      "E_res_eV": 672.0,
+      "sigma_0_barn": 0.2,
+      "I0_barn": 3.7600000000000002,
+      "isotopic_abundance": 0.0963,
+      "atomic_mass_g_mol": 95.94,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:2; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          127.22,
+          0.0285
+        ],
+        [
+          184.09,
+          0.0167
+        ],
+        [
+          233.74,
+          0.00272
+        ],
+        [
+          238.22,
+          0.00306
+        ],
+        [
+          295.14,
+          0.000533
+        ],
+        [
+          393.36,
+          0.000967
+        ],
+        [
+          531.45,
+          0.0102
+        ],
+        [
+          545.05,
+          0.0599
+        ],
+        [
+          627.1,
+          0.00387
+        ],
+        [
+          720.0,
+          0.00229
+        ],
+        [
+          928.66,
+          0.00127
+        ]
+      ]
+    },
+    "Tc-99m": {
+      "product_isotope": "Tc-99m",
+      "target_isotope": "Mo-98",
+      "element": "Mo",
+      "gamma_energy_keV": 140.5,
+      "gamma_intensity": 0.872,
+      "half_life_s": 21636.0,
+      "k0_Au": 0.000527,
+      "k0_unc_percent": 0.5,
+      "Q0": 53.1,
+      "Q0_unc_percent": 6.3,
+      "E_res_eV": 241.0,
+      "sigma_0_barn": 0.131,
+      "I0_barn": 6.9561,
+      "isotopic_abundance": 0.241,
+      "atomic_mass_g_mol": 95.94,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:5; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Ti-51": {
+      "product_isotope": "Ti-51",
+      "target_isotope": "Ti-50",
+      "element": "Ti",
+      "gamma_energy_keV": 320.1,
+      "gamma_intensity": 0.93,
+      "half_life_s": 345.59999999999997,
+      "k0_Au": 0.000374,
+      "k0_unc_percent": 1.0,
+      "Q0": 0.67,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 63200.0,
+      "sigma_0_barn": 0.171,
+      "I0_barn": 0.11457000000000002,
+      "isotopic_abundance": 0.054,
+      "atomic_mass_g_mol": 47.88,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          608.56,
+          0.011699999999999999
+        ],
+        [
+          928.64,
+          0.0687
+        ]
+      ]
+    },
+    "Tm-170": {
+      "product_isotope": "Tm-170",
+      "target_isotope": "Tm-169",
+      "element": "Tm",
+      "gamma_energy_keV": 84.3,
+      "gamma_intensity": 0.02510443,
+      "half_life_s": 11111040.0,
+      "k0_Au": 0.0326,
+      "k0_unc_percent": 1.7,
+      "Q0": 13.7,
+      "Q0_unc_percent": 1.6,
+      "E_res_eV": 4.8,
+      "sigma_0_barn": 107.0,
+      "I0_barn": 1465.8999999999999,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 168.93,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:endfb8_decay",
+      "additional_gammas": []
+    },
+    "U-239": {
+      "product_isotope": "U-239",
+      "target_isotope": "U-238",
+      "element": "U",
+      "gamma_energy_keV": 74.7,
+      "gamma_intensity": 0.492,
+      "half_life_s": 1407.0,
+      "k0_Au": 0.0133,
+      "k0_unc_percent": 1.2,
+      "Q0": 103.4,
+      "Q0_unc_percent": 1.3,
+      "E_res_eV": 16.9,
+      "sigma_0_barn": 3.1027813471447416,
+      "I0_barn": 320.8275912947663,
+      "isotopic_abundance": 0.992745,
+      "atomic_mass_g_mol": 238.03,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:endfb8_decay",
+      "additional_gammas": []
+    },
+    "V-52": {
+      "product_isotope": "V-52",
+      "target_isotope": "V-51",
+      "element": "V",
+      "gamma_energy_keV": 1434.1,
+      "gamma_intensity": 1.0,
+      "half_life_s": 225.0,
+      "k0_Au": 0.196,
+      "k0_unc_percent": 1.2,
+      "Q0": 0.55,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 7230.0,
+      "sigma_0_barn": 4.79,
+      "I0_barn": 2.6345,
+      "isotopic_abundance": 0.998,
+      "atomic_mass_g_mol": 50.94,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          398.12,
+          9.96e-05
+        ],
+        [
+          647.47,
+          0.000241
+        ],
+        [
+          935.53,
+          0.0006090000000000001
+        ],
+        [
+          1333.65,
+          0.005869999999999999
+        ],
+        [
+          1530.68,
+          0.00115
+        ]
+      ]
+    },
+    "W-187": {
+      "product_isotope": "W-187",
+      "target_isotope": "W-186",
+      "element": "W",
+      "gamma_energy_keV": 685.7,
+      "gamma_intensity": 0.264,
+      "half_life_s": 85392.0,
+      "k0_Au": 0.0371,
+      "k0_unc_percent": 0.5,
+      "Q0": 13.7,
+      "Q0_unc_percent": 1.8,
+      "E_res_eV": 20.5,
+      "sigma_0_barn": 38.7,
+      "I0_barn": 530.19,
+      "isotopic_abundance": 0.286,
+      "atomic_mass_g_mol": 183.85,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          106.59,
+          0.000245
+        ],
+        [
+          113.72,
+          0.000742
+        ],
+        [
+          134.23,
+          0.08560000000000001
+        ],
+        [
+          168.95,
+          2.5e-05
+        ],
+        [
+          206.21,
+          0.0013700000000000001
+        ],
+        [
+          239.15,
+          0.000834
+        ],
+        [
+          246.28,
+          0.00114
+        ],
+        [
+          454.89,
+          0.000283
+        ],
+        [
+          479.53,
+          0.21
+        ],
+        [
+          511.75,
+          0.00624
+        ],
+        [
+          551.51,
+          0.049100000000000005
+        ],
+        [
+          589.12,
+          0.00117
+        ],
+        [
+          611.74,
+          2e-05
+        ],
+        [
+          618.34,
+          0.060700000000000004
+        ],
+        [
+          625.47,
+          0.0105
+        ],
+        [
+          745.25,
+          0.0028699999999999997
+        ],
+        [
+          772.89,
+          0.0398
+        ],
+        [
+          816.54,
+          9.51e-05
+        ],
+        [
+          864.62,
+          0.0032500000000000003
+        ],
+        [
+          879.48,
+          0.0013700000000000001
+        ]
+      ]
+    },
+    "Y-90m": {
+      "product_isotope": "Y-90m",
+      "target_isotope": "Y-89",
+      "element": "Y",
+      "gamma_energy_keV": 202.5,
+      "gamma_intensity": 0.966,
+      "half_life_s": 11484.0,
+      "k0_Au": 2.36e-05,
+      "k0_unc_percent": 2.0,
+      "Q0": 5.93,
+      "Q0_unc_percent": 2.3,
+      "E_res_eV": 4300.0,
+      "sigma_0_barn": 0.00104,
+      "I0_barn": 0.006167199999999999,
+      "isotopic_abundance": 1.0,
+      "atomic_mass_g_mol": 88.91,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          479.49,
+          0.907
+        ]
+      ]
+    },
+    "Yb-169": {
+      "product_isotope": "Yb-169",
+      "target_isotope": "Yb-168",
+      "element": "Yb",
+      "gamma_energy_keV": 177.2,
+      "gamma_intensity": 0.214,
+      "half_life_s": 2767392.0,
+      "k0_Au": 0.0104,
+      "k0_unc_percent": 0.0,
+      "Q0": 4.97,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 0.61,
+      "sigma_0_barn": 2990.0,
+      "I0_barn": 14860.3,
+      "isotopic_abundance": 0.0013,
+      "atomic_mass_g_mol": 173.04,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          109.78,
+          0.174
+        ],
+        [
+          118.19,
+          0.0187
+        ],
+        [
+          130.52,
+          0.11199999999999999
+        ],
+        [
+          197.96,
+          0.349
+        ],
+        [
+          240.34,
+          0.00128
+        ],
+        [
+          261.08,
+          0.018000000000000002
+        ],
+        [
+          307.74,
+          0.10800000000000001
+        ],
+        [
+          316.15,
+          2.79e-07
+        ],
+        [
+          370.86,
+          6.63e-05
+        ]
+      ]
+    },
+    "Yb-175": {
+      "product_isotope": "Yb-175",
+      "target_isotope": "Yb-174",
+      "element": "Yb",
+      "gamma_energy_keV": 396.3,
+      "gamma_intensity": 0.065,
+      "half_life_s": 361584.0,
+      "k0_Au": 0.0312,
+      "k0_unc_percent": 0.6,
+      "Q0": 0.46,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 602.0,
+      "sigma_0_barn": 128.0,
+      "I0_barn": 58.88,
+      "isotopic_abundance": 0.318,
+      "atomic_mass_g_mol": 173.04,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          113.81,
+          0.019
+        ],
+        [
+          137.65,
+          0.00116
+        ],
+        [
+          144.87,
+          0.00331
+        ],
+        [
+          251.46,
+          0.000844
+        ],
+        [
+          282.52,
+          0.030600000000000002
+        ]
+      ]
+    },
+    "Yb-177": {
+      "product_isotope": "Yb-177",
+      "target_isotope": "Yb-176",
+      "element": "Yb",
+      "gamma_energy_keV": 150.6,
+      "gamma_intensity": 0.2,
+      "half_life_s": 6879.599999999999,
+      "k0_Au": 0.000894,
+      "k0_unc_percent": 0.0,
+      "Q0": 2.5,
+      "Q0_unc_percent": 1.8,
+      "E_res_eV": 412.0,
+      "sigma_0_barn": 2.85,
+      "I0_barn": 7.125,
+      "isotopic_abundance": 0.127,
+      "atomic_mass_g_mol": 173.04,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:10; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          121.62,
+          0.0341
+        ],
+        [
+          138.61,
+          0.013300000000000001
+        ],
+        [
+          899.04,
+          0.00644
+        ],
+        [
+          941.63,
+          0.0101
+        ],
+        [
+          1028.04,
+          0.00633
+        ],
+        [
+          1080.24,
+          0.055
+        ],
+        [
+          1119.69,
+          0.00545
+        ],
+        [
+          1149.66,
+          0.00644
+        ],
+        [
+          1230.64,
+          0.00368
+        ],
+        [
+          1241.31,
+          0.0335
+        ]
+      ]
+    },
+    "Zn-65": {
+      "product_isotope": "Zn-65",
+      "target_isotope": "Zn-64",
+      "element": "Zn",
+      "gamma_energy_keV": 1115.5,
+      "gamma_intensity": 0.508,
+      "half_life_s": 21107520.0,
+      "k0_Au": 0.00572,
+      "k0_unc_percent": 0.4,
+      "Q0": 1.908,
+      "Q0_unc_percent": 5.0,
+      "E_res_eV": 2560.0,
+      "sigma_0_barn": 0.726,
+      "I0_barn": 1.385208,
+      "isotopic_abundance": 0.486,
+      "atomic_mass_g_mol": 65.39,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; kayzero_fcd:1.003; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          511.0,
+          0.0291
+        ]
+      ]
+    },
+    "Zn-69m": {
+      "product_isotope": "Zn-69m",
+      "target_isotope": "Zn-68",
+      "element": "Zn",
+      "gamma_energy_keV": 438.6,
+      "gamma_intensity": 0.9470000000000001,
+      "half_life_s": 49536.0,
+      "k0_Au": 0.000398,
+      "k0_unc_percent": 0.6,
+      "Q0": 3.19,
+      "Q0_unc_percent": 1.4,
+      "E_res_eV": 590.0,
+      "sigma_0_barn": 0.0699,
+      "I0_barn": 0.222981,
+      "isotopic_abundance": 0.188,
+      "atomic_mass_g_mol": 65.39,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; kayzero_fcd:0.998; gamma_intensity_source:iri_mb2",
+      "additional_gammas": []
+    },
+    "Zn-71": {
+      "product_isotope": "Zn-71",
+      "target_isotope": "Zn-70",
+      "element": "Zn",
+      "gamma_energy_keV": 511.6,
+      "gamma_intensity": 0.302,
+      "half_life_s": 147.0,
+      "k0_Au": 1.55e-06,
+      "k0_unc_percent": 2.1,
+      "Q0": 7.9,
+      "Q0_unc_percent": 0.0,
+      "E_res_eV": 17.0,
+      "sigma_0_barn": 0.083,
+      "I0_barn": 0.6557000000000001,
+      "isotopic_abundance": 0.006,
+      "atomic_mass_g_mol": 65.39,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          121.62,
+          0.0302
+        ],
+        [
+          390.03,
+          0.0383
+        ],
+        [
+          398.7,
+          0.0060799999999999995
+        ],
+        [
+          453.25,
+          0.00188
+        ],
+        [
+          487.36,
+          0.00117
+        ],
+        [
+          666.82,
+          0.008960000000000001
+        ],
+        [
+          721.37,
+          0.00544
+        ],
+        [
+          910.35,
+          0.0783
+        ],
+        [
+          964.9,
+          0.00758
+        ],
+        [
+          1120.07,
+          0.0218
+        ]
+      ]
+    },
+    "Zr-95": {
+      "product_isotope": "Zr-95",
+      "target_isotope": "Zr-94",
+      "element": "Zr",
+      "gamma_energy_keV": 756.7,
+      "gamma_intensity": 0.545,
+      "half_life_s": 5531328.0,
+      "k0_Au": 0.00011,
+      "k0_unc_percent": 1.3,
+      "Q0": 5.31,
+      "Q0_unc_percent": 3.3,
+      "E_res_eV": 6260.0,
+      "sigma_0_barn": 0.053,
+      "I0_barn": 0.28142999999999996,
+      "isotopic_abundance": 0.174,
+      "atomic_mass_g_mol": 91.22,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:1; kayzero_md_code:1; kayzero_fcd:0.999; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          724.2,
+          0.441
+        ]
+      ]
+    },
+    "Zr-97": {
+      "product_isotope": "Zr-97",
+      "target_isotope": "Zr-96",
+      "element": "Zr",
+      "gamma_energy_keV": 507.6,
+      "gamma_intensity": 0.050499999999999996,
+      "half_life_s": 60264.0,
+      "k0_Au": 6.79e-07,
+      "k0_unc_percent": 0.0,
+      "Q0": 251.6,
+      "Q0_unc_percent": 1.0,
+      "E_res_eV": 338.0,
+      "sigma_0_barn": 0.0213,
+      "I0_barn": 5.35908,
+      "isotopic_abundance": 0.028,
+      "atomic_mass_g_mol": 91.22,
+      "reaction_family": "thermal_capture",
+      "data_status": "imported_kayzero_text_complete",
+      "source_note": "Imported from Kayzero text library sidecar files; unresolved fields may still depend on opaque Kayzero LB1/LB2 payloads. target_isotope_from_iri_mb1; kayzero_k0_code:2; kayzero_md_code:1; gamma_intensity_source:iri_mb2",
+      "additional_gammas": [
+        [
+          218.9,
+          0.0017499999999999998
+        ],
+        [
+          254.27,
+          0.0125
+        ],
+        [
+          272.26,
+          0.0025
+        ],
+        [
+          330.49,
+          0.00111
+        ],
+        [
+          355.47,
+          0.0227
+        ],
+        [
+          602.56,
+          0.0138
+        ],
+        [
+          690.7,
+          0.0025
+        ],
+        [
+          699.18,
+          0.0012
+        ],
+        [
+          703.76,
+          0.00927
+        ],
+        [
+          804.57,
+          0.00649
+        ],
+        [
+          829.84,
+          0.00222
+        ],
+        [
+          854.95,
+          0.00333
+        ],
+        [
+          971.44,
+          0.0028699999999999997
+        ],
+        [
+          1021.19,
+          0.013500000000000002
+        ],
+        [
+          1147.94,
+          0.0264
+        ],
+        [
+          1276.13,
+          0.00974
+        ],
+        [
+          1362.65,
+          0.013500000000000002
+        ],
+        [
+          1750.5,
+          0.013500000000000002
+        ],
+        [
+          1851.7,
+          0.0035199999999999997
+        ]
+      ]
+    }
+  }
+}

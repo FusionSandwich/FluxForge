@@ -6,7 +6,7 @@ from fluxforge.physics.activation import GammaLineMeasurement, IrradiationSegmen
 from fluxforge.solvers.gls import gls_adjust
 
 
-EXAMPLE_DIR = Path("src/fluxforge/examples/fe_cd_rafm_1")
+EXAMPLE_DIR = Path(__file__).resolve().parents[1] / "src" / "fluxforge" / "examples" / "fe_cd_rafm_1"
 
 
 def test_fe_cd_example_cli_flow():

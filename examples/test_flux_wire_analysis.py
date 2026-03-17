@@ -12,6 +12,9 @@ The goal is to demonstrate that FluxForge can reproduce commercial analysis
 results from raw gamma spectra.
 """
 
+# This file is a manual validation script, not a pytest unit test module.
+__test__ = False
+
 import json
 import os
 import sys
@@ -191,10 +194,10 @@ def test_efficiency_calculation():
     
     # Expected efficiency at 25 cm for coaxial HPGe is typically 1e-4 to 1e-3
     if 1e-6 < eff_1332 < 0.1:
-        print("  ✓ Efficiency in expected range")
+        print("  OK Efficiency in expected range")
         return True
     else:
-        print("  ✗ Efficiency outside expected range")
+        print("  FAIL Efficiency outside expected range")
         return False
 
 
@@ -286,10 +289,10 @@ def test_peak_finding():
     print(f"  Found: {found_co60}")
     
     if len(found_co60) == len(expected_co60):
-        print("  ✓ All Co-60 peaks found")
+        print("  OK All Co-60 peaks found")
         return True
     else:
-        print(f"  ✗ Missing peaks: {set(expected_co60) - set(found_co60)}")
+        print(f"  FAIL Missing peaks: {set(expected_co60) - set(found_co60)}")
         # Still count as passing if we found at least one peak
         if len(found_co60) >= 1:
             print("  (Partial detection - proceeding with tests)")
@@ -408,13 +411,13 @@ def test_activity_calculation():
         
         # Check if within factor of 3 (accounting for efficiency model differences)
         if 0.3 < mean_ratio < 3.0:
-            print("✓ Activities within factor of 3 of reference")
+            print("OK Activities within factor of 3 of reference")
             return True
         else:
-            print("✗ Activities outside expected range")
+            print("FAIL Activities outside expected range")
             return False
     else:
-        print("✗ No nuclides detected")
+        print("FAIL No nuclides detected")
         return False
 
 
@@ -541,7 +544,7 @@ def main():
     print("=" * 80)
     
     for name, status in results:
-        marker = "✓" if status == "PASSED" else "✗"
+        marker = "OK" if status == "PASSED" else "FAIL"
         print(f"  {marker} {name}: {status}")
     
     passed = sum(1 for _, s in results if s == "PASSED")

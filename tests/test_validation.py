@@ -192,7 +192,7 @@ class TestClosureMetrics:
         summary = metrics.summary()
         assert "Chi-square: 5.50" in summary
         assert "dof=10" in summary
-        assert "✓" in summary  # P-value acceptable
+        assert "OK" in summary  # P-value acceptable
 
 
 class TestValidationBundle:

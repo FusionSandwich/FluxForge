@@ -6,7 +6,7 @@ which allows absolute determination of element concentrations without standards
 through the use of pre-determined nuclear constants (k₀ factors).
 
 Key equations:
-    ρ(a) = [Np,a / (SDC·W)] / [Np,Au / (SDC·W)_Au] · 1/k0,Au(a) · 
+    ρ(a) = [Np,a / (SDC·W)] / [Np,Au / (SDC·W)_Au] · 1/k0,Au(a) ·
            Ge(Eγ,Au)/Ge(Eγ,a) · f+Q0,Au(α)/f+Q0,a(α)
 
 where:
@@ -34,6 +34,14 @@ from typing import Dict, List, Optional, Tuple, Any
 import numpy as np
 import logging
 
+from fluxforge.k0_physics import (
+    calculate_q0_alpha as _calculate_q0_alpha,
+    counting_factor as _counting_factor,
+    decay_factor as _decay_factor,
+    saturation_factor as _saturation_factor,
+    sdc_factor as _sdc_factor,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,11 +49,12 @@ logger = logging.getLogger(__name__)
 # k₀ Nuclear Data Database
 # =============================================================================
 
+
 @dataclass
 class K0NuclideData:
     """
     k₀-NAA nuclear data for a specific nuclide.
-    
+
     Attributes
     ----------
     target_isotope : str
@@ -79,6 +88,7 @@ class K0NuclideData:
     atomic_mass : float
         Atomic mass (g/mol)
     """
+
     target_isotope: str
     product_isotope: str
     element: str
@@ -104,13 +114,11 @@ K0_DATABASE: Dict[str, K0NuclideData] = {}
 
 def _initialize_k0_database():
     """Initialize the k0 nuclear data database."""
-    global K0_DATABASE
-    
     # Reference: Au-197(n,g)Au-198
-    K0_DATABASE['Au-198'] = K0NuclideData(
-        target_isotope='Au-197',
-        product_isotope='Au-198',
-        element='Au',
+    K0_DATABASE["Au-198"] = K0NuclideData(
+        target_isotope="Au-197",
+        product_isotope="Au-198",
+        element="Au",
         gamma_energy_keV=411.8,
         gamma_intensity=0.9558,
         half_life_s=2.6944 * 24 * 3600,  # 2.6944 d
@@ -124,12 +132,12 @@ def _initialize_k0_database():
         isotopic_abundance=1.0,
         atomic_mass=196.967,
     )
-    
+
     # Co-59(n,g)Co-60 - important for flux monitoring
-    K0_DATABASE['Co-60'] = K0NuclideData(
-        target_isotope='Co-59',
-        product_isotope='Co-60',
-        element='Co',
+    K0_DATABASE["Co-60"] = K0NuclideData(
+        target_isotope="Co-59",
+        product_isotope="Co-60",
+        element="Co",
         gamma_energy_keV=1332.5,
         gamma_intensity=0.9998,
         half_life_s=5.2714 * 365.25 * 24 * 3600,  # 5.2714 y
@@ -144,12 +152,12 @@ def _initialize_k0_database():
         atomic_mass=58.933,
         additional_gammas=[(1173.2, 0.9985)],
     )
-    
+
     # Sc-45(n,g)Sc-46 - flux monitor
-    K0_DATABASE['Sc-46'] = K0NuclideData(
-        target_isotope='Sc-45',
-        product_isotope='Sc-46',
-        element='Sc',
+    K0_DATABASE["Sc-46"] = K0NuclideData(
+        target_isotope="Sc-45",
+        product_isotope="Sc-46",
+        element="Sc",
         gamma_energy_keV=889.3,
         gamma_intensity=0.99984,
         half_life_s=83.79 * 24 * 3600,  # 83.79 d
@@ -164,12 +172,12 @@ def _initialize_k0_database():
         atomic_mass=44.956,
         additional_gammas=[(1120.5, 0.99987)],
     )
-    
+
     # Fe-58(n,g)Fe-59
-    K0_DATABASE['Fe-59'] = K0NuclideData(
-        target_isotope='Fe-58',
-        product_isotope='Fe-59',
-        element='Fe',
+    K0_DATABASE["Fe-59"] = K0NuclideData(
+        target_isotope="Fe-58",
+        product_isotope="Fe-59",
+        element="Fe",
         gamma_energy_keV=1099.2,
         gamma_intensity=0.565,
         half_life_s=44.50 * 24 * 3600,  # 44.50 d
@@ -184,12 +192,12 @@ def _initialize_k0_database():
         atomic_mass=55.845,
         additional_gammas=[(1291.6, 0.432)],
     )
-    
+
     # Cu-63(n,g)Cu-64
-    K0_DATABASE['Cu-64'] = K0NuclideData(
-        target_isotope='Cu-63',
-        product_isotope='Cu-64',
-        element='Cu',
+    K0_DATABASE["Cu-64"] = K0NuclideData(
+        target_isotope="Cu-63",
+        product_isotope="Cu-64",
+        element="Cu",
         gamma_energy_keV=1345.8,
         gamma_intensity=0.00473,
         half_life_s=12.701 * 3600,  # 12.701 h
@@ -203,12 +211,12 @@ def _initialize_k0_database():
         isotopic_abundance=0.6917,
         atomic_mass=63.546,
     )
-    
+
     # In-113(n,g)In-114m - high Q0, good epithermal monitor
-    K0_DATABASE['In-114m'] = K0NuclideData(
-        target_isotope='In-113',
-        product_isotope='In-114m',
-        element='In',
+    K0_DATABASE["In-114m"] = K0NuclideData(
+        target_isotope="In-113",
+        product_isotope="In-114m",
+        element="In",
         gamma_energy_keV=190.3,
         gamma_intensity=0.1556,
         half_life_s=49.51 * 24 * 3600,  # 49.51 d
@@ -222,12 +230,12 @@ def _initialize_k0_database():
         isotopic_abundance=0.0429,
         atomic_mass=114.818,
     )
-    
+
     # Mn-55(n,g)Mn-56 - short-lived, good for INAA
-    K0_DATABASE['Mn-56'] = K0NuclideData(
-        target_isotope='Mn-55',
-        product_isotope='Mn-56',
-        element='Mn',
+    K0_DATABASE["Mn-56"] = K0NuclideData(
+        target_isotope="Mn-55",
+        product_isotope="Mn-56",
+        element="Mn",
         gamma_energy_keV=846.8,
         gamma_intensity=0.9887,
         half_life_s=2.5789 * 3600,  # 2.5789 h
@@ -242,12 +250,12 @@ def _initialize_k0_database():
         atomic_mass=54.938,
         additional_gammas=[(1810.7, 0.272), (2113.1, 0.143)],
     )
-    
+
     # Na-23(n,g)Na-24
-    K0_DATABASE['Na-24'] = K0NuclideData(
-        target_isotope='Na-23',
-        product_isotope='Na-24',
-        element='Na',
+    K0_DATABASE["Na-24"] = K0NuclideData(
+        target_isotope="Na-23",
+        product_isotope="Na-24",
+        element="Na",
         gamma_energy_keV=1368.6,
         gamma_intensity=0.9999,
         half_life_s=14.997 * 3600,  # 14.997 h
@@ -262,12 +270,12 @@ def _initialize_k0_database():
         atomic_mass=22.990,
         additional_gammas=[(2754.0, 0.9986)],
     )
-    
+
     # Cr-50(n,g)Cr-51
-    K0_DATABASE['Cr-51'] = K0NuclideData(
-        target_isotope='Cr-50',
-        product_isotope='Cr-51',
-        element='Cr',
+    K0_DATABASE["Cr-51"] = K0NuclideData(
+        target_isotope="Cr-50",
+        product_isotope="Cr-51",
+        element="Cr",
         gamma_energy_keV=320.1,
         gamma_intensity=0.0991,
         half_life_s=27.70 * 24 * 3600,  # 27.70 d
@@ -281,12 +289,12 @@ def _initialize_k0_database():
         isotopic_abundance=0.04345,
         atomic_mass=51.996,
     )
-    
+
     # Zn-64(n,g)Zn-65
-    K0_DATABASE['Zn-65'] = K0NuclideData(
-        target_isotope='Zn-64',
-        product_isotope='Zn-65',
-        element='Zn',
+    K0_DATABASE["Zn-65"] = K0NuclideData(
+        target_isotope="Zn-64",
+        product_isotope="Zn-65",
+        element="Zn",
         gamma_energy_keV=1115.5,
         gamma_intensity=0.5004,
         half_life_s=244.26 * 24 * 3600,  # 244.26 d
@@ -300,12 +308,12 @@ def _initialize_k0_database():
         isotopic_abundance=0.486,
         atomic_mass=65.38,
     )
-    
+
     # As-75(n,g)As-76
-    K0_DATABASE['As-76'] = K0NuclideData(
-        target_isotope='As-75',
-        product_isotope='As-76',
-        element='As',
+    K0_DATABASE["As-76"] = K0NuclideData(
+        target_isotope="As-75",
+        product_isotope="As-76",
+        element="As",
         gamma_energy_keV=559.1,
         gamma_intensity=0.450,
         half_life_s=26.32 * 3600,  # 26.32 h
@@ -320,12 +328,12 @@ def _initialize_k0_database():
         atomic_mass=74.922,
         additional_gammas=[(657.0, 0.0619)],
     )
-    
+
     # W-186(n,g)W-187
-    K0_DATABASE['W-187'] = K0NuclideData(
-        target_isotope='W-186',
-        product_isotope='W-187',
-        element='W',
+    K0_DATABASE["W-187"] = K0NuclideData(
+        target_isotope="W-186",
+        product_isotope="W-187",
+        element="W",
         gamma_energy_keV=685.8,
         gamma_intensity=0.273,
         half_life_s=23.72 * 3600,  # 23.72 h
@@ -345,6 +353,50 @@ def _initialize_k0_database():
 _initialize_k0_database()
 
 
+def set_k0_database_from_governed_library(library: Any) -> None:
+    """Replace the active in-memory k0 database from a governed library."""
+
+    global K0_DATABASE
+    converted: Dict[str, K0NuclideData] = {}
+    for key, value in dict(getattr(library, "records", {}) or {}).items():
+        record = value.to_dict() if hasattr(value, "to_dict") else dict(value or {})
+        product_isotope = str(record.get("product_isotope") or key)
+        converted[product_isotope] = K0NuclideData(
+            target_isotope=str(record.get("target_isotope") or ""),
+            product_isotope=product_isotope,
+            element=str(record.get("element") or ""),
+            gamma_energy_keV=float(record.get("gamma_energy_keV", 0.0) or 0.0),
+            gamma_intensity=float(record.get("gamma_intensity", 0.0) or 0.0),
+            half_life_s=float(record.get("half_life_s", 0.0) or 0.0),
+            k0_Au=float(record.get("k0_Au", 0.0) or 0.0),
+            k0_unc=float(record.get("k0_unc_percent", 0.0) or 0.0),
+            Q0=float(record.get("Q0", 1.0) or 1.0),
+            Q0_unc=float(record.get("Q0_unc_percent", 0.0) or 0.0),
+            E_res_eV=float(record.get("E_res_eV", 0.0) or 0.0),
+            sigma_0_barn=float(record.get("sigma_0_barn", 0.0) or 0.0),
+            I0_barn=float(record.get("I0_barn", 0.0) or 0.0),
+            isotopic_abundance=float(record.get("isotopic_abundance", 1.0) or 1.0),
+            atomic_mass=float(
+                record.get("atomic_mass_g_mol", record.get("atomic_mass", 0.0)) or 0.0
+            ),
+            additional_gammas=[
+                tuple(item) for item in (record.get("additional_gammas") or [])
+            ],
+        )
+    K0_DATABASE = converted
+
+
+def reset_k0_database() -> None:
+    """Reset the active in-memory k0 database to the active governed library."""
+
+    from fluxforge.data.k0_library import get_active_k0_library
+
+    set_k0_database_from_governed_library(get_active_k0_library())
+
+
+reset_k0_database()
+
+
 def get_k0_data(product_isotope: str) -> Optional[K0NuclideData]:
     """Get k0 data for a product isotope."""
     return K0_DATABASE.get(product_isotope)
@@ -359,32 +411,35 @@ def list_available_nuclides() -> List[str]:
 # Flux Parameters
 # =============================================================================
 
+
 @dataclass
 class K0Parameters:
     """k₀-NAA flux parameters."""
-    f: float           # Thermal-to-epithermal flux ratio (φ_th / φ_epi)
-    alpha: float       # Epithermal flux shape deviation from 1/E
+
+    f: float  # Thermal-to-epithermal flux ratio (φ_th / φ_epi)
+    alpha: float  # Epithermal flux shape deviation from 1/E
     f_uncertainty: float = 0.0
     alpha_uncertainty: float = 0.0
-    phi_thermal: float = 0.0     # Thermal flux (n/cm²/s)
+    phi_thermal: float = 0.0  # Thermal flux (n/cm²/s)
     phi_epithermal: float = 0.0  # Epithermal flux (n/cm²/s)
-    phi_fast: float = 0.0        # Fast flux (n/cm²/s)
-    phi_total: float = 0.0       # Total flux (n/cm²/s)
+    phi_fast: float = 0.0  # Fast flux (n/cm²/s)
+    phi_total: float = 0.0  # Total flux (n/cm²/s)
 
 
-def calculate_k0_parameters(bare_activities: Dict[str, float],
-                           cd_activities: Dict[str, float]) -> K0Parameters:
+def calculate_k0_parameters(
+    bare_activities: Dict[str, float], cd_activities: Dict[str, float]
+) -> K0Parameters:
     """
     Calculate k₀-NAA parameters f and α from bare and Cd-covered measurements.
-    
+
     Following Di Luzio et al. 2017:
     - f = φ_th / φ_epi (thermal-to-epithermal flux ratio)
     - α = deviation of epithermal flux from ideal 1/E behavior
-    
+
     Args:
         bare_activities: Dictionary of isotope -> specific activity (Bq/g) for bare wires
         cd_activities: Dictionary of isotope -> specific activity (Bq/g) for Cd-covered wires
-        
+
     Returns:
         K0Parameters object containing f and alpha
     """
@@ -392,69 +447,69 @@ def calculate_k0_parameters(bare_activities: Dict[str, float],
     # Q_0 values at α=0 (resonance integral / thermal cross section)
     # TODO: Move these to a data library
     Q0_VALUES = {
-        'sc46': 0.43,   # Sc-45(n,g)Sc-46
-        'co60': 1.99,   # Co-59(n,g)Co-60  
-        'cu64': 0.975,  # Cu-63(n,g)Cu-64
-        'fe59': 0.45,   # Fe-58(n,g)Fe-59
-        'au198': 15.7,  # Au-197(n,g)Au-198
-        'zr95': 5.30,   # Zr-94(n,g)Zr-95
-        'zr97': 248.0,  # Zr-96(n,g)Zr-97
+        "sc46": 0.43,  # Sc-45(n,g)Sc-46
+        "co60": 1.99,  # Co-59(n,g)Co-60
+        "cu64": 0.975,  # Cu-63(n,g)Cu-64
+        "fe59": 0.45,  # Fe-58(n,g)Fe-59
+        "au198": 15.7,  # Au-197(n,g)Au-198
+        "zr95": 5.30,  # Zr-94(n,g)Zr-95
+        "zr97": 248.0,  # Zr-96(n,g)Zr-97
     }
-    
+
     # Effective resonance energies (eV)
     E_RES = {
-        'sc46': 4.93,
-        'co60': 132,
-        'cu64': 241,
-        'fe59': 231,
-        'au198': 5.65,
-        'zr95': 338,
-        'zr97': 338, # Approximation
+        "sc46": 4.93,
+        "co60": 132,
+        "cu64": 241,
+        "fe59": 231,
+        "au198": 5.65,
+        "zr95": 338,
+        "zr97": 338,  # Approximation
     }
-    
+
     f_values = []
-    
+
     # Calculate f from each bare/Cd pair
     for isotope, q0 in Q0_VALUES.items():
         # Normalize isotope keys to lowercase for matching
         iso_key = isotope.lower()
-        
+
         # Check if we have data for this isotope (checking various key formats)
         bare_val = None
         cd_val = None
-        
+
         for k in bare_activities:
             if k.lower() == iso_key:
                 bare_val = bare_activities[k]
                 break
-                
+
         for k in cd_activities:
             if k.lower() == iso_key:
                 cd_val = cd_activities[k]
                 break
-                
+
         if bare_val is not None and cd_val is not None and cd_val > 0:
             R_cd = bare_val / cd_val  # Cadmium ratio
-            
+
             # f = (R_cd - 1) * Q_0 / F_cd
             # F_cd ≈ 1 for well-thermalized positions (simplified)
             f_calc = (R_cd - 1) / q0
             if f_calc > 0:
                 f_values.append(f_calc)
-    
+
     # Average f value
     f = np.mean(f_values) if f_values else 0.0
     f_unc = np.std(f_values) if len(f_values) > 1 else (f * 0.1 if f > 0 else 0.0)
-    
+
     # Calculate α from multi-monitor method
     # Using log-linear fit of Cd-covered activities vs E_res
     alpha = 0.0  # Default - ideal 1/E spectrum
     alpha_unc = 0.0
-    
+
     if len(cd_activities) >= 2:
         ln_e_res = []
         ln_activity = []
-        
+
         for isotope, e_res in E_RES.items():
             iso_key = isotope.lower()
             cd_val = None
@@ -462,7 +517,7 @@ def calculate_k0_parameters(bare_activities: Dict[str, float],
                 if k.lower() == iso_key:
                     cd_val = cd_activities[k]
                     break
-            
+
             if cd_val is not None and cd_val > 0:
                 ln_e_res.append(np.log(e_res))
                 # We need to normalize activity by cross section and other factors for true alpha
@@ -473,7 +528,7 @@ def calculate_k0_parameters(bare_activities: Dict[str, float],
                 # For a robust implementation, we should use the specific activity equation:
                 # A_sp = ... E_res^(-alpha)
                 ln_activity.append(np.log(cd_val))
-        
+
         if len(ln_e_res) >= 2:
             # Linear regression: ln(A) = const - α * ln(E_res)
             try:
@@ -485,7 +540,7 @@ def calculate_k0_parameters(bare_activities: Dict[str, float],
             except Exception:
                 alpha = 0.0
                 alpha_unc = 0.0
-    
+
     return K0Parameters(
         f=f,
         alpha=alpha,
@@ -493,17 +548,21 @@ def calculate_k0_parameters(bare_activities: Dict[str, float],
         alpha_uncertainty=alpha_unc,
     )
 
+
 # =============================================================================
 # Correction Factor Calculations
 # =============================================================================
 
-def calculate_Q0_alpha(Q0: float, alpha: float, E_res_eV: float, E_Cd_eV: float = 0.55) -> float:
+
+def calculate_Q0_alpha(
+    Q0: float, alpha: float, E_res_eV: float, E_Cd_eV: float = 0.55
+) -> float:
     """
     Calculate Q0(α) - the epithermal correction factor.
-    
+
     For non-1/E epithermal spectra, Q0 needs to be corrected:
         Q0(α) = (Q0 - 0.429) / E_res^α + 0.429 / (2α + 1) / E_Cd^α
-    
+
     Parameters
     ----------
     Q0 : float
@@ -514,63 +573,52 @@ def calculate_Q0_alpha(Q0: float, alpha: float, E_res_eV: float, E_Cd_eV: float 
         Effective resonance energy (eV)
     E_Cd_eV : float
         Cadmium cut-off energy (eV), default 0.55 eV
-        
+
     Returns
     -------
     float
         Q0(α) - corrected Q0 for given α
     """
-    if alpha == 0:
-        return Q0
-    
-    if E_res_eV <= 0:
-        return Q0
-    
-    # Correction factor per Hogdahl convention
-    Q0_alpha = (Q0 - 0.429) / (E_res_eV ** alpha) + 0.429 / ((2 * alpha + 1) * (E_Cd_eV ** alpha))
-    
-    return Q0_alpha
+    return _calculate_q0_alpha(Q0, alpha, E_res_eV, E_Cd_eV)
 
 
 def saturation_factor(lambda_s: float, t_irr: float) -> float:
     """
     Calculate saturation factor S.
-    
+
     S = 1 - exp(-λ·t_irr)
-    
+
     Parameters
     ----------
     lambda_s : float
         Decay constant (1/s)
     t_irr : float
         Irradiation time (s)
-        
+
     Returns
     -------
     float
         Saturation factor S
     """
-    return 1.0 - np.exp(-lambda_s * t_irr)
+    return _saturation_factor(lambda_s, t_irr)
 
 
 def decay_factor(lambda_s: float, t_decay: float) -> float:
     """
     Calculate decay factor D.
-    
+
     D = exp(-λ·t_d)
     """
-    return np.exp(-lambda_s * t_decay)
+    return _decay_factor(lambda_s, t_decay)
 
 
 def counting_factor(lambda_s: float, t_count: float) -> float:
     """
     Calculate counting factor C.
-    
+
     C = [1 - exp(-λ·t_c)] / (λ·t_c)
     """
-    if lambda_s * t_count < 1e-6:
-        return 1.0
-    return (1.0 - np.exp(-lambda_s * t_count)) / (lambda_s * t_count)
+    return _counting_factor(lambda_s, t_count)
 
 
 def sdc_factor(
@@ -581,7 +629,7 @@ def sdc_factor(
 ) -> Tuple[float, float, float, float]:
     """
     Calculate S, D, C correction factors and their product.
-    
+
     Parameters
     ----------
     half_life_s : float
@@ -592,29 +640,25 @@ def sdc_factor(
         Decay time (s)
     t_count : float
         Counting time (s)
-        
+
     Returns
     -------
     tuple
         (S, D, C, SDC) - individual factors and product
     """
-    lambda_s = np.log(2) / half_life_s
-    S = saturation_factor(lambda_s, t_irr)
-    D = decay_factor(lambda_s, t_decay)
-    C = counting_factor(lambda_s, t_count)
-    
-    return S, D, C, S * D * C
+    return _sdc_factor(half_life_s, t_irr, t_decay, t_count)
 
 
 # =============================================================================
 # K0 Measurement and Result Classes
 # =============================================================================
 
+
 @dataclass
 class K0Measurement:
     """
     A single k0-NAA measurement.
-    
+
     Attributes
     ----------
     product_isotope : str
@@ -644,6 +688,7 @@ class K0Measurement:
     cd_factor : float
         Cadmium correction factor (F_cd)
     """
+
     product_isotope: str
     net_peak_area: float
     peak_area_unc: float = 0.0
@@ -663,7 +708,7 @@ class K0Measurement:
 class K0Result:
     """
     Result of k0-NAA concentration calculation.
-    
+
     Attributes
     ----------
     element : str
@@ -685,6 +730,7 @@ class K0Result:
     specific_count_rate : float
         Specific count rate (counts/s/g)
     """
+
     element: str
     product_isotope: str
     concentration_ug_g: float
@@ -700,18 +746,19 @@ class K0Result:
 # K0 Calculator Class
 # =============================================================================
 
+
 class K0Calculator:
     """
     Calculator for k0-NAA concentration determinations.
-    
+
     This class implements the k0-standardization method for absolute
     NAA without comparator standards.
-    
+
     Examples
     --------
     >>> # Characterize flux
     >>> flux_params = K0Parameters(f=25.0, alpha=0.02)
-    >>> 
+    >>>
     >>> # Create calculator with Au reference
     >>> au_meas = K0Measurement(
     ...     product_isotope='Au-198',
@@ -724,7 +771,7 @@ class K0Calculator:
     ...     sample_mass=0.001,
     ... )
     >>> calc = K0Calculator(flux_params, au_meas)
-    >>> 
+    >>>
     >>> # Analyze a peak
     >>> sample_meas = K0Measurement(
     ...     product_isotope='Co-60',
@@ -739,7 +786,7 @@ class K0Calculator:
     >>> result = calc.calculate_concentration(sample_meas)
     >>> print(f"Co concentration: {result.concentration_ug_g:.2f} μg/g")
     """
-    
+
     def __init__(
         self,
         flux_params: K0Parameters,
@@ -747,7 +794,7 @@ class K0Calculator:
     ):
         """
         Initialize k0 calculator.
-        
+
         Parameters
         ----------
         flux_params : K0Parameters
@@ -761,39 +808,40 @@ class K0Calculator:
         self._au_Q0_alpha = None
         self._au_g_factor = 1.0
         self._au_cd_factor = 1.0
-        
+
         if au_measurement is not None:
             self._calculate_au_reference()
-    
+
     def _calculate_au_reference(self):
         """Calculate Au reference specific count rate."""
         if self.au_measurement is None:
             return
-        
-        au_data = get_k0_data('Au-198')
+
+        au_data = get_k0_data("Au-198")
         if au_data is None:
             raise ValueError("Au-198 data not found in k0 database")
-        
+
         S, D, C, SDC = sdc_factor(
             au_data.half_life_s,
             self.au_measurement.t_irr,
             self.au_measurement.t_decay,
             self.au_measurement.t_count,
         )
-        
+
         # Specific count rate = Np / (SDC * ε * W * t_count)
-        self._au_specific_count_rate = (
-            self.au_measurement.net_peak_area /
-            (SDC * self.au_measurement.efficiency * self.au_measurement.sample_mass)
+        self._au_specific_count_rate = self.au_measurement.net_peak_area / (
+            SDC * self.au_measurement.efficiency * self.au_measurement.sample_mass
         )
-        
+
         # Q0(α) for Au
         self._au_Q0_alpha = calculate_Q0_alpha(
             au_data.Q0, self.flux_params.alpha, au_data.E_res_eV
         )
-        self._au_g_factor = self.au_measurement.g_th + self.au_measurement.g_ep * self._au_Q0_alpha
+        self._au_g_factor = (
+            self.au_measurement.g_th + self.au_measurement.g_ep * self._au_Q0_alpha
+        )
         self._au_cd_factor = self.au_measurement.cd_factor
-    
+
     def calculate_concentration(
         self,
         measurement: K0Measurement,
@@ -801,7 +849,7 @@ class K0Calculator:
     ) -> K0Result:
         """
         Calculate element concentration using k0 method.
-        
+
         Parameters
         ----------
         measurement : K0Measurement
@@ -809,7 +857,7 @@ class K0Calculator:
         use_relative : bool
             If True, use relative method with Au reference.
             If False, use absolute method with known flux.
-            
+
         Returns
         -------
         K0Result
@@ -819,7 +867,7 @@ class K0Calculator:
         nuclide_data = get_k0_data(measurement.product_isotope)
         if nuclide_data is None:
             raise ValueError(f"No k0 data for {measurement.product_isotope}")
-        
+
         # Calculate SDC factors
         S, D, C, SDC = sdc_factor(
             nuclide_data.half_life_s,
@@ -827,58 +875,72 @@ class K0Calculator:
             measurement.t_decay,
             measurement.t_count,
         )
-        
+
         # Calculate Q0(α)
         Q0_alpha = calculate_Q0_alpha(
             nuclide_data.Q0,
             self.flux_params.alpha,
             nuclide_data.E_res_eV,
         )
-        
+
         # Specific count rate for the sample peak
-        R_a = measurement.net_peak_area / (SDC * measurement.efficiency * measurement.sample_mass)
+        R_a = measurement.net_peak_area / (
+            SDC * measurement.efficiency * measurement.sample_mass
+        )
         g_factor_a = measurement.g_th + measurement.g_ep * Q0_alpha
         R_a_corr = R_a / (measurement.cd_factor * g_factor_a)
-        
+
         if use_relative and self._au_specific_count_rate is not None:
             # Relative method using Au reference
             # ρ(a) = (R_a / R_Au) · (1 / k0,Au(a)) · G(α)
             # where G(α) = (f + Q0(α)_Au) / (f + Q0(α)_a)
-            
-            flux_ratio = (self.flux_params.f + self._au_Q0_alpha) / (self.flux_params.f + Q0_alpha)
-            R_au_corr = self._au_specific_count_rate / (self._au_cd_factor * self._au_g_factor)
-            
-            # Mass fraction (g/g)
-            concentration = (
-                R_a_corr / R_au_corr *
-                1.0 / nuclide_data.k0_Au *
-                flux_ratio
+
+            flux_ratio = (self.flux_params.f + self._au_Q0_alpha) / (
+                self.flux_params.f + Q0_alpha
             )
-            
+            R_au_corr = self._au_specific_count_rate / (
+                self._au_cd_factor * self._au_g_factor
+            )
+
+            # Mass fraction (g/g)
+            concentration = R_a_corr / R_au_corr * 1.0 / nuclide_data.k0_Au * flux_ratio
+
         else:
             # Absolute method using known flux
             # ρ = Np / (SDC·ε·W·k0·φ_th·(f + Q0(α))/f)
             if self.flux_params.phi_thermal <= 0:
                 raise ValueError("Need phi_thermal for absolute method")
-            
-            flux_factor = self.flux_params.phi_thermal * (self.flux_params.f + Q0_alpha) / self.flux_params.f
+
+            flux_factor = (
+                self.flux_params.phi_thermal
+                * (self.flux_params.f + Q0_alpha)
+                / self.flux_params.f
+            )
             concentration = R_a_corr / (nuclide_data.k0_Au * flux_factor)
-        
+
         # Convert to μg/g (ppm)
         concentration_ug_g = concentration * 1e6
-        
+
         # Uncertainty propagation
-        rel_unc_peak = measurement.peak_area_unc / measurement.net_peak_area if measurement.net_peak_area > 0 else 0
+        rel_unc_peak = (
+            measurement.peak_area_unc / measurement.net_peak_area
+            if measurement.net_peak_area > 0
+            else 0
+        )
         rel_unc_k0 = nuclide_data.k0_unc / 100
         rel_unc_eff = measurement.efficiency_unc / 100
-        rel_unc_Q0 = nuclide_data.Q0_unc / 100 * Q0_alpha / (self.flux_params.f + Q0_alpha)
-        
-        rel_unc_total = np.sqrt(rel_unc_peak**2 + rel_unc_k0**2 + rel_unc_eff**2 + rel_unc_Q0**2)
+        rel_unc_Q0 = (
+            nuclide_data.Q0_unc / 100 * Q0_alpha / (self.flux_params.f + Q0_alpha)
+        )
+
+        rel_unc_total = np.sqrt(
+            rel_unc_peak**2 + rel_unc_k0**2 + rel_unc_eff**2 + rel_unc_Q0**2
+        )
         concentration_unc = concentration_ug_g * rel_unc_total
-        
+
         # Detection limit (Currie formulation, simplified)
         detection_limit = 3.0 * concentration_unc
-        
+
         return K0Result(
             element=nuclide_data.element,
             product_isotope=measurement.product_isotope,
@@ -890,45 +952,58 @@ class K0Calculator:
             sdc_factor=SDC,
             specific_count_rate=R_a,
         )
-    
+
     def analyze_spectrum(
         self,
         measurements: List[K0Measurement],
     ) -> Dict[str, K0Result]:
         """
         Analyze multiple peaks from a gamma spectrum.
-        
+
         Parameters
         ----------
         measurements : list of K0Measurement
             All identified peaks to analyze
-            
+
         Returns
         -------
         dict
             Element concentrations keyed by element symbol
         """
         results = {}
-        
+
         for meas in measurements:
             try:
                 result = self.calculate_concentration(meas)
-                
+
                 # If element already seen, combine results (weighted average)
                 if result.element in results:
                     existing = results[result.element]
                     # Weighted average
-                    w1 = 1.0 / existing.concentration_unc**2 if existing.concentration_unc > 0 else 1.0
-                    w2 = 1.0 / result.concentration_unc**2 if result.concentration_unc > 0 else 1.0
-                    combined_conc = (existing.concentration_ug_g * w1 + result.concentration_ug_g * w2) / (w1 + w2)
+                    w1 = (
+                        1.0 / existing.concentration_unc**2
+                        if existing.concentration_unc > 0
+                        else 1.0
+                    )
+                    w2 = (
+                        1.0 / result.concentration_unc**2
+                        if result.concentration_unc > 0
+                        else 1.0
+                    )
+                    combined_conc = (
+                        existing.concentration_ug_g * w1
+                        + result.concentration_ug_g * w2
+                    ) / (w1 + w2)
                     combined_unc = 1.0 / np.sqrt(w1 + w2)
-                    
+
                     results[result.element] = K0Result(
                         element=result.element,
                         product_isotope=f"{existing.product_isotope}+{result.product_isotope}",
                         concentration_ug_g=combined_conc,
                         concentration_unc=combined_unc,
-                        detection_limit_ug_g=min(existing.detection_limit_ug_g, result.detection_limit_ug_g),
+                        detection_limit_ug_g=min(
+                            existing.detection_limit_ug_g, result.detection_limit_ug_g
+                        ),
                         k0_used=result.k0_used,
                         Q0_alpha_used=result.Q0_alpha_used,
                         sdc_factor=result.sdc_factor,
@@ -936,10 +1011,10 @@ class K0Calculator:
                     )
                 else:
                     results[result.element] = result
-                    
+
             except Exception as e:
                 logger.warning(f"Could not analyze {meas.product_isotope}: {e}")
-        
+
         return results
 
 
@@ -947,20 +1022,21 @@ class K0Calculator:
 # Utility Functions
 # =============================================================================
 
+
 def identify_isotope_from_gamma(
     energy_keV: float,
     tolerance_keV: float = 2.0,
 ) -> Optional[str]:
     """
     Identify product isotope from gamma energy.
-    
+
     Parameters
     ----------
     energy_keV : float
         Measured gamma energy (keV)
     tolerance_keV : float
         Energy matching tolerance (keV)
-        
+
     Returns
     -------
     str or None
@@ -991,7 +1067,7 @@ def create_k0_measurement_from_peak(
 ) -> Optional[K0Measurement]:
     """
     Create a K0Measurement from a detected peak.
-    
+
     Parameters
     ----------
     peak_data : Peak or dict
@@ -1006,30 +1082,30 @@ def create_k0_measurement_from_peak(
         Optional correction factors (self-shielding, Cd)
     tolerance_keV : float
         Energy matching tolerance
-        
+
     Returns
     -------
     K0Measurement or None
         K0Measurement if isotope is identified and in database
     """
     # Get peak properties
-    if hasattr(peak_data, 'energy'):
+    if hasattr(peak_data, "energy"):
         energy = peak_data.energy
         area = peak_data.net_area
-        area_unc = peak_data.area_unc if hasattr(peak_data, 'area_unc') else area * 0.1
+        area_unc = peak_data.area_unc if hasattr(peak_data, "area_unc") else area * 0.1
     elif isinstance(peak_data, dict):
-        energy = peak_data.get('energy', 0)
-        area = peak_data.get('net_area', 0)
-        area_unc = peak_data.get('area_unc', area * 0.1)
+        energy = peak_data.get("energy", 0)
+        area = peak_data.get("net_area", 0)
+        area_unc = peak_data.get("area_unc", area * 0.1)
     else:
         return None
-    
+
     # Identify isotope from gamma energy
     isotope = identify_isotope_from_gamma(energy, tolerance_keV)
-    
+
     if isotope is None:
         return None
-    
+
     return K0Measurement(
         product_isotope=isotope,
         net_peak_area=area,

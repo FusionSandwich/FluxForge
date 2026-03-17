@@ -1,0 +1,46 @@
+name: Quality Checks
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - add_gui
+      - chore/repo-cleanup-phase1-safety-20260317
+    paths:
+      - 'src/fluxforge/**.py'
+      - 'tests/**.py'
+      - '.flake8'
+      - 'pyproject.toml'
+      - '.github/workflows/quality-checks.yml'
+
+jobs:
+  style-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install black==24.10.0 flake8 pytest
+
+      - name: Black (check)
+        run: |
+          black --check src tests examples/RAFM_irradiation
+
+      - name: Flake8
+        run: |
+          flake8 src tests examples/RAFM_irradiation
+
+      - name: Targeted k0 regression tests
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q tests/test_k0_physics.py tests/test_k0_naa.py tests/test_k0_workflow.py tests/test_kayzero_k0.py

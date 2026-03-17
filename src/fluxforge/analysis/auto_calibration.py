@@ -406,6 +406,6 @@ if __name__ == "__main__":
     print(f"Coefficients: {result.coefficients}")
     
     if result.success:
-        print("\n✅ auto_calibration module tests passed!")
+        print("\n[OK] auto_calibration module tests passed!")
     else:
-        print(f"\n⚠️ Auto-calibration returned: {result.message}")
+        print(f"\nWARNING Auto-calibration returned: {result.message}")

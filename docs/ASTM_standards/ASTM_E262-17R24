@@ -1,0 +1,1387 @@
+\documentclass[12pt]{article}
+
+% --- Packages ---
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{xcolor}
+
+% --- Page style ---
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{E262 $-$ 17 (2024)$^{\varepsilon 1}$}}
+\rfoot{\thepage}
+\lfoot{\footnotesize Copyright \textcopyright{} ASTM International, 100 Barr Harbor Drive,
+PO Box C700, West Conshohocken, PA 19428-2959, United States.}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- Section formatting ---
+\titleformat{\section}{\normalfont\bfseries\large}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalfont\bfseries}{\thesubsubsection}{0.5em}{}
+
+% --- Nuclide shorthand ---
+\providecommand{\nuc}[2]{$^{#1}$#2}
+
+% --- Note environment ---
+\newenvironment{astmnote}[1][\relax]{%
+  \par\smallskip\noindent\textit{N\textsc{ote}%
+  \ifx#1\relax\else~#1\fi---}\ignorespaces
+}{%
+  \par\smallskip
+}
+
+% ============================================================
+\begin{document}
+
+% ------ Title block ------
+\begin{center}
+  {\small Designation: \textbf{E262 $-$ 17 (Reapproved 2024)$^{\varepsilon 1}$}}\\[1.5ex]
+  \rule{\textwidth}{1.5pt}\\[1ex]
+  {\LARGE\bfseries Standard Test Method for\\[0.4ex]
+   Determining Thermal Neutron Reaction Rates and Thermal\\[0.4ex]
+   Neutron Fluence Rates by Radioactivation Techniques$^{1}$}\\[1ex]
+  \rule{\textwidth}{1pt}
+\end{center}
+
+\noindent
+This standard is issued under the fixed designation E262; the number immediately following
+the designation indicates the year of original adoption or, in the case of revision, the year
+of last revision. A number in parentheses indicates the year of last reapproval. A superscript
+epsilon ($\varepsilon$) indicates an editorial change since the last revision or reapproval.
+
+\begin{quote}
+\small $\varepsilon^1$ NOTE---8.2.2.4 was editorially corrected in May 2024.
+\end{quote}
+
+% ============================================================
+\section{Scope}
+
+1.1\quad The purpose of this test method is to define a general procedure for determining
+an unknown thermal neutron fluence rate by neutron activation techniques. It is not
+practicable to describe completely a technique applicable to the large number of
+experimental situations that require the measurement of a thermal neutron fluence rate.
+Therefore, this method is presented so that the user may adapt to their particular
+situation the fundamental procedures of the following techniques.
+
+\begin{enumerate}[label=1.1.\arabic*,leftmargin=3em]
+  \item Radiometric counting technique using pure cobalt, pure gold, pure indium,
+        cobalt-aluminum alloy, gold-aluminum alloy, or indium-aluminum alloy.
+  \item Standard comparison technique using pure gold, or gold-aluminum alloy, and
+  \item Secondary standard comparison techniques using pure indium, indium-aluminum
+        alloy, pure dysprosium, or dysprosium-aluminum alloy.
+\end{enumerate}
+
+1.2\quad The techniques presented are limited to measurements at room temperatures.
+However, special problems when making thermal neutron fluence rate measurements in
+high-temperature environments are discussed in 9.2. For those circumstances where the
+use of cadmium as a thermal shield is undesirable because of potential spectrum
+perturbations or of temperatures above the melting point of cadmium, the method
+described in Practice E481 can be used in some cases. Alternatively, gadolinium filters
+may be used instead of cadmium. For high-temperature applications in which aluminum
+alloys are unsuitable, other alloys such as cobalt-nickel or cobalt-vanadium have been
+used.
+
+1.3\quad This test method may be used to determine the equivalent 2200~m/s fluence rate.
+The accurate determination of the actual thermal neutron fluence rate requires knowledge
+of the neutron temperature, and determination of the neutron temperature is not within
+the scope of the standard.
+
+1.4\quad The techniques presented are suitable only for neutron fields having a significant
+thermal neutron component, in which moderating materials are present, and for which the
+average scattering cross section is large compared to the average absorption cross section
+in the thermal neutron energy range.
+
+1.5\quad Table~\ref{tab:fluence_ranges} indicates the useful neutron fluence ranges for
+each detector material.
+
+1.6\quad \textit{This standard does not purport to address all of the safety concerns, if
+any, associated with its use. It is the responsibility of the user of this standard to
+establish appropriate safety, health, and environmental practices and determine the
+applicability of regulatory limitations prior to use.}
+
+1.7\quad \textit{This international standard was developed in accordance with
+internationally recognized principles on standardization established in the Decision on
+Principles for the Development of International Standards, Guides and Recommendations
+issued by the World Trade Organization Technical Barriers to Trade (TBT) Committee.}
+
+% ============================================================
+\section{Referenced Documents}
+
+\noindent 2.1\quad \textit{ASTM Standards:}$^{2}$
+
+\begin{itemize}[leftmargin=2.5em,label={}]
+  \item E170\quad Terminology Relating to Radiation Measurements and Dosimetry
+  \item E177\quad Practice for Use of the Terms Precision and Bias in ASTM Test Methods
+  \item E181\quad Guide for Detector Calibration and Analysis of Radionuclides in
+        Radiation Metrology for Reactor Dosimetry
+  \item E261\quad Practice for Determining Neutron Fluence, Fluence Rate, and Spectra by
+        Radioactivation Techniques
+  \item E481\quad Practice for Measuring Neutron Fluence Rates by Radioactivation of
+        Cobalt and Silver
+\end{itemize}
+
+% ============================================================
+\section{Terminology}
+
+3.1\quad \textit{cadmium ratio}---see Terminology E170.
+
+3.2\quad \textit{Calibration Techniques:}
+
+3.2.1\quad \textit{radiometric}---the radiometric technique uses foil properties, decay
+properties of the activation product, the detector efficiency, and cross section to
+derive the neutron fluence rate. When beta counting is used, it becomes problematic to
+determine the absolute detector efficiency, and calibration is usually performed by
+exposing the foil to a standard or secondary standard field.
+
+3.2.2\quad \textit{standard comparison}---the standard comparison technique compares
+activity from a foil irradiated in a standard or reference field to the activity from a
+foil irradiated in the unknown field to derive the neutron fluence rate.
+
+3.2.3\quad \textit{secondary standard comparison}---the secondary standard comparison
+technique is the same as the standard comparison technique, except that the reference
+field is not a well-calibrated national reference, and is usually local to the facility.
+This is sometimes done because a foil with a short half-life undergoes too much decay in
+transit from a standard source.
+
+3.2.3.1\quad \textit{Discussion}---The standard comparison technique is the most accurate.
+Among the foils discussed in this standard, only gold has a suitable half-life for
+standard counting: long enough to allow transport of the foil from the standards
+laboratory to the facility for counting, and short enough to allow reuse of the foil. One
+might consider moving the radiation detector to the national standard location to
+accommodate a short half-life.
+
+3.3\quad \textit{equivalent 2200 m/s fluence}---see Terminology E170.
+
+3.4\quad \textit{foil}---material whose induced radioactivity is used to help determine the
+properties of a neutron field. Typical foil shapes are thin discs or rectangles, but wire
+segments are another common shape. In this document, all activation materials of every
+shape will be called ``foils'' for the sake of brevity. Foils are also often called
+``radiometric dosimeters'' or ``radiometric monitors.''
+
+3.5\quad \textit{Maxwell-Boltzmann distribution}---the Maxwell-Boltzmann distribution is a
+probability distribution which describes the energy or velocity distribution of particles
+in equilibrium at a given temperature. For neutrons, this is given by:
+
+\begin{equation*}
+  n(E)\,dE = n_{th}\,\frac{2}{\sqrt{\pi}}\,\frac{E^{1/2}}{(kT)^{3/2}}\,e^{-E/kT}\,dE
+\end{equation*}
+or
+\begin{equation*}
+  n(v)\,dv = n_{th}\,\frac{4}{\sqrt{\pi}}\left(\frac{m}{2kT}\right)^{3/2}
+  v^2\,e^{-\!\left(\frac{mv^2}{2kT}\right)}\,dv
+\end{equation*}
+
+\noindent where:
+\begin{align*}
+  n_{th} &= \text{the number of thermal neutrons per volume,}\\
+  m      &= \text{the neutron mass (931~MeV),}\\
+  k      &= \text{Boltzmann's constant }(8.617 \times 10^{-5}\ \text{eV K}^{-1}),\\
+  T      &= \text{the neutron temperature, and}\\
+  v\ \text{and}\ E &= \text{the neutron velocity and energy, respectively.}
+\end{align*}
+
+3.6\quad \textit{thermal neutron fluence rate} $(\Phi_{th})$---
+
+\begin{equation*}
+  \int_{0}^{\infty} v \cdot n(v)\,dv
+\end{equation*}
+
+\noindent where $v$ is the neutron velocity and $n(v)$ is the thermal neutron density as
+a function of velocity.
+
+3.7\quad \textit{Thermal neutron fluence rate conventions:}
+
+3.7.1\quad \textit{Stoughton and Halperin convention}---the neutron spectrum is separated
+into a thermal part and a 1/$E$ part. The 2200~m/s neutron fluence rate, $\Phi_0$, is
+the hypothetical neutron fluence rate in which all the thermal neutrons have a velocity
+of 2200~m/s. The 1/$E$ part of the spectrum is not included. The Stoughton and Halperin
+convention is followed in this standard.
+
+3.7.2\quad \textit{Westcott convention}---$\Phi_0$ is the hypothetical neutron fluence
+rate in which all the neutrons have a velocity of 2200~m/s, which gives the same
+activation as the total neutron fluence incident on a 1/v detector.
+
+3.7.2.1\quad \textit{Discussion}---See Theory section and Precision and Bias section for
+further discussion.
+
+3.7.3\quad \textit{Hogdahl convention}---the Hogdahl convention is similar to the
+Stoughton and Halperin convention, but separates out the subcadmium fluence as a
+separate entity, $\varphi_{sc}$. See Practice E261 for further discussion.
+
+3.8\quad \textit{thermal neutrons}---See Terminology E170.
+
+3.9\quad \textit{neutron temperature, T}---an adjustable parameter used to give the best
+fit of a calculated or measured thermal neutron speed distribution to the
+Maxwell-Boltzmann distribution. Because of increasing absorption for lower energy
+neutrons, the neutron temperature is usually higher than the temperature of the
+moderating materials in the system of interest.
+
+3.10\quad \textit{2200 m/s cross section}---see Terminology E170.
+
+% ============================================================
+\section{Significance and Use}
+
+4.1\quad This test method can be extended to use any material that has the necessary
+nuclear and activation properties that suit the experimenter's particular situation. No
+attempt has been made to fully describe the myriad problems of counting techniques,
+neutron fluence depression, and thick foil self-shielding. It is assumed that the
+experimenter will refer to existing literature on these subjects. This test method does
+offer a referee technique (the standard gold foil) to aid the experimenter when they are
+in doubt of their ability to perform the radiometric technique with sufficient accuracy.
+
+4.2\quad The standard comparison technique uses a set of foils that are as nearly
+identical as possible in shape and mass. The foils are fabricated from any material that
+activates by an (n, $\gamma$) reaction, preferably having a cross section approximately
+inversely proportional to neutron speed in the thermal energy range. Some of the foils
+are irradiated in a known neutron field (at NIST or other standards laboratory). The
+foils are counted in a fixed geometry on a stable radiation-detecting instrument. The
+neutron-induced reaction rate of the foils is computed from the counting data, and the
+ratio of the known neutron fluence rate to the computed reaction rate is determined. For
+any given foil, neutron energy spectrum, and counting setup, this ratio is a constant.
+Other foils from the identical set can now be exposed to an unknown neutron field. The
+magnitude of the fluence rate in the unknown field can be obtained by comparing the
+reaction rates as determined from the counting data from the unknown and reference field,
+with proper corrections to account for spectral differences between the two fields (see
+Section~5). One important feature of this technique is that it eliminates the need for
+knowing the detector efficiency.
+
+4.3\quad This test method follows the Stoughton and Halperin convention for reporting
+thermal neutron fluence. Other conventions are the Westcott convention (followed in
+Practice E481) and the Hogdahl convention. Practice E261 explains the three conventions
+and gives conversion formulae relating values determined by the different conventions.
+Reference~(1)$^{3}$ discusses the three thermal neutron conventions in detail.
+
+% ============================================================
+
+\begin{table}[ht]
+\centering
+\caption{Useful Neutron Fluence Ranges of Foil Material}
+\label{tab:fluence_ranges}
+\begin{tabular}{lll}
+\toprule
+Foil Material & Form & $\approx$ Useful Range (neutrons/cm$^2$) \\
+\midrule
+Indium     & pure or alloyed with aluminum & $10^3$ to $10^{12}$ \\
+Gold       & pure or alloyed with aluminum & $10^7$ to $10^{14}$ \\
+Dysprosium & pure or alloyed with aluminum & $10^3$ to $10^{10}$ \\
+Cobalt     & pure or alloyed with aluminum & $10^{14}$ to $10^{20}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Theory}
+
+5.1\quad \textit{1/v Cross Sections}---It is not possible using radioactivation techniques
+to determine the true thermal neutron fluence rate without making some assumptions about
+the spectral shapes of both the thermal and epithermal components of the neutron density.
+For most purposes, however, the information required is only that needed to make
+calculations of activation and other reaction rates for various materials exposed to the
+neutron field. For reactions in which the cross section varies inversely as the neutron
+speed (1/v cross sections) the reaction rates are proportional to the total neutron
+density and do not depend on the spectrum shape. Many radioactivation detectors have
+reaction cross sections in the thermal energy range which approximate to 1/v cross
+sections (1/v detectors). Departures from the 1/v shape can be accounted for by means
+of correction factors.
+
+5.2\quad \textit{Fluence Rate Conventions:}
+
+5.2.1\quad The purpose of a fluence rate convention (formerly called ``flux convention'')
+is to describe a neutron field in terms of a few parameters that can be conveniently used
+to calculate reaction rates. The best known fluence rate conventions relating to thermal
+neutron fields are the Westcott convention~(2) and the Stoughton and Halperin
+convention~(3). Both make use of the concept of an equivalent 2200~m/s fluence rate,
+that is equal to the product of the neutron density and the standard speed, $v_0$, equal
+to 2200~m/s which is the most probable speed of Maxwellian thermal neutrons when the
+characteristic temperature is 293.59~$^\circ$K. In the Westcott convention, it is the
+total neutron density (thermal plus epithermal) which is multiplied by $v_0$ to form the
+``Westcott flux,'' but in the Stoughton and Halperin convention, the conventional
+fluence rate is the product of the Maxwellian thermal neutron density and $v_0$. The
+latter convention is the one followed in this method:
+
+\begin{equation}
+  \varphi_0 = n_{th}\,v_0
+  \label{eq:phi0}
+\end{equation}
+
+\noindent where $\varphi_0$ is the equivalent (or conventional) 2200~m/s thermal fluence
+rate and $n_{th}$ represents the thermal neutron density, which is proportional to the
+reaction rate per atom in a 1/v detector exposed to thermal neutrons:
+
+\begin{equation}
+  R_0 = n_{th}\,\sigma_0\,v_0 = \sigma_0\,\varphi_0
+  \label{eq:R0_1v}
+\end{equation}
+
+5.2.2\quad $R_0$ represents only that part of the reaction rate that is induced by thermal
+neutrons, which have the Maxwellian spectrum shape. $\sigma_0$ is the 2200~m/s cross
+section. For a non-1/v detector Eq~\ref{eq:R0_1v} needs to be replaced by:
+
+\begin{equation}
+  R_0 = n_{th}\,g\,\sigma_0\,v_0 = g\,\sigma_0\,\varphi_0
+  \label{eq:R0_non1v}
+\end{equation}
+
+\noindent where $g$ is a correction factor that accounts for the departures from the
+ideal 1/v detector cross section in the thermal energy range. The same factor appears in
+the Westcott convention Ref~(2), and is usually referred to as the Westcott $g$ factor.
+$g$ depends on the neutron temperature, $T$, and is defined as follows:
+
+\begin{equation}
+  g = \frac{1}{v_0\,\sigma_0}
+  \int_{0}^{\infty}
+  \frac{4}{\pi^{1/2}}
+  \left(\frac{v}{v_0}\right)^{3}
+  \left(\frac{T_0}{T}\right)^{3/2}
+  \cdot\exp\!\left[-\left(\frac{v}{v_0}\right)^{2}\!\left(\frac{T_0}{T}\right)\right]
+  \sigma(v)\,dv
+  \label{eq:g_factor}
+\end{equation}
+
+5.2.3\quad If the thermal neutron spectrum truly follows the Maxwellian distribution and
+if the neutron temperature is known, it is possible to calculate the true thermal neutron
+fluence rate by multiplying the conventional (equivalent 2200~m/s) thermal fluence rate
+by the factor:
+
+\begin{equation}
+  \frac{v}{v_0} = \left(\frac{4T}{\pi\,T_0}\right)^{1/2}
+  \label{eq:v_ratio}
+\end{equation}
+
+\noindent where $v$ is the Maxwellian mean speed for neutron temperature $T$, and $T_0$
+is the standard temperature of 293.4~$^\circ$K. This conversion is most often
+unnecessary and is usually not made because the temperature $T$ may be unknown.
+Naturally, it is essential when reporting results to be absolutely clear whether the true
+thermal fluence rate or the equivalent 2200~m/s thermal fluence rate or the equivalent
+2200~m/s total (Westcott) fluence rate is used. If the true thermal fluence rate is used,
+then its value must be accompanied by the associated temperature value.
+
+5.3\quad \textit{Epithermal Neutrons}---In order to determine the effects of epithermal
+neutrons that are invariably present together with thermal neutrons, cadmium covered foil
+irradiations are made. It is important to realize that some epithermal neutrons can have
+energies below the effective cadmium cut-off energy, $E_\text{cd}$. The lowest energy of
+epithermal neutrons is usually taken to be equal to $5kT$ (where $k$ is Boltzmann's
+constant) that is equal to 0.13~eV for room temperature (293~$^\circ$K) neutrons~(2),
+though $4kT$ has been recommended for some reactors~(4). In order to correct for these,
+it is necessary to make some assumption about the epithermal neutron spectrum shape, and
+the assumption made in Refs~(2) and (3) is that the epithermal neutron fluence rate per
+unit energy is proportional to 1/$E$:
+
+\begin{equation}
+  \varphi_e(E) = \varphi_e/E \qquad E \geq 5kT
+  \label{eq:epithermal}
+\end{equation}
+
+\noindent where $\varphi_e$ is an epithermal fluence parameter equal to the fluence rate
+per unit energy, $\varphi_e(E)$, at 1~eV. This assumption is usually adequate for the
+purpose of correcting thermal neutron fluence rate measurements for epithermal neutrons
+at energies below the cadmium cut-off. To represent the epithermal fluence more
+correctly, however, many authors have shown that the use of a $1/E^{(1+\alpha)}$ spectrum
+shape is preferable, where $\alpha$ is an empirical parameter. Refs~(5--11).
+
+5.4\quad \textit{Resonance Integral:}
+
+5.4.1\quad The resonance integral for an ideal dilute detector is defined as follows:
+
+\begin{equation}
+  I_0 = \int_{E_\text{cd}}^{\infty} \sigma(E)\,\frac{dE}{E}
+  \label{eq:resonance_integral}
+\end{equation}
+
+5.4.2\quad The cadmium cut-off energy is taken to be 0.55~eV for a cylindrical cadmium
+box of wall thickness 1~mm~(12). The data needed to correct for epithermal neutron
+reactions in the methods described are the values of $I_0/g\sigma_0$ for each reaction
+(see Table~\ref{tab:nuclear_data}). These values, taken from Refs~(13--15), are based on
+integral measurements.
+
+5.5\quad \textit{Reaction Rate:}
+
+5.5.1\quad The reaction rate per atom, for an isotope exposed to a mixed thermal and
+epithermal neutron field is given by:
+
+\begin{equation}
+  R = \varphi_0\,g\sigma_0
+  + \varphi_e\!\left[g\sigma_0 f_1 + \sigma_0 w' + I_0\right]
+  \label{eq:reaction_rate}
+\end{equation}
+
+$f_1$ is a function that describes the epithermal activation of a 1/v detector in the
+energy range $5kT$ to $E_\text{cd}$:
+
+\begin{equation}
+  f_1 = \int_{5kT}^{E_\text{cd}}
+  \left(\frac{kT_0}{E}\right)^{1/2}\frac{dE}{E}
+  \label{eq:f1}
+\end{equation}
+
+5.5.2\quad For $E_\text{cd}$ equal to 0.55~eV and $T_0$ equal to 293.4~$^\circ$K,
+$f_1 = 0.468$. $w'$ in Eq~\ref{eq:reaction_rate} is a function which accounts for
+departure of the cross section from the 1/v law in the energy range $5kT$ to
+$E_\text{cd}$:
+
+\begin{equation}
+  w' = \frac{1}{\sigma_0}
+  \int_{5kT}^{E_\text{cd}}
+  \left[\sigma(E) - g\sigma_0\left(\frac{kT}{E}\right)^{1/2}\right]
+  \frac{dE}{E}
+  \label{eq:wprime}
+\end{equation}
+
+Some values of $w'$ for $T$ equal 293.4~$^\circ$K are given in Table~\ref{tab:nuclear_data}.
+
+5.5.3\quad For a cadmium-covered foil, the reaction rate is given as:
+
+\begin{equation}
+  R_\text{Cd} = \varphi_e\,I_0
+  \label{eq:RCd}
+\end{equation}
+
+5.5.4\quad This can be used to eliminate the unknown epithermal fluence rate parameter,
+$\varphi_e$, from Eq~\ref{eq:reaction_rate}. After rearrangement, one obtains an
+expression for the saturation activity due to thermal neutrons only:
+
+\begin{equation}
+  \varphi_0\,g\sigma_0 = R_0
+  = R - R_\text{Cd}\!\left(1 + \frac{g\sigma_0}{I_0}f_1
+    + \frac{\sigma_0 w'}{I_0}\right)
+  \label{eq:R0_thermal}
+\end{equation}
+
+5.6\quad \textit{Neutron Self-Shielding:}
+
+5.6.1\quad Unless extremely thin or dilute alloy materials are used, all of the
+measurement methods are subject to the effects of neutron self-shielding. The modified
+version of Eq~\ref{eq:R0_thermal} which takes into account both a thermal self-shielding
+factor $G_{th}$, and an epithermal self-shielding factor $G_{res}$ is:
+
+\begin{equation}
+  \varphi_0\,g\sigma_0 = \frac{R_0}{G_{th}}
+  = \frac{1}{G_{th}}\!\left[R
+    - R_\text{Cd}\!\left(1
+      + \frac{g\sigma_0}{G_{res}I_0}f_1
+      + \frac{\sigma_0 w'}{G_{res}I_0}
+    \right)\right]
+  \label{eq:R0_selfshield}
+\end{equation}
+
+5.6.2\quad Values of the self-shielding factors $G_{th}$ and $G_{res}$ for several foils
+and wires are given in Tables~\ref{tab:cobalt_foils}--\ref{tab:In_Au_foils}. In the
+literature, values for the resonance self-shielding factor are given in two ways, and
+those must not be confused. $G_{res}$, as used here, is a factor by which multiplies the
+resonance integral as defined in Eq~\ref{eq:resonance_integral}. $G'_{res}$ is a
+self-shielding factor that multiplies the reduced resonance integral from which the 1/v
+part of the cross section has been subtracted. The necessary conversion factor that has
+been applied where needed in Tables~\ref{tab:cobalt_foils}--\ref{tab:In_Au_foils} is:
+
+\begin{equation}
+  G_{res} = G'_{res} + (1-G'_{res})\,0.429\,\frac{g\sigma_0}{I_0}
+  \label{eq:Gres_convert}
+\end{equation}
+
+5.7\quad The tables in this test method may be used to provide self-shielding factors.
+For materials and dimensions not in the tables, neutron transport codes may be used.
+Reference~(1) provides formulae for determining self-shielding for foils and wires.
+
+5.8\quad \textit{Fluence Depression Factors}---Thermal fluence depression is an additional
+perturbation that occurs when an absorber is surrounded by a moderator. Because the
+effects are sensitive to the details of individual situations, it is not possible to
+provide correction factors here. References~(24--32) describe these effects. The problem
+is avoided when foils are exposed in cavities of very large volume compared to the
+detector volume. In other cases, a rough guide is that the external perturbation effect
+is usually less than the thermal self-shielding effect, and much less when the
+hydrogenous moderator is absent.
+
+% ---- Table 2 ----
+\begin{table}[ht]
+\centering
+\caption{Nuclear Data from References}
+\label{tab:nuclear_data}
+\begin{tabular}{lcccc}
+\toprule
+Reaction
+  & $\sigma_0$ (barns)$^A$
+  & $g\ (T=300\ \text{K})^A$
+  & $I_0/g\sigma_0$
+  & $w'$ \\
+\midrule
+$^{59}$Co(n,$\gamma$)$^{60}$Co
+  & $37.18 \pm 0.16\,\%$
+  & 1.000
+  & $1.98 \pm 0.034^B$
+  & $0^C$ \\
+$^{197}$Au(n,$\gamma$)$^{198}$Au
+  & $98.65 \pm 0.09\,\%$
+  & 1.005
+  & $15.7 \pm 0.3^B$
+  & $.0500^C$ \\
+$^{115}$In(n,$\gamma$)$^{116}$In
+  & $159 \pm 1\,\%$
+  & 1.020
+  & $16.01 \pm 0.51^A$
+  & $.2953^C$ \\
+$^{164}$Dy(n,$\gamma$)$^{165}$Dy
+  & $2650 \pm 2.6\,\%$
+  & 0.987
+  & $0.13 \pm 0.01^A$
+  & $0^D$ \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize $^A$ Ref~(16). $\sigma_0$ adjusted from $^{116m}$In by 0.79.}\\
+\multicolumn{5}{l}{\footnotesize $^B$ Ref~(15).}\\
+\multicolumn{5}{l}{\footnotesize $^C$ Ref~(17).}\\
+\multicolumn{5}{l}{\footnotesize $^D$ Ref~(13).}\\
+\end{tabular}
+\end{table}
+
+% ---- Table 3 ----
+\begin{table}[ht]
+\centering
+\caption{Resonance Self-Shielding Data for Cobalt Foils (Ref~(18))}
+\label{tab:cobalt_foils}
+\begin{tabular}{cccc}
+\toprule
+\multicolumn{2}{c}{Foil Thickness} & $G'_{res}$ (132~eV) & $G_{res}$ \\
+(in.) & (cm) & & \\
+\midrule
+0.0004 & 0.001018 & 0.8264 & 0.864 \\
+0.0010 & 0.00254  & 0.7000 & 0.765 \\
+0.0025 & 0.00635  & 0.5470 & 0.645 \\
+0.0050 & 0.0127   & 0.4395 & 0.561 \\
+0.0075 & 0.01905  & 0.3831 & 0.517 \\
+0.010  & 0.0254   & 0.3476 & 0.489 \\
+0.015  & 0.0381   & 0.3028 & 0.454 \\
+0.020  & 0.0508   & 0.2744 & 0.432 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---- Table 4 ----
+\begin{table}[ht]
+\centering
+\caption{Thermal and Resonance Self-Shielding Data for Cobalt Wires (Ref~(19))}
+\label{tab:cobalt_wires}
+\begin{tabular}{cccccc}
+\toprule
+\multicolumn{2}{c}{Wire Diameter} & Cobalt content & $G'_{res}$ (132~eV) & $G_{th}$ & $G_{res}$ \\
+(in.) & (cm) & (mass\,\%) & & & \\
+\midrule
+0.050 & 0.127   & 0.104 & 1.00            & 1.00            & 1.00 \\
+0.050 & 0.127   & 0.976 & $0.95\pm 0.04$  & $0.99\pm 0.01$  & 0.96 \\
+0.001 & 0.00254 & 100   & $0.81\pm 0.03$  & $0.99\pm 0.02$  & 0.85 \\
+0.005 & 0.01270 & 100   & $0.52\pm 0.02$  & $0.97\pm 0.01$  & 0.62 \\
+0.010 & 0.0254  & 100   & $0.42\pm 0.02$  & $0.94\pm 0.01$  & 0.55 \\
+0.015 & 0.0381  & 100   & $0.38\pm 0.01$  & $0.92\pm 0.02$  & 0.51 \\
+0.020 & 0.0508  & 100   & $0.34\pm 0.01$  & $0.90\pm 0.02$  & 0.48 \\
+0.025 & 0.0635  & 100   & $0.32\pm 0.01$  & $0.88\pm 0.03$  & 0.47 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---- Table 5 ----
+\begin{table}[ht]
+\centering
+\caption{Resonance Self-Shielding Data for Gold Foils (Refs~(20) and (21))}
+\label{tab:gold_foils}
+\begin{tabular}{ccccc}
+\toprule
+Foil Thickness (cm) & $I$ (barn) & $G_{res}$ (theory) & $G_{res}$ (experiment)
+  & $(G_\text{theo}-G_\text{exp})/G_\text{exp}$ (\%) \\
+\midrule
+$2\times10^{-6}$ & 1556.83 & 0.9936 & \ldots   & \ldots    \\
+$4\times10^{-6}$ & 1550.04 & 0.9893 & \ldots   & \ldots    \\
+$8\times10^{-6}$ & 1577.91 & 0.9815 & \ldots   & \ldots    \\
+$2\times10^{-5}$ & 1507.41 & 0.9621 & 0.9644   & $-0.24$   \\
+$4\times10^{-5}$ & 1465.83 & 0.9355 & 0.9340   & $+0.16$   \\
+$8\times10^{-5}$ & 1398.77 & 0.8927 & 0.8852   & $+0.85$   \\
+$2\times10^{-4}$ & 1252.38 & 0.7993 & 0.7852   & $+1.80$   \\
+$4\times10^{-4}$ & 1088.91 & 0.6950 & 0.6836   & $+1.66$   \\
+$8\times10^{-4}$ & 890.482 & 0.5683 & 0.5612   & $+1.27$   \\
+$2\times10^{-3}$ & 628.570 & 0.4012 & 0.3952   & $+1.51$   \\
+$4\times10^{-3}$ & 468.493 & 0.2990 & 0.3020   & $-0.99$   \\
+$8\times10^{-3}$ & 347.671 & 0.2219 & 0.2219   & $-0.0036$ \\
+$2\times10^{-2}$ & 234.983 & 0.1450 & 0.1505   & $-0.35$   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---- Table 6 ----
+\begin{table}[ht]
+\centering
+\caption{Resonance Self-Shielding Data for Gold Wires (Ref~(22))}
+\label{tab:gold_wires}
+\begin{tabular}{cccc}
+\toprule
+\multicolumn{2}{c}{Wire Diameter} & Average (cm) & $G_{res}$ \\
+Nominal ($10^{-3}$~in.) & Average ($10^{-3}$~in.) & & \\
+\midrule
+0.5  & 0.505  & 0.00128  & 0.703 \\
+1.0  & 0.98   & 0.00249  & 0.552 \\
+2.0  & 1.98   & 0.00503  & 0.410 \\
+4.0  & 4.05   & 0.01029  & 0.302 \\
+6.0  & 6.02   & 0.01529  & 0.258 \\
+8.0  & 7.98   & 0.02027  & 0.228 \\
+10.0 & 10.01  & 0.02542  & 0.208 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Apparatus}
+
+6.1\quad \textit{Radiation-Detection Instruments:}
+
+6.1.1\quad The radiation detectors that may be used in neutron activation techniques are
+described in the standard methods, Guide E181. In addition, or as an alternative, a
+calibration high-pressure ionization chamber may be used. Details for its construction
+and calibration may be found in Ref~(33).
+
+6.2\quad \textit{Precision Punch:}
+
+6.2.1\quad A precision punch is required to fabricate a set of identical foils for the
+standard foil technique. The punch must cut foils that have smooth edges. Since finding
+such a punch commercially available is difficult, it is recommended that the punch be
+custom made. It is possible to have several dies made to fit one punch so that a variety
+of foil sizes can be obtained. Normally, foil diameters are 12.7~mm (0.500~in.) or less.
+The precision punch is one of the most important items in the standard foil technique,
+particularly if the counting technique includes $\beta$ or soft-photon events.
+
+6.3\quad \textit{Aluminum and Cadmium Boxes:}
+
+6.3.1\quad One set of foils must be irradiated in cadmium boxes or covers to determine
+that part of the neutron activation resulting from absorption of epicadmium neutrons. The
+cadmium box must be constructed so that the entire foil is surrounded by 1~mm (0.040~in.)
+of cadmium. This can be accomplished by using a circular cup-shaped design as shown in
+Fig.~\ref{fig:cd_box}. To eliminate positioning errors, aluminum boxes identical to the cadmium boxes
+should be used for the ``bare'' or total neutron activation measurements. Small-bore
+cadmium tubing having 1~mm walls is commercially available for use with wires.
+
+\begin{figure}[ht]
+\centering
+\fbox{\rule{0pt}{2in}\rule{3in}{0pt}}
+\caption{Side View of Cadmium Box Cross Section (all wall thicknesses are
+0.040~in.\ (1.016~mm); inside diameter is a few mils greater than foil diameter).}
+\label{fig:cd_box}
+\end{figure}
+
+% ============================================================
+\section{Materials and Manufacture}
+
+7.1\quad The four materials required for the techniques in this method are cobalt, gold,
+indium, and dysprosium. These metals are available commercially in very pure form (at
+least 99.9\,\%) and can be obtained in either foil or wire form. Cobalt, gold, indium,
+and dysprosium are also available as an alloy with aluminum, for example NIST Standard
+Reference Material 953. The alloy dilutions are useful for extending the range of
+measurement to higher neutron fluences; in the case of indium, the alloy has the
+additional advantage of mechanical strength. Pure indium is so soft that it must be
+handled with extreme care to prevent distortions in the precision-punched foils. The use
+of alloys results in uncertainties and nonuniformity of alloy concentrations, but reduces
+the self-shielding corrections and their uncertainties.
+
+% ============================================================
+\section{Procedure}
+
+8.1\quad \textit{Cobalt Method (Radiometric Technique):}
+
+8.1.1\quad Pure cobalt wire, 0.127~mm (0.005~in.) in diameter will conveniently monitor
+thermal neutron fluences in the range of $10^{14}$ to $10^{18}$~cm$^{-2}$. Cobalt-aluminum
+alloy wire of the same diameter (0.50\,\% by weight of cobalt or less) can be used for
+higher fluences. Burn-up of the target material needs to be considered at fluences above
+$10^{20}$~cm$^{-2}$. The neutron reaction involved is $^{59}$Co(n,$\gamma$)$^{60}$Co.
+$^{60}$Co emits two gamma rays per disintegration in cascade with energies of 1.17 and
+1.33~MeV having a half-life of 1925.23~days~(34). $^{60m}$Co is also formed in the
+reaction, but this isometric state decays to $^{60}$Co by means of a single 0.0586~MeV
+gamma ray having a half-life of 10.467~min~(35).
+
+8.1.2\quad The equivalent 2200~m/s thermal fluence rate in which a thin sample of cobalt
+has been irradiated may be calculated as follows:
+
+\begin{equation}
+  \varphi_0 = \frac{R}{g\sigma_0}
+  \label{eq:phi0_cobalt}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  R        &= \text{reaction rate per target atom,}\\
+  \sigma_0 &= \text{2200~m/s cross section, and}\\
+  g        &= \text{Westcott }g\text{ factor.}
+\end{align*}
+
+8.1.3\quad The reaction rate is given by:
+
+\begin{equation}
+  R = \frac{C\,\exp(\lambda t_w)}{\varepsilon\,N_0\!\left(1-\exp(-\lambda t_i)\right)}
+  \label{eq:reaction_rate_exp}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  C   &= \text{net counting rate of }^{60}\text{Co in the sample at the time of}\\
+      &\quad\text{measurement, corrected for background radiations,}\\
+  \lambda &= \text{decay constant of }4.170\times10^{-9}\ \text{s}^{-1}
+             \text{ corresponding to the half-life of }^{60}\text{Co of 1925.5 days,}\\
+  N_0 &= \text{original number of atoms of nuclide to be activated}\\
+      &\quad\text{(given by the product of the weight in grams of }^{59}\text{Co in the}\\
+      &\quad\text{sample and Avogadro's number divided by the atomic weight,}\\
+      &\quad\text{58.9332, in g),}\\
+  \varepsilon &= \text{efficiency of the detector for }^{60}\text{Co radiation in the given geometry,}\\
+  t_i &= \text{duration of the exposure, and}\\
+  t_w &= \text{elapsed time from the end of the exposure period to the time of counting.}
+\end{align*}
+
+8.1.4\quad When the exposure time is small compared to the 1925.5~day half-life of
+$^{60}$Co, as is usually the case, we may write:
+
+\begin{equation}
+  1 - \exp(-\lambda t_i) \approx \lambda t_i
+  \label{eq:approx_exp}
+\end{equation}
+
+Eq~\ref{eq:phi0_cobalt} becomes:
+
+\begin{equation}
+  \varphi_0 = C\,\exp(\lambda t_w)/\lambda t_i N_0 \sigma_0 \varepsilon
+  \label{eq:phi0_approx}
+\end{equation}
+
+8.1.5\quad The fluence over the irradiation period is:
+
+\begin{equation}
+  \Phi = \varphi_0\,t_i = C\,\exp(\lambda t_w)/\lambda N_0 \sigma_0 \varepsilon
+  \label{eq:fluence_cobalt}
+\end{equation}
+
+8.1.6\quad If the cobalt sample has been activated in a neutron spectrum that is not
+totally thermalized, then the reaction rate must be corrected for epithermal neutron
+activation. This is done by irradiating a similar cobalt sample shielded by cadmium
+(1~mm (0.040~in.) thick) and using Eq~\ref{eq:R0_selfshield} which yields:
+
+\begin{equation}
+  \Phi = \frac{1}{G_{th}}\!\left(C_B - C_\text{cd}\!\left(1
+    + \frac{g\sigma_0 f_1}{G_{res}I_0}
+    + \frac{\sigma_0 w'}{G_{res}I_0}
+  \right)\right)
+  \cdot\frac{\exp(\lambda t_w)}{\lambda N_0\,g\sigma_0\,\varepsilon}
+  \label{eq:fluence_cobalt_epi}
+\end{equation}
+
+\noindent where $C_B$ and $C_\text{cd}$ are the $^{60}$Co counting rates in the bare and
+cadmium-covered samples, respectively. In practice, the 0.127~mm cobalt wire cannot be
+considered a thin sample. The self-shielding effects of the wire are accounted for by
+the $G_{th}$ and $G_{res}$ factors in Eq~\ref{eq:fluence_cobalt_epi} (see also
+Tables~\ref{tab:cobalt_wires} and \ref{tab:gold_foils}). If the cobalt-aluminum alloy
+(0.50\,\% by weight of cobalt or less) is being used, no self-shielding correction
+factors are needed.
+
+8.1.7\quad There are two methods for obtaining the detection efficiency for the $^{60}$Co
+in the sample. The first method uses a high-pressure ionization chamber, a heavily
+shielded well-type counter that almost completely surrounds the sample being counted with
+an ionization volume, thereby allowing for essentially $4\pi$ geometry to detect the
+radiation. A voltage placed across the collecting electrodes generates a current
+proportional to the number of ions produced, which in turn is proportional to the sample
+source strength. Measure the current, expressed as the voltage drop across precision
+resistors, with a potentiometer. Calibrate the chamber for $^{60}$Co with a $^{60}$Co
+gamma source having a certified activity which is traceable to a national standard. A
+calibration constant $S$, expressed as disintegrations per second per volt, is thereby
+obtained. Accordingly, the disintegration rate of the cobalt wire sample is the product
+of $S$ multiplied by the voltage reading obtained.
+
+8.1.8\quad A second method for determining the disintegration rate in the cobalt sample
+as described in Guide E181, makes use of high-resolution gamma detectors for
+interference-free counting of $^{60}$Co. The detection efficiency for the $^{60}$Co
+radiation must be measured using a certified $^{60}$Co source, or a multi-gamma-ray
+reference standard traceable to national standards as described in Section 12.5 of Guide
+E181. The shape, positioning, and encapsulation of both the standard source and the
+activation monitor sample must be carefully controlled to ensure the same detection
+efficiency in each case.
+
+8.2\quad \textit{Gold Methods}---Pure gold foil, 0.051~mm (0.002~in.) thick and 12.7~mm
+(0.5~in.) in diameter, or similar gold-aluminum alloy foils containing 0.5\,\% by weight
+of gold, can be used for neutron fluences in the range $10^7$ to $10^{14}$~cm$^{-2}$.
+Gold is composed of only one isotope, $^{197}$Au. The reaction involved is
+$^{197}$Au(n,$\gamma$)$^{198}$Au. The product nucleus, which has a half-life of
+2.6950~days~(34), can be counted by means of a calibrated gamma spectrometer or by
+$4\pi\beta$-$\gamma$ coincidence counting. The dominant gamma-ray peak has an energy of
+411.80~keV and an emission probability per decay of 0.9554~(34). Other details are as
+described for the cobalt method.
+
+8.2.1\quad \textit{Radiometric Technique Using Gold}---The procedures for using the
+radiometric technique for gold are as described for the cobalt method.
+
+8.2.2\quad \textit{Standard Foil Technique for Gold:}
+
+8.2.2.1\quad When a standard gold foil has been activated by neutrons, the following
+relationship is true:
+
+\begin{equation}
+  \varphi_0 = K\,R_0
+  \label{eq:phi0_K}
+\end{equation}
+
+\noindent where $K$ is a constant for any given size of foil and counting setup. The
+constant $K$ includes the counter efficiency, the macroscopic nuclear properties of the
+foil material, and the geometry of the foil and detector. The object of the standard foil
+technique is to determine $K$ for a particular experimental setup.
+
+8.2.2.2\quad Most neutron fluence rate measurements are made in a field of neutrons where
+all energies are present, not just thermal energies. Therefore, the experiment requires
+measuring the amount of activation on a standard foil due to epicadmium neutrons. This is
+accomplished by irradiating the foil in a cadmium cover. For a thickness of 1~mm
+(0.040~in.) of cadmium, essentially all neutrons having energies less than about 0.5~eV
+will be absorbed by the cadmium. (A neutron having a velocity of 2200~m/s has an energy
+of 0.025~eV.)
+
+8.2.2.3\quad Thus the general procedures for determining $K$ include two types of standard
+foil irradiations. For one set of irradiations, the samples are bare or aluminum covered;
+the second set of irradiations are cadmium covered. After the counting data have been
+converted to saturation activities, $K$ can then be determined from the following
+relationship:
+
+\begin{equation}
+  K = \frac{\varphi_0}{R_0}
+  \label{eq:K}
+\end{equation}
+
+\noindent and
+
+\begin{equation}
+  R_0 = R - R_\text{Cd}\!\left(1
+    + \frac{g\sigma_0 f_1}{G_{res}I_0}
+    + \frac{\sigma_0 w'}{G_{res}I_0}
+  \right)
+  \label{eq:R0_gold}
+\end{equation}
+
+8.2.2.4\quad Due to its half-life, gold is a convenient material for standard foils,
+especially if the foils are exposed at one site and transported to another site for
+counting. The relatively long half-life also allows great latitude in exposure times,
+thus increasing the range of fluence rates over which a set of standard gold foils is
+useful. Gold foils that are 12.7~mm (0.500~in.) in diameter and 0.051~mm (0.002~in.)
+thick can be used to measure neutron fluence from $10^7$ to $10^{14}$~cm$^{-2}$.
+
+8.2.2.5\quad Make a set of standard gold foils by punching them on a precision punch from
+the stock material of pure gold sheet. Weigh the foils on an analytical balance, and
+select only those foils whose weights differ by less than 0.5\,\%. Then lightly scribe
+numbers on the foils with a sharp stylus. Afterwards, irradiate a minimum of six foils
+in a known thermal neutron field; three in aluminum covers and three in cadmium covers.
+
+8.2.2.6\quad Upon receipt of the irradiated gold foils, count them on the counting setups
+that are to be calibrated; calculate the bare and cadmium-covered saturation activities;
+and determine the constant $K$ as shown in Eq~\ref{eq:K} and \ref{eq:R0_gold}. An
+unknown thermal neutron fluence rate can now be measured by irradiating both bare and
+cadmium-covered gold foils from the standard set. A radioisotope having a long half-life
+($^{137}$Cs or $^{60}$Co) is recommended as a daily performance standard check for the
+counting setups to guarantee long-term stability.
+
+8.2.2.7\quad For high fluence irradiations the second-order reaction
+$^{197}$Au(n,$\gamma$)$\to$$^{198}$Au(n,$\gamma$)$\to$$^{199}$Au may be important. As
+discussed in Practice E261, the high 25\,000~barn cross section of $^{198}$Au leads to
+its removal by capture during irradiation: at a fluence rate of
+$10^{14}$~cm$^{-2}$s$^{-1}$, the removal rate $A = \sigma\Phi$ is nearly twice the
+decay rate $\lambda$.
+
+8.3\quad \textit{Indium Methods:}
+
+8.3.1\quad Elemental indium is composed of two stable isotopes, $^{113}$In (4.29\,\%) and
+$^{115}$In (95.71\,\%)~(35). The reaction discussed here is
+$^{115}$In(n,$\gamma$)$^{116}$In. 79\,\%~(23) of the reactions go to the meta-stable
+state $^{116}$In decays in a complex manner by beta emission. The half-life for this
+decay is 54.29~min~(35). The beta rays may be counted, or one may count associated gamma
+rays, for example 818.7~keV (11.5\,\%), 1097.3~keV (56.2\,\%), or 1293.6~keV
+(84.4\,\%)~(36). $^{113}$In also activates upon neutron capture, but the resulting
+$^{114}$In decays with a 49.51~day half-life~(35). For the relatively short irradiation
+time necessary to activate $^{115}$In, there is essentially no $^{114}$In produced.
+Thus, indium is a convenient material for standard foils as the set can be reused on a
+daily basis if necessary due to the short half-life. Also, a few hours of irradiation
+time will essentially saturate the 54.29~min activity. These properties of indium,
+coupled with its good thermal cross section, allow pure indium foils to measure a minimum
+neutron fluence rate of 1~cm$^{-2}$$\cdot$s$^{-1}$. By diluting indium as an alloy of
+aluminum and also reducing the foil size to about 6.35~mm (0.250~in.) in diameter, it is
+possible to measure neutron fluence rates in the range of
+$10^{10}$~cm$^{-2}$$\cdot$s$^{-1}$. Indium foils may be calibrated directly in an
+on-site standard field; otherwise, the experimenter should use gold foils for the
+standard pile calibration, and then intercalibrate the set of indium foils in whatever
+neutron field is available at their own laboratory.
+
+8.3.2\quad Care must be taken to use the correct $^{115}$In(n,$\gamma$) cross section
+since either the total or $^{116m}$In cross section may be reported in various libraries.
+For $^{116m}$In, one may multiply the total cross section by 0.79.
+
+8.3.3\quad There is one additional correction that must be made when using indium. Indium
+has a tremendous resonance in its neutron absorption cross section curve at about 1.44~eV.
+This resonance is sufficiently close to the cadmium cut-off energy ($\approx$0.5~eV) that
+a correction must be made to all cadmium-covered indium measurements. The difficulty is
+that the cadmium not only absorbs the thermal neutrons effectively, but also begins to
+absorb many of the neutrons that should be captured by the lower wing of the tremendous
+indium resonance. Experimentally, this effect is seen as a rapid decrease in the
+cadmium-covered saturation activity of the indium foil as the thickness of cadmium
+increases. Thus, increase all cadmium-covered indium data by a correction factor greater
+than 1.00. Many experimenters have measured this correction, and there is good evidence
+that it is also a function of the size and thickness of the indium foil. It is recommended
+then that each experimenter empirically determine this correction for their own particular
+foils by irradiating an indium foil in cadmium covers ranging in thickness from 0.25 to
+1.00~mm (0.010 to 0.040~in.). For a thin or dilute foil in a 1~mm thick cadmium box the
+measured activity should be divided by the transmission factor of 0.93 reported in
+Ref~(37).
+
+8.3.4\quad Indium foils may be counted by the radiometric technique if gamma-ray counting
+is done. A secondary reference field may be used for foil calibration for either beta or
+gamma counting. The half-life is too short for calibration in an off-site reference field.
+
+8.4\quad \textit{Secondary Standard Foil Technique for Dysprosium:}
+
+8.4.1\quad Dysprosium is composed of the following seven isotopes~(35):
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Isotope Mass Number & Abundance, \% \\
+\midrule
+156 & 0.06 \\
+158 & 0.10 \\
+160 & 2.33 \\
+161 & 18.9 \\
+162 & 25.5 \\
+163 & 24.9 \\
+164 & 28.3 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+8.4.2\quad For many years the only pure form of this rare earth element commercially
+available was its oxide, Dy$_2$O$_3$. Currently, the pure metal is available and also an
+alloy with aluminum, containing approximately 5\,\% by weight of dysprosium is
+commercially available. The total absorption cross section for all the isotopes (about
+940~barns) is due almost entirely to the last isotope, $^{164}$Dy. Upon neutron capture,
+(n, $\gamma$) $^{164}$Dy becomes $^{165m}$Dy (half-life of 1.257~min) or $^{165}$Dy
+(half-life of 2.334~h)~(35). The isomeric state, $^{165m}$Dy decays into $^{165}$Dy.
+The activation cross sections for the two reactions are 1610 and 1040~barns, respectively,
+see Ref~(38). There must be a wait period of at least 10~min after activation to allow the
+decay of $^{165m}$Dy into $^{165}$Dy and then the $^{165}$Dy is counted.
+
+\begin{astmnote}[1]
+The $^{165}$Dy nuclei that are derived from $^{165m}$Dy do not begin their 2.334~h decay
+until slightly later than the $^{165}$Dy nuclei that are produced directly. There are
+0.5\,\% more $^{165}$Dy nuclei to count than if $^{165m}$Dy had a zero half-life. Reduce
+the measured $^{165}$Dy nuclei by 0.5\,\% and proceed as if the reaction cross section
+was 1650~b.
+\end{astmnote}
+
+8.4.3\quad Although the cross section-versus-energy curve shows several large resonances
+in the eV region, dysprosium has considerably less cadmium-covered activation than the
+more common neutron detector materials. It is this property, along with the large cross
+section and convenient half-life, that makes dysprosium an attractive choice for a
+thermal neutron detector. It is particularly useful in experiments where the physical
+space limitations will not allow the rather bulky cadmium-covered measurements to be
+made, such as inside the more tightly lattice plate-type or pin-type reactor fuel
+elements. The very low $I_0/g\sigma_0$ value for dysprosium means that the corrections
+for epithermal neutrons can be neglected. It also follows that self-shielding factors are
+not needed for relative thermal fluence rate measurements using dysprosium. Variation of
+the $g$ factor with temperature must be accounted for when the neutron temperature in the
+unknown field differs from that in the standard field used.
+
+8.4.4\quad Dysprosium foils are usually beta counted since the total gamma activity is
+only about 1\,\% of the beta activity. When the dysprosium-aluminum foils have been
+irradiated in a neutron spectrum containing a large fraction of high-energy neutrons
+(greater than 1~MeV), the experimenter must be aware of the beta-producing 9.458~min
+$^{27}$Mg and 0.62356~day $^{24}$Na activities produced in the aluminum from the
+$(n,\,p)$ and $(n,\,\alpha)$ reactions, respectively. If these activities are present,
+eliminate the $^{27}$Mg by allowing the foils to decay for 1 to 2~h before counting, and
+determine the $^{24}$Na contribution by recounting the foils after 24 to 36~h. If the
+intensity is sufficient, $^{165}$Dy gamma rays of 361~keV (0.84\,\%) or 715~keV
+(0.53\,\%) may be counted~(36).
+
+8.4.5\quad As in the case of indium, the relatively short half-life of $^{165}$Dy
+requires that the foils be counted at the same location where they were irradiated. Also,
+due to nonuniformity in the dysprosium-aluminum alloy, each foil must be individually
+calibrated, because the weight of the foil, even though precision punched, does not
+necessarily represent the relative dysprosium content. Make these calibrations
+conveniently by irradiating a set of dysprosium-aluminum foils on the rim (at equal
+radii) of a rotating disk in a thermal neutron field. The observed saturation activities
+of the foils will be in the same ratio as their individual dysprosium content, since each
+foil will have received an identical exposure. A set of dysprosium-aluminum foils will
+remain calibrated over long periods of time owing to the alloy having good mechanical
+strength and not corroding or oxidizing under reasonable exposure conditions.
+
+% ---- Table 7 ----
+\begin{landscape}
+\begin{table}[p]
+\centering
+\caption{Self-Shielding Calculations for Indium and Gold Foils (Ref~(23))}
+\label{tab:In_Au_foils}
+\small
+\begin{tabular}{cccc|cccc}
+\toprule
+\multicolumn{4}{c|}{Natural Indium} & \multicolumn{4}{c}{Natural Gold} \\
+Foil thickness & $G_{res}$ & $G_{th}$ & $G_{res}/G_{th}$
+  & Foil thickness & $G_{res}$ & $G_{th}$ & $G_{res}/G_{th}$ \\
+(mg/cm$^2$) & & & & (mg/cm$^2$) & & & \\
+\midrule
+0.05  & 0.988 & 1.000 & 0.988 & 0.05  & 0.994 & 1.000 & 0.994 \\
+0.1   & 0.977 & 1.000 & 0.977 & 0.1   & 0.987 & 1.000 & 0.987 \\
+0.2   & 0.959 & 0.999 & 0.960 & 0.2   & 0.975 & 1.000 & 0.975 \\
+0.5   & 0.920 & 0.998 & 0.922 & 0.5   & 0.950 & 1.000 & 0.950 \\
+1.0   & 0.868 & 0.997 & 0.870 & 0.75  & 0.931 & 0.999 & 0.932 \\
+2.0   & 0.796 & 0.993 & 0.801 & 1.0   & 0.919 & 0.999 & 0.920 \\
+5.0   & 0.649 & 0.987 & 0.658 & 2.0   & 0.867 & 0.998 & 0.869 \\
+10    & 0.519 & 0.976 & 0.531 & 3.0   & 0.828 & 0.997 & 0.830 \\
+20    & 0.400 & 0.956 & 0.417 & 5.0   & 0.763 & 0.995 & 0.767 \\
+30    & 0.334 & 0.939 & 0.357 & 7.5   & 0.698 & 0.994 & 0.702 \\
+40    & 0.294 & 0.924 & 0.319 & 10    & 0.645 & 0.993 & 0.650 \\
+60    & 0.243 & 0.897 & 0.271 & 20    & 0.521 & 0.985 & 0.529 \\
+100   & 0.192 & 0.850 & 0.226 & 40    & 0.410 & 0.969 & 0.423 \\
+150   & 0.156 & 0.800 & 0.195 & 60    & 0.347 & 0.959 & 0.362 \\
+200   & 0.134 & 0.759 & 0.177 & 120   & 0.264 & 0.930 & 0.283 \\
+250   & 0.120 & 0.720 & 0.167 & 240   & 0.202 & 0.882 & 0.229 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
+
+% ============================================================
+\section{Discussion of Problems}
+
+9.1\quad \textit{Long-Term Fluence Monitoring:}
+
+9.1.1\quad As indicated in the cobalt method, low-concentration cobalt-aluminum alloy
+wire is suitable for monitoring long-term thermal fluence. When the thermal neutron
+fluence rate being monitored exceeds $10^{14}$~cm$^{-2}$$\cdot$s$^{-1}$ and the exposure
+times exceed a few weeks, the experimenter must be aware of possible burn-up of the
+target $^{59}$Co nuclei and of the $^{60}$Co being formed in the monitor, and burnout of
+the $^{113}$Cd, if a cadmium sleeve is being used. A correction of the burnup of
+$^{59}$Co and $^{60}$Co can be made by solving the following equation~(6) for $\varphi$:
+
+\begin{equation}
+  A = \frac{N_0\,\sigma_1\,\varphi\,\lambda
+    \!\left[\exp\!\left(-(\varphi\sigma_1 t_i)\right)
+    - \exp\!\left(-(\varphi\sigma_2+\lambda)t_i\right)\right]}
+  {\left[\varphi(\sigma_2-\sigma_1)+\lambda\right]\exp(\lambda t_w)}
+  \label{eq:burnup}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  A       &= \text{measured }^{60}\text{Co activity,}\\
+  N_0     &= \text{original number of }^{59}\text{Co atoms (see 8.1.3),}\\
+  \sigma_1 &= {}^{59}\text{Co cross section} = 37.233\ \text{barns,}\\
+  \sigma_2 &= {}^{60}\text{Co cross section} = 2\ \text{barns,}\\
+  \lambda &= {}^{60}\text{Co decay constant} = 4.16647\times10^{-9},\\
+  t_i     &= \text{exposure time, s, and}\\
+  t_w     &= \text{elapsed time after the end of the exposure.}
+\end{align*}
+
+9.1.2\quad The method of dealing with long-term irradiations in which variations in
+fluence rate occur is discussed in Practice E261.
+
+9.2\quad \textit{High-Temperature Measurements:}
+
+9.2.1\quad As stated in the scope of this method, the methods being reported are
+essentially limited to room temperature environments. At higher temperatures, two basic
+problems arise. First, the most probable velocity for the Maxwell-Boltzmann distribution
+of neutrons in thermal equilibrium with their moderator shifts upward from the 2200~m/s
+value for 20~$^\circ$C. In the interpretation of fluence rate, the experimenter must
+make the correct choice of cross sections, be aware of the departure of the cross
+sections from the 1/v-law, and remember that the effective cadmium cut-off energy is a
+function of temperature for a given thickness of cadmium. Second, pure cadmium has a
+relatively low melting point (321~$^\circ$C) and gives considerable trouble for
+temperatures above 100~$^\circ$C. It has been observed that above 100~$^\circ$C, cadmium
+metal tends to diffuse rapidly into metals in contact with it. Thus, standard gold or
+indium foils are immediately ruined when cadmium covered at these temperatures by
+receiving a readily observed layer of cadmium impregnated on their surfaces. Two possible
+compounds of cadmium for high-temperature experiments are cadmium oxide and cadmium
+silicate. The melting points for these compounds are above 900~$^\circ$C. Equivalent
+cadmium metal thicknesses, stability under intense gamma and neutron bombardment, and
+fabrication properties would have to be determined before these compounds could be
+reliably used. Gadolinium filters, which have a lower cut-off energy than cadmium, have
+been successfully used~(14). For high temperatures, Co-Ni or Co-V alloy detectors should
+be selected instead of the Co-Al alloy referred to in 9.1.1.
+
+9.2.2\quad An alternate method for eliminating the use of cadmium at elevated temperatures
+is presented in Practice E481. The method uses one monitor (cobalt) with nearly a 1/v
+absorption cross section curve and a second monitor (silver) with a large resonance peak
+so that its resonance integral is large compared to the thermal cross section. The method
+relies on the assumption that the epithermal part of the spectrum follows a 1/$E$
+distribution. In this method, the activities of both cobalt and silver monitors are
+determined by the radiometric technique. This differs from the method described in 8.1
+wherein only the activity of cobalt is determined radiometrically. The advantages of
+Practice E481 are the elimination of three difficulties associated with the use of
+cadmium: (1) the perturbation of the neutron field by the cadmium, (2) the inexact
+cadmium cut-off energy, and (3) the low melting temperature of cadmium. Studies indicate
+that the accuracy of the two-reaction method can be comparable to the cadmium-ratio
+method. Also, the long half-lives of the two monitors, cobalt and silver, permit the
+determination of fluence for long-term monitoring.
+
+% ============================================================
+\section{Precision and Bias}
+
+\begin{astmnote}[2]
+Measurement uncertainty is described by a precision and bias statement in this standard.
+Another acceptable approach is to use Type~A and B uncertainty components~(39, 40). This
+Type~A/B uncertainty specification is now used in International Organization for
+Standardization (ISO) standards and this approach can be expected to play a more
+prominent role in future uncertainty analyses.
+\end{astmnote}
+
+10.1\quad \textit{Radiometric Technique Using Cobalt:}
+
+10.1.1\quad The estimated systematic uncertainties in the determination of equivalent
+2200~m/s thermal neutron fluence rate by the 0.127~mm (0.005~in.) cobalt wire method are
+listed below.
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Source of Uncertainty & Uncertainty, \% \\
+\midrule
+$^{60}$Co half-life (1925.5 days)     & 0.03    \\
+$^{59}$Co cross section (37.233 barns) & 0.16    \\
+NIST-calibrated $^{60}$Co source       & $+1.2^A$ \\
+Self-shielding factor                  & $\pm 1.0$ \\
+Gamma-ray detector calibration         & $\pm 1.0^B$ \\
+\bottomrule
+\multicolumn{2}{l}{\footnotesize $^A$ The value may vary from one batch of NIST-calibrated $^{60}$Co sources to another.}\\
+\multicolumn{2}{l}{\footnotesize \quad The total uncertainty given on the NIST certificate should be used, if different from this value.}\\
+\multicolumn{2}{l}{\footnotesize $^B$ This uncertainty is in addition to the contribution to the total systematic uncertainty in the}\\
+\multicolumn{2}{l}{\footnotesize \quad first row from the uncertainty in the $^{60}$Co half-life, and the contribution from the}\\
+\multicolumn{2}{l}{\footnotesize \quad uncertainty from the calibrated source given in the third row. The detector calibration may}\\
+\multicolumn{2}{l}{\footnotesize \quad vary from one detector to another.}\\
+\end{tabular}
+\end{center}
+
+The square root of the sum of the squares of the preceding errors yields a total
+estimated systematic uncertainty, that is, approximately $\pm 1.9$\,\%. When
+cobalt-aluminum alloy is used there is no self-shielding factor uncertainty, but instead
+there is an uncertainty in alloy composition.
+
+10.2\quad \textit{Gold Indium and Dysprosium Foils:}
+
+10.2.1\quad \textit{Standard Neutron Field}---The uncertainty in the calibrated neutron
+fluence rate in a standard field will vary depending upon which standard neutron field is
+used. In general, these uncertainties are in the range of from 5 to 10\,\%. However, the
+NIST estimates an uncertainty of only $\pm 1.5$ to $\pm 3$\,\% (1$\sigma$).
+
+10.2.2\quad \textit{Counting Uncertainties}---The counting rates from foils exposed in a
+standard pile are usually quite small, thus, counting statistics are poor. However, in
+the case of gold foils, the long half-life allows long counting times, and with care, the
+counting uncertainties can be kept to 2\,\% or less.
+
+10.2.3\quad \textit{Experimental Uncertainty}---Determine the experimental uncertainties
+that occur while using the calibrated foils to measure an unknown neutron fluence rate by
+observing the precision in repeating the experiment. Normal statistical methods of
+calculating the standard deviation will yield the best estimate of these uncertainties.
+Under normal experimental conditions, these uncertainties are usually 2\,\% or less as
+defined in Practice E177.
+
+10.2.4\quad \textit{Fluence Perturbation Uncertainties}---Uncertainties resulting from
+fluence perturbations due to the foils measuring the fluence rate are usually quite
+small. Even though the actual perturbations are large, it is assumed that the foil causes
+the same perturbation in the thermal neutron component of the standard field as it does
+in the unknown field. This feature is another major advantage of the standard foil
+technique. However, in extreme cases where the moderator materials are vastly different
+or if the neutron spectra to be measured are greatly different from the standard pile,
+uncertainties will arise unless the fluence perturbation corrections are carefully
+applied.
+
+10.3\quad \textit{Methodology Uncertainties:}
+
+10.3.1\quad The derivation of many of the equations used in this test method is based on
+the assumption that the neutron spectrum consists of a thermal neutron Maxwell-Boltzmann
+distribution superimposed on a 1/$E$ distribution. The Maxwell-Boltzmann distribution
+includes all neutron energies ($0$ to $\infty$), although virtually no neutrons are above
+the cadmium absorption energy of 0.55~eV because of the shape of the distribution. The
+1/$E$ distribution has an arbitrary low-energy cutoff at $5kT$. Above $5kT$, the neutron
+spectrum consists of both Maxwell-Boltzmann and 1/$E$ neutrons. The
+$(1 + g\sigma_0 f_1/I_0 + \sigma_0 w'/I_0)$ term in Eq~\ref{eq:R0_thermal} is used to
+subtract out the subcadmium 1/$E$ neutrons from the total of all subcadmium neutrons to
+leave the desired thermal neutron fluence.
+
+10.3.2\quad The assumption of Maxwell-Boltzmann plus 1/$E$ neutrons need not be exact for
+this test method to give accurate results. First, the reaction rates of a 1/v detector
+are totally independent of the shape of the neutron spectrum (see Theory section). The
+assumption of a Maxwell-Boltzmann distribution affects only the $g$ correction factor,
+which is essentially 1.0 for any neutron spectrum and a near 1/v detector. Secondly, the
+1/$E$ assumption is used primarily to subtract off non-thermal neutrons between $5kT$ and
+0.55~eV, and this is usually a correction of less than a few percent of the thermal
+neutron fluence. Even a 10 to 20\,\% error in a 5\,\% correction is not substantial.
+
+10.3.3\quad A good indicator that the methodology uncertainty is small is a high cadmium
+ratio. Since each foil material has its own thermal neutron to resonance-integral cross
+section ratio, the cadmium ratio varies with reaction. Measurements with cadmium ratios
+below 1.6 (gold), 5.6 (cobalt), 2.0 (indium), or 20.6 (dysprosium) each give 5\,\%
+adjustments for the 1/$E$ subtraction and should be considered cautionary for the use of
+this method.
+
+% ============================================================
+\section*{References}
+
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+  \item Williams, J.~G., and Gilliam, D.~M., ``Thermal Neutron Standards,''
+        \textit{Metrologia}, 48 S254, 2011.
+
+  \item Westcott, C.~H., Walker, W.~H., and Alexander, T.~K., ``Effective Cross Sections
+        and Cadmium Ratios for the Neutron Spectra of Thermal Reactors,''
+        \textit{Proceedings of the International Conference on Peaceful Uses of Atomic
+        Energy}, United Nations, Vol~16, 1958, p.~70.
+
+  \item Stoughton, R.~W., and Halperin, J., ``Heavy Nuclide Cross Sections of Particular
+        Interest to Thermal Reactor Operations: Conventions, Measurements, and Preferred
+        Values,'' \textit{Nuclear Science and Engineering}, Vol~6, 1959, p.~100.
+
+  \item Poole, M.~J., \textit{J. Nuclear Energy}, Vol~5, 1957, p.~325.
+
+  \item Connally, J.~W., Rose, A., and Wall, T., \textit{AAEC/TM} Vol~191, 1963.
+
+  \item Schumann, P., and Kernenergie, A.~D., Vol~8, 1965, p.~88.
+
+  \item Geiger, K.~W., and Van der Zwan, L., \textit{Metrologia}, Vol~2, 1966, p.~1.
+
+  \item Ryves, T.~B., and Paul, E.~B., \textit{Journal of Nuclear Energy}, Vol~22, 1968,
+        p.~759.
+
+  \item Ryves, T.~B., \textit{Metrologia}, Vol~5, 1969, p.~119.
+
+  \item Bereznai, T., and MacMahon, T.~D., \textit{Journal of Radioanalytical Chemistry},
+        Vol~45, 1978, p.~423.
+
+  \item Ahmad, A., Jefferies, S.~M., MacMahon, T.~D., Williams, J.~G., and Ryves, T.~B.,
+        \textit{Proceedings of the Fourth ASTM-EURATOM Symposium on Reactor Dosimetry},
+        NUREG/CP-0029, Vol~2, CONF-820321/V2, 1982, p.~745.
+
+  \item Goldstein, H., Harvey, J.~A., Story, J.~S., and Westcott, C.~H., ``Recommended
+        Definitions for Resonance Integral Cross-Sections,'' EANDC-12, 1981.
+
+  \item Ryves, T.~B., and Zieba, K.~J., ``The Resonance Integrals of $^{63}$Cu,
+        $^{65}$Cu, $^{107}$Ag, $^{159}$Tb, $^{164}$Dy, and $^{165}$Ho,''
+        \textit{Journal of Physics A}, Vol~7, 1974, p.~18.
+
+  \item Borchardt, G., ``Gadolinium Filters for Thermal Neutrons'' (in German),
+        \textit{Atomkernenergia}, Vol~15, 1970, p.~311.
+
+  \item Ahmad, A., ``Analysis and Evaluation of Thermal and Resonance Neutron Activation
+        Data,'' \textit{Annals of Nuclear Energy}, Vol~10, 1983, p.~41.
+
+  \item Mughabghab, S.~F., ``Thermal Neutron Capture Cross Sections Resonance Integrals
+        and G-Factors,'' INDC(NDS)-440, Feb. 2003.
+
+  \item Jefferies, S.~M., ``Characterization of Thermal and Epithermal Neutron Spectra,''
+        Ph.D.\ Thesis, University of London, 1983, pp.~122.
+
+  \item Selander, W.~N., ``Theoretical Evaluation of Self-Shielding Factors Due to
+        Scattering Resonances in Foils,'' Report AECL-1077, 1960.
+
+  \item Eastwood, T.~A., and Werner, R.~D., ``Resonance and Thermal Neutrons Self-Shielding
+        in Cobalt Foils and Wires,'' \textit{Nuclear Science and Engineering}, Vol~13, 1962,
+        p.~385.
+
+  \item Brose, M., ``Zur Messung und Berechnung der Resonanz Absorption in Gold-, Uran-,
+        and Thorium Folien,'' Dissertation Technische Hochschule Karlsruhe, 1962.
+
+  \item Brose, M., ``Zur Messung und Berechnung der Resonanzabsorption von Neutronen in
+        Goldfolien,'' \textit{Nukleonik}, Vol~6, 1964, p.~134.
+
+  \item McGarry, E.~D., ``Measurements of the Resonance Neutron Self-Shielding in Gold
+        Wires,'' \textit{Transactions American Nuclear Society}, Vol~7, 1964, p.~86.
+
+  \item Baumann, N.~P., ``Resonance Integrals and Self-Shielding Factors for Detector
+        Foils,'' Report DP-817, E.~I. duPont de Nemours \& Co., Savannah River Laboratory,
+        1963.
+
+  \item Sola, A., ``Flux Perturbation by Detector Foils,'' \textit{Nucleonics}, Vol~18,
+        No.~3, 1960.
+
+  \item Ritchie, R.~H., and Eldridge, H.~B., ``Thermal Neutron Flux Depression by
+        Absorbing Foils,'' \textit{Nuclear Science and Engineering}, Vol~8, 1960, p.~300.
+
+  \item Skyrme, T.~H.~R., ``Reduction in Neutron Density Caused by an Absorbing Disc,''
+        MS~91, UKAFA, 2nd Ed., 1961.
+
+  \item Osborn, R.~K., ``A Discussion of Theoretical Analyses of Probe-Induced Thermal
+        Flux Perturbations,'' \textit{Nuclear Science and Engineering}, Vol~15, 1963,
+        pp.~245--258.
+
+  \item Walker, J.~V., Randall, J.~D., and Stinson, R.~C., Jr., ``Thermal Neutron Flux
+        Perturbation Due to Indium Foils in Water,'' \textit{Nuclear Science and
+        Engineering}, Vol~15, 1963, pp.~309--313.
+
+  \item Hanna, G.~C., ``The Neutron Flux Perturbation Due to an Absorbing Foil; A
+        Comparison of Theories and Experiments,'' \textit{Nuclear Science and Engineering},
+        Vol~15, 1963, pp.~325--337.
+
+  \item Randall, J.~D., and Walker, J.~V., ``Nonperturbing Foils---An Experimental
+        Verification,'' \textit{Nuclear Science and Engineering}, Vol~15, 1963, pp.~344--345.
+
+  \item Helm, F.~H., ``Numerical Determination of Flux Perturbation by Foils,''
+        \textit{Nuclear Science and Engineering}, Vol~16, 1963, pp.~235--238.
+
+  \item Crane, J.~L., and Doerner, R.~C., ``Thermal Self-Shielding and Edge Effects in
+        Absorbing Foils,'' \textit{Nuclear Science and Engineering}, Vol~16, 1963,
+        pp.~259--262.
+
+  \item Mann, W.~B., ``A Handbook of Radioactivity Measurement Procedures,'' NCRP-Report
+        No.~58, National Council on Radiation Protection and Measurement, Second Edition,
+        Washington, DC, 1985, p.~212.
+
+  \item ``Update of X Ray and Gamma Ray Data Standards for Detector Calibration and Other
+        Applications,'' International Atomic Energy Agency STI/PUB/1287 (2007) update of
+        Lemmel, H.~D.\ ``X-ray and Gamma-ray Standards for Detector Calibration,''
+        International Atomic Energy Agency, report IAFC-TECDOC-619, September 1991.
+
+  \item \textit{Nuclear Wallet Cards}, compiled by Jagdish K.\ Tuli, National Nuclear Data
+        Center, November 2011.
+
+  \item Table of Radioactive Isotopes, L.~P. Ekstrom and R.~B. Firestone, \textit{WWW
+        Table of Radioactive Isotopes}, database version 2/28/99 from URL
+        \url{http://ie.lbl.gov/toi}
+
+  \item El Nimr, T., De Corte, F., Moens, L., Simonits, A., and Hoste, J., ``Epicadmium
+        Neutron Activation Analysis (ENAA) Based on the k$_0$-Comparator Method,''
+        \textit{Journal of Radioanalytical Chemistry}, Vol~67, 1981, pp.~421--435.
+
+  \item \textit{Neutron Cross Sections, Vol.~1: Neutron Resonance Parameters and Thermal
+        Cross Sections, Part~B: Z=61--100}, S.~F. Mughabghab, Academic Press, Inc.,
+        Orlando, FL, 1984.
+
+  \item \textit{Guide to the Expression of Uncertainty in Measurement}, International
+        Organization for Standardization, 1995, ISBN 92-67-10188-9.
+
+  \item Taylor, B.~N., and Kuyatt, C.~E., \textit{Guidelines for Evaluating and Expressing
+        the Uncertainty of NIST Measurement Results}, NIST Technical Note 1297, National
+        Institute of Standards and Technology, Gaithersburg, MD, 1994.
+\end{enumerate}
+
+% ============================================================
+\vspace{2em}
+\noindent\rule{\textwidth}{0.4pt}
+
+\noindent\footnotesize
+$^{1}$ This test method is under the jurisdiction of ASTM Committee E10 on Nuclear
+Technology and Applications and is the direct responsibility of Subcommittee E10.05 on
+Nuclear Radiation Metrology. Current edition approved May~1, 2024. Published May 2024.
+Originally approved in 1965. Last previous edition approved in 2017 as E262~--~17.
+DOI: 10.1520/E0262-17R24E01.
+
+\noindent
+$^{2}$ For referenced ASTM standards, visit the ASTM website, \url{www.astm.org}, or
+contact ASTM Customer Service at \href{mailto:service@astm.org}{service@astm.org}.
+
+\noindent
+$^{3}$ The boldface numbers in parentheses refer to the list of references appended to
+this method.
+
+\end{document}

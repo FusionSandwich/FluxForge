@@ -1,0 +1,10 @@
+sample_id,method,matched_peaks,mean_abs_net_error,mean_abs_gross_error
+Co-Cd-RAFM-1_25cm,qg,2,0.0,0.0
+Co-RAFM-1_25cm,qg,2,0.0,0.0
+In-Cd-RAFM-1_25cm,qg,4,0.0,0.0
+Ni-RAFM-1_25cm,qg,1,0.0,0.0
+Sc-Cd-RAFM-1_25cm,qg,2,0.0,0.0
+Sc-RAFM-1_25cm,qg,2,0.0,0.0
+Ti-RAFM-1_25cm,qg,7,0.0,0.0
+Ti-RAFM-1a_25cm,qg,7,0.0,0.0
+Ti-RAFM-1b_25cm,qg,7,0.0,0.0

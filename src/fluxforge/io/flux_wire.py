@@ -19,6 +19,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
+from fluxforge.data.rafm_profile import load_rafm_profile
+from fluxforge.data.xcom import get_attenuation_data
 from fluxforge.io.spe import GammaSpectrum
 
 
@@ -135,6 +137,67 @@ def _parse_datetime(value: str) -> Optional[datetime]:
     return None
 
 
+def _efficiency_from_override(
+    override: Dict[str, float],
+    base: Optional["EfficiencyCalibration"] = None,
+) -> "EfficiencyCalibration":
+    """Build an EfficiencyCalibration from override values."""
+    eff = base if base is not None else EfficiencyCalibration()
+    key_map = {
+        "C1": "C1",
+        "C2": "C2",
+        "C3": "C3",
+        "C4": "C4",
+        "DETMODEL": "geometry_factor_A",
+        "A": "geometry_factor_A",
+        "GEOMETRY_FACTOR_A": "geometry_factor_A",
+        "T1": "al_window_T1_um",
+        "AL_WINDOW_T1_UM": "al_window_T1_um",
+        "DI": "detector_thickness_DI_cm",
+        "DETECTOR_THICKNESS_DI_CM": "detector_thickness_DI_cm",
+        "DL": "dead_layer_DL_um",
+        "DEAD_LAYER_DL_UM": "dead_layer_DL_um",
+        "AI": "incident_angle_AI_deg",
+        "INCIDENT_ANGLE_AI_DEG": "incident_angle_AI_deg",
+        "DETECTOR_ID": "detector_id",
+        "DETECTOR_DIAMETER_CM": "detector_diameter_cm",
+        "SOURCE_DISTANCE_CM": "source_distance_cm",
+        "RELATIVE_UNCERTAINTY": "relative_uncertainty",
+        "EFFICIENCY_RELATIVE_UNCERTAINTY": "relative_uncertainty",
+    }
+    for raw_key, value in override.items():
+        normalized = str(raw_key).strip().upper()
+        attr = key_map.get(normalized)
+        if attr is not None:
+            if attr == "detector_id":
+                setattr(eff, attr, str(value))
+            else:
+                setattr(eff, attr, float(value))
+    return eff
+
+
+def _apply_profile_defaults(
+    data: "FluxWireData",
+    *,
+    profile_name: Optional[str],
+) -> "FluxWireData":
+    """Fill RAFM profile defaults for efficiency and resolution."""
+    if not profile_name:
+        return data
+
+    profile = load_rafm_profile(profile_name)
+    if data.efficiency is None and profile.efficiency:
+        data.efficiency = _efficiency_from_override(profile.efficiency)
+    if not data.resolution and profile.resolution:
+        data.resolution = [float(value) for value in profile.resolution]
+    if data.spectrum is not None and profile.efficiency:
+        metadata = dict(data.spectrum.metadata)
+        if not metadata.get("efficiency"):
+            metadata["efficiency"] = dict(profile.efficiency)
+        data.spectrum.metadata = metadata
+    return data
+
+
 @dataclass
 class NuclideResult:
     """Nuclide analysis result from processed file."""
@@ -218,6 +281,7 @@ class EfficiencyCalibration:
     detector_diameter_cm: float = 0.0
     source_distance_cm: float = 0.0
     detector_id: str = ""
+    relative_uncertainty: float = 0.0
     
     def efficiency(self, energy_keV: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
@@ -264,20 +328,26 @@ class EfficiencyCalibration:
         #   Then multiply by geometry factor A
         
         poly = self.C1 + self.C2 * lnE + self.C3 * lnE**2 + self.C4 * lnE**3
-        
-        # The polynomial value times geometry factor gives efficiency
-        # But we need to handle the sign - if poly is negative, we may need exp()
-        # 
-        # Let's check: at 1332 keV with given C values:
-        #   poly = -20.026 + 10.29*7.195 - 1.655*51.77 + 0.0867*372.5
-        #        = -20.026 + 74.04 - 85.68 + 32.30 = 0.634
-        #   Then: eff = A * poly = 0.00348 * 0.634 = 0.0022
-        # 
-        # That's reasonable! So eff = A × poly_value
-        
-        eff = self.geometry_factor_A * poly
-        
-        # Clip to physical range
+
+        cos_ai = np.cos(np.deg2rad(self.incident_angle_AI_deg))
+        cos_ai = float(cos_ai) if abs(cos_ai) > 1.0e-12 else 1.0
+
+        detector_model = np.full_like(E, self.geometry_factor_A, dtype=float)
+        valid = np.isfinite(E) & (E > 0)
+        if np.any(valid):
+            # The LabSOCS/QG detector-model equation uses mass attenuation
+            # coefficients in the window/dead-layer/intrinsic terms.
+            al_mu = get_attenuation_data("Aluminum").get_mu_rho(E[valid])
+            ge_mu = get_attenuation_data("Germanium").get_mu_rho(E[valid])
+            t1_cm = max(self.al_window_T1_um, 0.0) * 1.0e-4
+            dl_cm = max(self.dead_layer_DL_um, 0.0) * 1.0e-4
+            di_cm = max(self.detector_thickness_DI_cm, 0.0)
+            transmission = np.exp(-((t1_cm * al_mu) + (dl_cm * ge_mu)) / cos_ai)
+            absorption = 1.0 - np.exp(-(di_cm * ge_mu) / cos_ai) if di_cm > 0.0 else 1.0
+            detector_model[valid] = self.geometry_factor_A * transmission * absorption
+
+        eff = detector_model * poly
+        eff = np.where(np.isfinite(eff) & (eff > 0.0), eff, np.nan)
         eff = np.clip(eff, 0.0, 1.0)
         
         return eff.squeeze() if np.isscalar(energy_keV) else eff
@@ -297,6 +367,7 @@ class EfficiencyCalibration:
             'detector_diameter_cm': self.detector_diameter_cm,
             'source_distance_cm': self.source_distance_cm,
             'detector_id': self.detector_id,
+            'relative_uncertainty': self.relative_uncertainty,
         }
 
 
@@ -409,7 +480,13 @@ class FluxWireData:
         }
 
 
-def read_raw_asc(filepath: Union[str, Path]) -> FluxWireData:
+def read_raw_asc(
+    filepath: Union[str, Path],
+    *,
+    energy_calibration_override: Optional[List[float]] = None,
+    efficiency_override: Optional[Dict[str, float]] = None,
+    profile_name: Optional[str] = None,
+) -> FluxWireData:
     """
     Read raw Genie-2000 ASCII export file.
     
@@ -467,7 +544,9 @@ def read_raw_asc(filepath: Union[str, Path]) -> FluxWireData:
         value = float(match.group(2))
         cal[coef] = value
     
-    if 'A' in cal and 'B' in cal:
+    if energy_calibration_override is not None:
+        data.energy_calibration = [float(c) for c in energy_calibration_override]
+    elif 'A' in cal and 'B' in cal:
         data.energy_calibration = [
             cal.get('A', 0.0),
             cal.get('B', 1.0),
@@ -522,11 +601,26 @@ def read_raw_asc(filepath: Union[str, Path]) -> FluxWireData:
             calibration={'energy': data.energy_calibration},
             metadata={'source_file': str(filepath), 'format': 'genie_asc'},
         )
+
+    data = _apply_profile_defaults(data, profile_name=profile_name)
+
+    if efficiency_override:
+        data.efficiency = _efficiency_from_override(efficiency_override, base=data.efficiency)
+        if data.spectrum is not None:
+            metadata = dict(data.spectrum.metadata)
+            metadata["efficiency"] = {str(k): float(v) for k, v in efficiency_override.items()}
+            data.spectrum.metadata = metadata
     
     return data
 
 
-def read_processed_txt(filepath: Union[str, Path]) -> FluxWireData:
+def read_processed_txt(
+    filepath: Union[str, Path],
+    *,
+    energy_calibration_override: Optional[List[float]] = None,
+    efficiency_override: Optional[Dict[str, float]] = None,
+    profile_name: Optional[str] = None,
+) -> FluxWireData:
     """
     Read processed QuantaGraph TXT file.
     
@@ -701,10 +795,22 @@ def read_processed_txt(filepath: Union[str, Path]) -> FluxWireData:
             }
             current_nuclide.peaks.append(peak)
     
+    if energy_calibration_override is not None:
+        data.energy_calibration = [float(c) for c in energy_calibration_override]
+    data = _apply_profile_defaults(data, profile_name=profile_name)
+    if efficiency_override:
+        data.efficiency = _efficiency_from_override(efficiency_override, base=data.efficiency)
+
     return data
 
 
-def read_flux_wire(filepath: Union[str, Path]) -> FluxWireData:
+def read_flux_wire(
+    filepath: Union[str, Path],
+    *,
+    energy_calibration_override: Optional[List[float]] = None,
+    efficiency_override: Optional[Dict[str, float]] = None,
+    profile_name: Optional[str] = None,
+) -> FluxWireData:
     """
     Read flux wire file, auto-detecting format.
     
@@ -722,18 +828,38 @@ def read_flux_wire(filepath: Union[str, Path]) -> FluxWireData:
     ext = filepath.suffix.lower()
     
     if ext == '.asc':
-        return read_raw_asc(filepath)
+        return read_raw_asc(
+            filepath,
+            energy_calibration_override=energy_calibration_override,
+            efficiency_override=efficiency_override,
+            profile_name=profile_name,
+        )
     elif ext == '.txt':
-        return read_processed_txt(filepath)
+        return read_processed_txt(
+            filepath,
+            energy_calibration_override=energy_calibration_override,
+            efficiency_override=efficiency_override,
+            profile_name=profile_name,
+        )
     else:
         # Try to detect from content
         with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
             first_1000 = f.read(1000)
         
         if 'NUCLIDES ANALYZED' in first_1000:
-            return read_processed_txt(filepath)
+            return read_processed_txt(
+                filepath,
+                energy_calibration_override=energy_calibration_override,
+                efficiency_override=efficiency_override,
+                profile_name=profile_name,
+            )
         elif 'Channel' in first_1000 and 'Contents' in first_1000:
-            return read_raw_asc(filepath)
+            return read_raw_asc(
+                filepath,
+                energy_calibration_override=energy_calibration_override,
+                efficiency_override=efficiency_override,
+                profile_name=profile_name,
+            )
         else:
             raise ValueError(f"Unknown file format: {filepath}")
 

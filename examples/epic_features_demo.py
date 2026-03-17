@@ -370,13 +370,13 @@ print("\n" + "=" * 70)
 print("SUMMARY: All Epic Features Demonstrated!")
 print("=" * 70)
 print("""
-✅ Epic R: Auto-calibration using known isotope lines
-✅ Epic S: Complete GLS workflow with JSON database
-✅ Epic T: Stacked target energy degradation & multi-format export
-✅ Epic U: Stopping power, range, energy loss, straggling
-✅ Epic W: Multinomial/Poisson covariance, Adye error propagation
-✅ Epic X: Metastable state handling (Tc-99m, In-116m, etc.)
-✅ Epic Y: Log-smoothness regularization, ddJ convergence
+[OK] Epic R: Auto-calibration using known isotope lines
+[OK] Epic S: Complete GLS workflow with JSON database
+[OK] Epic T: Stacked target energy degradation & multi-format export
+[OK] Epic U: Stopping power, range, energy loss, straggling
+[OK] Epic W: Multinomial/Poisson covariance, Adye error propagation
+[OK] Epic X: Metastable state handling (Tc-99m, In-116m, etc.)
+[OK] Epic Y: Log-smoothness regularization, ddJ convergence
 
 All features are fully implemented and ready for use!
 """)

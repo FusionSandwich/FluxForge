@@ -556,4 +556,4 @@ if __name__ == "__main__":
     strag = calculate_straggling(10.0, proton, aluminum, 10.0)
     print(f"\nStraggling: σ={strag.sigma_MeV:.4f} MeV, FWHM={strag.fwhm_MeV:.4f} MeV")
     
-    print("\n✅ stopping_power module tests passed!")
+    print("\n[OK] stopping_power module tests passed!")

@@ -1,0 +1,30 @@
+sample_id,sample_group,check,dead_time_pct,threshold_pct,live_time_s,real_time_s,max_peak_significance,max_peak_gross_counts,flag_review,note,decay_label,decay_time_s
+RAFM1,RAFM1,dead_time_review,7.975460122699385,15.0,300.0,326.0,342.8586232834248,127255.12500000003,False,Dead time within configured review threshold.,,
+RAFM1_Long_144h_EOI,RAFM1,dead_time_review,23.2409381663113,15.0,3600.0,4690.0,3320.326116192206,12142571.75,True,Dead time exceeds configured review threshold; manual high-rate review recommended.,,
+RAFM1_Long_72h_EOI,RAFM1,dead_time_review,27.52164284276223,15.0,3600.0,4967.0,3300.7754317401573,13755412.0,True,Dead time exceeds configured review threshold; manual high-rate review recommended.,,
+RAFM3-B_24hrEOI,RAFM3,dead_time_review,0.16638935108153063,15.0,3600.0,3606.0,121.39354995751755,18085.75,False,Dead time within configured review threshold.,24h,94803.0
+RAFM3-B_2hrEOI,RAFM3,dead_time_review,2.9126213592232997,15.0,900.0,927.0,415.0960913149176,183267.0,False,Dead time within configured review threshold.,2h,7222.0
+RAFM3-B_300sEOI,RAFM3,dead_time_review,9.090909090909093,15.0,300.0,330.0,311.5748134355088,103139.52083333334,False,Dead time within configured review threshold.,300s,360.0
+RAFM3-B_4dEOI,RAFM3,dead_time_review,0.08326394671107629,15.0,3600.0,3603.0,45.307889366347304,9473.0,False,Dead time within configured review threshold.,4d,344033.0
+RAFM3-C_24hrEOI,RAFM3,dead_time_review,0.16638935108153063,15.0,3600.0,3606.0,115.50542878500971,16677.75,False,Dead time within configured review threshold.,24h,97565.0
+RAFM3-C_2hrEOI,RAFM3,dead_time_review,2.0674646354733373,15.0,900.0,919.0,350.5277365575641,126199.8125,False,Dead time within configured review threshold.,2h,9645.0
+RAFM3-C_300sEOI,RAFM3,dead_time_review,8.814589665653493,15.0,300.0,329.0,325.43509598737904,110982.52083333334,False,Dead time within configured review threshold.,300s,360.0
+RAFM3-C_4dEOI,RAFM3,dead_time_review,0.05552470849528035,15.0,3600.0,3602.0,44.83036889210194,3639.75,False,Dead time within configured review threshold.,4d,346788.0
+RAFM3-N_24hrEOI,RAFM3,dead_time_review,0.16638935108153063,15.0,3600.0,3606.0,125.3361496938982,18704.75,False,Dead time within configured review threshold.,24h,100557.0
+RAFM3-N_2hrEOI,RAFM3,dead_time_review,2.386117136659438,15.0,900.0,922.0,376.3312597261434,151328.0,False,Dead time within configured review threshold.,2h,9996.0
+RAFM3-N_300sEOI,RAFM3,dead_time_review,6.25,15.0,300.0,320.0,305.1728820074985,104074.0,False,Dead time within configured review threshold.,300s,360.0
+RAFM3-N_4dEOI,RAFM3,dead_time_review,0.08326394671107629,15.0,3600.0,3603.0,45.57127026100024,3956.0,False,Dead time within configured review threshold.,4d,349778.0
+RAFM4-A_15dEOI,RAFM4,dead_time_review,12.430065677450742,15.0,3600.0,4111.0,1674.7169684188088,3669332.0,False,Dead time within configured review threshold.,15d,1377400.0
+RAFM4-B_15dEOI,RAFM4,dead_time_review,11.699779249448127,15.0,3600.0,4077.0,1675.5890041017374,3455376.0,False,Dead time within configured review threshold.,15d,1381531.0
+RAFM4-C_15dEOI,RAFM4,dead_time_review,11.35188377246984,15.0,3600.0,4061.0,1664.6281850526261,3351006.0,False,Dead time within configured review threshold.,15d,1385628.0
+RAFM4-N_15dEOI,RAFM4,dead_time_review,9.774436090225569,15.0,3600.0,3990.0,1659.1996833432381,3085201.25,False,Dead time within configured review threshold.,15d,1389711.0
+CU-RAFM-1,flux_wires,dead_time_review,5.213270142180093,15.0,3600.0,3798.0,107.8314606741573,19876.0,False,Dead time within configured review threshold.,,247200.0
+Co-Cd-RAFM-1_25cm,flux_wires,dead_time_review,0.0701667810410922,15.0,129600.0,129691.0,28.886363636363637,28478.0,False,Dead time within configured review threshold.,,2066100.0
+Co-RAFM-1_25cm,flux_wires,dead_time_review,0.08095293165260031,15.0,43200.0,43235.0,106.66329966329967,41565.0,False,Dead time within configured review threshold.,,1989660.0
+In-Cd-RAFM-1_25cm,flux_wires,dead_time_review,0.4424778761061954,15.0,3600.0,3616.0,287.8783382789318,215667.0,False,Dead time within configured review threshold.,,236400.0
+Ni-RAFM-1_25cm,flux_wires,dead_time_review,0.33222591362126463,15.0,3600.0,3612.0,279.05607476635515,90721.0,False,Dead time within configured review threshold.,,1969080.0
+Sc-Cd-RAFM-1_25cm,flux_wires,dead_time_review,1.3698630136986356,15.0,3600.0,3650.0,417.29319371727746,303433.0,False,Dead time within configured review threshold.,,1974060.0
+Sc-RAFM-1_25cm,flux_wires,dead_time_review,12.706110572259943,15.0,3600.0,4124.0,885.9911797133407,3408583.0,False,Dead time within configured review threshold.,,1981080.0
+Ti-RAFM-1_25cm,flux_wires,dead_time_review,0.07633058080632749,15.0,14400.0,14411.0,120.97666666666667,44532.0,False,Dead time within configured review threshold.,,677040.0
+Ti-RAFM-1a_25cm,flux_wires,dead_time_review,0.07633058080632749,15.0,14400.0,14411.0,116.53674121405751,45284.0,False,Dead time within configured review threshold.,,691620.0
+Ti-RAFM-1b_25cm,flux_wires,dead_time_review,0.07806401249024209,15.0,172800.0,172935.0,310.9939455095863,404465.0,False,Dead time within configured review threshold.,,762540.0

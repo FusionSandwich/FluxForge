@@ -1,0 +1,86 @@
+{
+  "rafm_25cm": {
+    "description": "Shared RAFM irradiation detector profile for 25 cm counting geometry.",
+    "background_relative_path": "examples/RAFM_irradiation/background.ASC",
+    "energy_calibration": [
+      -1.694,
+      0.4996,
+      6.710e-08
+    ],
+    "efficiency": {
+      "C1": -20.26,
+      "C2": 10.29,
+      "C3": -1.655,
+      "C4": 0.08666,
+      "geometry_factor_A": 0.00348,
+      "al_window_T1_um": 1000.0,
+      "detector_thickness_DI_cm": 6.45,
+      "dead_layer_DL_um": 700.0,
+      "incident_angle_AI_deg": 0.0,
+      "detector_id": "South",
+      "detector_diameter_cm": 6.0,
+      "source_distance_cm": 25.0
+    },
+    "resolution": [
+      1.389,
+      0.00078,
+      -4.072e-08
+    ]
+  },
+  "astm_inl_dosimetry": {
+    "description": "ASTM/INL reactor dosimetry profile for the RAFM 25 cm counting geometry.",
+    "background_relative_path": "examples/RAFM_irradiation/background.ASC",
+    "energy_calibration": [
+      -1.694,
+      0.4996,
+      6.710e-08
+    ],
+    "efficiency": {
+      "C1": -20.26,
+      "C2": 10.29,
+      "C3": -1.655,
+      "C4": 0.08666,
+      "geometry_factor_A": 0.00348,
+      "al_window_T1_um": 1000.0,
+      "detector_thickness_DI_cm": 6.45,
+      "dead_layer_DL_um": 700.0,
+      "incident_angle_AI_deg": 0.0,
+      "detector_id": "South",
+      "detector_diameter_cm": 6.0,
+      "source_distance_cm": 25.0
+    },
+    "resolution": [
+      1.389,
+      0.00078,
+      -4.072e-08
+    ]
+  },
+  "us_astm_reactor_dosimetry": {
+    "description": "US ASTM reactor dosimetry profile for the RAFM 25 cm counting geometry.",
+    "background_relative_path": "examples/RAFM_irradiation/background.ASC",
+    "energy_calibration": [
+      -1.694,
+      0.4996,
+      6.710e-08
+    ],
+    "efficiency": {
+      "C1": -20.26,
+      "C2": 10.29,
+      "C3": -1.655,
+      "C4": 0.08666,
+      "geometry_factor_A": 0.00348,
+      "al_window_T1_um": 1000.0,
+      "detector_thickness_DI_cm": 6.45,
+      "dead_layer_DL_um": 700.0,
+      "incident_angle_AI_deg": 0.0,
+      "detector_id": "South",
+      "detector_diameter_cm": 6.0,
+      "source_distance_cm": 25.0
+    },
+    "resolution": [
+      1.389,
+      0.00078,
+      -4.072e-08
+    ]
+  }
+}

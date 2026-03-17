@@ -1,0 +1,243 @@
+{
+  "_metadata": {
+    "description": "Bundled sample-property and simplified reaction metadata for FluxForge flux-wire unfolding defaults.",
+    "notes": [
+      "These are committed defaults used by the current simplified flux-wire unfolding path.",
+      "Example-specific sample masses should eventually be sourced from RAFM metadata where available."
+    ]
+  },
+  "sample_defaults": {
+    "Co": {
+      "mass_mg": 10.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999,
+      "atomic_mass": 58.9332,
+      "density_g_cm3": 8.9,
+      "reaction_target_fractions": {
+        "Co-59(n,g)Co-60": 1.0
+      }
+    },
+    "Cu": {
+      "mass_mg": 20.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999,
+      "atomic_mass": 63.546,
+      "density_g_cm3": 8.96,
+      "reaction_target_fractions": {
+        "Cu-63(n,g)Cu-64": 0.6917
+      }
+    },
+    "Sc": {
+      "mass_mg": 5.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.999,
+      "atomic_mass": 44.9559,
+      "density_g_cm3": 2.99,
+      "reaction_target_fractions": {
+        "Sc-45(n,g)Sc-46": 1.0
+      }
+    },
+    "In": {
+      "mass_mg": 20.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999,
+      "atomic_mass": 114.818,
+      "density_g_cm3": 7.31,
+      "reaction_target_fractions": {
+        "In-113(n,g)In-114m": 0.0429,
+        "In-115(n,n')In-115m": 0.9571
+      }
+    },
+    "Ti": {
+      "mass_mg": 15.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999,
+      "atomic_mass": 47.867,
+      "density_g_cm3": 4.54,
+      "reaction_target_fractions": {
+        "Ti-46(n,p)Sc-46": 0.0825,
+        "Ti-47(n,p)Sc-47": 0.0744,
+        "Ti-48(n,p)Sc-48": 0.7372
+      }
+    },
+    "Ni": {
+      "mass_mg": 15.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999,
+      "atomic_mass": 58.693,
+      "density_g_cm3": 8.91,
+      "reaction_target_fractions": {
+        "Ni-58(n,p)Co-58": 0.6808,
+        "Ni-58(n,2n)Ni-57": 0.6808
+      }
+    },
+    "Fe": {
+      "mass_mg": 20.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999,
+      "atomic_mass": 55.845,
+      "density_g_cm3": 7.87,
+      "reaction_target_fractions": {
+        "Fe-54(n,p)Mn-54": 0.0585,
+        "Fe-58(n,g)Fe-59": 0.00282
+      }
+    }
+  },
+  "product_reactions": {
+    "Co": {
+      "Co60": "Co-59(n,g)Co-60"
+    },
+    "Cu": {
+      "Cu64": "Cu-63(n,g)Cu-64"
+    },
+    "Sc": {
+      "Sc46": "Sc-45(n,g)Sc-46"
+    },
+    "In": {
+      "In114m": "In-113(n,g)In-114m",
+      "In115m": "In-115(n,n')In-115m"
+    },
+    "Ti": {
+      "Sc46": "Ti-46(n,p)Sc-46",
+      "Sc47": "Ti-47(n,p)Sc-47",
+      "Sc48": "Ti-48(n,p)Sc-48"
+    },
+    "Ni": {
+      "Co58": "Ni-58(n,p)Co-58",
+      "Ni57": "Ni-58(n,2n)Ni-57"
+    },
+    "Fe": {
+      "Fe59": "Fe-58(n,g)Fe-59",
+      "Mn54": "Fe-54(n,p)Mn-54"
+    }
+  },
+  "reaction_defaults": {
+    "Co-59(n,g)Co-60": {
+      "cross_section": {
+        "sigma_thermal": 37.2,
+        "I_res": 75.5,
+        "E_res": 132.0
+      },
+      "characteristic_energy_eV": 0.025,
+      "response_center_eV": 0.025,
+      "response_log_width": 2.0
+    },
+    "Sc-45(n,g)Sc-46": {
+      "cross_section": {
+        "sigma_thermal": 27.5,
+        "I_res": 12.0,
+        "E_res": 4.5
+      },
+      "characteristic_energy_eV": 0.025,
+      "response_center_eV": 0.025,
+      "response_log_width": 2.0
+    },
+    "Cu-63(n,g)Cu-64": {
+      "cross_section": {
+        "sigma_thermal": 4.5,
+        "I_res": 5.0,
+        "E_res": 580.0
+      },
+      "characteristic_energy_eV": 0.025,
+      "response_center_eV": 0.025,
+      "response_log_width": 2.0
+    },
+    "Fe-58(n,g)Fe-59": {
+      "cross_section": {
+        "sigma_thermal": 1.31,
+        "I_res": 1.2,
+        "E_res": 0.0
+      },
+      "characteristic_energy_eV": 0.025,
+      "response_center_eV": 0.025,
+      "response_log_width": 2.0
+    },
+    "In-113(n,g)In-114m": {
+      "cross_section": {
+        "sigma_thermal": 4.0,
+        "I_res": 260.0,
+        "E_res": 1.45
+      },
+      "characteristic_energy_eV": 1.45,
+      "response_center_eV": 1.45,
+      "response_log_width": 1.5
+    },
+    "In-115(n,n')In-115m": {
+      "cross_section": {
+        "sigma_thermal": 0.0,
+        "I_res": 0.0,
+        "E_eff": 1500000.0
+      },
+      "characteristic_energy_eV": 340000.0,
+      "response_center_eV": 340000.0,
+      "response_log_width": 0.5
+    },
+    "Ni-58(n,p)Co-58": {
+      "cross_section": {
+        "sigma_avg": 0.113,
+        "E_threshold": 400000.0,
+        "E_eff": 3000000.0
+      },
+      "characteristic_energy_eV": 400000.0,
+      "response_center_eV": 400000.0,
+      "response_log_width": 0.8
+    },
+    "Ti-46(n,p)Sc-46": {
+      "cross_section": {
+        "sigma_avg": 0.011,
+        "E_threshold": 1600000.0,
+        "E_eff": 6000000.0
+      },
+      "characteristic_energy_eV": 1600000.0,
+      "response_center_eV": 1600000.0,
+      "response_log_width": 0.8
+    },
+    "Ti-47(n,p)Sc-47": {
+      "cross_section": {
+        "sigma_avg": 0.02,
+        "E_threshold": 220000.0,
+        "E_eff": 3000000.0
+      },
+      "characteristic_energy_eV": 220000.0,
+      "response_center_eV": 220000.0,
+      "response_log_width": 0.8
+    },
+    "Ti-48(n,p)Sc-48": {
+      "cross_section": {
+        "sigma_avg": 0.0003,
+        "E_threshold": 3400000.0,
+        "E_eff": 8000000.0
+      },
+      "characteristic_energy_eV": 3400000.0,
+      "response_center_eV": 3400000.0,
+      "response_log_width": 0.8
+    },
+    "Fe-54(n,p)Mn-54": {
+      "cross_section": {
+        "sigma_avg": 0.082,
+        "E_threshold": 90000.0,
+        "E_eff": 3000000.0
+      },
+      "characteristic_energy_eV": 90000.0,
+      "response_center_eV": 90000.0,
+      "response_log_width": 0.8
+    },
+    "Ni-58(n,2n)Ni-57": {
+      "cross_section": {
+        "sigma_avg": 0.003,
+        "E_threshold": 12000000.0,
+        "E_eff": 14000000.0
+      },
+      "characteristic_energy_eV": 12000000.0,
+      "response_center_eV": 12000000.0,
+      "response_log_width": 0.5
+    }
+  }
+}

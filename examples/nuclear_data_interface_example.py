@@ -250,7 +250,7 @@ def example_cross_section_consistency():
     )
     
     print(f"\nConsistency Check:")
-    print(f"  Result: {'✓ Consistent' if consistent else '✗ Inconsistent'}")
+    print(f"  Result: {'OK Consistent' if consistent else 'FAIL Inconsistent'}")
     print(f"  Maximum deviation: {max_dev*100:.1f}%")
     print(f"  Message: {message}")
     
@@ -261,7 +261,7 @@ def example_cross_section_consistency():
     )
     
     print(f"\nInconsistent data test:")
-    print(f"  Result: {'✓ Consistent' if consistent2 else '✗ Inconsistent'}")
+    print(f"  Result: {'OK Consistent' if consistent2 else 'FAIL Inconsistent'}")
     print(f"  Maximum deviation: {max_dev2*100:.1f}%")
     print(f"  Message: {message2}")
 

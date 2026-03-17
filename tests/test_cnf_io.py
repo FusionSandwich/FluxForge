@@ -19,6 +19,14 @@ from fluxforge.io.cnf import (
     CNFCalibration,
 )
 
+TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
+REAL_REFERENCE_CNF = (
+    TEST_DATA_DIR
+    / "spectrum_io"
+    / "samples"
+    / "01122014152731-GT01122014182338-GA37.4963000N-GO122.4633000W.cnf"
+)
+
 
 def create_mock_cnf_data(
     n_channels: int = 4096,
@@ -285,3 +293,27 @@ class TestCNFIntegration:
             # Check spectrum has expected peak
             peak_idx = np.argmax(spectrum.counts)
             assert 950 < peak_idx < 1050  # Peak near channel 1000
+
+
+class TestRealSampleParity:
+    """Regression tests for a real CNF sample bundle."""
+
+    def test_read_real_cnf_sample(self):
+        """Real sample should parse to sane channel/count magnitudes."""
+        assert REAL_REFERENCE_CNF.exists(), f"Missing test sample: {REAL_REFERENCE_CNF}"
+
+        spectrum = read_cnf_file(str(REAL_REFERENCE_CNF))
+
+        assert len(spectrum.counts) == 4096
+        assert spectrum.counts.max() < 1e6  # Guard against uint32 garbage parse
+        assert spectrum.counts.sum() == pytest.approx(683658.0, rel=0.01)
+        assert spectrum.live_time > 0.0
+        assert spectrum.real_time > 0.0
+        assert spectrum.metadata["format"] == "CNF"
+
+    def test_real_sample_calibration_coefficients(self):
+        """Calibration extracted from real sample should be physically reasonable."""
+        spectrum = read_cnf_file(str(REAL_REFERENCE_CNF))
+        cal = spectrum.calibration
+        assert "a1" in cal
+        assert 0.1 < cal["a1"] < 2.0

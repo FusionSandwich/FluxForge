@@ -1,0 +1,2 @@
+method,matched_peaks,mean_abs_net_error,median_abs_net_error,mean_abs_gross_error,median_abs_gross_error,net_within_25pct,gross_within_25pct
+qg,2,0.0396611695871438,0.0396611695871438,0.19497780042581886,0.19497780042581886,2,2

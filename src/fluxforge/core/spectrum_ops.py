@@ -629,4 +629,4 @@ if __name__ == "__main__":
     print(f"Calibration fit: R²={result.r_squared:.4f}")
     print(f"Channel 1500 → {cal(1500):.1f} keV")
     
-    print("\n✅ spectrum_ops module tests passed!")
+    print("\n[OK] spectrum_ops module tests passed!")

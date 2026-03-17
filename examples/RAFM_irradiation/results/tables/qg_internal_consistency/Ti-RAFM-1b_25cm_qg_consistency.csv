@@ -1,0 +1,4 @@
+sample_id,sample_group,isotope,header_activity_bq,header_activity_unc_bq,n_line_activities,min_line_activity_bq,max_line_activity_bq,mean_line_activity_bq,max_relative_line_header_deviation,flag_internal_inconsistency
+Ti-RAFM-1b_25cm,flux_wires,Sc47,1605.8,45.88,1,1605.8,1605.8,1605.8,0.0,False
+Ti-RAFM-1b_25cm,flux_wires,Sc48,8658.0,732.6,4,127.64999999999999,14504.0,6874.599999999999,0.9852564102564103,True
+Ti-RAFM-1b_25cm,flux_wires,Sc46,466.2,41.44,2,292.67,573.5,433.08500000000004,0.3722222222222222,True

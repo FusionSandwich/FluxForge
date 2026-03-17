@@ -139,6 +139,130 @@ def _read_uint16(data: bytes, offset: int) -> int:
         return 0
 
 
+def _read_uint8(data: bytes, offset: int) -> int:
+    """Read a 1-byte unsigned integer."""
+    try:
+        return data[offset]
+    except IndexError:
+        return 0
+
+
+def _read_uint64(data: bytes, offset: int) -> int:
+    """Read an 8-byte unsigned integer (little-endian)."""
+    try:
+        return struct.unpack('<Q', data[offset:offset + 8])[0]
+    except struct.error:
+        return 0
+
+
+def _read_pdp11_float(data: bytes, offset: int) -> float:
+    """
+    Convert PDP11 32-bit float layout to IEEE754 float.
+
+    CNF stores several calibration values in this legacy format.
+    """
+    w0 = _read_uint16(data, offset)
+    w1 = _read_uint16(data, offset + 2)
+    packed = struct.pack('<HH', w1, w0)
+    try:
+        return struct.unpack('<f', packed)[0] / 4.0
+    except struct.error:
+        return 0.0
+
+
+def _parse_cnf_sectioned(data: bytes) -> Optional[CNFData]:
+    """
+    Parse CNF using section headers (closer to Canberra layout).
+
+    This path handles real-world CNF files more reliably than fixed-offset
+    heuristics and is used first when section headers are present.
+    """
+    result = CNFData()
+    result.header.file_size = len(data)
+
+    offs_param = None
+    offs_chan = None
+    detector_name = ""
+    sample_desc = ""
+    live_time = 0.0
+    real_time = 0.0
+
+    i = 0
+    while True:
+        sec_header = 0x70 + i * 0x30
+        i += 1
+        if sec_header + 0x0E >= len(data):
+            break
+
+        sec_id_header = _read_uint32(data, sec_header)
+        if sec_id_header == 0:
+            break
+        sec_loc = _read_uint32(data, sec_header + 0x0A)
+        if sec_loc <= 0 or sec_loc >= len(data):
+            continue
+
+        # Parameter section (times, calibration, detector metadata)
+        if sec_id_header == 0x00012000:
+            offs_param = sec_loc
+
+            offs_calib = offs_param + 0x30 + _read_uint16(data, offs_param + 0x22)
+            if offs_calib + 0x50 < len(data):
+                a0 = _read_pdp11_float(data, offs_calib + 0x44)
+                a1 = _read_pdp11_float(data, offs_calib + 0x48)
+                a2 = _read_pdp11_float(data, offs_calib + 0x4C)
+                result.calibration.energy_coefficients = [a0, a1, a2]
+                detector_name = _read_string(data, offs_calib + 0x30C, 0x06)
+
+            offs_times = offs_param + 0x30 + _read_uint16(data, offs_param + 0x24)
+            if offs_times + 0x19 < len(data):
+                raw_rt = _read_uint64(data, offs_times + 0x09)
+                raw_lt = _read_uint64(data, offs_times + 0x11)
+                # CNF stores these in inverted uint64 form.
+                real_time = ((~raw_rt) & 0xFFFFFFFFFFFFFFFF) * 1e-7
+                live_time = ((~raw_lt) & 0xFFFFFFFFFFFFFFFF) * 1e-7
+
+        # String section
+        elif sec_id_header == 0x00012001:
+            sample_desc = _read_string(data, sec_loc + 0x036E, 0x100)
+
+        # Channel data section
+        elif sec_id_header == 0x00012005:
+            offs_chan = sec_loc
+
+    if offs_param is None or offs_chan is None:
+        return None
+
+    n_channels = int(_read_uint8(data, offs_param + 0x00BA)) * 256
+    if n_channels <= 0:
+        n_channels = int(_read_uint16(data, offs_param + 0x00BA))
+    if n_channels <= 0:
+        return None
+
+    spectrum_offset = offs_chan + 0x200
+    byte_count = n_channels * 4
+    if spectrum_offset + byte_count > len(data):
+        return None
+
+    counts = np.frombuffer(data, dtype='<u4', count=n_channels, offset=spectrum_offset).astype(np.float64)
+
+    # Reject clearly invalid streams and let heuristic parser try.
+    if counts.size == 0:
+        return None
+    if np.nanmax(counts) >= 4.2e9 and np.nanmean(counts) > 1e6:
+        return None
+
+    result.spectrum = counts
+    result.header.n_channels = n_channels
+    result.header.detector_name = detector_name.strip()
+    result.header.sample_id = sample_desc.strip()
+    if 0 < live_time < 1e8:
+        result.header.live_time = live_time
+    if 0 < real_time < 1e8:
+        result.header.real_time = real_time
+
+    return result
+
+
 def _find_record(data: bytes, record_id: int) -> Optional[Tuple[int, int]]:
     """
     Find a record in CNF file by ID.
@@ -185,8 +309,13 @@ def parse_cnf_binary(data: bytes) -> CNFData:
     
     if len(data) < 128:
         return result
-    
+
     result.header.file_size = len(data)
+
+    # Prefer section-based parsing when available.
+    sectioned = _parse_cnf_sectioned(data)
+    if sectioned is not None and len(sectioned.spectrum) > 0:
+        return sectioned
     
     # CNF structure varies by version, try common patterns
     # Look for spectrum data - usually follows specific pattern

@@ -56,7 +56,16 @@ This runbook defines how to process RAFM irradiation gamma spectra in FluxForge 
    - ROI width `4.0 * FWHM`
    - background width `1 channel`
    - background gap `0 * FWHM`
+ - For ordinary flux-wire lines, FluxForge now chooses the comparison ROI from a generic scored window search inside the `32 channel` capture range. The score favors net area while penalizing edge-to-background discontinuities, asymmetry, and unnecessary width.
  - For strong broad peaks, FluxForge now expands the flux-wire QG count-comparison ROI using five-point-smoothed local minima within the `32 channel` capture range. This improves raw `GROSS/NET` parity on broad `Co` and `Sc` lines without changing the background-adjusted activity path.
+ - The broad-window override is only accepted when it preserves the compact-window net area within a small tolerance. This keeps weak `Ti` lines from being widened spuriously while still allowing broader `Co` and `Sc` supports.
+- Generic RAFM sample QG count parity now uses a linear/trapezoid local background model in the comparison ROI. This is intended to reduce net-count bias on sloped low-energy continua without changing the flux-wire comparison model.
+- The generic broad-window override is now capped by the ratio between the widened gross window and the primary raw ROI gross. This blocks pathological overexpansion in crowded low-energy Ta regions.
+- Generic RAFM targeted recovery now prunes very weak nearby nuisance lines from the targeted library before fitting. This is intended to stop weak `Tb154m` neighbors from suppressing stronger lines such as `Fe59 1099 keV` and `Co60 1173 keV` in the automatic recovery pass.
+- Generic RAFM targeted recovery now also selects the targeted library from the exploratory support first:
+  - isotopes already supported by exploratory detection keep their full line sets
+  - unsupported isotopes keep only their strongest fallback lines
+  - this keeps plausible products like `W187` available while preventing dense nuisance libraries from dominating the targeted fit space
  - Flux-wire activity calculations still use the background-adjusted analysis path; QG count parity and FluxForge activity parity are now tracked separately.
 7. Export analysis artifacts and validation outputs.
    - Write one raw-vs-QG comparison plot per matched sample.
@@ -74,13 +83,13 @@ This runbook defines how to process RAFM irradiation gamma spectra in FluxForge 
 8. Optionally export channel-by-channel CSV tables:
    - background-adjusted counts
    - background-adjusted, calibrated, efficiency-corrected counts
-9. For manual inspection before the GUI exists, optionally export calibrated spectrum plots and manual ROI peak reports.
-   - `python -m fluxforge.cli.app spectrum-plot ...` writes a headless-safe spectrum-vs-energy plot
-   - `--background-subtracted` plots the measured-background-subtracted spectrum
-   - `--manual-peaks-file` overlays user-supplied ROIs in CSV or JSON
-   - `--save-peak-report` writes a FluxForge peak-report artifact from those manual ROIs
-   - `python -m fluxforge.cli.app peaks --manual-peaks-file ...` can write the same manual peak report without making a plot
 9. Run the RAFM validation workflow to compare FluxForge outputs to the committed QG gold-standard files and to unfold the flux-wire spectrum with all supported methods.
+
+## Main Workflow Boundary
+- The main RAFM and flux-wire validation workflow is intended to stay fully automatic.
+- The committed RAFM example under `examples/RAFM_irradiation/` should rely on FluxForge's automatic peak identification, counting, isotope assignment, and activity logic.
+- Manual ROI selection is not part of the main RAFM validation path and should not be used to make the primary RAFM/QG parity bundle pass.
+- A separate illustrative manual workflow now lives under `examples/manual_peak_inspection/` for SSH-based inspection and future GUI parity.
 
 ## RAFM4 Timing Rule
 - `RAFM4-*_15dEOI` spectra are interpreted as counts after the phase-2 whale-tube irradiation.
@@ -122,8 +131,14 @@ This runbook defines how to process RAFM irradiation gamma spectra in FluxForge 
 - Current flux-wire count forensic read:
   - `Sc-RAFM-1` is now close on both major `Sc46` lines after switching strong broad peaks to smoothed-valley comparison bounds
   - `Co-Cd` improved substantially, but `1332 keV` still carries a remaining `~7%` net deficit and `~14%` gross deficit
-  - `Ti-RAFM-1a` still matches `Sc47 @ 159 keV` well, but `Sc48 @ 175 keV` remains a real weak-line count problem
+  - `Ti-RAFM-1a` now matches `Sc47 @ 159 keV` well, and the weak `Sc48 @ 175 keV` line has improved to about `+11%` gross / `-4%` net in the current automatic comparison path
+  - `Ti-RAFM-1a Sc46 @ 889 keV` also improved materially, but it still carries a remaining `~8%` net surplus
   - applying the shared calibration to `background.ASC` and energy-aligning background subtraction was necessary for the corrected activity path, but it does not explain the remaining raw `GROSS/NET` parity failures
+- Current RAFM generic-sample count forensic read:
+  - low-energy crowded `Ta182` regions still have the largest remaining raw gross/net disagreement
+  - `W187` lines in RAFM3 now look more like a local-background-model problem than a peak-support problem
+  - the previous RAFM4 missing-line set (`Ta182 229.55`, `Ta182 1231.00`, `Fe59 1099.25`, `Co60 1173.17`) is now covered by focused regression tests for the new targeted-library selector
+  - the generic sample path is not yet at the same confidence level as the flux-wire count path, so step 1 is still open
 - The detector-efficiency path still needs a separate audit after the count-path discrepancies are reduced further; this runbook now treats count parity and efficiency/activity parity as separate problems.
 - The flux-wire analysis module no longer contains the old hardcoded product catalog or reference-derived scaling helpers; the remaining parity failures are now real model/data issues rather than hidden QG coupling.
 - `flux_unfold.py` now loads its simplified sample-property and reaction-default dictionaries from bundled data files, but the workflow still needs experiment-specific sample metadata to replace the remaining generic defaults cleanly.
@@ -210,49 +225,10 @@ python -m fluxforge.cli.app ingest \
 
 This override command replaces the profile efficiency with the user-supplied coefficients while still using the raw file's own energy calibration unless `--energy-calibration` is also provided.
 
-## Manual ROI Inspection Example
-Manual ROI CSV format:
-
-```csv
-label,left_keV,right_keV,isotope
-Sc47_main,158.6,160.1,Sc47
-Sc48_175,174.7,176.2,Sc48
-```
-
-Headless spectrum plot with manual ROI overlays:
-
-```bash
-python -m fluxforge.cli.app spectrum-plot \
-  --input examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC \
-  --profile rafm_25cm \
-  --background-subtracted \
-  --manual-peaks-file examples/RAFM_irradiation/manual_peaks_ti.csv \
-  --output examples/RAFM_irradiation/results/plots/manual/Ti-RAFM-1a_25cm_manual.png \
-  --save-peak-report examples/RAFM_irradiation/results/manual/Ti-RAFM-1a_25cm_manual_peaks.json
-```
-
-Manual ROI peak report only:
-
-```bash
-python -m fluxforge.cli.app peaks \
-  --spectrum-file examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC \
-  --profile rafm_25cm \
-  --background-subtracted \
-  --manual-peaks-file examples/RAFM_irradiation/manual_peaks_ti.csv \
-  --output examples/RAFM_irradiation/results/manual/Ti-RAFM-1a_25cm_manual_peaks.json
-```
-
-Supported manual ROI fields:
-- `label`
-- `isotope`
-- `left_keV`, `right_keV`
-- or `left_channel`, `right_channel`
-
-The manual peak report keeps:
-- raw gross counts inside the chosen ROI
-- integrated counts from the selected analysis spectrum
-- ROI endpoints in both channels and keV
-- a `background_subtracted` flag so the user can track whether the ROI area came from raw or background-adjusted counts
+## Separate Manual Inspection Example
+- Manual ROI inspection is documented separately in [examples/manual_peak_inspection/README.md](/filespace/s/smandych/CAE/projects/ALARA/FluxForge/examples/manual_peak_inspection/README.md).
+- That example is for user-driven inspection only and should not replace the automatic RAFM/flux-wire validation workflow.
+- A dedicated LLM handoff for the stuck count-parity work now lives at [count_parity_llm_handoff.md](/filespace/s/smandych/CAE/projects/ALARA/FluxForge/examples/RAFM_irradiation/count_parity_llm_handoff.md).
 
 ## Validation Checklist
 - Shared background subtraction applied for all RAFM runs.

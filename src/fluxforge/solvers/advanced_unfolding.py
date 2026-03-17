@@ -647,4 +647,4 @@ if __name__ == "__main__":
     print(f"\n  RMSE (no smoothing): {rmse(result.flux, true_flux):.1f}")
     print(f"  RMSE (with smoothing): {rmse(result_smooth.flux, true_flux):.1f}")
     
-    print("\n✅ advanced_unfolding module tests passed!")
+    print("\n[OK] advanced_unfolding module tests passed!")

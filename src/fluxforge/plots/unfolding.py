@@ -591,6 +591,179 @@ def plot_spectrum_with_ratio(
 
 
 # =============================================================================
+# Residual / Pull and Covariance Diagnostics
+# =============================================================================
+
+def plot_residuals_pulls(
+    result: "UnfoldingResult",
+    rate_uncertainties: Optional[np.ndarray] = None,
+    title: str = "Reaction Rate Residuals and Pulls",
+    figsize: Tuple[float, float] = (12, 5),
+    save_path: Optional[Union[str, Path]] = None,
+) -> Any:
+    """
+    Plot reaction residuals and pulls per monitor.
+
+    Parameters
+    ----------
+    result : UnfoldingResult
+        Unfolding result with measured and predicted rates
+    rate_uncertainties : np.ndarray, optional
+        1-sigma uncertainties for measured rates (same length as measured_rates)
+    title : str
+        Figure title
+    figsize : tuple
+        Figure size
+    save_path : str or Path, optional
+        Save figure to path
+
+    Returns
+    -------
+    fig, (ax_residuals, ax_pulls)
+        Matplotlib figure and axes
+    """
+    if not HAS_MATPLOTLIB:
+        raise ImportError("matplotlib required for plotting")
+
+    measured = np.asarray(result.measured_rates, dtype=float)
+    predicted = np.asarray(result.predicted_rates, dtype=float)
+    if measured.size == 0 or predicted.size == 0:
+        raise ValueError("Measured and predicted rates are required for residual plots")
+    if measured.shape != predicted.shape:
+        raise ValueError("Measured and predicted rates must have the same shape")
+
+    apply_plot_style()
+
+    fig, (ax_residuals, ax_pulls) = plt.subplots(1, 2, figsize=figsize)
+
+    residuals = predicted - measured
+    labels = result.reactions_used if result.reactions_used else [f"R{i+1}" for i in range(measured.size)]
+    x = np.arange(measured.size)
+
+    # Residual panel
+    ax_residuals.bar(x, residuals, color=COLORS["unfolded"], alpha=0.8, edgecolor="black")
+    ax_residuals.axhline(y=0.0, color="black", linestyle="-", linewidth=1)
+    ax_residuals.set_xticks(x)
+    ax_residuals.set_xticklabels(labels, rotation=45, ha="right")
+    ax_residuals.set_xlabel("Reaction")
+    ax_residuals.set_ylabel("Predicted - Measured")
+    ax_residuals.set_title("Residuals")
+    ax_residuals.grid(True, alpha=0.3, axis="y")
+
+    # Pull panel
+    if rate_uncertainties is not None:
+        sigma = np.asarray(rate_uncertainties, dtype=float)
+        if sigma.shape != measured.shape:
+            raise ValueError("rate_uncertainties must match measured rate shape")
+        sigma_safe = np.where(np.abs(sigma) > 0.0, sigma, np.nan)
+        pulls = residuals / sigma_safe
+        pulls = np.nan_to_num(pulls, nan=0.0, posinf=0.0, neginf=0.0)
+        ax_pulls.set_ylabel("Pull (Predicted - Measured) / σ")
+    else:
+        denom = np.where(np.abs(measured) > 0.0, measured, np.nan)
+        pulls = residuals / denom
+        pulls = np.nan_to_num(pulls, nan=0.0, posinf=0.0, neginf=0.0)
+        ax_pulls.set_ylabel("Relative Residual")
+
+    pull_colors = ["#2ca02c" if abs(v) <= 2.0 else "#ff7f0e" if abs(v) <= 3.0 else "#d62728" for v in pulls]
+    ax_pulls.bar(x, pulls, color=pull_colors, alpha=0.8, edgecolor="black")
+    ax_pulls.axhline(y=0.0, color="black", linestyle="-", linewidth=1)
+    ax_pulls.axhline(y=2.0, color="gray", linestyle="--", linewidth=1, alpha=0.8)
+    ax_pulls.axhline(y=-2.0, color="gray", linestyle="--", linewidth=1, alpha=0.8)
+    ax_pulls.set_xticks(x)
+    ax_pulls.set_xticklabels(labels, rotation=45, ha="right")
+    ax_pulls.set_xlabel("Reaction")
+    ax_pulls.set_title("Pulls")
+    ax_pulls.grid(True, alpha=0.3, axis="y")
+
+    fig.suptitle(title)
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=300, bbox_inches="tight")
+
+    return fig, (ax_residuals, ax_pulls)
+
+
+def plot_covariance_correlation_heatmaps(
+    covariance: np.ndarray,
+    energy_edges_eV: Optional[np.ndarray] = None,
+    title: str = "Posterior Covariance and Correlation",
+    figsize: Tuple[float, float] = (14, 6),
+    save_path: Optional[Union[str, Path]] = None,
+) -> Any:
+    """
+    Plot covariance and correlation heatmaps for an unfolded spectrum.
+
+    Parameters
+    ----------
+    covariance : np.ndarray
+        Posterior covariance matrix (N x N)
+    energy_edges_eV : np.ndarray, optional
+        Energy edges for labeling. If not provided, group indices are used.
+    title : str
+        Figure title
+    figsize : tuple
+        Figure size
+    save_path : str or Path, optional
+        Save figure to path
+
+    Returns
+    -------
+    fig, (ax_cov, ax_corr)
+        Matplotlib figure and axes
+    """
+    if not HAS_MATPLOTLIB:
+        raise ImportError("matplotlib required for plotting")
+
+    cov = np.asarray(covariance, dtype=float)
+    if cov.ndim != 2 or cov.shape[0] != cov.shape[1]:
+        raise ValueError("covariance must be a square matrix")
+
+    n = cov.shape[0]
+    std = np.sqrt(np.maximum(np.diag(cov), 0.0))
+    denom = np.outer(std, std)
+    corr = np.divide(cov, denom, out=np.zeros_like(cov), where=denom > 0.0)
+    np.fill_diagonal(corr, 1.0)
+
+    if energy_edges_eV is not None:
+        edges = np.asarray(energy_edges_eV, dtype=float)
+        if edges.size == n + 1:
+            labels = [f"{edges[i]:.2e}-{edges[i+1]:.2e}" for i in range(n)]
+        else:
+            labels = [f"G{i+1}" for i in range(n)]
+    else:
+        labels = [f"G{i+1}" for i in range(n)]
+
+    apply_plot_style()
+    fig, (ax_cov, ax_corr) = plt.subplots(1, 2, figsize=figsize)
+
+    cov_im = ax_cov.imshow(cov, cmap="RdBu_r", aspect="auto")
+    ax_cov.set_title("Covariance")
+    ax_cov.set_xticks(np.arange(n))
+    ax_cov.set_yticks(np.arange(n))
+    ax_cov.set_xticklabels(labels, rotation=45, ha="right")
+    ax_cov.set_yticklabels(labels)
+    fig.colorbar(cov_im, ax=ax_cov, fraction=0.046, pad=0.04, label="Covariance")
+
+    corr_im = ax_corr.imshow(corr, cmap="RdBu_r", vmin=-1.0, vmax=1.0, aspect="auto")
+    ax_corr.set_title("Correlation")
+    ax_corr.set_xticks(np.arange(n))
+    ax_corr.set_yticks(np.arange(n))
+    ax_corr.set_xticklabels(labels, rotation=45, ha="right")
+    ax_corr.set_yticklabels(labels)
+    fig.colorbar(corr_im, ax=ax_corr, fraction=0.046, pad=0.04, label="Correlation")
+
+    fig.suptitle(title)
+    plt.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=300, bbox_inches="tight")
+
+    return fig, (ax_cov, ax_corr)
+
+
+# =============================================================================
 # Response Matrix Visualization
 # =============================================================================
 

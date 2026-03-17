@@ -90,7 +90,7 @@ class ValidationSummary:
         print("-" * 80)
         
         for r in self.results:
-            status = "✅ PASS" if r.passed else "❌ FAIL"
+            status = "[OK] PASS" if r.passed else "[FAIL] FAIL"
             print(f"\n[{r.goal_id}] {r.description}")
             print(f"  Status: {status}")
             if r.details:

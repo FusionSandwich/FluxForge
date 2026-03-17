@@ -480,30 +480,30 @@ if __name__ == "__main__":
         # SPE
         spe_path = os.path.join(tmpdir, "test.spe")
         exporter.to_spe(spe_path)
-        print(f"✓ Exported to SPE: {os.path.getsize(spe_path)} bytes")
+        print(f"OK Exported to SPE: {os.path.getsize(spe_path)} bytes")
         
         # CSV
         csv_path = os.path.join(tmpdir, "test.csv")
         exporter.to_csv(csv_path)
-        print(f"✓ Exported to CSV: {os.path.getsize(csv_path)} bytes")
+        print(f"OK Exported to CSV: {os.path.getsize(csv_path)} bytes")
         
         # IEC
         iec_path = os.path.join(tmpdir, "test.xml")
         exporter.to_iec(iec_path)
-        print(f"✓ Exported to IEC XML: {os.path.getsize(iec_path)} bytes")
+        print(f"OK Exported to IEC XML: {os.path.getsize(iec_path)} bytes")
         
         # JSON
         json_path = os.path.join(tmpdir, "test.json")
         exporter.to_json(json_path)
-        print(f"✓ Exported to JSON: {os.path.getsize(json_path)} bytes")
+        print(f"OK Exported to JSON: {os.path.getsize(json_path)} bytes")
         
         # MCNP
         mcnp_path = os.path.join(tmpdir, "test.sdef")
         exporter.to_mcnp_sdef(mcnp_path)
-        print(f"✓ Exported to MCNP SDEF: {os.path.getsize(mcnp_path)} bytes")
+        print(f"OK Exported to MCNP SDEF: {os.path.getsize(mcnp_path)} bytes")
         
         # Re-import SPE
         imported = SpectrumExporter.from_spe(spe_path)
-        print(f"✓ Re-imported SPE: {len(imported.counts)} channels")
+        print(f"OK Re-imported SPE: {len(imported.counts)} channels")
     
-    print("\n✅ spectrum_export module tests passed!")
+    print("\n[OK] spectrum_export module tests passed!")

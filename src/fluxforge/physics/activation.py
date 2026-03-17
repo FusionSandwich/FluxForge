@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from typing import Iterable, Sequence
 
 from fluxforge.core.linalg import vector_average
+from fluxforge.data.elements import atomic_mass, parse_isotope
+
+
+AVOGADRO = 6.02214076e23
 
 
 @dataclass
@@ -92,3 +96,78 @@ def reaction_rate_from_activity(activity_eoi: float, segments: Sequence[Irradiat
     rate = activity_eoi / factor
     uncertainty = rate / math.sqrt(max(activity_eoi, 1e-12))
     return ReactionRateEstimate(rate=rate, uncertainty=uncertainty)
+
+
+def activity_to_atoms(activity_bq: float, half_life_s: float) -> float:
+    """Convert activity in Bq to radioactive atom count."""
+
+    if half_life_s <= 0:
+        return 0.0
+    decay_const = math.log(2.0) / half_life_s
+    return activity_bq / max(decay_const, 1e-30)
+
+
+def infer_nuclide_atomic_mass_g_mol(isotope: str | None) -> float | None:
+    """Infer an isotope molar mass from an isotope label like `Co60` or `Sc46`."""
+
+    if not isotope:
+        return None
+    try:
+        _element, mass_number, _isomeric = parse_isotope(str(isotope))
+    except ValueError:
+        symbol = "".join(ch for ch in str(isotope) if ch.isalpha())
+        return atomic_mass(symbol) or None
+    return float(mass_number)
+
+
+def activity_to_radioactive_mass_g(activity_bq: float, half_life_s: float, isotope: str | None = None) -> float:
+    """Infer radioactive product mass from activity and half-life."""
+
+    molar_mass = infer_nuclide_atomic_mass_g_mol(isotope)
+    if molar_mass is None or molar_mass <= 0.0:
+        return 0.0
+    atoms = activity_to_atoms(activity_bq, half_life_s)
+    return (atoms / AVOGADRO) * molar_mass
+
+
+def radioisotope_specific_activity_bq_g(half_life_s: float, isotope: str | None = None) -> float:
+    """Return the specific activity of a pure radioactive isotope in Bq/g."""
+
+    molar_mass = infer_nuclide_atomic_mass_g_mol(isotope)
+    if half_life_s <= 0.0 or molar_mass is None or molar_mass <= 0.0:
+        return 0.0
+    decay_const = math.log(2.0) / half_life_s
+    return decay_const * AVOGADRO / molar_mass
+
+
+def activation_study_metrics(
+    *,
+    activity_bq: float,
+    activity_unc_bq: float,
+    half_life_s: float,
+    isotope: str | None = None,
+    sample_mass_g: float | None = None,
+) -> dict[str, float]:
+    """Build common activation-study metrics derived from activity."""
+
+    decay_constant = math.log(2.0) / half_life_s if half_life_s > 0.0 else 0.0
+    radioisotope_specific_activity = radioisotope_specific_activity_bq_g(half_life_s, isotope=isotope)
+    atoms = activity_to_atoms(activity_bq, half_life_s) if activity_bq > 0.0 else 0.0
+    atoms_unc = activity_to_atoms(activity_unc_bq, half_life_s) if activity_unc_bq > 0.0 else 0.0
+    radioactive_mass_g = activity_to_radioactive_mass_g(activity_bq, half_life_s, isotope=isotope)
+    radioactive_mass_unc_g = activity_to_radioactive_mass_g(activity_unc_bq, half_life_s, isotope=isotope)
+
+    payload = {
+        "decay_constant_s": float(decay_constant),
+        "radioisotope_specific_activity_Bq_g": float(radioisotope_specific_activity),
+        "atoms": float(atoms),
+        "atoms_unc": float(atoms_unc),
+        "radioactive_mass_g": float(radioactive_mass_g),
+        "radioactive_mass_unc_g": float(radioactive_mass_unc_g),
+    }
+    if sample_mass_g is not None and sample_mass_g > 0.0:
+        payload["sample_mass_g"] = float(sample_mass_g)
+        payload["specific_activity_Bq_g"] = float(activity_bq / sample_mass_g)
+        payload["specific_activity_unc_Bq_g"] = float(activity_unc_bq / sample_mass_g)
+        payload["radioactive_mass_fraction"] = float(radioactive_mass_g / sample_mass_g)
+    return payload

@@ -434,7 +434,7 @@ class DecayChain:
             units=units
         )
         
-        return np.trapz(result.activities[nuclide], times)
+        return np.trapezoid(result.activities[nuclide], times)
 
 
 # =============================================================================

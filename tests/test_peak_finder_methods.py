@@ -3,7 +3,7 @@ Tests for peak finding algorithms.
 
 Compares all peak finder methods:
 - SimplePeakFinder (threshold-based with SNIP background)
-- WindowPeakFinder (local window statistics, from peakingduck)
+- WindowPeakFinder (local window statistics, reference-style)
 - ChunkedPeakFinder (spectrum subdivision)
 - ScipyPeakFinder (scipy with Savitzky-Golay smoothing)
 - SegmentedPeakFinder (region-specific thresholds, from rafm_analysis)
@@ -108,7 +108,7 @@ class TestSimplePeakFinder:
 
 
 class TestWindowPeakFinder:
-    """Tests for WindowPeakFinder (peakingduck-style)."""
+    """Tests for WindowPeakFinder (reference-style behavior)."""
     
     def test_finds_peaks(self):
         """Should find peaks using local window statistics."""

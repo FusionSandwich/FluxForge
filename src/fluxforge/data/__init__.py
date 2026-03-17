@@ -83,6 +83,44 @@ from fluxforge.data.nuclear_data import (
     create_nuclear_data,
     create_multigroup_data,
 )
+from fluxforge.data.kayzero_k0 import (
+    KayzeroImportResult,
+    import_kayzero_k0_library,
+    write_governed_library_json,
+    write_import_report_json,
+)
+from fluxforge.data.rafm_decay import (
+    load_rafm_decay_library,
+    get_rafm_decay_entry,
+    get_rafm_gamma_lines,
+    get_rafm_half_life,
+)
+from fluxforge.data.flux_wire_catalog import (
+    FluxWireCatalogEntry,
+    load_flux_wire_catalog,
+    list_flux_wire_isotopes,
+    get_flux_wire_catalog_entry,
+    get_flux_wire_isotopes_for_element,
+    list_flux_wire_elements,
+)
+from fluxforge.data.flux_wire_unfolding import (
+    load_flux_wire_unfolding_defaults,
+    load_flux_wire_sample_defaults,
+    load_flux_wire_reaction_defaults,
+    load_flux_wire_product_reactions,
+    get_flux_wire_reaction_id,
+    get_flux_wire_isotope_fraction,
+    get_flux_wire_reaction_cross_section_defaults,
+    get_flux_wire_reaction_characteristic_energies,
+    get_flux_wire_response_parameters,
+)
+from fluxforge.data.nuclear_data_sources import (
+    NuclearDataSourceRecord,
+    get_nuclear_data_source,
+    list_nuclear_data_sources,
+    load_gamma_identification_source,
+    summarize_nuclear_data_source,
+)
 
 __all__ = [
     # Efficiency curves (calibration-based)
@@ -153,4 +191,37 @@ __all__ = [
     'interpolate_temperature',
     'create_nuclear_data',
     'create_multigroup_data',
+    # Kayzero k0 importer
+    'KayzeroImportResult',
+    'import_kayzero_k0_library',
+    'write_governed_library_json',
+    'write_import_report_json',
+    # RAFM decay subset
+    'load_rafm_decay_library',
+    'get_rafm_decay_entry',
+    'get_rafm_gamma_lines',
+    'get_rafm_half_life',
+    # Flux-wire reaction metadata
+    'FluxWireCatalogEntry',
+    'load_flux_wire_catalog',
+    'list_flux_wire_isotopes',
+    'get_flux_wire_catalog_entry',
+    'get_flux_wire_isotopes_for_element',
+    'list_flux_wire_elements',
+    # Flux-wire unfolding defaults
+    'load_flux_wire_unfolding_defaults',
+    'load_flux_wire_sample_defaults',
+    'load_flux_wire_reaction_defaults',
+    'load_flux_wire_product_reactions',
+    'get_flux_wire_reaction_id',
+    'get_flux_wire_isotope_fraction',
+    'get_flux_wire_reaction_cross_section_defaults',
+    'get_flux_wire_reaction_characteristic_energies',
+    'get_flux_wire_response_parameters',
+    # Nuclear data sources / provenance-aware registry
+    'NuclearDataSourceRecord',
+    'get_nuclear_data_source',
+    'list_nuclear_data_sources',
+    'load_gamma_identification_source',
+    'summarize_nuclear_data_source',
 ]

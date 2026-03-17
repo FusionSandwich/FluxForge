@@ -849,4 +849,4 @@ if __name__ == "__main__":
     for etype, spec in by_type.items():
         print(f"  {etype}: {np.sum(spec.intensities):.2e} emissions/s")
     
-    print("\n✅ gamma_spectrum module tests passed!")
+    print("\n[OK] gamma_spectrum module tests passed!")

@@ -28,6 +28,8 @@ class GammaSpectrum:
     ----------
     counts : np.ndarray
         Channel counts array
+    counts_uncertainty : Optional[np.ndarray]
+        Per-channel 1-sigma uncertainty (sqrt(counts) if not supplied)
     channels : np.ndarray
         Channel numbers
     energies : Optional[np.ndarray]
@@ -56,6 +58,7 @@ class GammaSpectrum:
     """
     
     counts: np.ndarray
+    counts_uncertainty: Optional[np.ndarray] = None
     channels: np.ndarray = field(default_factory=lambda: np.array([]))
     energies: Optional[np.ndarray] = None
     live_time: float = 0.0
@@ -68,8 +71,22 @@ class GammaSpectrum:
     
     def __post_init__(self):
         """Initialize derived fields."""
-        if len(self.channels) == 0 and len(self.counts) > 0:
+        self.counts = np.asarray(self.counts, dtype=float)
+
+        if self.counts_uncertainty is None:
+            self.counts_uncertainty = np.sqrt(np.maximum(self.counts, 0.0))
+        else:
+            self.counts_uncertainty = np.asarray(self.counts_uncertainty, dtype=float)
+            if self.counts_uncertainty.shape != self.counts.shape:
+                raise ValueError("counts_uncertainty must have the same shape as counts.")
+
+        raw_channels = np.asarray(self.channels)
+        if len(raw_channels) == 0 and len(self.counts) > 0:
             self.channels = np.arange(len(self.counts))
+        elif np.allclose(raw_channels, np.round(raw_channels)):
+            self.channels = np.round(raw_channels).astype(int)
+        else:
+            self.channels = raw_channels.astype(float)
         
         # Apply energy calibration if available
         if self.energies is None and self.calibration:
@@ -160,8 +177,8 @@ class GammaSpectrum:
         
         mask = (self.channels >= ch_min) & (self.channels <= ch_max)
         total = self.counts[mask].sum()
-        
-        return float(total), np.sqrt(total)
+        total_unc = np.sqrt(np.sum(self.counts_uncertainty[mask] ** 2))
+        return float(total), float(total_unc)
     
     @property
     def dead_time_fraction(self) -> float:
@@ -181,6 +198,7 @@ class GammaSpectrum:
         """Convert to dictionary for serialization."""
         return {
             'counts': self.counts.tolist(),
+            'counts_uncertainty': self.counts_uncertainty.tolist() if self.counts_uncertainty is not None else None,
             'channels': self.channels.tolist(),
             'energies': self.energies.tolist() if self.energies is not None else None,
             'live_time': self.live_time,
@@ -197,6 +215,7 @@ class GammaSpectrum:
         """Create GammaSpectrum from dictionary."""
         return cls(
             counts=np.array(data['counts']),
+            counts_uncertainty=np.array(data['counts_uncertainty']) if data.get('counts_uncertainty') is not None else None,
             channels=np.array(data.get('channels', [])),
             energies=np.array(data['energies']) if data.get('energies') else None,
             live_time=data.get('live_time', 0.0),

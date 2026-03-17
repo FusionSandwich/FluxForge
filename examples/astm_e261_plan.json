@@ -1,0 +1,36 @@
+{
+  "schema": "fluxforge.astm_e261_plan.v1",
+  "title": "ASTM E261 example reactor dosimetry plan",
+  "irradiation": {
+    "segments": [
+      {
+        "duration_s": 600.0,
+        "relative_power": 1.0
+      }
+    ]
+  },
+  "measurements": [
+    {
+      "measurement_id": "co60-monitor",
+      "reaction_id": "Co-59(n,g)Co-60",
+      "monitor_id": "co-wire",
+      "product_isotope": "Co-60",
+      "target_isotope": "Co-59",
+      "line_energy_keV": 1332.5,
+      "net_counts": 2500.0,
+      "live_time_s": 100.0,
+      "efficiency": 0.01,
+      "gamma_intensity": 0.9998,
+      "half_life_s": 166344192.0,
+      "cooling_time_s": 3600.0,
+      "sample_mass_g": 0.001,
+      "atomic_mass_g_mol": 58.933,
+      "isotopic_abundance": 1.0,
+      "effective_cross_section_barn": 37.18,
+      "effective_cross_section_unc_barn": 0.5,
+      "self_shielding_factor": 1.0,
+      "cover_correction_factor": 1.0,
+      "geometry_factor": 1.0
+    }
+  ]
+}

@@ -11,7 +11,8 @@ import pytest
 import numpy as np
 
 import sys
-sys.path.insert(0, '/filespace/s/smandych/CAE/projects/ALARA/FluxForge/src')
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from fluxforge.unfold._types import ReactionRates, ResponseBundle, SpectrumFile
 

@@ -505,4 +505,4 @@ if __name__ == "__main__":
         if xs:
             print(f"  {rxn}: {len(xs.energies_MeV)} points, max σ={max(xs.cross_sections_mb):.1f} mb")
     
-    print("\n✅ stacked_target module tests passed!")
+    print("\n[OK] stacked_target module tests passed!")

@@ -4,7 +4,7 @@
 **OpenMC 0.15.3 (CE transport ± depletion) vs MCNP6.3 + ALARA (group activation)**
 
 **Version:** 3.1  
-**Last Updated:** 2026-03-08  
+**Last Updated:** 2026-03-16  
 **Scope:** End-to-end, reproducible pipeline from raw HPGe spectra to (a) unfolded/group spectra with covariance and (b) rigorous model-to-experiment comparisons for TRIGA irradiations (flux wires/foils + larger samples).
 
 ---
@@ -89,18 +89,18 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 | H: Model Comparison | 4 | 0 | 0 | 4 |
 | I: TRIGA/k₀-NAA | 5 | 0 | 0 | 5 |
 | J: Artifacts | 3 | 0 | 0 | 3 |
-| K: Reactor Dosimetry (INL) | 8 | 0 | 0 | 8 |
+| K: Reactor Dosimetry (INL) | 10 | 0 | 0 | 10 |
 | M: STAYSL Parity | 10 | 0 | 0 | 10 |
 | N: IRDFF-II Access | 8 | 0 | 0 | 8 |
 | O: ENDF/B-VIII.0 Access | 7 | 0 | 0 | 7 |
 | P: k₀-NAA Complete | 9 | 0 | 0 | 9 |
 | Q: RMLE Gamma Unfolding | 9 | 0 | 0 | 9 |
 | Z: NAA-ANN Neural Networks | 9 | 0 | 0 | 9 |
-| **Total** | **110** | **0** | **0** | **110** |
+| **Total** | **112** | **0** | **0** | **112** |
 
 **Implementation Coverage: 100% Complete ✅**
-**Test Suite: 731 tests passing**
-**Last Updated: January 10, 2026**
+**Test Suite: 762 tests passing**
+**Last Updated: March 16, 2026**
 
 ---
 
@@ -341,6 +341,8 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 | K6 | Adjusted Spectrum | ✅ | `UnfoldingResult` | `compare_with_mcnp()` |
 | K7 | Fluences of Interest | ✅ | — | 1-MeV eq, DPA |
 | K8 | A Priori Covariance | ✅ | `core.prior_covariance` | Prior covariance models + CLI wiring for GLS |
+| K9 | ASTM E261 reduction workflow | ✅ | `analysis.astm_e261` | Dedicated `astm-e261` CLI command + Standards-tab GUI runner |
+| K10 | INL Raw Spectra Peak Finding (ASTM E3376) | ✅ | `workflows.astm_inl_dosimetry` | FWHM-scaled ROIs, Covell subtraction, matching QG outputs |
 
 ---
 
@@ -593,6 +595,10 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 | V1.6 | Cross-repo consistency tests | ✅ | 25/27 tests pass (2 skipped: becquerel not installed) |
 | V1.7 | Performance benchmarks | ✅ | Inline timing in module tests |
 | V1.8 | Numerical precision validation | ✅ | Tolerance checks validated in comparison tests |
+
+**Future benchmark note:** add the official TECDOC-2026 supplementary benchmark dataset to the repository verification harness once it is available in-tree. Until then, use local deterministic benchmark assets and synthetic golden cases for k0 workflow regression.
+
+**Latest k0 iteration note:** the governed k0 workflow now supports bundled-vs-external library selection, bare triple-monitor plus Cd-ratio and single-monitor-known-parameter facility modes, cross-measurement aggregation, blank/CRM QA-QC artifacts, richer k0 report generation, and a matching expanded Standards-tab GUI runner. Remaining work is still the in-tree official TECDOC supplementary library/benchmark payload, validated numerical fast-flux corrections, and broader GUI integration coverage for the new k0 surfaces.
 
 ---
 
@@ -1162,13 +1168,13 @@ The following capabilities are planned and not counted in current completion met
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Planned | PeakEasy/QuantumGold-class UX |
-| C2 | ROI/peak workflows with multiplet deconvolution | Planned | Interactive peak tables + fit control |
-| C3 | Energy/efficiency calibration UI | Planned | Curve fit + residuals |
-| C4 | Batch operations (sum/append/convert, ROI integration) | Planned | Format conversion + batch reports |
+| C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Partial | Viewer, overlays, ROI editing, and PNG export are working in the current Tk/ttk prototype |
+| C2 | ROI/peak workflows with multiplet deconvolution | Partial | Peak tables, auto-finding, counting-method selection, ROI plot selection, plotted diagnostics, constrained-fit widgets, free-form constraint-matrix editing, and ASTM/INL preset-driven IEC-tiered counting defaults are wired; richer tied-parameter UX still remains |
+| C3 | Energy/efficiency calibration UI | Partial | Polynomial coefficient editor, calibration-point picking, residual plots, efficiency-point capture, and fitted-curve JSON export are implemented; detector-profile import/wizards remain |
+| C4 | Batch operations (sum/append/convert, ROI integration) | Partial | Multi-buffer management and buffer arithmetic are implemented; broader batch orchestration remains |
 | C5 | GUI-to-CLI macro recorder + project file | Planned | Reproducible workflows |
 | C6 | Interactive CLI shell (HDTV-style) | Planned | Batch scripts + keybindings |
-| C7 | Config-driven CLI tools (Neutron-Spectrometry-style) | Planned | Unfold/plot/trend/plot-lines |
+| C7 | Config-driven CLI tools (Neutron-Spectrometry-style) | Partial | GUI/CLI now expose GLS, GRAVEL, and MLEM unfold configuration plus embedded unfolded-spectrum plotting, uncertainty-aware rate residual/pull diagnostics, and correlation heatmaps; broader trend/plot-lines dashboards still remain |
 | C8 | STAYSL parity UI panels (SigPhi/SHIELD/BCF) | Planned | Spreadsheet-style workflow |
 | C9 | Online GUI/PWA (Gamma-MCA-style) | Planned | Offline-first browser UI |
 | C10 | MCA acquisition plugin (future) | Planned | Serial/WebUSB-class devices |
@@ -1180,17 +1186,28 @@ The following capabilities are planned and not counted in current completion met
 | C16 | ANN-based NAA workflow | Planned | From `testing/NAA-ANN-1` |
 | C17 | Additional unfolding libraries | Planned | From `testing/pyunfold` |
 | C18 | Guided instructional NAA workflow | Planned | End-to-end educational NAA path from calibration to analysis report |
-| C19 | Calibration wizard for standard sources | Planned | Annotated feature picking, residuals, and covariance-aware fit review |
-| C20 | Reference-assisted isotope ID workspace | Planned | Candidate ranking with line-accounting and half-life checks |
+| C19 | Calibration wizard for standard sources | Partial | Annotated manual point picking, residual fit review, and efficiency-source point capture are working; covariance/geometry assistants remain |
+| C20 | Reference-assisted isotope ID workspace | Partial | GUI now supports selectable line-match, nuclide-consensus, and hybrid-ranked identification methods with source/tolerance/intensity controls |
 | C21 | Comparator-standard mass worksheet | Planned | Reference-driven mass/concentration estimation with uncertainty propagation |
 | C22 | Irradiation / decay / count-time planner | Planned | Short-lived vs long-lived isotope timing studies |
 | C23 | MDA detection-limit worksheet | Planned | Report-ready detection thresholds and upper bounds |
 | C24 | Analysis checklist + figure-pack export | Planned | Abstract prompts, settings tables, plots, and completion checklist |
+| C25 | Curie-style stacked-target and decay-chain tabs | Partial | MVP tabs now call existing backend APIs and summarize energy-loss / Bateman results |
+| C26 | Additional nuclear-data backends in GUI/browser workflows | Partial | Provenance-aware source registry now exposes actigamma, FluxForge bundled gamma, NNDC offline activation, IRDFF-II, k0 monitor, calibration-source, flux-wire, and user custom JSON/CSV/YAML, HTTP(S), SQLite, and Python-plugin sources; broader downstream wiring beyond Peaks/Activity/Standards still remains |
 
 ---
 
 **Document Version:** 3.1  
-**Last Updated:** 2026-03-08  
+**Last Updated:** 2026-03-11  
 **Prepared by:** FluxForge Development Team
-**Test Suite:** 740 tests passing, 0 skipped
+**Test Suite:** 762 tests passing, 0 skipped
 **GPU Support:** NVIDIA T600, CUDA 12.5.1, cuDNN 9
+
+## 13. Documentation Appendices
+FluxForge documentation is highly scoped across separate subdirectories to support maintainability:
+- `/ASTM_standards/`: Core definitions of standard methodologies and LaTeX papers.
+- `/workflows/`: Process definition files outlining ASTM, INL, and QuantumGold workflow parities.
+- `/theory/`: Deep dive documents strictly outlining underlying metrology physics, particle decay equations, and continuum logic.
+- `/tutorials/`: Code-specific scripts providing reproducible examples for onboarding new analysts.
+- `/archive/legacy_plans/`: Inactive historical feature and integration logic matrices representing completed epic architectures. 
+- `/literature/`: Formal PDF manuals and external reference documents (PeakEasy manuals, standards papers, ENDF documentation).

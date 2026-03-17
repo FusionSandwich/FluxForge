@@ -40,6 +40,14 @@ ACQ_DATE_RE = re.compile(r"Acquisition Date:\s*(.+)$", re.IGNORECASE | re.MULTIL
 ID_RE = re.compile(r"^\s*ID:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 SAMPLE_ID_RE = re.compile(r"Sample(?:\s+ID)?:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 DETECTOR_RE = re.compile(r"Detector(?:\s+Name)?:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
+EFF_COEF_RE = re.compile(
+    r"^\s*C([1-4])\s*:\s*([+-]?\d+\.?\d*(?:[eE][+-]?\d+)?)\s*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+GEOMETRY_FACTOR_RE = re.compile(
+    r"Geometry Factor\s*\(A\)\s*:\s*([+-]?\d+\.?\d*(?:[eE][+-]?\d+)?)",
+    re.IGNORECASE,
+)
 
 # Filename pattern for RAFM samples: sample-C_timepoint.ASC or sample-N_timepoint.ASC
 ASC_NAME_RE = re.compile(r"(.+?)-([CN])_(.+)\.ASC$", re.IGNORECASE)
@@ -67,6 +75,7 @@ def parse_genie_header(filepath: Union[str, Path]) -> Dict[str, Any]:
     """
     header = {
         'calibration': {},
+        'efficiency': {},
         'live_time': 0.0,
         'real_time': 0.0,
         'start_time': None,
@@ -82,6 +91,16 @@ def parse_genie_header(filepath: Union[str, Path]) -> Dict[str, Any]:
         coef = match.group(1).upper()
         value = float(match.group(2))
         header['calibration'][coef] = value
+
+    # Extract optional efficiency coefficients if present
+    for match in EFF_COEF_RE.finditer(content):
+        coef_num = match.group(1)
+        value = float(match.group(2))
+        header['efficiency'][f"C{coef_num}"] = value
+
+    match = GEOMETRY_FACTOR_RE.search(content)
+    if match:
+        header['efficiency']['DetModel'] = float(match.group(1))
     
     # Extract live time
     match = LIVE_TIME_RE.search(content)
@@ -131,7 +150,12 @@ def parse_genie_header(filepath: Union[str, Path]) -> Dict[str, Any]:
     return header
 
 
-def read_genie_spectrum(filepath: Union[str, Path]) -> GammaSpectrum:
+def read_genie_spectrum(
+    filepath: Union[str, Path],
+    *,
+    energy_calibration_override: Optional[List[float]] = None,
+    efficiency_override: Optional[Dict[str, float]] = None,
+) -> GammaSpectrum:
     """
     Read Genie-2000 ASCII export file.
     
@@ -197,7 +221,9 @@ def read_genie_spectrum(filepath: Union[str, Path]) -> GammaSpectrum:
     
     # Build calibration coefficients list [A, B, C]
     cal = header['calibration']
-    if 'A' in cal and 'B' in cal:
+    if energy_calibration_override is not None:
+        coefficients = [float(c) for c in energy_calibration_override]
+    elif 'A' in cal and 'B' in cal:
         # E = A + B*ch + C*ch²
         coefficients = [
             cal.get('A', 0.0),
@@ -221,6 +247,10 @@ def read_genie_spectrum(filepath: Union[str, Path]) -> GammaSpectrum:
         detector_id=header['detector_id'],
     )
 
+    efficiency_data = dict(header.get('efficiency', {}))
+    if efficiency_override:
+        efficiency_data.update({str(k): float(v) for k, v in efficiency_override.items()})
+
     return GammaSpectrum(
         counts=counts,
         channels=channels,
@@ -234,6 +264,7 @@ def read_genie_spectrum(filepath: Union[str, Path]) -> GammaSpectrum:
         metadata={
             'format': 'genie2000',
             'source_file': str(filepath),
+            'efficiency': efficiency_data,
             'qc_flags': qc_flags,
         },
     )

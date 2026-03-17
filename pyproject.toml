@@ -9,7 +9,33 @@ dependencies = []
 
 [project.scripts]
 fluxforge = "fluxforge.cli.app:main"
+fluxforge-gui = "fluxforge_gui.app:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+fluxforge = ["data/*.json"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+include = "\\.pyi?$"
+extend-exclude = """
+(
+	^/tools/
+	| ^/testing/
+)
+"""
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+	".git",
+	"__pycache__",
+	".venv",
+	"tools",
+	"testing",
+]

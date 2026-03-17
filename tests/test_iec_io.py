@@ -6,11 +6,11 @@ import pytest
 from fluxforge.io.iec import read_iec_file
 from fluxforge.io.hpge import read_hpge_spectrum
 
-ROOT = Path(__file__).resolve().parents[2]
+TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
 def test_read_iec_file_parses_header():
-    path = ROOT / "testing/becquerel/tests/samples/hpge_dummy_test_01.iec"
+    path = TEST_DATA_DIR / "spectrum_io" / "samples" / "hpge_dummy_test_01.iec"
     spectrum = read_iec_file(path)
 
     assert spectrum.counts.size == 2048
@@ -23,7 +23,7 @@ def test_read_iec_file_parses_header():
 
 
 def test_read_hpge_spectrum_supports_iec():
-    path = ROOT / "testing/becquerel/tests/samples/hpge_dummy_test_01.iec"
+    path = TEST_DATA_DIR / "spectrum_io" / "samples" / "hpge_dummy_test_01.iec"
     spectrum = read_hpge_spectrum(path)
 
     assert spectrum.counts.size == 2048

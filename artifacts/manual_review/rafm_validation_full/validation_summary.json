@@ -1,0 +1,34 @@
+{
+  "overall_passed": true,
+  "n_raw_analyzed": 29,
+  "n_matched_pairs": 27,
+  "n_unmatched_raw": 2,
+  "n_unmatched_qg": 6,
+  "unmatched_raw": [
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/RAFM1/RAFM1.ASC",
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/RAFM1/RAFM1_Long_72h_EOI.ASC"
+  ],
+  "unmatched_qg": [
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/RAFM1/RAFM1_Long_70d_EOI.txt",
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-A_24hrEOI.txt",
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-A_300sEOI.txt",
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-A_4dEOI.txt",
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Cu-Cd-RAFM-1_25cm.txt",
+    "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Fe-Cd-RAFM-1_0cm.txt"
+  ],
+  "failing_samples": [],
+  "line_diagnostic_buckets": {
+    "gamma_library_mismatch": 16,
+    "matched": 231
+  },
+  "qg_internal_consistency_flags": 24,
+  "fluxforge_line_consistency_flags": 334,
+  "measurement_qc_flags": 2,
+  "results_root": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/artifacts/manual_review/rafm_validation_full",
+  "unfolding_methods": [
+    "DISCRETE",
+    "GLS",
+    "GRAVEL",
+    "MLEM"
+  ]
+}

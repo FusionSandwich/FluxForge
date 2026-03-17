@@ -1,0 +1,53 @@
+{
+  "source_path": "/tmp/KayWinV410.zip",
+  "library_version_detected": "2023",
+  "source_files": {
+    "uk0": "KayWinV4/library/k0-2023.uk0",
+    "uQ0": "KayWinV4/library/k0-2023.uQ0",
+    "uT12": "KayWinV4/library/k0-2023.uT12",
+    "MDcode": "KayWinV4/library/k0-2023.MDcode",
+    "FCd": "KayWinV4/library/k0-2020.FCd",
+    "LB1": "KayWinV4/library/k0-2023.LB1",
+    "LB2": "KayWinV4/library/k0-2023.LB2",
+    "IRI_MB1": "KayWinV4/library/IRI_MB1.TXT",
+    "IRI_MB2": "KayWinV4/library/IRI_MB2.TXT",
+    "IRI_MB3": "KayWinV4/library/IRI_MB3.TXT"
+  },
+  "half_life_scale": {
+    "scale_factor": 60.0,
+    "interpretation": "minutes_to_seconds"
+  },
+  "summary": {
+    "record_count": 135,
+    "resolved_without_missing_fields": 135,
+    "partial_record_count": 0,
+    "opaque_binary_files_present": true,
+    "iri_text_files_present": true
+  },
+  "fallback_counts": {
+    "derived_i0_from_sigma_q0": 135,
+    "derived_sigma0_from_k0": 2,
+    "endfb8_decay": 7,
+    "iri_abundance": 135,
+    "iri_ancestor": 17,
+    "iri_atomic_mass": 135,
+    "iri_direct": 117,
+    "iri_inferred_capture": 1,
+    "iri_mb2": 128,
+    "iri_sigma0": 133,
+    "nndc_half_life": 1,
+    "uq0_ancestor": 17,
+    "uq0_direct": 118,
+    "uq0_uncertainty": 82
+  },
+  "missing_field_counts": {},
+  "unresolved_records": [],
+  "notes": [
+    "This importer uses text-discoverable Kayzero sidecar files and transparent FluxForge fallbacks.",
+    "Where present, companion IRI_MB1/IRI_MB2 text tables are used to surface target-isotope, abundance, sigma0/I0, and gamma-intensity data distributed with the Kayzero library bundle.",
+    "IRI_MB1 decay-chain ancestry and IRI_MB3 line tables are used to promote daughter/isomer products onto their governing thermal-capture parent records where possible.",
+    "A small supplementary decay-line fallback derived from bundled ENDF/B-VIII decay evaluations is used for a handful of residual primary gamma intensities not surfaced by the Kayzero text tables.",
+    "LB1/LB2 remain opaque binary payloads; remaining gaps after IRI/text enrichment are reported explicitly.",
+    "Target isotopes are currently inferred as same-element (n,gamma) parents with A-1 mass number."
+  ]
+}

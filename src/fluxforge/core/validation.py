@@ -136,7 +136,7 @@ class CETable:
         ]
         
         for e in self.entries:
-            status = "✓" if e.within_tolerance else "✗"
+            status = "OK" if e.within_tolerance else "FAIL"
             lines.append(
                 f"| {e.identifier} | {e.calculated:.4e} | {e.experimental:.4e} | "
                 f"{e.ce_ratio:.3f} | {e.ce_uncertainty:.3f} | {e.pull:+.2f} | {status} |"
@@ -191,10 +191,10 @@ class ClosureMetrics:
         lines = [
             f"Chi-square: {self.chi_square:.2f} (dof={self.dof})",
             f"Reduced χ²: {self.reduced_chi2:.3f}",
-            f"P-value: {self.p_value:.4f} {'✓' if self.chi2_acceptable else '✗'}",
+            f"P-value: {self.p_value:.4f} {'OK' if self.chi2_acceptable else 'FAIL'}",
             f"RMS residual: {self.rms_residual:.4e}",
             f"Max |pull|: {self.max_pull:.2f}",
-            f"Pull normality (K-S p): {self.ks_pvalue:.4f} {'✓' if self.pulls_normal else '✗'}",
+            f"Pull normality (K-S p): {self.ks_pvalue:.4f} {'OK' if self.pulls_normal else 'FAIL'}",
         ]
         return "\n".join(lines)
 

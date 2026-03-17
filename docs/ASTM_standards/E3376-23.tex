@@ -1,0 +1,1272 @@
+\documentclass[12pt]{article}
+
+% --- Packages ---
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+% --- Page style ---
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{E3376 $-$ 23}}
+\rfoot{\thepage}
+\lfoot{\footnotesize Copyright \textcopyright{} ASTM International, 100 Barr Harbor Drive,
+PO Box C700, West Conshohocken, PA 19428-2959, United States.}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- Section formatting ---
+\titleformat{\section}{\normalfont\bfseries\large}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalfont\bfseries}{\thesubsubsection}{0.5em}{}
+
+% --- Annex section numbering ---
+\newcounter{annexsec}
+\renewcommand{\theannexsec}{A\arabic{annexsec}}
+
+% --- Note environment ---
+\newenvironment{astmnote}[1][\relax]{%
+  \par\smallskip\noindent\textit{N\textsc{ote}%
+  \ifx#1\relax\else~#1\fi---}\ignorespaces
+}{%
+  \par\smallskip
+}
+
+% ============================================================
+\begin{document}
+
+% ------ Title block ------
+\begin{center}
+  {\small Designation: \textbf{E3376 $-$ 23}}\\[1.5ex]
+  \rule{\textwidth}{1.5pt}\\[1ex]
+  {\LARGE\bfseries Standard Practice for\\[0.4ex]
+   Calibration and Usage of Germanium Detectors in\\[0.4ex]
+   Radiation Metrology for Reactor Dosimetry$^{1}$}\\[1ex]
+  \rule{\textwidth}{1pt}
+\end{center}
+
+\noindent
+This standard is issued under the fixed designation E3376; the number immediately following
+the designation indicates the year of original adoption or, in the case of revision, the year
+of last revision. A number in parentheses indicates the year of last reapproval. A superscript
+epsilon ($\varepsilon$) indicates an editorial change since the last revision or reapproval.
+
+% ============================================================
+\section{Scope}
+
+1.1\quad This standard establishes techniques for calibration, usage, and performance
+testing of germanium detectors for the measurement of gamma-ray emission rates of
+radionuclides in radiation metrology for reactor dosimetry. The practice is applicable
+only to samples of small size, approximating to point sources. It covers the energy and
+full-energy peak efficiency calibration as well as the determination of gamma-ray energies
+in the 0.06~MeV to 2~MeV energy region and is designed to yield gamma-ray emission rates
+with an uncertainty of $\pm 3$\,\% (see Note~1). This technique applies to measurements
+that do not involve overlapping peaks, and in which peak-to-continuum considerations are
+not important.
+
+\begin{astmnote}[1]
+Uncertainty $U$ is given at the 68\,\% confidence level; that is,
+\[
+  U = \sqrt{\Sigma\sigma_i^2 + \tfrac{1}{3}\Sigma\delta_i^2}
+\]
+where $\delta_i$ are the estimated maximum systematic uncertainties, and $\sigma_i$ are
+the random uncertainties at the 68\,\% confidence level. Other techniques of error
+analysis are in use~(1, 2).$^{2}$
+\end{astmnote}
+
+1.2\quad Additional information on the setup, calibration, and quality control for
+radiometric detectors and measurements is given in IEEE/ANSI N42.14 and in Guide C1402
+and Practice D7282.
+
+1.3\quad The values stated in SI units are generally to be regarded as standard. The rad is
+an exception.
+
+1.4\quad \textit{This standard does not purport to address all of the safety concerns, if
+any, associated with its use. It is the responsibility of the user of this standard to
+establish appropriate safety, health, and environmental practices and determine the
+applicability of regulatory limitations prior to use.}
+
+1.5\quad \textit{This international standard was developed in accordance with
+internationally recognized principles on standardization established in the Decision on
+Principles for the Development of International Standards, Guides and Recommendations
+issued by the World Trade Organization Technical Barriers to Trade (TBT) Committee.}
+
+% ============================================================
+\section{Referenced Documents}
+
+\noindent 2.1\quad \textit{ASTM Standards:}$^{3}$
+
+\begin{itemize}[leftmargin=2.5em,label={}]
+  \item C1402\quad Guide for High-Resolution Gamma-Ray Spectrometry of Soil Samples
+  \item D7282\quad Practice for Setup, Calibration, and Quality Control of Instruments
+        Used for Radioactivity Measurements
+  \item E170\quad Terminology Relating to Radiation Measurements and Dosimetry
+\end{itemize}
+
+\noindent 2.2\quad \textit{IEEE/ANSI Standard:}$^{4}$
+
+\begin{itemize}[leftmargin=2.5em,label={}]
+  \item N42.14\quad Calibration and Usage of Germanium Detectors Spectrometers for
+        Measurement of Gamma-Ray Emission Rates of Radionuclides
+\end{itemize}
+
+% ============================================================
+\section{Terminology}
+
+3.1\quad \textit{Definitions:}
+
+3.1.1\quad \textit{certified radioactivity standard source}---a calibrated radioactive
+source, with stated uncertainties, whose calibration is certified by the source supplier
+as traceable to an international or national standards laboratory.
+
+3.1.2\quad \textit{check source}---a radioactivity source, not necessarily calibrated,
+that is used to confirm the continuing satisfactory operation of an instrument.
+
+3.1.3\quad \textit{correlated photon summing}---the simultaneous detection of two or more
+photons originating from a single nuclear disintegration.
+
+3.1.4\quad \textit{dead time}---the time after a triggering pulse during which the system
+is unable to retrigger.
+
+3.1.5\quad \textit{FWHM}---(full width at half maximum) the full width of a gamma-ray
+peak distribution measured at half the maximum ordinate above the continuum.
+
+3.1.6\quad \textit{FWTM}---(full width at tenth maximum) the full width of a gamma-ray
+peak distribution measured at one tenth of the maximum ordinate above the continuum.
+
+3.1.7\quad \textit{national radioactivity standard source}---a calibrated radioactive
+source prepared and distributed as a standard reference material by an international or
+national standards laboratory.
+
+3.1.7.1\quad \textit{Discussion}---In the United States, the national standards laboratory
+is the U.S. National Institute of Standards and Technology (NIST).
+
+3.1.8\quad \textit{resolution, gamma ray}---the measured FWHM, after background
+subtraction, of a gamma-ray peak distribution, expressed in units of energy.
+
+3.2\quad \textit{Acronyms:}
+
+3.2.1\quad \textit{GUM}---the GUM, Guide to the Expression of Uncertainty in
+Measurement~(2).
+
+3.2.2\quad \textit{ROI}---region of interest.
+
+3.3\quad For other relevant terms, see Terminology E170.
+
+\begin{astmnote}[2]
+The terms ``standard source'' and ``radioactivity standard'' are general terms used to
+refer to the sources and standards of National Radioactivity Standard Source and Certified
+Radioactivity Standard Source.
+\end{astmnote}
+
+% ============================================================
+\section{Summary of Practice}
+
+4.1\quad This practice describes the calibration and usage of germanium detectors for
+measurement of gamma-ray emission rates of radionuclides in radiation metrology for
+nuclear reactors. The practice is intended for use by knowledgeable persons who are
+responsible for the development of correct procedures for the calibration and usage of
+germanium detectors.
+
+4.2\quad A source emission rate for a gamma ray of a selected energy is determined from
+the counting rate in a full-energy peak of a spectrum, together with the measured
+efficiency of the spectrometry system for that energy and source location. It is usually
+not possible to measure the efficiency directly with emission rate standards at all desired
+energies. Therefore, a curve or function is constructed to permit interpolation between
+available calibration points.
+
+% ============================================================
+\section{Significance and Use}
+
+5.1\quad High-purity germanium detectors are used for precise gamma-ray spectroscopy for
+the purpose of determining radioactivity in materials. Typical applications include
+monitoring, mapping, and characterization of neutron energy spectra in nuclear reactors or
+isotopic fission sources.
+
+% ============================================================
+\section{Apparatus}
+
+6.1\quad A typical gamma-ray spectrometry system used in reactor dosimetry consists of a
+germanium crystal, cooling system (cryogenic or electronic), power supply, and either
+digital or analog signal processing. When gamma rays interact with the detector, they
+produce pulses which must be analyzed and counted. Digital processing is often integrated
+into the detector system with fast analog-to-digital converter, mathematical shaping,
+signal, and amplification followed by the binning of the pulses. In analog systems, signal
+processing takes place in individual modules. In both cases, the resultant channelized
+data are collected and stored electronically for further analysis.
+
+% ============================================================
+\section{Preparation of Apparatus}
+
+7.1\quad Follow the manufacturer's instructions for setting up and preliminary testing of
+the equipment. Observe all of the manufacturer's limitations and cautions. All tests
+described in Section~12 should be performed before starting the calibrations, and all
+corrections made when required. A check source may be used to check the stability of the
+system at least before and after the calibration. In cases where electronic settings are
+adjustable by the user, it is essential that all the settings be the same for calibration
+and subsequent use.
+
+% ============================================================
+\section{Calibration Procedure}
+
+8.1\quad \textit{Energy Calibration}---Determine the energy calibration (channel number
+versus gamma-ray energy) of the detector system at a fixed gain by determining the
+channel numbers corresponding to full-energy peak centroids from gamma rays emitted over
+the full-energy range of interest from multipeaked or multinuclide radioactivity sources,
+or both. Determine nonlinearity correction factors as necessary~(3).
+
+8.1.1\quad Using suitable gamma-ray compilations~(4, 5), plot or fit to an appropriate
+mathematical function the values for peak centroid (in channels) versus gamma energy.
+
+8.2\quad \textit{Efficiency Calibration:}
+
+8.2.1\quad Accumulate an energy spectrum using calibrated radioactivity standards at a
+desired and reproducible source-to-detector distance. Set the ROI for each peak of
+interest to include at least all channels within the FWTM of the peak. At least 20\,000
+net counts should be accumulated in each full-energy gamma-ray peak of interest using
+National or Certified Radioactivity Standard Sources, or both (see 12.1, 12.5, and 12.6).
+
+8.2.2\quad For each standard source, obtain the net count rate (total count rate of region
+of interest minus the Compton continuum count rate and, if applicable, the ambient
+background count rate within the same region) in the full-energy gamma-ray peak, or
+peaks, using a method that provides consistent results (see 12.2, 12.3, and 12.4).
+
+8.2.3\quad Correct the standard source emission rate for decay to the date and time of the
+count in 8.2.2.
+
+8.2.4\quad Calculate the full-energy peak efficiency, $E_f$, as follows:
+
+\begin{equation}
+  E_f = \frac{N_p}{N_\gamma}
+  \label{eq:efficiency}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  E_f      &= \text{full-energy peak efficiency (counts per gamma ray emitted),}\\
+  N_p      &= \text{net gamma-ray count in the full-energy peak (counts per second}\\
+           &\quad\text{live time) (Note 3) (see 8.2.2), and}\\
+  N_\gamma &= \text{gamma-ray emission rate (gamma rays per second).}
+\end{align*}
+
+\begin{astmnote}[3]
+Any other unit of time is acceptable provided it is used consistently throughout.
+\end{astmnote}
+
+8.2.5\quad There are many ways of calculating the net gamma-ray count. This practice
+specifies a valid, common technique, applicable when there are no interferences from photo
+peaks within an energy range at least equal to the FWTM adjacent to the peak of interest.
+
+8.2.5.1\quad Other net peak area calculation techniques used for single peaks when there
+is interference from adjacent peaks are not considered in this practice. Other techniques
+are acceptable, if they are used in a consistent manner and have been verified to provide
+accurate results.
+
+8.2.5.2\quad Using a simple model, the net peak area for a single peak can be calculated
+as follows:
+
+\begin{equation}
+  N_A = G_s - B - I
+  \label{eq:net_peak_area}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  G_s &= \text{gross count in the peak region of interest (ROI) in the sample spectrum,}\\
+  B   &= \text{continuum, and}\\
+  I   &= \text{number of background counts in the region of interest}\\
+      &\quad\text{(if there is no background peak, or if a background}\\
+      &\quad\text{subtraction is not performed, }I=0\text{).}
+\end{align*}
+
+8.2.5.3\quad The net gamma-ray count, $N_p$, is related to the net peak area as follows:
+
+\begin{equation}
+  N_p = N_A / T_s
+  \label{eq:net_count_rate}
+\end{equation}
+
+\noindent where $T_s$ is the spectrum live time.
+
+8.2.5.4\quad The continuum, $B$, is calculated from the sample spectrum using the
+following equation (see Fig.~\ref{fig:spectral_peak}):
+
+\begin{equation}
+  B = \frac{N}{2n}\!\left(B_{1s} + B_{2s}\right)
+  \label{eq:continuum}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  N     &= \text{number of channels in the peak ROI,}\\
+  n     &= \text{number of continuum channels on each side,}^{5}\\
+  B_{1s}&= \text{sum of counts in the low-energy continuum region in the sample spectrum, and}\\
+  B_{2s}&= \text{sum of counts in the high-energy continuum region in the sample spectrum.}
+\end{align*}
+
+\begin{astmnote}[4]
+These equations assume that the channels that are used to calculate the continuum do not
+overlap with the peak ROI, and are adjacent to it or have the same size gap between the
+two regions on both sides. A different equation must be used if the gaps are of a
+different size.
+\end{astmnote}
+
+8.2.5.5\quad The peak background, $I$, is calculated from a separate background
+measurement using the following equation:
+
+\begin{equation}
+  I = \frac{T_s}{T_b}\,I_b
+  \label{eq:peak_background}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  T_s &= \text{live time of the sample spectrum,}\\
+  T_b &= \text{live time of the background spectrum, and}\\
+  I_b &= \text{net background peak area in the background spectrum.}
+\end{align*}
+
+8.2.5.6\quad If a separate background measurement exists, the net background peak area is
+calculated from the following equation:
+
+\begin{equation}
+  I_b = G_b - B_b
+  \label{eq:net_bg_area}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  G_b &= \text{sum of gross counts in the background peak region (of the background spectrum), and}\\
+  B_b &= \text{continuum counts in the background peak region (of the background spectrum).}
+\end{align*}
+
+8.2.5.7\quad The continuum counts in the background spectrum are calculated from the
+following equation:
+
+\begin{equation}
+  B_b = \frac{N}{2n}\!\left(B_{1b} + B_{2b}\right)
+  \label{eq:bg_continuum}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  N     &= \text{number of channels in the background peak ROI,}\\
+  n     &= \text{number of continuum channels on each side (assumed to be the same on both sides),}\\
+  B_{1b}&= \text{sum of counts in the low-energy continuum region in the background spectrum, and}\\
+  B_{2b}&= \text{sum of counts in the high-energy continuum region in the background spectrum.}
+\end{align*}
+
+8.2.5.8\quad If the standard source is calibrated in units of Becquerels, the gamma-ray
+emission rate is given by:
+
+\begin{equation}
+  N_\gamma = A\,P_\gamma
+  \label{eq:emission_rate}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  A       &= \text{number of nuclear decays per second, and}\\
+  P_\gamma &= \text{probability per nuclear decay for the gamma ray~(4, 5).}
+\end{align*}
+
+8.2.6\quad In cases where a calibrated standard source is available for a particular
+isotope that is also used in an unknown sample, the measured efficiency for that isotope
+is used directly for the unknown.
+
+8.2.7\quad Plot, or fit to an appropriate mathematical function, the values for
+full-energy peak efficiency (determined in 8.2.4) versus gamma-ray energy (see 12.5)
+(6--14).
+
+\begin{figure}[ht]
+\centering
+\fbox{\rule{0pt}{2.5in}\rule{4in}{0pt}}
+\caption{Typical Spectral Peak with Parameters Used in the Peak Area Determination
+Indicated. The figure shows a peak with gross area $G_S$, net area $N_A$, continuum
+$B$, and flanking continuum regions $B_1$ and $B_2$ each spanning $n$ channels,
+with the ROI spanning $N$ channels.}
+\label{fig:spectral_peak}
+\end{figure}
+
+% ============================================================
+\section{Measurement of Gamma-Ray Emission Rate of the Sample}
+
+9.1\quad Place the sample to be measured at the source-to-detector distance used for
+efficiency calibration (see 12.6).
+
+9.1.1\quad Accumulate the gamma-ray spectrum, recording the count duration.
+
+9.1.2\quad Determine the energy of the gamma rays present by use of the energy
+calibration obtained under and at the same gain as 8.1.
+
+9.1.3\quad Obtain the net count rate in each full-energy gamma-ray peak of interest as
+described in 8.2.2 using the same region of interest and continuum regions as were used
+in the efficiency measurement. In cases where the width of the region of interest varies
+with energy, use a consistent method for choosing the regions.
+
+9.1.4\quad Determine the full-energy peak efficiency for each energy of interest from the
+curve or function obtained in 8.2.5.
+
+9.1.5\quad Calculate the number of gamma rays emitted per unit live time for each
+full-energy peak as follows:
+
+\begin{equation}
+  N_\gamma = \frac{N_p}{E_f}
+  \label{eq:emission_from_count}
+\end{equation}
+
+9.1.5.1\quad When calculating a nuclear transmutation rate from a gamma-ray emission
+rate determined for a specific radionuclide, a knowledge of the gamma-ray probability per
+decay is required~(4, 5), that is,
+
+\begin{equation}
+  A = \frac{N_\gamma}{P_\gamma}
+  \label{eq:transmutation_rate}
+\end{equation}
+
+9.1.6\quad Calculate the net peak area statistical uncertainty as follows:
+
+\begin{equation}
+  S_{N_A} = \sqrt{G_s + \left(\frac{N}{2n}\right)^{\!2}\!\left(B_{1s}+B_{2s}\right)
+    + \left(\frac{T_s}{T_b}\right)^{\!2}\!\left(S_{I_b}\right)^2}
+  \label{eq:stat_uncertainty}
+\end{equation}
+
+\noindent where:
+
+\begin{equation}
+  S_{I_b} = \sqrt{G_b + \left(\frac{N}{2n}\right)^{\!2}\!\left(B_{1b}+B_{2b}\right)}
+  \label{eq:bg_uncertainty}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  S_{N_A} &= \text{net peak area statistical uncertainty (at }1\sigma\text{ confidence level),}\\
+  G_s     &= \text{gross counts in the peak ROI of the sample spectrum,}\\
+  G_b     &= \text{gross counts in the peak ROI of the background spectrum,}\\
+  N       &= \text{number of channels in the peak ROI,}\\
+  n       &= \text{number of continuum channels on each side (assumed to be the same}\\
+           &\quad\text{on both sides for these equations to be valid),}\\
+  B_{1s}  &= \text{continuum counts left of the peak ROI in the sample spectrum,}\\
+  B_{2s}  &= \text{continuum counts right of the peak ROI in the sample spectrum,}\\
+  B_{1b}  &= \text{continuum counts left of the peak ROI in the background spectrum,}\\
+  B_{2b}  &= \text{continuum counts right of the peak ROI in the background spectrum,}\\
+  T_s     &= \text{live time of the sample spectrum, and}\\
+  T_b     &= \text{live time of the background spectrum.}
+\end{align*}
+
+9.1.6.1\quad If there is no separate background measurement, or if no background subtract
+is performed, $S_{I_b} = 0$.
+
+9.1.7\quad For other sources of uncertainty, see Section~11.
+
+% ============================================================
+\section{Performance Testing}
+
+10.1\quad System tests should be performed on a regularly scheduled basis (or, if
+infrequently used, preceding the use of the system). The frequency for performing each
+test will depend on the stability of the particular system as well as on the accuracy and
+reliability of the required results. Where health or safety is involved, more frequent
+checking may be appropriate. A range of typical frequencies for noncritical applications
+is given below for each test.
+
+10.1.1\quad Check the system energy calibration (typically daily to weekly), using two or
+more gamma rays whose energies span at least 50\,\% of the calibration range of interest.
+Correct the energy calibration, if necessary. Sample counting must be halted or redone if
+the system energy calibration is found to be inadequate.
+
+10.1.2\quad Check the system count rate reproducibility (typically weekly to monthly)
+using at least one long-lived radionuclide. Correct for radioactive decay if significant
+decay ($>1$\,\%) has occurred between checks.
+
+10.1.3\quad Check the system resolution (typically weekly to monthly) using at least one
+gamma-ray emitting radionuclide.
+
+10.1.4\quad Check the efficiency calibration (typically monthly to yearly) using a
+National or Certified Radioactivity Standard (or Standards) emitting gamma rays with
+energies spanning the intended range of use.
+
+10.2\quad Results of all performance checks should be recorded in such a way that
+deviations from the norm will be readily observable. Appropriate action, which could
+include confirmation, repair, and recalibration as required, should be taken when the
+measured values fall outside the predetermined limits.
+
+10.2.1\quad In addition, the above performance checks (see 10.1) are recommended after an
+event (such as power failures or repairs) which might lead to potential changes in the
+system.
+
+% ============================================================
+\section{Sources of Uncertainty}
+
+11.1\quad Other than Poisson distribution uncertainties, the principal sources of
+uncertainty (and typical magnitudes) in this technique are:
+
+11.1.1\quad The calibration of the standard source, including uncertainties introduced in
+using a standard radioactivity solution, or aliquot thereof, to prepare another (working)
+standard for counting, typically $\pm 1$ to $2$\,\% (1S\,\%).
+
+11.1.2\quad The reproducibility in the determination of net full-energy peak counts,
+typically $\pm 2$\,\% (1S\,\%).
+
+11.1.3\quad The reproducibility of the positioning of the source relative to the detector
+and the source geometry, typically $\pm 1$\,\% (1S\,\%).
+
+11.1.4\quad The accuracy with which the full-energy peak efficiency at a given energy can
+be determined from the calibration curve or function, typically $\pm 1.5$\,\% (1S\,\%).
+
+11.1.5\quad The accuracy of the live-time determinations and pile-up corrections,
+typically $\pm 1$\,\% (1S\,\%).
+
+% ============================================================
+\section{Precautions and Tests}
+
+12.1\quad \textit{Random Summing and Dead Time:}
+
+12.1.1\quad \textit{Precaution}---The shape and length of pulses used can cause a
+reduction in peak areas due to random summing of pulses at rates of over a few hundred
+per second~(15, 16). Sample count rates should be low enough to reduce the effect of
+random summing of gamma rays to a level where it may be neglected, or one should use
+pile-up rejectors and live-time circuits, or reference pulser techniques of verified
+accuracy at the required rates~(17--23).
+
+\begin{astmnote}[5]
+Use of percent dead time to indicate whether random summing can be neglected may not be
+appropriate.
+\end{astmnote}
+
+12.1.2\quad \textit{Test:}
+
+12.1.2.1\quad Accumulate a $^{60}$Co spectrum with a total count rate of less than 1000
+counts per second until at least 25\,000 counts are collected in the 1.332~MeV and
+1.173~MeV full-energy peaks. A mixed isotopic point source may be used. Record the
+counting live time. The source may be placed at any convenient distance from the
+detector.
+
+12.1.2.2\quad Evaluate the activity of $^{60}$Co utilizing first the full photon peak
+area at 1.332~MeV and then the area at 1.173~MeV, including any techniques employed to
+correct for pile-up and dead time losses.
+
+12.1.2.3\quad Without moving the $^{60}$Co source, introduce a second source, such as
+$^{57}$Co, having no gamma rays emitted with an energy greater than 0.662~MeV. Position
+the added source so that the highest count rate used for gamma-ray emission rate
+determinations has been achieved.
+
+12.1.2.4\quad Erase the first spectrum and accumulate another spectrum for the same
+length of time as in 12.1.2.1. The same live time may be used, if the use of live time
+constitutes at least a part of the correction technique.
+
+12.1.2.5\quad Evaluate the activity of $^{60}$Co utilizing first the full photon peak
+area at 1.332~MeV and then the area at 1.173~MeV, including any techniques employed to
+correct for pile-up and dead time losses. For the correction technique to be acceptable,
+the resolution must not have increased beyond the range of the technique and the
+corrected activity will differ from those in 12.1.2.2 by no more than 2\,\% $1\sigma$
+(67\,\% confidence level).
+
+12.2\quad \textit{Peak Evaluation:}
+
+12.2.1\quad \textit{Precaution}---Many techniques~(24--29) exist for specifying the
+full-energy peak area and removing the contribution of any continuum under the peak.
+Within the scope of this standard, various techniques give equivalent results if they are
+applied consistently to the calibration standards and the sources to be measured, and if
+they are not sensitive to moderate amounts of underlying continuum. A test of the latter
+point is a recommended part of this technique.
+
+12.2.2\quad \textit{Test:}
+
+12.2.2.1\quad Accumulate a spectrum from a mixed isotopic point source until at least
+20\,000 net counts are recorded in the peaks of interest lower in energy than 0.662~MeV.
+The source may be placed at any convenient distance from the detector.
+
+12.2.2.2\quad Determine the net peak areas of the peaks chosen in 12.2.2.1 with the
+technique to be tested. Include any calculations employed by the analysis technique to be
+tested to correct for dead time losses, pile-up, and background contributions.
+
+12.2.2.3\quad Without moving the mixed isotopic point source, introduce a $^{137}$Cs,
+$^{60}$Co, or any other source with no full-energy photons emitted with energies in the
+range 0.060~MeV to 0.600~MeV so the continuum level of the spectrum in this range is
+increased 20 times.
+
+12.2.2.4\quad Erase the first spectrum and accumulate another spectrum for the same live
+time as in 12.2.2.1, if the use of live time constitutes at least a part of the
+correction technique.
+
+12.2.2.5\quad Determine the net peak areas of the same peaks chosen in 12.2.2.1 with the
+technique to be tested. Include any calculations employed by the analysis technique to be
+tested to correct for dead time losses, pile-up, and background contributions.
+
+12.2.2.6\quad Ideally, the deviations of the 12.2.2.5 net peak areas from the 12.2.2.2
+values will be no more than 2\,\% $1\sigma$ (67\,\% confidence level) for the evaluation
+technique to be acceptable.
+
+12.3\quad \textit{Correlated Photon Summing Correction:}
+
+12.3.1\quad Correlated photon summing corrections are not needed when an instrument is
+calibrated using a standard source of the same radioisotope as the unknown sample.
+
+12.3.2\quad If an energy-dependent efficiency calibration is performed at a large enough
+source-detector distance, correlated photon summing corrections may not be needed for
+sources that produce multiple photons in cascade. In such a case, isotope-specific
+calibrations can be obtained at closer distances by a ratio method using a check source
+of each isotope at large and small distance.
+
+12.3.3\quad When another gamma ray or X-ray is emitted in cascade with the gamma ray
+being measured, in many cases a multiplicative correlated summing correction, $C$, must
+be applied to the net full-energy-peak count rate if the sample-to-detector distance less
+than 1.5 times the diameter of the detector. The correction factor is expressed as:
+
+\begin{equation}
+  C = \frac{1}{\prod_{i}^{n}(1 - q_i\,\varepsilon_i)}
+  \label{eq:summing_correction}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  C          &= \text{correlated summing correction to be applied to the measured count rate,}\\
+  n          &= \text{number of gamma or X-rays in correlation with gamma ray of interest,}\\
+  i          &= \text{identification of correlated photon,}\\
+  q_i        &= \text{fraction of the gamma ray of interest in correlation with the }i\text{th photon, and}\\
+  \varepsilon_i &= \text{total detection efficiency of }i\text{th correlated photon.}
+\end{align*}
+
+12.3.3.1\quad Correlated summing correction factors for the primary gamma rays of
+radionuclides $^{60}$Co, $^{88}$Y, and $^{46}$Sc are approximately 1.09 and 1.03 for a
+65~cm$^3$ detector at 1~cm and at 4~cm sample-to-detector distances, respectively, and
+approximately 1.01 for a 100~cm$^3$ detector at a 10~cm sample-to-detector distance. The
+$q_i$ must be obtained from the nuclear decay scheme, while the $\varepsilon_i$, which
+are slowly varying functions of the energy, can be measured or calculated~(30--32).
+
+12.3.4\quad A similar correction must be applied when a weak gamma ray occurs in a decay
+scheme as an alternate decay mode to two strong cascade gamma rays with energies that
+total to that of the weak gamma ray~(33). The correction is over 5\,\% for the 0.40~MeV
+gamma ray of $^{75}$Se when a source is counted 10~cm from a 65~cm$^3$ detector. Other
+common radionuclides with similar-type decay schemes, however, do not require a
+correction of this magnitude. For example, $^{47}$Ca (1.297~MeV), $^{59}$Fe (1.292~MeV),
+$^{144}$Pr (2.186~MeV), $^{187}$W (0.686~MeV), and $^{175}$Yb (0.396~MeV) require
+corrections between 0.990 and 0.998 when counted at 4~cm from a 65~cm$^3$ detector.
+
+12.4\quad \textit{Correction for Decay During the Counting Period:}
+
+12.4.1\quad If the value of a full-energy peak counting rate is determined by a
+measurement that spans a significant fraction of a half-life, and the value is assigned
+to the beginning of the counting period, a multiplicative correction, $F_b$, must be
+applied:
+
+\begin{equation}
+  F_b = \frac{\lambda t}{1 - e^{-\lambda t}}
+  \label{eq:decay_correction_begin}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  F_b      &= \text{decay during count correction (count rate referenced to beginning of}\\
+           &\quad\text{counting period),}\\
+  t        &= \text{elapsed counting time,}\\
+  \lambda  &= \text{radionuclide decay constant }\!\left(\dfrac{\ln 2}{T_{1/2}}\right)\text{, and}\\
+  T_{1/2}  &= \text{radionuclide half-life.}
+\end{align*}
+
+$t$ and $T_{1/2}$ must be in the same units of time ($F_b = 1.01$ for $t/T_{1/2} = 0.03$).
+
+12.4.2\quad If under the same conditions the counting rate is assigned to the midpoint of
+the counting period, the multiplicative correction $F_m$ will be essentially 1 for
+$t/T_{1/2} = 0.03$ and 0.995 for $t/T_{1/2} = 0.5$. If it need be applied, the
+correction to be used is:
+
+\begin{equation}
+  F_m = \frac{\lambda t}{1 - e^{-\lambda t}}\,e^{-\lambda t/2}
+  \label{eq:decay_correction_mid}
+\end{equation}
+
+12.5\quad \textit{Efficiency versus Energy Function or Curve}---The expression or curve
+showing the variation of efficiency with energy (see Fig.~\ref{fig:efficiency_curve} for
+an example) must be determined for a particular detector~(6--14), and must be checked for
+changes with time as specified in the standard. If the full energy range covered by this
+standard is to be used, calibrations should be made at least every 0.1~MeV from 0.06~MeV
+to 0.30~MeV, about every 0.2~MeV from 0.3~MeV to 1.4~MeV, and at least at one energy
+between 1.4~MeV and 2~MeV. Radionuclides emitting two or more gamma rays with
+well-established relative gamma-ray probabilities may be used to better define the form
+of the calibration curve or function. A calibration with the same radionuclides that are
+to be measured should be made whenever possible and may provide the only reliable
+calibration when a radionuclide with cascade gamma rays is measured very close to the
+detector.
+
+12.6\quad See mandatory Annex~A1 for the fitting method to be used for determination of
+the energy-dependent function to be used for detector efficiency and for the estimation
+of the correlation coefficient between efficiencies at pairs of energies.
+
+12.7\quad \textit{Source Geometry}---A gamma ray undergoing even small-angle scattering
+is lost from the narrow full-energy peak, making the full-energy peak efficiency sensitive
+to the source or container thickness and composition. For most accurate results, the
+source to be measured must duplicate as closely as possible the calibration standards in
+all aspects (for example, shape, physical and chemical characteristics, etc.). If this is
+not practicable, appropriate corrections must be determined and applied.
+
+12.7.1\quad If the source shape and detector distance remain constant, attenuation within
+the source material is corrected as follows:
+
+\begin{equation}
+  A_c = A_o\,\frac{\mu x}{1 - e^{-\mu x}}
+  \label{eq:source_attenuation}
+\end{equation}
+
+\noindent where:
+\begin{align*}
+  A_c &= \text{corrected number of nuclear decays per second,}\\
+  A_o &= \text{observed number of nuclear decays per second,}\\
+  \mu &= \text{cm}^2/\text{g} = \text{mass attenuation coefficient~(34), and}\\
+  x   &= \text{g}\cdot\tfrac{1}{\text{cm}^3}\cdot\text{cm}
+        = \text{mass times path length divided by volume.}
+\end{align*}
+
+\begin{figure}[ht]
+\centering
+\fbox{\rule{0pt}{3in}\rule{4.5in}{0pt}}
+\caption{Typical Efficiency versus Energy for a Germanium Detector. The vertical
+axis shows absolute full-energy peak efficiency (log scale, 0.01 to 1) and the
+horizontal axis shows energy in MeV (log scale, 0.050 to 2.000). The curve rises
+to a maximum near 0.1--0.2~MeV and falls smoothly at higher energies.}
+\label{fig:efficiency_curve}
+\end{figure}
+
+12.7.2\quad If the source shape, composition, and detector distance remain constant, the
+attenuation of an interposed absorber is corrected as follows:
+
+\begin{equation}
+  A_c = A_o\cdot e^{\mu x}
+  \label{eq:absorber_attenuation}
+\end{equation}
+
+% ============================================================
+\section{Precision and Bias}
+
+\begin{astmnote}[6]
+Measurement uncertainty is described by a precision and bias statement in this standard.
+Another acceptable approach is to use Type~A and Type~B uncertainty components~(1, 2).
+The Type~A/B uncertainty specification is now used in the International Organization for
+Standardization (ISO) standards and this approach can be expected to play a more
+prominent role in future uncertainty analyses.
+\end{astmnote}
+
+13.1\quad Tests in individual laboratories have indicated that activities can be determined
+with a bias of $\pm 3$\,\% (1S\,\%) and with a precision of $\pm 1$\,\% (1S\,\%).
+
+% ============================================================
+\section{Keywords}
+
+14.1\quad calibration of germanium detectors; germanium detectors; radiation metrology;
+reactor dosimetry; usage of germanium detectors
+
+% ============================================================
+% ANNEX
+% ============================================================
+\newpage
+\begin{center}
+  \rule{\textwidth}{1pt}\\[0.5ex]
+  {\large\bfseries ANNEX}\\[0.3ex]
+  {\normalsize\bfseries (Mandatory Information)}\\[0.5ex]
+  \rule{\textwidth}{1pt}
+\end{center}
+
+\section*{A1.\quad FITTING OF ENERGY-DEPENDENT FORMULAE FOR FULL-ENERGY
+EFFICIENCY OF HPGe DETECTORS}
+
+\begin{astmnote}[A1.1]
+Material in this annex is based on Ref~(35). General guidance on the linear model for
+least-squares fitting can be found in Ref~(36).
+\end{astmnote}
+
+\subsection*{A1.1\quad Overview}
+
+A1.1.1\quad A calibration of the full-energy detection efficiency of gamma spectrometers
+is performed using multi-element standard sources, or a combination of these together
+with sources of some isotopes that produce many gamma lines. The sources used do not
+include all isotopes which the detectors are later used to measure, and therefore the
+calibration has to include an energy-dependent fitting to obtain the efficiencies at
+energies other than those in the calibration measurements.
+
+A1.1.2\quad This fitting process introduces strong correlations between gamma lines of
+nearby energies.
+
+A1.1.3\quad Examples are given in this annex of detector calibrations in which the
+correlations are calculated and propagated through an analysis of measured activities.
+Methods of calculating the correlations are described in detail, and numerical examples
+are presented in which strong correlations are present between activities measured for
+different activation detectors.
+
+\begin{astmnote}[A1.2]
+Numerical values given in this annex are for illustrative purposes only.
+\end{astmnote}
+
+A1.1.4\quad The effect of uncertainties arising from other causes than source calibration
+and counting errors is also briefly discussed, so that the results of this work can be
+placed in context with other errors arising in radiometric dosimetry.
+
+\subsection*{A1.2\quad Fitting Functions}
+
+A1.2.1\quad Many papers have been published on the topic of efficiency calibration
+functions for germanium spectrometers. Only a few will be mentioned here.
+
+A1.2.2\quad McNelles and Campbell~(9) used a variety of analytical functions, including:
+
+\begin{equation}
+  \varepsilon = (a_1/E)^{a_2+a_3}\exp(-a_4 E)
+    + a_5\exp(-a_6 E) + a_7\exp(-a_8 E)
+  \tag{A1.1}
+  \label{eq:A1.1}
+\end{equation}
+
+A1.2.3\quad Debertin~(37) introduced the following class of functions:
+
+\begin{equation}
+  \varepsilon = a_1\ln(E) + \frac{a_2\ln(E)}{E}
+    + \frac{a_3(\ln(E))^2}{E} + \frac{a_4(\ln(E))^4}{E}
+    + \frac{a_5(\ln(E))^5}{E}
+  \tag{A1.2}
+  \label{eq:A1.2}
+\end{equation}
+
+A1.2.4\quad Gray and Ahmad~(38) also selected a linear class of fitting function,
+defined by:
+
+\begin{equation}
+  \varepsilon = \frac{1}{E}\!\left(a_1 + a_2\ln(E) + a_3(\ln(E))^2
+    + a_4(\ln(E))^3 + a_5(\ln(E))^5
+    + a_6(\ln(E))^7\right)
+  \tag{A1.3}
+  \label{eq:A1.3}
+\end{equation}
+
+A1.2.5\quad Another class of linear fitting functions has been used to fit the logarithm
+of the measured efficiencies:
+
+\begin{equation}
+  \ln(\varepsilon) = \sum_{i}^{I} a_i \left(\ln\!\left(\frac{E_c}{E}\right)\right)^{\!i-1}
+  \tag{A1.4}
+  \label{eq:A1.4}
+\end{equation}
+
+\noindent where $E_c$ is an arbitrary energy chosen near the middle of the energy range
+(to simplify the problem numerically).
+
+A1.2.5.1\quad The number of parameters, $I$, was chosen by Lin et al.~(39) to be six,
+for the energy range 300~keV to 9700~keV. Kis et al.~(40) used up to nine parameters for
+the range 50~keV to 11\,000~keV. Such a large number is not needed for a narrower energy
+range and may be impractical when the number of measured efficiencies is limited. The
+number of parameters must always be fewer (ideally many fewer) than the number of
+measurements. The purpose of fitting a continuous function to the data is so that
+efficiencies at energies in between those included in the calibration can be determined.
+Functions that do not sufficiently constrain the values in between the fitted points are
+useless for this purpose. Eq~\ref{eq:A1.4}, with $I$ chosen as 6, is used in this
+practice.
+
+\subsection*{A1.3\quad Least-Squares Model for Linear Fitting Formulae}
+
+A1.3.1\quad Let $A$ represent a column vector of the parameters $a_i$, for $i = 1, I$.
+Then the efficiencies measured for each photon energy of the calibration source can be
+represented, using Eq~\ref{eq:A1.4}, by:
+
+\begin{equation}
+  \ln(\varepsilon) = S \cdot A + \delta
+  \tag{A1.5}
+  \label{eq:A1.5}
+\end{equation}
+
+\noindent where $\ln(\varepsilon)$ is a column vector of the measured log values for the
+efficiencies, $S$ is the design matrix for the model, and $\delta$ is a vector
+representing the experimental deviations from the ideal model. When Eq~\ref{eq:A1.4} is
+used, the $I$ columns of the matrix $S$ are the values of $(\ln(E_c/E))^{i-1}$,
+evaluated at each energy at which the efficiency was measured.
+
+A1.3.2\quad To adapt the linear least-squares model for the case in which
+$\log(\text{efficiency})$ is given by a linear model in $A$, we have only to define
+$V_{l\varepsilon}$ as the covariance matrix of the logarithms of the measured
+efficiencies. If the uncertainties in $\varepsilon$ are assumed to be distributed as log
+normal, then the least-squares solution for the parameters $A$ is:
+
+\begin{equation}
+  \hat{A} = (S'V_{l\varepsilon}^{-1}S)^{-1}S'V_{l\varepsilon}^{-1}\ln(\varepsilon)
+  \tag{A1.6}
+  \label{eq:A1.6}
+\end{equation}
+
+\noindent with covariance matrix:
+
+\begin{equation}
+  V_{\hat{A}} = (S'V_{l\varepsilon}^{-1}S)^{-1}
+  \tag{A1.7}
+  \label{eq:A1.7}
+\end{equation}
+
+A1.3.3\quad The fitted values of the efficiency at the energies of the calibration
+measurement are:
+
+\begin{equation}
+  \widehat{\ln(\varepsilon)} = S\hat{A}
+  \tag{A1.8}
+  \label{eq:A1.8}
+\end{equation}
+
+\noindent with covariance matrix:
+
+\begin{equation}
+  \hat{V}_{l\varepsilon} = S(S'V_{l\varepsilon}^{-1}S)^{-1}S'
+  \tag{A1.9}
+  \label{eq:A1.9}
+\end{equation}
+
+A1.3.4\quad The value of chi-squared must always be calculated when an efficiency fitting
+is performed. It is given by:
+
+\begin{equation}
+  \chi^2 = \bigl(\ln(\varepsilon) - \widehat{\ln(\varepsilon)}\bigr)'
+           \cdot V_{l\varepsilon}^{-1}
+           \cdot \bigl(\ln(\varepsilon) - \widehat{\ln(\varepsilon)}\bigr)
+  \tag{A1.10}
+  \label{eq:A1.10}
+\end{equation}
+
+If the number of fitted efficiency values is $N$, then the number of degrees of freedom
+of the fit is equal to:
+
+\begin{equation}
+  n = N - I
+  \tag{A1.11}
+  \label{eq:A1.11}
+\end{equation}
+
+A1.3.4.1\quad Tables of the chi-squared distribution give the confidence intervals for
+the values to be expected assuming that deviations from the nominal value of 1 arise by
+chance. For the numerical example given in this annex, $n = 11 - 6 = 5$ and the critical
+values for the interval 2.5\,\% to 97.5\,\% of chi-squared for five degrees of freedom
+are 0.831 to 12.833. If the observed value is outside this range, then it should be
+assumed that the input values and uncertainties are unreliable, and the fit should be
+rejected.
+
+A1.3.5\quad Chi-squared values for the test calculated with Eq~\ref{eq:A1.10} will only
+be meaningful if the input uncertainties are correctly calculated as one standard
+deviation ($1\sigma$). Calibration sources usually have their uncertainties specified
+with a confidence of 95\,\% or 99\,\%. According to the GUM~(2), such externally
+supplied uncertainties are to be treated as having infinite degrees of freedom, hence a
+normal (Gaussian) distribution. Accordingly, the reported calibration uncertainties must
+be divided by the $z$-value for a normal distribution that corresponds to the correct
+confidence level for a one-tailed test. This must be done before the uncertainties are
+combined with $1\sigma$ contributions from other sources, such as counting statistics.
+Combination of various uncertainties must be done in quadrature, that is, using the
+square root of the sum of squares. A single-lab test of repeatability has shown that the
+statistical counting uncertainties may be accurately determined using the Poisson
+distribution (Type~B uncertainty estimate). For counts greater than 30, the Poisson
+distribution may be approximated with negligible bias by a normal distribution with
+standard deviation equal to the square root of the recorded count.
+
+A1.3.6\quad Define $V_{ld}$ as the covariance matrix of the logarithms of the
+efficiencies at the gamma energies used to count the activities of activation detectors.
+Then:
+
+\begin{equation}
+  V_{ld} = D\cdot(S'\cdot V_{l\varepsilon}^{-1}\cdot S)^{-1}\cdot D'
+  \tag{A1.12}
+  \label{eq:A1.12}
+\end{equation}
+
+\noindent where the matrix $D$ is the design matrix that applies for the activation
+detector gamma energies. $D$ is formed in the same manner as the $S$ matrix but using
+the activation detector gamma energies instead of the calibration source energies.
+
+A1.3.7\quad This result is convenient, because the matrices that specify the log
+covariances are the same as the fractional covariances (sometimes called the relative
+covariances) of the efficiencies themselves.
+
+\subsection*{A1.4\quad Numerical Example}
+
+A1.4.1\quad A commonly used type of calibration source has eleven gamma energies from
+88~keV to 1836~keV, from nine radioisotopes, as shown in Table~\ref{tab:A1.1}.
+
+A1.4.2\quad When Eq~\ref{eq:A1.8} is used to fit measured efficiency values, the
+fractional covariance is found using Eq~\ref{eq:A1.9}. The matrix $S$, shown in
+Table~\ref{tab:A1.2}, is calculated using the energies in row 2 of Table~\ref{tab:A1.1}.
+The matrix $D$ is calculated in the same way using the energies of the activation
+detectors. The ones used in the examples here are shown (in~keV) in row 2 of
+Table~\ref{tab:A1.3}.
+
+A1.4.3\quad Table~\ref{tab:A1.4} shows the correlation coefficients and percent
+uncertainties for the activation detector activities when the Ge spectrometer
+efficiencies are fitted with Eq~\ref{eq:A1.4}. The values are calculated for the
+activation detector energies of Table~\ref{tab:A1.3}.
+
+A1.4.4\quad The analysis presented shows that activities measured in radiometric monitors
+need to have uncertainties no larger than 1.5\,\%, and that those uncertainties are
+correlated between detectors because of the detector calibration. Larger uncertainties
+are often quoted, and may be present because of filter corrections, flux perturbation
+corrections, and positioning errors during irradiation and counting. However, some of
+those uncertainties properly belong to the calculations with which the measurements are
+compared.
+
+% ---- Table A1.1 ----
+\begin{table}[ht]
+\centering
+\caption{Calibration Source Specifications}
+\label{tab:A1.1}
+\small
+\begin{tabular}{lrrrrrrrrrrr}
+\toprule
+Radionuclide        & Cd-109 & Co-57 & Ce-139 & Hg-203 & Sn-113 & Sr-85 & Cs-137 & Y-88 & Co-60 & Co-60 & Y-88 \\
+Gamma energy (keV)  & 88.03  & 122.1 & 165.9  & 279.2  & 391.7  & 514   & 661.6  & 898  & 1173  & 1333  & 1836 \\
+Uncertainty\,\% (1$\sigma$) & 2.9 & 0.8 & 0.8 & 0.8 & 2.1 & 0.8 & 0.9 & 0.8 & 0.8 & 0.8 & 0.8 \\
+Correlation coeff.  & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & 0.95+ & 0.999* & 0.999* & 0.95+ \\
+\% Counting uncert. & 2.68 & 1.06 & 0.8 & 0.6 & 1.07 & 2.19 & 1.23 & 0.71 & 0.56 & 0.69 & 0.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---- Table A1.2 ----
+\begin{table}[ht]
+\centering
+\caption{The Design Matrix, $S$, for the Fit (elements of $S$ are within Columns 2 to 7)}
+\label{tab:A1.2}
+\begin{tabular}{ccccccc}
+\toprule
+$E$ (keV) & $x^0$ & $x^1$ & $x^2$ & $x^3$ & $x^4$ & $x^5$ \\
+\midrule
+88.03   & 1.0 & 2.3913  & 5.7185  & 13.6748  & 32.7011 & 78.1995  \\
+122.06  & 1.0 & 2.0645  & 4.2622  &  8.7993  & 18.1661 & 37.5039  \\
+165.85  & 1.0 & 1.7579  & 3.0903  &  5.4326  &  9.5501 & 16.7884  \\
+279.19  & 1.0 & 1.2371  & 1.5305  &  1.8934  &  2.3423 &  2.8978  \\
+391.69  & 1.0 & 0.8985  & 0.8074  &  0.7255  &  0.6519 &  0.5857  \\
+513.99  & 1.0 & 0.6268  & 0.3929  &  0.2463  &  0.1544 &  0.0968  \\
+661.65  & 1.0 & 0.3743  & 0.1401  &  0.0524  &  0.0196 &  0.0073  \\
+898.02  & 1.0 & 0.0688  & 0.0047  &  0.0003  &  0.0000 &  0.0000  \\
+1173.22 & 1.0 & $-$0.1985 & 0.0394 & $-$0.0078 & 0.0016 & $-$0.0003 \\
+1332.49 & 1.0 & $-$0.3258 & 0.1061 & $-$0.0346 & 0.0113 & $-$0.0037 \\
+1836.01 & 1.0 & $-$0.6463 & 0.4177 & $-$0.2700 & 0.1745 & $-$0.1128 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---- Table A1.3 ----
+\begin{table}[ht]
+\centering
+\caption{Activation Detector Activities and Energies in keV}
+\label{tab:A1.3}
+\small
+\begin{tabular}{llllllllllllllllll}
+\toprule
+Sc47 & In115m & Au198 & Ag110m & W187 & Co58 & Mn54 & Mn56 & Sc46 & Zr89 & Nb92m & Sc48 & Fe59 & Co60 & In116 & Cu64 & Na24 & Ni57 \\
+159 & 336 & 412 & 658 & 686 & 811 & 835 & 847 & 889 & 909 & 935 & 984 & 1099 & 1173 & 1294 & 1346 & 1369 & 1378 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ---- Table A1.4 ----
+\begin{landscape}
+\begin{table}[p]
+\centering
+\caption{Percentage Uncertainties and Correlation Coefficients for Measured Activities of
+Isotopes Shown in Table~\ref{tab:A1.3}, Using Photons at the Energies Listed in keV (row 2 of
+Table~\ref{tab:A1.3})}
+\label{tab:A1.4}
+\begin{astmnote}[1]
+Uncertainties attributable to calibration source strength and counting errors are as shown
+in Table~\ref{tab:A1.1}. Counting errors of 1\,\% were assumed on each of the peak areas
+measured in activity measurements.
+\end{astmnote}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{rr rrrrrrrrrrrrrrrrrr}
+\toprule
+s.d. & keV & 159 & 336 & 412 & 658 & 686 & 811 & 835 & 847 & 889 & 909 & 935 & 984 & 1099 & 1173 & 1294 & 1346 & 1369 & 1378 \\
+\midrule
+1.33\,\% & 159  & 1.00  & $-$0.01 & $-$0.07 & $-$0.05 & $-$0.05 & $-$0.02 & $-$0.01 & $-$0.01 & 0.00 & 0.00 & 0.00 & 0.01 & 0.02 & 0.02 & 0.02 & 0.01 & 0.01 & 0.01 \\
+1.32\,\% & 336  & $-$0.01 & 1.00 & 0.40 & 0.16 & 0.14 & 0.06 & 0.05 & 0.04 & 0.02 & 0.01 & 0.00 & $-$0.02 & $-$0.04 & $-$0.04 & $-$0.04 & $-$0.04 & $-$0.04 & $-$0.04 \\
+1.36\,\% & 412  & $-$0.07 & 0.40 & 1.00 & 0.34 & 0.32 & 0.21 & 0.18 & 0.17 & 0.13 & 0.11 & 0.09 & 0.04 & $-$0.05 & $-$0.09 & $-$0.12 & $-$0.13 & $-$0.13 & $-$0.13 \\
+1.40\,\% & 658  & $-$0.05 & 0.16 & 0.34 & 1.00 & 0.48 & 0.41 & 0.38 & 0.37 & 0.32 & 0.30 & 0.27 & 0.20 & 0.05 & $-$0.03 & $-$0.11 & $-$0.14 & $-$0.14 & $-$0.14 \\
+1.38\,\% & 686  & $-$0.05 & 0.14 & 0.32 & 0.48 & 1.00 & 0.41 & 0.39 & 0.38 & 0.33 & 0.31 & 0.28 & 0.22 & 0.07 & $-$0.01 & $-$0.09 & $-$0.12 & $-$0.12 & $-$0.13 \\
+1.28\,\% & 811  & $-$0.02 & 0.06 & 0.21 & 0.41 & 0.41 & 1.00 & 0.38 & 0.38 & 0.35 & 0.34 & 0.32 & 0.28 & 0.17 & 0.11 & 0.03 & 0.01 & 0.00 & 0.00 \\
+1.26\,\% & 835  & $-$0.01 & 0.05 & 0.18 & 0.38 & 0.39 & 0.38 & 1.00 & 0.37 & 0.35 & 0.34 & 0.32 & 0.28 & 0.19 & 0.13 & 0.06 & 0.04 & 0.03 & 0.03 \\
+1.26\,\% & 847  & $-$0.01 & 0.04 & 0.17 & 0.37 & 0.38 & 0.38 & 0.37 & 1.00 & 0.35 & 0.34 & 0.32 & 0.29 & 0.20 & 0.14 & 0.07 & 0.05 & 0.04 & 0.04 \\
+1.23\,\% & 889  & 0.00 & 0.02 & 0.13 & 0.32 & 0.33 & 0.35 & 0.35 & 0.35 & 1.00 & 0.33 & 0.32 & 0.30 & 0.23 & 0.19 & 0.13 & 0.11 & 0.10 & 0.10 \\
+1.22\,\% & 909  & 0.00 & 0.01 & 0.11 & 0.30 & 0.31 & 0.34 & 0.34 & 0.34 & 0.33 & 1.00 & 0.32 & 0.31 & 0.25 & 0.21 & 0.15 & 0.13 & 0.13 & 0.12 \\
+1.21\,\% & 935  & 0.00 & 0.00 & 0.09 & 0.27 & 0.28 & 0.32 & 0.32 & 0.32 & 0.32 & 0.32 & 1.00 & 0.31 & 0.27 & 0.23 & 0.19 & 0.17 & 0.16 & 0.16 \\
+1.21\,\% & 984  & 0.01 & $-$0.02 & 0.04 & 0.20 & 0.22 & 0.28 & 0.28 & 0.29 & 0.30 & 0.31 & 0.31 & 1.00 & 0.30 & 0.28 & 0.25 & 0.23 & 0.23 & 0.22 \\
+1.24\,\% & 1099 & 0.02 & $-$0.04 & $-$0.05 & 0.05 & 0.07 & 0.17 & 0.19 & 0.20 & 0.23 & 0.25 & 0.27 & 0.30 & 1.00 & 0.36 & 0.36 & 0.35 & 0.35 & 0.35 \\
+1.28\,\% & 1173 & 0.02 & $-$0.04 & $-$0.09 & $-$0.03 & $-$0.01 & 0.11 & 0.13 & 0.14 & 0.19 & 0.21 & 0.23 & 0.28 & 0.36 & 1.00 & 0.41 & 0.41 & 0.40 & 0.40 \\
+1.34\,\% & 1294 & 0.02 & $-$0.04 & $-$0.12 & $-$0.11 & $-$0.09 & 0.03 & 0.06 & 0.07 & 0.13 & 0.15 & 0.19 & 0.25 & 0.36 & 0.41 & 1.00 & 0.45 & 0.45 & 0.45 \\
+1.36\,\% & 1346 & 0.01 & $-$0.04 & $-$0.13 & $-$0.14 & $-$0.12 & 0.01 & 0.04 & 0.05 & 0.11 & 0.13 & 0.17 & 0.23 & 0.35 & 0.41 & 0.45 & 1.00 & 0.46 & 0.46 \\
+1.37\,\% & 1369 & 0.01 & $-$0.04 & $-$0.13 & $-$0.14 & $-$0.12 & 0.00 & 0.03 & 0.04 & 0.10 & 0.13 & 0.16 & 0.23 & 0.35 & 0.40 & 0.45 & 0.46 & 1.00 & 0.46 \\
+1.37\,\% & 1378 & 0.01 & $-$0.04 & $-$0.13 & $-$0.14 & $-$0.13 & 0.00 & 0.03 & 0.04 & 0.10 & 0.12 & 0.16 & 0.22 & 0.35 & 0.40 & 0.45 & 0.46 & 0.46 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
+
+% ============================================================
+\section*{References}
+
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+  \item Taylor, B. and Kuyatt, C., ``Guidelines for Evaluating and Expressing the
+        Uncertainty of NIST Measurement Results,'' NIST Technical Note 1297, 1994.
+
+  \item ``Evaluation of measurement data---Guide to the expression of uncertainty in
+        measurement,'' JCGM 100:2008, GUM 1995 with minor corrections, BIPM, 2008.
+
+  \item Helmer, R.~G., et al., \textit{Nuclear Instruments and Methods}, Vol~96, 1972,
+        p.~173.
+
+  \item Evaluated Nuclear Structure Data File (ENSDF), a computer file of evaluated
+        nuclear structure and radioactive decay data, which is maintained by the National
+        Nuclear Data Center (NNDC), Brookhaven National Laboratory (BNL), on behalf of
+        The International Network for Nuclear Structure Data Evaluation, which functions
+        under the auspices of the Nuclear Data Section of the International Atomic Energy
+        Agency (IAEA).
+
+  \item \textit{Nuclear Wallet Cards}, compiled by J.~K. Tuli, National Nuclear Data
+        Center, \url{www.nndc.bnl.gov/wallet/wccurrent.html}.
+
+  \item Freeman, J.~M., and Jenkin, J.~G., \textit{Nuclear Instruments and Methods},
+        Vol~43, 1966, p.~269.
+
+  \item Tokcan, G., and Cothern, C.~R., \textit{Nuclear Instruments and Methods},
+        Vol~64, 1968, p.~219.
+
+  \item Paradellis, T., and Hontzeas, S., \textit{Nuclear Instruments and Methods},
+        Vol~73, 1969, p.~210.
+
+  \item McNelles, L.~A., and Campbell, J.~L., \textit{Nuclear Instruments and Methods},
+        Vol~109, 1973, p.~241.
+
+  \item Debertin, K., et al., \textit{Proceedings of ERDA Symposium on X- and Gamma-Ray
+        Sources and Applications}, CONF-760539, 1976, p.~59. Available from the National
+        Technical Information Service.
+
+  \item Hirschfeld, A.~T., et al., \textit{Proceedings of ERDA Symposium on X- and
+        Gamma-Ray Sources and Applications}, CONF-760539, 1976, p.~90. Available from
+        the National Technical Information Service.
+
+  \item Singh, R., \textit{Nuclear Instruments and Methods}, Vol~136, 1976, p.~543.
+
+  \item Kawade, K., et al., \textit{Nuclear Instruments and Methods}, Vol~190, 1981,
+        p.~101.
+
+  \item Moens, L., et al., \textit{Nuclear Instruments and Methods}, Vol~187, 1981,
+        p.~451.
+
+  \item Koskelo, M.~J., \textit{Journal of Radioanalytical Chemistry}, Vol~70, 1982,
+        p.~473.
+
+  \item Houtermans, H., et al., \textit{International Journal of Applied Radiation and
+        Isotopes}, Vol~34, 1983, p.~487.
+
+  \item Wyttenbach, A., \textit{Journal of Radioanalytical Chemistry}, Vol~8, 1971,
+        p.~335.
+
+  \item Cohen, E.~J., \textit{Nuclear Instruments and Methods}, Vol~121, 1974, p.~25.
+
+  \item Strauss, M.~G., et al., \textit{IEEE Transactions of Nuclear Science NS-15},
+        1968, p.~518.
+
+  \item Anders, O.~U., \textit{Nuclear Instruments and Methods}, Vol~68, 1969, p.~205.
+
+  \item Wiernik, M., \textit{Nuclear Instruments and Methods}, Vol~96, 1971, p.~325.
+
+  \item Debertin, K., and Schotzig, U., \textit{Nuclear Instruments and Methods},
+        Vol~140, 1977, p.~337.
+
+  \item Westphal, G.~P., \textit{Nuclear Instruments and Methods}, Vol~163, 1979,
+        p.~189.
+
+  \item Routti, J.~T., and Prussin, S.~G., \textit{Nuclear Instruments and Methods},
+        Vol~72, 1969, p.~125.
+
+  \item Gunnink, R., and Niday, J.~B., University of California, Lawrence Livermore
+        Laboratory Report, UCRL-51061, 1972.
+
+  \item Yule, H.~P., \textit{Analytical Chemistry}, Vol~40, 1968, p.~1480.
+
+  \item Heydorn, K., and Lada, W., \textit{Analytical Chemistry}, Vol~44, 1972, p.~2313.
+
+  \item Kokta, L., \textit{Nuclear Instruments and Methods}, Vol~112, 1973, p.~245.
+
+  \item Helmer, R.~G., and Lee, M.~A., \textit{Nuclear Instruments and Methods},
+        Vol~178, 1980, p.~499.
+
+  \item Schima, F.~J., and Hoppes, D.~D., \textit{International Journal of Applied
+        Radiation and Isotopes}, Vol~34, 1983, p.~1109.
+
+  \item Debertin, K., and Schotzig, U., \textit{Nuclear Instruments and Methods},
+        Vol~158, 1979, p.~471.
+
+  \item Morel, J., et al., \textit{International Journal of Applied Radiation and
+        Isotopes}, Vol~34, 1983, p.~1115.
+
+  \item McCallum, G.~J., and Coote, G.~E., \textit{Nuclear Instruments and Methods},
+        Vol~130, 1975, p.~189.
+
+  \item Hubbell, J.~H., and Seltzer, S.~M., ``X-Ray Mass Attenuation Coefficients,''
+        NIST Standard Reference Database 126,
+        \url{www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.
+
+  \item Williams, J.~G., ``Covariances for Gamma Spectrometer Efficiency Calibrations,''
+        \textit{Fifteenth International Symposium on Reactor Dosimetry},
+        Aix-en-Provence, 2014, EPJ Web of Conferences, 106, 07004 (2016).
+
+  \item Seber, G.~A.~F., \textit{Linear Regression Analysis}, Wiley, New York, 1977.
+
+  \item Debertin, K., ``The Effect of Correlations in the Efficiency Calibration of
+        Germanium Detectors,'' \textit{Nuclear Instruments and Methods}, Vol~226, 1984,
+        pp.~566--568.
+
+  \item Gray, P.~W., and Ahmad, A., ``Linear Classes of Ge(Li) Detector Efficiency
+        Functions,'' \textit{Nuclear Instruments and Methods A}, Vol~237, 1985,
+        pp.~577--589.
+
+  \item Lin, J., Henry, E., and Meyer, R.~A., Lawrence Livermore National Laboratory
+        Report UCLR-84536, 1980.
+
+  \item Kis, Z., et al., ``Comparison of efficiency functions for Ge gamma-ray detectors
+        in a wide energy range,'' \textit{Nuclear Instruments and Methods in Physics
+        Research A}, Vol~418, 1998, pp.~374--386.
+\end{enumerate}
+
+% ============================================================
+\vspace{2em}
+\noindent\rule{\textwidth}{0.4pt}
+
+\noindent\footnotesize
+$^{1}$ This practice is under the jurisdiction of ASTM Committee E10 on Nuclear
+Technology and Applications and is the direct responsibility of Subcommittee E10.05 on
+Nuclear Radiation Metrology. Current edition approved Feb.~15, 2023. Published April
+2023. DOI: 10.1520/E3376-23.
+
+\noindent
+$^{2}$ The boldface numbers in parentheses refer to a list of references at the end of
+this standard.
+
+\noindent
+$^{3}$ For referenced ASTM standards, visit the ASTM website, \url{www.astm.org}, or
+contact ASTM Customer Service at \href{mailto:service@astm.org}{service@astm.org}.
+
+\noindent
+$^{4}$ Available from Institute of Electrical and Electronics Engineers, Inc. (IEEE),
+445 Hoes Ln., Piscataway, NJ 08854-4141, \url{http://www.ieee.org}.
+
+\noindent
+$^{5}$ For simplicity of these calculations, $n$ is assumed to be the same on both sides
+of the peak. If the continuum is calculated using a different number of channels on the
+left of the peak than on the right of the peak, different equations must be used.
+
+\end{document}

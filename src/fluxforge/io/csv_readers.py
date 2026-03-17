@@ -10,6 +10,8 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
 
+from fluxforge.io.metadata import append_missing_field_flags
+
 
 def _parse_datetime(value: str) -> Optional[datetime]:
     value = value.strip()
@@ -19,6 +21,23 @@ def _parse_datetime(value: str) -> Optional[datetime]:
         return datetime.fromisoformat(value)
     except ValueError:
         return None
+
+
+def _parse_required_float(
+    row: Dict[str, str],
+    field: str,
+    qc_flags: List[str],
+) -> float:
+    """Parse required numeric CSV field with QC flagging."""
+    value = row.get(field, "").strip()
+    if not value:
+        qc_flags.append(f"missing_{field}")
+        return 0.0
+    try:
+        return float(value)
+    except ValueError:
+        qc_flags.append(f"invalid_{field}")
+        return 0.0
 
 
 @dataclass
@@ -121,40 +140,51 @@ def read_flux_wire_timing_csv(path: Union[str, Path]) -> List[FluxWireTiming]:
         reader = csv.DictReader(f)
         for row in reader:
             qc_flags: List[str] = []
-            for required in (
-                "wire_name",
-                "base_name",
-                "category",
-                "reaction",
-                "products",
-                "irradiation_start",
-                "irradiation_end",
-                "measurement_time",
-            ):
-                if not row.get(required):
-                    qc_flags.append(f"missing_{required}")
+            append_missing_field_flags(
+                mapping=row,
+                required_fields=(
+                    "wire_name",
+                    "base_name",
+                    "category",
+                    "reaction",
+                    "products",
+                    "irradiation_start",
+                    "irradiation_end",
+                    "measurement_time",
+                ),
+                flags=qc_flags,
+            )
 
             irradiation_start = _parse_datetime(row.get("irradiation_start", ""))
             irradiation_end = _parse_datetime(row.get("irradiation_end", ""))
             measurement_time = _parse_datetime(row.get("measurement_time", ""))
 
-            def _parse_float(field: str) -> float:
-                value = row.get(field, "").strip()
-                if not value:
-                    qc_flags.append(f"missing_{field}")
-                    return 0.0
-                try:
-                    return float(value)
-                except ValueError:
-                    qc_flags.append(f"invalid_{field}")
-                    return 0.0
+            irradiation_seconds = _parse_required_float(
+                row,
+                "irradiation_seconds",
+                qc_flags,
+            )
+            cooldown_seconds = _parse_required_float(
+                row,
+                "cooldown_seconds",
+                qc_flags,
+            )
+            cooldown_hours = _parse_required_float(
+                row,
+                "cooldown_hours",
+                qc_flags,
+            )
+            cooldown_days = _parse_required_float(
+                row,
+                "cooldown_days",
+                qc_flags,
+            )
 
-            irradiation_seconds = _parse_float("irradiation_seconds")
-            cooldown_seconds = _parse_float("cooldown_seconds")
-            cooldown_hours = _parse_float("cooldown_hours")
-            cooldown_days = _parse_float("cooldown_days")
-
-            if irradiation_start and irradiation_end and irradiation_end < irradiation_start:
+            if (
+                irradiation_start
+                and irradiation_end
+                and irradiation_end < irradiation_start
+            ):
                 qc_flags.append("irradiation_end_before_start")
             if irradiation_seconds <= 0:
                 qc_flags.append("missing_irradiation_duration")

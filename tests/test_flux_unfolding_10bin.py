@@ -7,10 +7,10 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ALARA_ROOT = REPO_ROOT.parent
+TEST_DATA_ROOT = Path(__file__).resolve().parent / "data"
 
-PROC_DIR = ALARA_ROOT / "rafm_irradiation_ldrd" / "irradiation_QG_processed" / "flux_wires"
-RAW_DIR = ALARA_ROOT / "rafm_irradiation_ldrd" / "raw_gamma_spec" / "flux_wires"
+PROC_DIR = TEST_DATA_ROOT / "flux_wires" / "processed"
+RAW_DIR = TEST_DATA_ROOT / "flux_wires" / "raw"
 MODEL_PATH = RAW_DIR / "spectrum_vit_j.csv"
 
 ARTIFACT_DIR = REPO_ROOT / "artifacts" / "validation" / "flux_unfolding_10bin"

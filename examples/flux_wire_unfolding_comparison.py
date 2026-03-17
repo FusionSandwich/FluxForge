@@ -406,7 +406,7 @@ def main():
     print("\nChecking cross section availability:")
     for i, rxn in enumerate(UNFOLDING_REACTIONS):
         xs = db.get_cross_section(rxn)
-        status = "✓" if xs is not None else "✗"
+        status = "OK" if xs is not None else "FAIL"
         print(f"  {status} {rxn}")
     
     # Generate simulated reaction rates from a priori spectrum

@@ -235,9 +235,9 @@ def example_check_njoy():
     is_available, njoy_path = check_njoy_available()
     
     if is_available:
-        print(f"\n✓ NJOY is available at: {njoy_path}")
+        print(f"\nOK NJOY is available at: {njoy_path}")
     else:
-        print("\n✗ NJOY is not found in PATH")
+        print("\nFAIL NJOY is not found in PATH")
         print("  To use NJOY processing, install NJOY and add to PATH")
         print("  NJOY2016 available from: https://github.com/njoy/NJOY2016")
 

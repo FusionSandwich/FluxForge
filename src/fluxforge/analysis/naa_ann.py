@@ -28,10 +28,13 @@ from pathlib import Path
 import pickle
 import json
 
+from fluxforge._tensorflow_env import configure_tensorflow_cuda_runtime
+
 logger = logging.getLogger(__name__)
 
 # Check for TensorFlow availability
 try:
+    configure_tensorflow_cuda_runtime()
     import tensorflow as tf
     from tensorflow import keras
     from tensorflow.keras import layers, Model

@@ -25,12 +25,21 @@ import numpy as np
 
 from fluxforge.analysis.flux_wire_analysis import (
     FLUX_WIRE_NUCLIDES,
-    ELEMENT_TO_ISOTOPES,
     FluxWireAnalysisResult,
     analyze_flux_wire,
     analyze_flux_wire_targeted,
     get_sample_element,
     get_expected_isotopes,
+)
+from fluxforge.data.flux_wire_unfolding import (
+    get_flux_wire_isotope_fraction,
+    get_flux_wire_reaction_characteristic_energies,
+    get_flux_wire_reaction_cross_section_defaults,
+    get_flux_wire_reaction_id as get_reaction_id,
+    get_flux_wire_response_parameters,
+    load_flux_wire_product_reactions,
+    load_flux_wire_reaction_defaults,
+    load_flux_wire_sample_defaults,
 )
 from fluxforge.io.flux_wire import (
     FluxWireData,
@@ -39,6 +48,7 @@ from fluxforge.io.flux_wire import (
     read_raw_asc,
     load_flux_wire_directory,
 )
+from fluxforge.io.spe import GammaSpectrum
 from fluxforge.core.response import (
     EnergyGroupStructure,
     ReactionCrossSection,
@@ -51,64 +61,12 @@ from fluxforge.core.response import (
 # Reaction Rate Extraction
 # =============================================================================
 
-# Typical flux wire sample parameters
-# These are typical values for reactor dosimetry wires
-# Mass in mg, diameter in mm
-FLUX_WIRE_SAMPLES = {
-    'Co': {'mass_mg': 10.0, 'diameter_mm': 0.5, 'length_mm': 5.0, 'purity': 0.9999,
-           'atomic_mass': 58.9332, 'density_g_cm3': 8.9},
-    'Cu': {'mass_mg': 20.0, 'diameter_mm': 0.5, 'length_mm': 5.0, 'purity': 0.9999,
-           'atomic_mass': 63.546, 'density_g_cm3': 8.96, 'Cu63_fraction': 0.6917},
-    'Sc': {'mass_mg': 5.0, 'diameter_mm': 0.5, 'length_mm': 5.0, 'purity': 0.999,
-           'atomic_mass': 44.9559, 'density_g_cm3': 2.99},
-    'In': {'mass_mg': 20.0, 'diameter_mm': 0.5, 'length_mm': 5.0, 'purity': 0.9999,
-           'atomic_mass': 114.818, 'density_g_cm3': 7.31,
-           'In113_fraction': 0.0429, 'In115_fraction': 0.9571},
-    'Ti': {'mass_mg': 15.0, 'diameter_mm': 0.5, 'length_mm': 5.0, 'purity': 0.9999,
-           'atomic_mass': 47.867, 'density_g_cm3': 4.54,
-           'Ti46_fraction': 0.0825, 'Ti47_fraction': 0.0744, 'Ti48_fraction': 0.7372},
-    'Ni': {'mass_mg': 15.0, 'diameter_mm': 0.5, 'length_mm': 5.0, 'purity': 0.9999,
-           'atomic_mass': 58.693, 'density_g_cm3': 8.91, 'Ni58_fraction': 0.6808},
-    'Fe': {'mass_mg': 20.0, 'diameter_mm': 0.5, 'length_mm': 5.0, 'purity': 0.9999,
-           'atomic_mass': 55.845, 'density_g_cm3': 7.87,
-           'Fe54_fraction': 0.0585, 'Fe58_fraction': 0.00282},
-}
-
-# Thermal (2200 m/s) and epithermal resonance integral cross sections (barns)
-# From IRDFF-II and standard compilations
-THERMAL_CROSS_SECTIONS = {
-    'Co-59(n,g)Co-60': {'sigma_thermal': 37.2, 'I_res': 75.5, 'E_res': 132.0},
-    'Sc-45(n,g)Sc-46': {'sigma_thermal': 27.5, 'I_res': 12.0, 'E_res': 4.5},
-    'Cu-63(n,g)Cu-64': {'sigma_thermal': 4.5, 'I_res': 5.0, 'E_res': 580.0},
-    'Fe-58(n,g)Fe-59': {'sigma_thermal': 1.31, 'I_res': 1.2, 'E_res': 0.0},
-    'In-113(n,g)In-114m': {'sigma_thermal': 4.0, 'I_res': 260.0, 'E_res': 1.45},
-    'In-115(n,n\')In-115m': {'sigma_thermal': 0.0, 'I_res': 0.0, 'E_eff': 1.5e6},  # Threshold
-    # Threshold reactions - average cross sections in specified energy range
-    'Ni-58(n,p)Co-58': {'sigma_avg': 0.113, 'E_threshold': 4.0e5, 'E_eff': 3.0e6},
-    'Ti-46(n,p)Sc-46': {'sigma_avg': 0.011, 'E_threshold': 1.6e6, 'E_eff': 6.0e6},
-    'Ti-47(n,p)Sc-47': {'sigma_avg': 0.020, 'E_threshold': 2.2e5, 'E_eff': 3.0e6},
-    'Ti-48(n,p)Sc-48': {'sigma_avg': 0.0003, 'E_threshold': 3.4e6, 'E_eff': 8.0e6},
-    'Fe-54(n,p)Mn-54': {'sigma_avg': 0.082, 'E_threshold': 9.0e4, 'E_eff': 3.0e6},
-    'Ni-58(n,2n)Ni-57': {'sigma_avg': 0.003, 'E_threshold': 1.2e7, 'E_eff': 1.4e7},
-}
-
-# Characteristic energies for each reaction (in eV) for spectrum unfolding
-REACTION_ENERGIES = {
-    # Thermal/epithermal (n,g) - sensitive around thermal
-    'Co-59(n,g)Co-60': 0.025,
-    'Sc-45(n,g)Sc-46': 0.025,
-    'Cu-63(n,g)Cu-64': 0.025,
-    'Fe-58(n,g)Fe-59': 0.025,
-    'In-113(n,g)In-114m': 1.45,  # Epithermal resonance
-    "In-115(n,n')In-115m": 3.4e5,  # Inelastic threshold ~340 keV
-    # Threshold reactions
-    'Ni-58(n,p)Co-58': 4.0e5,  # ~400 keV threshold
-    'Ti-46(n,p)Sc-46': 1.6e6,  # ~1.6 MeV threshold
-    'Ti-47(n,p)Sc-47': 2.2e5,  # ~220 keV threshold
-    'Ti-48(n,p)Sc-48': 3.4e6,  # ~3.4 MeV threshold
-    'Fe-54(n,p)Mn-54': 9.0e4,  # ~90 keV threshold
-    'Ni-58(n,2n)Ni-57': 1.2e7,  # ~12 MeV threshold
-}
+FLUX_WIRE_SAMPLES = load_flux_wire_sample_defaults()
+THERMAL_CROSS_SECTIONS = get_flux_wire_reaction_cross_section_defaults()
+REACTION_ENERGIES = get_flux_wire_reaction_characteristic_energies()
+PRODUCT_REACTIONS = load_flux_wire_product_reactions()
+REACTION_DEFAULTS = load_flux_wire_reaction_defaults()
+REACTION_RESPONSE_PARAMS = get_flux_wire_response_parameters()
 
 AVOGADRO = 6.02214076e23  # atoms/mol
 
@@ -187,49 +145,6 @@ class FluxWireReaction:
     irradiation_time_s: float = 0.0
     decay_time_s: float = 0.0
 
-
-# Map from product isotope to IRDFF reaction identifier
-ISOTOPE_TO_IRDFF = {
-    'Co60': 'Co-59(n,g)Co-60',
-    'Sc46': 'Sc-45(n,g)Sc-46',  # For Sc wire; Ti wire uses Ti-46(n,p)Sc-46
-    'Cu64': 'Cu-63(n,g)Cu-64',
-    'In114m': 'In-113(n,g)In-114m',
-    'In115m': 'In-115(n,n\')In-115m',
-    'Co58': 'Ni-58(n,p)Co-58',
-    'Ni57': 'Ni-58(n,2n)Ni-57',
-    'Fe59': 'Fe-58(n,g)Fe-59',
-    'Mn54': 'Fe-54(n,p)Mn-54',
-    'Sc47': 'Ti-47(n,p)Sc-47',
-    'Sc48': 'Ti-48(n,p)Sc-48',
-}
-
-# Ti wire special case: Sc-46 produced via (n,p) not (n,g)
-TI_WIRE_SC46_REACTION = 'Ti-46(n,p)Sc-46'
-
-
-def get_reaction_id(isotope: str, sample_element: Optional[str] = None) -> str:
-    """
-    Get IRDFF reaction ID for a product isotope.
-    
-    Parameters
-    ----------
-    isotope : str
-        Product isotope name (e.g., "Co60")
-    sample_element : str, optional
-        Parent element from flux wire sample name
-        
-    Returns
-    -------
-    str
-        IRDFF reaction identifier
-    """
-    # Special case: Sc-46 from Ti wire is threshold reaction
-    if isotope == 'Sc46' and sample_element == 'Ti':
-        return TI_WIRE_SC46_REACTION
-    
-    return ISOTOPE_TO_IRDFF.get(isotope, f"Unknown({isotope})")
-
-
 def activity_to_reaction_rate(
     activity_bq: float,
     n_atoms: float,
@@ -306,29 +221,7 @@ def activity_to_reaction_rate(
 
 def get_isotope_fraction(reaction_id: str, element: str) -> float:
     """Get the isotopic abundance fraction for the target isotope."""
-    params = FLUX_WIRE_SAMPLES.get(element, {})
-    
-    # Look for specific isotope fraction
-    if 'Cu-63' in reaction_id:
-        return params.get('Cu63_fraction', 0.6917)
-    elif 'In-113' in reaction_id:
-        return params.get('In113_fraction', 0.0429)
-    elif 'In-115' in reaction_id:
-        return params.get('In115_fraction', 0.9571)
-    elif 'Ti-46' in reaction_id:
-        return params.get('Ti46_fraction', 0.0825)
-    elif 'Ti-47' in reaction_id:
-        return params.get('Ti47_fraction', 0.0744)
-    elif 'Ti-48' in reaction_id:
-        return params.get('Ti48_fraction', 0.7372)
-    elif 'Ni-58' in reaction_id:
-        return params.get('Ni58_fraction', 0.6808)
-    elif 'Fe-54' in reaction_id:
-        return params.get('Fe54_fraction', 0.0585)
-    elif 'Fe-58' in reaction_id:
-        return params.get('Fe58_fraction', 0.00282)
-    
-    return 1.0  # Mono-isotopic elements (Co-59, Sc-45)
+    return get_flux_wire_isotope_fraction(reaction_id, element)
 
 
 def reaction_rate_to_flux(
@@ -470,32 +363,33 @@ def extract_reactions_from_raw(
     decay_time_s: float = 0.0,
     calculate_flux: bool = True,
     peak_threshold: float = 0.0,
+    background_spectrum: Optional[GammaSpectrum] = None,
+    background_scale_mode: str = "live",
+    background_scale_factor: Optional[float] = None,
+    background_subtract: bool = True,
+    profile_name: Optional[str] = None,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from raw flux wire spectra.
     
-    This uses targeted peak extraction and optional processed references
-    to align energy calibration, efficiency, and resolution.
+    This uses targeted peak extraction. Optional processed references are
+    comparison-only and do not alter the raw-spectrum analysis path.
     """
     if raw_data.has_spectrum is False:
         return []
-    
-    # Apply reference calibration/efficiency if provided
-    if reference_data is not None:
-        if reference_data.energy_calibration:
-            raw_data.energy_calibration = reference_data.energy_calibration
-            raw_data.spectrum.calibration['energy'] = reference_data.energy_calibration
-            raw_data.spectrum.energies = raw_data.channel_to_energy(raw_data.spectrum.channels)
-        if reference_data.efficiency is not None:
-            raw_data.efficiency = reference_data.efficiency
-        if reference_data.resolution:
-            raw_data.resolution = reference_data.resolution
     
     # Targeted analysis for activities
     analysis = analyze_flux_wire_targeted(
         data=raw_data,
         reference_data=reference_data,
         peak_threshold=peak_threshold,
+        min_energy_keV=80.0,
+        max_energy_keV=3000.0,
+        background_spectrum=background_spectrum,
+        background_scale_mode=background_scale_mode,
+        background_scale_factor=background_scale_factor,
+        background_subtract=background_subtract,
+        profile_name=profile_name,
     )
     
     sample_element = get_sample_element(raw_data.sample_id)
@@ -894,23 +788,7 @@ def _make_response_row(
     centered on the reaction's threshold/resonance energy.
     For production use, would load actual IRDFF-II cross sections.
     """
-    # Reaction characteristic energies and widths
-    REACTION_PARAMS = {
-        'Co-59(n,g)Co-60': (0.025, 2.0),  # thermal, broad
-        'Sc-45(n,g)Sc-46': (0.025, 2.0),
-        'Cu-63(n,g)Cu-64': (0.025, 2.0),
-        'Fe-58(n,g)Fe-59': (0.025, 2.0),
-        'In-113(n,g)In-114m': (1.45, 1.5),  # Epithermal resonance
-        'In-115(n,n\')In-115m': (3.4e5, 0.5),
-        'Ni-58(n,p)Co-58': (4.0e5, 0.8),
-        'Ti-46(n,p)Sc-46': (1.6e6, 0.8),
-        'Ti-47(n,p)Sc-47': (2.2e5, 0.8),
-        'Ti-48(n,p)Sc-48': (3.4e6, 0.8),
-        'Fe-54(n,p)Mn-54': (9.0e4, 0.8),
-        'Ni-58(n,2n)Ni-57': (1.2e7, 0.5),
-    }
-    
-    e_center, log_width = REACTION_PARAMS.get(reaction_id, (1e6, 1.0))
+    e_center, log_width = REACTION_RESPONSE_PARAMS.get(reaction_id, (1e6, 1.0))
     
     # Create response as Gaussian in log-energy space
     bin_centers = np.sqrt(energy_bounds[:-1] * energy_bounds[1:])
@@ -1019,7 +897,6 @@ def unfold_flux_wires(
             data = read_processed_txt(filepath)
             reactions = extract_reactions_from_processed(
                 data,
-                n_atoms=n_atoms,
                 irradiation_time_s=irradiation_time_s,
             )
             all_reactions.extend(reactions)

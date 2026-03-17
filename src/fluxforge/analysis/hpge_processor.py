@@ -36,6 +36,10 @@ from fluxforge.analysis.peakfit import (
     calculate_activity,
     estimate_background,
 )
+from fluxforge.analysis.spectrum_math import (
+    nonnegative_counts_for_algorithm,
+    subtract_measured_background,
+)
 
 
 @dataclass
@@ -308,7 +312,11 @@ class HPGeProcessor:
         self,
         spectrum: GammaSpectrum,
         known_isotopes: Optional[List[str]] = None,
-        fit_all_peaks: bool = False
+        fit_all_peaks: bool = False,
+        background_spectrum: Optional[GammaSpectrum] = None,
+        background_scale_mode: str = "live",
+        background_scale_factor: Optional[float] = None,
+        background_subtract: bool = True,
     ) -> HPGeAnalysisResult:
         """
         Analyze HPGe spectrum.
@@ -327,9 +335,21 @@ class HPGeProcessor:
         HPGeAnalysisResult
             Analysis results
         """
+        if background_subtract:
+            working_spectrum = subtract_measured_background(
+                spectrum,
+                background_spectrum,
+                mode=background_scale_mode,
+                manual_scale=background_scale_factor,
+                negative_policy="hybrid",
+                warn_missing=True,
+            )
+        else:
+            working_spectrum = spectrum
+
         # Use spectrum calibration or processor calibration
-        if spectrum.calibration.get('energy'):
-            energy_cal = spectrum.calibration['energy']
+        if working_spectrum.calibration.get('energy'):
+            energy_cal = working_spectrum.calibration['energy']
         elif self.energy_calibration:
             energy_cal = self.energy_calibration
         else:
@@ -337,12 +357,17 @@ class HPGeProcessor:
             energy_cal = [0.0, 1.0]
         
         # Calculate energies
-        energies = self._calibrate(spectrum.channels, energy_cal)
+        energies = self._calibrate(working_spectrum.channels, energy_cal)
+        counts_for_analysis = nonnegative_counts_for_algorithm(
+            working_spectrum,
+            algorithm_name="HPGe peak background estimation",
+            warn=True,
+        )
         
         # Estimate background
         background = estimate_background(
-            spectrum.channels.astype(float),
-            spectrum.counts.astype(float),
+            working_spectrum.channels.astype(float),
+            counts_for_analysis.astype(float),
             method='snip'
         )
         
@@ -354,7 +379,7 @@ class HPGeProcessor:
                 lines = get_gamma_lines_for_isotope(isotope)
                 for line in lines:
                     result = self._analyze_line(
-                        spectrum, energies, background,
+                        working_spectrum, counts_for_analysis, energies, background,
                         line['energy'], isotope, line['intensity']
                     )
                     if result:
@@ -363,8 +388,8 @@ class HPGeProcessor:
         if fit_all_peaks or not known_isotopes:
             # Auto peak finding
             peaks = auto_find_peaks(
-                spectrum.channels.astype(float),
-                spectrum.counts.astype(float),
+                working_spectrum.channels.astype(float),
+                counts_for_analysis.astype(float),
                 threshold=self.peak_threshold
             )
             
@@ -393,14 +418,14 @@ class HPGeProcessor:
                     intensity = 1.0
                 
                 result = self._analyze_line(
-                    spectrum, energies, background,
+                    working_spectrum, counts_for_analysis, energies, background,
                     peak_energy, isotope, intensity
                 )
                 if result:
                     gamma_lines.append(result)
         
         return HPGeAnalysisResult(
-            spectrum=spectrum,
+            spectrum=working_spectrum,
             gamma_lines=gamma_lines,
             efficiency_curve=self.efficiency_curve,
             background=background,
@@ -408,6 +433,10 @@ class HPGeProcessor:
                 'energy_calibration': energy_cal,
                 'known_isotopes': known_isotopes,
                 'peak_threshold': self.peak_threshold,
+                'background_subtract': background_subtract,
+                'background_scale_mode': background_scale_mode,
+                'background_scale_factor': background_scale_factor,
+                'background_source': background_spectrum.spectrum_id if background_spectrum else None,
             }
         )
     
@@ -421,6 +450,7 @@ class HPGeProcessor:
     def _analyze_line(
         self,
         spectrum: GammaSpectrum,
+        counts_for_analysis: np.ndarray,
         energies: np.ndarray,
         background: np.ndarray,
         target_energy: float,
@@ -438,7 +468,7 @@ class HPGeProcessor:
         try:
             fit_result = fit_single_peak(
                 spectrum.channels.astype(float),
-                spectrum.counts.astype(float),
+                counts_for_analysis.astype(float),
                 int(spectrum.channels[ch_idx]),
                 fit_width=15,
                 background_model='linear'
@@ -452,6 +482,14 @@ class HPGeProcessor:
         # Check if peak is significant
         if fit_result.peak.area < 3 * fit_result.peak.area_uncertainty:
             return None
+
+        net_counts_unc = float(fit_result.peak.area_uncertainty)
+        if spectrum.counts_uncertainty is not None:
+            fit_lo, fit_hi = fit_result.fit_region
+            mask = (spectrum.channels >= fit_lo) & (spectrum.channels <= fit_hi)
+            if np.any(mask):
+                roi_unc = float(np.sqrt(np.sum(np.asarray(spectrum.counts_uncertainty[mask], dtype=float) ** 2)))
+                net_counts_unc = max(net_counts_unc, roi_unc)
         
         # Get efficiency
         if self.efficiency_curve:
@@ -464,7 +502,7 @@ class HPGeProcessor:
         # Calculate activity
         activity, activity_unc = calculate_activity(
             fit_result.peak.area,
-            fit_result.peak.area_uncertainty,
+            net_counts_unc,
             spectrum.live_time,
             efficiency,
             eff_unc * efficiency,  # Convert relative to absolute
@@ -475,7 +513,7 @@ class HPGeProcessor:
             energy=target_energy,
             isotope=isotope,
             net_counts=fit_result.peak.area,
-            net_counts_unc=fit_result.peak.area_uncertainty,
+            net_counts_unc=net_counts_unc,
             activity=activity,
             activity_unc=activity_unc,
             efficiency=efficiency,
@@ -542,7 +580,11 @@ class HPGeProcessor:
 def process_spe_file(
     filepath: Union[str, Path],
     efficiency_curve: Optional[EfficiencyCurve] = None,
-    known_isotopes: Optional[List[str]] = None
+    known_isotopes: Optional[List[str]] = None,
+    background_file: Optional[Union[str, Path]] = None,
+    background_scale_mode: str = "live",
+    background_scale_factor: Optional[float] = None,
+    background_subtract: bool = True,
 ) -> HPGeAnalysisResult:
     """
     Convenience function to process SPE file.
@@ -561,15 +603,27 @@ def process_spe_file(
     HPGeAnalysisResult
     """
     spectrum = read_spe_file(filepath)
+    background = read_spe_file(background_file) if background_file is not None else None
     processor = HPGeProcessor(efficiency_curve=efficiency_curve)
-    return processor.analyze(spectrum, known_isotopes=known_isotopes)
+    return processor.analyze(
+        spectrum,
+        known_isotopes=known_isotopes,
+        background_spectrum=background,
+        background_scale_mode=background_scale_mode,
+        background_scale_factor=background_scale_factor,
+        background_subtract=background_subtract,
+    )
 
 
 def batch_process_spe(
     filepaths: List[Union[str, Path]],
     efficiency_curve: Optional[EfficiencyCurve] = None,
     known_isotopes: Optional[List[str]] = None,
-    output_dir: Optional[Union[str, Path]] = None
+    output_dir: Optional[Union[str, Path]] = None,
+    background_file: Optional[Union[str, Path]] = None,
+    background_scale_mode: str = "live",
+    background_scale_factor: Optional[float] = None,
+    background_subtract: bool = True,
 ) -> List[HPGeAnalysisResult]:
     """
     Batch process multiple SPE files.
@@ -591,10 +645,18 @@ def batch_process_spe(
     """
     processor = HPGeProcessor(efficiency_curve=efficiency_curve)
     results = []
+    background = read_spe_file(background_file) if background_file is not None else None
     
     for fp in filepaths:
         spectrum = read_spe_file(fp)
-        result = processor.analyze(spectrum, known_isotopes=known_isotopes)
+        result = processor.analyze(
+            spectrum,
+            known_isotopes=known_isotopes,
+            background_spectrum=background,
+            background_scale_mode=background_scale_mode,
+            background_scale_factor=background_scale_factor,
+            background_subtract=background_subtract,
+        )
         results.append(result)
         
         if output_dir:

@@ -1,0 +1,2 @@
+sample_id,sample_group,isotope,header_activity_bq,header_activity_unc_bq,n_line_activities,min_line_activity_bq,max_line_activity_bq,mean_line_activity_bq,max_relative_line_header_deviation,flag_internal_inconsistency
+Sc-RAFM-1_25cm,flux_wires,Sc46,1607650.0,123617.0,2,1562510.0,1638730.0,1600620.0,0.02807825086306099,False

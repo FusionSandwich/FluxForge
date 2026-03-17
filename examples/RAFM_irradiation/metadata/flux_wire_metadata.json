@@ -1,0 +1,172 @@
+{
+  "co-cd-rafm-1": [
+    {
+      "sample": "Co-Cd-RAFM-1",
+      "iso": "co59",
+      "prod": "co60",
+      "mass_mg": 3.6703,
+      "xs": 74.0,
+      "unit": "b",
+      "e_start": 4.57e-08,
+      "e_end": 0.000381
+    }
+  ],
+  "co-rafm-1": [
+    {
+      "sample": "Co-RAFM-1",
+      "iso": "co59",
+      "prod": "co60",
+      "mass_mg": 4.0661,
+      "xs": 37.18,
+      "unit": "b",
+      "e_start": 2.23e-09,
+      "e_end": 0.000186
+    }
+  ],
+  "cu-cd-rafm-1": [
+    {
+      "sample": "Cu-Cd-RAFM-1",
+      "iso": "cu63",
+      "prod": "cu64",
+      "mass_mg": 1.3748,
+      "xs": 4.97,
+      "unit": "b",
+      "e_start": 2.57e-08,
+      "e_end": 1.51
+    }
+  ],
+  "cu-rafm-1": [
+    {
+      "sample": "Cu-RAFM-1",
+      "iso": "cu63",
+      "prod": "cu64",
+      "mass_mg": 1.3748,
+      "xs": 4.5,
+      "unit": "b",
+      "e_start": 2.1e-09,
+      "e_end": 0.00277
+    }
+  ],
+  "fe-cd-rafm-1": [
+    {
+      "sample": "Fe-Cd-RAFM-1",
+      "iso": "fe58",
+      "prod": "fe59",
+      "mass_mg": 3.0209,
+      "xs": 1.25,
+      "unit": "b",
+      "e_start": 3.05e-08,
+      "e_end": 0.636
+    }
+  ],
+  "in-cd-rafm-1": [
+    {
+      "sample": "In-Cd-RAFM-1",
+      "iso": "in113",
+      "prod": "in113m",
+      "mass_mg": 17.364,
+      "xs": 70.0,
+      "unit": "mb",
+      "e_start": 0.674,
+      "e_end": 11.3
+    },
+    {
+      "sample": "In-Cd-RAFM-1",
+      "iso": "in115",
+      "prod": "in115m",
+      "mass_mg": 17.364,
+      "xs": 183.1,
+      "unit": "mb",
+      "e_start": 0.674,
+      "e_end": 11.6
+    },
+    {
+      "sample": "In-Cd-RAFM-1",
+      "iso": "in113",
+      "prod": "in114m",
+      "mass_mg": 17.364,
+      "xs": 325.2,
+      "unit": "b",
+      "e_start": 6.82e-07,
+      "e_end": 0.0779
+    },
+    {
+      "sample": "In-Cd-RAFM-1",
+      "iso": "in115",
+      "prod": "in116m",
+      "mass_mg": 17.364,
+      "xs": 2500.0,
+      "unit": "b",
+      "e_start": 4.97e-07,
+      "e_end": 3.5e-05
+    }
+  ],
+  "ni-rafm-1": [
+    {
+      "sample": "Ni-RAFM-1",
+      "iso": "ni58",
+      "prod": "co58",
+      "mass_mg": 41.6747,
+      "xs": 113.2,
+      "unit": "mb",
+      "e_start": 1.34,
+      "e_end": 13.0
+    }
+  ],
+  "sc-cd-rafm-1": [
+    {
+      "sample": "Sc-Cd-RAFM-1",
+      "iso": "sc45",
+      "prod": "sc46",
+      "mass_mg": 3.8285,
+      "xs": 11.83,
+      "unit": "b",
+      "e_start": 2.36e-08,
+      "e_end": 0.0695
+    }
+  ],
+  "sc-rafm-1": [
+    {
+      "sample": "Sc-RAFM-1",
+      "iso": "sc45",
+      "prod": "sc46",
+      "mass_mg": 0.9645,
+      "xs": 27.14,
+      "unit": "b",
+      "e_start": 2.04e-09,
+      "e_end": 5.25e-06
+    }
+  ],
+  "ti-rafm-1": [
+    {
+      "sample": "Ti-RAFM-1",
+      "iso": "ti46",
+      "prod": "sc46",
+      "mass_mg": 13.4986,
+      "xs": 13.16,
+      "unit": "mb",
+      "e_start": 3.28,
+      "e_end": 13.4
+    },
+    {
+      "sample": "Ti-RAFM-1",
+      "iso": "ti47",
+      "prod": "sc47",
+      "mass_mg": 13.4986,
+      "xs": 24.0,
+      "unit": "mb",
+      "e_start": 1.2,
+      "e_end": 12.3
+    },
+    {
+      "sample": "Ti-RAFM-1",
+      "iso": "ti48",
+      "prod": "sc48",
+      "mass_mg": 13.4986,
+      "xs": 0.3998,
+      "unit": "mb",
+      "e_start": 5.19,
+      "e_end": 17.4
+    }
+  ]
+}

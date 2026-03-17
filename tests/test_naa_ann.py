@@ -273,6 +273,9 @@ class TestNAAANNModel:
 
 
 @pytest.mark.skipif(not HAS_TENSORFLOW, reason="TensorFlow not installed")
+@pytest.mark.filterwarnings(
+    "ignore:__array__ implementation doesn't accept a copy keyword.*:DeprecationWarning"
+)
 class TestNAAANNTraining:
     """Test NAA-ANN training pipeline (requires TensorFlow)."""
     

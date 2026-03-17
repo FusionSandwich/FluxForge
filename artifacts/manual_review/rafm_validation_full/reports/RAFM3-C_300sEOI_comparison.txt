@@ -1,0 +1,96 @@
+Sample: RAFM3-C_300sEOI
+Raw file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/RAFM3/RAFM3-C_300sEOI.ASC
+QG file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-C_300sEOI.txt
+Sample group: RAFM3
+Irradiation phase: phase1_rabbit_tube
+Schedule source: sample_schedule.phase1
+Decay label: 300s
+Decay time (s): 360.0
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+QG peaks not identified by FluxForge
+------------------------------------
+- none
+
+Matched energies with isotope mismatch
+--------------------------------------
+- none
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- none
+
+Peak gross-count parity failures
+--------------------------------
+- none
+
+Isotope activity parity failures
+--------------------------------
+- none
+
+Line-level diagnostic flags
+---------------------------
+- W187 @ 685.77 keV | bucket=gamma_library_mismatch | rel_count=+0.000 | rel_line_activity=+0.000 | eff_ratio=0.774
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- Co60 @ 1181.63 keV | stage=eoi | rel_dev=2.499 | consensus=1.021e+04 Bq
+- Fe59 @ 332.77 keV | stage=eoi | rel_dev=17.681 | consensus=2.489e+04 Bq
+- Fe59 @ 1100.53 keV | stage=eoi | rel_dev=0.749 | consensus=2.489e+04 Bq
+- Fe59 @ 1293.22 keV | stage=eoi | rel_dev=1.485 | consensus=2.489e+04 Bq
+- Mn56 @ 2112.81 keV | stage=eoi | rel_dev=0.271 | consensus=5.976e+05 Bq
+- Mn56 @ 2523.00 keV | stage=eoi | rel_dev=0.285 | consensus=5.976e+05 Bq
+- Mn56 @ 2657.08 keV | stage=eoi | rel_dev=0.275 | consensus=5.976e+05 Bq
+- Mn56 @ 2959.41 keV | stage=eoi | rel_dev=0.423 | consensus=5.976e+05 Bq
+- Sb124 @ 723.02 keV | stage=eoi | rel_dev=3.972 | consensus=3868 Bq
+- Ta182 @ 226.48 keV | stage=eoi | rel_dev=0.949 | consensus=6.954e+04 Bq
+- V52 @ 1333.22 keV | stage=eoi | rel_dev=0.809 | consensus=5.116e+06 Bq
+- W187 @ 133.70 keV | stage=eoi | rel_dev=3.950 | consensus=1.334e+05 Bq
+- W187 @ 202.70 keV | stage=eoi | rel_dev=77.006 | consensus=1.334e+05 Bq
+- W187 @ 479.48 keV | stage=eoi | rel_dev=0.311 | consensus=1.334e+05 Bq
+- W187 @ 510.97 keV | stage=eoi | rel_dev=20.760 | consensus=1.334e+05 Bq
+- W187 @ 618.26 keV | stage=eoi | rel_dev=0.515 | consensus=1.334e+05 Bq
+- W187 @ 685.38 keV | stage=eoi | rel_dev=0.353 | consensus=1.334e+05 Bq
+- W187 @ 744.76 keV | stage=eoi | rel_dev=8.518 | consensus=1.334e+05 Bq
+- W187 @ 772.91 keV | stage=eoi | rel_dev=0.655 | consensus=1.334e+05 Bq
+
+Measurement QC review flags
+---------------------------
+- none
+
+QG internal consistency flags
+-----------------------------
+- W187 | header=3.707e+04 Bq | line range=(1746, 3.996e+04) Bq | max rel deviation=0.953
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- none
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- W187 @ 202.70 keV | net=3702.50 +/- 301.93
+- Ta182 @ 226.48 keV | net=2707.00 +/- 457.31
+- Fe59 @ 332.77 keV | net=283.00 +/- 104.88
+- W187 @ 510.97 keV | net=3314.16 +/- 147.55
+- Sb124 @ 723.02 keV | net=296.00 +/- 94.26
+- W187 @ 744.76 keV | net=529.50 +/- 85.52
+- Co58 @ 809.13 keV | net=248.00 +/- 86.47
+- Mn54 @ 832.83 keV | net=80572.00 +/- 341.54
+- Tb154m @ 876.41 keV | net=137.00 +/- 60.86
+- Tb154m @ 1005.35 keV | net=243.50 +/- 63.87
+- Fe59 @ 1100.53 keV | net=389.50 +/- 101.80
+- Co60 @ 1181.63 keV | net=3792.50 +/- 300.46
+- Ta182 @ 1213.33 keV | net=1790.00 +/- 195.98
+- Fe59 @ 1293.22 keV | net=2739.02 +/- 102.09
+- V52 @ 1333.22 keV | net=1189.82 +/- 79.49
+- Co60 @ 1333.33 keV | net=890.50 +/- 67.99
+- Sb124 @ 1694.36 keV | net=162.50 +/- 44.18
+- Mn56 @ 2523.00 keV | net=468.44 +/- 21.66
+- Mn56 @ 2657.08 keV | net=314.83 +/- 17.75
+- Mn56 @ 2959.41 keV | net=127.00 +/- 11.27
+

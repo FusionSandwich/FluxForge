@@ -234,8 +234,9 @@ class DecayInventory:
         activities = network.activity_series(self.atoms, times, units=units)
         times_s = times * unit_factor
         totals: Dict[str, float] = {}
+        trapezoid = getattr(np, "trapezoid", np.trapz)
         for nuclide, values in activities.items():
-            totals[nuclide] = float(np.trapz(values, times_s))
+            totals[nuclide] = float(trapezoid(values, times_s))
         return totals
 
 

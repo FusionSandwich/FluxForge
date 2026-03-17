@@ -126,7 +126,7 @@ def demo_lower_triangular_matrix():
     
     # Verify symmetry
     assert np.allclose(loaded, loaded.T), "Matrix should be symmetric"
-    print("\n✓ Matrix symmetry verified")
+    print("\nOK Matrix symmetry verified")
     
     return matrix
 
@@ -180,9 +180,9 @@ def demo_staysl_bundle():
     if warnings:
         print("Validation warnings:")
         for w in warnings:
-            print(f"  ⚠ {w}")
+            print(f"  WARNING {w}")
     else:
-        print("✓ Bundle validation passed")
+        print("OK Bundle validation passed")
     
     # Export
     files = export_staysl_bundle(bundle, output_dir, prefix="example")
@@ -209,7 +209,7 @@ def demo_staysl_bundle():
     # Verify roundtrip
     np.testing.assert_array_almost_equal(loaded.prior_flux, bundle.prior_flux)
     np.testing.assert_array_almost_equal(loaded.measured_rates, bundle.measured_rates, decimal=5)
-    print("\n✓ Roundtrip verification passed")
+    print("\nOK Roundtrip verification passed")
     
     return bundle
 

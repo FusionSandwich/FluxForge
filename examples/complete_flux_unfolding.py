@@ -467,8 +467,8 @@ def main():
     print(f"Loaded {len(samples)} flux wire samples:")
     
     for sample_id, data_dict in samples.items():
-        proc_status = "✓" if data_dict['processed'] else "✗"
-        raw_status = "✓" if data_dict['raw'] else "✗"
+        proc_status = "OK" if data_dict['processed'] else "FAIL"
+        raw_status = "OK" if data_dict['raw'] else "FAIL"
         element = get_sample_element(sample_id)
         nuclides = data_dict['processed'].nuclides if data_dict['processed'] else []
         isotopes = [n.isotope for n in nuclides]

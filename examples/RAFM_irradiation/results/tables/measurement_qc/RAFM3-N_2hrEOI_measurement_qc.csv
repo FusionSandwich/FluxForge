@@ -1,0 +1,2 @@
+sample_id,sample_group,check,dead_time_pct,threshold_pct,live_time_s,real_time_s,max_peak_significance,max_peak_gross_counts,flag_review,note
+RAFM3-N_2hrEOI,RAFM3,dead_time_review,2.386117136659438,15.0,900.0,922.0,376.3312597261434,151328.0,False,Dead time within configured review threshold.

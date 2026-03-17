@@ -9,6 +9,9 @@ Implements:
 - Jeffreys prior for logarithmic ranges
 """
 
+# Prevent pytest from collecting this source module as a test module.
+__test__ = False
+
 import numpy as np
 from typing import Tuple, Callable, Optional
 from dataclasses import dataclass
@@ -641,4 +644,4 @@ if __name__ == "__main__":
     print(f"  Unfolded: {phi_unfolded.astype(int)}")
     print(f"  Converged: {info['converged']} in {info['n_iter']} iterations")
     
-    print("\n✅ All tests passed!")
+    print("\n[OK] All tests passed!")
