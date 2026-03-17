@@ -1,3 +1,5 @@
+"""Developer utility for splitting `fluxforge_gui.app` into smaller modules."""
+
 import ast
 import sys
 from pathlib import Path
@@ -14,10 +16,16 @@ def get_method_lines(source, class_name):
     return methods
 
 
+def resolve_app_path(argv: list[str]) -> Path:
+    """Return the app module path to split, defaulting to the local package file."""
+
+    if len(argv) > 1:
+        return Path(argv[1]).expanduser().resolve()
+    return Path(__file__).resolve().with_name("app.py")
+
+
 def main():
-    app_path = Path(
-        "/filespace/s/smandych/CAE/projects/ALARA/FluxForge/src/fluxforge_gui/app.py"
-    )
+    app_path = resolve_app_path(sys.argv)
     source = app_path.read_text(encoding="utf-8")
     lines = source.split("\n")
 
@@ -76,7 +84,14 @@ def main():
 
     cmd_path = app_path.parent / "commands.py"
     cmd_path.write_text(
-        "import tkinter as tk\nfrom tkinter import messagebox\nfrom pathlib import Path\nfrom argparse import Namespace\nfrom fluxforge import cli_app\n\nclass CommandsMixin:\n"
+        (
+            "import tkinter as tk\n"
+            "from tkinter import messagebox\n"
+            "from pathlib import Path\n"
+            "from argparse import Namespace\n"
+            "from fluxforge import cli_app\n\n"
+            "class CommandsMixin:\n"
+        )
         + "\n".join(command_lines),
         encoding="utf-8",
     )

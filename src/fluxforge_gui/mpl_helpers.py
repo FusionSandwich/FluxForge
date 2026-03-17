@@ -11,7 +11,7 @@ except ImportError:  # pragma: no cover - optional GUI plotting dependency
 
 
 def ensure_agg_renderer(figure):
-    """Attach an Agg canvas when a figure would otherwise use the deprecated fallback renderer path."""
+    """Attach an Agg canvas for figures that would otherwise use a fallback."""
 
     if figure is None or FigureCanvasAgg is None:
         return figure
@@ -21,7 +21,12 @@ def ensure_agg_renderer(figure):
     return figure
 
 
-def create_offscreen_figure(*, figsize: tuple[float, float], dpi: int = 100, figure=None):
+def create_offscreen_figure(
+    *,
+    figsize: tuple[float, float],
+    dpi: int = 100,
+    figure=None,
+):
     """Return a figure that is safe for off-screen layout and export helpers."""
 
     if figure is None:
@@ -38,4 +43,8 @@ def apply_tight_layout(figure) -> None:
     figure.tight_layout()
 
 
-__all__ = ["apply_tight_layout", "create_offscreen_figure", "ensure_agg_renderer"]
+__all__ = [
+    "apply_tight_layout",
+    "create_offscreen_figure",
+    "ensure_agg_renderer",
+]

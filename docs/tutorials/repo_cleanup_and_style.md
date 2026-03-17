@@ -3,7 +3,7 @@
 ## Scope
 This document tracks active cleanup steps for FluxForge repository deduplication and Python style enforcement.
 
-## Phase 1 Completed (2026-03-17)
+## Historical Cleanup Work Completed Earlier On 2026-03-17
 - Created safety branch for cleanup work.
 - Archived recovered GUI copies from active source tree:
   - `src/fluxforge_gui/app_recovered.py`
@@ -24,18 +24,30 @@ This document tracks active cleanup steps for FluxForge repository deduplication
   - Black formatter config
   - Flake8 baseline settings (PEP8-focused)
 
-## Formatting Commands
-Run from repository root.
+## Current Audit Snapshot (2026-03-17)
+- Branch under active cleanup review: `chore/repo-cleanup-phase1-safety-20260317`
+- Latest pushed implementation baseline:
+  - `e75ce05` `Fix GUI render warnings and add native desktop acceptance`
+- Current broad lint snapshot:
+  - `1089` flake8 findings across `src/fluxforge_gui`, `src/fluxforge`, `tests`, and `tools`
+- Highest-payoff folder buckets from the current audit:
+  - `src/fluxforge_gui`: `363` findings, dominated by dead imports and line length after the app split
+  - `src/fluxforge/cli`: `30` findings, all in the `3501`-line `app.py` monolith
+  - `src/fluxforge/analysis`: `116` findings, including several real code issues (`F821`, `E731`, unused state)
+  - `src/fluxforge/data`: `77` findings, concentrated in `kayzero_k0.py`, `nuclear_data_sources.py`, and `irdff.py`
+  - `tests`: `161` findings, mostly import-order bootstrap patterns plus duplicated test-only helpers
+- Largest active source files:
+  - `src/fluxforge_gui/ui_builder.py`: `2540` lines
+  - `src/fluxforge_gui/app.py`: `2176` lines
+  - `src/fluxforge_gui/commands.py`: `1190` lines
+  - `src/fluxforge/cli/app.py`: `3501` lines
+  - `src/fluxforge/analysis/flux_wire_analysis.py`: `2792` lines
+- Additional cleanup hotspots outside the main packages:
+  - `src/fluxforge_gui/split_app.py` is a developer-only splitter script and had a hard-coded absolute path before this audit pass.
+  - `tools/github_issues/*.py` still use hard-coded local filesystem paths.
+  - `examples/` and parts of `docs/` still contain workstation-specific absolute paths that should be converted to repo-relative usage or clearly marked as local-only examples.
 
-```bash
-black src tests examples
-flake8 src tests
-```
-
-## Next Implementation Steps
-All original cleanup-plan goals are now completed.
-
-## Plan Completion Status (2026-03-17)
+## Verified Earlier Cleanup Work
 - Completed: Archived recovered GUI files and removed them from active source tree.
 - Completed: Removed generated/temp outputs and merge artifacts; expanded `.gitignore` guardrails.
 - Completed: Consolidated duplicated k0 physics helpers into canonical shared modules with compatibility wrappers.
@@ -64,6 +76,36 @@ All original cleanup-plan goals are now completed.
 - Repeated S/D/C timing factor implementations in `analysis/k0_naa.py` and `triga/k0.py`.
 - Additional repeated timing helpers were identified in `physics/sigphi.py`, but these include stability shortcuts and will be handled in a separate, test-first pass.
 
-## Current Verification Snapshot
-- Full suite: `963 passed, 6 skipped` (OpenMC statepoint file unavailable in this workspace).
-- MCNP workflow tests: passing (`tests/test_mcnp_io.py`, `tests/test_transport_io.py -k MCNP`).
+## Phase 3 Active Roadmap
+1. `src/fluxforge_gui`
+   - Reduce copied import blocks and dead imports in `app.py`, `ui_builder.py`, and `commands.py`.
+   - Continue splitting widget construction, dispatch, and state helpers into smaller focused modules.
+   - Keep native desktop GUI tests green after each extraction.
+2. `src/fluxforge/cli`
+   - Break `cli/app.py` into command-group builders or subcommand modules.
+   - Preserve CLI names and help text while shrinking the monolith.
+3. `src/fluxforge/analysis` and `src/fluxforge/data`
+   - Fix true lint/code-quality issues first (`F821`, bare `except`, lambda assignments, ambiguous names).
+   - Then reduce duplicated parsing, validation, and plotting-input preparation helpers.
+4. `tests`
+   - Consolidate repeated GUI/bootstrap setup into shared fixtures.
+   - Separate helper tests, native desktop tests, and long-running validation flows more clearly.
+5. `tools`, `examples`, and `docs`
+   - Remove or parameterize hard-coded local paths.
+   - Mark developer-only scripts explicitly.
+   - Keep shipped docs and examples runnable from a clean checkout.
+
+## Formatting and Audit Commands
+Run from repository root.
+
+```bash
+black src tests examples
+flake8 src tests
+python -m pytest -q
+```
+
+## Current Success Criteria For Cleanup
+- No workstation-specific absolute paths in shipped runtime code.
+- Smaller GUI and CLI module boundaries with less copied import boilerplate.
+- PEP8/flake8 debt reduced in staged, reviewable slices instead of one large reformat-only diff.
+- Regression coverage stays green after each folder-level cleanup pass.

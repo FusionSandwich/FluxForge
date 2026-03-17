@@ -37,9 +37,12 @@ def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:
             background_subtracted=True,
             reaction_category="fast",
             notes=(
-                "Applies the bundled ASTM/INL detector profile to ingest and manual-ROI peak workflows.",
-                "Use measured background subtraction, manual ROI files, and IEC-tiered counting for standards-style peak review.",
-                "Pairs well with IRDFF-II fast-reaction browsing for monitor selection.",
+                "Applies the bundled ASTM/INL detector profile to ingest and "
+                "manual-ROI peak workflows.",
+                "Use measured background subtraction, manual ROI files, and "
+                "IEC-tiered counting for standards-style peak review.",
+                "Pairs well with IRDFF-II fast-reaction browsing for monitor "
+                "selection.",
             ),
         ),
         "us_astm": StandardsGuiPreset(
@@ -51,9 +54,12 @@ def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:
             background_subtracted=True,
             reaction_category="fast",
             notes=(
-                "Uses the US ASTM reactor-dosimetry bundled profile for consistent background and efficiency defaults.",
-                "Designed for standards-driven dosimetry spectra with explicit ROI review.",
-                "Use the reactions browser to narrow candidate threshold reactions by target or category.",
+                "Uses the US ASTM reactor-dosimetry bundled profile for "
+                "consistent background and efficiency defaults.",
+                "Designed for standards-driven dosimetry spectra with "
+                "explicit ROI review.",
+                "Use the reactions browser to narrow candidate threshold "
+                "reactions by target or category.",
             ),
         ),
         "iaea_irdff_gma": StandardsGuiPreset(
@@ -65,9 +71,15 @@ def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:
             background_subtracted=True,
             reaction_category="all",
             notes=(
-                "Targets the IAEA-style dosimetry path backed by IRDFF-II reactions, response-matrix construction, and GMA-like advanced solvers.",
-                "Use the Unfold tab with IRDFF-derived responses and the Standards reactions browser to inspect thermal, epithermal, fast, and fission monitors.",
-                "This preset reuses the bundled dosimetry detector profile where a practical GUI default is needed, but the physics backend is the IAEA IRDFF/GMA workflow.",
+                "Targets the IAEA-style dosimetry path backed by IRDFF-II "
+                "reactions, response-matrix construction, and GMA-like "
+                "advanced solvers.",
+                "Use the Unfold tab with IRDFF-derived responses and the "
+                "Standards reactions browser to inspect thermal, epithermal, "
+                "fast, and fission monitors.",
+                "This preset reuses the bundled dosimetry detector profile "
+                "where a practical GUI default is needed, but the physics "
+                "backend is the IAEA IRDFF/GMA workflow.",
             ),
         ),
         "k0_naa": StandardsGuiPreset(
@@ -79,9 +91,12 @@ def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:
             background_subtracted=True,
             reaction_category="thermal",
             notes=(
-                "Configures the GUI for k0-NAA style peak review with manual ROI support and background-subtracted integration.",
-                "Enter timing, efficiency, isotope, and comparator-specific values on the Activity tab after peak extraction.",
-                "Thermal and epithermal monitor browsing is exposed through the IRDFF reactions browser.",
+                "Configures the GUI for k0-NAA style peak review with manual "
+                "ROI support and background-subtracted integration.",
+                "Enter timing, efficiency, isotope, and comparator-specific "
+                "values on the Activity tab after peak extraction.",
+                "Thermal and epithermal monitor browsing is exposed through "
+                "the IRDFF reactions browser.",
             ),
         ),
         "comparator_naa": StandardsGuiPreset(
@@ -93,9 +108,12 @@ def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:
             background_subtracted=True,
             reaction_category="thermal",
             notes=(
-                "Sets up manual-ROI and background-subtracted peak processing for comparator-based NAA workflows.",
-                "Use Activity tab overrides to keep isotope and reaction identifiers aligned with comparator calculations.",
-                "Report and Rates tabs can then bundle the resulting activities into downstream validation artifacts.",
+                "Sets up manual-ROI and background-subtracted peak processing "
+                "for comparator-based NAA workflows.",
+                "Use Activity tab overrides to keep isotope and reaction "
+                "identifiers aligned with comparator calculations.",
+                "Report and Rates tabs can then bundle the resulting "
+                "activities into downstream validation artifacts.",
             ),
         ),
         "physics_like": StandardsGuiPreset(
@@ -107,9 +125,16 @@ def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:
             background_subtracted=True,
             reaction_category="all",
             notes=(
-                "Maps to FluxForge modules that parallel Physics-style workflows: Bateman decay chains, stacked-target energy degradation, XCOM attenuation, dose-rate estimates, and SPE export.",
-                "Use the Peaks, Activity, and Rates tabs for HPGe-style spectroscopy, then pair with stacked-target and activation modules from the Python API for charged-particle workflows.",
-                "This preset is informational for the GUI today because the stacked-target and decay-chain parity modules are implemented in code and tests but are not yet full GUI tasks.",
+                "Maps to FluxForge modules that parallel Physics-style "
+                "workflows: Bateman decay chains, stacked-target energy "
+                "degradation, XCOM attenuation, dose-rate estimates, and SPE "
+                "export.",
+                "Use the Peaks, Activity, and Rates tabs for HPGe-style "
+                "spectroscopy, then pair with stacked-target and activation "
+                "modules from the Python API for charged-particle workflows.",
+                "This preset is informational for the GUI today because the "
+                "stacked-target and decay-chain parity modules are "
+                "implemented in code and tests but are not yet full GUI tasks.",
             ),
         ),
         "curie_like": StandardsGuiPreset(
@@ -121,9 +146,16 @@ def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:
             background_subtracted=True,
             reaction_category="all",
             notes=(
-                "Maps to FluxForge modules that parallel Curie-style workflows: Bateman decay chains, stacked-target energy degradation, XCOM attenuation, dose-rate estimates, and SPE export.",
-                "Use the Peaks, Activity, and Rates tabs for HPGe-style spectroscopy, then pair with stacked-target and activation modules from the Python API for charged-particle workflows.",
-                "This preset is informational for the GUI today because the stacked-target and decay-chain parity modules are implemented in code and tests but are not yet full GUI tasks.",
+                "Maps to FluxForge modules that parallel Curie-style "
+                "workflows: Bateman decay chains, stacked-target energy "
+                "degradation, XCOM attenuation, dose-rate estimates, and SPE "
+                "export.",
+                "Use the Peaks, Activity, and Rates tabs for HPGe-style "
+                "spectroscopy, then pair with stacked-target and activation "
+                "modules from the Python API for charged-particle workflows.",
+                "This preset is informational for the GUI today because the "
+                "stacked-target and decay-chain parity modules are "
+                "implemented in code and tests but are not yet full GUI tasks.",
             ),
         ),
     }
