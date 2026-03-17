@@ -29,9 +29,9 @@ This document tracks active cleanup steps for FluxForge repository deduplication
 - Latest pushed implementation baseline:
   - `e75ce05` `Fix GUI render warnings and add native desktop acceptance`
 - Current broad lint snapshot:
-  - `1089` flake8 findings across `src/fluxforge_gui`, `src/fluxforge`, `tests`, and `tools`
+  - `1036` flake8 findings across `src/fluxforge_gui`, `src/fluxforge`, `tests`, and `tools`
 - Highest-payoff folder buckets from the current audit:
-  - `src/fluxforge_gui`: `363` findings, dominated by dead imports and line length after the app split
+  - `src/fluxforge_gui`: `310` findings after the first support-module cleanup pass, still dominated by dead imports and line length after the app split
   - `src/fluxforge/cli`: `30` findings, all in the `3501`-line `app.py` monolith
   - `src/fluxforge/analysis`: `116` findings, including several real code issues (`F821`, `E731`, unused state)
   - `src/fluxforge/data`: `77` findings, concentrated in `kayzero_k0.py`, `nuclear_data_sources.py`, and `irdff.py`
