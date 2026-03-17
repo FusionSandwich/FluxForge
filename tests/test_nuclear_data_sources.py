@@ -49,7 +49,9 @@ def test_load_sqlite_identification_source(tmp_path):
             "INSERT INTO gamma_lines VALUES (?, ?, ?, ?)",
             ("Cs137", 661.7, 0.851, 9.493632e8),
         )
-    database = load_gamma_identification_source("custom_gamma_file", custom_path=f"sqlite:///{db_path}?table=gamma_lines")
+    database = load_gamma_identification_source(
+        "custom_gamma_file", custom_path=f"sqlite:///{db_path}?table=gamma_lines"
+    )
 
     matches = database.find_matches(661.7, tolerance_keV=1.0)
     assert matches
@@ -67,7 +69,9 @@ def test_load_python_identification_source(tmp_path, monkeypatch):
     )
     monkeypatch.syspath_prepend(str(tmp_path))
 
-    database = load_gamma_identification_source("custom_gamma_file", custom_path="python://custom_loader:load")
+    database = load_gamma_identification_source(
+        "custom_gamma_file", custom_path="python://custom_loader:load"
+    )
     matches = database.find_matches(1332.5, tolerance_keV=1.0)
 
     assert matches

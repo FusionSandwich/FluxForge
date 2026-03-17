@@ -19,21 +19,75 @@ import numpy as np
 # Default air mass energy-absorption coefficients (cm²/g) at various energies (keV)
 # Source: NIST XCOM database for air
 DEFAULT_AIR_COEFFICIENTS = {
-    'energy': np.array([
-        10, 15, 20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 500, 600, 800,
-        1000, 1250, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000
-    ], dtype=float),  # keV
-    'energy_absorption': np.array([
-        4.614, 1.287, 0.529, 0.147, 0.0648, 0.0406, 0.0305, 0.0243, 0.0233, 
-        0.0250, 0.0268, 0.0288, 0.0296, 0.0297, 0.0296, 0.0289, 0.0280, 
-        0.0268, 0.0255, 0.0235, 0.0205, 0.0186, 0.0172, 0.0161, 0.0146, 0.0135
-    ], dtype=float)  # cm²/g
+    "energy": np.array(
+        [
+            10,
+            15,
+            20,
+            30,
+            40,
+            50,
+            60,
+            80,
+            100,
+            150,
+            200,
+            300,
+            400,
+            500,
+            600,
+            800,
+            1000,
+            1250,
+            1500,
+            2000,
+            3000,
+            4000,
+            5000,
+            6000,
+            8000,
+            10000,
+        ],
+        dtype=float,
+    ),  # keV
+    "energy_absorption": np.array(
+        [
+            4.614,
+            1.287,
+            0.529,
+            0.147,
+            0.0648,
+            0.0406,
+            0.0305,
+            0.0243,
+            0.0233,
+            0.0250,
+            0.0268,
+            0.0288,
+            0.0296,
+            0.0297,
+            0.0296,
+            0.0289,
+            0.0280,
+            0.0268,
+            0.0255,
+            0.0235,
+            0.0205,
+            0.0186,
+            0.0172,
+            0.0161,
+            0.0146,
+            0.0135,
+        ],
+        dtype=float,
+    ),  # cm²/g
 }
 
 
 @dataclass
 class GammaLine:
     """Representation of a single gamma line with energy and emission probability."""
+
     energy_keV: float
     intensity: float  # probability per decay (0 to 1)
     energy_unc_keV: float = 0.0
@@ -43,6 +97,7 @@ class GammaLine:
 @dataclass
 class DoseRateResult:
     """Container for dose rate calculation results."""
+
     dose_rate_uSv_h: float
     uncertainty_uSv_h: float = 0.0
     details: Optional[Dict] = None
@@ -66,14 +121,14 @@ def mean_lifetime(half_life_s: float) -> float:
 
 def interpolate_coefficient(
     energy_keV: float,
-    energies: np.ndarray = DEFAULT_AIR_COEFFICIENTS['energy'],
-    coefficients: np.ndarray = DEFAULT_AIR_COEFFICIENTS['energy_absorption']
+    energies: np.ndarray = DEFAULT_AIR_COEFFICIENTS["energy"],
+    coefficients: np.ndarray = DEFAULT_AIR_COEFFICIENTS["energy_absorption"],
 ) -> float:
     """
     Interpolate mass energy-absorption coefficient at given energy.
-    
+
     Uses log-log interpolation for physical accuracy.
-    
+
     Parameters
     ----------
     energy_keV : float
@@ -82,7 +137,7 @@ def interpolate_coefficient(
         Reference energies in keV
     coefficients : np.ndarray
         Corresponding mass energy-absorption coefficients in cm²/g
-    
+
     Returns
     -------
     float
@@ -92,12 +147,12 @@ def interpolate_coefficient(
         return coefficients[0]
     if energy_keV >= energies[-1]:
         return coefficients[-1]
-    
+
     # Log-log interpolation
     log_E = np.log(energy_keV)
     log_energies = np.log(energies)
     log_coeffs = np.log(coefficients)
-    
+
     return float(np.exp(np.interp(log_E, log_energies, log_coeffs)))
 
 
@@ -106,14 +161,14 @@ def gamma_dose_rate(
     intensity: float,
     activity_Bq: float,
     distance_cm: float,
-    material: str = 'air'
+    material: str = "air",
 ) -> float:
     """
     Calculate dose rate from a single gamma line.
-    
+
     Based on the Health Physics Society formula:
     https://hps.org/publicinformation/ate/faqs/gammaandexposure.html
-    
+
     Parameters
     ----------
     energy_keV : float
@@ -126,7 +181,7 @@ def gamma_dose_rate(
         Distance from source in cm
     material : str
         Absorbing material (default 'air')
-    
+
     Returns
     -------
     float
@@ -134,15 +189,17 @@ def gamma_dose_rate(
     """
     # Get mass energy-absorption coefficient
     mu_en = interpolate_coefficient(energy_keV)
-    
+
     # Conversion factors:
     # 5.263e-6: exposure rate constant factor (R·cm²)/(h·keV·Bq)
     # 1/107.185: Roentgen to Sievert for air
     # 1e3: keV to MeV correction × Sv to µSv
     custom_factor = 5.263e-6 * (1.0 / 107.185) * 1e3
-    
-    dose_rate = custom_factor * energy_keV * intensity * mu_en * activity_Bq / (distance_cm ** 2)
-    
+
+    dose_rate = (
+        custom_factor * energy_keV * intensity * mu_en * activity_Bq / (distance_cm**2)
+    )
+
     return dose_rate
 
 
@@ -152,11 +209,11 @@ def isotope_dose_rate(
     distance_cm: float,
     half_life_s: Optional[float] = None,
     integration_time_s: Optional[float] = None,
-    material: str = 'air'
+    material: str = "air",
 ) -> DoseRateResult:
     """
     Calculate total dose rate from an isotope's gamma spectrum.
-    
+
     Parameters
     ----------
     gamma_lines : List[GammaLine]
@@ -171,7 +228,7 @@ def isotope_dose_rate(
         If provided, integrate dose over this time period
     material : str
         Absorbing material (default 'air')
-    
+
     Returns
     -------
     DoseRateResult
@@ -180,28 +237,28 @@ def isotope_dose_rate(
     total_dose_rate = 0.0
     total_variance = 0.0
     details = {}
-    
+
     for i, line in enumerate(gamma_lines):
         dr = gamma_dose_rate(
             energy_keV=line.energy_keV,
             intensity=line.intensity,
             activity_Bq=activity_Bq,
             distance_cm=distance_cm,
-            material=material
+            material=material,
         )
         total_dose_rate += dr
-        
+
         # Uncertainty propagation (intensity uncertainty dominates)
         if line.intensity > 0 and line.intensity_unc > 0:
             rel_unc = line.intensity_unc / line.intensity
             total_variance += (dr * rel_unc) ** 2
-        
-        details[f'line_{i}'] = {
-            'energy_keV': line.energy_keV,
-            'intensity': line.intensity,
-            'dose_rate_uSv_h': dr
+
+        details[f"line_{i}"] = {
+            "energy_keV": line.energy_keV,
+            "intensity": line.intensity,
+            "dose_rate_uSv_h": dr,
         }
-    
+
     # Integrate over time if requested
     if integration_time_s is not None and half_life_s is not None:
         lam = decay_constant(half_life_s)
@@ -213,13 +270,13 @@ def isotope_dose_rate(
             time_factor_h = integration_time_s / 3600.0
             # The integrated dose in µSv
             integrated_dose = total_dose_rate * decay_factor / 3600.0
-            details['integrated_dose_uSv'] = integrated_dose
-            details['integration_time_s'] = integration_time_s
-    
+            details["integrated_dose_uSv"] = integrated_dose
+            details["integration_time_s"] = integration_time_s
+
     return DoseRateResult(
         dose_rate_uSv_h=total_dose_rate,
         uncertainty_uSv_h=math.sqrt(total_variance),
-        details=details
+        details=details,
     )
 
 
@@ -231,11 +288,11 @@ def fluence_from_activity(
     irradiation_time_s: float,
     half_life_s: float,
     abundance: float = 1.0,
-    cooldown_time_s: float = 0.0
+    cooldown_time_s: float = 0.0,
 ) -> float:
     """
     Calculate neutron fluence from measured activation product activity.
-    
+
     Parameters
     ----------
     activity_Bq : float
@@ -254,7 +311,7 @@ def fluence_from_activity(
         Isotopic abundance fraction (0 to 1)
     cooldown_time_s : float
         Time between end of irradiation and measurement
-    
+
     Returns
     -------
     float
@@ -262,42 +319,43 @@ def fluence_from_activity(
     """
     AVOGADRO = 6.02214076e23
     BARN_TO_CM2 = 1e-24
-    
+
     lam = decay_constant(half_life_s)
-    
+
     # Correct activity back to end of irradiation
     A_eoi = activity_Bq * math.exp(lam * cooldown_time_s)
-    
+
     # Number of target atoms
     N_target = (sample_mass_g / molar_mass_g) * AVOGADRO * abundance
-    
+
     # Cross section in cm²
     sigma_cm2 = cross_section_barn * BARN_TO_CM2
-    
+
     # Saturation factor
     saturation = 1.0 - math.exp(-lam * irradiation_time_s)
-    
+
     if saturation <= 0 or sigma_cm2 <= 0 or N_target <= 0:
         raise ValueError("Invalid parameters for fluence calculation")
-    
+
     # Fluence = A / (N * sigma * lambda * saturation_factor)
     # Actually: A = N * sigma * phi * lambda * saturation where phi is flux (n/cm²/s)
     # For fluence Phi (n/cm²) = flux * time, need different formula
     # A = N * sigma * Phi_dot * saturation_factor * lambda
     # where saturation_factor = (1 - e^(-λT))/λ for constant flux
-    
+
     # For fluence: Phi = A / (N * sigma * saturation_factor * lambda / λ)
     # Simplifies to: Phi = A * λ / (N * sigma * (1 - e^(-λT)))
-    
+
     fluence = (A_eoi * lam) / (N_target * sigma_cm2 * saturation * lam)
     # Above simplifies to: A_eoi / (N_target * sigma_cm2 * saturation)
-    
+
     return A_eoi / (N_target * sigma_cm2 * saturation)
 
 
 @dataclass
 class ShieldingLayer:
     """Representation of a shielding layer."""
+
     material: str
     thickness_cm: float
     linear_attenuation_coeff: float  # cm⁻¹ at reference energy
@@ -306,11 +364,11 @@ class ShieldingLayer:
 def attenuated_dose_rate(
     unshielded_dose_rate: float,
     shielding_layers: List[ShieldingLayer],
-    buildup_factors: Optional[List[float]] = None
+    buildup_factors: Optional[List[float]] = None,
 ) -> float:
     """
     Calculate dose rate after passing through shielding.
-    
+
     Parameters
     ----------
     unshielded_dose_rate : float
@@ -319,7 +377,7 @@ def attenuated_dose_rate(
         List of shielding layers
     buildup_factors : List[float], optional
         Buildup factors for each layer (default 1.0)
-    
+
     Returns
     -------
     float
@@ -327,10 +385,10 @@ def attenuated_dose_rate(
     """
     if buildup_factors is None:
         buildup_factors = [1.0] * len(shielding_layers)
-    
+
     transmission = 1.0
     for layer, B in zip(shielding_layers, buildup_factors):
         mu_x = layer.linear_attenuation_coeff * layer.thickness_cm
         transmission *= B * math.exp(-mu_x)
-    
+
     return unshielded_dose_rate * transmission

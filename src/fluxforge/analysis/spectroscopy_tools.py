@@ -60,7 +60,7 @@ def _gaussian_unit(x: np.ndarray, x0: float, sigma: float) -> np.ndarray:
 def _poly_baseline(x: np.ndarray, coeffs: List[float]) -> np.ndarray:
     baseline = np.zeros_like(x, dtype=float)
     for power, coef in enumerate(coeffs):
-        baseline += coef * (x ** power)
+        baseline += coef * (x**power)
     return baseline
 
 
@@ -86,7 +86,9 @@ def fit_gaussian_baseline(
         raise ValueError("Not enough data points in fit window.")
 
     def model(x, amplitude, centroid, sigma, *baseline_coeffs):
-        return amplitude * _gaussian_unit(x, centroid, sigma) + _poly_baseline(x, list(baseline_coeffs))
+        return amplitude * _gaussian_unit(x, centroid, sigma) + _poly_baseline(
+            x, list(baseline_coeffs)
+        )
 
     guess = [max(y), 0.5 * (e_min + e_max), 0.1 * (e_max - e_min)]
     guess.extend([0.0] * (baseline_order + 1))

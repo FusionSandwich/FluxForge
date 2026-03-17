@@ -113,7 +113,10 @@ def test_line_activities_roundtrip(tmp_path):
     assert payload["lines"][0]["atoms"] == 72.0
     assert payload["lines"][0]["radioisotope_specific_activity_Bq_g"] == 1.2e21
     assert payload["lines"][0]["specific_activity_Bq_g"] == 20.0
-    assert payload["provenance"]["definitions"]["activity_Bq"] == "activity at count time unless corrected"
+    assert (
+        payload["provenance"]["definitions"]["activity_Bq"]
+        == "activity at count time unless corrected"
+    )
     assert payload["provenance"]["units"]["activity_Bq"] == "Bq"
 
 
@@ -128,7 +131,10 @@ def test_reaction_rates_roundtrip(tmp_path):
     payload = read_reaction_rates(output)
     assert validate_artifact(payload) == []
     assert payload["rates"][0]["rate"] == 1.5
-    assert payload["provenance"]["definitions"]["rate"] == "reaction rate at EOI per reaction"
+    assert (
+        payload["provenance"]["definitions"]["rate"]
+        == "reaction rate at EOI per reaction"
+    )
     assert payload["provenance"]["units"]["rate"] == "reactions/s"
 
 
@@ -144,7 +150,10 @@ def test_response_bundle_roundtrip(tmp_path):
     payload = read_response_bundle(output)
     assert validate_artifact(payload) == []
     assert payload["matrix"][0][0] == 1.0
-    assert payload["provenance"]["definitions"]["matrix"] == "response matrix with rows as reactions and columns as energy groups"
+    assert (
+        payload["provenance"]["definitions"]["matrix"]
+        == "response matrix with rows as reactions and columns as energy groups"
+    )
     assert payload["provenance"]["units"]["boundaries_eV"] == "eV"
 
 
@@ -163,7 +172,10 @@ def test_unfold_result_roundtrip(tmp_path):
     payload = read_unfold_result(output)
     assert validate_artifact(payload) == []
     assert payload["flux"] == [1.2]
-    assert payload["provenance"]["definitions"]["flux"] == "group-integrated flux per energy bin"
+    assert (
+        payload["provenance"]["definitions"]["flux"]
+        == "group-integrated flux per energy bin"
+    )
     assert payload["provenance"]["units"]["flux"] == "a.u."
 
 
@@ -180,7 +192,10 @@ def test_validation_bundle_roundtrip(tmp_path):
     payload = read_validation_bundle(output)
     assert validate_artifact(payload) == []
     assert payload["metrics"]["mae"] == 0.1
-    assert payload["provenance"]["definitions"]["residuals"] == "predicted_flux - truth_flux"
+    assert (
+        payload["provenance"]["definitions"]["residuals"]
+        == "predicted_flux - truth_flux"
+    )
     assert payload["provenance"]["units"]["residuals"] == "a.u."
 
 
@@ -191,19 +206,33 @@ def test_report_bundle_roundtrip(tmp_path):
         output,
         summary={"peak_count": 3},
         inputs={"peaks_file": "peaks.json"},
-        figures={"directory": "report_figures", "items": {"spectrum_preview": {"path": "spectrum_preview.png"}}},
-        tables={"directory": "report_tables", "items": {"activity_summary": {"path": "activity_summary.csv"}}},
+        figures={
+            "directory": "report_figures",
+            "items": {"spectrum_preview": {"path": "spectrum_preview.png"}},
+        },
+        tables={
+            "directory": "report_tables",
+            "items": {"activity_summary": {"path": "activity_summary.csv"}},
+        },
         text_report={"path": "report.txt", "format": "text/plain"},
     )
     payload = read_report_bundle(output)
     assert validate_artifact(payload) == []
     assert payload["summary"]["peak_count"] == 3
     assert payload["figures"]["directory"] == "report_figures"
-    assert payload["figures"]["items"]["spectrum_preview"]["path"] == "spectrum_preview.png"
+    assert (
+        payload["figures"]["items"]["spectrum_preview"]["path"]
+        == "spectrum_preview.png"
+    )
     assert payload["tables"]["directory"] == "report_tables"
-    assert payload["tables"]["items"]["activity_summary"]["path"] == "activity_summary.csv"
+    assert (
+        payload["tables"]["items"]["activity_summary"]["path"] == "activity_summary.csv"
+    )
     assert payload["text_report"]["path"] == "report.txt"
-    assert payload["provenance"]["definitions"]["summary"] == "aggregate summary across artifacts"
+    assert (
+        payload["provenance"]["definitions"]["summary"]
+        == "aggregate summary across artifacts"
+    )
     assert payload["provenance"]["units"]["summary"] == "mixed"
 
 
@@ -250,8 +279,14 @@ def test_detector_characterization_roundtrip(tmp_path):
         detector_id="hpge-01",
         reference_position_mm=200.0,
         characterized_positions_mm=[100.0, 200.0],
-        calibration_points=[{"position_mm": 200.0, "reference_energy_keV": 661.7, "efficiency": 0.01}],
-        efficiency_model={"model_type": "log_poly", "coefficients": [-5.0, -0.8, 0.02], "energy_range_keV": [50.0, 2000.0]},
+        calibration_points=[
+            {"position_mm": 200.0, "reference_energy_keV": 661.7, "efficiency": 0.01}
+        ],
+        efficiency_model={
+            "model_type": "log_poly",
+            "coefficients": [-5.0, -0.8, 0.02],
+            "energy_range_keV": [50.0, 2000.0],
+        },
         geometry_conversions={"items": {"100": {"ratio_mean": 3.0, "ratio_std": 0.1}}},
         peak_to_total_model={"method": "constant_ratio", "value": 0.32},
         coincidence_model={"mode": "not_applied", "applied": False},
@@ -271,7 +306,12 @@ def test_facility_characterization_roundtrip(tmp_path):
         method="bare_triple_monitor",
         monitor_definitions=[{"monitor_id": "Au-197", "activity": 1000.0}],
         irradiation={"irradiation_time_s": 600.0},
-        flux_parameters={"f": 25.0, "alpha": 0.01, "phi_thermal": 1.0e12, "phi_epithermal": 4.0e10},
+        flux_parameters={
+            "f": 25.0,
+            "alpha": 0.01,
+            "phi_thermal": 1.0e12,
+            "phi_epithermal": 4.0e10,
+        },
         temperature={"value_K": 300.0, "method": "assumed_cooling_water"},
         capability_flags={"supports_thermal_inaa": "validated"},
     )
@@ -285,8 +325,12 @@ def test_k0_analysis_bundle_roundtrip(tmp_path):
     write_k0_analysis_bundle(
         output,
         summary={"element_count": 1},
-        line_results=[{"element": "Co", "concentration_ug_g": 12.0, "concentration_unc_ug_g": 0.6}],
-        element_results=[{"element": "Co", "concentration_ug_g": 12.0, "concentration_unc_ug_g": 0.6}],
+        line_results=[
+            {"element": "Co", "concentration_ug_g": 12.0, "concentration_unc_ug_g": 0.6}
+        ],
+        element_results=[
+            {"element": "Co", "concentration_ug_g": 12.0, "concentration_unc_ug_g": 0.6}
+        ],
         rejected_observations=[{"peak_id": "bad_line"}],
         applied_corrections=["saturation_decay_counting"],
         recognized_but_not_applied=["westcott_gT_not_applied:Lu-176"],
@@ -304,8 +348,17 @@ def test_k0_aggregation_bundle_roundtrip(tmp_path):
     write_k0_aggregation_bundle(
         output,
         summary={"aggregated_result_count": 1},
-        aggregated_results=[{"element": "Co", "concentration_ug_g": 11.0, "concentration_unc_ug_g": 0.8}],
-        irradiation_summaries=[{"element": "Co", "irradiation_id": "irr-1", "concentration_ug_g": 11.0, "concentration_unc_ug_g": 0.8}],
+        aggregated_results=[
+            {"element": "Co", "concentration_ug_g": 11.0, "concentration_unc_ug_g": 0.8}
+        ],
+        irradiation_summaries=[
+            {
+                "element": "Co",
+                "irradiation_id": "irr-1",
+                "concentration_ug_g": 11.0,
+                "concentration_unc_ug_g": 0.8,
+            }
+        ],
     )
     payload = read_k0_aggregation_bundle(output)
     assert validate_artifact(payload) == []

@@ -30,7 +30,10 @@ def _region_bounds_in_energy(
     if region.get("left_keV") is not None and region.get("right_keV") is not None:
         lo = float(region["left_keV"])
         hi = float(region["right_keV"])
-    elif region.get("left_channel") is not None and region.get("right_channel") is not None:
+    elif (
+        region.get("left_channel") is not None
+        and region.get("right_channel") is not None
+    ):
         lo = float(energies[int(round(float(region["left_channel"])))])
         hi = float(energies[int(round(float(region["right_channel"])))])
     else:
@@ -110,4 +113,3 @@ def plot_gamma_spectrum(
 
     fig.tight_layout()
     return fig, ax
-

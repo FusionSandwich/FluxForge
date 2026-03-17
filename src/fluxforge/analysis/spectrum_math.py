@@ -33,7 +33,9 @@ def _spectrum_energies(spectrum: GammaSpectrum) -> Optional[np.ndarray]:
         return np.asarray(spectrum.energies, dtype=float)
     calibration = spectrum.calibration.get("energy") if spectrum.calibration else None
     if calibration:
-        return np.asarray(spectrum.calibrate_channels(coefficients=list(calibration)), dtype=float)
+        return np.asarray(
+            spectrum.calibrate_channels(coefficients=list(calibration)), dtype=float
+        )
     return None
 
 
@@ -55,38 +57,44 @@ def _resample_background_to_sample_energy(
         return background, False
 
     n_min = min(len(sample_energies), len(background_energies))
-    if (
-        len(sample_energies) == len(background_energies)
-        and np.allclose(sample_energies[:n_min], background_energies[:n_min], atol=atol_keV, rtol=rtol)
+    if len(sample_energies) == len(background_energies) and np.allclose(
+        sample_energies[:n_min], background_energies[:n_min], atol=atol_keV, rtol=rtol
     ):
         return background, False
 
     background_counts = np.asarray(background.counts, dtype=float)
     background_unc = np.asarray(background.counts_uncertainty, dtype=float)
-    resampled_counts = np.interp(sample_energies, background_energies, background_counts, left=0.0, right=0.0)
+    resampled_counts = np.interp(
+        sample_energies, background_energies, background_counts, left=0.0, right=0.0
+    )
     resampled_variance = np.interp(
         sample_energies,
         background_energies,
-        background_unc ** 2,
+        background_unc**2,
         left=0.0,
         right=0.0,
     )
     metadata = dict(background.metadata)
     metadata["energy_resampled_to_sample_grid"] = True
-    metadata["resampled_from_energy_calibration"] = list(background.calibration.get("energy", []))
-    return GammaSpectrum(
-        counts=resampled_counts,
-        counts_uncertainty=np.sqrt(np.maximum(resampled_variance, 0.0)),
-        channels=np.asarray(sample.channels).copy(),
-        energies=np.asarray(sample_energies, dtype=float).copy(),
-        live_time=float(background.live_time),
-        real_time=float(background.real_time),
-        start_time=background.start_time,
-        spectrum_id=background.spectrum_id,
-        detector_id=background.detector_id,
-        calibration=dict(sample.calibration),
-        metadata=metadata,
-    ), True
+    metadata["resampled_from_energy_calibration"] = list(
+        background.calibration.get("energy", [])
+    )
+    return (
+        GammaSpectrum(
+            counts=resampled_counts,
+            counts_uncertainty=np.sqrt(np.maximum(resampled_variance, 0.0)),
+            channels=np.asarray(sample.channels).copy(),
+            energies=np.asarray(sample_energies, dtype=float).copy(),
+            live_time=float(background.live_time),
+            real_time=float(background.real_time),
+            start_time=background.start_time,
+            spectrum_id=background.spectrum_id,
+            detector_id=background.detector_id,
+            calibration=dict(sample.calibration),
+            metadata=metadata,
+        ),
+        True,
+    )
 
 
 def _align_spectra(
@@ -196,9 +204,16 @@ def moving_average(
     window = np.ones(2 * width + 1, dtype=float)
     smoothed = np.convolve(counts, window, mode="valid") / window.size
     channels = spectrum.channels[width:-width]
-    uncertainty = np.sqrt(
-        np.convolve(np.asarray(spectrum.counts_uncertainty, dtype=float) ** 2, window, mode="valid")
-    ) / window.size
+    uncertainty = (
+        np.sqrt(
+            np.convolve(
+                np.asarray(spectrum.counts_uncertainty, dtype=float) ** 2,
+                window,
+                mode="valid",
+            )
+        )
+        / window.size
+    )
 
     return GammaSpectrum(
         counts=smoothed,
@@ -284,9 +299,15 @@ def subtract_measured_background(
             )
         return GammaSpectrum(
             counts=np.asarray(sample.counts, dtype=float).copy(),
-            counts_uncertainty=np.asarray(sample.counts_uncertainty, dtype=float).copy(),
+            counts_uncertainty=np.asarray(
+                sample.counts_uncertainty, dtype=float
+            ).copy(),
             channels=np.asarray(sample.channels, dtype=int).copy(),
-            energies=np.asarray(sample.energies, dtype=float).copy() if sample.energies is not None else None,
+            energies=(
+                np.asarray(sample.energies, dtype=float).copy()
+                if sample.energies is not None
+                else None
+            ),
             live_time=float(sample.live_time),
             real_time=float(sample.real_time),
             start_time=sample.start_time,
@@ -296,12 +317,18 @@ def subtract_measured_background(
             metadata=dict(sample.metadata),
         )
 
-    aligned_background, energy_aligned = _resample_background_to_sample_energy(sample, background)
+    aligned_background, energy_aligned = _resample_background_to_sample_energy(
+        sample, background
+    )
     aligned = _align_spectra(sample, aligned_background)
-    scale_factor = _resolve_scale_factor(sample, background, mode=mode, manual_scale=manual_scale)
+    scale_factor = _resolve_scale_factor(
+        sample, background, mode=mode, manual_scale=manual_scale
+    )
 
     net_counts = aligned.left_counts - scale_factor * aligned.right_counts
-    variance = aligned.left_uncertainty**2 + (scale_factor**2) * aligned.right_uncertainty**2
+    variance = (
+        aligned.left_uncertainty**2 + (scale_factor**2) * aligned.right_uncertainty**2
+    )
     net_uncertainty = np.sqrt(np.maximum(variance, 0.0))
 
     negative_policy_normalized = negative_policy.lower()

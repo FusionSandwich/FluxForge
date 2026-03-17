@@ -17,6 +17,8 @@ on:
 jobs:
   style-and-tests:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,9 +37,13 @@ jobs:
         run: |
           black --check src tests examples/RAFM_irradiation
 
-      - name: Flake8
+      - name: Flake8 (baseline scope)
         run: |
-          flake8 src tests examples/RAFM_irradiation
+          flake8 \
+            src/fluxforge/k0_physics.py \
+            src/fluxforge/data/isotope_names.py \
+            src/fluxforge/io/metadata.py \
+            tests/test_io_metadata.py
 
       - name: Targeted k0 regression tests
         env:

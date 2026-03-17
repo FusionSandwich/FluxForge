@@ -18,7 +18,10 @@ BACKGROUND_ASC = RAFM_ROOT / "background.ASC"
 SAMPLE_ASC = RAFM_ROOT / "raw_gamma_spec" / "flux_wires" / "Co-Cd-RAFM-1_25cm.ASC"
 
 
-@pytest.mark.skipif(not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(), reason="RAFM example data not present")
+@pytest.mark.skipif(
+    not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(),
+    reason="RAFM example data not present",
+)
 def test_rafm_shared_background_subtraction_live_mode():
     background = read_genie_spectrum(BACKGROUND_ASC)
     sample = read_genie_spectrum(SAMPLE_ASC)
@@ -27,7 +30,9 @@ def test_rafm_shared_background_subtraction_live_mode():
     expected_scale = sample.live_time / background.live_time
 
     assert corrected.counts.shape == sample.counts.shape
-    assert corrected.metadata["background_subtraction"]["scale_factor"] == pytest.approx(expected_scale)
+    assert corrected.metadata["background_subtraction"][
+        "scale_factor"
+    ] == pytest.approx(expected_scale)
     assert corrected.counts_uncertainty.shape == sample.counts.shape
 
 
@@ -50,7 +55,10 @@ def test_astm_profile_aliases_are_listed_and_match_rafm_defaults():
     assert us_astm.efficiency == pytest.approx(rafm.efficiency)
 
 
-@pytest.mark.skipif(not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(), reason="RAFM example data not present")
+@pytest.mark.skipif(
+    not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(),
+    reason="RAFM example data not present",
+)
 def test_rafm_analysis_runs_with_shared_background():
     background = read_genie_spectrum(BACKGROUND_ASC)
     sample = read_genie_spectrum(SAMPLE_ASC)
@@ -66,10 +74,15 @@ def test_rafm_analysis_runs_with_shared_background():
             background_subtract=True,
         )
     assert len(peaks) > 0
-    assert not any("requires non-negative counts" in str(item.message) for item in caught)
+    assert not any(
+        "requires non-negative counts" in str(item.message) for item in caught
+    )
 
 
-@pytest.mark.skipif(not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(), reason="RAFM example data not present")
+@pytest.mark.skipif(
+    not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(),
+    reason="RAFM example data not present",
+)
 @pytest.mark.parametrize("profile_name", ["rafm_25cm", "astm_inl_dosimetry"])
 def test_rafm_profile_supplies_background_and_efficiency_defaults(profile_name: str):
     data = read_raw_asc(SAMPLE_ASC, profile_name=profile_name)
@@ -89,5 +102,9 @@ def test_rafm_profile_supplies_background_and_efficiency_defaults(profile_name: 
     assert data.efficiency is not None
     assert data.efficiency.C1 == pytest.approx(-20.26)
     assert len(peaks) > 0
-    assert not any("no background spectrum was provided" in str(item.message) for item in caught)
-    assert not any("requires non-negative counts" in str(item.message) for item in caught)
+    assert not any(
+        "no background spectrum was provided" in str(item.message) for item in caught
+    )
+    assert not any(
+        "requires non-negative counts" in str(item.message) for item in caught
+    )

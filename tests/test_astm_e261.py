@@ -71,7 +71,9 @@ def test_analyze_astm_e261_plan_builds_fluence_bundle(tmp_path: Path) -> None:
 
 def test_astm_e261_cli_parser_registers_command() -> None:
     parser = cli_app.build_parser()
-    args = parser.parse_args(["astm-e261", "--plan-file", "plan.json", "--output", "out.json"])
+    args = parser.parse_args(
+        ["astm-e261", "--plan-file", "plan.json", "--output", "out.json"]
+    )
 
     assert args.plan_file.name == "plan.json"
     assert args.output.name == "out.json"
@@ -105,7 +107,9 @@ def test_astm_e261_cli_command_writes_output(tmp_path: Path) -> None:
     plan_path.write_text(json.dumps(plan), encoding="utf-8")
 
     parser = cli_app.build_parser()
-    args = parser.parse_args(["astm-e261", "--plan-file", str(plan_path), "--output", str(output_path)])
+    args = parser.parse_args(
+        ["astm-e261", "--plan-file", str(plan_path), "--output", str(output_path)]
+    )
     args.func(args)
 
     assert output_path.exists()

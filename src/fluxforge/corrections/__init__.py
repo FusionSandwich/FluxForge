@@ -6,6 +6,6 @@ from fluxforge.corrections.coincidence import (
 )
 
 __all__ = [
-    'CoincidenceCorrection',
-    'CoincidenceCorrector',
+    "CoincidenceCorrection",
+    "CoincidenceCorrector",
 ]

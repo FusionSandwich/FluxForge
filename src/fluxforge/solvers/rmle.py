@@ -33,7 +33,7 @@ from scipy import linalg, optimize, sparse
 
 class RegularizationType(Enum):
     """Types of regularization."""
-    
+
     NONE = "none"  # No regularization (MLE)
     TIKHONOV = "tikhonov"  # Tikhonov (L2) regularization
     TIKHONOV_DERIVATIVE = "tikhonov_derivative"  # Tikhonov on 1st derivative
@@ -45,7 +45,7 @@ class RegularizationType(Enum):
 
 class ParameterSelection(Enum):
     """Methods for regularization parameter selection."""
-    
+
     FIXED = "fixed"  # User-specified value
     L_CURVE = "l_curve"  # L-curve method
     GCV = "gcv"  # Generalized Cross-Validation
@@ -67,7 +67,7 @@ class PoissonPenalty(Enum):
 class SpectrumData:
     """
     Gamma spectrum data.
-    
+
     Attributes:
         counts: Channel counts
         channels: Channel numbers
@@ -75,28 +75,28 @@ class SpectrumData:
         energy_calibration: Function mapping channel to energy
         uncertainty: Count uncertainties (sqrt(counts) if not provided)
     """
-    
+
     counts: np.ndarray
     channels: Optional[np.ndarray] = None
     live_time_s: float = 1.0
     energy_calibration: Optional[Callable[[np.ndarray], np.ndarray]] = None
     uncertainty: Optional[np.ndarray] = None
-    
+
     def __post_init__(self):
         if self.channels is None:
             self.channels = np.arange(len(self.counts))
         if self.uncertainty is None:
             self.uncertainty = np.sqrt(np.maximum(self.counts, 1))
-    
+
     @property
     def n_channels(self) -> int:
         return len(self.counts)
-    
+
     @property
     def count_rate(self) -> np.ndarray:
         """Count rate in counts per second."""
         return self.counts / self.live_time_s
-    
+
     def get_energies(self) -> np.ndarray:
         """Get energy values for channels."""
         if self.energy_calibration:
@@ -108,49 +108,49 @@ class SpectrumData:
 class PeakModel:
     """
     Model for a gamma peak.
-    
+
     Attributes:
         centroid: Peak centroid (channel or energy)
         sigma: Peak width (Gaussian sigma)
         amplitude: Peak amplitude
         amplitude_unc: Uncertainty in amplitude
     """
-    
+
     centroid: float
     sigma: float
     amplitude: float = 0.0
     amplitude_unc: float = 0.0
-    
+
     def evaluate(self, x: np.ndarray) -> np.ndarray:
         """Evaluate Gaussian peak shape."""
-        return self.amplitude * np.exp(-0.5 * ((x - self.centroid) / self.sigma)**2)
+        return self.amplitude * np.exp(-0.5 * ((x - self.centroid) / self.sigma) ** 2)
 
 
 @dataclass
 class ResponseMatrix:
     """
     Detector response matrix for spectrum unfolding.
-    
+
     R[i,j] = probability that a photon of energy j is detected in channel i
-    
+
     Attributes:
         matrix: Response matrix (n_channels x n_energy_bins)
         channel_edges: Channel bin edges
         energy_edges: Energy bin edges
     """
-    
+
     matrix: np.ndarray
     channel_edges: Optional[np.ndarray] = None
     energy_edges: Optional[np.ndarray] = None
-    
+
     @property
     def n_channels(self) -> int:
         return self.matrix.shape[0]
-    
+
     @property
     def n_energy_bins(self) -> int:
         return self.matrix.shape[1]
-    
+
     def normalize_columns(self) -> "ResponseMatrix":
         """Normalize each column to sum to 1."""
         col_sums = np.sum(self.matrix, axis=0)
@@ -167,7 +167,7 @@ class ResponseMatrix:
 class UnfoldingResult:
     """
     Result of spectrum unfolding.
-    
+
     Attributes:
         solution: Unfolded spectrum (activity or counts in energy bins)
         uncertainty: Uncertainty in solution
@@ -178,7 +178,7 @@ class UnfoldingResult:
         residuals: Fit residuals
         converged: Whether algorithm converged
     """
-    
+
     solution: np.ndarray
     uncertainty: np.ndarray
     covariance: Optional[np.ndarray] = None
@@ -188,12 +188,12 @@ class UnfoldingResult:
     residuals: Optional[np.ndarray] = None
     converged: bool = True
     diagnostics: Dict = field(default_factory=dict)
-    
+
     @property
     def n_dof(self) -> int:
         """Degrees of freedom."""
         return len(self.residuals) if self.residuals is not None else 0
-    
+
     @property
     def reduced_chi_squared(self) -> float:
         """Reduced chi-squared."""
@@ -270,11 +270,11 @@ class PoissonRMLEConfig:
     prior_uncertainties: Optional[np.ndarray] = None
     prior_weight: float = 1.0
     contaminant_mask: Optional[np.ndarray] = None
-    
+
     def has_priors(self) -> bool:
         """Check if informative priors are specified."""
         return (
-            self.prior_activities is not None 
+            self.prior_activities is not None
             and self.prior_uncertainties is not None
             and len(self.prior_activities) > 0
         )
@@ -289,24 +289,24 @@ def _prior_penalty(
     """Compute prior constraint penalty: Σ [(μ - μ₀)² / σ₀²]."""
     if prior_mean is None or prior_sigma is None:
         return 0.0
-    
+
     n = len(mu)
     if len(prior_mean) != n or len(prior_sigma) != n:
         return 0.0
-    
+
     # Apply mask if provided
     if mask is not None:
         active = mask.astype(bool)
     else:
         # Only constrain components with finite, positive sigma
         active = (prior_sigma > 0) & np.isfinite(prior_sigma)
-    
+
     if not np.any(active):
         return 0.0
-    
+
     residuals = (mu - prior_mean)[active]
     weights = 1.0 / (prior_sigma[active] ** 2)
-    
+
     return float(np.sum(residuals**2 * weights))
 
 
@@ -318,26 +318,26 @@ def _prior_grad(
 ) -> np.ndarray:
     """Gradient of prior constraint penalty."""
     grad = np.zeros_like(mu)
-    
+
     if prior_mean is None or prior_sigma is None:
         return grad
-    
+
     n = len(mu)
     if len(prior_mean) != n or len(prior_sigma) != n:
         return grad
-    
+
     # Apply mask
     if mask is not None:
         active = mask.astype(bool)
     else:
         active = (prior_sigma > 0) & np.isfinite(prior_sigma)
-    
+
     if not np.any(active):
         return grad
-    
+
     # d/dμ [(μ - μ₀)² / σ₀²] = 2(μ - μ₀) / σ₀²
     grad[active] = 2.0 * (mu - prior_mean)[active] / (prior_sigma[active] ** 2)
-    
+
     return grad
 
 
@@ -457,7 +457,9 @@ def poisson_rmle_unfolding(
     def objective(x: np.ndarray) -> float:
         mu, b = unpack(x)
         m = R @ mu + b
-        return _poisson_nll(m, y, config.eps) + config.alpha * _penalty_value(mu, config.penalty, config.eps)
+        return _poisson_nll(m, y, config.eps) + config.alpha * _penalty_value(
+            mu, config.penalty, config.eps
+        )
 
     def gradient(x: np.ndarray) -> np.ndarray:
         mu, b = unpack(x)
@@ -497,7 +499,11 @@ def poisson_rmle_unfolding(
         pearson_chi2 = float(np.sum((resid**2) / np.maximum(m_hat, 1.0)))
         red = pearson_chi2 / max(n_channels - n_bins, 1)
 
-        converged = bool(opt.success) and np.isfinite(red) and (red < config.guardrail_max_reduced_chi2)
+        converged = (
+            bool(opt.success)
+            and np.isfinite(red)
+            and (red < config.guardrail_max_reduced_chi2)
+        )
 
         diagnostics = {
             "solver": "poisson_rmle",
@@ -609,50 +615,50 @@ def create_gaussian_response_matrix(
 ) -> ResponseMatrix:
     """
     Create Gaussian response matrix for HPGe detector.
-    
+
     Args:
         n_channels: Number of detector channels
         n_energy_bins: Number of energy bins
         fwhm_function: Function giving FWHM at each energy
         efficiency_function: Detection efficiency function
         energy_range: Energy range (keV)
-        
+
     Returns:
         ResponseMatrix
     """
     channel_edges = np.linspace(0, n_channels, n_channels + 1)
     energy_edges = np.linspace(energy_range[0], energy_range[1], n_energy_bins + 1)
-    
+
     # Energy centers
     energies = (energy_edges[:-1] + energy_edges[1:]) / 2
     channels = np.arange(n_channels)
-    
+
     # Assume linear energy calibration for simplicity
     keV_per_channel = (energy_range[1] - energy_range[0]) / n_channels
-    
+
     matrix = np.zeros((n_channels, n_energy_bins))
-    
+
     for j, E in enumerate(energies):
         # Peak centroid in channel space
         centroid = (E - energy_range[0]) / keV_per_channel
-        
+
         # FWHM in channels
         fwhm_keV = fwhm_function(E)
         sigma = fwhm_keV / (2.355 * keV_per_channel)
         sigma = max(sigma, 0.5)  # Minimum width
-        
+
         # Efficiency
         if efficiency_function:
             eff = efficiency_function(E)
         else:
             eff = 1.0
-        
+
         # Gaussian peak
-        peak = eff * np.exp(-0.5 * ((channels - centroid) / sigma)**2)
+        peak = eff * np.exp(-0.5 * ((channels - centroid) / sigma) ** 2)
         peak /= np.sum(peak) if np.sum(peak) > 0 else 1
-        
+
         matrix[:, j] = peak
-    
+
     return ResponseMatrix(
         matrix=matrix,
         channel_edges=channel_edges,
@@ -663,11 +669,11 @@ def create_gaussian_response_matrix(
 def tikhonov_matrix(n: int, order: int = 0) -> np.ndarray:
     """
     Create Tikhonov regularization matrix.
-    
+
     Args:
         n: Matrix dimension
         order: Derivative order (0=identity, 1=first derivative, 2=second)
-        
+
     Returns:
         Regularization matrix L
     """
@@ -715,15 +721,15 @@ def rmle_unfolding(
 ) -> UnfoldingResult:
     """
     Perform RMLE spectrum unfolding.
-    
+
     Solves the inverse problem:
         d = R @ s + noise
     where d is the observed spectrum, R is the response matrix,
     and s is the unknown source spectrum to recover.
-    
+
     Uses regularization to handle ill-posedness:
         min_s ||R @ s - d||² + λ² ||L @ s||²
-    
+
     Args:
         spectrum: Observed spectrum data
         response: Detector response matrix
@@ -733,16 +739,16 @@ def rmle_unfolding(
         max_iterations: Maximum iterations
         tolerance: Convergence tolerance
         enforce_positivity: Enforce non-negative solution
-        
+
     Returns:
         UnfoldingResult with unfolded spectrum
     """
     d = spectrum.counts
     sigma = spectrum.uncertainty
     R = response.matrix
-    
+
     n_channels, n_bins = R.shape
-    
+
     # Build regularization matrix
     if regularization == RegularizationType.NONE:
         L = np.zeros((1, n_bins))
@@ -755,10 +761,10 @@ def rmle_unfolding(
         L = tikhonov_matrix(n_bins, order=2)
     else:
         L = tikhonov_matrix(n_bins, order=0)
-    
+
     # Weight by uncertainties
     W = np.diag(1.0 / sigma)
-    
+
     # Automatic parameter selection
     if param_selection == ParameterSelection.L_CURVE:
         reg_param = select_lambda_lcurve(d, R, W, L)
@@ -767,7 +773,7 @@ def rmle_unfolding(
     elif param_selection == ParameterSelection.AUTOMATIC:
         # Use L-curve as default automatic method
         reg_param = select_lambda_lcurve(d, R, W, L)
-    
+
     # Solve regularized least squares
     if enforce_positivity:
         solution, n_iter, converged = solve_nnls_regularized(
@@ -780,12 +786,12 @@ def rmle_unfolding(
         solution, residuals, rank, s = linalg.lstsq(A, b)
         n_iter = 1
         converged = True
-    
+
     # Calculate fit quality
     expected = R @ solution
     residuals = d - expected
     chi_sq = calculate_chi_squared(d, expected, sigma)
-    
+
     # Calculate uncertainty via error propagation
     try:
         # Covariance of solution
@@ -793,7 +799,7 @@ def rmle_unfolding(
         LtL = L.T @ L
         H = RtWR + reg_param**2 * LtL
         H_inv = linalg.inv(H)
-        
+
         # Propagate input uncertainty
         data_cov = np.diag(sigma**2)
         G = H_inv @ R.T @ W.T @ W
@@ -802,7 +808,7 @@ def rmle_unfolding(
     except Exception:
         solution_cov = None
         solution_unc = solution * 0.1  # Default 10% uncertainty
-    
+
     return UnfoldingResult(
         solution=solution,
         uncertainty=solution_unc,
@@ -832,13 +838,13 @@ def solve_nnls_regularized(
 ) -> Tuple[np.ndarray, int, bool]:
     """
     Solve regularized non-negative least squares.
-    
+
     Uses active set method with regularization.
     """
     # Build augmented system
     A = np.vstack([W @ R, reg_param * L])
     b = np.concatenate([W @ d, np.zeros(L.shape[0])])
-    
+
     # Solve using scipy NNLS
     try:
         solution, residual_norm = optimize.nnls(A, b)
@@ -859,17 +865,17 @@ def select_lambda_lcurve(
 ) -> float:
     """
     Select regularization parameter using L-curve method.
-    
+
     Finds the corner of the L-curve (log residual norm vs log solution norm).
     """
     lambdas = np.logspace(-4, 4, n_points)
     residual_norms = []
     solution_norms = []
-    
+
     for lam in lambdas:
         A = np.vstack([W @ R, lam * L])
         b = np.concatenate([W @ d, np.zeros(L.shape[0])])
-        
+
         try:
             solution, _, _, _ = linalg.lstsq(A, b)
             residual = W @ (R @ solution - d)
@@ -878,11 +884,11 @@ def select_lambda_lcurve(
         except Exception:
             residual_norms.append(np.inf)
             solution_norms.append(np.inf)
-    
+
     # Find corner using curvature
     log_res = np.log10(np.maximum(residual_norms, 1e-100))
     log_sol = np.log10(np.maximum(solution_norms, 1e-100))
-    
+
     # Calculate curvature (discrete approximation)
     curvature = np.zeros(len(lambdas))
     for i in range(1, len(lambdas) - 1):
@@ -890,11 +896,11 @@ def select_lambda_lcurve(
         dy = log_sol[i + 1] - log_sol[i - 1]
         ddx = log_res[i + 1] - 2 * log_res[i] + log_res[i - 1]
         ddy = log_sol[i + 1] - 2 * log_sol[i] + log_sol[i - 1]
-        
-        denom = (dx**2 + dy**2)**1.5
+
+        denom = (dx**2 + dy**2) ** 1.5
         if denom > 0:
             curvature[i] = abs(dx * ddy - dy * ddx) / denom
-    
+
     # Select lambda at maximum curvature
     best_idx = np.argmax(curvature)
     return lambdas[best_idx]
@@ -909,14 +915,14 @@ def select_lambda_gcv(
 ) -> float:
     """
     Select regularization parameter using Generalized Cross-Validation.
-    
+
     Minimizes GCV functional:
         GCV(λ) = ||A @ x - b||² / (n - trace(A @ A⁺))²
     """
     n = len(d)
     lambdas = np.logspace(-4, 4, n_points)
     gcv_values = []
-    
+
     for lam in lambdas:
         try:
             # Influence matrix
@@ -924,24 +930,24 @@ def select_lambda_gcv(
             LtL = L.T @ L
             H = RtWR + lam**2 * LtL
             H_inv = linalg.inv(H)
-            
+
             A_hat = R @ H_inv @ R.T @ W.T @ W  # Influence/hat matrix
-            
+
             solution = H_inv @ R.T @ W.T @ W @ d
             residual = W @ (R @ solution - d)
-            
+
             trace_A = np.trace(A_hat)
-            denom = (n - trace_A)**2
-            
+            denom = (n - trace_A) ** 2
+
             if denom > 0:
                 gcv = np.sum(residual**2) / denom
             else:
                 gcv = np.inf
-            
+
             gcv_values.append(gcv)
         except Exception:
             gcv_values.append(np.inf)
-    
+
     # Select lambda that minimizes GCV
     best_idx = np.argmin(gcv_values)
     return lambdas[best_idx]
@@ -950,12 +956,12 @@ def select_lambda_gcv(
 @dataclass
 class PeakFitResult:
     """Result of peak fitting."""
-    
+
     peaks: List[PeakModel]
     continuum: np.ndarray
     chi_squared: float
     residuals: np.ndarray
-    
+
     @property
     def n_peaks(self) -> int:
         return len(self.peaks)
@@ -969,37 +975,37 @@ def fit_peaks_mle(
 ) -> PeakFitResult:
     """
     Fit peaks using Maximum Likelihood Estimation.
-    
+
     Args:
         spectrum: Spectrum data
         peak_positions: Initial peak centroid positions
         fwhm_function: Function giving FWHM at each position
         fit_range: Channel range to fit (min, max)
-        
+
     Returns:
         PeakFitResult with fitted peaks
     """
     counts = spectrum.counts
     channels = spectrum.channels
-    
+
     if fit_range:
         mask = (channels >= fit_range[0]) & (channels <= fit_range[1])
         counts = counts[mask]
         channels = channels[mask]
-    
+
     n_peaks = len(peak_positions)
-    
+
     # Initial parameters: [amplitude1, ..., ampN, continuum_slope, continuum_intercept]
     initial_params = [np.max(counts) / 2] * n_peaks + [0, np.min(counts)]
-    
+
     # Model function
     def model(x, *params):
         result = params[-2] * x + params[-1]  # Linear continuum
         for i, pos in enumerate(peak_positions):
             sigma = fwhm_function(pos) / 2.355
-            result += params[i] * np.exp(-0.5 * ((x - pos) / sigma)**2)
+            result += params[i] * np.exp(-0.5 * ((x - pos) / sigma) ** 2)
         return result
-    
+
     # Fit using curve_fit (Levenberg-Marquardt)
     try:
         popt, pcov = optimize.curve_fit(
@@ -1011,36 +1017,36 @@ def fit_peaks_mle(
             absolute_sigma=True,
             maxfev=5000,
         )
-        
+
         perr = np.sqrt(np.diag(pcov))
-        
+
         # Build peak models
         peaks = []
         for i, pos in enumerate(peak_positions):
             sigma = fwhm_function(pos) / 2.355
-            peaks.append(PeakModel(
-                centroid=pos,
-                sigma=sigma,
-                amplitude=popt[i],
-                amplitude_unc=perr[i],
-            ))
-        
+            peaks.append(
+                PeakModel(
+                    centroid=pos,
+                    sigma=sigma,
+                    amplitude=popt[i],
+                    amplitude_unc=perr[i],
+                )
+            )
+
         # Calculate continuum and residuals
         full_channels = spectrum.channels
         continuum = popt[-2] * full_channels + popt[-1]
         expected = model(full_channels, *popt)
         residuals = spectrum.counts - expected
-        chi_sq = calculate_chi_squared(
-            spectrum.counts, expected, spectrum.uncertainty
-        )
-        
+        chi_sq = calculate_chi_squared(spectrum.counts, expected, spectrum.uncertainty)
+
         return PeakFitResult(
             peaks=peaks,
             continuum=continuum,
             chi_squared=chi_sq,
             residuals=residuals,
         )
-        
+
     except Exception as e:
         # Return empty result on failure
         return PeakFitResult(
@@ -1055,7 +1061,7 @@ def fit_peaks_mle(
 class ActivityResult:
     """
     Activity determination result.
-    
+
     Attributes:
         nuclide: Nuclide name
         activity_Bq: Activity in Becquerels
@@ -1065,7 +1071,7 @@ class ActivityResult:
         detection_limit_Bq: Detection limit (if applicable)
         is_detected: Whether activity is above detection limit
     """
-    
+
     nuclide: str
     activity_Bq: float
     uncertainty_Bq: float
@@ -1084,42 +1090,42 @@ def calculate_activity_from_peak(
 ) -> Tuple[float, float]:
     """
     Calculate activity from fitted peak.
-    
+
     Activity = counts / (ε × I × t × C_decay)
-    
+
     Args:
         peak: Fitted peak model
         efficiency: Detection efficiency at peak energy
         intensity: Gamma intensity (branching ratio)
         live_time_s: Spectrum live time
         decay_correction: Decay correction factor
-        
+
     Returns:
         Tuple of (activity_Bq, uncertainty_Bq)
     """
     # Net counts = peak area
     net_counts = peak.amplitude * peak.sigma * np.sqrt(2 * np.pi)
     net_unc = peak.amplitude_unc * peak.sigma * np.sqrt(2 * np.pi)
-    
+
     denom = efficiency * intensity * live_time_s * decay_correction
-    
+
     if denom > 0:
         activity = net_counts / denom
         uncertainty = net_unc / denom
     else:
         activity = 0.0
         uncertainty = 0.0
-    
+
     return activity, uncertainty
 
 
 class RMLEArtifact:
     """
     RMLE unfolding artifact for FluxForge pipeline.
-    
+
     Contains complete unfolding results and metadata.
     """
-    
+
     def __init__(
         self,
         spectrum: SpectrumData,
@@ -1130,15 +1136,15 @@ class RMLEArtifact:
         self.result = result
         self.response = response
         self._activities: List[ActivityResult] = []
-    
+
     def add_activity(self, activity: ActivityResult):
         """Add activity determination result."""
         self._activities.append(activity)
-    
+
     @property
     def activities(self) -> List[ActivityResult]:
         return self._activities
-    
+
     def to_dict(self) -> dict:
         """Export to dictionary."""
         return {

@@ -295,12 +295,22 @@ def test_aggregate_and_qaqc_k0_bundles():
                 "role": "blank",
                 "sample_id": "blank-1",
                 "default_limit_ug_g": 0.5,
-                "analysis_payload": {"element_results": [{"element": "Co", "concentration_ug_g": 0.1}]},
+                "analysis_payload": {
+                    "element_results": [{"element": "Co", "concentration_ug_g": 0.1}]
+                },
             },
             {
                 "role": "crm",
                 "sample_id": "crm-1",
-                "analysis_payload": {"element_results": [{"element": "Co", "concentration_ug_g": 10.5, "concentration_unc_ug_g": 0.5}]},
+                "analysis_payload": {
+                    "element_results": [
+                        {
+                            "element": "Co",
+                            "concentration_ug_g": 10.5,
+                            "concentration_unc_ug_g": 0.5,
+                        }
+                    ]
+                },
                 "certified_values": {"Co": {"value_ug_g": 10.0, "unc_ug_g": 0.5}},
             },
         ]

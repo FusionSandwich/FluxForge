@@ -30,11 +30,17 @@ class GammaLineMeasurement:
 
         decay_const = math.log(2.0) / self.half_life_s
         corrected_counts = self.net_counts / max(1.0 - self.dead_time_fraction, 1e-12)
-        buildup = (1.0 - math.exp(-decay_const * self.live_time_s)) / max(decay_const, 1e-12)
+        buildup = (1.0 - math.exp(-decay_const * self.live_time_s)) / max(
+            decay_const, 1e-12
+        )
         if buildup <= 0:
             raise ValueError("Live time must be positive to compute activity.")
-        activity_at_count_start = corrected_counts / (self.efficiency * self.gamma_intensity * buildup)
-        activity_ref = activity_at_count_start * math.exp(decay_const * self.cooling_time_s)
+        activity_at_count_start = corrected_counts / (
+            self.efficiency * self.gamma_intensity * buildup
+        )
+        activity_ref = activity_at_count_start * math.exp(
+            decay_const * self.cooling_time_s
+        )
         return activity_ref
 
 
@@ -54,7 +60,9 @@ class ReactionRateEstimate:
     uncertainty: float
 
 
-def weighted_activity(gamma_lines: Iterable[GammaLineMeasurement]) -> tuple[float, float]:
+def weighted_activity(
+    gamma_lines: Iterable[GammaLineMeasurement],
+) -> tuple[float, float]:
     """Compute a weighted mean activity and uncertainty from multiple lines."""
 
     activities = []
@@ -74,20 +82,26 @@ def weighted_activity(gamma_lines: Iterable[GammaLineMeasurement]) -> tuple[floa
     return weighted_mean, math.sqrt(combined_variance)
 
 
-def irradiation_buildup_factor(segments: Sequence[IrradiationSegment], half_life_s: float) -> float:
+def irradiation_buildup_factor(
+    segments: Sequence[IrradiationSegment], half_life_s: float
+) -> float:
     decay_const = math.log(2.0) / half_life_s
     total_duration = sum(seg.duration_s for seg in segments)
     elapsed = 0.0
     factor = 0.0
     for segment in segments:
         elapsed += segment.duration_s
-        segment_term = segment.relative_power * (1.0 - math.exp(-decay_const * segment.duration_s))
+        segment_term = segment.relative_power * (
+            1.0 - math.exp(-decay_const * segment.duration_s)
+        )
         decay_after = math.exp(-decay_const * (total_duration - elapsed))
         factor += segment_term * decay_after
     return factor
 
 
-def reaction_rate_from_activity(activity_eoi: float, segments: Sequence[IrradiationSegment], half_life_s: float) -> ReactionRateEstimate:
+def reaction_rate_from_activity(
+    activity_eoi: float, segments: Sequence[IrradiationSegment], half_life_s: float
+) -> ReactionRateEstimate:
     if activity_eoi < 0:
         raise ValueError("Activity must be non-negative.")
     factor = irradiation_buildup_factor(segments, half_life_s)
@@ -120,7 +134,9 @@ def infer_nuclide_atomic_mass_g_mol(isotope: str | None) -> float | None:
     return float(mass_number)
 
 
-def activity_to_radioactive_mass_g(activity_bq: float, half_life_s: float, isotope: str | None = None) -> float:
+def activity_to_radioactive_mass_g(
+    activity_bq: float, half_life_s: float, isotope: str | None = None
+) -> float:
     """Infer radioactive product mass from activity and half-life."""
 
     molar_mass = infer_nuclide_atomic_mass_g_mol(isotope)
@@ -130,7 +146,9 @@ def activity_to_radioactive_mass_g(activity_bq: float, half_life_s: float, isoto
     return (atoms / AVOGADRO) * molar_mass
 
 
-def radioisotope_specific_activity_bq_g(half_life_s: float, isotope: str | None = None) -> float:
+def radioisotope_specific_activity_bq_g(
+    half_life_s: float, isotope: str | None = None
+) -> float:
     """Return the specific activity of a pure radioactive isotope in Bq/g."""
 
     molar_mass = infer_nuclide_atomic_mass_g_mol(isotope)
@@ -151,11 +169,21 @@ def activation_study_metrics(
     """Build common activation-study metrics derived from activity."""
 
     decay_constant = math.log(2.0) / half_life_s if half_life_s > 0.0 else 0.0
-    radioisotope_specific_activity = radioisotope_specific_activity_bq_g(half_life_s, isotope=isotope)
+    radioisotope_specific_activity = radioisotope_specific_activity_bq_g(
+        half_life_s, isotope=isotope
+    )
     atoms = activity_to_atoms(activity_bq, half_life_s) if activity_bq > 0.0 else 0.0
-    atoms_unc = activity_to_atoms(activity_unc_bq, half_life_s) if activity_unc_bq > 0.0 else 0.0
-    radioactive_mass_g = activity_to_radioactive_mass_g(activity_bq, half_life_s, isotope=isotope)
-    radioactive_mass_unc_g = activity_to_radioactive_mass_g(activity_unc_bq, half_life_s, isotope=isotope)
+    atoms_unc = (
+        activity_to_atoms(activity_unc_bq, half_life_s)
+        if activity_unc_bq > 0.0
+        else 0.0
+    )
+    radioactive_mass_g = activity_to_radioactive_mass_g(
+        activity_bq, half_life_s, isotope=isotope
+    )
+    radioactive_mass_unc_g = activity_to_radioactive_mass_g(
+        activity_unc_bq, half_life_s, isotope=isotope
+    )
 
     payload = {
         "decay_constant_s": float(decay_constant),

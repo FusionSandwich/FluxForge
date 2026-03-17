@@ -22,7 +22,10 @@ SPECTRUM_FILE_SCHEMA: Dict[str, Any] = {
             "required": ["counts", "channels", "live_time", "real_time"],
             "properties": {
                 "counts": {"type": "array", "items": {"type": "number"}},
-                "counts_uncertainty": {"type": ["array", "null"], "items": {"type": "number"}},
+                "counts_uncertainty": {
+                    "type": ["array", "null"],
+                    "items": {"type": "number"},
+                },
                 "channels": {"type": "array", "items": {"type": "integer"}},
                 "energies": {"type": ["array", "null"], "items": {"type": "number"}},
                 "live_time": {"type": "number"},
@@ -95,7 +98,12 @@ LINE_ACTIVITIES_SCHEMA: Dict[str, Any] = {
             "type": "array",
             "items": {
                 "type": "object",
-                "required": ["energy_keV", "net_counts", "activity_Bq", "activity_unc_Bq"],
+                "required": [
+                    "energy_keV",
+                    "net_counts",
+                    "activity_Bq",
+                    "activity_unc_Bq",
+                ],
                 "properties": {
                     "energy_keV": {"type": "number"},
                     "isotope": {"type": "string"},
@@ -155,7 +163,10 @@ RESPONSE_BUNDLE_SCHEMA: Dict[str, Any] = {
     "required": ["schema", "matrix", "reactions", "boundaries_eV", "provenance"],
     "properties": {
         "schema": {"const": _schema_id("response_bundle")},
-        "matrix": {"type": "array", "items": {"type": "array", "items": {"type": "number"}}},
+        "matrix": {
+            "type": "array",
+            "items": {"type": "array", "items": {"type": "number"}},
+        },
         "reactions": {"type": "array", "items": {"type": "string"}},
         "boundaries_eV": {"type": "array", "items": {"type": "number"}},
         "provenance": {"type": "object"},
@@ -170,7 +181,10 @@ UNFOLD_RESULT_SCHEMA: Dict[str, Any] = {
     "properties": {
         "schema": {"const": _schema_id("unfold_result")},
         "flux": {"type": "array", "items": {"type": "number"}},
-        "covariance": {"type": "array", "items": {"type": "array", "items": {"type": "number"}}},
+        "covariance": {
+            "type": "array",
+            "items": {"type": "array", "items": {"type": "number"}},
+        },
         "chi2": {"type": "number"},
         "method": {"type": "string"},
         "diagnostics": {"type": "object"},
@@ -232,7 +246,13 @@ DETECTOR_CHARACTERIZATION_SCHEMA: Dict[str, Any] = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "DetectorCharacterization",
     "type": "object",
-    "required": ["schema", "detector_id", "reference_position_mm", "efficiency_model", "provenance"],
+    "required": [
+        "schema",
+        "detector_id",
+        "reference_position_mm",
+        "efficiency_model",
+        "provenance",
+    ],
     "properties": {
         "schema": {"const": _schema_id("detector_characterization")},
         "detector_id": {"type": "string"},
@@ -354,7 +374,14 @@ def validate_artifact(
     if not schema_id:
         return ["Missing schema identifier."]
 
-    schema = next((s for s in SCHEMAS.values() if s.get("properties", {}).get("schema", {}).get("const") == schema_id), None)
+    schema = next(
+        (
+            s
+            for s in SCHEMAS.values()
+            if s.get("properties", {}).get("schema", {}).get("const") == schema_id
+        ),
+        None,
+    )
     if schema is None:
         return [f"Unknown schema identifier: {schema_id}."]
 

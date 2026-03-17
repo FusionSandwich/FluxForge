@@ -45,48 +45,48 @@ import numpy as np
 
 class NJOYModule(Enum):
     """NJOY processing modules."""
-    
+
     RECONR = "reconr"  # Reconstruct pointwise from resonance parameters
     BROADR = "broadr"  # Doppler broadening
     UNRESR = "unresr"  # Unresolved resonance processing
-    HEATR = "heatr"    # Heating/KERMA calculation
+    HEATR = "heatr"  # Heating/KERMA calculation
     THERMR = "thermr"  # Thermal scattering treatment
     GROUPR = "groupr"  # Multi-group processing
     ERRORR = "errorr"  # Covariance processing
-    ACER = "acer"      # ACE format output
+    ACER = "acer"  # ACE format output
 
 
 class GroupStructure(Enum):
     """Standard group structures supported by NJOY."""
-    
-    VITAMIN_J = 1       # VITAMIN-J 175g
-    XMAS = 2            # XMAS 172g
-    ECCO_33 = 3         # ECCO 33g
-    ECCO_1968 = 4       # ECCO 1968g
-    GAM_II = 5          # GAM-II 68g
-    SAND_II = 6         # SAND-II 640g
-    WIMS_69 = 7         # WIMS 69g
-    SCALE_238 = 8       # SCALE 238g
-    SCALE_252 = 9       # SCALE 252g
-    CUSTOM = 0          # User-defined structure
+
+    VITAMIN_J = 1  # VITAMIN-J 175g
+    XMAS = 2  # XMAS 172g
+    ECCO_33 = 3  # ECCO 33g
+    ECCO_1968 = 4  # ECCO 1968g
+    GAM_II = 5  # GAM-II 68g
+    SAND_II = 6  # SAND-II 640g
+    WIMS_69 = 7  # WIMS 69g
+    SCALE_238 = 8  # SCALE 238g
+    SCALE_252 = 9  # SCALE 252g
+    CUSTOM = 0  # User-defined structure
 
 
 # Standard group structure boundaries (eV)
 GROUP_STRUCTURE_DATA = {
     GroupStructure.SAND_II: {
-        'name': 'SAND-II 640-group',
-        'n_groups': 640,
-        'description': 'Standard for activation foil analysis',
+        "name": "SAND-II 640-group",
+        "n_groups": 640,
+        "description": "Standard for activation foil analysis",
     },
     GroupStructure.VITAMIN_J: {
-        'name': 'VITAMIN-J 175-group',
-        'n_groups': 175,
-        'description': 'General purpose coupled n/gamma library structure',
+        "name": "VITAMIN-J 175-group",
+        "n_groups": 175,
+        "description": "General purpose coupled n/gamma library structure",
     },
     GroupStructure.SCALE_238: {
-        'name': 'SCALE 238-group',
-        'n_groups': 238,
-        'description': 'SCALE thermal reactor structure',
+        "name": "SCALE 238-group",
+        "n_groups": 238,
+        "description": "SCALE thermal reactor structure",
     },
 }
 
@@ -95,7 +95,7 @@ GROUP_STRUCTURE_DATA = {
 class NJOYInput:
     """
     NJOY input specification.
-    
+
     Attributes:
         endf_file: Path to ENDF tape file
         mat_number: Material (MAT) number in ENDF file
@@ -106,29 +106,33 @@ class NJOYInput:
         output_file: Path for output file
         tolerance: Reconstruction tolerance (default 0.001)
     """
-    
+
     endf_file: Path
     mat_number: int
     temperatures: List[float] = field(default_factory=lambda: [300.0])
     group_structure: GroupStructure = GroupStructure.SAND_II
     custom_boundaries: Optional[np.ndarray] = None
-    modules: List[NJOYModule] = field(default_factory=lambda: [
-        NJOYModule.RECONR, NJOYModule.BROADR, NJOYModule.GROUPR
-    ])
+    modules: List[NJOYModule] = field(
+        default_factory=lambda: [
+            NJOYModule.RECONR,
+            NJOYModule.BROADR,
+            NJOYModule.GROUPR,
+        ]
+    )
     output_file: Optional[Path] = None
     tolerance: float = 0.001
-    
+
     # Optional parameters
     mf: int = 3  # File type (3 = cross sections)
     mt_list: Optional[List[int]] = None  # Specific MTs to process
     description: str = ""
 
 
-@dataclass  
+@dataclass
 class NJOYResult:
     """
     Result from NJOY processing.
-    
+
     Attributes:
         success: Whether processing completed successfully
         group_boundaries: Energy group boundaries (eV)
@@ -139,7 +143,7 @@ class NJOYResult:
         log_file: Path to NJOY output log
         errors: List of error messages if any
     """
-    
+
     success: bool
     group_boundaries: Optional[np.ndarray] = None
     cross_sections: Dict[int, np.ndarray] = field(default_factory=dict)
@@ -148,18 +152,18 @@ class NJOYResult:
     provenance: Dict[str, Any] = field(default_factory=dict)
     log_file: Optional[Path] = None
     errors: List[str] = field(default_factory=list)
-    
+
     @property
     def n_groups(self) -> int:
         """Number of energy groups."""
         if self.group_boundaries is not None:
             return len(self.group_boundaries) - 1
         return 0
-    
+
     def get_xs(self, mt: int) -> Optional[np.ndarray]:
         """Get cross section for specific MT."""
         return self.cross_sections.get(mt)
-    
+
     def summary(self) -> str:
         """Generate summary string."""
         lines = [
@@ -196,7 +200,7 @@ def generate_broadr_input(
     """Generate BROADR module input."""
     n_temps = len(temperatures)
     temps_str = " ".join(f"{t:.1f}" for t in temperatures)
-    
+
     return f"""broadr
 {tape_in_endf} {tape_in_pendf} {tape_out}
 {mat} {n_temps} 0 0 0./
@@ -217,7 +221,7 @@ def generate_groupr_input(
 ) -> str:
     """
     Generate GROUPR module input.
-    
+
     Parameters
     ----------
     mat : int
@@ -231,7 +235,7 @@ def generate_groupr_input(
     """
     n_temps = len(temperatures)
     temps_str = " ".join(f"{t:.1f}" for t in temperatures)
-    
+
     lines = [
         "groupr",
         f"{tape_in_endf} {tape_in_pendf} 0 {tape_out}",
@@ -240,7 +244,7 @@ def generate_groupr_input(
         f"{temps_str}/",
         "0./",  # Infinite dilution (sigma0)
     ]
-    
+
     # Add custom group structure if specified
     if group_structure == 0 and custom_groups is not None:
         n_groups = len(custom_groups) - 1
@@ -248,13 +252,15 @@ def generate_groupr_input(
         # Write boundaries in NJOY format (high to low energy)
         for e in reversed(custom_groups):
             lines.append(f"{e:.5e}/")
-    
+
     # Process all MTs
     lines.append("3/")  # MF=3 cross sections
-    lines.append("3 1 2 4 16 18 102/")  # Total, elastic, inelastic, n2n, fission, capture
+    lines.append(
+        "3 1 2 4 16 18 102/"
+    )  # Total, elastic, inelastic, n2n, fission, capture
     lines.append("0/")  # End MF processing
     lines.append("0/")  # End material
-    
+
     return "\n".join(lines)
 
 
@@ -264,14 +270,14 @@ def generate_njoy_input(
 ) -> str:
     """
     Generate complete NJOY input deck.
-    
+
     Parameters
     ----------
     config : NJOYInput
         Processing configuration.
     tape_assignments : dict, optional
         Custom tape unit assignments.
-        
+
     Returns
     -------
     str
@@ -279,56 +285,62 @@ def generate_njoy_input(
     """
     if tape_assignments is None:
         tape_assignments = {
-            'endf_in': 20,
-            'pendf_reconr': 21,
-            'pendf_broadr': 22,
-            'gendf': 23,
+            "endf_in": 20,
+            "pendf_reconr": 21,
+            "pendf_broadr": 22,
+            "gendf": 23,
         }
-    
+
     lines = [
         "-- NJOY input generated by FluxForge --",
         f"-- {datetime.now().isoformat()} --",
         "",
     ]
-    
-    current_tape_out = tape_assignments['pendf_reconr']
-    
+
+    current_tape_out = tape_assignments["pendf_reconr"]
+
     # RECONR
     if NJOYModule.RECONR in config.modules:
-        lines.append(generate_reconr_input(
-            config.mat_number,
-            tape_assignments['endf_in'],
-            tape_assignments['pendf_reconr'],
-        ))
-        current_tape_out = tape_assignments['pendf_reconr']
-    
+        lines.append(
+            generate_reconr_input(
+                config.mat_number,
+                tape_assignments["endf_in"],
+                tape_assignments["pendf_reconr"],
+            )
+        )
+        current_tape_out = tape_assignments["pendf_reconr"]
+
     # BROADR
     if NJOYModule.BROADR in config.modules:
-        lines.append(generate_broadr_input(
-            config.mat_number,
-            config.temperatures,
-            tape_assignments['endf_in'],
-            current_tape_out,
-            tape_assignments['pendf_broadr'],
-        ))
-        current_tape_out = tape_assignments['pendf_broadr']
-    
+        lines.append(
+            generate_broadr_input(
+                config.mat_number,
+                config.temperatures,
+                tape_assignments["endf_in"],
+                current_tape_out,
+                tape_assignments["pendf_broadr"],
+            )
+        )
+        current_tape_out = tape_assignments["pendf_broadr"]
+
     # GROUPR
     if NJOYModule.GROUPR in config.modules:
         ign = config.group_structure.value
-        lines.append(generate_groupr_input(
-            config.mat_number,
-            ign,
-            config.temperatures,
-            tape_assignments['endf_in'],
-            current_tape_out,
-            tape_assignments['gendf'],
-            config.custom_boundaries,
-        ))
-    
+        lines.append(
+            generate_groupr_input(
+                config.mat_number,
+                ign,
+                config.temperatures,
+                tape_assignments["endf_in"],
+                current_tape_out,
+                tape_assignments["gendf"],
+                config.custom_boundaries,
+            )
+        )
+
     # STOP
     lines.append("stop")
-    
+
     return "\n".join(lines)
 
 
@@ -340,7 +352,7 @@ def run_njoy(
 ) -> NJOYResult:
     """
     Run NJOY processing.
-    
+
     Parameters
     ----------
     config : NJOYInput
@@ -351,7 +363,7 @@ def run_njoy(
         Working directory (uses temp if not specified).
     keep_files : bool
         Whether to keep intermediate files.
-        
+
     Returns
     -------
     NJOYResult
@@ -360,7 +372,7 @@ def run_njoy(
     result = NJOYResult(success=False)
     result.mat_number = config.mat_number
     result.temperatures = list(config.temperatures)
-    
+
     # Check NJOY availability
     try:
         version_check = subprocess.run(
@@ -371,21 +383,23 @@ def run_njoy(
         )
         njoy_version = version_check.stdout.strip() or "unknown"
     except (subprocess.SubprocessError, FileNotFoundError):
-        result.errors.append(f"NJOY executable '{njoy_executable}' not found or not working")
+        result.errors.append(
+            f"NJOY executable '{njoy_executable}' not found or not working"
+        )
         return result
-    
+
     # Create working directory
     if work_dir is None:
         work_dir = Path(tempfile.mkdtemp(prefix="fluxforge_njoy_"))
     else:
         work_dir = Path(work_dir)
         work_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Generate input
     input_deck = generate_njoy_input(config)
     input_file = work_dir / "njoy.inp"
     input_file.write_text(input_deck)
-    
+
     # Copy/link ENDF file
     tape20 = work_dir / "tape20"
     if config.endf_file.exists():
@@ -393,7 +407,7 @@ def run_njoy(
     else:
         result.errors.append(f"ENDF file not found: {config.endf_file}")
         return result
-    
+
     # Run NJOY
     try:
         proc = subprocess.run(
@@ -404,24 +418,24 @@ def run_njoy(
             text=True,
             timeout=3600,  # 1 hour timeout
         )
-        
+
         # Save log
         log_file = work_dir / "njoy.log"
         log_file.write_text(proc.stdout + "\n" + proc.stderr)
         result.log_file = log_file
-        
+
         if proc.returncode != 0:
             result.errors.append(f"NJOY returned code {proc.returncode}")
             result.errors.append(proc.stderr[:500])
             return result
-        
+
     except subprocess.TimeoutExpired:
         result.errors.append("NJOY processing timed out")
         return result
     except Exception as e:
         result.errors.append(f"NJOY execution error: {e}")
         return result
-    
+
     # Parse output
     gendf_file = work_dir / "tape23"
     if gendf_file.exists():
@@ -434,42 +448,43 @@ def run_njoy(
             result.errors.append(f"Error parsing GENDF: {e}")
     else:
         result.errors.append("GENDF output file not created")
-    
+
     # Record provenance
     result.provenance = {
-        'njoy_version': njoy_version,
-        'processed_at': datetime.now().isoformat(),
-        'endf_file': str(config.endf_file),
-        'mat_number': config.mat_number,
-        'temperatures_K': config.temperatures,
-        'group_structure': config.group_structure.name,
-        'modules': [m.value for m in config.modules],
-        'tolerance': config.tolerance,
+        "njoy_version": njoy_version,
+        "processed_at": datetime.now().isoformat(),
+        "endf_file": str(config.endf_file),
+        "mat_number": config.mat_number,
+        "temperatures_K": config.temperatures,
+        "group_structure": config.group_structure.name,
+        "modules": [m.value for m in config.modules],
+        "tolerance": config.tolerance,
     }
-    
+
     # Cleanup if requested
     if not keep_files and result.success:
         import shutil
+
         try:
             shutil.rmtree(work_dir)
         except:
             pass
-    
+
     return result
 
 
 def parse_gendf(gendf_path: Path) -> Tuple[np.ndarray, Dict[int, np.ndarray]]:
     """
     Parse GENDF (group-averaged cross section) file.
-    
+
     This is a simplified parser for the most common case.
     Full ENDF-6 parsing would require a more comprehensive implementation.
-    
+
     Parameters
     ----------
     gendf_path : Path
         Path to GENDF file.
-        
+
     Returns
     -------
     group_boundaries : np.ndarray
@@ -479,37 +494,40 @@ def parse_gendf(gendf_path: Path) -> Tuple[np.ndarray, Dict[int, np.ndarray]]:
     """
     # GENDF format is complex; this is a placeholder for basic parsing
     # In practice, use openmc.data or sandy to parse properly
-    
+
     group_boundaries = np.array([])
     cross_sections = {}
-    
+
     try:
-        with open(gendf_path, 'r') as f:
+        with open(gendf_path, "r") as f:
             content = f.read()
-        
+
         # Parse group structure from MF1/MT451
         # Parse cross sections from MF3
         # This requires proper ENDF-6 parsing
-        
+
         # For now, return empty with warning
         import warnings
-        warnings.warn("GENDF parsing is limited; consider using openmc.data for full support")
-        
+
+        warnings.warn(
+            "GENDF parsing is limited; consider using openmc.data for full support"
+        )
+
     except Exception as e:
         raise ValueError(f"Failed to parse GENDF: {e}")
-    
+
     return group_boundaries, cross_sections
 
 
 def check_njoy_available(executable: str = "njoy") -> Tuple[bool, str]:
     """
     Check if NJOY is available.
-    
+
     Parameters
     ----------
     executable : str
         Path to NJOY executable.
-        
+
     Returns
     -------
     available : bool
@@ -541,11 +559,11 @@ def check_njoy_available(executable: str = "njoy") -> Tuple[bool, str]:
 class NJOYPipelineSpec:
     """
     Specification for a reproducible NJOY processing pipeline.
-    
+
     This dataclass captures all information needed to reproduce
     the cross section processing.
     """
-    
+
     name: str
     description: str
     endf_library: str  # e.g., "ENDF/B-VIII.0", "IRDFF-II"
@@ -553,48 +571,63 @@ class NJOYPipelineSpec:
     group_structure: GroupStructure
     custom_boundaries: Optional[np.ndarray] = None
     temperatures: List[float] = field(default_factory=lambda: [300.0])
-    modules: List[NJOYModule] = field(default_factory=lambda: [
-        NJOYModule.RECONR, NJOYModule.BROADR, NJOYModule.GROUPR
-    ])
+    modules: List[NJOYModule] = field(
+        default_factory=lambda: [
+            NJOYModule.RECONR,
+            NJOYModule.BROADR,
+            NJOYModule.GROUPR,
+        ]
+    )
     tolerance: float = 0.001
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
-            'name': self.name,
-            'description': self.description,
-            'endf_library': self.endf_library,
-            'materials': self.materials,
-            'group_structure': self.group_structure.name,
-            'custom_boundaries': self.custom_boundaries.tolist() if self.custom_boundaries is not None else None,
-            'temperatures': self.temperatures,
-            'modules': [m.value for m in self.modules],
-            'tolerance': self.tolerance,
-            'created_at': self.created_at,
+            "name": self.name,
+            "description": self.description,
+            "endf_library": self.endf_library,
+            "materials": self.materials,
+            "group_structure": self.group_structure.name,
+            "custom_boundaries": (
+                self.custom_boundaries.tolist()
+                if self.custom_boundaries is not None
+                else None
+            ),
+            "temperatures": self.temperatures,
+            "modules": [m.value for m in self.modules],
+            "tolerance": self.tolerance,
+            "created_at": self.created_at,
         }
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'NJOYPipelineSpec':
+    def from_dict(cls, data: Dict[str, Any]) -> "NJOYPipelineSpec":
         """Create from dictionary."""
         return cls(
-            name=data['name'],
-            description=data['description'],
-            endf_library=data['endf_library'],
-            materials=data['materials'],
-            group_structure=GroupStructure[data['group_structure']],
-            custom_boundaries=np.array(data['custom_boundaries']) if data.get('custom_boundaries') else None,
-            temperatures=data.get('temperatures', [300.0]),
-            modules=[NJOYModule(m) for m in data.get('modules', ['reconr', 'broadr', 'groupr'])],
-            tolerance=data.get('tolerance', 0.001),
-            created_at=data.get('created_at', ''),
+            name=data["name"],
+            description=data["description"],
+            endf_library=data["endf_library"],
+            materials=data["materials"],
+            group_structure=GroupStructure[data["group_structure"]],
+            custom_boundaries=(
+                np.array(data["custom_boundaries"])
+                if data.get("custom_boundaries")
+                else None
+            ),
+            temperatures=data.get("temperatures", [300.0]),
+            modules=[
+                NJOYModule(m)
+                for m in data.get("modules", ["reconr", "broadr", "groupr"])
+            ],
+            tolerance=data.get("tolerance", 0.001),
+            created_at=data.get("created_at", ""),
         )
 
 
 def create_dosimetry_pipeline() -> NJOYPipelineSpec:
     """
     Create standard pipeline for dosimetry cross sections.
-    
+
     Returns a pipeline specification suitable for processing
     IRDFF-II dosimetry reactions for activation foil analysis.
     """

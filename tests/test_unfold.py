@@ -12,6 +12,7 @@ import numpy as np
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from fluxforge.unfold._types import ReactionRates, ResponseBundle, SpectrumFile
@@ -121,7 +122,7 @@ class TestGammaUnfolderRMLE:
         result = poisson_rmle_unfolding(spec, resp, cfg)
 
         assert result.solution.shape == (n,)
-        assert hasattr(result, 'converged')
+        assert hasattr(result, "converged")
 
     def test_dimension_mismatch_raises(self):
         """Mismatched input dimensions should raise ValueError."""
@@ -228,7 +229,7 @@ class TestNeutronUnfolderIBU:
 
         # GLS
         meas_cov = np.diag(uncertainties**2).tolist()
-        prior_cov = np.diag((prior * 0.5)**2).tolist()
+        prior_cov = np.diag((prior * 0.5) ** 2).tolist()
         gls_result = gls_adjust(
             response=R.tolist(),
             measurements=measured.tolist(),

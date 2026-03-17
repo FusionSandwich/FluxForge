@@ -22,7 +22,9 @@ def test_window_metrics_linear_background_tracks_linear_continuum() -> None:
     assert net_unc >= 0.0
 
 
-def test_window_metrics_linear_background_matches_constant_sum_on_linear_background() -> None:
+def test_window_metrics_linear_background_matches_constant_sum_on_linear_background() -> (
+    None
+):
     counts = np.array([10.0, 11.0, 12.0, 20.0, 25.0, 24.0, 18.0, 17.0, 18.0, 19.0])
     const_net, _, _, _ = _window_metrics_local_background(
         counts,

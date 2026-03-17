@@ -71,7 +71,7 @@ from fluxforge.physics.attenuation import (
 __all__ = [
     # activation
     "GammaLineMeasurement",
-    "IrradiationSegment", 
+    "IrradiationSegment",
     "ReactionRateEstimate",
     "activation_study_metrics",
     "activity_to_atoms",

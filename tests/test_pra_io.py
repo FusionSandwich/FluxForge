@@ -1,7 +1,11 @@
 import numpy as np
 from pathlib import Path
 
-from fluxforge.io.pra import read_pra_histogram, pra_to_gamma_spectrum, read_pra_as_spectrum
+from fluxforge.io.pra import (
+    read_pra_histogram,
+    pra_to_gamma_spectrum,
+    read_pra_as_spectrum,
+)
 
 TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
 

@@ -8,7 +8,11 @@ matplotlib.use("Agg", force=True)
 
 import numpy as np
 
-from fluxforge.io.artifacts import write_reaction_rates, write_response_bundle, write_unfold_result
+from fluxforge.io.artifacts import (
+    write_reaction_rates,
+    write_response_bundle,
+    write_unfold_result,
+)
 from fluxforge.plots.master_suite import (
     generate_master_plan_plots,
     load_example_plot_inputs,
@@ -57,8 +61,18 @@ def test_master_plot_suite_artifact_inputs(tmp_path):
     write_reaction_rates(
         rates_file,
         rates=[
-            {"reaction_id": "r1", "rate": 0.22, "uncertainty": 0.01, "half_life_s": 1.0},
-            {"reaction_id": "r2", "rate": 0.34, "uncertainty": 0.02, "half_life_s": 1.0},
+            {
+                "reaction_id": "r1",
+                "rate": 0.22,
+                "uncertainty": 0.01,
+                "half_life_s": 1.0,
+            },
+            {
+                "reaction_id": "r2",
+                "rate": 0.34,
+                "uncertainty": 0.02,
+                "half_life_s": 1.0,
+            },
         ],
         segments=[{"duration_s": 1.0, "relative_power": 1.0}],
     )

@@ -133,7 +133,9 @@ def fit_efficiency_curve(
         detector_id=detector_id,
     )
 
-    return EfficiencyFit(coefficients=coeffs, covariance=cov, curve=curve, residuals=residuals)
+    return EfficiencyFit(
+        coefficients=coeffs, covariance=cov, curve=curve, residuals=residuals
+    )
 
 
 def fit_resolution_curve(

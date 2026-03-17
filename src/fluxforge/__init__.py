@@ -34,20 +34,20 @@ from fluxforge.corrections import CoincidenceCorrector
 
 __all__ += [
     # I/O
-    'GammaSpectrum',
-    'read_spe_file',
-    'read_genie_spectrum',
+    "GammaSpectrum",
+    "read_spe_file",
+    "read_genie_spectrum",
     # Data
-    'EfficiencyModel',
-    'EfficiencyCurve',
+    "EfficiencyModel",
+    "EfficiencyCurve",
     # Analysis
-    'fit_single_peak',
-    'auto_find_peaks',
-    'detect_peaks_segmented',
-    'match_peaks_three_tier',
-    'build_gamma_database',
+    "fit_single_peak",
+    "auto_find_peaks",
+    "detect_peaks_segmented",
+    "match_peaks_three_tier",
+    "build_gamma_database",
     # Corrections
-    'CoincidenceCorrector',
+    "CoincidenceCorrector",
 ]
 
 # TRIGA-specific modules
@@ -59,12 +59,13 @@ try:
         TRIGAk0Workflow,
         TRIGAIrradiationParams,
     )
+
     __all__ += [
-        'CdRatioMeasurement',
-        'FluxParameters',
-        'CdRatioAnalyzer',
-        'TRIGAk0Workflow',
-        'TRIGAIrradiationParams',
+        "CdRatioMeasurement",
+        "FluxParameters",
+        "CdRatioAnalyzer",
+        "TRIGAk0Workflow",
+        "TRIGAIrradiationParams",
     ]
 except ImportError:
     pass  # TRIGA module not available

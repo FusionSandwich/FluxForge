@@ -10,29 +10,38 @@ from fluxforge.analysis.astm_e2005 import (
     analyze_astm_e2005_plan,
 )
 
+
 def test_calculate_fluence_rate_transfer():
     # phi_a = phi_b * (r_a / r_b) * (sigma_b / sigma_a)
     # phi_b = 100, ra = 10, rb = 5, sig_a = 2, sig_b = 4
     # phi_a = 100 * (10 / 5) * (4 / 2) = 100 * 2 * 2 = 400
     phi_a, phi_a_unc = calculate_fluence_rate_transfer(
-        phi_b=100.0, phi_b_unc=10.0,  # 10%
-        rate_a=10.0, rate_a_unc=0.0,
-        rate_b=5.0,  rate_b_unc=0.0,
-        sigma_a=2.0, sigma_a_unc=0.0,
-        sigma_b=4.0, sigma_b_unc=0.0
+        phi_b=100.0,
+        phi_b_unc=10.0,  # 10%
+        rate_a=10.0,
+        rate_a_unc=0.0,
+        rate_b=5.0,
+        rate_b_unc=0.0,
+        sigma_a=2.0,
+        sigma_a_unc=0.0,
+        sigma_b=4.0,
+        sigma_b_unc=0.0,
     )
     assert math.isclose(phi_a, 400.0)
-    assert math.isclose(phi_a_unc, 40.0)  # 10% uncertainty propagates directly if others 0
+    assert math.isclose(
+        phi_a_unc, 40.0
+    )  # 10% uncertainty propagates directly if others 0
+
 
 def test_calculate_spectral_index():
     # SI = ra / rb
     si, si_unc = calculate_spectral_index(
-        rate_a=10.0, rate_a_unc=1.0,  # 10%
-        rate_b=5.0, rate_b_unc=0.0    # 0%
+        rate_a=10.0, rate_a_unc=1.0, rate_b=5.0, rate_b_unc=0.0  # 10%  # 0%
     )
     assert math.isclose(si, 2.0)
     # 2.0 * sqrt(0.1^2 + 0) = 0.2
     assert math.isclose(si_unc, 0.2)
+
 
 def test_analyze_astm_e2005_plan():
     plan = {
@@ -40,29 +49,21 @@ def test_analyze_astm_e2005_plan():
         "fluence_transfers": [
             {
                 "transfer_id": "ni_transfer",
-                "field_a": {
-                    "reaction_rate_s": 10.0,
-                    "cross_section_barn": 2.0
-                },
+                "field_a": {"reaction_rate_s": 10.0, "cross_section_barn": 2.0},
                 "field_b": {
                     "fluence_rate_cm2_s": 100.0,
                     "reaction_rate_s": 5.0,
-                    "cross_section_barn": 4.0
-                }
+                    "cross_section_barn": 4.0,
+                },
             }
         ],
         "spectral_indices": [
             {
                 "index_id": "si_1",
-                "measured": {
-                    "reaction_rate_a_s": 10.0,
-                    "reaction_rate_b_s": 5.0
-                },
-                "calculated": {
-                    "index": 2.5
-                }
+                "measured": {"reaction_rate_a_s": 10.0, "reaction_rate_b_s": 5.0},
+                "calculated": {"index": 2.5},
             }
-        ]
+        ],
     }
     res = analyze_astm_e2005_plan(plan)
     assert len(res["fluence_transfers"]) == 1

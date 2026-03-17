@@ -26,7 +26,10 @@ import numpy as np
 from scipy import optimize
 
 try:
-    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+    from matplotlib.backends.backend_tkagg import (
+        FigureCanvasTkAgg,
+        NavigationToolbar2Tk,
+    )
     from matplotlib.figure import Figure
 except ImportError:  # pragma: no cover - optional GUI plotting dependency
     FigureCanvasTkAgg = None
@@ -38,16 +41,33 @@ from fluxforge.analysis.flux_wire_analysis import (
     _gilmore_moving_minimum_counts,
     _standards_tiered_counts,
 )
-from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
-from fluxforge.analysis.peak_finders import PEAK_FINDER_METHODS, find_peaks_multi_method, get_peak_finder
-from fluxforge.analysis.peakfit import fit_hypermet_peak, fit_multiple_peaks, fit_single_peak
+from fluxforge.analysis.detector_calibration import (
+    EfficiencyPoint,
+    fit_efficiency_curve,
+)
+from fluxforge.analysis.peak_finders import (
+    PEAK_FINDER_METHODS,
+    find_peaks_multi_method,
+    get_peak_finder,
+)
+from fluxforge.analysis.peakfit import (
+    fit_hypermet_peak,
+    fit_multiple_peaks,
+    fit_single_peak,
+)
 from fluxforge.cli import app as cli_app
 from fluxforge.data.efficiency import CALIBRATION_SOURCES, EfficiencyCurve
-from fluxforge.data.flux_wire_catalog import get_flux_wire_catalog_entry, list_flux_wire_isotopes
+from fluxforge.data.flux_wire_catalog import (
+    get_flux_wire_catalog_entry,
+    list_flux_wire_isotopes,
+)
 from fluxforge.data.irdff_access import get_default_library
 from fluxforge.data.nndc import get_nuclear_data
 from fluxforge.data.gamma_database import get_database
-from fluxforge.data.nuclear_data_sources import load_gamma_identification_source, summarize_nuclear_data_source
+from fluxforge.data.nuclear_data_sources import (
+    load_gamma_identification_source,
+    summarize_nuclear_data_source,
+)
 from fluxforge.io.artifacts import (
     read_k0_analysis_bundle,
     read_line_activities,
@@ -129,6 +149,7 @@ from fluxforge_gui.spectrum_ops import (
 from .ui_builder import UiBuilderMixin
 from .commands import CommandsMixin
 
+
 class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     """Main Tk application window."""
 
@@ -173,7 +194,6 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
 
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
-
     # ------------------------------------------------------------------
     # Layout
     # ------------------------------------------------------------------
@@ -182,20 +202,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     # Tab builders
     # ------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
     # ------------------------------------------------------------------
     # Shared UI helpers
     # ------------------------------------------------------------------
-
-
 
     def _browse_open_path(self, variable: tk.StringVar) -> None:
         path = filedialog.askopenfilename(initialdir=str(self.project_dir))
@@ -222,7 +231,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     # ------------------------------------------------------------------
     # Command dispatch
     # ------------------------------------------------------------------
-    def _dispatch(self, func, args: Namespace, cli_tokens: list[str], on_success=None) -> None:
+    def _dispatch(
+        self, func, args: Namespace, cli_tokens: list[str], on_success=None
+    ) -> None:
         if self._busy:
             messagebox.showinfo("FluxForge GUI", "A command is already running.")
             return
@@ -232,7 +243,11 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._append_log(f"\n$ {command_line}")
         self._set_busy(True)
         future = self._executor.submit(self._execute_command, func, args)
-        future.add_done_callback(lambda f, callback=on_success: self.root.after(0, self._on_command_done, f, callback))
+        future.add_done_callback(
+            lambda f, callback=on_success: self.root.after(
+                0, self._on_command_done, f, callback
+            )
+        )
 
     @staticmethod
     def _execute_command(func, args: Namespace) -> str:
@@ -306,7 +321,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
 
     def _render_unfold_result_preview(self, payload: dict[str, Any]) -> None:
         self.unfold_summary.set(summarize_gui_unfold_result(payload))
-        if getattr(self, "unfold_canvas", None) is None or getattr(self, "unfold_figure", None) is None:
+        if (
+            getattr(self, "unfold_canvas", None) is None
+            or getattr(self, "unfold_figure", None) is None
+        ):
             return
         render_gui_unfold_result(payload, figure=self.unfold_figure)
         self.unfold_canvas.draw_idle()
@@ -406,7 +424,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         if activities_path:
             payload = read_line_activities(Path(activities_path))
             activity_output = figure_dir / "activity_summary.png"
-            saved = self._save_report_figure(render_gui_activity_result(payload), activity_output)
+            saved = self._save_report_figure(
+                render_gui_activity_result(payload), activity_output
+            )
             if saved is not None:
                 items["activity_summary"] = {
                     "title": "Activity summary",
@@ -419,7 +439,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         if rates_path:
             payload = read_reaction_rates(Path(rates_path))
             rates_output = figure_dir / "rate_summary.png"
-            saved = self._save_report_figure(render_gui_rate_result(payload), rates_output)
+            saved = self._save_report_figure(
+                render_gui_rate_result(payload), rates_output
+            )
             if saved is not None:
                 items["rate_summary"] = {
                     "title": "Reaction rate summary",
@@ -432,7 +454,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         if unfold_path:
             payload = read_unfold_result(Path(unfold_path))
             unfold_output = figure_dir / "unfold_summary.png"
-            saved = self._save_report_figure(render_gui_unfold_result(payload), unfold_output)
+            saved = self._save_report_figure(
+                render_gui_unfold_result(payload), unfold_output
+            )
             if saved is not None:
                 items["unfold_summary"] = {
                     "title": "Unfolded spectrum diagnostics",
@@ -445,7 +469,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         if validation_path:
             payload = read_validation_bundle(Path(validation_path))
             validation_output = figure_dir / "validation_summary.png"
-            saved = self._save_report_figure(render_gui_validation_result(payload), validation_output)
+            saved = self._save_report_figure(
+                render_gui_validation_result(payload), validation_output
+            )
             if saved is not None:
                 items["validation_summary"] = {
                     "title": "Validation comparison",
@@ -455,7 +481,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 }
 
         if not items:
-            raise ValueError("No report figures were exported. Provide at least one readable report input artifact.")
+            raise ValueError(
+                "No report figures were exported. Provide at least one readable report input artifact."
+            )
 
         manifest_path = figure_dir / "figure_manifest.json"
         manifest_payload = {
@@ -463,7 +491,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             "count": len(items),
             "items": items,
         }
-        manifest_path.write_text(json.dumps(manifest_payload, indent=2), encoding="utf-8")
+        manifest_path.write_text(
+            json.dumps(manifest_payload, indent=2), encoding="utf-8"
+        )
 
         report_path = Path(self.report_output.get())
         if report_path.exists():
@@ -517,10 +547,12 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             float(self.preview_calibration_c3.get() or 0.0),
         )
 
-    def _series_with_coefficients(self, series: GuiSpectrumSeries, coefficients: tuple[float, ...]) -> GuiSpectrumSeries:
+    def _series_with_coefficients(
+        self, series: GuiSpectrumSeries, coefficients: tuple[float, ...]
+    ) -> GuiSpectrumSeries:
         energies = np.zeros_like(series.channels, dtype=float)
         for power, coeff in enumerate(coefficients):
-            energies += float(coeff) * (series.channels ** power)
+            energies += float(coeff) * (series.channels**power)
         return GuiSpectrumSeries(
             label=series.label,
             channels=np.asarray(series.channels, dtype=float),
@@ -533,15 +565,23 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         if self._preview_state_raw is None:
             return None
         coefficients = self._preview_calibration_coeffs()
-        primary = self._series_with_coefficients(self._preview_state_raw.primary, coefficients)
-        overlays = tuple(self._series_with_coefficients(item, coefficients) for item in self._preview_state_raw.overlays)
+        primary = self._series_with_coefficients(
+            self._preview_state_raw.primary, coefficients
+        )
+        overlays = tuple(
+            self._series_with_coefficients(item, coefficients)
+            for item in self._preview_state_raw.overlays
+        )
         peaks: list[GuiSpectrumPeak] = []
         source_peaks = self._preview_state_raw.peaks
         for peak in source_peaks:
             if peak.channel is None:
                 peaks.append(peak)
                 continue
-            energy = sum(coeff * (float(peak.channel) ** power) for power, coeff in enumerate(coefficients))
+            energy = sum(
+                coeff * (float(peak.channel) ** power)
+                for power, coeff in enumerate(coefficients)
+            )
             peaks.append(
                 GuiSpectrumPeak(
                     energy_keV=float(energy),
@@ -550,7 +590,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                     label=peak.label,
                 )
             )
-        return GuiSpectrumPreview(primary=primary, overlays=overlays, peaks=tuple(peaks))
+        return GuiSpectrumPreview(
+            primary=primary, overlays=overlays, peaks=tuple(peaks)
+        )
 
     def _selected_region_label(self) -> str | None:
         selection = self.preview_roi_table.selection()
@@ -587,7 +629,11 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             self.preview_buffer_list.insert(tk.END, str(path))
 
     def _selected_buffer_paths(self) -> list[Path]:
-        return [self._buffer_paths[index] for index in self.preview_buffer_list.curselection() if 0 <= index < len(self._buffer_paths)]
+        return [
+            self._buffer_paths[index]
+            for index in self.preview_buffer_list.curselection()
+            if 0 <= index < len(self._buffer_paths)
+        ]
 
     def _buffer_add_current(self) -> None:
         current = self.preview_input.get().strip()
@@ -611,7 +657,11 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         selected = set(self.preview_buffer_list.curselection())
         if not selected:
             return
-        self._buffer_paths = [path for index, path in enumerate(self._buffer_paths) if index not in selected]
+        self._buffer_paths = [
+            path
+            for index, path in enumerate(self._buffer_paths)
+            if index not in selected
+        ]
         self._refresh_buffer_list()
 
     def _buffer_clear(self) -> None:
@@ -641,7 +691,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _buffer_apply_arithmetic(self) -> None:
         selected = self._selected_buffer_paths()
         if len(selected) != 2:
-            messagebox.showerror("FluxForge GUI", "Select exactly two buffered spectra for arithmetic.")
+            messagebox.showerror(
+                "FluxForge GUI", "Select exactly two buffered spectra for arithmetic."
+            )
             return
         try:
             left = build_gui_spectrum_preview(selected[0]).primary
@@ -652,7 +704,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 operation=self.preview_buffer_operation.get(),
                 label=f"{left.label} {self.preview_buffer_operation.get()} {right.label}",
             )
-            output_path = Path(self.preview_buffer_output.get().strip() or self.project_dir / "combined_buffer.json")
+            output_path = Path(
+                self.preview_buffer_output.get().strip()
+                or self.project_dir / "combined_buffer.json"
+            )
             output_path.parent.mkdir(parents=True, exist_ok=True)
             write_spectrum_file(output_path, _series_to_spectrum(combined))
         except Exception as exc:
@@ -664,8 +719,12 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             self._buffer_paths.append(output_path)
             self._refresh_buffer_list()
         self.preview_input.set(str(output_path))
-        self.preview_status.set(f"Created combined buffer {output_path.name} using {self.preview_buffer_operation.get()}.")
-        self._append_log(f"Combined buffers into {output_path} with operation {self.preview_buffer_operation.get()}")
+        self.preview_status.set(
+            f"Created combined buffer {output_path.name} using {self.preview_buffer_operation.get()}."
+        )
+        self._append_log(
+            f"Combined buffers into {output_path} with operation {self.preview_buffer_operation.get()}"
+        )
         self._load_spectrum_preview()
 
     def _refresh_preview_data_source_summary(self) -> None:
@@ -690,7 +749,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         if "://" not in path_text:
             path = Path(path_text)
             if not path.exists():
-                messagebox.showerror("FluxForge GUI", f"Custom data source not found: {path}")
+                messagebox.showerror(
+                    "FluxForge GUI", f"Custom data source not found: {path}"
+                )
                 return
             locator = path
         else:
@@ -710,7 +771,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _refresh_efficiency_line_choices(self) -> None:
         source = self.preview_efficiency_source.get()
         lines = CALIBRATION_SOURCES.get(source, [])
-        values = [f"{item['energy']:.2f} keV | I={item['intensity']:.4f}" for item in lines]
+        values = [
+            f"{item['energy']:.2f} keV | I={item['intensity']:.4f}" for item in lines
+        ]
         self.preview_efficiency_line_combo.configure(values=values)
         if values and self.preview_efficiency_line.get() not in values:
             self.preview_efficiency_line.set(values[0])
@@ -745,7 +808,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._preview_diagnostic_plot = None
         self._render_current_preview()
 
-    def _log_selected_data_source(self, context_label: str, source_id: str, locator: str | None = None) -> None:
+    def _log_selected_data_source(
+        self, context_label: str, source_id: str, locator: str | None = None
+    ) -> None:
         try:
             summary = summarize_nuclear_data_source(source_id, custom_path=locator)
         except Exception:
@@ -755,7 +820,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _refresh_peaks_source_summary(self) -> None:
         try:
             self.peaks_source_summary.set(
-                summarize_nuclear_data_source(self.peaks_data_source.get(), custom_path=self.peaks_custom_source.get().strip() or None)
+                summarize_nuclear_data_source(
+                    self.peaks_data_source.get(),
+                    custom_path=self.peaks_custom_source.get().strip() or None,
+                )
             )
         except Exception as exc:
             self.peaks_source_summary.set(f"Reference source unavailable: {exc}")
@@ -763,7 +831,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _refresh_activity_source_summary(self) -> None:
         try:
             self.activity_source_summary.set(
-                summarize_nuclear_data_source(self.activity_data_source.get(), custom_path=self.activity_custom_source.get().strip() or None)
+                summarize_nuclear_data_source(
+                    self.activity_data_source.get(),
+                    custom_path=self.activity_custom_source.get().strip() or None,
+                )
             )
         except Exception as exc:
             self.activity_source_summary.set(f"Activity source unavailable: {exc}")
@@ -771,7 +842,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _refresh_standards_source_summary(self) -> None:
         try:
             self.standards_source_summary.set(
-                summarize_nuclear_data_source(self.standards_data_source.get(), custom_path=self.standards_custom_source.get().strip() or None)
+                summarize_nuclear_data_source(
+                    self.standards_data_source.get(),
+                    custom_path=self.standards_custom_source.get().strip() or None,
+                )
             )
         except Exception as exc:
             self.standards_source_summary.set(f"Standards source unavailable: {exc}")
@@ -779,32 +853,49 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _lookup_activity_reference(self) -> None:
         isotope_text = self.activity_isotope.get().strip()
         if not isotope_text:
-            messagebox.showerror("FluxForge GUI", "Enter an isotope override before looking up reference data.")
+            messagebox.showerror(
+                "FluxForge GUI",
+                "Enter an isotope override before looking up reference data.",
+            )
             return
         source_id = self.activity_data_source.get()
         try:
-            if source_id in {"decay_2012", "fluxforge_bundled_gamma", "nndc_offline_activation", "custom_gamma_file"}:
-                database = load_gamma_identification_source(source_id, custom_path=self.activity_custom_source.get().strip() or None)
+            if source_id in {
+                "decay_2012",
+                "fluxforge_bundled_gamma",
+                "nndc_offline_activation",
+                "custom_gamma_file",
+            }:
+                database = load_gamma_identification_source(
+                    source_id,
+                    custom_path=self.activity_custom_source.get().strip() or None,
+                )
                 normalized = isotope_text.replace("-", "")
                 decay = database.get(normalized)
                 if decay is None:
                     raise ValueError(f"{isotope_text} was not found in {source_id}.")
                 strongest = decay.strongest_gamma_lines(1)
                 if strongest:
-                    self.activity_emission.set(f"{strongest[0].intensity * strongest[0].norm:.6g}")
+                    self.activity_emission.set(
+                        f"{strongest[0].intensity * strongest[0].norm:.6g}"
+                    )
                 if decay.halflife > 0:
                     self.activity_half_life.set(f"{decay.halflife:.6g}")
             else:
                 data = get_nuclear_data(isotope_text)
                 if data.get("main_gamma_keV") is not None and data.get("gamma_lines"):
-                    self.activity_emission.set(f"{float(data['gamma_lines'][0][1]):.6g}")
+                    self.activity_emission.set(
+                        f"{float(data['gamma_lines'][0][1]):.6g}"
+                    )
                 if data.get("half_life_s"):
                     self.activity_half_life.set(f"{float(data['half_life_s']):.6g}")
         except Exception as exc:
             self._append_log(f"ERROR looking up activity reference: {exc}")
             messagebox.showerror("FluxForge GUI", str(exc))
             return
-        self._log_selected_data_source("Activity", source_id, self.activity_custom_source.get().strip() or None)
+        self._log_selected_data_source(
+            "Activity", source_id, self.activity_custom_source.get().strip() or None
+        )
 
     def _browse_standards_source(self) -> None:
         source_id = self.standards_data_source.get()
@@ -812,34 +903,63 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         lines: list[str] = []
         if source_id == "irdff_ii_dosimetry":
             library = get_default_library()
-            reactions = library.search(category=None if self.standards_reaction_category.get() == "all" else self.standards_reaction_category.get())
+            reactions = library.search(
+                category=(
+                    None
+                    if self.standards_reaction_category.get() == "all"
+                    else self.standards_reaction_category.get()
+                )
+            )
             for reaction in reactions:
-                if target_filter and target_filter not in reaction.target.lower() and target_filter not in reaction.product.lower():
+                if (
+                    target_filter
+                    and target_filter not in reaction.target.lower()
+                    and target_filter not in reaction.product.lower()
+                ):
                     continue
-                lines.append(f"{reaction.full_name} | threshold={reaction.threshold_MeV:.3f} MeV | half-life={reaction.half_life_days:.3f} d")
+                lines.append(
+                    f"{reaction.full_name} | threshold={reaction.threshold_MeV:.3f} MeV | half-life={reaction.half_life_days:.3f} d"
+                )
         elif source_id == "k0_naa_monitors":
             for element, data in sorted(STANDARD_MONITORS.items()):
-                if target_filter and target_filter not in element.lower() and target_filter not in data["reaction"].lower():
+                if (
+                    target_filter
+                    and target_filter not in element.lower()
+                    and target_filter not in data["reaction"].lower()
+                ):
                     continue
-                lines.append(f"{element}: {data['reaction']} | Q0={data['Q0']:.3f} | isotope={data['isotope']}")
+                lines.append(
+                    f"{element}: {data['reaction']} | Q0={data['Q0']:.3f} | isotope={data['isotope']}"
+                )
         elif source_id == "flux_wire_catalog":
             for isotope in list_flux_wire_isotopes():
                 entry = get_flux_wire_catalog_entry(isotope)
                 if entry is None:
                     continue
-                haystack = f"{entry.isotope} {entry.parent_element} {entry.reaction}".lower()
+                haystack = (
+                    f"{entry.isotope} {entry.parent_element} {entry.reaction}".lower()
+                )
                 if target_filter and target_filter not in haystack:
                     continue
-                lines.append(f"{entry.isotope}: parent={entry.parent_element} | reaction={entry.reaction} | lines={', '.join(f'{value:.1f}' for value in entry.target_lines_keV)}")
+                lines.append(
+                    f"{entry.isotope}: parent={entry.parent_element} | reaction={entry.reaction} | lines={', '.join(f'{value:.1f}' for value in entry.target_lines_keV)}"
+                )
         else:
-            lines.append(summarize_nuclear_data_source(source_id, custom_path=self.standards_custom_source.get().strip() or None))
+            lines.append(
+                summarize_nuclear_data_source(
+                    source_id,
+                    custom_path=self.standards_custom_source.get().strip() or None,
+                )
+            )
         if not lines:
             lines.append("No entries matched the current filter.")
         self.standards_notes_box.configure(state="normal")
         self.standards_notes_box.delete("1.0", "end")
         self.standards_notes_box.insert("1.0", "\n".join(lines[:200]))
         self.standards_notes_box.configure(state="disabled")
-        self._log_selected_data_source("Standards", source_id, self.standards_custom_source.get().strip() or None)
+        self._log_selected_data_source(
+            "Standards", source_id, self.standards_custom_source.get().strip() or None
+        )
 
     def _sync_peak_table(self) -> None:
         self.preview_peak_table.delete(*self.preview_peak_table.get_children())
@@ -871,7 +991,8 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 tolerance_keV=float(self.preview_peak_tolerance_keV.get() or 1.5),
                 min_matches=int(self.preview_peak_min_matches.get() or 2),
                 identification_source_id=self.preview_database_source.get(),
-                custom_source_path=self.preview_custom_database_path.get().strip() or None,
+                custom_source_path=self.preview_custom_database_path.get().strip()
+                or None,
                 min_intensity=float(self.preview_peak_min_intensity.get() or 0.0),
             )
         except Exception as exc:
@@ -905,10 +1026,16 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _count_selected_peak(self) -> None:
         peak = self._selected_peak()
         if peak is None or self._preview_state is None:
-            messagebox.showerror("FluxForge GUI", "Select a peak row before running peak counting.")
+            messagebox.showerror(
+                "FluxForge GUI", "Select a peak row before running peak counting."
+            )
             return
         try:
-            self._peak_count_result = count_gui_peak(self._preview_state.primary, peak, self.preview_peak_counting_method.get())
+            self._peak_count_result = count_gui_peak(
+                self._preview_state.primary,
+                peak,
+                self.preview_peak_counting_method.get(),
+            )
         except Exception as exc:
             self._append_log(f"ERROR counting peak: {exc}")
             messagebox.showerror("FluxForge GUI", str(exc))
@@ -927,28 +1054,70 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _fit_selected_peak_group(self) -> None:
         peak = self._selected_peak()
         if peak is None or self._preview_state is None:
-            messagebox.showerror("FluxForge GUI", "Select a peak to run a multiplet or Hypermet fit.")
+            messagebox.showerror(
+                "FluxForge GUI", "Select a peak to run a multiplet or Hypermet fit."
+            )
             return
         fit_width = int(self.preview_fit_window.get() or 8)
         neighbor_window_keV = float(self.preview_fit_neighbor_window.get() or 5.0)
         channels = np.asarray(self._preview_state.primary.channels, dtype=float)
         counts = np.asarray(self._preview_state.primary.counts, dtype=float)
-        selected_channel = int(peak.channel if peak.channel is not None else round(np.interp(peak.energy_keV, self._preview_state.primary.energies_keV, channels)))
+        selected_channel = int(
+            peak.channel
+            if peak.channel is not None
+            else round(
+                np.interp(
+                    peak.energy_keV, self._preview_state.primary.energies_keV, channels
+                )
+            )
+        )
         constraint_text = self.preview_fit_constraint_box.get("1.0", "end").strip()
         try:
             if self.preview_fit_mode.get() == "hypermet":
-                hypermet_peak, result = fit_hypermet_peak(channels, counts, peak_channel=selected_channel, fit_width=fit_width, enable_tail=True, enable_step=True)
-                roi_x = np.asarray(channels[result.fit_region[0]: result.fit_region[1] + 1], dtype=float)
-                roi_counts = np.asarray(counts[result.fit_region[0]: result.fit_region[1] + 1], dtype=float)
-                model = np.asarray(result.background, dtype=float) + np.asarray(result.peak.evaluate(roi_x), dtype=float)
+                hypermet_peak, result = fit_hypermet_peak(
+                    channels,
+                    counts,
+                    peak_channel=selected_channel,
+                    fit_width=fit_width,
+                    enable_tail=True,
+                    enable_step=True,
+                )
+                roi_x = np.asarray(
+                    channels[result.fit_region[0] : result.fit_region[1] + 1],
+                    dtype=float,
+                )
+                roi_counts = np.asarray(
+                    counts[result.fit_region[0] : result.fit_region[1] + 1], dtype=float
+                )
+                model = np.asarray(result.background, dtype=float) + np.asarray(
+                    result.peak.evaluate(roi_x), dtype=float
+                )
                 self._preview_diagnostic_plot = GuiDiagnosticPlot(
                     title="Hypermet residuals",
                     x_label="Channel",
                     y_label="Counts / residual",
                     series=(
-                        GuiDiagnosticSeries(label="Counts", x=roi_x, y=roi_counts, style="line", color="#1f77b4"),
-                        GuiDiagnosticSeries(label="Model", x=roi_x, y=model, style="line", color="#d62728"),
-                        GuiDiagnosticSeries(label="Residuals", x=roi_x, y=np.asarray(result.residuals, dtype=float), style="scatter", color="#2ca02c"),
+                        GuiDiagnosticSeries(
+                            label="Counts",
+                            x=roi_x,
+                            y=roi_counts,
+                            style="line",
+                            color="#1f77b4",
+                        ),
+                        GuiDiagnosticSeries(
+                            label="Model",
+                            x=roi_x,
+                            y=model,
+                            style="line",
+                            color="#d62728",
+                        ),
+                        GuiDiagnosticSeries(
+                            label="Residuals",
+                            x=roi_x,
+                            y=np.asarray(result.residuals, dtype=float),
+                            style="scatter",
+                            color="#2ca02c",
+                        ),
                     ),
                     reference_y=0.0,
                 )
@@ -966,31 +1135,54 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 {
                     int(item.channel)
                     for item in self._preview_state.peaks
-                    if item.channel is not None and abs(item.energy_keV - peak.energy_keV) <= neighbor_window_keV
+                    if item.channel is not None
+                    and abs(item.energy_keV - peak.energy_keV) <= neighbor_window_keV
                 }
             )
             if selected_channel not in neighbor_channels:
                 neighbor_channels.append(selected_channel)
                 neighbor_channels.sort()
             if constraint_text:
-                constraint_matrix = parse_gui_constraint_matrix(constraint_text, len(neighbor_channels))
-                constrained_results, roi_x, roi_counts, composite = fit_gui_constrained_multiplet(
-                    channels,
-                    counts,
-                    neighbor_channels,
-                    fit_width=fit_width,
-                    amplitude_constraint_matrix=constraint_matrix,
-                    share_sigma=self.preview_fit_share_sigma.get(),
-                    fix_centroids=self.preview_fit_lock_centroids.get(),
+                constraint_matrix = parse_gui_constraint_matrix(
+                    constraint_text, len(neighbor_channels)
+                )
+                constrained_results, roi_x, roi_counts, composite = (
+                    fit_gui_constrained_multiplet(
+                        channels,
+                        counts,
+                        neighbor_channels,
+                        fit_width=fit_width,
+                        amplitude_constraint_matrix=constraint_matrix,
+                        share_sigma=self.preview_fit_share_sigma.get(),
+                        fix_centroids=self.preview_fit_lock_centroids.get(),
+                    )
                 )
                 self._preview_diagnostic_plot = GuiDiagnosticPlot(
                     title="Constrained multiplet diagnostic",
                     x_label="Channel",
                     y_label="Counts / residual",
                     series=(
-                        GuiDiagnosticSeries(label="Counts", x=roi_x, y=roi_counts, style="line", color="#1f77b4"),
-                        GuiDiagnosticSeries(label="Composite", x=roi_x, y=composite, style="line", color="#d62728"),
-                        GuiDiagnosticSeries(label="Residuals", x=roi_x, y=roi_counts - composite, style="scatter", color="#2ca02c"),
+                        GuiDiagnosticSeries(
+                            label="Counts",
+                            x=roi_x,
+                            y=roi_counts,
+                            style="line",
+                            color="#1f77b4",
+                        ),
+                        GuiDiagnosticSeries(
+                            label="Composite",
+                            x=roi_x,
+                            y=composite,
+                            style="line",
+                            color="#d62728",
+                        ),
+                        GuiDiagnosticSeries(
+                            label="Residuals",
+                            x=roi_x,
+                            y=roi_counts - composite,
+                            style="scatter",
+                            color="#2ca02c",
+                        ),
                     ),
                     reference_y=0.0,
                 )
@@ -999,7 +1191,8 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                     for item in constrained_results[:4]
                 ]
                 self.preview_fit_summary.set(
-                    f"Constrained multiplet fit ({len(constrained_results)} peaks, matrix {constraint_matrix.shape[0]}x{constraint_matrix.shape[1]}): " + "; ".join(summary_parts)
+                    f"Constrained multiplet fit ({len(constrained_results)} peaks, matrix {constraint_matrix.shape[0]}x{constraint_matrix.shape[1]}): "
+                    + "; ".join(summary_parts)
                 )
                 self._render_current_preview()
                 return
@@ -1037,29 +1230,62 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             for result in results[:4]
         ]
         local_lo = max(0, min(result.fit_region[0] for result in results))
-        local_hi = min(len(channels) - 1, max(result.fit_region[1] for result in results))
-        roi_x = np.asarray(channels[local_lo: local_hi + 1], dtype=float)
-        roi_counts = np.asarray(counts[local_lo: local_hi + 1], dtype=float)
+        local_hi = min(
+            len(channels) - 1, max(result.fit_region[1] for result in results)
+        )
+        roi_x = np.asarray(channels[local_lo : local_hi + 1], dtype=float)
+        roi_counts = np.asarray(counts[local_lo : local_hi + 1], dtype=float)
         composite = np.zeros_like(roi_x, dtype=float)
         residual_stack: list[np.ndarray] = []
         for result in results:
-            local_x = np.asarray(channels[result.fit_region[0]: result.fit_region[1] + 1], dtype=float)
-            local_model = np.asarray(result.background, dtype=float) + np.asarray(result.peak.evaluate(local_x), dtype=float)
+            local_x = np.asarray(
+                channels[result.fit_region[0] : result.fit_region[1] + 1], dtype=float
+            )
+            local_model = np.asarray(result.background, dtype=float) + np.asarray(
+                result.peak.evaluate(local_x), dtype=float
+            )
             composite += np.interp(roi_x, local_x, local_model, left=0.0, right=0.0)
-            residual_stack.append(np.interp(roi_x, local_x, np.asarray(result.residuals, dtype=float), left=0.0, right=0.0))
+            residual_stack.append(
+                np.interp(
+                    roi_x,
+                    local_x,
+                    np.asarray(result.residuals, dtype=float),
+                    left=0.0,
+                    right=0.0,
+                )
+            )
         self._preview_diagnostic_plot = GuiDiagnosticPlot(
             title="Multiplet diagnostic",
             x_label="Channel",
             y_label="Counts / residual",
             series=(
-                GuiDiagnosticSeries(label="Counts", x=roi_x, y=roi_counts, style="line", color="#1f77b4"),
-                GuiDiagnosticSeries(label="Composite", x=roi_x, y=composite, style="line", color="#d62728"),
-                GuiDiagnosticSeries(label="Residuals", x=roi_x, y=np.sum(residual_stack, axis=0) if residual_stack else np.zeros_like(roi_x), style="scatter", color="#2ca02c"),
+                GuiDiagnosticSeries(
+                    label="Counts", x=roi_x, y=roi_counts, style="line", color="#1f77b4"
+                ),
+                GuiDiagnosticSeries(
+                    label="Composite",
+                    x=roi_x,
+                    y=composite,
+                    style="line",
+                    color="#d62728",
+                ),
+                GuiDiagnosticSeries(
+                    label="Residuals",
+                    x=roi_x,
+                    y=(
+                        np.sum(residual_stack, axis=0)
+                        if residual_stack
+                        else np.zeros_like(roi_x)
+                    ),
+                    style="scatter",
+                    color="#2ca02c",
+                ),
             ),
             reference_y=0.0,
         )
         self.preview_fit_summary.set(
-            f"Multiplet fit ({len(results)} peaks, shared σ={self.preview_fit_share_sigma.get()}, lock centroids={self.preview_fit_lock_centroids.get()}): " + "; ".join(summary_parts)
+            f"Multiplet fit ({len(results)} peaks, shared σ={self.preview_fit_share_sigma.get()}, lock centroids={self.preview_fit_lock_centroids.get()}): "
+            + "; ".join(summary_parts)
         )
         self._render_current_preview()
 
@@ -1068,7 +1294,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             self._pending_roi_start_keV = None
             self._active_roi_drag = None
             return
-        self.preview_status.set("ROI draw mode enabled: click the plot twice to set left and right bounds.")
+        self.preview_status.set(
+            "ROI draw mode enabled: click the plot twice to set left and right bounds."
+        )
 
     def _roi_drag_threshold_keV(self) -> float:
         if self._preview_state is None:
@@ -1086,7 +1314,12 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 "",
                 "end",
                 iid=str(index),
-                values=(region.label, f"{region.left_keV:.3f}", f"{region.right_keV:.3f}", region.notes),
+                values=(
+                    region.label,
+                    f"{region.left_keV:.3f}",
+                    f"{region.right_keV:.3f}",
+                    region.notes,
+                ),
             )
 
     def _on_preview_click(self, event) -> None:
@@ -1104,7 +1337,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 return
             if abs(x_value - region.right_keV) <= threshold:
                 self._active_roi_drag = (region_index, "right")
-                self.preview_status.set(f"Dragging right ROI handle for {region.label}.")
+                self.preview_status.set(
+                    f"Dragging right ROI handle for {region.label}."
+                )
                 return
         for region_index, region in enumerate(self._manual_regions):
             if region.left_keV <= x_value <= region.right_keV:
@@ -1116,7 +1351,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 return
         if self._pending_roi_start_keV is None:
             self._pending_roi_start_keV = x_value
-            self.preview_status.set(f"ROI start set at {x_value:.3f} keV. Click again to finish the ROI.")
+            self.preview_status.set(
+                f"ROI start set at {x_value:.3f} keV. Click again to finish the ROI."
+            )
             self.preview_roi_left.set(f"{x_value:.3f}")
             self.preview_roi_right.set("")
             return
@@ -1134,9 +1371,19 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         region = self._manual_regions[region_index]
         x_value = float(event.xdata)
         if edge == "left":
-            updated = GuiManualRegion(label=region.label, left_keV=min(x_value, region.right_keV), right_keV=max(x_value, region.right_keV), notes=region.notes)
+            updated = GuiManualRegion(
+                label=region.label,
+                left_keV=min(x_value, region.right_keV),
+                right_keV=max(x_value, region.right_keV),
+                notes=region.notes,
+            )
         else:
-            updated = GuiManualRegion(label=region.label, left_keV=min(region.left_keV, x_value), right_keV=max(region.left_keV, x_value), notes=region.notes)
+            updated = GuiManualRegion(
+                label=region.label,
+                left_keV=min(region.left_keV, x_value),
+                right_keV=max(region.left_keV, x_value),
+                notes=region.notes,
+            )
         self._manual_regions[region_index] = updated
         self.preview_roi_left.set(f"{updated.left_keV:.3f}")
         self.preview_roi_right.set(f"{updated.right_keV:.3f}")
@@ -1150,13 +1397,20 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._active_roi_drag = None
 
     def _add_or_update_manual_roi(self) -> None:
-        label = self.preview_roi_label.get().strip() or f"ROI {len(self._manual_regions) + 1}"
+        label = (
+            self.preview_roi_label.get().strip()
+            or f"ROI {len(self._manual_regions) + 1}"
+        )
         left = self._optional_float(self.preview_roi_left.get())
         right = self._optional_float(self.preview_roi_right.get())
         if left is None or right is None:
-            messagebox.showerror("FluxForge GUI", "Manual ROI requires both left and right bounds.")
+            messagebox.showerror(
+                "FluxForge GUI", "Manual ROI requires both left and right bounds."
+            )
             return
-        region = GuiManualRegion(label=label, left_keV=min(left, right), right_keV=max(left, right))
+        region = GuiManualRegion(
+            label=label, left_keV=min(left, right), right_keV=max(left, right)
+        )
         selection = self.preview_roi_table.selection()
         if selection:
             self._manual_regions[int(selection[0])] = region
@@ -1228,8 +1482,16 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.preview_status.set(f"Saved {len(payload)} manual ROI(s) to {path}")
 
     def _load_calibration_from_preview(self) -> None:
-        source = self._preview_state_raw.primary if self._preview_state_raw is not None else None
-        coeffs = source.calibration_coeffs if source and source.calibration_coeffs else (0.0, 1.0, 0.0, 0.0)
+        source = (
+            self._preview_state_raw.primary
+            if self._preview_state_raw is not None
+            else None
+        )
+        coeffs = (
+            source.calibration_coeffs
+            if source and source.calibration_coeffs
+            else (0.0, 1.0, 0.0, 0.0)
+        )
         padded = tuple(list(coeffs[:4]) + [0.0] * (4 - len(coeffs[:4])))
         self.preview_calibration_c0.set(str(padded[0]))
         self.preview_calibration_c1.set(str(padded[1]))
@@ -1240,7 +1502,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         if self._preview_state_raw is None:
             return
         self._render_current_preview()
-        self.preview_status.set("Applied calibration editor coefficients to the loaded preview.")
+        self.preview_status.set(
+            "Applied calibration editor coefficients to the loaded preview."
+        )
 
     def _reset_calibration_editor(self) -> None:
         self.preview_calibration_c0.set("0.0")
@@ -1250,8 +1514,14 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._render_current_preview()
 
     def _sync_calibration_table(self) -> None:
-        self.preview_calibration_table.delete(*self.preview_calibration_table.get_children())
-        residuals = self._calibration_fit.residuals_keV if self._calibration_fit is not None else np.full(len(self._calibration_points), np.nan)
+        self.preview_calibration_table.delete(
+            *self.preview_calibration_table.get_children()
+        )
+        residuals = (
+            self._calibration_fit.residuals_keV
+            if self._calibration_fit is not None
+            else np.full(len(self._calibration_points), np.nan)
+        )
         for index, point in enumerate(self._calibration_points):
             residual = residuals[index] if index < len(residuals) else np.nan
             self.preview_calibration_table.insert(
@@ -1270,23 +1540,35 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _pick_calibration_point_from_selected_peak(self) -> None:
         peak = self._selected_peak()
         if peak is None:
-            messagebox.showerror("FluxForge GUI", "Select a peak row to seed a calibration point.")
+            messagebox.showerror(
+                "FluxForge GUI", "Select a peak row to seed a calibration point."
+            )
             return
-        self.preview_calibration_point_channel.set("" if peak.channel is None else f"{peak.channel:.3f}")
+        self.preview_calibration_point_channel.set(
+            "" if peak.channel is None else f"{peak.channel:.3f}"
+        )
         self.preview_calibration_point_observed.set(f"{peak.energy_keV:.3f}")
         if not self.preview_calibration_point_label.get().strip():
-            self.preview_calibration_point_label.set(peak.label or f"Peak {peak.energy_keV:.1f} keV")
+            self.preview_calibration_point_label.set(
+                peak.label or f"Peak {peak.energy_keV:.1f} keV"
+            )
 
     def _add_calibration_point(self) -> None:
         try:
             point = GuiCalibrationPoint(
                 channel=float(self.preview_calibration_point_channel.get()),
-                observed_energy_keV=float(self.preview_calibration_point_observed.get()),
-                reference_energy_keV=float(self.preview_calibration_point_reference.get()),
+                observed_energy_keV=float(
+                    self.preview_calibration_point_observed.get()
+                ),
+                reference_energy_keV=float(
+                    self.preview_calibration_point_reference.get()
+                ),
                 label=self.preview_calibration_point_label.get().strip(),
             )
         except ValueError as exc:
-            messagebox.showerror("FluxForge GUI", f"Calibration point is incomplete: {exc}")
+            messagebox.showerror(
+                "FluxForge GUI", f"Calibration point is incomplete: {exc}"
+            )
             return
         self._calibration_points.append(point)
         self.preview_calibration_point_channel.set("")
@@ -1295,23 +1577,36 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.preview_calibration_point_label.set("")
         self._calibration_fit = None
         self._sync_calibration_table()
-        self.preview_calibration_summary.set(f"Added {len(self._calibration_points)} calibration point(s).")
+        self.preview_calibration_summary.set(
+            f"Added {len(self._calibration_points)} calibration point(s)."
+        )
 
     def _fit_preview_calibration_points(self) -> None:
         try:
-            self._calibration_fit = fit_gui_energy_calibration(self._calibration_points, order=int(self.preview_calibration_order.get() or 1))
+            self._calibration_fit = fit_gui_energy_calibration(
+                self._calibration_points,
+                order=int(self.preview_calibration_order.get() or 1),
+            )
         except Exception as exc:
             self._append_log(f"ERROR fitting calibration points: {exc}")
             messagebox.showerror("FluxForge GUI", str(exc))
             return
-        coeffs = list(self._calibration_fit.coefficients[:4]) + [0.0] * max(0, 4 - len(self._calibration_fit.coefficients[:4]))
+        coeffs = list(self._calibration_fit.coefficients[:4]) + [0.0] * max(
+            0, 4 - len(self._calibration_fit.coefficients[:4])
+        )
         self.preview_calibration_c0.set(f"{coeffs[0]:.12g}")
         self.preview_calibration_c1.set(f"{coeffs[1]:.12g}")
         self.preview_calibration_c2.set(f"{coeffs[2]:.12g}")
         self.preview_calibration_c3.set(f"{coeffs[3]:.12g}")
         self._sync_calibration_table()
-        self._preview_diagnostic_plot = build_calibration_residual_plot(self._calibration_points, self._calibration_fit)
-        rms = float(np.sqrt(np.mean(self._calibration_fit.residuals_keV**2))) if len(self._calibration_fit.residuals_keV) else 0.0
+        self._preview_diagnostic_plot = build_calibration_residual_plot(
+            self._calibration_points, self._calibration_fit
+        )
+        rms = (
+            float(np.sqrt(np.mean(self._calibration_fit.residuals_keV**2)))
+            if len(self._calibration_fit.residuals_keV)
+            else 0.0
+        )
         self.preview_calibration_summary.set(
             f"Calibration fit complete: order {self.preview_calibration_order.get()}, R²={self._calibration_fit.r_squared:.6f}, residual RMS={rms:.4f} keV."
         )
@@ -1325,7 +1620,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.preview_calibration_summary.set("Cleared manual calibration points.")
 
     def _sync_efficiency_table(self) -> None:
-        self.preview_efficiency_table.delete(*self.preview_efficiency_table.get_children())
+        self.preview_efficiency_table.delete(
+            *self.preview_efficiency_table.get_children()
+        )
         for index, point in enumerate(self._efficiency_points):
             self.preview_efficiency_table.insert(
                 "",
@@ -1343,18 +1640,29 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     def _add_efficiency_point_from_selected_peak(self) -> None:
         peak = self._selected_peak()
         if peak is None:
-            messagebox.showerror("FluxForge GUI", "Select a peak before adding an efficiency calibration point.")
+            messagebox.showerror(
+                "FluxForge GUI",
+                "Select a peak before adding an efficiency calibration point.",
+            )
             return
         try:
-            reference_energy, emission_probability = self._selected_efficiency_reference()
-            net_counts = float(self._peak_count_result.net_counts) if self._peak_count_result is not None else float(max(peak.area, 0.0))
+            reference_energy, emission_probability = (
+                self._selected_efficiency_reference()
+            )
+            net_counts = (
+                float(self._peak_count_result.net_counts)
+                if self._peak_count_result is not None
+                else float(max(peak.area, 0.0))
+            )
             point = EfficiencyPoint(
                 energy_keV=reference_energy,
                 net_counts=net_counts,
                 live_time_s=float(self.preview_efficiency_live_time_s.get()),
                 activity_bq=float(self.preview_efficiency_activity_bq.get()),
                 emission_probability=emission_probability,
-                geometry_factor=float(self.preview_efficiency_geometry_factor.get() or 1.0),
+                geometry_factor=float(
+                    self.preview_efficiency_geometry_factor.get() or 1.0
+                ),
                 count_uncertainty=np.sqrt(max(net_counts, 1.0)),
             )
             efficiency, uncertainty = point.efficiency()
@@ -1383,7 +1691,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
 
     def _fit_efficiency_curve_from_points(self) -> None:
         if len(self._efficiency_points) < 2:
-            messagebox.showerror("FluxForge GUI", "Add at least two efficiency points before fitting a curve.")
+            messagebox.showerror(
+                "FluxForge GUI",
+                "Add at least two efficiency points before fitting a curve.",
+            )
             return
         try:
             fit = fit_efficiency_curve(
@@ -1395,8 +1706,14 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             messagebox.showerror("FluxForge GUI", str(exc))
             return
         self._efficiency_curve = fit.curve
-        self._preview_diagnostic_plot = build_efficiency_fit_diagnostic_plot(self._efficiency_points, fit.curve)
-        rms = float(np.sqrt(np.mean(np.asarray(fit.residuals, dtype=float) ** 2))) if len(fit.residuals) else 0.0
+        self._preview_diagnostic_plot = build_efficiency_fit_diagnostic_plot(
+            self._efficiency_points, fit.curve
+        )
+        rms = (
+            float(np.sqrt(np.mean(np.asarray(fit.residuals, dtype=float) ** 2)))
+            if len(fit.residuals)
+            else 0.0
+        )
         self.preview_efficiency_summary.set(
             f"Efficiency fit complete: degree {self.preview_efficiency_fit_degree.get()}, log-space residual RMS={rms:.5f}."
         )
@@ -1449,14 +1766,14 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         }
         self._stacked_foils.append(foil)
         self._sync_stacked_foil_table()
-        self.stacked_summary.set(f"Added {len(self._stacked_foils)} foil(s) to the stacked-target workspace.")
+        self.stacked_summary.set(
+            f"Added {len(self._stacked_foils)} foil(s) to the stacked-target workspace."
+        )
 
     def _physics_clear_foils(self) -> None:
         self._stacked_foils.clear()
         self._sync_stacked_foil_table()
         self.stacked_summary.set("Cleared stacked-target foil list.")
-
-
 
     def _selected_peak(self) -> GuiSpectrumPeak | None:
         selection = self.preview_peak_table.selection()
@@ -1469,15 +1786,29 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
 
     def _update_peak_inspector(self, peak: GuiSpectrumPeak | None) -> None:
         if peak is None or self._preview_state is None:
-            self.preview_inspector.set("Load peaks, then select a peak row to inspect fit/deconvolution context.")
+            self.preview_inspector.set(
+                "Load peaks, then select a peak row to inspect fit/deconvolution context."
+            )
             self._selected_peak_energy_keV = None
             return
-        neighbors = [item for item in self._preview_state.peaks if item is not peak and abs(item.energy_keV - peak.energy_keV) <= 5.0]
+        neighbors = [
+            item
+            for item in self._preview_state.peaks
+            if item is not peak and abs(item.energy_keV - peak.energy_keV) <= 5.0
+        ]
         left = peak.energy_keV - 5.0
         right = peak.energy_keV + 5.0
-        local_mask = (self._preview_state.primary.energies_keV >= left) & (self._preview_state.primary.energies_keV <= right)
-        local_max = float(np.nanmax(self._preview_state.primary.counts[local_mask])) if np.any(local_mask) else 0.0
-        neighbor_text = ", ".join(f"{item.energy_keV:.2f} keV" for item in neighbors[:5]) or "none"
+        local_mask = (self._preview_state.primary.energies_keV >= left) & (
+            self._preview_state.primary.energies_keV <= right
+        )
+        local_max = (
+            float(np.nanmax(self._preview_state.primary.counts[local_mask]))
+            if np.any(local_mask)
+            else 0.0
+        )
+        neighbor_text = (
+            ", ".join(f"{item.energy_keV:.2f} keV" for item in neighbors[:5]) or "none"
+        )
         self.preview_inspector.set(
             (
                 f"Peak {peak.energy_keV:.3f} keV | area {peak.area:.3f} | channel {peak.channel}. "
@@ -1507,11 +1838,15 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
 
     def _load_spectrum_preview(self) -> None:
         if self.preview_canvas is None or self.preview_figure is None:
-            messagebox.showerror("FluxForge GUI", "matplotlib is required for the spectrum viewer.")
+            messagebox.showerror(
+                "FluxForge GUI", "matplotlib is required for the spectrum viewer."
+            )
             return
         spectrum_path = self.preview_input.get().strip()
         if not spectrum_path:
-            messagebox.showerror("FluxForge GUI", "Choose a primary spectrum file or artifact first.")
+            messagebox.showerror(
+                "FluxForge GUI", "Choose a primary spectrum file or artifact first."
+            )
             return
 
         overlay_paths = _coerce_path_tokens(self.preview_overlay_inputs.get())
@@ -1585,20 +1920,21 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
     # Button handlers
     # ------------------------------------------------------------------
 
-
-
-
-
-
     def _sync_standards_notes(self) -> None:
         preset = next(
-            (item for item in get_standards_gui_presets().values() if item.label == self.standards_preset.get()),
+            (
+                item
+                for item in get_standards_gui_presets().values()
+                if item.label == self.standards_preset.get()
+            ),
             None,
         )
         if preset is None:
             notes_text = ""
         else:
-            values = build_standards_preset_values(preset.key, self.standards_profile.get())
+            values = build_standards_preset_values(
+                preset.key, self.standards_profile.get()
+            )
             notes_text = values["notes"]
             self.standards_reaction_category.set(str(values["reaction_category"]))
         self.standards_notes_box.configure(state="normal")
@@ -1608,7 +1944,11 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
 
     def _apply_standards_preset(self) -> None:
         preset = next(
-            (item for item in get_standards_gui_presets().values() if item.label == self.standards_preset.get()),
+            (
+                item
+                for item in get_standards_gui_presets().values()
+                if item.label == self.standards_preset.get()
+            ),
             None,
         )
         if preset is None:
@@ -1630,23 +1970,22 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._refresh_standards_source_summary()
         self._append_log(f"Applied standards preset: {preset.label}")
 
-
-
-
-
-
-
-
-
     def _load_k0_preview(self) -> None:
         path = self._optional_path(self.k0_report_output.get())
         if path is None or not path.exists():
             path = self._optional_path(self.k0_analysis_output.get())
         if path is None or not path.exists():
-            messagebox.showerror("FluxForge GUI", "Choose an existing k0 analysis or report artifact first.")
+            messagebox.showerror(
+                "FluxForge GUI",
+                "Choose an existing k0 analysis or report artifact first.",
+            )
             return
         if path.suffix.lower() == ".json":
-            payload = read_report_bundle(path) if path == Path(self.k0_report_output.get()) else read_k0_analysis_bundle(path)
+            payload = (
+                read_report_bundle(path)
+                if path == Path(self.k0_report_output.get())
+                else read_k0_analysis_bundle(path)
+            )
         else:
             payload = read_k0_analysis_bundle(path)
         preview = build_gui_k0_preview(payload, path)
@@ -1654,31 +1993,37 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.k0_preview.delete("1.0", "end")
         self.k0_preview.insert("1.0", preview)
         self.k0_preview.configure(state="disabled")
-        self.k0_status.set("Loaded k0 preview from the latest analysis/report artifact.")
-
-
+        self.k0_status.set(
+            "Loaded k0 preview from the latest analysis/report artifact."
+        )
 
     def _load_astm_e2005_preview(self) -> None:
-        if not hasattr(self, 'astm_e2005_output'):
-            return 
+        if not hasattr(self, "astm_e2005_output"):
+            return
         path = self._optional_path(self.astm_e2005_output.get())
         if path is None or not path.exists():
-            messagebox.showerror("FluxForge GUI", "Choose an existing ASTM E2005 output artifact first.")
+            messagebox.showerror(
+                "FluxForge GUI", "Choose an existing ASTM E2005 output artifact first."
+            )
             return
         import json
+
         payload = json.loads(path.read_text(encoding="utf-8"))
         preview = build_gui_astm_e2005_preview(payload, path)
         self.astm_e2005_preview.configure(state="normal")
         self.astm_e2005_preview.delete("1.0", "end")
         self.astm_e2005_preview.insert("1.0", preview)
         self.astm_e2005_preview.configure(state="disabled")
-        self.astm_e2005_status.set("Loaded ASTM E2005 preview from the latest workflow artifact")
-
+        self.astm_e2005_status.set(
+            "Loaded ASTM E2005 preview from the latest workflow artifact"
+        )
 
     def _load_astm_e261_preview(self) -> None:
         path = self._optional_path(self.astm_e261_output.get())
         if path is None or not path.exists():
-            messagebox.showerror("FluxForge GUI", "Choose an existing ASTM E261 output artifact first.")
+            messagebox.showerror(
+                "FluxForge GUI", "Choose an existing ASTM E261 output artifact first."
+            )
             return
         payload = json.loads(path.read_text(encoding="utf-8"))
         preview = build_gui_astm_e261_preview(payload, path)
@@ -1686,13 +2031,16 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.astm_e261_preview.delete("1.0", "end")
         self.astm_e261_preview.insert("1.0", preview)
         self.astm_e261_preview.configure(state="disabled")
-        self.astm_e261_status.set("Loaded ASTM E261 preview from the latest workflow artifact.")
-
+        self.astm_e261_status.set(
+            "Loaded ASTM E261 preview from the latest workflow artifact."
+        )
 
     def _load_astm_e262_preview(self) -> None:
         path = self._optional_path(self.astm_e262_output.get())
         if path is None or not path.exists():
-            messagebox.showerror("FluxForge GUI", "Choose an existing ASTM E262 output artifact first.")
+            messagebox.showerror(
+                "FluxForge GUI", "Choose an existing ASTM E262 output artifact first."
+            )
             return
         payload = json.loads(path.read_text(encoding="utf-8"))
         preview = build_gui_astm_e262_preview(payload, path)
@@ -1700,13 +2048,16 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.astm_e262_preview.delete("1.0", "end")
         self.astm_e262_preview.insert("1.0", preview)
         self.astm_e262_preview.configure(state="disabled")
-        self.astm_e262_status.set("Loaded ASTM E262 preview from the latest workflow artifact.")
-
+        self.astm_e262_status.set(
+            "Loaded ASTM E262 preview from the latest workflow artifact."
+        )
 
     def _auto_fill_report_from_validation_dir(self) -> None:
         raw = self.report_validation_results_root.get().strip()
         if not raw:
-            messagebox.showerror("FluxForge GUI", "Choose a validation results directory first.")
+            messagebox.showerror(
+                "FluxForge GUI", "Choose a validation results directory first."
+            )
             return
         try:
             defaults = discover_gui_validation_report_inputs(raw)
@@ -1719,7 +2070,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.report_validation.set(defaults["validation_file"])
         self.report_output.set(defaults["output"])
         self.report_figure_dir.set(defaults["figure_dir"])
-        self.report_status.set(f"Auto-filled report inputs from {defaults['validation_results_root']}")
+        self.report_status.set(
+            f"Auto-filled report inputs from {defaults['validation_results_root']}"
+        )
         self._append_log(self.report_status.get())
 
     def _after_report_run(self) -> None:

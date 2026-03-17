@@ -113,7 +113,9 @@ def test_flux_wire_catalog_and_decay_subset_are_data_backed() -> None:
 
 def test_flux_wire_unfolding_defaults_are_data_backed() -> None:
     sample_defaults = load_flux_wire_sample_defaults()
-    assert sample_defaults["Ti"]["reaction_target_fractions"]["Ti-48(n,p)Sc-48"] == pytest.approx(0.7372)
+    assert sample_defaults["Ti"]["reaction_target_fractions"][
+        "Ti-48(n,p)Sc-48"
+    ] == pytest.approx(0.7372)
 
     product_reactions = load_flux_wire_product_reactions()
     assert product_reactions["Ti"]["Sc46"] == "Ti-46(n,p)Sc-46"
@@ -122,7 +124,9 @@ def test_flux_wire_unfolding_defaults_are_data_backed() -> None:
     assert get_flux_wire_reaction_id("Sc46", "Sc") == "Sc-45(n,g)Sc-46"
     assert get_flux_wire_reaction_id("missing", "Ti").startswith("Unknown(")
 
-    assert get_flux_wire_isotope_fraction("Ti-46(n,p)Sc-46", "Ti") == pytest.approx(0.0825)
+    assert get_flux_wire_isotope_fraction("Ti-46(n,p)Sc-46", "Ti") == pytest.approx(
+        0.0825
+    )
     assert get_flux_wire_isotope_fraction("Co-59(n,g)Co-60", "Co") == pytest.approx(1.0)
 
     xs = get_flux_wire_reaction_cross_section_defaults()
@@ -220,7 +224,9 @@ def test_nndc_isotope_quantity_and_queries() -> None:
     assert stable_q.average_activity(10.0, 10.0) == 0.0
 
     # from_decays constructor.
-    q_from_decays = IsotopeQuantity.from_decays("Co-60", decays=1000.0, start_time=0.0, end_time=100.0)
+    q_from_decays = IsotopeQuantity.from_decays(
+        "Co-60", decays=1000.0, start_time=0.0, end_time=100.0
+    )
     assert q_from_decays.activity_Bq > 0.0
 
     data = get_nuclear_data("Co-60")

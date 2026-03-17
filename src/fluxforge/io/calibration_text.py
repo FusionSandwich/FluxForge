@@ -28,7 +28,10 @@ def read_pygammaspec_calibration(path: Union[str, Path]) -> PolynomialCalibratio
     Read PyGammaSpec-style calibration file.
     """
     path = Path(path)
-    lines = [line.strip() for line in path.read_text(encoding="utf-8", errors="ignore").splitlines()]
+    lines = [
+        line.strip()
+        for line in path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    ]
     lines = [line for line in lines if line]
 
     if not lines or "Calibration points" not in lines[0]:
@@ -66,6 +69,8 @@ def pygammaspec_to_calibration(data: PolynomialCalibrationFile) -> Calibration:
     """
     # PyGammaSpec stores coefficients in descending order.
     coeffs_asc = list(reversed(data.coefficients_desc))
-    cal = Calibration(expression="polynomial", coefficients=np.array(coeffs_asc), degree=data.order)
+    cal = Calibration(
+        expression="polynomial", coefficients=np.array(coeffs_asc), degree=data.order
+    )
     cal.add_points(data.channels, data.energies_keV)
     return cal

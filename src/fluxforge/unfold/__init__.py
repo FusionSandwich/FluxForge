@@ -18,15 +18,19 @@ __all__ = [
     "SpectrumFile",
 ]
 
+
 # Lazy imports to avoid hard dependency on optional packages
 def __getattr__(name: str):
     if name == "GammaUnfolderRMLE":
         from .gamma_rmle import GammaUnfolderRMLE
+
         return GammaUnfolderRMLE
     if name == "NeutronUnfolderIBU":
         from .neutron_ibu import NeutronUnfolderIBU
+
         return NeutronUnfolderIBU
     if name in ("ReactionRates", "ResponseBundle", "SpectrumFile"):
         from . import _types
+
         return getattr(_types, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

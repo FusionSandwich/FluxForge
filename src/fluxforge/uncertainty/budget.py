@@ -29,7 +29,7 @@ import numpy as np
 
 class UncertaintyCategory(Enum):
     """Standard uncertainty categories for activation analysis."""
-    
+
     # Experimental uncertainties
     COUNTING_STATISTICS = "counting"
     EFFICIENCY = "efficiency"
@@ -37,29 +37,29 @@ class UncertaintyCategory(Enum):
     GEOMETRY = "geometry"
     DEAD_TIME = "dead_time"
     PILE_UP = "pile_up"
-    
+
     # Nuclear data uncertainties
     CROSS_SECTION = "cross_section"
     DECAY_DATA = "decay_data"
     BRANCHING_RATIO = "branching_ratio"
     HALF_LIFE = "half_life"
-    
+
     # Correction uncertainties
     SELF_SHIELDING = "self_shielding"
     COINCIDENCE_SUMMING = "coincidence_summing"
     BACKGROUND = "background"
-    
+
     # Spectral uncertainties
     PRIOR_SPECTRUM = "prior_spectrum"
     RESPONSE_MATRIX = "response_matrix"
     ENERGY_CALIBRATION = "energy_calibration"
-    
+
     # k0-NAA specific
     K0_FACTOR = "k0_factor"
     Q0_RATIO = "q0_ratio"
     ALPHA_PARAMETER = "alpha"
     F_FLUX_RATIO = "f_flux_ratio"
-    
+
     # Other
     OTHER = "other"
     TOTAL = "total"
@@ -68,7 +68,7 @@ class UncertaintyCategory(Enum):
 @dataclass
 class UncertaintyComponent:
     """Single uncertainty component.
-    
+
     Attributes
     ----------
     category : UncertaintyCategory
@@ -84,14 +84,14 @@ class UncertaintyComponent:
     correlation_group : str, optional
         Identifier for correlation group (if correlated)
     """
-    
+
     category: UncertaintyCategory
     value: float
     relative: float = 0.0
     description: str = ""
     is_correlated: bool = False
     correlation_group: Optional[str] = None
-    
+
     @classmethod
     def from_relative(
         cls,
@@ -101,7 +101,7 @@ class UncertaintyComponent:
         description: str = "",
     ) -> UncertaintyComponent:
         """Create component from relative uncertainty.
-        
+
         Parameters
         ----------
         category : UncertaintyCategory
@@ -112,7 +112,7 @@ class UncertaintyComponent:
             Measured value for computing absolute uncertainty
         description : str
             Description
-            
+
         Returns
         -------
         UncertaintyComponent
@@ -123,7 +123,7 @@ class UncertaintyComponent:
             relative=relative,
             description=description,
         )
-    
+
     @classmethod
     def from_absolute(
         cls,
@@ -133,7 +133,7 @@ class UncertaintyComponent:
         description: str = "",
     ) -> UncertaintyComponent:
         """Create component from absolute uncertainty.
-        
+
         Parameters
         ----------
         category : UncertaintyCategory
@@ -144,7 +144,7 @@ class UncertaintyComponent:
             Measured value for computing relative uncertainty
         description : str
             Description
-            
+
         Returns
         -------
         UncertaintyComponent
@@ -161,10 +161,10 @@ class UncertaintyComponent:
 @dataclass
 class UncertaintyBudget:
     """Complete uncertainty budget with component breakdown.
-    
+
     Follows GUM methodology for combining uncertainties from
     multiple independent sources.
-    
+
     Attributes
     ----------
     measurement : float
@@ -182,7 +182,7 @@ class UncertaintyBudget:
     name : str
         Identifier for this budget
     """
-    
+
     measurement: float
     total_uncertainty: float = 0.0
     components: list[UncertaintyComponent] = field(default_factory=list)
@@ -190,11 +190,11 @@ class UncertaintyBudget:
     confidence_level: float = 0.68
     units: str = ""
     name: str = ""
-    
+
     def add_component(self, component: UncertaintyComponent) -> None:
         """Add an uncertainty component."""
         self.components.append(component)
-    
+
     def add_relative(
         self,
         category: UncertaintyCategory,
@@ -202,7 +202,7 @@ class UncertaintyBudget:
         description: str = "",
     ) -> None:
         """Add component from relative uncertainty.
-        
+
         Parameters
         ----------
         category : UncertaintyCategory
@@ -217,7 +217,7 @@ class UncertaintyBudget:
                 category, relative, self.measurement, description
             )
         )
-    
+
     def add_absolute(
         self,
         category: UncertaintyCategory,
@@ -225,7 +225,7 @@ class UncertaintyBudget:
         description: str = "",
     ) -> None:
         """Add component from absolute uncertainty.
-        
+
         Parameters
         ----------
         category : UncertaintyCategory
@@ -240,15 +240,15 @@ class UncertaintyBudget:
                 category, value, self.measurement, description
             )
         )
-    
+
     def compute_total(self, method: str = "quadrature") -> float:
         """Compute total uncertainty from components.
-        
+
         Parameters
         ----------
         method : str
             Combination method: "quadrature" (RSS) or "linear"
-            
+
         Returns
         -------
         float
@@ -256,9 +256,9 @@ class UncertaintyBudget:
         """
         if not self.components:
             return self.total_uncertainty
-        
+
         values = np.array([c.value for c in self.components])
-        
+
         if method == "quadrature":
             # Root-sum-of-squares for uncorrelated uncertainties
             self.total_uncertainty = float(np.sqrt(np.sum(values**2)))
@@ -267,35 +267,35 @@ class UncertaintyBudget:
             self.total_uncertainty = float(np.sum(np.abs(values)))
         else:
             raise ValueError(f"Unknown method: {method}")
-        
+
         return self.total_uncertainty
-    
+
     @property
     def relative_total(self) -> float:
         """Total relative uncertainty."""
         if self.measurement == 0:
             return 0.0
         return self.total_uncertainty / abs(self.measurement)
-    
+
     @property
     def expanded_uncertainty(self) -> float:
         """Expanded uncertainty (k × standard uncertainty)."""
         return self.coverage_factor * self.total_uncertainty
-    
+
     def dominant_component(self) -> Optional[UncertaintyComponent]:
         """Get the largest uncertainty component."""
         if not self.components:
             return None
         return max(self.components, key=lambda c: abs(c.value))
-    
+
     def fraction_by_category(self, category: UncertaintyCategory) -> float:
         """Get fraction of variance from a category.
-        
+
         Parameters
         ----------
         category : UncertaintyCategory
             Category to check
-            
+
         Returns
         -------
         float
@@ -303,17 +303,17 @@ class UncertaintyBudget:
         """
         if self.total_uncertainty == 0:
             return 0.0
-        
+
         category_var = sum(
             c.value**2 for c in self.components if c.category == category
         )
         total_var = self.total_uncertainty**2
-        
+
         return category_var / total_var if total_var > 0 else 0.0
-    
+
     def summary_table(self) -> str:
         """Generate text summary table.
-        
+
         Returns
         -------
         str
@@ -329,19 +329,19 @@ class UncertaintyBudget:
             f"{'Category':<25} {'Absolute':>12} {'Relative':>10} {'Variance %':>10}",
             "-" * 70,
         ]
-        
+
         total_var = self.total_uncertainty**2
-        
+
         for c in sorted(self.components, key=lambda x: -x.value**2):
             var_frac = (c.value**2 / total_var * 100) if total_var > 0 else 0
             lines.append(
                 f"{c.category.value:<25} {c.value:>12.4g} {100*c.relative:>9.2f}% {var_frac:>9.1f}%"
             )
-        
+
         lines.append("-" * 70)
-        
+
         return "\n".join(lines)
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
         return {
@@ -369,14 +369,14 @@ def combine_budgets(
     correlation_matrix: Optional[np.ndarray] = None,
 ) -> UncertaintyBudget:
     """Combine multiple uncertainty budgets.
-    
+
     Parameters
     ----------
     budgets : list[UncertaintyBudget]
         Individual budgets to combine
     correlation_matrix : ndarray, optional
         Correlation matrix between budgets (default: identity)
-        
+
     Returns
     -------
     UncertaintyBudget
@@ -385,25 +385,25 @@ def combine_budgets(
     n = len(budgets)
     if n == 0:
         return UncertaintyBudget(measurement=0.0)
-    
+
     if n == 1:
         return budgets[0]
-    
+
     # Default to uncorrelated
     if correlation_matrix is None:
         correlation_matrix = np.eye(n)
-    
+
     measurements = np.array([b.measurement for b in budgets])
     uncertainties = np.array([b.total_uncertainty for b in budgets])
-    
+
     # Mean measurement
     mean_measurement = float(np.mean(measurements))
-    
+
     # Combined uncertainty accounting for correlations
     cov = np.outer(uncertainties, uncertainties) * correlation_matrix
     combined_var = np.sum(cov) / n**2
     combined_unc = float(np.sqrt(combined_var))
-    
+
     # Aggregate components by category
     category_totals: dict[UncertaintyCategory, float] = {}
     for budget in budgets:
@@ -411,16 +411,20 @@ def combine_budgets(
             if c.category not in category_totals:
                 category_totals[c.category] = 0.0
             category_totals[c.category] += c.value**2
-    
+
     components = [
         UncertaintyComponent(
             category=cat,
             value=float(np.sqrt(var_sum)) / n,
-            relative=float(np.sqrt(var_sum)) / n / abs(mean_measurement) if mean_measurement != 0 else 0.0,
+            relative=(
+                float(np.sqrt(var_sum)) / n / abs(mean_measurement)
+                if mean_measurement != 0
+                else 0.0
+            ),
         )
         for cat, var_sum in category_totals.items()
     ]
-    
+
     return UncertaintyBudget(
         measurement=mean_measurement,
         total_uncertainty=combined_unc,
@@ -442,7 +446,7 @@ def create_activation_budget(
     units: str = "Bq",
 ) -> UncertaintyBudget:
     """Create standard activation analysis uncertainty budget.
-    
+
     Parameters
     ----------
     activity : float
@@ -465,7 +469,7 @@ def create_activation_budget(
         Coincidence summing uncertainty (default 1%)
     units : str
         Activity units
-        
+
     Returns
     -------
     UncertaintyBudget
@@ -476,7 +480,7 @@ def create_activation_budget(
         units=units,
         name="activation_analysis",
     )
-    
+
     budget.add_relative(
         UncertaintyCategory.COUNTING_STATISTICS,
         counting_rel,
@@ -517,9 +521,9 @@ def create_activation_budget(
         coincidence_rel,
         "True coincidence summing correction",
     )
-    
+
     budget.compute_total()
-    
+
     return budget
 
 
@@ -536,7 +540,7 @@ def create_k0_naa_budget(
     units: str = "mg/kg",
 ) -> UncertaintyBudget:
     """Create k₀-NAA uncertainty budget.
-    
+
     Parameters
     ----------
     concentration : float
@@ -559,7 +563,7 @@ def create_k0_naa_budget(
         Coincidence summing (default 1%)
     units : str
         Concentration units
-        
+
     Returns
     -------
     UncertaintyBudget
@@ -570,7 +574,7 @@ def create_k0_naa_budget(
         units=units,
         name="k0_naa",
     )
-    
+
     budget.add_relative(
         UncertaintyCategory.COUNTING_STATISTICS,
         counting_rel,
@@ -611,9 +615,9 @@ def create_k0_naa_budget(
         coincidence_rel,
         "True coincidence summing",
     )
-    
+
     budget.compute_total()
-    
+
     return budget
 
 
@@ -627,7 +631,7 @@ def create_flux_unfolding_budget(
     units: str = "n/cm²/s",
 ) -> UncertaintyBudget:
     """Create flux unfolding uncertainty budget.
-    
+
     Parameters
     ----------
     flux_value : float
@@ -644,7 +648,7 @@ def create_flux_unfolding_budget(
         Self-shielding correction (default 1%)
     units : str
         Flux units
-        
+
     Returns
     -------
     UncertaintyBudget
@@ -655,7 +659,7 @@ def create_flux_unfolding_budget(
         units=units,
         name="flux_unfolding",
     )
-    
+
     budget.add_relative(
         UncertaintyCategory.PRIOR_SPECTRUM,
         prior_rel,
@@ -681,9 +685,9 @@ def create_flux_unfolding_budget(
         self_shielding_rel,
         "Self-shielding corrections",
     )
-    
+
     budget.compute_total()
-    
+
     return budget
 
 

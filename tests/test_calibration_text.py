@@ -1,6 +1,9 @@
 from pathlib import Path
 
-from fluxforge.io.calibration_text import read_pygammaspec_calibration, pygammaspec_to_calibration
+from fluxforge.io.calibration_text import (
+    read_pygammaspec_calibration,
+    pygammaspec_to_calibration,
+)
 
 TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
 

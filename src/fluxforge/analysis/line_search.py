@@ -45,7 +45,10 @@ def search_decay_lines(
     for nuclide, decay in db._nuclides.items():
         for line in _iter_decay_lines(decay, line_type):
             line_energy = line.energy_keV
-            if abs(line_energy - energy_keV) <= tolerance_keV and line.intensity >= min_intensity:
+            if (
+                abs(line_energy - energy_keV) <= tolerance_keV
+                and line.intensity >= min_intensity
+            ):
                 matches.append(
                     LineMatch(
                         nuclide=decay.nuclide,

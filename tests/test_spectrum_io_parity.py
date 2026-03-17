@@ -42,7 +42,9 @@ def _assert_matches_baseline(dataset_key: str, counts: np.ndarray) -> None:
     assert observed["n_channels"] == baseline["n_channels"]
     assert observed["sum_counts"] == pytest.approx(baseline["sum_counts"], rel=0, abs=0)
     assert observed["max_counts"] == pytest.approx(baseline["max_counts"], rel=0, abs=0)
-    assert observed["mean_counts"] == pytest.approx(baseline["mean_counts"], rel=0, abs=0)
+    assert observed["mean_counts"] == pytest.approx(
+        baseline["mean_counts"], rel=0, abs=0
+    )
     assert observed["sha256_counts_int64_le"] == baseline["sha256_counts_int64_le"]
 
 

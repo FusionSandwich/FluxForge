@@ -20,10 +20,14 @@ class FluxWireCatalogEntry:
 
 
 def _load_catalog_payload() -> Dict[str, Any]:
-    with resources.files("fluxforge.data").joinpath("flux_wire_catalog.json").open(
-        "r",
-        encoding="utf-8",
-    ) as handle:
+    with (
+        resources.files("fluxforge.data")
+        .joinpath("flux_wire_catalog.json")
+        .open(
+            "r",
+            encoding="utf-8",
+        ) as handle
+    ):
         return json.load(handle)
 
 
@@ -35,8 +39,13 @@ def load_flux_wire_catalog() -> Dict[str, FluxWireCatalogEntry]:
             isotope=isotope,
             parent_element=str(entry["parent_element"]),
             reaction=str(entry["reaction"]),
-            target_lines_keV=[float(value) for value in entry.get("target_lines_keV", [])],
-            expected_elements=[str(value) for value in entry.get("expected_elements", [entry["parent_element"]])],
+            target_lines_keV=[
+                float(value) for value in entry.get("target_lines_keV", [])
+            ],
+            expected_elements=[
+                str(value)
+                for value in entry.get("expected_elements", [entry["parent_element"]])
+            ],
         )
         for isotope, entry in payload.items()
     }
@@ -64,4 +73,10 @@ def get_flux_wire_isotopes_for_element(element: str) -> List[str]:
 
 def list_flux_wire_elements() -> List[str]:
     """Return sorted parent elements present in the bundled flux-wire catalog."""
-    return sorted({element for entry in load_flux_wire_catalog().values() for element in entry.expected_elements})
+    return sorted(
+        {
+            element
+            for entry in load_flux_wire_catalog().values()
+            for element in entry.expected_elements
+        }
+    )

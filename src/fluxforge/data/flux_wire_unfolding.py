@@ -8,10 +8,14 @@ from typing import Any, Dict, Optional, Tuple
 
 
 def _load_payload() -> Dict[str, Any]:
-    with resources.files("fluxforge.data").joinpath("flux_wire_unfolding_defaults.json").open(
-        "r",
-        encoding="utf-8",
-    ) as handle:
+    with (
+        resources.files("fluxforge.data")
+        .joinpath("flux_wire_unfolding_defaults.json")
+        .open(
+            "r",
+            encoding="utf-8",
+        ) as handle
+    ):
         return json.load(handle)
 
 
@@ -35,7 +39,9 @@ def load_flux_wire_product_reactions() -> Dict[str, Dict[str, str]]:
     return dict(_load_payload().get("product_reactions", {}))
 
 
-def get_flux_wire_reaction_id(isotope: str, sample_element: Optional[str] = None) -> str:
+def get_flux_wire_reaction_id(
+    isotope: str, sample_element: Optional[str] = None
+) -> str:
     """Resolve the default reaction id for a product isotope in one wire context."""
     product_reactions = load_flux_wire_product_reactions()
     if sample_element:

@@ -1,6 +1,9 @@
 import numpy as np
 
-from fluxforge.analysis.spectroscopy_tools import prominence_peaks, fit_gaussian_baseline
+from fluxforge.analysis.spectroscopy_tools import (
+    prominence_peaks,
+    fit_gaussian_baseline,
+)
 
 
 def test_prominence_peaks_simple():
@@ -19,5 +22,7 @@ def test_fit_gaussian_baseline_recovers_centroid():
     baseline = 2.0 + 0.1 * energies
     counts = amplitude * np.exp(-0.5 * ((energies - centroid) / sigma) ** 2) + baseline
 
-    result = fit_gaussian_baseline(energies, counts, e_min=5.0, e_max=8.0, baseline_order=1)
+    result = fit_gaussian_baseline(
+        energies, counts, e_min=5.0, e_max=8.0, baseline_order=1
+    )
     assert abs(result.parameters[1] - centroid) < 0.2

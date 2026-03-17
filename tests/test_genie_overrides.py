@@ -67,7 +67,13 @@ def test_flux_wire_raw_override_precedence():
     data = read_raw_asc(
         RAW_ASC,
         energy_calibration_override=[2.0, 0.1, 0.0],
-        efficiency_override={"C1": 0.1, "C2": 0.2, "C3": 0.3, "C4": 0.4, "DetModel": 0.5},
+        efficiency_override={
+            "C1": 0.1,
+            "C2": 0.2,
+            "C3": 0.3,
+            "C4": 0.4,
+            "DetModel": 0.5,
+        },
     )
     assert data.energy_calibration == [2.0, 0.1, 0.0]
     assert data.efficiency is not None
@@ -79,7 +85,13 @@ def test_flux_wire_processed_override_precedence():
     data = read_processed_txt(
         PROC_TXT,
         energy_calibration_override=[3.0, 0.25, 0.0],
-        efficiency_override={"C1": -2.0, "C2": 0.6, "C3": -0.1, "C4": 0.01, "DetModel": 0.01},
+        efficiency_override={
+            "C1": -2.0,
+            "C2": 0.6,
+            "C3": -0.1,
+            "C4": 0.01,
+            "DetModel": 0.01,
+        },
     )
     assert data.energy_calibration == [3.0, 0.25, 0.0]
     assert data.efficiency is not None

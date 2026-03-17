@@ -40,7 +40,8 @@ def test_no_external_repo_path_literals_in_tests() -> None:
             if any(pattern.search(line) for pattern in BANNED_PATTERNS):
                 offenders.append(f"{path.relative_to(REPO_ROOT)}:{lineno}: {stripped}")
 
-    assert not offenders, (
-        "Found external testing-repo path literals in FluxForge tests:\n"
-        + "\n".join(offenders)
+    assert (
+        not offenders
+    ), "Found external testing-repo path literals in FluxForge tests:\n" + "\n".join(
+        offenders
     )

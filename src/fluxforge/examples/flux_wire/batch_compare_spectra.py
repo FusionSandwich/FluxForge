@@ -79,6 +79,7 @@ REGION_PARAMS = (
 # paceENSDF is optional
 try:
     import paceENSDF as pe
+
     HAS_PACE = True
 except ImportError:  # pragma: no cover
     HAS_PACE = False
@@ -173,6 +174,7 @@ def normalize_timepart(s: str) -> str:
 
 # ────────────────────── CALIBRATION / CORRECTION ─────────────────────────────
 
+
 def apply_energy_cal(df: pd.DataFrame, A: float, B: float, C: float) -> pd.DataFrame:
     df["Energy_keV"] = A + B * df["Channel"] + C * df["Channel"] ** 2
     return df
@@ -222,7 +224,9 @@ def parse_efficiency_model(csv_path: str) -> Dict[str, float | str]:
     }
 
 
-def apply_efficiency_model(df: pd.DataFrame, model: Dict[str, float | str]) -> pd.DataFrame:
+def apply_efficiency_model(
+    df: pd.DataFrame, model: Dict[str, float | str]
+) -> pd.DataFrame:
     """Apply the user-specified detector efficiency equation."""
     E = df["Energy_keV"].to_numpy()
 
@@ -244,6 +248,7 @@ def apply_efficiency_model(df: pd.DataFrame, model: Dict[str, float | str]) -> p
 
 
 # ───────────────────────── PEAK DETECTION ────────────────────────────────────
+
 
 def _gaussian(x, a, mu, sigma, c):
     return a * np.exp(-0.5 * ((x - mu) / sigma) ** 2) + c
@@ -326,15 +331,24 @@ def detect_peaks_segmented(
     if not peaks:
         return pd.DataFrame(
             columns=[
-                "Channel", "Energy_keV", "Amplitude", "Peak_height", "Sigma_keV", "Area",
-                "Is_Report", "Report_Isotope", "Report_File"
+                "Channel",
+                "Energy_keV",
+                "Amplitude",
+                "Peak_height",
+                "Sigma_keV",
+                "Area",
+                "Is_Report",
+                "Report_Isotope",
+                "Report_File",
             ]
         )
 
     return pd.DataFrame(peaks).sort_values("Energy_keV").reset_index(drop=True)
 
 
-def deduplicate_peaks_with_report(peaks: pd.DataFrame, merge_keV: float = 0.6) -> pd.DataFrame:
+def deduplicate_peaks_with_report(
+    peaks: pd.DataFrame, merge_keV: float = 0.6
+) -> pd.DataFrame:
     """Merge near-duplicate peaks; prefer report peaks if present."""
     if peaks.empty:
         return peaks
@@ -348,15 +362,26 @@ def deduplicate_peaks_with_report(peaks: pd.DataFrame, merge_keV: float = 0.6) -
 
         if "Is_Report" in sub.columns and sub["Is_Report"].any():
             sub_r = sub[sub["Is_Report"] == True]
-            best_i = sub_r["Peak_height"].idxmax() if "Peak_height" in sub_r.columns else sub_r.index[0]
+            best_i = (
+                sub_r["Peak_height"].idxmax()
+                if "Peak_height" in sub_r.columns
+                else sub_r.index[0]
+            )
             keep_rows.append(peaks.loc[best_i])
             return
 
-        best_i = sub["Peak_height"].idxmax() if "Peak_height" in sub.columns else sub.index[0]
+        best_i = (
+            sub["Peak_height"].idxmax()
+            if "Peak_height" in sub.columns
+            else sub.index[0]
+        )
         keep_rows.append(peaks.loc[best_i])
 
     for i in range(1, len(peaks)):
-        if peaks.loc[i, "Energy_keV"] - peaks.loc[cluster[-1], "Energy_keV"] <= merge_keV:
+        if (
+            peaks.loc[i, "Energy_keV"] - peaks.loc[cluster[-1], "Energy_keV"]
+            <= merge_keV
+        ):
             cluster.append(i)
         else:
             _flush(cluster)
@@ -377,8 +402,14 @@ def filter_physical_peaks(peaks: pd.DataFrame, min_energy_keV: float) -> pd.Data
 # ─────────────────────── ENSDF CATALOG (OPTIONAL) ────────────────────────────
 
 _ISO_PATTERNS = (
-    re.compile(r"^(?P<el>[A-Za-z]{1,3})[-\s]?(?P<mass>\d{1,3})(?P<meta>m\d*|m)?$", re.IGNORECASE),
-    re.compile(r"^(?P<mass>\d{1,3})(?P<meta>m\d*|m)?[-\s]?(?P<el>[A-Za-z]{1,3})$", re.IGNORECASE),
+    re.compile(
+        r"^(?P<el>[A-Za-z]{1,3})[-\s]?(?P<mass>\d{1,3})(?P<meta>m\d*|m)?$",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"^(?P<mass>\d{1,3})(?P<meta>m\d*|m)?[-\s]?(?P<el>[A-Za-z]{1,3})$",
+        re.IGNORECASE,
+    ),
 )
 
 
@@ -424,7 +455,9 @@ def _safe_float(x) -> float:
     return float(m.group())
 
 
-def _walk_ensdf(node, iso_raw: str, iso_canon: str, elem: Optional[str], rows: List[dict]) -> None:
+def _walk_ensdf(
+    node, iso_raw: str, iso_canon: str, elem: Optional[str], rows: List[dict]
+) -> None:
     if isinstance(node, dict):
         keys = {k.lower(): k for k in node}
         e_key = next((k for k in keys if "energy" in k or k in ("e", "eg")), None)
@@ -452,7 +485,9 @@ def _walk_ensdf(node, iso_raw: str, iso_canon: str, elem: Optional[str], rows: L
             _walk_ensdf(v, iso_raw, iso_canon, elem, rows)
 
 
-def build_gamma_catalog(elements: Sequence[str] | None = None) -> Optional[pd.DataFrame]:
+def build_gamma_catalog(
+    elements: Sequence[str] | None = None,
+) -> Optional[pd.DataFrame]:
     if not HAS_PACE:
         return None
 
@@ -568,6 +603,7 @@ def match_peaks_three_tier(
 
 # ─────────────────────── REPORT TXT PARSING (NEW) ────────────────────────────
 
+
 def extract_id_line_text(report_path: str, max_lines: int = 80) -> str:
     """Extract the ID line string if present, otherwise empty."""
     try:
@@ -635,7 +671,13 @@ def parse_report_nuclide_centroids(report_path: str) -> List[dict]:
             try:
                 e = float(m_cent.group(1))
                 if 0.0 < e < 10000.0:
-                    peaks.append({"Isotope": current_iso, "Energy_keV": e, "Report_File": os.path.basename(report_path)})
+                    peaks.append(
+                        {
+                            "Isotope": current_iso,
+                            "Energy_keV": e,
+                            "Report_File": os.path.basename(report_path),
+                        }
+                    )
             except ValueError:
                 pass
 
@@ -661,7 +703,10 @@ def score_report_to_asc(
         score += 3
 
     # Time match (normalized)
-    if time_norm and (time_norm in normalize_timepart(report_basename_lower) or time_norm in normalize_timepart(id_text_lower)):
+    if time_norm and (
+        time_norm in normalize_timepart(report_basename_lower)
+        or time_norm in normalize_timepart(id_text_lower)
+    ):
         score += 3
 
     # Letter match: prefer explicit token-ish patterns
@@ -671,7 +716,12 @@ def score_report_to_asc(
             letter_hit = True
             break
         # common filename encodings
-        if f"_{letter_l}_" in blob or f"-{letter_l}_" in blob or f"_{letter_l}-" in blob or f"-{letter_l}-" in blob:
+        if (
+            f"_{letter_l}_" in blob
+            or f"-{letter_l}_" in blob
+            or f"_{letter_l}-" in blob
+            or f"-{letter_l}-" in blob
+        ):
             letter_hit = True
             break
 
@@ -692,7 +742,9 @@ def build_report_map(
     report_map: Dict[Tuple[str, str, str], List[dict]] = {}
 
     report_dir_exp = os.path.expanduser(report_dir)
-    txt_files = sorted(glob(os.path.join(report_dir_exp, "*.txt"))) + sorted(glob(os.path.join(report_dir_exp, "*.TXT")))
+    txt_files = sorted(glob(os.path.join(report_dir_exp, "*.txt"))) + sorted(
+        glob(os.path.join(report_dir_exp, "*.TXT"))
+    )
 
     if not txt_files:
         return report_map
@@ -741,8 +793,15 @@ def build_report_peaks_df(
     if not report_entries:
         return pd.DataFrame(
             columns=[
-                "Channel", "Energy_keV", "Amplitude", "Peak_height", "Sigma_keV", "Area",
-                "Is_Report", "Report_Isotope", "Report_File",
+                "Channel",
+                "Energy_keV",
+                "Amplitude",
+                "Peak_height",
+                "Sigma_keV",
+                "Area",
+                "Is_Report",
+                "Report_Isotope",
+                "Report_File",
             ]
         )
 
@@ -783,8 +842,15 @@ def build_report_peaks_df(
     if not rows:
         return pd.DataFrame(
             columns=[
-                "Channel", "Energy_keV", "Amplitude", "Peak_height", "Sigma_keV", "Area",
-                "Is_Report", "Report_Isotope", "Report_File",
+                "Channel",
+                "Energy_keV",
+                "Amplitude",
+                "Peak_height",
+                "Sigma_keV",
+                "Area",
+                "Is_Report",
+                "Report_Isotope",
+                "Report_File",
             ]
         )
 
@@ -836,6 +902,7 @@ def remove_peaks_covered_by_report(
 
 # ─────────────────────── PLOTTING HELPERS ────────────────────────────────────
 
+
 def _highlight_annihilation(peaks: pd.DataFrame, tol_keV: float) -> pd.DataFrame:
     """Return subset of peaks near 511 keV."""
     if peaks.empty:
@@ -870,13 +937,27 @@ def plot_single(
             rpt = peaks.iloc[0:0]
 
         if not auto.empty:
-            plt.scatter(auto["Energy_keV"], auto["Peak_height"], s=18, c="red", label="Detected Peaks")
+            plt.scatter(
+                auto["Energy_keV"],
+                auto["Peak_height"],
+                s=18,
+                c="red",
+                label="Detected Peaks",
+            )
         if not rpt.empty:
-            plt.scatter(rpt["Energy_keV"], rpt["Peak_height"], s=26, c="orange", label="Report Peaks")
+            plt.scatter(
+                rpt["Energy_keV"],
+                rpt["Peak_height"],
+                s=26,
+                c="orange",
+                label="Report Peaks",
+            )
 
         ann = _highlight_annihilation(peaks, annihil_tol_keV)
         if not ann.empty:
-            plt.scatter(ann["Energy_keV"], ann["Peak_height"], s=40, c="green", label="511 keV")
+            plt.scatter(
+                ann["Energy_keV"], ann["Peak_height"], s=40, c="green", label="511 keV"
+            )
 
         # Balanced annotation across energy bands
         bands = [(0, 500), (500, 1200), (1200, np.inf)]
@@ -898,7 +979,11 @@ def plot_single(
 
                 if label is None and matches is not None and not matches.empty:
                     hit = matches[
-                        np.isclose(matches["Observed_E_keV"], r["Energy_keV"], atol=match_atol_keV)
+                        np.isclose(
+                            matches["Observed_E_keV"],
+                            r["Energy_keV"],
+                            atol=match_atol_keV,
+                        )
                     ]
                     if not hit.empty:
                         label = f"{hit.iloc[0]['Isotope']}"
@@ -909,7 +994,14 @@ def plot_single(
                     else:
                         label = f"{r['Energy_keV']:.1f} keV"
 
-                plt.text(r["Energy_keV"], r["Peak_height"] * 1.2, label, rotation=72, fontsize=7, ha="center")
+                plt.text(
+                    r["Energy_keV"],
+                    r["Peak_height"] * 1.2,
+                    label,
+                    rotation=72,
+                    fontsize=7,
+                    ha="center",
+                )
 
     plt.grid(True, which="both", ls="--", lw=0.4)
     plt.legend()
@@ -930,8 +1022,18 @@ def plot_comparison(
     annihil_tol_keV: float,
 ) -> None:
     plt.figure(figsize=(10, 6))
-    plt.plot(record_a["df"]["Energy_keV"], record_a["df"]["Corrected_Counts"], lw=1.0, label=label_a)
-    plt.plot(record_b["df"]["Energy_keV"], record_b["df"]["Corrected_Counts"], lw=1.0, label=label_b)
+    plt.plot(
+        record_a["df"]["Energy_keV"],
+        record_a["df"]["Corrected_Counts"],
+        lw=1.0,
+        label=label_a,
+    )
+    plt.plot(
+        record_b["df"]["Energy_keV"],
+        record_b["df"]["Corrected_Counts"],
+        lw=1.0,
+        label=label_b,
+    )
     plt.yscale("log")
     plt.xlabel("Energy (keV)")
     plt.ylabel("Counts / Efficiency")
@@ -943,11 +1045,15 @@ def plot_comparison(
         if peaks.empty:
             continue
 
-        plt.scatter(peaks["Energy_keV"], peaks["Peak_height"], s=12, color=color, alpha=0.35)
+        plt.scatter(
+            peaks["Energy_keV"], peaks["Peak_height"], s=12, color=color, alpha=0.35
+        )
 
         ann = _highlight_annihilation(peaks, annihil_tol_keV)
         if not ann.empty:
-            plt.scatter(ann["Energy_keV"], ann["Peak_height"], s=28, c="green", alpha=0.9)
+            plt.scatter(
+                ann["Energy_keV"], ann["Peak_height"], s=28, c="green", alpha=0.9
+            )
 
         if annotate_top > 0:
             top = peaks.nlargest(annotate_top, "Peak_height")
@@ -959,7 +1065,11 @@ def plot_comparison(
 
                 if label is None and matches is not None and not matches.empty:
                     hit = matches[
-                        np.isclose(matches["Observed_E_keV"], r["Energy_keV"], atol=match_atol_keV)
+                        np.isclose(
+                            matches["Observed_E_keV"],
+                            r["Energy_keV"],
+                            atol=match_atol_keV,
+                        )
                     ]
                     if not hit.empty:
                         label = hit.iloc[0]["Isotope"]
@@ -990,6 +1100,7 @@ def plot_comparison(
 
 # ────────────────────────── MAIN PIPELINE ────────────────────────────────────
 
+
 def process_file(
     path: str,
     eff_model: Dict[str, float | str],
@@ -1016,9 +1127,21 @@ def process_file(
         splits=(args.split_channel1, args.split_channel2),
         sigmas=(args.sigma_low, args.sigma_mid, args.sigma_high),
         region_params=(
-            {"height": args.height_low, "prominence": args.prom_low, "distance": args.dist_low},
-            {"height": args.height_mid, "prominence": args.prom_mid, "distance": args.dist_mid},
-            {"height": args.height_high, "prominence": args.prom_high, "distance": args.dist_high},
+            {
+                "height": args.height_low,
+                "prominence": args.prom_low,
+                "distance": args.dist_low,
+            },
+            {
+                "height": args.height_mid,
+                "prominence": args.prom_mid,
+                "distance": args.dist_mid,
+            },
+            {
+                "height": args.height_high,
+                "prominence": args.prom_high,
+                "distance": args.dist_high,
+            },
         ),
     )
 
@@ -1057,7 +1180,9 @@ def process_file(
     elif report_matches.empty:
         matches = auto_matches
     else:
-        matches = pd.concat([report_matches, auto_matches], ignore_index=True).sort_values("Observed_E_keV")
+        matches = pd.concat(
+            [report_matches, auto_matches], ignore_index=True
+        ).sort_values("Observed_E_keV")
 
     return {
         "df": df,
@@ -1095,11 +1220,21 @@ def discover_pairs(files: Sequence[str]) -> List[Tuple[str, str, str]]:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Batch γ-spectrum processing and comparison")
+    p = argparse.ArgumentParser(
+        description="Batch γ-spectrum processing and comparison"
+    )
 
-    p.add_argument("--spectra-dir", default="../spectra_files", help="Directory with *.ASC spectra")
-    p.add_argument("--eff-csv", default="eff.csv", help="Efficiency CSV (C1–C4 + optional DetModel)")
-    p.add_argument("--out-dir", default="output_plots/batch", help="Output directory for plots")
+    p.add_argument(
+        "--spectra-dir", default="../spectra_files", help="Directory with *.ASC spectra"
+    )
+    p.add_argument(
+        "--eff-csv",
+        default="eff.csv",
+        help="Efficiency CSV (C1–C4 + optional DetModel)",
+    )
+    p.add_argument(
+        "--out-dir", default="output_plots/batch", help="Output directory for plots"
+    )
 
     # NEW: report directory
     p.add_argument(
@@ -1109,20 +1244,38 @@ def main() -> None:
     )
 
     # ── Matching controls ───────────────────────────────────────────────
-    p.add_argument("--tol-tier1", type=float, default=3.0, help="Tier 1 matching tolerance (keV)")
-    p.add_argument("--tol-tier2", type=float, default=3.0, help="Tier 2 matching tolerance (keV)")
-    p.add_argument("--tol-tier3", type=float, default=2.0, help="Tier 3 matching tolerance (keV)")
-    p.add_argument("--top-n", type=int, default=3, help="Number of top-RI candidates to record")
+    p.add_argument(
+        "--tol-tier1", type=float, default=3.0, help="Tier 1 matching tolerance (keV)"
+    )
+    p.add_argument(
+        "--tol-tier2", type=float, default=3.0, help="Tier 2 matching tolerance (keV)"
+    )
+    p.add_argument(
+        "--tol-tier3", type=float, default=2.0, help="Tier 3 matching tolerance (keV)"
+    )
+    p.add_argument(
+        "--top-n", type=int, default=3, help="Number of top-RI candidates to record"
+    )
 
     # ── Peak post-processing ───────────────────────────────────────────
-    p.add_argument("--merge-keV", type=float, default=0.6, help="Merge peaks closer than this (keV)")
+    p.add_argument(
+        "--merge-keV",
+        type=float,
+        default=0.6,
+        help="Merge peaks closer than this (keV)",
+    )
     p.add_argument(
         "--min-peak-energy-keV",
         type=float,
         default=25.0,
         help="Discard detected peaks below this energy (keV)",
     )
-    p.add_argument("--fit-window", type=int, default=4, help="Half-window (points) for local Gaussian fit")
+    p.add_argument(
+        "--fit-window",
+        type=int,
+        default=4,
+        help="Half-window (points) for local Gaussian fit",
+    )
 
     # ── Segmentation and smoothing ─────────────────────────────────────
     p.add_argument("--split-channel1", type=int, default=SPLIT_CHANNEL1)
@@ -1184,7 +1337,7 @@ def main() -> None:
     # Build tier-1 isotopes dynamically from paceENSDF (or fallback data)
     # These are high-intensity gamma emitters from RAFM-relevant elements
     tier1_isotopes = build_tier1_isotopes(
-        elements=['W', 'Cr', 'Fe', 'Ta', 'Co', 'Mn', 'V', 'Al', 'Tb'],
+        elements=["W", "Cr", "Fe", "Ta", "Co", "Mn", "V", "Al", "Tb"],
         min_intensity=0.10,
     )
     print(f"Tier-1 isotopes ({get_data_source()}): {tier1_isotopes}")
@@ -1198,7 +1351,9 @@ def main() -> None:
         return sub if not sub.empty else None
 
     gamma_tier1 = build_isotope_subset(tier1_isotopes) if HAS_PACE else None
-    gamma_tier2 = build_gamma_catalog(element_list) if (element_list and HAS_PACE) else None
+    gamma_tier2 = (
+        build_gamma_catalog(element_list) if (element_list and HAS_PACE) else None
+    )
     gamma_tier3 = build_gamma_catalog(None) if HAS_PACE else None
 
     if not HAS_PACE:
@@ -1258,7 +1413,11 @@ def main() -> None:
                 else:
                     if matches is not None and not matches.empty:
                         hit = matches[
-                            np.isclose(matches["Observed_E_keV"], r["Energy_keV"], atol=plot_atol)
+                            np.isclose(
+                                matches["Observed_E_keV"],
+                                r["Energy_keV"],
+                                atol=plot_atol,
+                            )
                         ]
                         if not hit.empty:
                             row_hit = hit.iloc[0]
@@ -1309,7 +1468,9 @@ def main() -> None:
     if peak_rows:
         peak_df = pd.DataFrame(peak_rows)
         os.makedirs(args.out_dir, exist_ok=True)
-        peak_df.to_csv(os.path.join(args.out_dir, "identified_peaks_batch.csv"), index=False)
+        peak_df.to_csv(
+            os.path.join(args.out_dir, "identified_peaks_batch.csv"), index=False
+        )
 
     # paired comparisons (C vs N)
     for c_path, n_path, label in discover_pairs(spectra_files):
@@ -1368,15 +1529,21 @@ def main() -> None:
     print(f"Processed {len(spectra_files)} spectra → {single_dir}")
     print(f"C/N comparisons saved to {compare_dir}")
     if peak_rows:
-        print(f"Peak CSV updated: {os.path.join(args.out_dir, 'identified_peaks_batch.csv')}")
+        print(
+            f"Peak CSV updated: {os.path.join(args.out_dir, 'identified_peaks_batch.csv')}"
+        )
 
     # Report mapping summary
     if report_map:
         n_keys = len(report_map)
         n_total = sum(len(v) for v in report_map.values())
-        print(f"Seeded from reports: {n_keys} matched spectrum keys, {n_total} report centroid entries.")
+        print(
+            f"Seeded from reports: {n_keys} matched spectrum keys, {n_total} report centroid entries."
+        )
     else:
-        print("No report peaks seeded (no matching TXT files found or matching score too low).")
+        print(
+            "No report peaks seeded (no matching TXT files found or matching score too low)."
+        )
 
 
 if __name__ == "__main__":

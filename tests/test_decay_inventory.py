@@ -8,7 +8,12 @@ TEST_DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
 def test_decay_inventory_matches_reference():
-    path = TEST_DATA_DIR / "radioactivedecay" / "icrp107_ame2020_nubase2020" / "decay_data.npz"
+    path = (
+        TEST_DATA_DIR
+        / "radioactivedecay"
+        / "icrp107_ame2020_nubase2020"
+        / "decay_data.npz"
+    )
     dataset = DecayDataset.from_radioactivedecay_npz(path)
 
     inv = DecayInventory.from_quantities({"Mo-99": 2.0}, unit="bq", dataset=dataset)
@@ -21,7 +26,12 @@ def test_decay_inventory_matches_reference():
 
 
 def test_cumulative_decays_reference():
-    path = TEST_DATA_DIR / "radioactivedecay" / "icrp107_ame2020_nubase2020" / "decay_data.npz"
+    path = (
+        TEST_DATA_DIR
+        / "radioactivedecay"
+        / "icrp107_ame2020_nubase2020"
+        / "decay_data.npz"
+    )
     dataset = DecayDataset.from_radioactivedecay_npz(path)
 
     inv = DecayInventory.from_quantities({"Mo-99": 2.0}, unit="bq", dataset=dataset)

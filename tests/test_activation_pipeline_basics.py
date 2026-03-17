@@ -15,8 +15,12 @@ def test_alara_config_find_executable_returns_string_or_none():
 
 
 def test_activation_comparison_and_pipeline_summary():
-    calc = ActivationResult(isotope="Co60", activity_Bq=100.0, activity_unc=10.0, source="ALARA")
-    meas = ActivationResult(isotope="Co60", activity_Bq=95.0, activity_unc=8.0, source="measured")
+    calc = ActivationResult(
+        isotope="Co60", activity_Bq=100.0, activity_unc=10.0, source="ALARA"
+    )
+    meas = ActivationResult(
+        isotope="Co60", activity_Bq=95.0, activity_unc=8.0, source="measured"
+    )
     comp = ActivationComparison(isotope="Co60", calculated=calc, measured=meas)
 
     assert comp.c_over_e > 0

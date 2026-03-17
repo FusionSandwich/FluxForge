@@ -53,7 +53,7 @@ def semi_empirical_efficiency(
     window_term = np.exp(-mu_window * window)
     dead_term = np.exp(-mu_total * dead)
     absorption = 1.0 - np.exp(-mu_total * length)
-    scatter = tau + sigma * (1.0 - np.exp(-(mu_total * length0) ** alpha)) * kappa
+    scatter = tau + sigma * (1.0 - np.exp(-((mu_total * length0) ** alpha))) * kappa
 
     efficiency = scale * window_term * dead_term * absorption * scatter / mu_total
     return efficiency

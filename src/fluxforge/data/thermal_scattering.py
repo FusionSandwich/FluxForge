@@ -23,28 +23,28 @@ from typing import Optional
 
 class TSLLibrary(Enum):
     """Thermal scattering library identifiers."""
-    
+
     # ENDF/B-VIII.0 TSL identifiers
-    ENDF8_LWTR = "lwtr"    # Light water H
-    ENDF8_HWTR = "hwtr"    # Heavy water D
-    ENDF8_HZR = "hzr"      # H in ZrH
-    ENDF8_DZR = "dzr"      # D in ZrD  
-    ENDF8_GRPH = "grph"    # Graphite
-    ENDF8_BE = "be"        # Beryllium metal
-    ENDF8_BEO = "beo"      # Beryllium oxide
-    ENDF8_POLY = "poly"    # Polyethylene CH2
-    ENDF8_BENZ = "benz"    # Benzene C6H6
-    ENDF8_METH = "meth"    # Methane CH4
-    ENDF8_AL = "al"        # Aluminum
-    ENDF8_FE = "fe"        # Iron
-    ENDF8_SI = "si"        # Silicon
-    ENDF8_UMET = "umet"    # Uranium metal
-    ENDF8_UO2 = "uo2"      # Uranium dioxide
-    
+    ENDF8_LWTR = "lwtr"  # Light water H
+    ENDF8_HWTR = "hwtr"  # Heavy water D
+    ENDF8_HZR = "hzr"  # H in ZrH
+    ENDF8_DZR = "dzr"  # D in ZrD
+    ENDF8_GRPH = "grph"  # Graphite
+    ENDF8_BE = "be"  # Beryllium metal
+    ENDF8_BEO = "beo"  # Beryllium oxide
+    ENDF8_POLY = "poly"  # Polyethylene CH2
+    ENDF8_BENZ = "benz"  # Benzene C6H6
+    ENDF8_METH = "meth"  # Methane CH4
+    ENDF8_AL = "al"  # Aluminum
+    ENDF8_FE = "fe"  # Iron
+    ENDF8_SI = "si"  # Silicon
+    ENDF8_UMET = "umet"  # Uranium metal
+    ENDF8_UO2 = "uo2"  # Uranium dioxide
+
     # JEFF-3.3 identifiers
     JEFF_LWTR = "j_lwtr"
     JEFF_GRPH = "j_grph"
-    
+
     # Custom/user libraries
     CUSTOM = "custom"
 
@@ -52,7 +52,7 @@ class TSLLibrary(Enum):
 @dataclass
 class ThermalScatteringData:
     """Thermal scattering data for a material-nuclide pair.
-    
+
     Attributes
     ----------
     material : str
@@ -70,7 +70,7 @@ class ThermalScatteringData:
     description : str
         Human-readable description
     """
-    
+
     material: str
     bound_nuclide: str
     tsl_id: str
@@ -78,19 +78,19 @@ class ThermalScatteringData:
     temperatures_K: list[float] = field(default_factory=list)
     mat_number: int = 0
     description: str = ""
-    
+
     def __post_init__(self):
         """Sort temperatures after initialization."""
         self.temperatures_K = sorted(self.temperatures_K)
-    
+
     def nearest_temperature(self, T: float) -> float:
         """Find nearest available temperature.
-        
+
         Parameters
         ----------
         T : float
             Desired temperature in Kelvin
-            
+
         Returns
         -------
         float
@@ -98,17 +98,19 @@ class ThermalScatteringData:
         """
         if not self.temperatures_K:
             return T
-        
+
         return min(self.temperatures_K, key=lambda x: abs(x - T))
-    
-    def interpolation_temperatures(self, T: float) -> tuple[Optional[float], Optional[float]]:
+
+    def interpolation_temperatures(
+        self, T: float
+    ) -> tuple[Optional[float], Optional[float]]:
         """Get bracketing temperatures for interpolation.
-        
+
         Parameters
         ----------
         T : float
             Target temperature in Kelvin
-            
+
         Returns
         -------
         tuple[float | None, float | None]
@@ -116,17 +118,17 @@ class ThermalScatteringData:
         """
         if not self.temperatures_K:
             return None, None
-        
+
         temps = self.temperatures_K
         if T <= temps[0]:
             return None, temps[0]
         if T >= temps[-1]:
             return temps[-1], None
-        
+
         for i, t in enumerate(temps[:-1]):
             if t <= T <= temps[i + 1]:
                 return t, temps[i + 1]
-        
+
         return temps[-1], None
 
 
@@ -157,7 +159,18 @@ ENDF8_TSL_DATA = {
         tsl_id="grph",
         library=TSLLibrary.ENDF8_GRPH,
         mat_number=31,
-        temperatures_K=[293.6, 400.0, 500.0, 600.0, 700.0, 800.0, 1000.0, 1200.0, 1600.0, 2000.0],
+        temperatures_K=[
+            293.6,
+            400.0,
+            500.0,
+            600.0,
+            700.0,
+            800.0,
+            1000.0,
+            1200.0,
+            1600.0,
+            2000.0,
+        ],
         description="Carbon in crystalline graphite",
     ),
     "Be": ThermalScatteringData(
@@ -255,14 +268,14 @@ def get_tsl_for_material(
     temperature_K: float = 293.6,
 ) -> Optional[ThermalScatteringData]:
     """Get thermal scattering data for a material.
-    
+
     Parameters
     ----------
     material : str
         Material name (e.g., "H2O", "graphite", "Be")
     temperature_K : float
         Operating temperature in Kelvin (for validation)
-        
+
     Returns
     -------
     ThermalScatteringData or None
@@ -270,16 +283,16 @@ def get_tsl_for_material(
     """
     # Normalize material name
     material_key = material.strip()
-    
+
     # Try exact match
     if material_key in ENDF8_TSL_DATA:
         return ENDF8_TSL_DATA[material_key]
-    
+
     # Try case-insensitive match
     for key, data in ENDF8_TSL_DATA.items():
         if key.lower() == material_key.lower():
             return data
-    
+
     # Try common aliases
     aliases = {
         "water": "H2O",
@@ -299,24 +312,26 @@ def get_tsl_for_material(
         "iron": "Fe",
         "uranium_dioxide": "UO2",
     }
-    
+
     if material_key.lower() in aliases:
         canonical = aliases[material_key.lower()]
         return ENDF8_TSL_DATA.get(canonical)
-    
+
     return None
 
 
-def requires_thermal_scattering(nuclide: str, material_context: Optional[str] = None) -> bool:
+def requires_thermal_scattering(
+    nuclide: str, material_context: Optional[str] = None
+) -> bool:
     """Check if a nuclide requires thermal scattering treatment.
-    
+
     Parameters
     ----------
     nuclide : str
         Nuclide name (e.g., "H1", "C12", "Be9")
     material_context : str, optional
         Material context for determining if bound scattering is relevant
-        
+
     Returns
     -------
     bool
@@ -324,34 +339,34 @@ def requires_thermal_scattering(nuclide: str, material_context: Optional[str] = 
     """
     # Elements that commonly require thermal scattering
     tsl_elements = {"H", "D", "C", "Be", "O", "Al", "Fe", "U", "Zr"}
-    
+
     # Extract element from nuclide
     element = "".join(c for c in nuclide if c.isalpha())
-    
+
     if element not in tsl_elements:
         return False
-    
+
     # If material context provided, check if TSL available
     if material_context:
         tsl = get_tsl_for_material(material_context)
         if tsl and tsl.bound_nuclide == element:
             return True
         return False
-    
+
     # Default: only H, D, C, Be require TSL without context
     return element in {"H", "D", "C", "Be"}
 
 
 def get_mcnp_sab_card(material: str, temperature_K: float = 293.6) -> Optional[str]:
     """Get MCNP SAB card identifier for thermal scattering.
-    
+
     Parameters
     ----------
     material : str
         Material name
     temperature_K : float
         Temperature in Kelvin (for selecting temperature suffix)
-        
+
     Returns
     -------
     str or None
@@ -360,13 +375,13 @@ def get_mcnp_sab_card(material: str, temperature_K: float = 293.6) -> Optional[s
     tsl = get_tsl_for_material(material, temperature_K)
     if tsl is None:
         return None
-    
+
     base_id = MCNP_SAB_IDENTIFIERS.get(material, tsl.tsl_id)
-    
+
     # Temperature suffix (approximate mapping)
     # MCNP uses suffixes like .10t, .12t, .14t, etc.
     T_nearest = tsl.nearest_temperature(temperature_K)
-    
+
     # Map temperature to MCNP suffix (simplified)
     if T_nearest <= 300:
         suffix = ".10t"  # Room temperature
@@ -378,18 +393,18 @@ def get_mcnp_sab_card(material: str, temperature_K: float = 293.6) -> Optional[s
         suffix = ".16t"
     else:
         suffix = ".18t"
-    
+
     return f"{base_id}{suffix}"
 
 
 def get_openmc_tsl_name(material: str) -> Optional[str]:
     """Get OpenMC thermal scattering library name.
-    
+
     Parameters
     ----------
     material : str
         Material name
-        
+
     Returns
     -------
     str or None
@@ -398,14 +413,14 @@ def get_openmc_tsl_name(material: str) -> Optional[str]:
     tsl = get_tsl_for_material(material)
     if tsl is None:
         return None
-    
+
     return OPENMC_TSL_NAMES.get(material)
 
 
 @dataclass
 class ThermalScatteringConfig:
     """Configuration for thermal scattering treatment.
-    
+
     Attributes
     ----------
     enabled : bool
@@ -417,12 +432,12 @@ class ThermalScatteringConfig:
     interpolate : bool
         Whether to interpolate between temperature points
     """
-    
+
     enabled: bool = True
     materials: dict[str, ThermalScatteringData] = field(default_factory=dict)
     temperature_K: float = 293.6
     interpolate: bool = False
-    
+
     @classmethod
     def default(cls) -> ThermalScatteringConfig:
         """Create default configuration with standard materials."""
@@ -431,10 +446,10 @@ class ThermalScatteringConfig:
             materials=dict(ENDF8_TSL_DATA),
             temperature_K=293.6,
         )
-    
+
     def add_material(self, material: str, tsl_id: Optional[str] = None) -> None:
         """Add a material to the configuration.
-        
+
         Parameters
         ----------
         material : str
@@ -453,15 +468,15 @@ class ThermalScatteringConfig:
             std_tsl = get_tsl_for_material(material)
             if std_tsl:
                 self.materials[material] = std_tsl
-    
+
     def get_njoy_thermr_inputs(self, material: str) -> dict:
         """Get NJOY THERMR module inputs for a material.
-        
+
         Parameters
         ----------
         material : str
             Material name
-            
+
         Returns
         -------
         dict
@@ -470,9 +485,9 @@ class ThermalScatteringConfig:
         tsl = self.materials.get(material) or get_tsl_for_material(material)
         if tsl is None:
             return {}
-        
+
         T_nearest = tsl.nearest_temperature(self.temperature_K)
-        
+
         return {
             "matde": tsl.mat_number,
             "matdp": tsl.mat_number,

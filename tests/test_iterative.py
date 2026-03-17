@@ -9,7 +9,9 @@ def test_mlem_identity_converges_to_measurements():
     ]
     measurements = [1.5, 3.0]
     # More iterations and tighter solver tolerance for better convergence
-    solution = mlem(response, measurements, initial_flux=[0.5, 0.5], max_iters=500, tolerance=1e-10)
+    solution = mlem(
+        response, measurements, initial_flux=[0.5, 0.5], max_iters=500, tolerance=1e-10
+    )
     assert solution.converged
     for est, truth in zip(solution.flux, measurements):
         # Realistic tolerance for iterative solver (0.5% relative error)
@@ -23,8 +25,10 @@ def test_gravel_recovers_scale_with_weights():
         [0.2, 1.0],
     ]
     true_flux = [2.0, 1.0]
-    measurements = [response[0][0] * true_flux[0] + response[0][1] * true_flux[1],
-                    response[1][0] * true_flux[0] + response[1][1] * true_flux[1]]
+    measurements = [
+        response[0][0] * true_flux[0] + response[0][1] * true_flux[1],
+        response[1][0] * true_flux[0] + response[1][1] * true_flux[1],
+    ]
     measurement_uncertainty = [0.05 * m for m in measurements]
 
     solution = gravel(
@@ -49,7 +53,7 @@ def test_gradient_descent_identity_case():
         [0.0, 0.0, 1.0],
     ]
     measurements = [2.0, 4.0, 6.0]
-    
+
     solution = gradient_descent(
         response,
         measurements,
@@ -59,7 +63,7 @@ def test_gradient_descent_identity_case():
         smoothness_weight=0.0,  # No smoothness for identity test
         chi2_tolerance=0.01,
     )
-    
+
     assert solution.converged or solution.chi_squared < 0.1
     for est, truth in zip(solution.flux, measurements):
         # Allow 5% relative error
@@ -77,10 +81,9 @@ def test_gradient_descent_with_smoothness():
     # Measurements consistent with a smooth spectrum
     true_flux = [1.0, 2.0, 3.0, 2.0, 1.0]  # Bell-shaped
     measurements = [
-        sum(response[i][g] * true_flux[g] for g in range(5))
-        for i in range(3)
+        sum(response[i][g] * true_flux[g] for g in range(5)) for i in range(3)
     ]
-    
+
     solution = gradient_descent(
         response,
         measurements,
@@ -90,15 +93,23 @@ def test_gradient_descent_with_smoothness():
         smoothness_weight=0.1,  # Encourage smoothness
         chi2_tolerance=0.1,
     )
-    
+
     # Check that solution is reasonably smooth
     log_diffs = []
     import math
+
     for g in range(len(solution.flux) - 1):
-        log_diffs.append(abs(math.log(solution.flux[g+1] + 1e-12) - math.log(solution.flux[g] + 1e-12)))
-    
+        log_diffs.append(
+            abs(
+                math.log(solution.flux[g + 1] + 1e-12)
+                - math.log(solution.flux[g] + 1e-12)
+            )
+        )
+
     avg_smoothness = sum(log_diffs) / len(log_diffs)
-    assert avg_smoothness < 2.0, f"Spectrum not smooth enough: avg log-diff = {avg_smoothness}"
+    assert (
+        avg_smoothness < 2.0
+    ), f"Spectrum not smooth enough: avg log-diff = {avg_smoothness}"
 
 
 def test_gradient_descent_auto_scaling():
@@ -109,7 +120,7 @@ def test_gradient_descent_auto_scaling():
     ]
     # Very different scale from initial guess
     measurements = [1e6, 2e6]
-    
+
     solution = gradient_descent(
         response,
         measurements,
@@ -118,7 +129,7 @@ def test_gradient_descent_auto_scaling():
         auto_scale=True,
         smoothness_weight=0.0,
     )
-    
+
     # Should scale up to match measurement magnitude
     for est, truth in zip(solution.flux, measurements):
         assert abs(est - truth) / truth < 0.1, f"Expected ~{truth}, got {est}"

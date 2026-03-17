@@ -20,7 +20,11 @@ import zipfile
 
 from fluxforge.data.elements import atomic_mass as element_atomic_mass
 from fluxforge.data.gamma_database import get_database
-from fluxforge.data.k0_library import GovernedLibrary, K0LibraryRecord, get_k0_library_record
+from fluxforge.data.k0_library import (
+    GovernedLibrary,
+    K0LibraryRecord,
+    get_k0_library_record,
+)
 from fluxforge.data.nndc import ATOMIC_MASSES as ISOTOPE_ATOMIC_MASSES
 from fluxforge.data.nndc import GAMMA_LINES as NNDC_GAMMA_LINES
 from fluxforge.data.nndc import HALF_LIVES_S
@@ -141,7 +145,9 @@ def _normalize_kayzero_nuclide(label: str) -> str:
     return format_isotope(element, mass_number, metastable)
 
 
-def _find_versioned_member(names: Iterable[str], suffix: str, preferred_version: str | None = None) -> str | None:
+def _find_versioned_member(
+    names: Iterable[str], suffix: str, preferred_version: str | None = None
+) -> str | None:
     candidates = []
     pattern = re.compile(r"k0-(\d{4})" + re.escape(suffix) + r"$", re.IGNORECASE)
     for name in names:
@@ -154,7 +160,9 @@ def _find_versioned_member(names: Iterable[str], suffix: str, preferred_version:
     if not candidates:
         return None
     if preferred_version is not None:
-        preferred = [name for year, name in candidates if str(year) == str(preferred_version)]
+        preferred = [
+            name for year, name in candidates if str(year) == str(preferred_version)
+        ]
         if preferred:
             return sorted(preferred)[-1]
     candidates.sort()
@@ -169,7 +177,10 @@ def _find_named_member(names: Iterable[str], basename: str) -> str | None:
         lowered = normalized.lower()
         if "/__MACOSX/" in f"/{normalized}" or "/._" in f"/{normalized}":
             continue
-        if lowered.endswith(f"/{normalized_basename}") or lowered == normalized_basename:
+        if (
+            lowered.endswith(f"/{normalized_basename}")
+            or lowered == normalized_basename
+        ):
             candidates.append(normalized)
     if not candidates:
         return None
@@ -193,8 +204,14 @@ def _parse_k0_lines(text: str) -> list[_KayzeroGammaLine]:
                     nuclide=_normalize_kayzero_nuclide(nuclide_text),
                     energy_keV=float(energy_text),
                     k0=float(k0_text),
-                    dk0_percent=float(dk0_text) if dk0_text not in {"", "-", "--"} else None,
-                    k0_code=int(float(code_text)) if code_text not in {"", "-", "--"} else None,
+                    dk0_percent=(
+                        float(dk0_text) if dk0_text not in {"", "-", "--"} else None
+                    ),
+                    k0_code=(
+                        int(float(code_text))
+                        if code_text not in {"", "-", "--"}
+                        else None
+                    ),
                 )
             )
         return rows
@@ -215,7 +232,15 @@ def _parse_k0_lines(text: str) -> list[_KayzeroGammaLine]:
         else:
             dk0_percent = None
             k0_code = int(float(tokens[3])) if tokens[3] not in {"-", "--"} else None
-        rows.append(_KayzeroGammaLine(nuclide=nuclide, energy_keV=energy_keV, k0=k0, dk0_percent=dk0_percent, k0_code=k0_code))
+        rows.append(
+            _KayzeroGammaLine(
+                nuclide=nuclide,
+                energy_keV=energy_keV,
+                k0=k0,
+                dk0_percent=dk0_percent,
+                k0_code=k0_code,
+            )
+        )
     return rows
 
 
@@ -231,9 +256,21 @@ def _parse_q0_rows(text: str) -> dict[str, _KayzeroQ0Row]:
             rows[_normalize_kayzero_nuclide(nuclide_text)] = _KayzeroQ0Row(
                 nuclide=_normalize_kayzero_nuclide(nuclide_text),
                 Q0=float(q0_text),
-                dQ0_percent=float(row["dQ0"]) if str(row.get("dQ0") or "").strip() not in {"", "-", "--"} else None,
-                E_res_eV=float(row["Er"]) if str(row.get("Er") or "").strip() not in {"", "-", "--"} else None,
-                dE_res_eV=float(row["dEr"]) if str(row.get("dEr") or "").strip() not in {"", "-", "--"} else None,
+                dQ0_percent=(
+                    float(row["dQ0"])
+                    if str(row.get("dQ0") or "").strip() not in {"", "-", "--"}
+                    else None
+                ),
+                E_res_eV=(
+                    float(row["Er"])
+                    if str(row.get("Er") or "").strip() not in {"", "-", "--"}
+                    else None
+                ),
+                dE_res_eV=(
+                    float(row["dEr"])
+                    if str(row.get("dEr") or "").strip() not in {"", "-", "--"}
+                    else None
+                ),
             )
         return rows
 
@@ -246,10 +283,24 @@ def _parse_q0_rows(text: str) -> dict[str, _KayzeroQ0Row]:
             continue
         nuclide = _normalize_kayzero_nuclide(tokens[0])
         q0 = float(tokens[1])
-        d_q0 = float(tokens[2]) if len(tokens) >= 3 and tokens[2] not in {"-", "--"} else None
-        e_res = float(tokens[3]) if len(tokens) >= 4 and tokens[3] not in {"-", "--"} else None
-        d_e_res = float(tokens[4]) if len(tokens) >= 5 and tokens[4] not in {"-", "--"} else None
-        rows[nuclide] = _KayzeroQ0Row(nuclide=nuclide, Q0=q0, dQ0_percent=d_q0, E_res_eV=e_res, dE_res_eV=d_e_res)
+        d_q0 = (
+            float(tokens[2])
+            if len(tokens) >= 3 and tokens[2] not in {"-", "--"}
+            else None
+        )
+        e_res = (
+            float(tokens[3])
+            if len(tokens) >= 4 and tokens[3] not in {"-", "--"}
+            else None
+        )
+        d_e_res = (
+            float(tokens[4])
+            if len(tokens) >= 5 and tokens[4] not in {"-", "--"}
+            else None
+        )
+        rows[nuclide] = _KayzeroQ0Row(
+            nuclide=nuclide, Q0=q0, dQ0_percent=d_q0, E_res_eV=e_res, dE_res_eV=d_e_res
+        )
     return rows
 
 
@@ -262,11 +313,17 @@ def _parse_half_life_rows(text: str) -> dict[str, _KayzeroHalfLifeRow]:
             value_text = str(row.get("T1/2") or row.get("t1/2") or "").strip()
             if not nuclide_text or not value_text:
                 continue
-            uncertainty_text = str(row.get("dT") or row.get("dT12") or row.get("dT1/2") or "").strip()
+            uncertainty_text = str(
+                row.get("dT") or row.get("dT12") or row.get("dT1/2") or ""
+            ).strip()
             rows[_normalize_kayzero_nuclide(nuclide_text)] = _KayzeroHalfLifeRow(
                 nuclide=_normalize_kayzero_nuclide(nuclide_text),
                 raw_value=float(value_text),
-                raw_uncertainty=float(uncertainty_text) if uncertainty_text not in {"", "-", "--"} else None,
+                raw_uncertainty=(
+                    float(uncertainty_text)
+                    if uncertainty_text not in {"", "-", "--"}
+                    else None
+                ),
             )
         return rows
 
@@ -279,8 +336,14 @@ def _parse_half_life_rows(text: str) -> dict[str, _KayzeroHalfLifeRow]:
             continue
         nuclide = _normalize_kayzero_nuclide(tokens[0])
         value = float(tokens[1])
-        uncertainty = float(tokens[2]) if len(tokens) >= 3 and tokens[2] not in {"-", "--"} else None
-        rows[nuclide] = _KayzeroHalfLifeRow(nuclide=nuclide, raw_value=value, raw_uncertainty=uncertainty)
+        uncertainty = (
+            float(tokens[2])
+            if len(tokens) >= 3 and tokens[2] not in {"-", "--"}
+            else None
+        )
+        rows[nuclide] = _KayzeroHalfLifeRow(
+            nuclide=nuclide, raw_value=value, raw_uncertainty=uncertainty
+        )
     return rows
 
 
@@ -306,7 +369,9 @@ def _parse_iri_mb1_rows(text: str) -> dict[str, _IriReactionRow]:
     current_atomic_mass: float | None = None
     current_reaction: tuple[str, str] | None = None
     float_pattern = r"[-+]?\d+(?:\.\d+)?(?:E[-+]?\d+)?"
-    reaction_pattern = re.compile(r"^\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)\s*->\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)")
+    reaction_pattern = re.compile(
+        r"^\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)\s*->\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)"
+    )
 
     for raw_line in text.splitlines():
         line = raw_line.rstrip()
@@ -333,7 +398,9 @@ def _parse_iri_mb1_rows(text: str) -> dict[str, _IriReactionRow]:
             continue
         q0_match = re.search(r"Q0:\s*(%s)" % float_pattern, stripped)
         e_res_match = re.search(r"Er:\s*(%s)" % float_pattern, stripped)
-        sigma_match = re.search(r",\s*[^:,()]+:\s*(%s)\s*(m?b)" % float_pattern, stripped)
+        sigma_match = re.search(
+            r",\s*[^:,()]+:\s*(%s)\s*(m?b)" % float_pattern, stripped
+        )
         if sigma_match is None or sigma_match.group(2).lower() != "b":
             continue
         numeric_tokens = re.findall(float_pattern, stripped)
@@ -355,7 +422,9 @@ def _parse_iri_mb1_rows(text: str) -> dict[str, _IriReactionRow]:
 
 def _parse_iri_mb1_parent_map(text: str) -> dict[str, list[str]]:
     rows: dict[str, list[str]] = {}
-    reaction_pattern = re.compile(r"^\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)\s*->\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)")
+    reaction_pattern = re.compile(
+        r"^\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)\s*->\s*([A-Za-z]{1,2}-\d+(?:m\d?|\*)?)"
+    )
     for raw_line in text.splitlines():
         stripped = raw_line.strip()
         if not stripped:
@@ -447,7 +516,11 @@ def _parse_iri_mb3_rows(text: str) -> dict[str, list[_IriGammaLine]]:
         except ValueError:
             continue
         rows.setdefault(nuclide, []).append(
-            _IriGammaLine(energy_keV=energy_keV, intensity_fraction=float(intensity_fraction), is_primary=False)
+            _IriGammaLine(
+                energy_keV=energy_keV,
+                intensity_fraction=float(intensity_fraction),
+                is_primary=False,
+            )
         )
     return rows
 
@@ -468,7 +541,9 @@ def _parse_fcd_rows(text: str) -> dict[str, float]:
     return rows
 
 
-def _detect_half_life_scale(raw_half_lives: dict[str, _KayzeroHalfLifeRow]) -> tuple[float, str]:
+def _detect_half_life_scale(
+    raw_half_lives: dict[str, _KayzeroHalfLifeRow]
+) -> tuple[float, str]:
     minute_votes = 0
     second_votes = 0
     for nuclide, row in raw_half_lives.items():
@@ -495,16 +570,24 @@ def _product_and_target_isotopes(product_isotope: str) -> tuple[str, str, list[s
     return element, target_isotope, notes
 
 
-def _match_gamma_intensity(iri_lines: list[_IriGammaLine], energy_keV: float) -> float | None:
+def _match_gamma_intensity(
+    iri_lines: list[_IriGammaLine], energy_keV: float
+) -> float | None:
     for line in iri_lines:
         if abs(float(line.energy_keV) - float(energy_keV)) <= 1.0:
             return float(line.intensity_fraction)
     return None
 
 
-def _supplemental_gamma_intensity(product_isotope: str, energy_keV: float) -> tuple[float, str] | None:
+def _supplemental_gamma_intensity(
+    product_isotope: str, energy_keV: float
+) -> tuple[float, str] | None:
     for candidate in _metastable_family(product_isotope):
-        for line_energy_keV, intensity_fraction, source_name in _SUPPLEMENTAL_GAMMA_LINES.get(candidate, []):
+        for (
+            line_energy_keV,
+            intensity_fraction,
+            source_name,
+        ) in _SUPPLEMENTAL_GAMMA_LINES.get(candidate, []):
             if abs(float(line_energy_keV) - float(energy_keV)) <= 1.0:
                 return float(intensity_fraction), source_name
         for line_energy_keV, intensity_fraction in NNDC_GAMMA_LINES.get(candidate, []):
@@ -532,7 +615,9 @@ def _resolve_iri_reaction_row(
 
     for candidate in _metastable_family(product_isotope):
         for parent_isotope in parent_map.get(candidate, []):
-            resolved, source = _resolve_iri_reaction_row(parent_isotope, direct_rows, parent_map, _seen=seen)
+            resolved, source = _resolve_iri_reaction_row(
+                parent_isotope, direct_rows, parent_map, _seen=seen
+            )
             if resolved is not None:
                 return resolved, "iri_ancestor" if source else "iri_ancestor"
 
@@ -541,11 +626,17 @@ def _resolve_iri_reaction_row(
         return inferred_capture, "iri_inferred_capture"
 
     element, mass_number, metastable = parse_isotope(product_isotope)
-    sibling_candidates = [format_isotope(element, mass_number, 1)] if metastable == 0 else [format_isotope(element, mass_number)]
+    sibling_candidates = (
+        [format_isotope(element, mass_number, 1)]
+        if metastable == 0
+        else [format_isotope(element, mass_number)]
+    )
     for sibling in sibling_candidates:
         if sibling == product_isotope:
             continue
-        resolved, source = _resolve_iri_reaction_row(sibling, direct_rows, parent_map, _seen=seen)
+        resolved, source = _resolve_iri_reaction_row(
+            sibling, direct_rows, parent_map, _seen=seen
+        )
         if resolved is not None:
             return resolved, "iri_sibling"
     return None, None
@@ -578,13 +669,20 @@ def _infer_capture_reaction_row(
                     product_isotope=product_isotope,
                     target_isotope=parent_isotope,
                     element=parent_element,
-                    atomic_mass_g_mol=float(target_atomic_mass) if target_atomic_mass is not None else None,
-                    isotopic_abundance=NATURAL_ABUNDANCES.get(parent_isotope) or _supplemental_isotopic_abundance(parent_isotope),
+                    atomic_mass_g_mol=(
+                        float(target_atomic_mass)
+                        if target_atomic_mass is not None
+                        else None
+                    ),
+                    isotopic_abundance=NATURAL_ABUNDANCES.get(parent_isotope)
+                    or _supplemental_isotopic_abundance(parent_isotope),
                     sigma_0_barn=None,
                     Q0=None,
                     E_res_eV=None,
                 )
-            inferred = _infer_capture_reaction_row(parent_isotope, parent_map, _seen=seen)
+            inferred = _infer_capture_reaction_row(
+                parent_isotope, parent_map, _seen=seen
+            )
             if inferred is not None:
                 return inferred
     return None
@@ -609,12 +707,18 @@ def _resolve_ancestor_q0_row(
 
     for candidate in _metastable_family(product_isotope):
         for parent_isotope in parent_map.get(candidate, []):
-            row, source = _resolve_ancestor_q0_row(parent_isotope, q0_rows, parent_map, _seen=seen)
+            row, source = _resolve_ancestor_q0_row(
+                parent_isotope, q0_rows, parent_map, _seen=seen
+            )
             if row is not None:
                 return row, "uq0_ancestor" if source else "uq0_ancestor"
 
     element, mass_number, metastable = parse_isotope(product_isotope)
-    sibling_candidates = [format_isotope(element, mass_number, 1)] if metastable == 0 else [format_isotope(element, mass_number)]
+    sibling_candidates = (
+        [format_isotope(element, mass_number, 1)]
+        if metastable == 0
+        else [format_isotope(element, mass_number)]
+    )
     for sibling in sibling_candidates:
         if sibling == product_isotope:
             continue
@@ -634,7 +738,11 @@ def _derive_sigma0_from_k0(
     if gamma_intensity <= 0.0 or isotopic_abundance <= 0.0 or atomic_mass_g_mol <= 0.0:
         return None
     gold_reference = get_k0_library_record("Au-198")
-    if gold_reference is None or gold_reference.sigma_0_barn <= 0.0 or gold_reference.gamma_intensity <= 0.0:
+    if (
+        gold_reference is None
+        or gold_reference.sigma_0_barn <= 0.0
+        or gold_reference.gamma_intensity <= 0.0
+    ):
         return None
     return float(
         k0_au
@@ -682,10 +790,15 @@ def _choose_primary_line(
             for line in lines:
                 if abs(line.energy_keV - iri_line.energy_keV) <= 1.0:
                     return line
-    return sorted(lines, key=lambda item: (item.k0_code if item.k0_code is not None else 9999, -item.k0))[0]
+    return sorted(
+        lines,
+        key=lambda item: (item.k0_code if item.k0_code is not None else 9999, -item.k0),
+    )[0]
 
 
-def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str | None = None) -> KayzeroImportResult:
+def import_kayzero_k0_library(
+    source_path: str | Path, *, preferred_version: str | None = None
+) -> KayzeroImportResult:
     """Import a Kayzero library folder or zip into a governed FluxForge k0 library.
 
     The import currently uses the text-discoverable sidecar files and emits a
@@ -713,13 +826,31 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
         gamma_lines = _parse_k0_lines(source.read_text(uk0_member))
         q0_rows = _parse_q0_rows(source.read_text(q0_member))
         half_life_rows = _parse_half_life_rows(source.read_text(t12_member))
-        md_codes = {} if md_member is None else _parse_md_codes(source.read_text(md_member))
-        fcd_rows = {} if fcd_member is None else _parse_fcd_rows(source.read_text(fcd_member))
-        iri_mb1_text = None if iri_mb1_member is None else source.read_text(iri_mb1_member)
-        iri_reaction_rows = {} if iri_mb1_text is None else _parse_iri_mb1_rows(iri_mb1_text)
-        iri_parent_map = {} if iri_mb1_text is None else _parse_iri_mb1_parent_map(iri_mb1_text)
-        iri_gamma_rows = {} if iri_mb2_member is None else _parse_iri_mb2_rows(source.read_text(iri_mb2_member))
-        iri_mb3_rows = {} if iri_mb3_member is None else _parse_iri_mb3_rows(source.read_text(iri_mb3_member))
+        md_codes = (
+            {} if md_member is None else _parse_md_codes(source.read_text(md_member))
+        )
+        fcd_rows = (
+            {} if fcd_member is None else _parse_fcd_rows(source.read_text(fcd_member))
+        )
+        iri_mb1_text = (
+            None if iri_mb1_member is None else source.read_text(iri_mb1_member)
+        )
+        iri_reaction_rows = (
+            {} if iri_mb1_text is None else _parse_iri_mb1_rows(iri_mb1_text)
+        )
+        iri_parent_map = (
+            {} if iri_mb1_text is None else _parse_iri_mb1_parent_map(iri_mb1_text)
+        )
+        iri_gamma_rows = (
+            {}
+            if iri_mb2_member is None
+            else _parse_iri_mb2_rows(source.read_text(iri_mb2_member))
+        )
+        iri_mb3_rows = (
+            {}
+            if iri_mb3_member is None
+            else _parse_iri_mb3_rows(source.read_text(iri_mb3_member))
+        )
         half_life_scale, half_life_scale_note = _detect_half_life_scale(half_life_rows)
 
         grouped_lines: dict[str, list[_KayzeroGammaLine]] = {}
@@ -732,10 +863,17 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
         fallback_counts: Counter[str] = Counter()
 
         for product_isotope, lines in sorted(grouped_lines.items()):
-            iri_reaction, iri_reaction_source = _resolve_iri_reaction_row(product_isotope, iri_reaction_rows, iri_parent_map)
-            iri_lines = [*iri_gamma_rows.get(product_isotope, []), *iri_mb3_rows.get(product_isotope, [])]
+            iri_reaction, iri_reaction_source = _resolve_iri_reaction_row(
+                product_isotope, iri_reaction_rows, iri_parent_map
+            )
+            iri_lines = [
+                *iri_gamma_rows.get(product_isotope, []),
+                *iri_mb3_rows.get(product_isotope, []),
+            ]
             primary = _choose_primary_line(product_isotope, lines, iri_lines=iri_lines)
-            q0_row, q0_row_source = _resolve_ancestor_q0_row(product_isotope, q0_rows, iri_parent_map)
+            q0_row, q0_row_source = _resolve_ancestor_q0_row(
+                product_isotope, q0_rows, iri_parent_map
+            )
             t12_row = half_life_rows.get(product_isotope)
             starter = get_k0_library_record(product_isotope)
             if iri_reaction is not None:
@@ -744,7 +882,9 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                 notes = ["target_isotope_from_iri_mb1"]
                 fallback_counts[iri_reaction_source or "iri_reaction"] += 1
             else:
-                element, target_isotope, notes = _product_and_target_isotopes(product_isotope)
+                element, target_isotope, notes = _product_and_target_isotopes(
+                    product_isotope
+                )
             missing_fields: list[str] = []
 
             gamma_intensity = None
@@ -754,7 +894,10 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                 if gamma_intensity is not None:
                     gamma_source = "iri_mb2"
             if starter is not None:
-                if gamma_intensity is None and abs(primary.energy_keV - starter.gamma_energy_keV) <= 1.0:
+                if (
+                    gamma_intensity is None
+                    and abs(primary.energy_keV - starter.gamma_energy_keV) <= 1.0
+                ):
                     gamma_intensity = starter.gamma_intensity
                     gamma_source = "starter_primary"
                 elif gamma_intensity is None:
@@ -764,11 +907,15 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                             gamma_source = "starter_additional"
                             break
             if gamma_intensity is None:
-                supplemental_gamma = _supplemental_gamma_intensity(product_isotope, primary.energy_keV)
+                supplemental_gamma = _supplemental_gamma_intensity(
+                    product_isotope, primary.energy_keV
+                )
                 if supplemental_gamma is not None:
                     gamma_intensity, gamma_source = supplemental_gamma
             if gamma_intensity is None:
-                gamma_intensity = _gamma_database_intensity(product_isotope, primary.energy_keV)
+                gamma_intensity = _gamma_database_intensity(
+                    product_isotope, primary.energy_keV
+                )
                 if gamma_intensity is not None:
                     gamma_source = "gamma_database"
             if gamma_intensity is None:
@@ -804,7 +951,11 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
             elif q0_row is None and iri_reaction is None:
                 missing_fields.append("Q0")
 
-            q0_unc_percent = float(q0_row.dQ0_percent or 0.0) if q0_row is not None else float(starter.Q0_unc_percent if starter is not None else 0.0)
+            q0_unc_percent = (
+                float(q0_row.dQ0_percent or 0.0)
+                if q0_row is not None
+                else float(starter.Q0_unc_percent if starter is not None else 0.0)
+            )
             if q0_row is not None and q0_row.dQ0_percent is not None:
                 fallback_counts["uq0_uncertainty"] += 1
 
@@ -822,11 +973,17 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                 sigma_0_barn = float(iri_reaction.sigma_0_barn)
                 fallback_counts["iri_sigma0"] += 1
             else:
-                sigma_0_barn = float(starter.sigma_0_barn) if starter is not None else 0.0
+                sigma_0_barn = (
+                    float(starter.sigma_0_barn) if starter is not None else 0.0
+                )
             if iri_reaction is None and starter is not None:
                 fallback_counts["starter_sigma_i0"] += 1
 
-            isotopic_abundance = iri_reaction.isotopic_abundance if iri_reaction is not None else NATURAL_ABUNDANCES.get(target_isotope)
+            isotopic_abundance = (
+                iri_reaction.isotopic_abundance
+                if iri_reaction is not None
+                else NATURAL_ABUNDANCES.get(target_isotope)
+            )
             if iri_reaction is not None and iri_reaction.isotopic_abundance is not None:
                 fallback_counts["iri_abundance"] += 1
             if isotopic_abundance is None:
@@ -841,7 +998,11 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                     isotopic_abundance = 1.0
                     missing_fields.append("isotopic_abundance")
 
-            atomic_mass = iri_reaction.atomic_mass_g_mol if iri_reaction is not None else ISOTOPE_ATOMIC_MASSES.get(target_isotope)
+            atomic_mass = (
+                iri_reaction.atomic_mass_g_mol
+                if iri_reaction is not None
+                else ISOTOPE_ATOMIC_MASSES.get(target_isotope)
+            )
             if iri_reaction is not None and iri_reaction.atomic_mass_g_mol is not None:
                 fallback_counts["iri_atomic_mass"] += 1
             if atomic_mass is None:
@@ -874,7 +1035,11 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
             if I0_barn <= 0.0:
                 missing_fields.append("I0_barn")
 
-            data_status = "imported_kayzero_text_complete" if not missing_fields else "imported_kayzero_text_partial"
+            data_status = (
+                "imported_kayzero_text_complete"
+                if not missing_fields
+                else "imported_kayzero_text_partial"
+            )
             if primary.k0_code is not None:
                 notes.append(f"kayzero_k0_code:{primary.k0_code}")
             if product_isotope in md_codes:
@@ -894,14 +1059,21 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                 rounded_energy = int(round(iri_line.energy_keV * 10.0))
                 if rounded_energy in seen_additional_energies:
                     continue
-                additional_gammas.append((iri_line.energy_keV, iri_line.intensity_fraction))
+                additional_gammas.append(
+                    (iri_line.energy_keV, iri_line.intensity_fraction)
+                )
                 seen_additional_energies.add(rounded_energy)
             if starter is not None:
                 for energy_keV, fallback_intensity in starter.additional_gammas:
                     rounded_energy = int(round(float(energy_keV) * 10.0))
-                    if rounded_energy in seen_additional_energies or abs(float(energy_keV) - primary.energy_keV) <= 1.0:
+                    if (
+                        rounded_energy in seen_additional_energies
+                        or abs(float(energy_keV) - primary.energy_keV) <= 1.0
+                    ):
                         continue
-                    additional_gammas.append((float(energy_keV), float(fallback_intensity)))
+                    additional_gammas.append(
+                        (float(energy_keV), float(fallback_intensity))
+                    )
                     seen_additional_energies.add(rounded_energy)
 
             records[product_isotope] = K0LibraryRecord(
@@ -937,12 +1109,18 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                         "product_isotope": product_isotope,
                         "primary_energy_keV": primary.energy_keV,
                         "missing_fields": sorted(set(missing_fields)),
-                        "available_line_energies_keV": [item.energy_keV for item in lines],
+                        "available_line_energies_keV": [
+                            item.energy_keV for item in lines
+                        ],
                     }
                 )
 
         available_year_match = re.search(r"k0-(\d{4})", uk0_member, re.IGNORECASE)
-        version = available_year_match.group(1) if available_year_match else (preferred_version or "unknown")
+        version = (
+            available_year_match.group(1)
+            if available_year_match
+            else (preferred_version or "unknown")
+        )
         report = {
             "source_path": str(source_path),
             "library_version_detected": version,
@@ -954,17 +1132,23 @@ def import_kayzero_k0_library(source_path: str | Path, *, preferred_version: str
                 "FCd": fcd_member,
                 "LB1": lb1_member,
                 "LB2": lb2_member,
-                    "IRI_MB1": iri_mb1_member,
-                    "IRI_MB2": iri_mb2_member,
-                    "IRI_MB3": iri_mb3_member,
+                "IRI_MB1": iri_mb1_member,
+                "IRI_MB2": iri_mb2_member,
+                "IRI_MB3": iri_mb3_member,
             },
-            "half_life_scale": {"scale_factor": half_life_scale, "interpretation": half_life_scale_note},
+            "half_life_scale": {
+                "scale_factor": half_life_scale,
+                "interpretation": half_life_scale_note,
+            },
             "summary": {
                 "record_count": len(records),
-                "resolved_without_missing_fields": len(records) - len(unresolved_records),
+                "resolved_without_missing_fields": len(records)
+                - len(unresolved_records),
                 "partial_record_count": len(unresolved_records),
                 "opaque_binary_files_present": bool(lb1_member or lb2_member),
-                    "iri_text_files_present": bool(iri_mb1_member or iri_mb2_member or iri_mb3_member),
+                "iri_text_files_present": bool(
+                    iri_mb1_member or iri_mb2_member or iri_mb3_member
+                ),
             },
             "fallback_counts": dict(sorted(fallback_counts.items())),
             "missing_field_counts": dict(sorted(missing_field_counts.items())),

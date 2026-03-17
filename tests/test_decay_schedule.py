@@ -21,7 +21,9 @@ def test_fit_schedule_scale_recovers_factor():
     )
 
     network = DecayNetwork.from_roots(["X-1"], dataset)
-    schedule = schedule_from_rates({"X-1": [(100.0, 10.0), (50.0, 30.0)]}, timestamp=True)
+    schedule = schedule_from_rates(
+        {"X-1": [(100.0, 10.0), (50.0, 30.0)]}, timestamp=True
+    )
 
     atoms_end = evolve_with_schedule(network, atoms={}, schedule=schedule, units="s")
     hl = dataset.half_life_s("X-1")
@@ -39,5 +41,7 @@ def test_fit_schedule_scale_recovers_factor():
         )
     ]
 
-    fitted = fit_schedule_scale(network, atoms={}, schedule=schedule, observations=obs, units="s")
+    fitted = fit_schedule_scale(
+        network, atoms={}, schedule=schedule, observations=obs, units="s"
+    )
     assert math.isclose(fitted["X-1"], scale_factor, rel_tol=0.1)

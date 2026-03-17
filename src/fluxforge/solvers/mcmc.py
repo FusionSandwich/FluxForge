@@ -23,7 +23,7 @@ from fluxforge.core.linalg import Matrix, Vector, matmul
 @dataclass
 class MCMCSolution:
     """Container for MCMC solver results.
-    
+
     Attributes
     ----------
     flux : Vector
@@ -43,7 +43,7 @@ class MCMCSolution:
     chi_squared : float
         Chi-squared per DOF at posterior mean
     """
-    
+
     flux: Vector
     samples: List[Vector]
     credible_lower: Vector
@@ -64,11 +64,11 @@ def _log_likelihood(
     floor: float = 1e-20,
 ) -> float:
     """Compute log-likelihood assuming Gaussian measurement errors.
-    
+
     log L = -0.5 * sum_i ((y_i - (R @ phi)_i) / sigma_i)^2
     """
     predicted = matmul(response, flux)
-    
+
     log_lik = 0.0
     for i, (m, p) in enumerate(zip(measurements, predicted)):
         p_safe = max(p, floor)
@@ -76,7 +76,7 @@ def _log_likelihood(
         if sigma > 0:
             residual = (m - p_safe) / sigma
             log_lik -= 0.5 * residual * residual
-    
+
     return log_lik
 
 
@@ -84,7 +84,7 @@ def _log_prior_uniform(flux: Vector, floor: float = 1e-20) -> float:
     """Uniform (improper) prior - returns 0 if all positive, -inf otherwise."""
     for phi in flux:
         if phi <= 0:
-            return float('-inf')
+            return float("-inf")
     return 0.0
 
 
@@ -94,22 +94,22 @@ def _log_prior_smoothness(
     floor: float = 1e-20,
 ) -> float:
     """Smoothness prior penalizing large log-space variations.
-    
+
     Encourages smooth spectra by penalizing (log(phi_g+1) - log(phi_g))^2.
     """
     # Check positivity
     for phi in flux:
         if phi <= 0:
-            return float('-inf')
-    
+            return float("-inf")
+
     if len(flux) < 2:
         return 0.0
-    
+
     penalty = 0.0
     for g in range(len(flux) - 1):
-        log_diff = math.log(max(flux[g+1], floor)) - math.log(max(flux[g], floor))
+        log_diff = math.log(max(flux[g + 1], floor)) - math.log(max(flux[g], floor))
         penalty += log_diff * log_diff
-    
+
     return -smoothness_weight * penalty
 
 
@@ -119,7 +119,7 @@ def _propose_flux(
     floor: float = 1e-20,
 ) -> Vector:
     """Propose new flux using log-normal random walk.
-    
+
     Each group is perturbed independently in log-space:
     log(phi_new) = log(phi_old) + epsilon
     where epsilon ~ N(0, step_size^2)
@@ -161,12 +161,12 @@ def mcmc_unfold(
     target_acceptance: float = 0.3,
 ) -> MCMCSolution:
     """Bayesian MCMC spectrum unfolding using Metropolis-Hastings.
-    
+
     Samples from the posterior distribution:
         P(phi | y) ∝ P(y | phi) * P(phi)
-    
+
     where P(y | phi) is the Gaussian likelihood and P(phi) is the prior.
-    
+
     Parameters
     ----------
     response : Matrix
@@ -199,12 +199,12 @@ def mcmc_unfold(
         Adapt step_size during burn-in for target acceptance rate
     target_acceptance : float
         Target acceptance rate for adaptive stepping (0.2-0.5 recommended)
-    
+
     Returns
     -------
     MCMCSolution
         Container with posterior statistics, samples, and diagnostics
-    
+
     Examples
     --------
     >>> from fluxforge.solvers.mcmc import mcmc_unfold
@@ -214,17 +214,17 @@ def mcmc_unfold(
     """
     if seed is not None:
         random.seed(seed)
-    
+
     n_groups = len(response[0])
     n_meas = len(measurements)
-    
+
     # Initialize flux
     if initial_flux is not None:
         current_flux = [max(x, floor) for x in initial_flux]
     else:
         avg_meas = sum(measurements) / len(measurements)
         current_flux = [avg_meas / n_groups for _ in range(n_groups)]
-    
+
     # Select prior function
     if prior == "uniform":
         log_prior_fn = lambda phi: _log_prior_uniform(phi, floor)
@@ -232,93 +232,111 @@ def mcmc_unfold(
         log_prior_fn = lambda phi: _log_prior_smoothness(phi, smoothness_weight, floor)
     else:
         raise ValueError(f"Unknown prior: {prior}. Use 'uniform' or 'smoothness'")
-    
+
     # Compute initial log-posterior
-    current_log_lik = _log_likelihood(response, current_flux, measurements, measurement_uncertainty, floor)
+    current_log_lik = _log_likelihood(
+        response, current_flux, measurements, measurement_uncertainty, floor
+    )
     current_log_prior = log_prior_fn(current_flux)
     current_log_post = current_log_lik + current_log_prior
-    
+
     # Storage
     samples: List[Vector] = []
     log_post_history: List[float] = []
     n_accepted = 0
     n_total = 0
-    
+
     # Adaptive stepping variables
     adapt_interval = 100
     current_step = step_size
-    
+
     for i in range(n_samples):
         n_total += 1
-        
+
         # Propose new flux
         proposed_flux = _propose_flux(current_flux, current_step, floor)
-        
+
         # Compute log-posterior for proposal
-        proposed_log_lik = _log_likelihood(response, proposed_flux, measurements, measurement_uncertainty, floor)
+        proposed_log_lik = _log_likelihood(
+            response, proposed_flux, measurements, measurement_uncertainty, floor
+        )
         proposed_log_prior = log_prior_fn(proposed_flux)
         proposed_log_post = proposed_log_lik + proposed_log_prior
-        
+
         # Metropolis acceptance ratio (in log space)
         log_alpha = proposed_log_post - current_log_post
-        
+
         # Accept or reject
         if math.log(random.random()) < log_alpha:
             current_flux = proposed_flux
             current_log_post = proposed_log_post
             n_accepted += 1
-        
+
         log_post_history.append(current_log_post)
-        
+
         # Adaptive step size during burn-in
         if adaptive_step and i < burn_in and i > 0 and i % adapt_interval == 0:
             recent_rate = n_accepted / n_total
             if recent_rate < target_acceptance - 0.1:
                 current_step *= 0.8
                 if verbose:
-                    print(f"  MCMC iter {i}: Reducing step to {current_step:.4f} (accept rate {recent_rate:.2%})")
+                    print(
+                        f"  MCMC iter {i}: Reducing step to {current_step:.4f} (accept rate {recent_rate:.2%})"
+                    )
             elif recent_rate > target_acceptance + 0.1:
                 current_step *= 1.2
                 if verbose:
-                    print(f"  MCMC iter {i}: Increasing step to {current_step:.4f} (accept rate {recent_rate:.2%})")
-        
+                    print(
+                        f"  MCMC iter {i}: Increasing step to {current_step:.4f} (accept rate {recent_rate:.2%})"
+                    )
+
         # Store sample after burn-in with thinning
         if i >= burn_in and (i - burn_in) % thin == 0:
             samples.append(current_flux[:])
-        
+
         if verbose and i % 1000 == 0:
             rate = n_accepted / n_total if n_total > 0 else 0
-            print(f"  MCMC iter {i}/{n_samples}: accept_rate = {rate:.2%}, log_post = {current_log_post:.2f}")
-    
+            print(
+                f"  MCMC iter {i}/{n_samples}: accept_rate = {rate:.2%}, log_post = {current_log_post:.2f}"
+            )
+
     # Compute posterior statistics
     if len(samples) == 0:
-        raise ValueError("No samples collected. Increase n_samples or decrease burn_in.")
-    
+        raise ValueError(
+            "No samples collected. Increase n_samples or decrease burn_in."
+        )
+
     # Posterior mean
     n_samples_kept = len(samples)
     posterior_mean = []
     for g in range(n_groups):
         mean_g = sum(s[g] for s in samples) / n_samples_kept
         posterior_mean.append(mean_g)
-    
+
     # Credible intervals
     credible_lower = [_compute_percentile(samples, 2.5, g) for g in range(n_groups)]
     credible_upper = [_compute_percentile(samples, 97.5, g) for g in range(n_groups)]
     credible_median = [_compute_percentile(samples, 50, g) for g in range(n_groups)]
-    
+
     # Compute chi-squared at posterior mean
     predicted = matmul(response, posterior_mean)
     chi2 = 0.0
     for i in range(n_meas):
-        sigma = measurement_uncertainty[i] if measurement_uncertainty else max(measurements[i] * 0.1, floor)
+        sigma = (
+            measurement_uncertainty[i]
+            if measurement_uncertainty
+            else max(measurements[i] * 0.1, floor)
+        )
         if sigma > 0:
             residual = (measurements[i] - predicted[i]) / sigma
             chi2 += residual * residual
     chi2_per_dof = chi2 / max(n_meas - 1, 1)
-    
+
     if verbose:
-        print(f"  MCMC complete: {n_samples_kept} samples, accept_rate = {n_accepted/n_total:.2%}, chi2/dof = {chi2_per_dof:.4f}")
-    
+        print(
+            f"  MCMC complete: {n_samples_kept} samples, accept_rate = {n_accepted/n_total:.2%}, chi2/dof = {chi2_per_dof:.4f}"
+        )
+
     return MCMCSolution(
         flux=posterior_mean,
         samples=samples,
@@ -335,16 +353,16 @@ def mcmc_unfold(
 
 def mcmc_convergence_diagnostic(samples: List[Vector], group: int = 0) -> dict:
     """Compute convergence diagnostics for MCMC chain.
-    
+
     Returns Gelman-Rubin R-hat approximation and effective sample size.
-    
+
     Parameters
     ----------
     samples : List[Vector]
         MCMC samples
     group : int
         Energy group to analyze
-    
+
     Returns
     -------
     dict
@@ -356,29 +374,31 @@ def mcmc_convergence_diagnostic(samples: List[Vector], group: int = 0) -> dict:
     """
     values = [s[group] for s in samples]
     n = len(values)
-    
+
     if n < 10:
-        return {'ess': n, 'mean': sum(values)/n, 'std': 0, 'autocorr_1': 0}
-    
+        return {"ess": n, "mean": sum(values) / n, "std": 0, "autocorr_1": 0}
+
     mean = sum(values) / n
-    variance = sum((v - mean)**2 for v in values) / (n - 1)
+    variance = sum((v - mean) ** 2 for v in values) / (n - 1)
     std = math.sqrt(variance) if variance > 0 else 0
-    
+
     # Lag-1 autocorrelation
     if std > 0:
-        autocorr_1 = sum((values[i] - mean) * (values[i+1] - mean) for i in range(n-1)) / ((n-1) * variance)
+        autocorr_1 = sum(
+            (values[i] - mean) * (values[i + 1] - mean) for i in range(n - 1)
+        ) / ((n - 1) * variance)
     else:
         autocorr_1 = 0
-    
+
     # Approximate effective sample size
     if abs(autocorr_1) < 1:
         ess = n * (1 - autocorr_1) / (1 + autocorr_1)
     else:
         ess = n
-    
+
     return {
-        'ess': max(1, ess),
-        'mean': mean,
-        'std': std,
-        'autocorr_1': autocorr_1,
+        "ess": max(1, ess),
+        "mean": mean,
+        "std": std,
+        "autocorr_1": autocorr_1,
     }

@@ -16,11 +16,35 @@ from typing import Any, Dict, Iterable, List, Optional
 
 import numpy as np
 
-from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
-from fluxforge.analysis.k0_naa import K0Calculator, K0Measurement, K0Parameters, create_k0_measurement_from_peak, identify_isotope_from_gamma, reset_k0_database, set_k0_database_from_governed_library
+from fluxforge.analysis.detector_calibration import (
+    EfficiencyPoint,
+    fit_efficiency_curve,
+)
+from fluxforge.analysis.k0_naa import (
+    K0Calculator,
+    K0Measurement,
+    K0Parameters,
+    create_k0_measurement_from_peak,
+    identify_isotope_from_gamma,
+    reset_k0_database,
+    set_k0_database_from_governed_library,
+)
 from fluxforge.data.efficiency import EfficiencyCurve
-from fluxforge.data.k0_library import GovernedLibrary, get_active_auxiliary_correction_library, get_active_k0_library, get_k0_library_record, get_library_summary, load_governed_library, use_governed_libraries
-from fluxforge.triga.k0 import TRIGAIrradiationParams, TRIGAk0Workflow, get_westcott_g, triple_monitor_method
+from fluxforge.data.k0_library import (
+    GovernedLibrary,
+    get_active_auxiliary_correction_library,
+    get_active_k0_library,
+    get_k0_library_record,
+    get_library_summary,
+    load_governed_library,
+    use_governed_libraries,
+)
+from fluxforge.triga.k0 import (
+    TRIGAIrradiationParams,
+    TRIGAk0Workflow,
+    get_westcott_g,
+    triple_monitor_method,
+)
 from fluxforge.uncertainty.budget import create_k0_naa_budget
 
 
@@ -108,18 +132,30 @@ class PeakObservation:
             irradiation_time_s=float(payload.get("irradiation_time_s", 0.0) or 0.0),
             decay_time_s=float(payload.get("decay_time_s", 0.0) or 0.0),
             counting_time_s=float(payload.get("counting_time_s", 0.0) or 0.0),
-            dead_time_correction_method=str(payload.get("dead_time_correction_method") or "live_time_real_time"),
+            dead_time_correction_method=str(
+                payload.get("dead_time_correction_method") or "live_time_real_time"
+            ),
             baseline_method=str(payload.get("baseline_method") or "unspecified"),
-            deconvolution_status=str(payload.get("deconvolution_status") or "not_evaluated"),
-            interference_flags=tuple(str(item) for item in (payload.get("interference_flags") or [])),
-            analyst_review_status=str(payload.get("analyst_review_status") or "unreviewed"),
-            peak_area_provenance=str(payload.get("peak_area_provenance") or "imported_peak_table"),
+            deconvolution_status=str(
+                payload.get("deconvolution_status") or "not_evaluated"
+            ),
+            interference_flags=tuple(
+                str(item) for item in (payload.get("interference_flags") or [])
+            ),
+            analyst_review_status=str(
+                payload.get("analyst_review_status") or "unreviewed"
+            ),
+            peak_area_provenance=str(
+                payload.get("peak_area_provenance") or "imported_peak_table"
+            ),
             import_format=str(payload.get("import_format") or "peak_report"),
             peak_class=str(payload.get("peak_class") or "photopeak"),
             reaction_family=str(payload.get("reaction_family") or "thermal_capture"),
             gamma_yield=float(payload.get("gamma_yield", 1.0) or 1.0),
             efficiency=_optional_float(payload.get("efficiency")),
-            efficiency_uncertainty=_optional_float(payload.get("efficiency_uncertainty")),
+            efficiency_uncertainty=_optional_float(
+                payload.get("efficiency_uncertainty")
+            ),
             emission_probability=_optional_float(payload.get("emission_probability")),
             sample_role=str(payload.get("sample_role") or "sample"),
             sample_mass_g=_optional_float(payload.get("sample_mass_g")),
@@ -130,9 +166,13 @@ class PeakObservation:
             g_th=float(payload.get("g_th", 1.0) or 1.0),
             g_ep=float(payload.get("g_ep", 1.0) or 1.0),
             cd_factor=float(payload.get("cd_factor", 1.0) or 1.0),
-            eligibility_class=str(payload.get("eligibility_class") or "direct_k0_eligible"),
+            eligibility_class=str(
+                payload.get("eligibility_class") or "direct_k0_eligible"
+            ),
             eligibility_accepted=bool(payload.get("eligibility_accepted", True)),
-            rejection_reasons=tuple(str(item) for item in (payload.get("rejection_reasons") or [])),
+            rejection_reasons=tuple(
+                str(item) for item in (payload.get("rejection_reasons") or [])
+            ),
             expert_override=bool(payload.get("expert_override", False)),
             metadata=dict(payload.get("metadata") or {}),
         )
@@ -166,7 +206,11 @@ def resolve_governed_libraries(
 ) -> tuple[GovernedLibrary, GovernedLibrary]:
     """Resolve the selected standard and auxiliary k0 libraries."""
 
-    standard_library = load_governed_library(k0_library_file, library_kind="standard") if k0_library_file else get_active_k0_library()
+    standard_library = (
+        load_governed_library(k0_library_file, library_kind="standard")
+        if k0_library_file
+        else get_active_k0_library()
+    )
     auxiliary_library = (
         load_governed_library(auxiliary_library_file, library_kind="auxiliary")
         if auxiliary_library_file
@@ -203,11 +247,19 @@ def classify_peak_observation(
         reasons.append("sum_peaks_are_not_base_k0_lines")
         eligibility = "sum_peak"
         accepted = False
-    elif normalized_reaction not in {"thermal_capture", "thermal_fission", "(n,g)", "(n,f)"}:
+    elif normalized_reaction not in {
+        "thermal_capture",
+        "thermal_fission",
+        "(n,g)",
+        "(n,f)",
+    }:
         reasons.append(f"unsupported_reaction_family:{normalized_reaction}")
         eligibility = "unsupported_reaction_family"
         accepted = False
-    elif any(flag.lower() in {"threshold", "threshold_interference", "fast_flux"} for flag in flags):
+    elif any(
+        flag.lower() in {"threshold", "threshold_interference", "fast_flux"}
+        for flag in flags
+    ):
         reasons.append("threshold_or_fast_flux_sensitive")
         eligibility = "threshold_interference_sensitive"
         accepted = False
@@ -220,7 +272,9 @@ def classify_peak_observation(
         accepted = True
 
     if not accepted and (expert_override or allow_advanced):
-        reasons.append("expert_override_applied" if expert_override else "advanced_line_allowed")
+        reasons.append(
+            "expert_override_applied" if expert_override else "advanced_line_allowed"
+        )
         accepted = True
     return eligibility, accepted, reasons
 
@@ -247,8 +301,14 @@ def evaluate_detector_characterization(
     uncertainty = None
     method = "direct_position_calibration"
     reference_position = _optional_float(detector_payload.get("reference_position_mm"))
-    conversions = (detector_payload.get("geometry_conversions") or {}).get("items") or {}
-    if position_mm is not None and reference_position is not None and abs(position_mm - reference_position) > 1e-9:
+    conversions = (detector_payload.get("geometry_conversions") or {}).get(
+        "items"
+    ) or {}
+    if (
+        position_mm is not None
+        and reference_position is not None
+        and abs(position_mm - reference_position) > 1e-9
+    ):
         key = f"{position_mm:.6g}"
         conversion = conversions.get(key)
         if conversion is not None:
@@ -257,7 +317,11 @@ def evaluate_detector_characterization(
             method = str(conversion.get("method") or "empirical_reference_conversion")
         else:
             method = "geometric_fallback"
-            scale = (reference_position / position_mm) ** 2 if position_mm > 0 and reference_position > 0 else 1.0
+            scale = (
+                (reference_position / position_mm) ** 2
+                if position_mm > 0 and reference_position > 0
+                else 1.0
+            )
             efficiency *= scale
             uncertainty = 0.15
     return efficiency, uncertainty, method
@@ -288,20 +352,36 @@ def peak_report_to_observations(
     """Normalize a peak-report artifact into k0-ready peak observations."""
 
     spectrum = spectrum_payload.get("spectrum", {}) if spectrum_payload else {}
-    live_time_s = float(peak_payload.get("live_time_s") or spectrum.get("live_time") or 0.0)
+    live_time_s = float(
+        peak_payload.get("live_time_s") or spectrum.get("live_time") or 0.0
+    )
     real_time_s = float(spectrum.get("real_time") or live_time_s)
     count_start_time = spectrum.get("start_time")
-    source_spectrum_id = str(peak_payload.get("spectrum_id") or spectrum.get("spectrum_id") or "")
+    source_spectrum_id = str(
+        peak_payload.get("spectrum_id") or spectrum.get("spectrum_id") or ""
+    )
     detector_id = str(detector_id or spectrum.get("detector_id") or "")
-    geometry_id = str(geometry_id or spectrum.get("metadata", {}).get("geometry_id") or "")
+    geometry_id = str(
+        geometry_id or spectrum.get("metadata", {}).get("geometry_id") or ""
+    )
     spectrum_metadata = spectrum.get("metadata", {}) or {}
     observations: list[PeakObservation] = []
 
     for index, row in enumerate(peak_payload.get("peaks", []) or []):
-        energy_keV = float(row.get("analysis_peak_energy_keV") or row.get("energy_keV") or 0.0)
-        net_area = float(row.get("net_counts") or row.get("area") or row.get("raw_counts") or 0.0)
-        area_uncertainty = float(row.get("net_counts_unc") or max(np.sqrt(max(net_area, 0.0)), 0.0))
-        assigned = row.get("assigned_radionuclide") or row.get("report_isotope") or identify_isotope_from_gamma(energy_keV)
+        energy_keV = float(
+            row.get("analysis_peak_energy_keV") or row.get("energy_keV") or 0.0
+        )
+        net_area = float(
+            row.get("net_counts") or row.get("area") or row.get("raw_counts") or 0.0
+        )
+        area_uncertainty = float(
+            row.get("net_counts_unc") or max(np.sqrt(max(net_area, 0.0)), 0.0)
+        )
+        assigned = (
+            row.get("assigned_radionuclide")
+            or row.get("report_isotope")
+            or identify_isotope_from_gamma(energy_keV)
+        )
         peak_class = str(row.get("peak_type") or row.get("peak_class") or "photopeak")
         flags: list[str] = []
         if row.get("interference_flags"):
@@ -309,7 +389,9 @@ def peak_report_to_observations(
         if row.get("threshold_interference_sensitive"):
             flags.append("threshold_interference")
         reaction_family = str(row.get("reaction_family") or "thermal_capture")
-        gamma_yield = float(row.get("gamma_yield") or row.get("emission_probability") or 1.0)
+        gamma_yield = float(
+            row.get("gamma_yield") or row.get("emission_probability") or 1.0
+        )
         eligibility_class, accepted, reasons = classify_peak_observation(
             peak_class,
             gamma_yield=gamma_yield,
@@ -318,7 +400,9 @@ def peak_report_to_observations(
             expert_override=expert_override,
             allow_advanced=allow_advanced,
         )
-        position_mm = _optional_float(row.get("position_mm") or spectrum.get("metadata", {}).get("position_mm"))
+        position_mm = _optional_float(
+            row.get("position_mm") or spectrum.get("metadata", {}).get("position_mm")
+        )
         efficiency = _optional_float(row.get("efficiency"))
         efficiency_uncertainty = _optional_float(row.get("efficiency_uncertainty"))
         metadata = {
@@ -328,10 +412,12 @@ def peak_report_to_observations(
             "background_subtracted": row.get("background_subtracted"),
         }
         if detector_payload is not None and efficiency is None:
-            efficiency, efficiency_uncertainty, conversion_method = evaluate_detector_characterization(
-                detector_payload,
-                energy_keV,
-                position_mm=position_mm,
+            efficiency, efficiency_uncertainty, conversion_method = (
+                evaluate_detector_characterization(
+                    detector_payload,
+                    energy_keV,
+                    position_mm=position_mm,
+                )
             )
             metadata["geometry_conversion_method"] = conversion_method
         observation = PeakObservation(
@@ -341,7 +427,9 @@ def peak_report_to_observations(
             geometry_id=geometry_id,
             position_mm=position_mm,
             line_energy_keV=energy_keV,
-            line_id=str(row.get("line_id") or f"{assigned or 'unknown'}@{energy_keV:.3f}keV"),
+            line_id=str(
+                row.get("line_id") or f"{assigned or 'unknown'}@{energy_keV:.3f}keV"
+            ),
             assigned_radionuclide=str(assigned) if assigned else None,
             net_peak_area=net_area,
             area_uncertainty=area_uncertainty,
@@ -349,28 +437,65 @@ def peak_report_to_observations(
             real_time_s=real_time_s,
             count_start_time=count_start_time,
             reference_time=spectrum.get("metadata", {}).get("reference_time"),
-            irradiation_time_s=float(row.get("irradiation_time_s") or irradiation_time_s or 0.0),
+            irradiation_time_s=float(
+                row.get("irradiation_time_s") or irradiation_time_s or 0.0
+            ),
             decay_time_s=float(row.get("decay_time_s") or decay_time_s or 0.0),
-            counting_time_s=float(row.get("counting_time_s") or counting_time_s or live_time_s or 0.0),
-            dead_time_correction_method=str(row.get("dead_time_correction_method") or default_dead_time_correction_method),
+            counting_time_s=float(
+                row.get("counting_time_s") or counting_time_s or live_time_s or 0.0
+            ),
+            dead_time_correction_method=str(
+                row.get("dead_time_correction_method")
+                or default_dead_time_correction_method
+            ),
             baseline_method=str(row.get("baseline_method") or baseline_method),
-            deconvolution_status=str(row.get("deconvolution_status") or ("manual_roi" if row.get("manual") else "not_evaluated")),
+            deconvolution_status=str(
+                row.get("deconvolution_status")
+                or ("manual_roi" if row.get("manual") else "not_evaluated")
+            ),
             interference_flags=tuple(flags),
-            analyst_review_status=str(row.get("analyst_review_status") or analyst_review_status),
-            peak_area_provenance=str(row.get("peak_area_provenance") or peak_area_provenance),
+            analyst_review_status=str(
+                row.get("analyst_review_status") or analyst_review_status
+            ),
+            peak_area_provenance=str(
+                row.get("peak_area_provenance") or peak_area_provenance
+            ),
             import_format=str(row.get("import_format") or import_format),
             peak_class=peak_class,
             reaction_family=reaction_family,
             gamma_yield=gamma_yield,
             efficiency=efficiency,
             efficiency_uncertainty=efficiency_uncertainty,
-            emission_probability=_optional_float(row.get("emission_probability")) or gamma_yield,
+            emission_probability=_optional_float(row.get("emission_probability"))
+            or gamma_yield,
             sample_role=str(row.get("sample_role") or "sample"),
             sample_mass_g=_optional_float(row.get("sample_mass_g")),
-            project_id=_first_nonempty(row.get("project_id"), project_id, peak_payload.get("project_id"), spectrum_metadata.get("project_id")),
-            sample_id=_first_nonempty(row.get("sample_id"), sample_id, peak_payload.get("sample_id"), spectrum_metadata.get("sample_id"), source_spectrum_id),
-            irradiation_id=_first_nonempty(row.get("irradiation_id"), irradiation_id, peak_payload.get("irradiation_id"), spectrum_metadata.get("irradiation_id")),
-            measurement_id=_first_nonempty(row.get("measurement_id"), measurement_id, peak_payload.get("measurement_id"), spectrum_metadata.get("measurement_id"), f"{source_spectrum_id}:{index + 1}"),
+            project_id=_first_nonempty(
+                row.get("project_id"),
+                project_id,
+                peak_payload.get("project_id"),
+                spectrum_metadata.get("project_id"),
+            ),
+            sample_id=_first_nonempty(
+                row.get("sample_id"),
+                sample_id,
+                peak_payload.get("sample_id"),
+                spectrum_metadata.get("sample_id"),
+                source_spectrum_id,
+            ),
+            irradiation_id=_first_nonempty(
+                row.get("irradiation_id"),
+                irradiation_id,
+                peak_payload.get("irradiation_id"),
+                spectrum_metadata.get("irradiation_id"),
+            ),
+            measurement_id=_first_nonempty(
+                row.get("measurement_id"),
+                measurement_id,
+                peak_payload.get("measurement_id"),
+                spectrum_metadata.get("measurement_id"),
+                f"{source_spectrum_id}:{index + 1}",
+            ),
             g_th=float(row.get("g_th", 1.0) or 1.0),
             g_ep=float(row.get("g_ep", 1.0) or 1.0),
             cd_factor=float(row.get("cd_factor", 1.0) or 1.0),
@@ -399,7 +524,9 @@ def build_detector_characterization(
     grouped: Dict[float, list[EfficiencyPoint]] = {}
     point_payloads: list[Dict[str, Any]] = []
     for row in rows:
-        position_mm = float(row.get("position_mm", reference_position_mm) or reference_position_mm)
+        position_mm = float(
+            row.get("position_mm", reference_position_mm) or reference_position_mm
+        )
         point = EfficiencyPoint(
             energy_keV=float(row["reference_energy_keV"]),
             net_counts=float(row["net_counts"]),
@@ -425,12 +552,18 @@ def build_detector_characterization(
 
     reference_points = grouped.get(reference_position_mm)
     if not reference_points:
-        raise ValueError("Reference-position calibration points are required for detector characterization.")
+        raise ValueError(
+            "Reference-position calibration points are required for detector characterization."
+        )
     effective_degree = max(0, min(int(degree), len(reference_points) - 2))
-    fit = fit_efficiency_curve(reference_points, degree=effective_degree, detector_id=detector_id)
+    fit = fit_efficiency_curve(
+        reference_points, degree=effective_degree, detector_id=detector_id
+    )
 
     conversions: Dict[str, Dict[str, Any]] = {}
-    reference_by_energy = {round(point.energy_keV, 3): point.efficiency()[0] for point in reference_points}
+    reference_by_energy = {
+        round(point.energy_keV, 3): point.efficiency()[0] for point in reference_points
+    }
     for position_mm, points in grouped.items():
         if abs(position_mm - reference_position_mm) < 1e-9:
             continue
@@ -461,14 +594,20 @@ def build_detector_characterization(
             "coefficients": list(fit.coefficients),
             "fit_degree": effective_degree,
             "energy_range_keV": list(fit.curve.energy_range),
-            "residuals": [float(value) for value in np.asarray(fit.residuals, dtype=float)],
+            "residuals": [
+                float(value) for value in np.asarray(fit.residuals, dtype=float)
+            ],
         },
         "geometry_conversions": {
             "method": "reference_position_models",
             "items": conversions,
         },
         "peak_to_total_model": {
-            "method": "constant_ratio" if peak_to_total_ratio is not None else "not_characterized",
+            "method": (
+                "constant_ratio"
+                if peak_to_total_ratio is not None
+                else "not_characterized"
+            ),
             "value": peak_to_total_ratio,
         },
         "coincidence_model": {
@@ -501,7 +640,9 @@ def build_facility_characterization(
     fast_flux = dict(payload.get("fast_flux") or {"status": "not_characterized"})
 
     if method == "bare_triple_monitor":
-        activities = {str(row["monitor_id"]): float(row["activity"] or 0.0) for row in monitors}
+        activities = {
+            str(row["monitor_id"]): float(row["activity"] or 0.0) for row in monitors
+        }
         triple = triple_monitor_method(activities, irradiation_params)
         flux_parameters = {
             "f": triple.f,
@@ -515,7 +656,11 @@ def build_facility_characterization(
             "iterations": triple.convergence_iterations,
         }
         facility_method = "bare_triple_monitor"
-    elif method in {"cd_ratio_multi_monitor", "cadmium_ratio_multi_monitor", "cd_ratio"}:
+    elif method in {
+        "cd_ratio_multi_monitor",
+        "cadmium_ratio_multi_monitor",
+        "cd_ratio",
+    }:
         workflow = TRIGAk0Workflow(
             position=irradiation_params.position,
             reactor_power_kW=irradiation_params.reactor_power_kW,
@@ -527,25 +672,35 @@ def build_facility_characterization(
             dead_time_fraction=irradiation_params.dead_time_fraction,
         )
         bare_activities = {
-            str(row.get("element") or row.get("monitor_id") or row.get("monitor")): float(row.get("activity_bare") or row.get("activity") or 0.0)
+            str(
+                row.get("element") or row.get("monitor_id") or row.get("monitor")
+            ): float(row.get("activity_bare") or row.get("activity") or 0.0)
             for row in monitors
             if row.get("activity_bare") is not None or row.get("activity") is not None
         }
         cd_activities = {
-            str(row.get("element") or row.get("monitor_id") or row.get("monitor")): float(row.get("activity_cd") or 0.0)
+            str(
+                row.get("element") or row.get("monitor_id") or row.get("monitor")
+            ): float(row.get("activity_cd") or 0.0)
             for row in monitors
             if row.get("activity_cd") is not None
         }
         uncertainties_bare = {
-            str(row.get("element") or row.get("monitor_id") or row.get("monitor")): float(row.get("uncertainty_bare") or row.get("uncertainty") or 0.05)
+            str(
+                row.get("element") or row.get("monitor_id") or row.get("monitor")
+            ): float(row.get("uncertainty_bare") or row.get("uncertainty") or 0.05)
             for row in monitors
         }
         uncertainties_cd = {
-            str(row.get("element") or row.get("monitor_id") or row.get("monitor")): float(row.get("uncertainty_cd") or 0.07)
+            str(
+                row.get("element") or row.get("monitor_id") or row.get("monitor")
+            ): float(row.get("uncertainty_cd") or 0.07)
             for row in monitors
             if row.get("activity_cd") is not None
         }
-        cd_flux = workflow.characterize_flux_cd_ratio(bare_activities, cd_activities, uncertainties_bare, uncertainties_cd)
+        cd_flux = workflow.characterize_flux_cd_ratio(
+            bare_activities, cd_activities, uncertainties_bare, uncertainties_cd
+        )
         flux_parameters = {
             "f": cd_flux.f,
             "f_uncertainty": cd_flux.f_uncertainty,
@@ -553,15 +708,31 @@ def build_facility_characterization(
             "alpha_uncertainty": cd_flux.alpha_uncertainty,
             "phi_thermal": cd_flux.phi_thermal,
             "phi_epithermal": cd_flux.phi_epithermal,
-            "phi_fast": float((payload.get("flux_parameters") or {}).get("phi_fast", 0.0) or 0.0),
+            "phi_fast": float(
+                (payload.get("flux_parameters") or {}).get("phi_fast", 0.0) or 0.0
+            ),
             "monitors_used": sorted(set(bare_activities) & set(cd_activities)),
             "cd_covered": True,
         }
         fast_flux.setdefault("status", "tracked_not_solved")
         facility_method = "cadmium_ratio_multi_monitor"
-    elif method in {"single_monitor_known_flux", "known_flux_parameters", "single_monitor"}:
-        known = payload.get("known_flux_parameters") or payload.get("flux_parameters") or {}
-        monitor_ids = [str(row.get("monitor_id") or row.get("element") or row.get("monitor") or "monitor") for row in monitors]
+    elif method in {
+        "single_monitor_known_flux",
+        "known_flux_parameters",
+        "single_monitor",
+    }:
+        known = (
+            payload.get("known_flux_parameters") or payload.get("flux_parameters") or {}
+        )
+        monitor_ids = [
+            str(
+                row.get("monitor_id")
+                or row.get("element")
+                or row.get("monitor")
+                or "monitor"
+            )
+            for row in monitors
+        ]
         flux_parameters = {
             "f": float(known.get("f", 0.0) or 0.0),
             "f_uncertainty": float(known.get("f_uncertainty", 0.0) or 0.0),
@@ -580,7 +751,9 @@ def build_facility_characterization(
         raise ValueError(f"Unsupported facility characterization method: {method}")
 
     return {
-        "facility_id": str(payload.get("facility_id") or irradiation_params.position or "facility"),
+        "facility_id": str(
+            payload.get("facility_id") or irradiation_params.position or "facility"
+        ),
         "method": facility_method,
         "monitor_definitions": [dict(row) for row in monitors],
         "irradiation": {
@@ -642,7 +815,9 @@ def _observation_to_measurement(
             cd_factor=observation.cd_factor,
         )
     if measurement is None:
-        raise ValueError(f"Could not create K0Measurement for observation {observation.peak_id}")
+        raise ValueError(
+            f"Could not create K0Measurement for observation {observation.peak_id}"
+        )
     return measurement
 
 
@@ -661,12 +836,20 @@ def analyze_k0_observations(
     standard_library = standard_library or get_active_k0_library()
     auxiliary_library = auxiliary_library or get_active_auxiliary_correction_library()
     try:
-        with use_governed_libraries(standard_library=standard_library, auxiliary_library=auxiliary_library):
+        with use_governed_libraries(
+            standard_library=standard_library, auxiliary_library=auxiliary_library
+        ):
             set_k0_database_from_governed_library(get_active_k0_library())
 
-            observations = [PeakObservation.from_dict(item) for item in (observation_payload.get("observations") or [])]
+            observations = [
+                PeakObservation.from_dict(item)
+                for item in (observation_payload.get("observations") or [])
+            ]
             flux = facility_payload.get("flux_parameters", {}) or {}
-            temperature = float((facility_payload.get("temperature") or {}).get("value_K", 293.6) or 293.6)
+            temperature = float(
+                (facility_payload.get("temperature") or {}).get("value_K", 293.6)
+                or 293.6
+            )
             parameters = K0Parameters(
                 f=float(flux.get("f", 0.0) or 0.0),
                 alpha=float(flux.get("alpha", 0.0) or 0.0),
@@ -680,17 +863,27 @@ def analyze_k0_observations(
             reference_candidates = [
                 item
                 for item in observations
-                if item.eligibility_accepted and item.assigned_radionuclide == reference_isotope
+                if item.eligibility_accepted
+                and item.assigned_radionuclide == reference_isotope
             ]
             if not reference_candidates:
-                raise ValueError(f"No eligible reference observation found for {reference_isotope}")
+                raise ValueError(
+                    f"No eligible reference observation found for {reference_isotope}"
+                )
             reference = reference_candidates[0]
-            reference_mass = float(reference_mass_g or reference.sample_mass_g or sample_mass_g)
-            calculator = K0Calculator(parameters, _observation_to_measurement(reference, sample_mass_g=reference_mass))
+            reference_mass = float(
+                reference_mass_g or reference.sample_mass_g or sample_mass_g
+            )
+            calculator = K0Calculator(
+                parameters,
+                _observation_to_measurement(reference, sample_mass_g=reference_mass),
+            )
 
             line_results: list[Dict[str, Any]] = []
             rejected: list[Dict[str, Any]] = []
-            weighted_by_element: Dict[str, list[tuple[float, float, str, PeakObservation]]] = {}
+            weighted_by_element: Dict[
+                str, list[tuple[float, float, str, PeakObservation]]
+            ] = {}
             recognized_not_applied: list[str] = []
             applied_corrections = [
                 "saturation_decay_counting",
@@ -705,21 +898,43 @@ def analyze_k0_observations(
                     rejected.append(observation.to_dict())
                     continue
                 if observation.efficiency is None or observation.efficiency <= 0.0:
-                    rejected.append({**observation.to_dict(), "rejection_reasons": list(observation.rejection_reasons) + ["missing_efficiency"]})
+                    rejected.append(
+                        {
+                            **observation.to_dict(),
+                            "rejection_reasons": list(observation.rejection_reasons)
+                            + ["missing_efficiency"],
+                        }
+                    )
                     continue
-                measurement = _observation_to_measurement(observation, sample_mass_g=float(observation.sample_mass_g or sample_mass_g))
+                measurement = _observation_to_measurement(
+                    observation,
+                    sample_mass_g=float(observation.sample_mass_g or sample_mass_g),
+                )
                 result = calculator.calculate_concentration(measurement)
                 record = get_k0_library_record(result.product_isotope)
-                g_t = get_westcott_g(record.target_isotope if record else result.product_isotope, temperature)
+                g_t = get_westcott_g(
+                    record.target_isotope if record else result.product_isotope,
+                    temperature,
+                )
                 if abs(g_t - 1.0) > 1e-6:
-                    recognized_not_applied.append(f"westcott_gT_not_applied:{record.target_isotope if record else result.product_isotope}")
+                    recognized_not_applied.append(
+                        f"westcott_gT_not_applied:{record.target_isotope if record else result.product_isotope}"
+                    )
                 budget = create_k0_naa_budget(
                     concentration=result.concentration_ug_g,
-                    counting_rel=(measurement.peak_area_unc / measurement.net_peak_area) if measurement.net_peak_area else 0.0,
+                    counting_rel=(
+                        (measurement.peak_area_unc / measurement.net_peak_area)
+                        if measurement.net_peak_area
+                        else 0.0
+                    ),
                     efficiency_rel=float(observation.efficiency_uncertainty or 0.0),
                     k0_rel=float((record.k0_unc_percent if record else 0.0) / 100.0),
                     q0_rel=float((record.Q0_unc_percent if record else 0.0) / 100.0),
-                    f_rel=(parameters.f_uncertainty / parameters.f) if parameters.f else 0.0,
+                    f_rel=(
+                        (parameters.f_uncertainty / parameters.f)
+                        if parameters.f
+                        else 0.0
+                    ),
                     alpha_abs=parameters.alpha_uncertainty,
                     timing_rel=0.005,
                     coincidence_rel=0.0,
@@ -746,22 +961,53 @@ def analyze_k0_observations(
                     "uncertainty_budget": budget.to_dict(),
                 }
                 line_results.append(line_row)
-                weighted_by_element.setdefault(result.element, []).append((result.concentration_ug_g, max(result.concentration_unc, 1e-12), observation.line_id, observation))
+                weighted_by_element.setdefault(result.element, []).append(
+                    (
+                        result.concentration_ug_g,
+                        max(result.concentration_unc, 1e-12),
+                        observation.line_id,
+                        observation,
+                    )
+                )
 
             element_results: list[Dict[str, Any]] = []
             for element, rows in weighted_by_element.items():
-                weights = np.array([1.0 / (unc ** 2) for _, unc, _, _ in rows], dtype=float)
+                weights = np.array(
+                    [1.0 / (unc**2) for _, unc, _, _ in rows], dtype=float
+                )
                 values = np.array([value for value, _, _, _ in rows], dtype=float)
-                combined = float(np.sum(values * weights) / np.sum(weights)) if np.sum(weights) else 0.0
-                combined_unc = float(1.0 / np.sqrt(np.sum(weights))) if np.sum(weights) else 0.0
+                combined = (
+                    float(np.sum(values * weights) / np.sum(weights))
+                    if np.sum(weights)
+                    else 0.0
+                )
+                combined_unc = (
+                    float(1.0 / np.sqrt(np.sum(weights))) if np.sum(weights) else 0.0
+                )
                 row_observations = [item[3] for item in rows]
                 element_results.append(
                     {
                         "element": element,
-                        "project_id": _first_nonempty(*(item.project_id for item in row_observations)),
-                        "sample_id": _first_nonempty(*(item.sample_id for item in row_observations)),
-                        "irradiation_ids": sorted({item.irradiation_id for item in row_observations if item.irradiation_id}),
-                        "measurement_ids": sorted({item.measurement_id for item in row_observations if item.measurement_id}),
+                        "project_id": _first_nonempty(
+                            *(item.project_id for item in row_observations)
+                        ),
+                        "sample_id": _first_nonempty(
+                            *(item.sample_id for item in row_observations)
+                        ),
+                        "irradiation_ids": sorted(
+                            {
+                                item.irradiation_id
+                                for item in row_observations
+                                if item.irradiation_id
+                            }
+                        ),
+                        "measurement_ids": sorted(
+                            {
+                                item.measurement_id
+                                for item in row_observations
+                                if item.measurement_id
+                            }
+                        ),
                         "concentration_ug_g": combined,
                         "concentration_unc_ug_g": combined_unc,
                         "line_ids": [line_id for _, _, line_id, _ in rows],
@@ -785,8 +1031,12 @@ def analyze_k0_observations(
 
             project_id = _first_nonempty(*(item.project_id for item in observations))
             sample_id = _first_nonempty(*(item.sample_id for item in observations))
-            irradiation_ids = sorted({item.irradiation_id for item in observations if item.irradiation_id})
-            measurement_ids = sorted({item.measurement_id for item in observations if item.measurement_id})
+            irradiation_ids = sorted(
+                {item.irradiation_id for item in observations if item.irradiation_id}
+            )
+            measurement_ids = sorted(
+                {item.measurement_id for item in observations if item.measurement_id}
+            )
 
             return {
                 "summary": {
@@ -827,12 +1077,24 @@ def aggregate_k0_analysis_bundles(
     """Aggregate k0 analysis bundles across measurements and irradiations."""
 
     groups: Dict[tuple[str | None, str | None, str], Dict[str, Any]] = {}
-    by_irradiation: Dict[tuple[str | None, str | None, str, str], list[tuple[float, float]]] = defaultdict(list)
+    by_irradiation: Dict[
+        tuple[str | None, str | None, str, str], list[tuple[float, float]]
+    ] = defaultdict(list)
     bundle_count = 0
     for payload in analysis_payloads:
         bundle_count += 1
         for row in payload.get("element_results") or []:
-            key = (_optional_text(row.get("project_id") or (payload.get("summary") or {}).get("project_id")), _optional_text(row.get("sample_id") or (payload.get("summary") or {}).get("sample_id")), str(row.get("element") or "unknown"))
+            key = (
+                _optional_text(
+                    row.get("project_id")
+                    or (payload.get("summary") or {}).get("project_id")
+                ),
+                _optional_text(
+                    row.get("sample_id")
+                    or (payload.get("summary") or {}).get("sample_id")
+                ),
+                str(row.get("element") or "unknown"),
+            )
             group = groups.setdefault(
                 key,
                 {
@@ -854,14 +1116,23 @@ def aggregate_k0_analysis_bundles(
             group["irradiation_ids"].update(row.get("irradiation_ids") or [])
             group["line_ids"].update(row.get("line_ids") or [])
             for irradiation_id in row.get("irradiation_ids") or ["unspecified"]:
-                by_irradiation[(key[0], key[1], key[2], str(irradiation_id))].append((value, unc))
+                by_irradiation[(key[0], key[1], key[2], str(irradiation_id))].append(
+                    (value, unc)
+                )
 
     aggregated_results: list[Dict[str, Any]] = []
     irradiation_summaries: list[Dict[str, Any]] = []
-    for (project_id, sample_id, element), group in sorted(groups.items(), key=lambda item: (item[0][0] or "", item[0][1] or "", item[0][2])):
+    for (project_id, sample_id, element), group in sorted(
+        groups.items(),
+        key=lambda item: (item[0][0] or "", item[0][1] or "", item[0][2]),
+    ):
         values = np.array([value for value, _ in group["values"]], dtype=float)
-        weights = np.array([1.0 / (unc ** 2) for _, unc in group["values"]], dtype=float)
-        combined = float(np.sum(values * weights) / np.sum(weights)) if np.sum(weights) else 0.0
+        weights = np.array([1.0 / (unc**2) for _, unc in group["values"]], dtype=float)
+        combined = (
+            float(np.sum(values * weights) / np.sum(weights))
+            if np.sum(weights)
+            else 0.0
+        )
         combined_unc = float(1.0 / np.sqrt(np.sum(weights))) if np.sum(weights) else 0.0
         aggregated_results.append(
             {
@@ -878,8 +1149,11 @@ def aggregate_k0_analysis_bundles(
             }
         )
 
-    for (project_id, sample_id, element, irradiation_id), values in sorted(by_irradiation.items(), key=lambda item: (item[0][0] or "", item[0][1] or "", item[0][2], item[0][3])):
-        weights = np.array([1.0 / (unc ** 2) for _, unc in values], dtype=float)
+    for (project_id, sample_id, element, irradiation_id), values in sorted(
+        by_irradiation.items(),
+        key=lambda item: (item[0][0] or "", item[0][1] or "", item[0][2], item[0][3]),
+    ):
+        weights = np.array([1.0 / (unc**2) for _, unc in values], dtype=float)
         concentrations = np.array([value for value, _ in values], dtype=float)
         irradiation_summaries.append(
             {
@@ -887,8 +1161,14 @@ def aggregate_k0_analysis_bundles(
                 "sample_id": sample_id,
                 "element": element,
                 "irradiation_id": irradiation_id,
-                "concentration_ug_g": float(np.sum(concentrations * weights) / np.sum(weights)) if np.sum(weights) else 0.0,
-                "concentration_unc_ug_g": float(1.0 / np.sqrt(np.sum(weights))) if np.sum(weights) else 0.0,
+                "concentration_ug_g": (
+                    float(np.sum(concentrations * weights) / np.sum(weights))
+                    if np.sum(weights)
+                    else 0.0
+                ),
+                "concentration_unc_ug_g": (
+                    float(1.0 / np.sqrt(np.sum(weights))) if np.sum(weights) else 0.0
+                ),
             }
         )
 
@@ -897,7 +1177,12 @@ def aggregate_k0_analysis_bundles(
             "source_bundle_count": bundle_count,
             "aggregated_result_count": len(aggregated_results),
             "irradiation_summary_count": len(irradiation_summaries),
-            "sample_count": len({(row.get('project_id'), row.get('sample_id')) for row in aggregated_results}),
+            "sample_count": len(
+                {
+                    (row.get("project_id"), row.get("sample_id"))
+                    for row in aggregated_results
+                }
+            ),
         },
         "aggregated_results": aggregated_results,
         "irradiation_summaries": irradiation_summaries,
@@ -918,13 +1203,22 @@ def evaluate_k0_qaqc(
         role = str(record.get("role") or "sample").strip().lower()
         analysis_payload = record.get("analysis_payload") or {}
         element_results = analysis_payload.get("element_results") or []
-        sample_id = _first_nonempty(record.get("sample_id"), (analysis_payload.get("summary") or {}).get("sample_id"))
+        sample_id = _first_nonempty(
+            record.get("sample_id"),
+            (analysis_payload.get("summary") or {}).get("sample_id"),
+        )
 
         if role == "blank":
             limits = dict(record.get("element_limits_ug_g") or {})
             exceedances = []
             for row in element_results:
-                limit = float(limits.get(row.get("element"), record.get("default_limit_ug_g", default_blank_limit_ug_g)) or 0.0)
+                limit = float(
+                    limits.get(
+                        row.get("element"),
+                        record.get("default_limit_ug_g", default_blank_limit_ug_g),
+                    )
+                    or 0.0
+                )
                 concentration = float(row.get("concentration_ug_g", 0.0) or 0.0)
                 if concentration > limit:
                     exceedances.append(
@@ -954,7 +1248,11 @@ def evaluate_k0_qaqc(
                 target_unc = float(reference.get("unc_ug_g", 0.0) or 0.0)
                 measured = float(row.get("concentration_ug_g", 0.0) or 0.0)
                 measured_unc = float(row.get("concentration_unc_ug_g", 0.0) or 0.0)
-                combined_unc = float(np.sqrt(measured_unc ** 2 + target_unc ** 2)) if (measured_unc or target_unc) else 0.0
+                combined_unc = (
+                    float(np.sqrt(measured_unc**2 + target_unc**2))
+                    if (measured_unc or target_unc)
+                    else 0.0
+                )
                 bias = measured - target_value
                 rel_bias = (bias / target_value * 100.0) if target_value else 0.0
                 en_score = (bias / combined_unc) if combined_unc else 0.0
@@ -968,10 +1266,19 @@ def evaluate_k0_qaqc(
                         "bias_ug_g": bias,
                         "relative_bias_percent": rel_bias,
                         "en_score": en_score,
-                        "status": "pass" if abs(en_score) <= float(record.get("acceptance_en_limit", 2.0) or 2.0) else "fail",
+                        "status": (
+                            "pass"
+                            if abs(en_score)
+                            <= float(record.get("acceptance_en_limit", 2.0) or 2.0)
+                            else "fail"
+                        ),
                     }
                 )
-            status = "pass" if comparisons and all(item["status"] == "pass" for item in comparisons) else "fail"
+            status = (
+                "pass"
+                if comparisons and all(item["status"] == "pass" for item in comparisons)
+                else "fail"
+            )
             result_records.append(
                 {
                     "role": "crm",
@@ -1007,9 +1314,13 @@ def build_k0_report_payload(
     """Build summary text and table payloads for a richer k0 report."""
 
     summary = dict(analysis_payload.get("summary") or {})
-    summary["recognized_but_not_applied_count"] = len(analysis_payload.get("recognized_but_not_applied") or [])
+    summary["recognized_but_not_applied_count"] = len(
+        analysis_payload.get("recognized_but_not_applied") or []
+    )
     if aggregation_payload is not None:
-        summary["aggregated_result_count"] = len(aggregation_payload.get("aggregated_results") or [])
+        summary["aggregated_result_count"] = len(
+            aggregation_payload.get("aggregated_results") or []
+        )
     if qaqc_payload is not None:
         qaqc_summary = qaqc_payload.get("summary") or {}
         summary["qaqc_pass_count"] = int(qaqc_summary.get("pass_count", 0) or 0)
@@ -1027,7 +1338,9 @@ def build_k0_report_payload(
     if standard_library:
         lines.append("Libraries")
         lines.append("---------")
-        lines.append(f"standard_k0_library: {standard_library.get('library_id', 'unknown')} @ {standard_library.get('version', 'unknown')}")
+        lines.append(
+            f"standard_k0_library: {standard_library.get('library_id', 'unknown')} @ {standard_library.get('version', 'unknown')}"
+        )
         lines.append(f"status: {standard_library.get('status', 'unknown')}")
         lines.append("")
 
@@ -1060,7 +1373,9 @@ def build_k0_report_payload(
         lines.append("QA/QC")
         lines.append("-----")
         for row in qaqc_payload.get("records") or []:
-            lines.append(f"{row.get('role', 'record')} {row.get('sample_id', '')}: {row.get('status', 'unknown')}")
+            lines.append(
+                f"{row.get('role', 'record')} {row.get('sample_id', '')}: {row.get('status', 'unknown')}"
+            )
         lines.append("")
 
     return {
@@ -1069,7 +1384,11 @@ def build_k0_report_payload(
         "tables": {
             "element_results": analysis_payload.get("element_results") or [],
             "line_results": analysis_payload.get("line_results") or [],
-            "aggregation": [] if aggregation_payload is None else aggregation_payload.get("aggregated_results") or [],
+            "aggregation": (
+                []
+                if aggregation_payload is None
+                else aggregation_payload.get("aggregated_results") or []
+            ),
             "qaqc": [] if qaqc_payload is None else qaqc_payload.get("records") or [],
         },
     }

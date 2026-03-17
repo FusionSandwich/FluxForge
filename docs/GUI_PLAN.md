@@ -509,7 +509,7 @@ FluxForge is primarily analysis-scale, but interactive UX benefits from fast ker
    - `fluxforge plots --example` generates the core master-plan plots (G1.1-G1.5)
      without opening windows (Agg backend), so SSH sessions can validate plotting
      capability before interactive GUI work.
-1. **UI skeleton + spectrum viewer (read-only)** + artifact export. ✅ implemented
+1. **UI skeleton + spectrum viewer (read-only)** + artifact export.  implemented
 2. **Annotations + ROI + peak tools** (interactive fit panel). ◑ partially implemented
 3. **Calibration UI** (energy + efficiency) + exportable calibration artifacts. ◑ partially implemented
 4. **Pipeline tabs** (activities -> reaction rates -> unfolding) + run dashboard.

@@ -46,7 +46,10 @@ def test_analyze_astm_e262_plan_radiometric_with_cd_pair(tmp_path: Path) -> None
     row = result["measurements"][0]
     assert row["mode"] == "radiometric"
     assert row["equivalent_2200ms_fluence_rate_cm2_s"] > 0.0
-    assert row["equivalent_2200ms_fluence_cm2"] > row["equivalent_2200ms_fluence_rate_cm2_s"]
+    assert (
+        row["equivalent_2200ms_fluence_cm2"]
+        > row["equivalent_2200ms_fluence_rate_cm2_s"]
+    )
     assert "cadmium_ratio" in row
 
     output_path = tmp_path / "astm_e262.json"
@@ -91,7 +94,9 @@ def test_analyze_astm_e262_plan_standard_comparison_mode() -> None:
 
 def test_astm_e262_cli_parser_registers_command() -> None:
     parser = cli_app.build_parser()
-    args = parser.parse_args(["astm-e262", "--plan-file", "plan.json", "--output", "out.json"])
+    args = parser.parse_args(
+        ["astm-e262", "--plan-file", "plan.json", "--output", "out.json"]
+    )
 
     assert args.plan_file.name == "plan.json"
     assert args.output.name == "out.json"
@@ -123,13 +128,16 @@ def test_astm_e262_cli_command_writes_output(tmp_path: Path) -> None:
     plan_path.write_text(json.dumps(plan), encoding="utf-8")
 
     parser = cli_app.build_parser()
-    args = parser.parse_args(["astm-e262", "--plan-file", str(plan_path), "--output", str(output_path)])
+    args = parser.parse_args(
+        ["astm-e262", "--plan-file", str(plan_path), "--output", str(output_path)]
+    )
     args.func(args)
 
     assert output_path.exists()
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload["schema"] == "fluxforge.astm_e262_result.v1"
     assert payload["summary"]["measurement_count"] == 1
+
 
 def test_analyze_astm_e262_plan_fallback_to_library() -> None:
     # Omit sigma_0_barn, it should resolve from Co-60 via k0 library lookup
@@ -148,14 +156,13 @@ def test_analyze_astm_e262_plan_fallback_to_library() -> None:
                 "cooling_time_s": 3600.0,
                 "thermal_self_shielding_factor": 1.0,
             }
-        ]
+        ],
     }
-    
+
     result = analyze_astm_e262_plan(plan)
     row = result["measurements"][0]
-    
+
     # Check that sigma_0_barn was indeed resolved (Co-59 thermal cross-section is ~37.18 barns)
     assert "sigma_0_barn" in row
     assert row["sigma_0_barn"] > 30.0 and row["sigma_0_barn"] < 45.0
     assert row["equivalent_2200ms_fluence_rate_cm2_s"] > 0.0
-

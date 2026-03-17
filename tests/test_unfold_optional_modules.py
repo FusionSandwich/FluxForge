@@ -14,7 +14,9 @@ def test_unfold_lazy_exports() -> None:
     SpectrumFile = unfold.SpectrumFile
 
     rates = ReactionRates(values=np.array([1.0]), uncertainties=np.array([0.1]))
-    response = ResponseBundle(matrix=np.array([[1.0]]), energy_bins=np.array([0.0, 1.0]))
+    response = ResponseBundle(
+        matrix=np.array([[1.0]]), energy_bins=np.array([0.0, 1.0])
+    )
     spec = SpectrumFile(counts=np.array([10.0]), live_time_s=1.0)
 
     assert rates.values.shape == (1,)
@@ -117,7 +119,9 @@ def test_neutron_ibu_guard_and_solver(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(neutron_ibu, "_pyunfold_unfold", fake_pyunfold_unfold)
 
     solver = neutron_ibu.NeutronUnfolderIBU(ts="chi2", ts_stopping=0.05, max_iter=20)
-    rates = ReactionRates(values=np.array([10.0, 20.0]), uncertainties=np.array([1.0, 2.0]))
+    rates = ReactionRates(
+        values=np.array([10.0, 20.0]), uncertainties=np.array([1.0, 2.0])
+    )
     response = ResponseBundle(
         matrix=np.array([[1.0, 0.2], [0.1, 1.0]]),
         energy_bins=np.array([0.0, 1.0, 2.0]),

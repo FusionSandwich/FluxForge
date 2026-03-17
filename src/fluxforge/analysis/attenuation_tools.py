@@ -56,7 +56,9 @@ def stacked_transmission(
         if self_absorption and idx == 0:
             material = get_material(layer.material, density=layer.density_g_cm3)
             if layer.thickness_cm is None and layer.areal_density_g_cm2 is None:
-                raise ValueError("Self-absorption layer requires thickness or areal density.")
+                raise ValueError(
+                    "Self-absorption layer requires thickness or areal density."
+                )
             if layer.areal_density_g_cm2 is None:
                 areal = material.density * layer.thickness_cm
             else:

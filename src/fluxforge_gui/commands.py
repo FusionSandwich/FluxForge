@@ -26,7 +26,10 @@ import numpy as np
 from scipy import optimize
 
 try:
-    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+    from matplotlib.backends.backend_tkagg import (
+        FigureCanvasTkAgg,
+        NavigationToolbar2Tk,
+    )
     from matplotlib.figure import Figure
 except ImportError:  # pragma: no cover - optional GUI plotting dependency
     FigureCanvasTkAgg = None
@@ -38,16 +41,33 @@ from fluxforge.analysis.flux_wire_analysis import (
     _gilmore_moving_minimum_counts,
     _standards_tiered_counts,
 )
-from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
-from fluxforge.analysis.peak_finders import PEAK_FINDER_METHODS, find_peaks_multi_method, get_peak_finder
-from fluxforge.analysis.peakfit import fit_hypermet_peak, fit_multiple_peaks, fit_single_peak
+from fluxforge.analysis.detector_calibration import (
+    EfficiencyPoint,
+    fit_efficiency_curve,
+)
+from fluxforge.analysis.peak_finders import (
+    PEAK_FINDER_METHODS,
+    find_peaks_multi_method,
+    get_peak_finder,
+)
+from fluxforge.analysis.peakfit import (
+    fit_hypermet_peak,
+    fit_multiple_peaks,
+    fit_single_peak,
+)
 from fluxforge.cli import app as cli_app
 from fluxforge.data.efficiency import CALIBRATION_SOURCES, EfficiencyCurve
-from fluxforge.data.flux_wire_catalog import get_flux_wire_catalog_entry, list_flux_wire_isotopes
+from fluxforge.data.flux_wire_catalog import (
+    get_flux_wire_catalog_entry,
+    list_flux_wire_isotopes,
+)
 from fluxforge.data.irdff_access import get_default_library
 from fluxforge.data.nndc import get_nuclear_data
 from fluxforge.data.gamma_database import get_database
-from fluxforge.data.nuclear_data_sources import load_gamma_identification_source, summarize_nuclear_data_source
+from fluxforge.data.nuclear_data_sources import (
+    load_gamma_identification_source,
+    summarize_nuclear_data_source,
+)
 from fluxforge.io.artifacts import (
     read_k0_analysis_bundle,
     read_line_activities,
@@ -128,11 +148,13 @@ from fluxforge_gui.spectrum_ops import (
 )
 
 
-
 class CommandsMixin:
     def _physics_run_stacked_target(self) -> None:
         if not self._stacked_foils:
-            messagebox.showerror("FluxForge GUI", "Add at least one foil before solving the stacked target.")
+            messagebox.showerror(
+                "FluxForge GUI",
+                "Add at least one foil before solving the stacked target.",
+            )
             return
         try:
             stack = StackedTarget(
@@ -143,9 +165,19 @@ class CommandsMixin:
                 stack.add_foil(
                     foil["material"],
                     thickness_um=float(foil["thickness_um"]),
-                    reaction=str(foil["reaction"] or None) if foil["reaction"] else None,
-                    target_isotope=str(foil["target_isotope"] or None) if foil["target_isotope"] else None,
-                    product_isotope=str(foil["product_isotope"] or None) if foil["product_isotope"] else None,
+                    reaction=(
+                        str(foil["reaction"] or None) if foil["reaction"] else None
+                    ),
+                    target_isotope=(
+                        str(foil["target_isotope"] or None)
+                        if foil["target_isotope"]
+                        else None
+                    ),
+                    product_isotope=(
+                        str(foil["product_isotope"] or None)
+                        if foil["product_isotope"]
+                        else None
+                    ),
                 )
             energies = stack.calculate_energies()
         except Exception as exc:
@@ -176,7 +208,10 @@ class CommandsMixin:
             chain = DecayChain(
                 parent,
                 nuclide_data={
-                    parent: {"half_life_s": parent_half_life, "decay_products": {daughter: 1.0}},
+                    parent: {
+                        "half_life_s": parent_half_life,
+                        "decay_products": {daughter: 1.0},
+                    },
                     daughter: {"half_life_s": daughter_half_life, "decay_products": {}},
                 },
             )
@@ -184,16 +219,28 @@ class CommandsMixin:
                 initial_activity={parent: initial_activity},
                 t_end=end_time,
                 n_points=100,
-                production_rates={parent: production_rate} if production_rate > 0.0 else None,
+                production_rates=(
+                    {parent: production_rate} if production_rate > 0.0 else None
+                ),
                 units=self.decay_time_units.get(),
             )
         except Exception as exc:
             self._append_log(f"ERROR solving decay chain: {exc}")
             messagebox.showerror("FluxForge GUI", str(exc))
             return
-        parent_final = float(result.activities[parent][-1]) if parent in result.activities else 0.0
-        daughter_final = float(result.activities[daughter][-1]) if daughter in result.activities else 0.0
-        peak_daughter = float(np.max(result.activities[daughter])) if daughter in result.activities else 0.0
+        parent_final = (
+            float(result.activities[parent][-1]) if parent in result.activities else 0.0
+        )
+        daughter_final = (
+            float(result.activities[daughter][-1])
+            if daughter in result.activities
+            else 0.0
+        )
+        peak_daughter = (
+            float(np.max(result.activities[daughter]))
+            if daughter in result.activities
+            else 0.0
+        )
         self.decay_summary.set(
             (
                 f"Decay chain solved for {parent} → {daughter}. Final parent activity {parent_final:.3f} Bq, "
@@ -206,14 +253,18 @@ class CommandsMixin:
         background_scale_factor = self.ingest_background_scale_factor.get().strip()
         profile = self.ingest_profile.get().strip() or None
         energy_calibration = self.ingest_energy_calibration.get().strip() or None
-        efficiency_coefficients = self.ingest_efficiency_coefficients.get().strip() or None
+        efficiency_coefficients = (
+            self.ingest_efficiency_coefficients.get().strip() or None
+        )
         args = Namespace(
             input=Path(self.ingest_input.get()),
             output=Path(self.ingest_output.get()),
             profile=profile,
             background_file=Path(background_file) if background_file else None,
             background_scale_mode=self.ingest_background_scale_mode.get(),
-            background_scale_factor=float(background_scale_factor) if background_scale_factor else None,
+            background_scale_factor=(
+                float(background_scale_factor) if background_scale_factor else None
+            ),
             energy_calibration=energy_calibration,
             efficiency_coefficients=efficiency_coefficients,
             validate=self.ingest_validate.get(),
@@ -226,7 +277,9 @@ class CommandsMixin:
         if args.background_scale_mode != "live":
             tokens.extend(["--background-scale-mode", args.background_scale_mode])
         if args.background_scale_factor is not None:
-            tokens.extend(["--background-scale-factor", str(args.background_scale_factor)])
+            tokens.extend(
+                ["--background-scale-factor", str(args.background_scale_factor)]
+            )
         if args.energy_calibration:
             tokens.extend(["--energy-calibration", args.energy_calibration])
         if args.efficiency_coefficients:
@@ -237,11 +290,17 @@ class CommandsMixin:
 
     def _run_ingest_batch(self) -> None:
         background_file = self.ingest_batch_background_file.get().strip()
-        background_scale_factor = self.ingest_batch_background_scale_factor.get().strip()
+        background_scale_factor = (
+            self.ingest_batch_background_scale_factor.get().strip()
+        )
         profile = self.ingest_batch_profile.get().strip() or None
         energy_calibration = self.ingest_batch_energy_calibration.get().strip() or None
-        efficiency_coefficients = self.ingest_batch_efficiency_coefficients.get().strip() or None
-        background_adjusted_dir = self.ingest_batch_background_adjusted_dir.get().strip()
+        efficiency_coefficients = (
+            self.ingest_batch_efficiency_coefficients.get().strip() or None
+        )
+        background_adjusted_dir = (
+            self.ingest_batch_background_adjusted_dir.get().strip()
+        )
         final_corrected_dir = self.ingest_batch_final_corrected_dir.get().strip()
         args = Namespace(
             input_dir=Path(self.ingest_batch_input_dir.get()),
@@ -249,11 +308,17 @@ class CommandsMixin:
             profile=profile,
             background_file=Path(background_file) if background_file else None,
             background_scale_mode=self.ingest_batch_background_scale_mode.get(),
-            background_scale_factor=float(background_scale_factor) if background_scale_factor else None,
+            background_scale_factor=(
+                float(background_scale_factor) if background_scale_factor else None
+            ),
             energy_calibration=energy_calibration,
             efficiency_coefficients=efficiency_coefficients,
-            background_adjusted_dir=Path(background_adjusted_dir) if background_adjusted_dir else None,
-            final_corrected_dir=Path(final_corrected_dir) if final_corrected_dir else None,
+            background_adjusted_dir=(
+                Path(background_adjusted_dir) if background_adjusted_dir else None
+            ),
+            final_corrected_dir=(
+                Path(final_corrected_dir) if final_corrected_dir else None
+            ),
             validate=self.ingest_batch_validate.get(),
         )
         tokens = [
@@ -270,13 +335,17 @@ class CommandsMixin:
         if args.background_scale_mode != "live":
             tokens.extend(["--background-scale-mode", args.background_scale_mode])
         if args.background_scale_factor is not None:
-            tokens.extend(["--background-scale-factor", str(args.background_scale_factor)])
+            tokens.extend(
+                ["--background-scale-factor", str(args.background_scale_factor)]
+            )
         if args.energy_calibration:
             tokens.extend(["--energy-calibration", args.energy_calibration])
         if args.efficiency_coefficients:
             tokens.extend(["--efficiency-coefficients", args.efficiency_coefficients])
         if args.background_adjusted_dir:
-            tokens.extend(["--background-adjusted-dir", str(args.background_adjusted_dir)])
+            tokens.extend(
+                ["--background-adjusted-dir", str(args.background_adjusted_dir)]
+            )
         if args.final_corrected_dir:
             tokens.extend(["--final-corrected-dir", str(args.final_corrected_dir)])
         if not args.validate:
@@ -289,7 +358,9 @@ class CommandsMixin:
         background_scale_factor = self.peaks_background_scale_factor.get().strip()
         profile = self.peaks_profile.get().strip() or None
         energy_calibration = self.peaks_energy_calibration.get().strip() or None
-        efficiency_coefficients = self.peaks_efficiency_coefficients.get().strip() or None
+        efficiency_coefficients = (
+            self.peaks_efficiency_coefficients.get().strip() or None
+        )
         args = Namespace(
             spectrum_file=Path(self.peaks_input.get()),
             output=Path(self.peaks_output.get()),
@@ -299,7 +370,9 @@ class CommandsMixin:
             profile=profile,
             background_file=Path(background_file) if background_file else None,
             background_scale_mode=self.peaks_background_scale_mode.get(),
-            background_scale_factor=float(background_scale_factor) if background_scale_factor else None,
+            background_scale_factor=(
+                float(background_scale_factor) if background_scale_factor else None
+            ),
             energy_calibration=energy_calibration,
             efficiency_coefficients=efficiency_coefficients,
             background_subtracted=self.peaks_background_subtracted.get(),
@@ -325,7 +398,9 @@ class CommandsMixin:
         if args.background_scale_mode != "live":
             tokens.extend(["--background-scale-mode", args.background_scale_mode])
         if args.background_scale_factor is not None:
-            tokens.extend(["--background-scale-factor", str(args.background_scale_factor)])
+            tokens.extend(
+                ["--background-scale-factor", str(args.background_scale_factor)]
+            )
         if args.energy_calibration:
             tokens.extend(["--energy-calibration", args.energy_calibration])
         if args.efficiency_coefficients:
@@ -334,7 +409,11 @@ class CommandsMixin:
             tokens.append("--background-subtracted")
         if not args.validate:
             tokens.append("--no-validate")
-        self._log_selected_data_source("Peaks", self.peaks_data_source.get(), self.peaks_custom_source.get().strip() or None)
+        self._log_selected_data_source(
+            "Peaks",
+            self.peaks_data_source.get(),
+            self.peaks_custom_source.get().strip() or None,
+        )
         self._dispatch(cli_app.cmd_peaks, args, tokens)
 
     def _run_activity(self) -> None:
@@ -377,8 +456,17 @@ class CommandsMixin:
             tokens.extend(["--reaction-id", args.reaction_id])
         if not args.validate:
             tokens.append("--no-validate")
-        self._log_selected_data_source("Activity", self.activity_data_source.get(), self.activity_custom_source.get().strip() or None)
-        self._dispatch(cli_app.cmd_activity, args, tokens, on_success=self._load_activity_result_summary)
+        self._log_selected_data_source(
+            "Activity",
+            self.activity_data_source.get(),
+            self.activity_custom_source.get().strip() or None,
+        )
+        self._dispatch(
+            cli_app.cmd_activity,
+            args,
+            tokens,
+            on_success=self._load_activity_result_summary,
+        )
 
     def _run_rates(self) -> None:
         segments = self.rates_segments.get().strip()
@@ -405,7 +493,9 @@ class CommandsMixin:
             tokens.extend(["--segments-file", str(args.segments_file)])
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_rates, args, tokens, on_success=self._load_rates_result_summary)
+        self._dispatch(
+            cli_app.cmd_rates, args, tokens, on_success=self._load_rates_result_summary
+        )
 
     def _run_unfold(self) -> None:
         prior = self.unfold_prior.get().strip()
@@ -465,7 +555,12 @@ class CommandsMixin:
             tokens.append("--verbose-solver")
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_unfold, args, tokens, on_success=self._load_unfold_result_preview)
+        self._dispatch(
+            cli_app.cmd_unfold,
+            args,
+            tokens,
+            on_success=self._load_unfold_result_preview,
+        )
 
     def _run_compare(self) -> None:
         args = Namespace(
@@ -485,7 +580,12 @@ class CommandsMixin:
         ]
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_compare, args, tokens, on_success=self._load_compare_result_summary)
+        self._dispatch(
+            cli_app.cmd_compare,
+            args,
+            tokens,
+            on_success=self._load_compare_result_summary,
+        )
 
     def _run_reactions(self) -> None:
         source_id = self.standards_data_source.get()
@@ -501,7 +601,9 @@ class CommandsMixin:
         tokens = ["reactions", "--category", args.category, "--format", args.format]
         if args.target:
             tokens.extend(["--target", args.target])
-        self._log_selected_data_source("Standards", source_id, self.standards_custom_source.get().strip() or None)
+        self._log_selected_data_source(
+            "Standards", source_id, self.standards_custom_source.get().strip() or None
+        )
         self._dispatch(cli_app.cmd_reactions, args, tokens)
 
     def _run_k0_detector(self) -> None:
@@ -542,7 +644,13 @@ class CommandsMixin:
             output=Path(self.k0_facility_output.get()),
             validate=self.k0_validate.get(),
         )
-        tokens = ["k0-facility", "--input", str(args.input), "--output", str(args.output)]
+        tokens = [
+            "k0-facility",
+            "--input",
+            str(args.input),
+            "--output",
+            str(args.output),
+        ]
         if not args.validate:
             tokens.append("--no-validate")
         self._dispatch(cli_app.cmd_k0_facility, args, tokens)
@@ -551,7 +659,9 @@ class CommandsMixin:
         args = Namespace(
             peaks_file=Path(self.k0_peaks_input.get()),
             spectrum_file=self._optional_path(self.k0_spectrum_input.get()),
-            detector_characterization_file=self._optional_path(self.k0_detector_output.get()),
+            detector_characterization_file=self._optional_path(
+                self.k0_detector_output.get()
+            ),
             detector_id=None,
             geometry_id=None,
             irradiation_time_s=float(self.k0_irradiation_time_s.get()),
@@ -581,7 +691,12 @@ class CommandsMixin:
         if args.spectrum_file:
             tokens.extend(["--spectrum-file", str(args.spectrum_file)])
         if args.detector_characterization_file:
-            tokens.extend(["--detector-characterization-file", str(args.detector_characterization_file)])
+            tokens.extend(
+                [
+                    "--detector-characterization-file",
+                    str(args.detector_characterization_file),
+                ]
+            )
         if args.project_id:
             tokens.extend(["--project-id", args.project_id])
         if args.sample_id:
@@ -624,10 +739,14 @@ class CommandsMixin:
         if args.k0_library_file:
             tokens.extend(["--k0-library-file", str(args.k0_library_file)])
         if args.auxiliary_library_file:
-            tokens.extend(["--auxiliary-library-file", str(args.auxiliary_library_file)])
+            tokens.extend(
+                ["--auxiliary-library-file", str(args.auxiliary_library_file)]
+            )
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_k0_analyze, args, tokens, on_success=self._load_k0_preview)
+        self._dispatch(
+            cli_app.cmd_k0_analyze, args, tokens, on_success=self._load_k0_preview
+        )
 
     def _run_k0_aggregate(self) -> None:
         analysis_file = Path(self.k0_analysis_output.get())
@@ -636,7 +755,13 @@ class CommandsMixin:
             output=Path(self.k0_aggregation_output.get()),
             validate=self.k0_validate.get(),
         )
-        tokens = ["k0-aggregate", "--analysis-files", str(analysis_file), "--output", str(args.output)]
+        tokens = [
+            "k0-aggregate",
+            "--analysis-files",
+            str(analysis_file),
+            "--output",
+            str(args.output),
+        ]
         if not args.validate:
             tokens.append("--no-validate")
         self._dispatch(cli_app.cmd_k0_aggregate, args, tokens)
@@ -647,7 +772,13 @@ class CommandsMixin:
             output=Path(self.k0_qaqc_output.get()),
             validate=self.k0_validate.get(),
         )
-        tokens = ["k0-qaqc", "--plan-file", str(args.plan_file), "--output", str(args.output)]
+        tokens = [
+            "k0-qaqc",
+            "--plan-file",
+            str(args.plan_file),
+            "--output",
+            str(args.output),
+        ]
         if not args.validate:
             tokens.append("--no-validate")
         self._dispatch(cli_app.cmd_k0_qaqc, args, tokens)
@@ -660,25 +791,56 @@ class CommandsMixin:
             output=Path(self.k0_report_output.get()),
             validate=self.k0_validate.get(),
         )
-        tokens = ["k0-report", "--analysis-file", str(args.analysis_file), "--output", str(args.output)]
+        tokens = [
+            "k0-report",
+            "--analysis-file",
+            str(args.analysis_file),
+            "--output",
+            str(args.output),
+        ]
         if args.aggregation_file:
             tokens.extend(["--aggregation-file", str(args.aggregation_file)])
         if args.qaqc_file:
             tokens.extend(["--qaqc-file", str(args.qaqc_file)])
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_k0_report, args, tokens, on_success=self._load_k0_preview)
+        self._dispatch(
+            cli_app.cmd_k0_report, args, tokens, on_success=self._load_k0_preview
+        )
 
     def _run_astm_e2005(self) -> None:
         args = Namespace(
-            plan_file=Path(self.astm_e2005_plan.get()) if hasattr(self, 'astm_e2005_plan') else Path('astm_e2005_plan.json'),
-            output=Path(self.astm_e2005_output.get()) if hasattr(self, 'astm_e2005_output') else Path('astm_e2005.json'),
-            validate=self.astm_e2005_validate.get() if hasattr(self, 'astm_e2005_validate') else True,
+            plan_file=(
+                Path(self.astm_e2005_plan.get())
+                if hasattr(self, "astm_e2005_plan")
+                else Path("astm_e2005_plan.json")
+            ),
+            output=(
+                Path(self.astm_e2005_output.get())
+                if hasattr(self, "astm_e2005_output")
+                else Path("astm_e2005.json")
+            ),
+            validate=(
+                self.astm_e2005_validate.get()
+                if hasattr(self, "astm_e2005_validate")
+                else True
+            ),
         )
-        tokens = ["astm-e2005", "--plan-file", str(args.plan_file), "--output", str(args.output)]
+        tokens = [
+            "astm-e2005",
+            "--plan-file",
+            str(args.plan_file),
+            "--output",
+            str(args.output),
+        ]
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_astm_e2005, args, tokens, on_success=self._load_astm_e2005_preview)
+        self._dispatch(
+            cli_app.cmd_astm_e2005,
+            args,
+            tokens,
+            on_success=self._load_astm_e2005_preview,
+        )
 
     def _run_astm_e261(self) -> None:
         args = Namespace(
@@ -686,10 +848,18 @@ class CommandsMixin:
             output=Path(self.astm_e261_output.get()),
             validate=self.astm_e261_validate.get(),
         )
-        tokens = ["astm-e261", "--plan-file", str(args.plan_file), "--output", str(args.output)]
+        tokens = [
+            "astm-e261",
+            "--plan-file",
+            str(args.plan_file),
+            "--output",
+            str(args.output),
+        ]
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_astm_e261, args, tokens, on_success=self._load_astm_e261_preview)
+        self._dispatch(
+            cli_app.cmd_astm_e261, args, tokens, on_success=self._load_astm_e261_preview
+        )
 
     def _run_astm_e262(self) -> None:
         args = Namespace(
@@ -697,10 +867,18 @@ class CommandsMixin:
             output=Path(self.astm_e262_output.get()),
             validate=self.astm_e262_validate.get(),
         )
-        tokens = ["astm-e262", "--plan-file", str(args.plan_file), "--output", str(args.output)]
+        tokens = [
+            "astm-e262",
+            "--plan-file",
+            str(args.plan_file),
+            "--output",
+            str(args.output),
+        ]
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_astm_e262, args, tokens, on_success=self._load_astm_e262_preview)
+        self._dispatch(
+            cli_app.cmd_astm_e262, args, tokens, on_success=self._load_astm_e262_preview
+        )
 
     def _run_astm_e3376(self) -> None:
         args = Namespace(
@@ -708,19 +886,34 @@ class CommandsMixin:
             output=Path(self.astm_e3376_output.get()),
             validate=self.astm_e3376_validate.get(),
         )
-        tokens = ["astm-e3376", "--plan-file", str(args.plan_file), "--output", str(args.output)]
+        tokens = [
+            "astm-e3376",
+            "--plan-file",
+            str(args.plan_file),
+            "--output",
+            str(args.output),
+        ]
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_astm_e3376, args, tokens, on_success=self._load_astm_e3376_preview)
+        self._dispatch(
+            cli_app.cmd_astm_e3376,
+            args,
+            tokens,
+            on_success=self._load_astm_e3376_preview,
+        )
 
     def _run_rafm_validate(self) -> None:
         max_spectra = self.rafm_max_spectra.get().strip()
         flux_wire_method = self.rafm_flux_wire_counting_method.get().strip() or None
         generic_method = self.rafm_generic_counting_method.get().strip() or None
         if flux_wire_method and flux_wire_method not in GUI_RAFM_COUNTING_METHODS:
-            raise ValueError(f"Unsupported RAFM flux-wire counting method: {flux_wire_method}")
+            raise ValueError(
+                f"Unsupported RAFM flux-wire counting method: {flux_wire_method}"
+            )
         if generic_method and generic_method not in GUI_RAFM_COUNTING_METHODS:
-            raise ValueError(f"Unsupported RAFM generic counting method: {generic_method}")
+            raise ValueError(
+                f"Unsupported RAFM generic counting method: {generic_method}"
+            )
         args = Namespace(
             example_root=Path(self.rafm_example_root.get()),
             results_root=Path(self.rafm_raw_results_root.get()),
@@ -729,16 +922,29 @@ class CommandsMixin:
             generic_counting_method=generic_method,
             no_fail=not self.rafm_enforce_thresholds.get(),
         )
-        tokens = ["rafm-validate", "--example-root", str(args.example_root), "--results-root", str(args.results_root)]
+        tokens = [
+            "rafm-validate",
+            "--example-root",
+            str(args.example_root),
+            "--results-root",
+            str(args.results_root),
+        ]
         if args.max_spectra is not None:
             tokens.extend(["--max-spectra", str(args.max_spectra)])
         if args.flux_wire_counting_method:
-            tokens.extend(["--flux-wire-counting-method", args.flux_wire_counting_method])
+            tokens.extend(
+                ["--flux-wire-counting-method", args.flux_wire_counting_method]
+            )
         if args.generic_counting_method:
             tokens.extend(["--generic-counting-method", args.generic_counting_method])
         if args.no_fail:
             tokens.append("--no-fail")
-        self._dispatch(cli_app.cmd_rafm_validate, args, tokens, on_success=self._after_rafm_validate_run)
+        self._dispatch(
+            cli_app.cmd_rafm_validate,
+            args,
+            tokens,
+            on_success=self._after_rafm_validate_run,
+        )
 
     def _run_rafm_qg_benchmark(self) -> None:
         max_spectra = self.rafm_max_spectra.get().strip()
@@ -747,10 +953,21 @@ class CommandsMixin:
             results_root=Path(self.rafm_qg_results_root.get()),
             max_spectra=int(max_spectra) if max_spectra else None,
         )
-        tokens = ["rafm-qg-benchmark", "--example-root", str(args.example_root), "--results-root", str(args.results_root)]
+        tokens = [
+            "rafm-qg-benchmark",
+            "--example-root",
+            str(args.example_root),
+            "--results-root",
+            str(args.results_root),
+        ]
         if args.max_spectra is not None:
             tokens.extend(["--max-spectra", str(args.max_spectra)])
-        self._dispatch(cli_app.cmd_rafm_qg_benchmark, args, tokens, on_success=self._after_rafm_qg_benchmark_run)
+        self._dispatch(
+            cli_app.cmd_rafm_qg_benchmark,
+            args,
+            tokens,
+            on_success=self._after_rafm_qg_benchmark_run,
+        )
 
     def _run_rafm_compare_branches(self) -> None:
         args = Namespace(
@@ -767,7 +984,12 @@ class CommandsMixin:
             "--output-root",
             str(args.output_root),
         ]
-        self._dispatch(cli_app.cmd_rafm_compare_branches, args, tokens, on_success=self._after_rafm_compare_run)
+        self._dispatch(
+            cli_app.cmd_rafm_compare_branches,
+            args,
+            tokens,
+            on_success=self._after_rafm_compare_run,
+        )
 
     def _run_report(self) -> None:
         args = Namespace(
@@ -777,7 +999,9 @@ class CommandsMixin:
             rates_file=self._optional_path(self.report_rates.get()),
             unfold_file=self._optional_path(self.report_unfold.get()),
             validation_file=self._optional_path(self.report_validation.get()),
-            validation_results_root=self._optional_path(self.report_validation_results_root.get()),
+            validation_results_root=self._optional_path(
+                self.report_validation_results_root.get()
+            ),
             output=Path(self.report_output.get()),
             validate=self.report_validate.get(),
         )
@@ -795,8 +1019,12 @@ class CommandsMixin:
         if args.validation_file:
             tokens.extend(["--validation-file", str(args.validation_file)])
         if args.validation_results_root:
-            tokens.extend(["--validation-results-root", str(args.validation_results_root)])
+            tokens.extend(
+                ["--validation-results-root", str(args.validation_results_root)]
+            )
         tokens.extend(["--output", str(args.output)])
         if not args.validate:
             tokens.append("--no-validate")
-        self._dispatch(cli_app.cmd_report, args, tokens, on_success=self._after_report_run)
+        self._dispatch(
+            cli_app.cmd_report, args, tokens, on_success=self._after_report_run
+        )

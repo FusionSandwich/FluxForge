@@ -173,9 +173,9 @@ All output files conform to the `fluxforge.unfold_result.v1` schema with:
 
 ### Immediate (Phase 0-1)
 
-1. ✅ Validate core physics (activity → reaction rate)
-2. ✅ Validate GLS solver with experimental data
-3. ✅ Generate output artifacts with provenance
+1.  Validate core physics (activity → reaction rate)
+2.  Validate GLS solver with experimental data
+3.  Generate output artifacts with provenance
 4. ⬜ Add multiple foil reactions for better constraint
 5. ⬜ Compare with transport calculation (OpenMC/MCNP)
 
@@ -197,22 +197,22 @@ All output files conform to the `fluxforge.unfold_result.v1` schema with:
 
 | Goal | Description | Status |
 |------|-------------|--------|
-| GOAL-1 | Activities from HPGe with uncertainty | ✅ Achieved |
-| GOAL-2 | EOI reaction rates with history | ✅ Achieved |
-| GOAL-3 | Response matrix from IRDFF | ✅ Achieved |
-| GOAL-4 | Multiple solver families (GLS/GRAVEL/MLEM) | ✅ Achieved |
-| GOAL-5 | Posterior with covariance & χ² | ✅ Achieved |
-| GOAL-6 | Artifact provenance | ✅ Achieved |
-| GOAL-7 | End-to-end with experimental data | ✅ Achieved |
+| GOAL-1 | Activities from HPGe with uncertainty |  Achieved |
+| GOAL-2 | EOI reaction rates with history |  Achieved |
+| GOAL-3 | Response matrix from IRDFF |  Achieved |
+| GOAL-4 | Multiple solver families (GLS/GRAVEL/MLEM) |  Achieved |
+| GOAL-5 | Posterior with covariance & χ² |  Achieved |
+| GOAL-6 | Artifact provenance |  Achieved |
+| GOAL-7 | End-to-end with experimental data |  Achieved |
 
 ## Conclusion
 
 The FluxForge package successfully implements the complete activation analysis workflow from experimental HPGe measurements to unfolded neutron spectra. The Fe-Cd-RAFM-1 single-foil example demonstrates:
 
-✅ **Correct physics:** Activity calculations with decay/buildup corrections  
-✅ **Multiple solvers:** GLS, GRAVEL, MLEM all functional  
-✅ **Reproducibility:** Full provenance in output artifacts  
-✅ **Extensibility:** Ready for multi-foil, multi-reaction datasets  
+ **Correct physics:** Activity calculations with decay/buildup corrections  
+ **Multiple solvers:** GLS, GRAVEL, MLEM all functional  
+ **Reproducibility:** Full provenance in output artifacts  
+ **Extensibility:** Ready for multi-foil, multi-reaction datasets  
 
 The example also highlights the importance of proper regularization (GLS prior) for underdetermined problems, providing valuable guidance for future analyses.
 

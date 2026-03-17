@@ -54,9 +54,11 @@ from fluxforge.core.linalg import (
 
 class ResponseCovariancePolicy(Enum):
     """Policy for handling response matrix uncertainty."""
-    
+
     IGNORE = "ignore"  # Ignore response uncertainty (default)
-    AUGMENT_VY = "augment_vy"  # Augment measurement covariance with response contribution
+    AUGMENT_VY = (
+        "augment_vy"  # Augment measurement covariance with response contribution
+    )
     NUISANCE = "nuisance"  # Treat response as nuisance parameters
     MONTE_CARLO = "monte_carlo"  # Full MC propagation
 
@@ -65,7 +67,7 @@ class ResponseCovariancePolicy(Enum):
 class GLSSolution:
     """
     Result of GLS spectrum adjustment.
-    
+
     Attributes:
         flux: Adjusted (posterior) neutron flux spectrum
         covariance: Posterior flux covariance matrix
@@ -77,7 +79,7 @@ class GLSSolution:
         influence: Diagonal of the hat matrix (leverage)
         prior_posterior_change: Relative change from prior to posterior
     """
-    
+
     flux: Vector
     covariance: Matrix
     residuals: Vector
@@ -88,11 +90,12 @@ class GLSSolution:
     influence: Optional[Vector] = None
     prior_posterior_change: Optional[Vector] = None
     diagnostics: Dict[str, Any] = field(default_factory=dict)
-    
+
     @property
     def flux_uncertainty(self) -> Vector:
         """Standard deviation of posterior flux."""
         import math
+
         return [math.sqrt(max(self.covariance[i][i], 0)) for i in range(len(self.flux))]
 
 
@@ -100,7 +103,7 @@ class GLSSolution:
 class GLSConfig:
     """
     Configuration for GLS adjustment.
-    
+
     Attributes:
         enforce_nonnegativity: Clip negative flux values to zero
         response_cov_policy: How to handle response uncertainty
@@ -109,7 +112,7 @@ class GLSConfig:
         conditioning_threshold: Threshold for matrix conditioning
         compute_diagnostics: Whether to compute pull, influence, etc.
     """
-    
+
     enforce_nonnegativity: bool = True
     response_cov_policy: ResponseCovariancePolicy = ResponseCovariancePolicy.IGNORE
     response_cov: Optional[Matrix] = None
@@ -134,6 +137,7 @@ def _diagonal(mat: Matrix) -> Vector:
 def _compute_pull(residuals: Vector, cov_diag: Vector) -> Vector:
     """Compute normalized residuals (pull)."""
     import math
+
     pull = []
     for r, v in zip(residuals, cov_diag):
         if v > 0:
@@ -151,19 +155,21 @@ def _augment_measurement_cov(
 ) -> Matrix:
     """
     Augment measurement covariance with response uncertainty contribution.
-    
+
     V_y_aug = V_y + diag(R σ_R × φ₀)²
-    
+
     This is a linearized approximation of response uncertainty propagation.
     """
     import math
-    
+
     n_reactions = len(measurement_cov)
     n_groups = len(prior_flux)
-    
+
     # Create augmented covariance
-    augmented = [[measurement_cov[i][j] for j in range(n_reactions)] for i in range(n_reactions)]
-    
+    augmented = [
+        [measurement_cov[i][j] for j in range(n_reactions)] for i in range(n_reactions)
+    ]
+
     # For each reaction, compute response uncertainty contribution
     for i in range(n_reactions):
         response_var = 0.0
@@ -175,7 +181,7 @@ def _augment_measurement_cov(
                 sigma_R_ig = 0.0
             response_var += (sigma_R_ig * prior_flux[g]) ** 2
         augmented[i][i] += response_var
-    
+
     return augmented
 
 
@@ -192,7 +198,7 @@ def gls_adjust(
 ) -> GLSSolution:
     """
     Perform GLS spectral adjustment (STAYSL-style).
-    
+
     Parameters
     ----------
     response : Matrix
@@ -211,17 +217,17 @@ def gls_adjust(
         Response uncertainty matrix (N_reactions × N_groups) for variance
     response_cov_policy : ResponseCovariancePolicy
         How to handle response uncertainty
-        
+
     Returns
     -------
     GLSSolution
         Adjusted spectrum with covariance and diagnostics
     """
     import math
-    
+
     n_reactions = len(measurements)
     n_groups = len(prior_flux)
-    
+
     if len(response) != n_reactions or len(response[0]) != n_groups:
         raise ValueError(
             f"Response matrix shape ({len(response)}×{len(response[0])}) "
@@ -230,35 +236,38 @@ def gls_adjust(
 
     # Handle response covariance if provided
     working_measurement_cov = measurement_cov
-    if response_cov is not None and response_cov_policy == ResponseCovariancePolicy.AUGMENT_VY:
+    if (
+        response_cov is not None
+        and response_cov_policy == ResponseCovariancePolicy.AUGMENT_VY
+    ):
         working_measurement_cov = _augment_measurement_cov(
             measurement_cov, response, prior_flux, response_cov
         )
 
     # Compute R × V_φ
     rc0 = matmul(response, prior_cov)  # type: ignore[arg-type]
-    
+
     # Innovation covariance: R V_φ R^T + V_y
     innovation_cov = matmul(rc0, transpose(response))  # type: ignore[arg-type]
     for i in range(len(innovation_cov)):
         for j in range(len(innovation_cov)):
             innovation_cov[i][j] += working_measurement_cov[i][j]
-    
+
     # Invert innovation covariance
     innovation_cov_inv = pseudo_inverse(innovation_cov)
 
     # Kalman gain: V_φ R^T (R V_φ R^T + V_y)^(-1)
     gain = matmul(prior_cov, matmul(transpose(response), innovation_cov_inv))  # type: ignore[arg-type]
-    
+
     # Model prediction: R φ₀
     model_prediction = matmul(response, prior_flux)  # type: ignore[arg-type]
-    
+
     # Innovation (residuals): y - R φ₀
     residuals = sub_vectors(measurements, model_prediction)  # type: ignore[arg-type]
-    
+
     # Update: V_φ R^T (R V_φ R^T + V_y)^(-1) (y - R φ₀)
     update = matmul(gain, residuals)  # type: ignore[arg-type]
-    
+
     # Posterior flux: φ̂ = φ₀ + update
     phi_hat = add_vectors(prior_flux, update)
     if enforce_nonnegativity:
@@ -272,32 +281,36 @@ def gls_adjust(
 
     # Chi-squared: (y - R φ₀)^T (R V_φ R^T + V_y)^(-1) (y - R φ₀)
     chi2 = _quadratic_form(residuals, innovation_cov_inv)
-    
+
     # Degrees of freedom
-    n_dof = max(n_reactions - 1, 1)  # Typically n_reactions - n_parameters, but flux has many DOF
+    n_dof = max(
+        n_reactions - 1, 1
+    )  # Typically n_reactions - n_parameters, but flux has many DOF
     reduced_chi2 = chi2 / n_dof if n_dof > 0 else chi2
-    
+
     # Diagnostics
     pull = None
     influence = None
     prior_posterior_change = None
     diagnostics: Dict[str, Any] = {}
-    
+
     if compute_diagnostics:
         # Pull (normalized residuals)
         innovation_diag = _diagonal(innovation_cov)
         pull = _compute_pull(residuals, innovation_diag)
-        
+
         # Prior to posterior relative change
         prior_posterior_change = [
             (phi_hat[g] - prior_flux[g]) / max(prior_flux[g], 1e-20)
             for g in range(n_groups)
         ]
-        
+
         # Influence (diagonal of hat matrix H = R (R^T V_y^-1 R)^(-1) R^T V_y^-1)
         # Simplified: use gain magnitude
-        influence = [sum(abs(gain[i][j]) for j in range(n_reactions)) for i in range(n_groups)]
-        
+        influence = [
+            sum(abs(gain[i][j]) for j in range(n_reactions)) for i in range(n_groups)
+        ]
+
         diagnostics = {
             "n_reactions": n_reactions,
             "n_groups": n_groups,
@@ -330,7 +343,7 @@ def _estimate_condition(mat: Matrix) -> float:
     min_d = min(abs(d) for d in diag if abs(d) > 1e-20)
     if min_d > 0:
         return max_d / min_d
-    return float('inf')
+    return float("inf")
 
 
 def gls_adjust_with_response_cov(
@@ -345,10 +358,10 @@ def gls_adjust_with_response_cov(
 ) -> GLSSolution:
     """
     GLS adjustment with Monte Carlo propagation of response uncertainty.
-    
+
     This performs multiple GLS adjustments with perturbed response matrices
     to propagate response uncertainty into the final result.
-    
+
     Parameters
     ----------
     response : Matrix
@@ -367,7 +380,7 @@ def gls_adjust_with_response_cov(
         Number of MC samples
     enforce_nonnegativity : bool
         Clip negative values
-        
+
     Returns
     -------
     GLSSolution
@@ -375,13 +388,13 @@ def gls_adjust_with_response_cov(
     """
     import random
     import math
-    
+
     n_reactions = len(response)
     n_groups = len(response[0])
-    
+
     # Collect MC samples of posterior flux
     flux_samples = []
-    
+
     for _ in range(n_samples):
         # Perturb response matrix
         perturbed_R = [
@@ -391,7 +404,7 @@ def gls_adjust_with_response_cov(
             ]
             for i in range(n_reactions)
         ]
-        
+
         # Run GLS
         result = gls_adjust(
             perturbed_R,
@@ -403,17 +416,13 @@ def gls_adjust_with_response_cov(
             compute_diagnostics=False,
         )
         flux_samples.append(result.flux)
-    
+
     # Compute mean and covariance from samples
     mean_flux = [
-        sum(samples[g] for samples in flux_samples) / n_samples
-        for g in range(n_groups)
+        sum(samples[g] for samples in flux_samples) / n_samples for g in range(n_groups)
     ]
-    
-    mc_cov = [
-        [0.0 for _ in range(n_groups)]
-        for _ in range(n_groups)
-    ]
+
+    mc_cov = [[0.0 for _ in range(n_groups)] for _ in range(n_groups)]
     for g1 in range(n_groups):
         for g2 in range(n_groups):
             cov_sum = sum(
@@ -421,7 +430,7 @@ def gls_adjust_with_response_cov(
                 for samples in flux_samples
             )
             mc_cov[g1][g2] = cov_sum / (n_samples - 1)
-    
+
     # Run nominal GLS for residuals and chi2
     nominal = gls_adjust(
         response,
@@ -432,7 +441,7 @@ def gls_adjust_with_response_cov(
         enforce_nonnegativity=enforce_nonnegativity,
         compute_diagnostics=True,
     )
-    
+
     # Combine: mean flux, MC covariance, nominal diagnostics
     return GLSSolution(
         flux=mean_flux,

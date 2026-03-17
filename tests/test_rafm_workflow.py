@@ -24,7 +24,11 @@ from fluxforge.examples.rafm_workflow import (
     merge_detected_and_targeted_peaks,
 )
 from fluxforge.data.rafm_profile import load_rafm_profile
-from fluxforge.analysis.flux_wire_analysis import GammaLine, analyze_raw_spectrum, analyze_raw_spectrum_targeted
+from fluxforge.analysis.flux_wire_analysis import (
+    GammaLine,
+    analyze_raw_spectrum,
+    analyze_raw_spectrum_targeted,
+)
 from fluxforge.analysis.spectrum_math import subtract_measured_background
 from fluxforge.io.flux_wire import read_processed_txt, read_raw_asc
 
@@ -38,8 +42,13 @@ def test_metadata_and_pairing_aliases_load():
     assert metadata.config["profile_name"] == "rafm_25cm"
     assert metadata.config["use_profile_energy_calibration"] is True
     assert "Fe59" in metadata.sample_gamma_library
-    assert normalize_pairing_key("Cu-RAFM-1_25cm", metadata.pairing_aliases) == "cu-rafm-1"
-    assert normalize_pairing_key("Fe-Cd-RAFM-1_0cm", metadata.pairing_aliases) == "fe-cd-rafm-1"
+    assert (
+        normalize_pairing_key("Cu-RAFM-1_25cm", metadata.pairing_aliases) == "cu-rafm-1"
+    )
+    assert (
+        normalize_pairing_key("Fe-Cd-RAFM-1_0cm", metadata.pairing_aliases)
+        == "fe-cd-rafm-1"
+    )
 
 
 def test_workflow_profile_energy_calibration_supports_astm_inl_alias():
@@ -60,7 +69,9 @@ def test_prune_generic_targeted_lines_drops_weak_nearby_nuisance_lines():
         GammaLine(energy_keV=1231.02, intensity=0.1130, isotope="Ta182"),
         GammaLine(energy_keV=1229.42, intensity=0.0050, isotope="Tb154m"),
     ]
-    pruned = prune_generic_targeted_lines(lines, neighbor_window_keV=5.0, intensity_ratio=20.0)
+    pruned = prune_generic_targeted_lines(
+        lines, neighbor_window_keV=5.0, intensity_ratio=20.0
+    )
     got = {(line.isotope, round(line.energy_keV, 2)) for line in pruned}
     assert ("Fe59", 1099.25) in got
     assert ("Co60", 1173.23) in got
@@ -157,12 +168,16 @@ def test_analyze_generic_sample_writes_artifacts(tmp_path):
     paths = default_paths(EXAMPLE_ROOT, results_root=tmp_path / "results")
     tree = ensure_results_tree(paths.results_root)
     gamma_library, half_lives = build_generic_gamma_library(metadata)
-    background = read_raw_asc(paths.background_path, profile_name=metadata.config["profile_name"]).spectrum
+    background = read_raw_asc(
+        paths.background_path, profile_name=metadata.config["profile_name"]
+    ).spectrum
     assert background is not None
 
     raw_path = paths.raw_root / "RAFM4" / "RAFM4-B_15dEOI.ASC"
     qg_path = paths.qg_root / "RAFM4" / "RAFM4-B_15dEOI.txt"
-    artifact = analyze_generic_sample(raw_path, metadata, paths, tree, gamma_library, half_lives, background, qg_path)
+    artifact = analyze_generic_sample(
+        raw_path, metadata, paths, tree, gamma_library, half_lives, background, qg_path
+    )
 
     assert artifact["sample_id"] == "RAFM4-B_15dEOI"
     assert artifact["sample_group"] == "RAFM4"
@@ -172,10 +187,20 @@ def test_analyze_generic_sample_writes_artifacts(tmp_path):
     assert Path(artifact["comparison_report_txt"]).exists()
     assert Path(artifact["line_diagnostics_csv"]).exists()
     assert Path(artifact["qg_consistency_csv"]).exists()
-    assert artifact["analysis_configuration"]["efficiency_source"] == "profile:rafm_25cm"
-    assert artifact["analysis_configuration"]["energy_calibration_source"] == "profile_override"
-    assert artifact["analysis_configuration"]["qg_comparison_stage"] == "raw_fluxforge_activity_pre_cd_compensation"
-    assert artifact["isotopes"]["Cr51"]["sample_mass_g"] == pytest.approx(0.076026542216873 * 7.87)
+    assert (
+        artifact["analysis_configuration"]["efficiency_source"] == "profile:rafm_25cm"
+    )
+    assert (
+        artifact["analysis_configuration"]["energy_calibration_source"]
+        == "profile_override"
+    )
+    assert (
+        artifact["analysis_configuration"]["qg_comparison_stage"]
+        == "raw_fluxforge_activity_pre_cd_compensation"
+    )
+    assert artifact["isotopes"]["Cr51"]["sample_mass_g"] == pytest.approx(
+        0.076026542216873 * 7.87
+    )
     assert artifact["isotopes"]["Cr51"]["specific_activity_Bq_g"] > 0.0
     assert (tree["artifacts"] / "RAFM4-B_15dEOI.json").exists()
     assert (tree["plots_comparisons"] / "RAFM4-B_15dEOI_vs_qg.png").exists()
@@ -200,7 +225,13 @@ def test_generic_targeted_selection_recovers_known_rafm4_missing_lines():
         energy_calibration_override=energy_override,
         profile_name=metadata.config["profile_name"],
     )
-    adjusted = subtract_measured_background(raw_data.spectrum, background, mode="live", negative_policy="hybrid", warn_missing=True)
+    adjusted = subtract_measured_background(
+        raw_data.spectrum,
+        background,
+        mode="live",
+        negative_policy="hybrid",
+        warn_missing=True,
+    )
     detected_peaks = analyze_raw_spectrum(
         adjusted,
         efficiency=raw_data.efficiency,
@@ -210,25 +241,46 @@ def test_generic_targeted_selection_recovers_known_rafm4_missing_lines():
         max_energy_keV=float(metadata.config.get("max_peak_energy_keV", 3000.0)),
         background_subtract=False,
     )
-    targeted_gamma_library = select_generic_targeted_lines(detected_peaks, list(gamma_library), metadata.config)
+    targeted_gamma_library = select_generic_targeted_lines(
+        detected_peaks, list(gamma_library), metadata.config
+    )
     targeted_peaks = analyze_raw_spectrum_targeted(
         data=raw_data,
         expected_lines=targeted_gamma_library,
-        peak_threshold=float(metadata.config.get("targeted_peak_significance_sigma", metadata.config.get("peak_significance_sigma", 3.0))),
+        peak_threshold=float(
+            metadata.config.get(
+                "targeted_peak_significance_sigma",
+                metadata.config.get("peak_significance_sigma", 3.0),
+            )
+        ),
         min_energy_keV=float(metadata.config.get("min_peak_energy_keV", 80.0)),
         max_energy_keV=float(metadata.config.get("max_peak_energy_keV", 3000.0)),
         background_spectrum=background,
         background_subtract=True,
         profile_name=metadata.config["profile_name"],
         roi_width_fwhm=float(metadata.config.get("flux_wire_roi_width_fwhm", 4.0)),
-        background_width_channels=int(metadata.config.get("flux_wire_background_width_channels", 1)),
-        background_gap_fwhm=float(metadata.config.get("flux_wire_background_gap_fwhm", 0.0)),
-        comparison_background_model=str(metadata.config.get("generic_comparison_background_model", "linear")),
-        broad_window_max_raw_gross_ratio=float(metadata.config.get("generic_broad_window_max_raw_gross_ratio", 1.35)),
+        background_width_channels=int(
+            metadata.config.get("flux_wire_background_width_channels", 1)
+        ),
+        background_gap_fwhm=float(
+            metadata.config.get("flux_wire_background_gap_fwhm", 0.0)
+        ),
+        comparison_background_model=str(
+            metadata.config.get("generic_comparison_background_model", "linear")
+        ),
+        broad_window_max_raw_gross_ratio=float(
+            metadata.config.get("generic_broad_window_max_raw_gross_ratio", 1.35)
+        ),
     )
-    peaks = merge_detected_and_targeted_peaks(detected_peaks, targeted_peaks, metadata.config)
-    reference = read_processed_txt(qg_path, profile_name=metadata.config["profile_name"])
-    line_rows, _ = build_line_diagnostic_records("RAFM4-A_15dEOI", "RAFM4", peaks, reference, metadata.config)
+    peaks = merge_detected_and_targeted_peaks(
+        detected_peaks, targeted_peaks, metadata.config
+    )
+    reference = read_processed_txt(
+        qg_path, profile_name=metadata.config["profile_name"]
+    )
+    line_rows, _ = build_line_diagnostic_records(
+        "RAFM4-A_15dEOI", "RAFM4", peaks, reference, metadata.config
+    )
     missing = {
         (str(row["reference_isotope"]), round(float(row["reference_energy_keV"]), 2))
         for row in line_rows
@@ -244,13 +296,17 @@ def test_analyze_flux_wire_sample_writes_reactions(tmp_path):
     metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
     paths = default_paths(EXAMPLE_ROOT, results_root=tmp_path / "results")
     tree = ensure_results_tree(paths.results_root)
-    background = read_raw_asc(paths.background_path, profile_name=metadata.config["profile_name"]).spectrum
+    background = read_raw_asc(
+        paths.background_path, profile_name=metadata.config["profile_name"]
+    ).spectrum
     assert background is not None
 
     raw_path = paths.raw_root / "flux_wires" / "Co-RAFM-1_25cm.ASC"
     qg_path = paths.qg_root / "flux_wires" / "Co-RAFM-1_25cm.txt"
     sample_key = normalize_pairing_key(raw_path.stem, metadata.pairing_aliases)
-    artifact = analyze_flux_wire_sample(raw_path, metadata, paths, tree, background, qg_path, sample_key)
+    artifact = analyze_flux_wire_sample(
+        raw_path, metadata, paths, tree, background, qg_path, sample_key
+    )
 
     assert artifact["sample_group"] == "flux_wires"
     assert artifact["reactions"]
@@ -259,8 +315,14 @@ def test_analyze_flux_wire_sample_writes_reactions(tmp_path):
     assert Path(artifact["comparison_report_txt"]).exists()
     assert Path(artifact["line_diagnostics_csv"]).exists()
     assert Path(artifact["qg_consistency_csv"]).exists()
-    assert artifact["analysis_configuration"]["energy_calibration_source"] == "profile_override"
-    assert artifact["analysis_configuration"]["qg_comparison_stage"] == "raw_fluxforge_activity_pre_cd_compensation"
+    assert (
+        artifact["analysis_configuration"]["energy_calibration_source"]
+        == "profile_override"
+    )
+    assert (
+        artifact["analysis_configuration"]["qg_comparison_stage"]
+        == "raw_fluxforge_activity_pre_cd_compensation"
+    )
     with open(artifact["line_diagnostics_csv"], newline="", encoding="utf-8") as handle:
         first_row = next(csv.DictReader(handle))
     assert "reference_gross_counts" in first_row
@@ -298,9 +360,14 @@ def test_flux_wire_count_parity_representative_lines(tmp_path):
         raw_path = paths.raw_root / "flux_wires" / f"{stem}.ASC"
         qg_path = paths.qg_root / "flux_wires" / f"{stem}.txt"
         sample_key = normalize_pairing_key(raw_path.stem, metadata.pairing_aliases)
-        artifact = analyze_flux_wire_sample(raw_path, metadata, paths, tree, background, qg_path, sample_key)
+        artifact = analyze_flux_wire_sample(
+            raw_path, metadata, paths, tree, background, qg_path, sample_key
+        )
         rows = {
-            (str(row["reference_isotope"]), round(float(row["reference_energy_keV"]), 2)): row
+            (
+                str(row["reference_isotope"]),
+                round(float(row["reference_energy_keV"]), 2),
+            ): row
             for row in artifact["line_diagnostics"]
         }
         for (isotope, energy), limits in line_expectations.items():
@@ -321,6 +388,10 @@ def test_run_rafm_validation_subset_generates_summary(tmp_path):
     assert (Path(summary["results_root"]) / "validation_summary.json").exists()
     assert (Path(summary["results_root"]) / "tables" / "raw_qg_pairing.csv").exists()
     assert (Path(summary["results_root"]) / "tables" / "line_diagnostics.csv").exists()
-    assert (Path(summary["results_root"]) / "tables" / "qg_internal_consistency.csv").exists()
-    assert (Path(summary["results_root"]) / "tables" / "flux_wire_count_disagreement.csv").exists()
+    assert (
+        Path(summary["results_root"]) / "tables" / "qg_internal_consistency.csv"
+    ).exists()
+    assert (
+        Path(summary["results_root"]) / "tables" / "flux_wire_count_disagreement.csv"
+    ).exists()
     assert (Path(summary["results_root"]) / "reports").exists()

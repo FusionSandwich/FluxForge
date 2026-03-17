@@ -47,7 +47,11 @@ class AttenuationMaterial:
 
     @property
     def density(self) -> float:
-        return self.density_override if self.density_override is not None else self.data.density
+        return (
+            self.density_override
+            if self.density_override is not None
+            else self.data.density
+        )
 
     def mu_rho(self, energy_keV: Union[float, np.ndarray]) -> np.ndarray:
         return self.data.get_mu_rho(energy_keV)
@@ -55,7 +59,9 @@ class AttenuationMaterial:
     def mu(self, energy_keV: Union[float, np.ndarray]) -> np.ndarray:
         return self.mu_rho(energy_keV) * self.density
 
-    def transmission(self, energy_keV: Union[float, np.ndarray], thickness_cm: float) -> np.ndarray:
+    def transmission(
+        self, energy_keV: Union[float, np.ndarray], thickness_cm: float
+    ) -> np.ndarray:
         mu = self.mu(energy_keV)
         return np.exp(-mu * thickness_cm)
 

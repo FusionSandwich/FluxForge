@@ -57,7 +57,9 @@ def test_gls_update_numpy_matches_closed_form_identity_case() -> None:
 
     # For identity response, posterior mean = (1/(1+0.25))*measurement = 0.8*y.
     np.testing.assert_allclose(phi_post, np.array([0.8, 1.6]), rtol=1e-12, atol=1e-12)
-    np.testing.assert_allclose(np.diag(cov_post), np.array([0.2, 0.2]), rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(
+        np.diag(cov_post), np.array([0.2, 0.2]), rtol=1e-12, atol=1e-12
+    )
     assert chi2 > 0.0
 
 
@@ -161,5 +163,7 @@ def test_estimate_unknown_uncertainty_methods() -> None:
     assert unknown == 0.0
 
     # Small residuals should not require extra uncertainty.
-    no_extra = estimate_unknown_uncertainty(np.array([0.01, 0.01]), covariance, method="ml")
+    no_extra = estimate_unknown_uncertainty(
+        np.array([0.01, 0.01]), covariance, method="ml"
+    )
     assert no_extra == 0.0

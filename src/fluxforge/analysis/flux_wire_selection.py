@@ -30,13 +30,15 @@ import numpy as np
 # Flux Wire Database (from IRDFF-II and INL recommendations)
 # =============================================================================
 
+
 class WireCategory(Enum):
     """Categories for flux wire applications."""
+
     THERMAL = auto()
     EPITHERMAL = auto()
-    FAST_LOW = auto()     # 0.1 - 1 MeV
-    FAST_MID = auto()     # 1 - 5 MeV
-    FAST_HIGH = auto()    # 5 - 20 MeV
+    FAST_LOW = auto()  # 0.1 - 1 MeV
+    FAST_MID = auto()  # 1 - 5 MeV
+    FAST_HIGH = auto()  # 5 - 20 MeV
     FISSION = auto()
 
 
@@ -44,7 +46,7 @@ class WireCategory(Enum):
 class FluxWireReaction:
     """
     Complete metadata for a flux wire reaction.
-    
+
     Attributes
     ----------
     target : str
@@ -70,6 +72,7 @@ class FluxWireReaction:
     notes : str
         Special considerations
     """
+
     target: str
     product: str
     reaction_type: str
@@ -81,24 +84,25 @@ class FluxWireReaction:
     category: WireCategory = WireCategory.THERMAL
     recommended_combos: List[str] = field(default_factory=list)
     notes: str = ""
-    
+
     @property
     def reaction_str(self) -> str:
         """Full reaction string (e.g., 'Ti-46(n,p)Sc-46')."""
         return f"{self.target}({self.reaction_type}){self.product}"
-    
+
     @property
     def element(self) -> str:
         """Element name from target."""
-        return ''.join(c for c in self.target if c.isalpha())
-    
+        return "".join(c for c in self.target if c.isalpha())
+
     @property
     def is_thermal(self) -> bool:
         """True if this is a thermal/epithermal reaction."""
         return self.threshold_MeV == 0.0 or self.category in [
-            WireCategory.THERMAL, WireCategory.EPITHERMAL
+            WireCategory.THERMAL,
+            WireCategory.EPITHERMAL,
         ]
-    
+
     @property
     def is_threshold(self) -> bool:
         """True if this is a threshold reaction."""
@@ -242,7 +246,6 @@ FLUX_WIRE_DATABASE: Dict[str, FluxWireReaction] = {
         recommended_combos=["Co", "Mn"],
         notes="Very clean gamma signature.",
     ),
-    
     # ==========================================================================
     # Fast Threshold Reactions - (n,p)
     # ==========================================================================
@@ -337,7 +340,6 @@ FLUX_WIRE_DATABASE: Dict[str, FluxWireReaction] = {
         recommended_combos=["Ti", "Ni"],
         notes="Pure beta emitter - requires liquid scintillation counting.",
     ),
-    
     # ==========================================================================
     # Fast Threshold Reactions - (n,α)
     # ==========================================================================
@@ -380,7 +382,6 @@ FLUX_WIRE_DATABASE: Dict[str, FluxWireReaction] = {
         recommended_combos=["Ti", "Al"],
         notes="High threshold. Good for >5 MeV spectrum.",
     ),
-    
     # ==========================================================================
     # (n,n') and (n,2n) Reactions - High Energy
     # ==========================================================================
@@ -443,11 +444,12 @@ FLUX_WIRE_DATABASE: Dict[str, FluxWireReaction] = {
 # Flux Wire Selection Advisor
 # =============================================================================
 
+
 @dataclass
 class WireCombinationScore:
     """
     Score for a flux wire combination.
-    
+
     Attributes
     ----------
     wires : Tuple[str, ...]
@@ -465,6 +467,7 @@ class WireCombinationScore:
     recommendations : List[str]
         Specific recommendations
     """
+
     wires: Tuple[str, ...]
     energy_coverage: float
     threshold_spacing: float
@@ -479,11 +482,11 @@ def get_wire_reactions(element: str) -> List[FluxWireReaction]:
     """Get all reactions for a given element/wire."""
     results = []
     element_upper = element.upper()
-    
+
     for reaction_str, rxn in FLUX_WIRE_DATABASE.items():
         if rxn.element.upper() == element_upper:
             results.append(rxn)
-    
+
     return results
 
 
@@ -493,14 +496,14 @@ def analyze_wire_combination(
 ) -> WireCombinationScore:
     """
     Analyze a flux wire combination for spectrum unfolding suitability.
-    
+
     Parameters
     ----------
     wires : List[str]
         Wire elements (e.g., ['Ti', 'Fe', 'Co'])
     verbose : bool
         Print analysis details
-    
+
     Returns
     -------
     WireCombinationScore
@@ -509,7 +512,7 @@ def analyze_wire_combination(
     reactions_found: List[FluxWireReaction] = []
     thresholds: List[float] = []
     categories: Set[WireCategory] = set()
-    
+
     for wire in wires:
         wire_rxns = get_wire_reactions(wire)
         reactions_found.extend(wire_rxns)
@@ -517,25 +520,32 @@ def analyze_wire_combination(
             if rxn.threshold_MeV > 0:
                 thresholds.append(rxn.threshold_MeV)
             categories.add(rxn.category)
-    
+
     # Check thermal coverage
-    has_thermal = WireCategory.THERMAL in categories or WireCategory.EPITHERMAL in categories
-    has_fast = any(cat in categories for cat in [
-        WireCategory.FAST_LOW, WireCategory.FAST_MID, WireCategory.FAST_HIGH
-    ])
-    
+    has_thermal = (
+        WireCategory.THERMAL in categories or WireCategory.EPITHERMAL in categories
+    )
+    has_fast = any(
+        cat in categories
+        for cat in [
+            WireCategory.FAST_LOW,
+            WireCategory.FAST_MID,
+            WireCategory.FAST_HIGH,
+        ]
+    )
+
     # Energy coverage score (0-1)
     n_categories = len(categories)
     energy_coverage = min(n_categories / 5.0, 1.0)  # Max 5 categories
-    
+
     # Threshold spacing score
     if len(thresholds) >= 2:
         thresholds_sorted = sorted(thresholds)
         log_ratios = []
         for i in range(1, len(thresholds_sorted)):
-            if thresholds_sorted[i-1] > 0:
+            if thresholds_sorted[i - 1] > 0:
                 log_ratios.append(
-                    np.log10(thresholds_sorted[i] / thresholds_sorted[i-1])
+                    np.log10(thresholds_sorted[i] / thresholds_sorted[i - 1])
                 )
         # Good spacing = uniform log distribution
         if log_ratios:
@@ -546,35 +556,37 @@ def analyze_wire_combination(
             threshold_spacing = 0.5
     else:
         threshold_spacing = 0.3  # Poor threshold coverage
-    
+
     # Overall score
     thermal_bonus = 0.2 if has_thermal else 0.0
     fast_bonus = 0.2 if has_fast else 0.0
-    overall_score = 0.4 * energy_coverage + 0.2 * threshold_spacing + thermal_bonus + fast_bonus
-    
+    overall_score = (
+        0.4 * energy_coverage + 0.2 * threshold_spacing + thermal_bonus + fast_bonus
+    )
+
     # Generate recommendations
     recommendations = []
-    
+
     if not has_thermal:
         recommendations.append(
             "WARNING No thermal reaction. Consider adding Co, Au, or In for thermal flux monitoring."
         )
-    
+
     if not has_fast:
         recommendations.append(
             "WARNING No fast threshold reactions. Consider adding Ti, Ni, or Fe for fast flux."
         )
-    
+
     if len(wires) < 3:
         recommendations.append(
             "WARNING Fewer than 3 wires. INL recommends at least Ti-Fe-Co as baseline."
         )
-    
+
     if len(thresholds) < 3:
         recommendations.append(
             "Consider adding reactions with different thresholds for better energy resolution."
         )
-    
+
     # Check if this matches INL robust combinations
     wire_set = set(w.upper() for w in wires)
     inl_baseline = {"TI", "FE", "CO"}
@@ -582,7 +594,7 @@ def analyze_wire_combination(
         recommendations.append(
             "OK Includes INL baseline {Ti, Fe, Co} - robust against a priori uncertainty."
         )
-    
+
     return WireCombinationScore(
         wires=tuple(wires),
         energy_coverage=energy_coverage,
@@ -603,7 +615,7 @@ def suggest_wire_combinations(
 ) -> List[WireCombinationScore]:
     """
     Suggest optimal flux wire combinations.
-    
+
     Parameters
     ----------
     spectrum_type : str
@@ -614,14 +626,14 @@ def suggest_wire_combinations(
         Maximum number of wires
     min_wires : int
         Minimum number of wires
-    
+
     Returns
     -------
     List[WireCombinationScore]
         Ranked wire combinations
     """
     from itertools import combinations
-    
+
     # Define wire sets based on spectrum type
     if spectrum_type == "fusion":
         available = ["Nb", "Ni", "Ti", "Fe", "Zr", "Al"]
@@ -629,12 +641,12 @@ def suggest_wire_combinations(
         available = ["Ti", "Ni", "Fe", "Al", "In", "S"]
     else:  # reactor
         available = ["Ti", "Fe", "Co", "Ni", "Au", "Sc", "In", "Mn", "Cu"]
-    
+
     if must_include:
         for wire in must_include:
             if wire not in available:
                 available.append(wire)
-    
+
     # Generate combinations
     results = []
     for n in range(min_wires, min(max_wires + 1, len(available) + 1)):
@@ -642,13 +654,13 @@ def suggest_wire_combinations(
             combo_list = list(combo)
             if must_include and not all(w in combo_list for w in must_include):
                 continue
-            
+
             score = analyze_wire_combination(combo_list, verbose=False)
             results.append(score)
-    
+
     # Sort by overall score
     results.sort(key=lambda x: x.overall_score, reverse=True)
-    
+
     return results[:10]  # Top 10
 
 
@@ -658,38 +670,38 @@ def recommend_wire_additions(
 ) -> List[Tuple[str, str, float]]:
     """
     Recommend additional wires to improve a combination.
-    
+
     Parameters
     ----------
     current_wires : List[str]
         Current wire selection
     spectrum_type : str
         Type of spectrum being measured
-    
+
     Returns
     -------
     List[Tuple[str, str, float]]
         List of (wire, reason, score_improvement)
     """
     current_score = analyze_wire_combination(current_wires, verbose=False)
-    
+
     # Candidate wires
     if spectrum_type == "fusion":
         candidates = ["Nb", "Ni", "Ti", "Zr", "Al", "Fe"]
     else:
         candidates = ["Ti", "Fe", "Co", "Ni", "Au", "Sc", "In", "Mn", "Cu", "Al"]
-    
+
     recommendations = []
-    
+
     for wire in candidates:
         if wire in current_wires:
             continue
-        
+
         new_combo = current_wires + [wire]
         new_score = analyze_wire_combination(new_combo, verbose=False)
-        
+
         improvement = new_score.overall_score - current_score.overall_score
-        
+
         if improvement > 0.01:
             # Determine reason
             rxns = get_wire_reactions(wire)
@@ -703,12 +715,12 @@ def recommend_wire_additions(
                     reason = f"Adds {primary.threshold_MeV:.2f} MeV threshold reaction"
             else:
                 reason = "Improves energy coverage"
-            
+
             recommendations.append((wire, reason, improvement))
-    
+
     # Sort by improvement
     recommendations.sort(key=lambda x: x[2], reverse=True)
-    
+
     return recommendations[:5]
 
 
@@ -720,9 +732,9 @@ def print_wire_summary(reaction_str: str) -> None:
         for rxn in list(FLUX_WIRE_DATABASE.keys())[:10]:
             print(f"  - {rxn}")
         return
-    
+
     rxn = FLUX_WIRE_DATABASE[reaction_str]
-    
+
     print(f"\n{'='*60}")
     print(f"Reaction: {rxn.reaction_str}")
     print(f"{'='*60}")
@@ -731,7 +743,9 @@ def print_wire_summary(reaction_str: str) -> None:
     print(f"Type:             ({rxn.reaction_type})")
     print(f"Category:         {rxn.category.name}")
     print(f"Threshold:        {rxn.threshold_MeV:.3f} MeV")
-    print(f"Half-life:        {rxn.half_life_s/3600:.2f} hours ({rxn.half_life_s/86400:.2f} days)")
+    print(
+        f"Half-life:        {rxn.half_life_s/3600:.2f} hours ({rxn.half_life_s/86400:.2f} days)"
+    )
     print(f"Gamma energy:     {rxn.gamma_energy_keV:.1f} keV")
     print(f"Gamma intensity:  {rxn.gamma_intensity*100:.2f}%")
     if rxn.thermal_xs_barn > 0:
@@ -745,6 +759,7 @@ def print_wire_summary(reaction_str: str) -> None:
 # ASTM E722 1-MeV Silicon Equivalent Fluence
 # =============================================================================
 
+
 def calculate_1mev_equivalent_fluence(
     energy_edges_MeV: np.ndarray,
     flux: np.ndarray,
@@ -752,11 +767,11 @@ def calculate_1mev_equivalent_fluence(
 ) -> Tuple[float, float]:
     """
     Calculate 1-MeV silicon equivalent fluence per ASTM E722.
-    
+
     The 1-MeV equivalent fluence is a single-number metric that represents
     the fluence of 1-MeV neutrons that would cause the same damage as the
     actual neutron spectrum.
-    
+
     Parameters
     ----------
     energy_edges_MeV : np.ndarray
@@ -765,28 +780,28 @@ def calculate_1mev_equivalent_fluence(
         Flux per energy group (n/cm²/s or n/cm² for fluence)
     damage_function : str
         Damage function to use: 'kerma_si', 'niel_si', 'dpa_fe'
-    
+
     Returns
     -------
     fluence_1mev : float
         1-MeV equivalent fluence
     hardness_parameter : float
         Spectral hardness H = φ(>1MeV) / φ(total)
-    
+
     References
     ----------
-    ASTM E722-19: Standard Practice for Characterizing Neutron Fluence 
+    ASTM E722-19: Standard Practice for Characterizing Neutron Fluence
     Spectra in Terms of an Equivalent Monoenergetic Neutron Fluence
-    
-    K. R. DePriest, "Historical Examination of the ASTM Standard E722 
+
+    K. R. DePriest, "Historical Examination of the ASTM Standard E722
     1-MeV Silicon Equivalent Fluence Metric", SAND2019-15194
     """
     # Simplified damage function (normalized to 1 at 1 MeV)
     # Real implementation would use tabulated NIEL or KERMA data
-    
+
     energy_centers_MeV = np.sqrt(energy_edges_MeV[:-1] * energy_edges_MeV[1:])
     energy_widths_MeV = energy_edges_MeV[1:] - energy_edges_MeV[:-1]
-    
+
     if damage_function == "kerma_si":
         # Silicon KERMA damage function (approximate)
         # Normalized to 1.0 at 1 MeV
@@ -799,56 +814,56 @@ def calculate_1mev_equivalent_fluence(
         damage = _dpa_iron(energy_centers_MeV)
     else:
         raise ValueError(f"Unknown damage function: {damage_function}")
-    
+
     # Calculate weighted fluence
     # φ_eq = Σ φ(E) × D(E) / D(1 MeV)
     damage_at_1mev = np.interp(1.0, energy_centers_MeV, damage)
     if damage_at_1mev == 0:
         damage_at_1mev = 1.0
-    
+
     damage_normalized = damage / damage_at_1mev
-    
+
     # Integrate: sum of flux × damage function
     fluence_1mev = np.sum(flux * energy_widths_MeV * damage_normalized)
-    
+
     # Calculate spectral hardness
     total_flux = np.sum(flux * energy_widths_MeV)
     fast_mask = energy_centers_MeV > 1.0
     fast_flux = np.sum(flux[fast_mask] * energy_widths_MeV[fast_mask])
-    
+
     hardness = fast_flux / total_flux if total_flux > 0 else 0.0
-    
+
     return fluence_1mev, hardness
 
 
 def _kerma_silicon(energy_MeV: np.ndarray) -> np.ndarray:
     """
     Approximate silicon KERMA damage function.
-    
+
     Based on ASTM E722 and IRDF data.
     """
     # Simplified piece-wise approximation
     # Real data from IRDFF or NJOY processing
     damage = np.zeros_like(energy_MeV)
-    
+
     # Thermal region (< 0.1 eV in MeV = 1e-7)
     thermal = energy_MeV < 1e-7
     damage[thermal] = 0.005 * (energy_MeV[thermal] / 1e-7)
-    
+
     # Epithermal/intermediate (1e-7 to 0.1 MeV)
     intermediate = (energy_MeV >= 1e-7) & (energy_MeV < 0.1)
     damage[intermediate] = 0.005 + 0.5 * np.log10(energy_MeV[intermediate] / 1e-7) / 6
-    
+
     # Fast region (0.1 to 20 MeV) - roughly linear in log scale
     fast = (energy_MeV >= 0.1) & (energy_MeV <= 20)
     damage[fast] = 0.5 + 0.5 * np.log10(energy_MeV[fast] / 0.1) / np.log10(10)
     # Normalize so damage(1 MeV) = 1
     damage[fast] = (energy_MeV[fast] / 1.0) ** 0.3
-    
+
     # Very high energy (> 20 MeV)
     high = energy_MeV > 20
     damage[high] = (20.0 / 1.0) ** 0.3 * (energy_MeV[high] / 20.0) ** 0.1
-    
+
     # Ensure damage(1 MeV) = 1.0
     return damage
 
@@ -856,43 +871,43 @@ def _kerma_silicon(energy_MeV: np.ndarray) -> np.ndarray:
 def _niel_silicon(energy_MeV: np.ndarray) -> np.ndarray:
     """
     Approximate silicon NIEL (Non-Ionizing Energy Loss) damage function.
-    
+
     NIEL is more relevant for semiconductor damage.
     """
     # Similar shape to KERMA but different scaling
     # Based on Messenger & Burke data
     damage = np.zeros_like(energy_MeV)
-    
+
     # Low energy (threshold effects)
     low = energy_MeV < 0.185  # Si displacement threshold ~ 185 keV
     damage[low] = 0.0
-    
+
     # Above threshold
     above = energy_MeV >= 0.185
     damage[above] = (energy_MeV[above] / 1.0) ** 0.5
-    
+
     return damage
 
 
 def _dpa_iron(energy_MeV: np.ndarray) -> np.ndarray:
     """
     Approximate iron DPA (displacements per atom) damage function.
-    
+
     For structural steel damage calculations.
     """
     # Simplified NRT-based approximation
     damage = np.zeros_like(energy_MeV)
-    
+
     # Iron displacement energy ~ 40 eV, so threshold ~ 0.3 keV PKA
     threshold = 0.0003  # MeV
-    
+
     low = energy_MeV < threshold
     damage[low] = 0.0
-    
+
     above = energy_MeV >= threshold
     # Lindhard partition function approximation
     damage[above] = (energy_MeV[above] / 1.0) ** 0.4
-    
+
     return damage
 
 
@@ -903,7 +918,7 @@ def calculate_dpa(
 ) -> float:
     """
     Calculate displacements per atom (DPA) for a material.
-    
+
     Parameters
     ----------
     energy_edges_MeV : np.ndarray
@@ -912,12 +927,12 @@ def calculate_dpa(
         Neutron fluence per energy group (n/cm²)
     material : str
         Target material ('Fe', 'Si', 'Graphite')
-    
+
     Returns
     -------
     float
         DPA value
-    
+
     References
     ----------
     ASTM E693: Standard Practice for Characterizing Neutron Exposures
@@ -925,7 +940,7 @@ def calculate_dpa(
     """
     energy_centers = np.sqrt(energy_edges_MeV[:-1] * energy_edges_MeV[1:])
     energy_widths = energy_edges_MeV[1:] - energy_edges_MeV[:-1]
-    
+
     # DPA cross sections (simplified - should use IRDFF or NJOY data)
     if material.upper() == "FE":
         dpa_xs = _dpa_iron(energy_centers) * 500  # ~500 barn-equivalent at 1 MeV
@@ -933,11 +948,11 @@ def calculate_dpa(
         dpa_xs = _niel_silicon(energy_centers) * 300
     else:
         raise ValueError(f"Unknown material: {material}")
-    
+
     # Convert to barn-cm² units and integrate
     # DPA = Σ σ_DPA(E) × φ(E) × ΔE
     dpa = np.sum(dpa_xs * 1e-24 * fluence * energy_widths)
-    
+
     return dpa
 
 

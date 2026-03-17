@@ -40,11 +40,12 @@ from fluxforge.solvers.iterative import gravel, mlem, IterativeSolution
 # Data Classes
 # =============================================================================
 
+
 @dataclass
 class FluxWireMeasurement:
     """
     Container for a flux wire measurement result.
-    
+
     Attributes
     ----------
     reaction : str
@@ -66,6 +67,7 @@ class FluxWireMeasurement:
     isotope_abundance : float
         Isotope abundance (0-1)
     """
+
     reaction: str
     activity_Bq: float
     uncertainty_Bq: float = 0.0
@@ -75,14 +77,14 @@ class FluxWireMeasurement:
     cooling_time: float = 0.0
     sample_mass_g: float = 1.0
     isotope_abundance: float = 1.0
-    
+
     @property
     def reaction_rate_per_atom(self) -> float:
         """Calculate reaction rate per target atom per second."""
         # R = A / (N * S * D)
         # where A = activity, N = number of atoms, S = saturation factor, D = decay factor
         return self.activity_Bq / (self.saturation_factor * self.decay_factor)
-    
+
     @property
     def relative_uncertainty(self) -> float:
         """Relative uncertainty as fraction."""
@@ -95,7 +97,7 @@ class FluxWireMeasurement:
 class UnfoldingResult:
     """
     Container for spectrum unfolding results.
-    
+
     Attributes
     ----------
     energy_edges : np.ndarray
@@ -129,6 +131,7 @@ class UnfoldingResult:
     metadata : Dict[str, Any]
         Additional metadata
     """
+
     energy_edges: np.ndarray
     flux: np.ndarray
     flux_uncertainty: np.ndarray = field(default_factory=lambda: np.array([]))
@@ -144,7 +147,7 @@ class UnfoldingResult:
     method: str = "GRAVEL"
     initial_guess_source: str = "uniform"
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         """Calculate derived quantities."""
         if len(self.energy_midpoints) == 0 and len(self.energy_edges) > 1:
@@ -153,37 +156,37 @@ class UnfoldingResult:
             )
         if len(self.energy_widths) == 0 and len(self.energy_edges) > 1:
             self.energy_widths = self.energy_edges[1:] - self.energy_edges[:-1]
-    
+
     @property
     def n_groups(self) -> int:
         """Number of energy groups."""
         return len(self.flux)
-    
+
     @property
     def integral_flux(self) -> float:
         """Total integral flux."""
         return float(np.sum(self.flux * self.energy_widths))
-    
+
     @property
     def thermal_flux(self, e_max: float = 0.55) -> float:
         """Thermal flux (E < Cd cutoff)."""
         mask = self.energy_midpoints < e_max
         return float(np.sum(self.flux[mask] * self.energy_widths[mask]))
-    
+
     @property
     def fast_flux(self, e_min: float = 1e5) -> float:
         """Fast flux (E > 100 keV)."""
         mask = self.energy_midpoints > e_min
         return float(np.sum(self.flux[mask] * self.energy_widths[mask]))
-    
+
     def get_flux_at_energy(self, energy_eV: float) -> float:
         """Get flux at a specific energy by interpolation."""
         return float(np.interp(energy_eV, self.energy_midpoints, self.flux))
-    
+
     def to_lethargy(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Convert to lethargy representation (E * φ(E)).
-        
+
         Returns
         -------
         lethargy : np.ndarray
@@ -201,13 +204,14 @@ class UnfoldingResult:
 # Spectrum Unfolding Workflow
 # =============================================================================
 
+
 class SpectrumUnfolder:
     """
     Main class for neutron spectrum unfolding.
-    
+
     Combines IRDFF-II cross sections with iterative solvers to unfold
     measured reaction rates into continuous neutron spectra.
-    
+
     Examples
     --------
     >>> unfolder = SpectrumUnfolder()
@@ -216,7 +220,7 @@ class SpectrumUnfolder:
     >>> unfolder.set_mcnp_initial_guess("spectrum.csv")
     >>> result = unfolder.unfold(method="GRAVEL")
     """
-    
+
     def __init__(
         self,
         energy_structure: str = "flux_wire",
@@ -225,7 +229,7 @@ class SpectrumUnfolder:
     ):
         """
         Initialize spectrum unfolder.
-        
+
         Parameters
         ----------
         energy_structure : str
@@ -236,7 +240,7 @@ class SpectrumUnfolder:
             Print status messages
         """
         self.verbose = verbose
-        
+
         # Set up energy structure
         if custom_energy_edges is not None:
             self.energy_edges = custom_energy_edges
@@ -247,28 +251,30 @@ class SpectrumUnfolder:
         else:
             db = IRDFFDatabase()
             self.energy_edges = db.get_energy_grid(energy_structure)
-        
+
         self.n_groups = len(self.energy_edges) - 1
-        
+
         # Initialize IRDFF database
         self.irdff_db = IRDFFDatabase(verbose=verbose)
-        
+
         # Measurement storage
         self.measurements: List[FluxWireMeasurement] = []
-        
+
         # Initial guess
         self.initial_flux: Optional[np.ndarray] = None
         self.initial_guess_source = "uniform"
-        
+
         # Response matrix (built when needed)
         self._response_matrix: Optional[np.ndarray] = None
         self._reaction_list: List[str] = []
-        
+
         if self.verbose:
             print(f"SpectrumUnfolder initialized:")
             print(f"  Energy groups: {self.n_groups}")
-            print(f"  Energy range: {self.energy_edges[0]:.2e} - {self.energy_edges[-1]:.2e} eV")
-    
+            print(
+                f"  Energy range: {self.energy_edges[0]:.2e} - {self.energy_edges[-1]:.2e} eV"
+            )
+
     def add_reaction(
         self,
         reaction: str,
@@ -280,7 +286,7 @@ class SpectrumUnfolder:
     ) -> None:
         """
         Add a measured reaction for unfolding.
-        
+
         Parameters
         ----------
         reaction : str
@@ -305,13 +311,13 @@ class SpectrumUnfolder:
             **kwargs,
         )
         self.measurements.append(meas)
-        
+
         # Invalidate cached response matrix
         self._response_matrix = None
-        
+
         if self.verbose:
             print(f"  Added: {reaction} - {activity_Bq:.3e} ± {uncertainty_Bq:.3e} Bq")
-    
+
     def add_measurements_from_dataframe(
         self,
         df,
@@ -321,7 +327,7 @@ class SpectrumUnfolder:
     ) -> None:
         """
         Add measurements from a pandas DataFrame.
-        
+
         Parameters
         ----------
         df : DataFrame
@@ -339,7 +345,7 @@ class SpectrumUnfolder:
                 activity_Bq=row[activity_col],
                 uncertainty_Bq=row.get(uncertainty_col, 0.0),
             )
-    
+
     def set_mcnp_initial_guess(
         self,
         spectrum_file: Union[str, Path],
@@ -351,7 +357,7 @@ class SpectrumUnfolder:
     ) -> None:
         """
         Load MCNP spectrum as initial guess.
-        
+
         Parameters
         ----------
         spectrum_file : str or Path
@@ -368,15 +374,16 @@ class SpectrumUnfolder:
             Units of flux in file
         """
         spectrum_file = Path(spectrum_file)
-        
-        if spectrum_file.suffix == '.csv':
+
+        if spectrum_file.suffix == ".csv":
             import csv
-            with open(spectrum_file, 'r') as f:
+
+            with open(spectrum_file, "r") as f:
                 reader = csv.reader(f)
                 for _ in range(skiprows):
                     next(reader)
                 data = list(reader)
-            
+
             energies = []
             fluxes = []
             for row in data:
@@ -387,31 +394,31 @@ class SpectrumUnfolder:
                     fluxes.append(f)
                 except (ValueError, IndexError):
                     continue
-            
+
             energies = np.array(energies)
             fluxes = np.array(fluxes)
         else:
             data = np.loadtxt(spectrum_file, skiprows=skiprows)
             energies = data[:, energy_col]
             fluxes = data[:, flux_col]
-        
+
         # Convert energy units to eV
         if energy_units.lower() == "mev":
             energies = energies * 1e6
-        
+
         # Interpolate to our energy structure
         group_centers = np.sqrt(self.energy_edges[:-1] * self.energy_edges[1:])
         self.initial_flux = np.interp(group_centers, energies, fluxes, left=0, right=0)
-        
+
         # Ensure positive
         self.initial_flux = np.maximum(self.initial_flux, 1e-30)
-        
+
         self.initial_guess_source = "MCNP"
-        
+
         if self.verbose:
             print(f"  Loaded MCNP spectrum from {spectrum_file}")
             print(f"  Interpolated to {self.n_groups} groups")
-    
+
     def set_initial_guess(
         self,
         flux: np.ndarray,
@@ -419,7 +426,7 @@ class SpectrumUnfolder:
     ) -> None:
         """
         Set custom initial guess.
-        
+
         Parameters
         ----------
         flux : np.ndarray
@@ -429,30 +436,32 @@ class SpectrumUnfolder:
         """
         if len(flux) != self.n_groups:
             raise ValueError(f"Flux length {len(flux)} != n_groups {self.n_groups}")
-        
+
         self.initial_flux = np.array(flux)
         self.initial_guess_source = source
-    
+
     def _build_response_matrix(self) -> Tuple[np.ndarray, List[str], np.ndarray]:
         """Build response matrix from measurements."""
-        if self._response_matrix is not None and len(self._reaction_list) == len(self.measurements):
+        if self._response_matrix is not None and len(self._reaction_list) == len(
+            self.measurements
+        ):
             return self._response_matrix, self._reaction_list, self._response_unc
-        
+
         reactions = [m.reaction for m in self.measurements]
-        
+
         response, valid_reactions, uncertainties = build_response_matrix(
             reactions=reactions,
             energy_edges=self.energy_edges,
             db=self.irdff_db,
             verbose=self.verbose,
         )
-        
+
         self._response_matrix = response
         self._reaction_list = valid_reactions
         self._response_unc = uncertainties
-        
+
         return response, valid_reactions, uncertainties
-    
+
     def unfold(
         self,
         method: str = "GRAVEL",
@@ -463,7 +472,7 @@ class SpectrumUnfolder:
     ) -> UnfoldingResult:
         """
         Perform spectrum unfolding.
-        
+
         Parameters
         ----------
         method : str
@@ -476,7 +485,7 @@ class SpectrumUnfolder:
             Chi-squared per DOF threshold
         relaxation : float
             Under-relaxation factor (0-1)
-        
+
         Returns
         -------
         UnfoldingResult
@@ -484,13 +493,13 @@ class SpectrumUnfolder:
         """
         if len(self.measurements) == 0:
             raise ValueError("No measurements added. Use add_reaction() first.")
-        
+
         # Build response matrix
         response_matrix, valid_reactions, response_unc = self._build_response_matrix()
-        
+
         if len(valid_reactions) == 0:
             raise ValueError("No valid reactions found with cross section data.")
-        
+
         # Get measured rates and uncertainties
         measured_rates = []
         rate_uncertainties = []
@@ -499,12 +508,13 @@ class SpectrumUnfolder:
                 measured_rates.append(m.reaction_rate_per_atom)
                 rate_uncertainties.append(
                     m.reaction_rate_per_atom * m.relative_uncertainty
-                    if m.relative_uncertainty > 0 else m.reaction_rate_per_atom * 0.1
+                    if m.relative_uncertainty > 0
+                    else m.reaction_rate_per_atom * 0.1
                 )
-        
+
         measured_rates = np.array(measured_rates)
         rate_uncertainties = np.array(rate_uncertainties)
-        
+
         # Prepare initial guess
         if self.initial_flux is not None:
             initial = self.initial_flux.tolist()
@@ -512,14 +522,16 @@ class SpectrumUnfolder:
             # Default: flat spectrum scaled to match measurements
             avg_rate = np.mean(measured_rates)
             avg_xs = np.mean(response_matrix)
-            initial = [avg_rate / (avg_xs * self.n_groups) if avg_xs > 0 else 1.0] * self.n_groups
-        
+            initial = [
+                avg_rate / (avg_xs * self.n_groups) if avg_xs > 0 else 1.0
+            ] * self.n_groups
+
         if self.verbose:
             print(f"\nStarting {method} unfolding:")
             print(f"  Reactions: {len(valid_reactions)}")
             print(f"  Energy groups: {self.n_groups}")
             print(f"  Initial guess: {self.initial_guess_source}")
-        
+
         # Run unfolding
         if method.upper() == "GRAVEL":
             result = gravel(
@@ -547,22 +559,22 @@ class SpectrumUnfolder:
             )
         else:
             raise ValueError(f"Unknown method: {method}. Use 'GRAVEL' or 'MLEM'.")
-        
+
         # Calculate predicted rates
         flux_array = np.array(result.flux)
         predicted_rates = response_matrix @ flux_array
-        
+
         # Estimate flux uncertainties (simplified - from response matrix propagation)
         flux_uncertainty = self._estimate_flux_uncertainty(
             flux_array, response_matrix, rate_uncertainties
         )
-        
+
         if self.verbose:
             print(f"\nUnfolding complete:")
             print(f"  Iterations: {result.iterations}")
             print(f"  Converged: {result.converged}")
             print(f"  Chi²/dof: {result.chi_squared:.4f}")
-        
+
         return UnfoldingResult(
             energy_edges=self.energy_edges,
             flux=flux_array,
@@ -583,7 +595,7 @@ class SpectrumUnfolder:
                 "relaxation": relaxation,
             },
         )
-    
+
     def _estimate_flux_uncertainty(
         self,
         flux: np.ndarray,
@@ -592,7 +604,7 @@ class SpectrumUnfolder:
     ) -> np.ndarray:
         """
         Estimate flux uncertainties via pseudo-inverse propagation.
-        
+
         This is a simplified uncertainty estimate. For rigorous uncertainty
         quantification, use Monte Carlo propagation.
         """
@@ -603,7 +615,7 @@ class SpectrumUnfolder:
             reg = 1e-10 * np.trace(RtR) / RtR.shape[0] * np.eye(RtR.shape[0])
             RtR_inv = np.linalg.inv(RtR + reg)
             sensitivity = RtR_inv @ response.T
-            
+
             # Propagate uncertainties
             flux_var = np.sum((sensitivity * rate_unc) ** 2, axis=1)
             flux_unc = np.sqrt(flux_var)
@@ -611,9 +623,9 @@ class SpectrumUnfolder:
             # Fall back to simple relative uncertainty
             avg_rel_unc = np.mean(rate_unc / np.maximum(np.abs(flux), 1e-30))
             flux_unc = flux * avg_rel_unc
-        
+
         return flux_unc
-    
+
     def compare_with_mcnp(
         self,
         mcnp_spectrum: Union[str, Path, np.ndarray],
@@ -621,14 +633,14 @@ class SpectrumUnfolder:
     ) -> Dict[str, Any]:
         """
         Compare unfolded spectrum with MCNP reference.
-        
+
         Parameters
         ----------
         mcnp_spectrum : str, Path, or np.ndarray
             MCNP spectrum (file path or array)
         unfolded_result : UnfoldingResult
             Unfolded spectrum
-        
+
         Returns
         -------
         Dict
@@ -640,17 +652,17 @@ class SpectrumUnfolder:
             mcnp_flux = self.initial_flux
         else:
             mcnp_flux = np.array(mcnp_spectrum)
-        
+
         unfolded_flux = unfolded_result.flux
-        
+
         # Normalize for comparison
         mcnp_norm = mcnp_flux / np.sum(mcnp_flux)
         unfolded_norm = unfolded_flux / np.sum(unfolded_flux)
-        
+
         # Calculate metrics
         ratio = np.where(mcnp_norm > 1e-30, unfolded_norm / mcnp_norm, 1.0)
         residual = unfolded_norm - mcnp_norm
-        
+
         return {
             "mcnp_flux": mcnp_flux,
             "mcnp_normalized": mcnp_norm,
@@ -668,6 +680,7 @@ class SpectrumUnfolder:
 # Convenience Functions
 # =============================================================================
 
+
 def quick_unfold(
     reactions: Dict[str, float],
     uncertainties: Optional[Dict[str, float]] = None,
@@ -678,7 +691,7 @@ def quick_unfold(
 ) -> UnfoldingResult:
     """
     Quick spectrum unfolding from dictionary of reactions.
-    
+
     Parameters
     ----------
     reactions : Dict[str, float]
@@ -693,12 +706,12 @@ def quick_unfold(
         Energy group structure
     verbose : bool
         Print status
-    
+
     Returns
     -------
     UnfoldingResult
         Unfolded spectrum
-    
+
     Examples
     --------
     >>> result = quick_unfold({
@@ -709,22 +722,22 @@ def quick_unfold(
     """
     if uncertainties is None:
         uncertainties = {rxn: 0.1 * act for rxn, act in reactions.items()}
-    
+
     unfolder = SpectrumUnfolder(
         energy_structure=energy_structure,
         verbose=verbose,
     )
-    
+
     for rxn, activity in reactions.items():
         unfolder.add_reaction(
             reaction=rxn,
             activity_Bq=activity,
             uncertainty_Bq=uncertainties.get(rxn, activity * 0.1),
         )
-    
+
     if initial_spectrum is not None:
         unfolder.set_initial_guess(initial_spectrum, source="user")
-    
+
     return unfolder.unfold(method=method)
 
 
@@ -735,7 +748,7 @@ def build_flux_wire_response_matrix(
 ) -> Tuple[np.ndarray, np.ndarray, List[str]]:
     """
     Build response matrix for standard flux wire reactions.
-    
+
     Parameters
     ----------
     reactions : List[str], optional
@@ -744,7 +757,7 @@ def build_flux_wire_response_matrix(
         Energy group structure
     custom_edges : np.ndarray, optional
         Custom energy edges
-    
+
     Returns
     -------
     response_matrix : np.ndarray
@@ -768,7 +781,7 @@ def build_flux_wire_response_matrix(
             "Fe-58(n,g)Fe-59",
             "Cu-63(n,g)Cu-64",
         ]
-    
+
     if custom_edges is not None:
         energy_edges = custom_edges
     elif energy_structure == "flux_wire":
@@ -778,11 +791,11 @@ def build_flux_wire_response_matrix(
     else:
         db = IRDFFDatabase()
         energy_edges = db.get_energy_grid(energy_structure)
-    
+
     response, valid_reactions, _ = build_response_matrix(
         reactions=reactions,
         energy_edges=energy_edges,
         verbose=False,
     )
-    
+
     return response, energy_edges, valid_reactions

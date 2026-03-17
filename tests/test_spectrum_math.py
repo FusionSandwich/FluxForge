@@ -12,7 +12,9 @@ from fluxforge.io.spe import GammaSpectrum
 
 
 def test_add_subtract_spectra_alignment():
-    spec_a = GammaSpectrum(counts=np.array([1.0, 2.0, 3.0]), channels=np.array([0, 1, 2]))
+    spec_a = GammaSpectrum(
+        counts=np.array([1.0, 2.0, 3.0]), channels=np.array([0, 1, 2])
+    )
     spec_b = GammaSpectrum(counts=np.array([1.0, 1.0]), channels=np.array([0, 1]))
 
     summed = add_spectra(spec_a, spec_b)
@@ -51,7 +53,9 @@ def test_subtract_measured_background_live_scaling_and_uncertainty():
     assert np.allclose(corrected.counts, [8.0, 16.0, 24.0])
     expected_var = np.array([10.0, 20.0, 30.0]) + (2.0**2) * np.array([1.0, 2.0, 3.0])
     assert np.allclose(corrected.counts_uncertainty, np.sqrt(expected_var))
-    assert corrected.metadata["background_subtraction"]["scale_factor"] == pytest.approx(2.0)
+    assert corrected.metadata["background_subtraction"][
+        "scale_factor"
+    ] == pytest.approx(2.0)
 
 
 def test_subtract_measured_background_real_and_manual_scaling():
@@ -70,7 +74,9 @@ def test_subtract_measured_background_real_and_manual_scaling():
 
     corrected_real = subtract_measured_background(sample, background, mode="real")
     assert np.allclose(corrected_real.counts, [6.0, 12.0])
-    assert corrected_real.metadata["background_subtraction"]["scale_factor"] == pytest.approx(2.0)
+    assert corrected_real.metadata["background_subtraction"][
+        "scale_factor"
+    ] == pytest.approx(2.0)
 
     corrected_manual = subtract_measured_background(
         sample,
@@ -97,14 +103,28 @@ def test_subtract_measured_background_missing_warns_and_returns_raw():
 
 
 def test_subtract_measured_background_negative_policy_and_clipping_warning():
-    sample = GammaSpectrum(counts=np.array([1.0, 1.0]), channels=np.array([0, 1]), live_time=10.0, real_time=10.0)
-    background = GammaSpectrum(counts=np.array([2.0, 0.0]), channels=np.array([0, 1]), live_time=10.0, real_time=10.0)
+    sample = GammaSpectrum(
+        counts=np.array([1.0, 1.0]),
+        channels=np.array([0, 1]),
+        live_time=10.0,
+        real_time=10.0,
+    )
+    background = GammaSpectrum(
+        counts=np.array([2.0, 0.0]),
+        channels=np.array([0, 1]),
+        live_time=10.0,
+        real_time=10.0,
+    )
 
-    corrected_hybrid = subtract_measured_background(sample, background, negative_policy="hybrid")
+    corrected_hybrid = subtract_measured_background(
+        sample, background, negative_policy="hybrid"
+    )
     assert corrected_hybrid.counts[0] < 0.0
 
     with pytest.warns(RuntimeWarning, match="clipping to zero"):
-        corrected_clip = subtract_measured_background(sample, background, negative_policy="clip")
+        corrected_clip = subtract_measured_background(
+            sample, background, negative_policy="clip"
+        )
     assert corrected_clip.counts[0] == 0.0
 
 

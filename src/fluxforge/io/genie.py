@@ -35,7 +35,9 @@ def _parse_number(value: str) -> Optional[float]:
 ENERGY_CAL_RE = re.compile(r"\b([ABC])\s*=\s*([+-]?\d+\.?\d*E[+-]?\d+)", re.IGNORECASE)
 LIVE_TIME_RE = re.compile(r"Elapsed Live Time:\s*([\d.,]+)", re.IGNORECASE)
 REAL_TIME_RE = re.compile(r"Elapsed Real Time:\s*([\d.,]+)", re.IGNORECASE)
-START_TIME_RE = re.compile(r"Acquisition Started:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
+START_TIME_RE = re.compile(
+    r"Acquisition Started:\s*(.+)$", re.IGNORECASE | re.MULTILINE
+)
 ACQ_DATE_RE = re.compile(r"Acquisition Date:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 ID_RE = re.compile(r"^\s*ID:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
 SAMPLE_ID_RE = re.compile(r"Sample(?:\s+ID)?:\s*(.+)$", re.IGNORECASE | re.MULTILINE)
@@ -56,12 +58,12 @@ ASC_NAME_RE = re.compile(r"(.+?)-([CN])_(.+)\.ASC$", re.IGNORECASE)
 def parse_genie_header(filepath: Union[str, Path]) -> Dict[str, Any]:
     """
     Parse Genie-2000 ASCII file header for calibration and metadata.
-    
+
     Parameters
     ----------
     filepath : str or Path
         Path to Genie-2000 ASCII file
-    
+
     Returns
     -------
     dict
@@ -74,79 +76,79 @@ def parse_genie_header(filepath: Union[str, Path]) -> Dict[str, Any]:
         - detector_id: str
     """
     header = {
-        'calibration': {},
-        'efficiency': {},
-        'live_time': 0.0,
-        'real_time': 0.0,
-        'start_time': None,
-        'sample_id': '',
-        'detector_id': '',
+        "calibration": {},
+        "efficiency": {},
+        "live_time": 0.0,
+        "real_time": 0.0,
+        "start_time": None,
+        "sample_id": "",
+        "detector_id": "",
     }
-    
-    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+
+    with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read()
-    
+
     # Extract calibration coefficients A, B, C
     for match in ENERGY_CAL_RE.finditer(content):
         coef = match.group(1).upper()
         value = float(match.group(2))
-        header['calibration'][coef] = value
+        header["calibration"][coef] = value
 
     # Extract optional efficiency coefficients if present
     for match in EFF_COEF_RE.finditer(content):
         coef_num = match.group(1)
         value = float(match.group(2))
-        header['efficiency'][f"C{coef_num}"] = value
+        header["efficiency"][f"C{coef_num}"] = value
 
     match = GEOMETRY_FACTOR_RE.search(content)
     if match:
-        header['efficiency']['DetModel'] = float(match.group(1))
-    
+        header["efficiency"]["DetModel"] = float(match.group(1))
+
     # Extract live time
     match = LIVE_TIME_RE.search(content)
     if match:
         parsed = _parse_number(match.group(1))
         if parsed is not None:
-            header['live_time'] = parsed
-    
+            header["live_time"] = parsed
+
     # Extract real time
     match = REAL_TIME_RE.search(content)
     if match:
         parsed = _parse_number(match.group(1))
         if parsed is not None:
-            header['real_time'] = parsed
-    
+            header["real_time"] = parsed
+
     # Extract start time
     for match in (START_TIME_RE.search(content), ACQ_DATE_RE.search(content)):
         if not match:
             continue
         time_str = match.group(1).strip()
         for fmt in [
-            '%m/%d/%Y %H:%M:%S',
-            '%d/%m/%Y %H:%M:%S',
-            '%Y-%m-%d %H:%M:%S',
-            '%m-%d-%Y %H:%M:%S %p',
-            '%d-%b-%Y %H:%M',
+            "%m/%d/%Y %H:%M:%S",
+            "%d/%m/%Y %H:%M:%S",
+            "%Y-%m-%d %H:%M:%S",
+            "%m-%d-%Y %H:%M:%S %p",
+            "%d-%b-%Y %H:%M",
         ]:
             try:
-                header['start_time'] = datetime.strptime(time_str, fmt)
+                header["start_time"] = datetime.strptime(time_str, fmt)
                 break
             except ValueError:
                 continue
-        if header['start_time'] is not None:
+        if header["start_time"] is not None:
             break
-    
+
     # Extract sample ID / report ID
     for match in (SAMPLE_ID_RE.search(content), ID_RE.search(content)):
         if match:
-            header['sample_id'] = match.group(1).strip()
+            header["sample_id"] = match.group(1).strip()
             break
-    
+
     # Extract detector ID
     match = DETECTOR_RE.search(content)
     if match:
-        header['detector_id'] = match.group(1).strip()
-    
+        header["detector_id"] = match.group(1).strip()
+
     return header
 
 
@@ -158,22 +160,22 @@ def read_genie_spectrum(
 ) -> GammaSpectrum:
     """
     Read Genie-2000 ASCII export file.
-    
+
     The file format has:
     - Header lines with calibration coefficients (A, B, C)
     - Timing information (live time, real time)
     - Channel/Counts data pairs after "Channel" header line
-    
+
     Parameters
     ----------
     filepath : str or Path
         Path to Genie-2000 ASCII file (.ASC or .TXT)
-    
+
     Returns
     -------
     GammaSpectrum
         Parsed spectrum with calibration applied
-    
+
     Examples
     --------
     >>> spectrum = read_genie_spectrum("sample-C_300sEOI.ASC")
@@ -181,27 +183,27 @@ def read_genie_spectrum(
     >>> print(f"Channels: {len(spectrum.counts)}")
     """
     filepath = Path(filepath)
-    
+
     # Parse header
     header = parse_genie_header(filepath)
-    
+
     # Read channel data
     channels = []
     counts = []
     in_data = False
-    
-    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+
+    with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
         for line in f:
             line_stripped = line.strip()
-            
+
             # Look for start of data section
-            if line_stripped.lower().startswith('channel'):
+            if line_stripped.lower().startswith("channel"):
                 in_data = True
                 continue
-            
+
             if not in_data:
                 continue
-            
+
             # Parse channel/count pairs
             parts = line_stripped.split()
             if len(parts) >= 2:
@@ -212,60 +214,62 @@ def read_genie_spectrum(
                     counts.append(cnt)
                 except ValueError:
                     continue
-    
+
     if not counts:
         raise ValueError(f"No channel data found in {filepath}")
-    
+
     channels = np.array(channels)
     counts = np.array(counts)
-    
+
     # Build calibration coefficients list [A, B, C]
-    cal = header['calibration']
+    cal = header["calibration"]
     if energy_calibration_override is not None:
         coefficients = [float(c) for c in energy_calibration_override]
-    elif 'A' in cal and 'B' in cal:
+    elif "A" in cal and "B" in cal:
         # E = A + B*ch + C*ch²
         coefficients = [
-            cal.get('A', 0.0),
-            cal.get('B', 1.0),
-            cal.get('C', 0.0),
+            cal.get("A", 0.0),
+            cal.get("B", 1.0),
+            cal.get("C", 0.0),
         ]
     else:
         coefficients = [0.0, 1.0]  # Default: channel = keV
-    
+
     # Calculate energies
     energies = np.zeros_like(channels, dtype=float)
     for i, coef in enumerate(coefficients):
         energies += coef * (channels.astype(float) ** i)
-    
+
     qc_flags = qc_flags_for_spectrum(
-        spectrum_id=header['sample_id'] or filepath.stem,
-        live_time=header['live_time'],
-        real_time=header['real_time'],
-        start_time=header['start_time'],
-        calibration={'energy': coefficients},
-        detector_id=header['detector_id'],
+        spectrum_id=header["sample_id"] or filepath.stem,
+        live_time=header["live_time"],
+        real_time=header["real_time"],
+        start_time=header["start_time"],
+        calibration={"energy": coefficients},
+        detector_id=header["detector_id"],
     )
 
-    efficiency_data = dict(header.get('efficiency', {}))
+    efficiency_data = dict(header.get("efficiency", {}))
     if efficiency_override:
-        efficiency_data.update({str(k): float(v) for k, v in efficiency_override.items()})
+        efficiency_data.update(
+            {str(k): float(v) for k, v in efficiency_override.items()}
+        )
 
     return GammaSpectrum(
         counts=counts,
         channels=channels,
         energies=energies,
-        live_time=header['live_time'],
-        real_time=header['real_time'],
-        start_time=header['start_time'],
-        spectrum_id=header['sample_id'] or filepath.stem,
-        detector_id=header['detector_id'],
-        calibration={'energy': coefficients},
+        live_time=header["live_time"],
+        real_time=header["real_time"],
+        start_time=header["start_time"],
+        spectrum_id=header["sample_id"] or filepath.stem,
+        detector_id=header["detector_id"],
+        calibration={"energy": coefficients},
         metadata={
-            'format': 'genie2000',
-            'source_file': str(filepath),
-            'efficiency': efficiency_data,
-            'qc_flags': qc_flags,
+            "format": "genie2000",
+            "source_file": str(filepath),
+            "efficiency": efficiency_data,
+            "qc_flags": qc_flags,
         },
     )
 
@@ -273,19 +277,19 @@ def read_genie_spectrum(
 def parse_asc_filename(filepath: Union[str, Path]) -> Optional[Tuple[str, str, str]]:
     """
     Parse RAFM-style ASC filename to extract sample, letter, and timepoint.
-    
+
     Format: sample-C_timepoint.ASC or sample-N_timepoint.ASC
-    
+
     Parameters
     ----------
     filepath : str or Path
         Path to ASC file
-    
+
     Returns
     -------
     tuple or None
         (sample, letter, timepoint) or None if pattern doesn't match
-    
+
     Examples
     --------
     >>> parse_asc_filename("RAFM3-C_300sEOI.ASC")
@@ -304,23 +308,23 @@ def parse_asc_filename(filepath: Union[str, Path]) -> Optional[Tuple[str, str, s
 def normalize_timepoint(timepoint: str) -> str:
     """
     Normalize timepoint string for matching.
-    
+
     Removes spaces, dashes, underscores for consistent comparison.
-    
+
     Parameters
     ----------
     timepoint : str
         Timepoint string like "300s EOI" or "15d-EOI"
-    
+
     Returns
     -------
     str
         Normalized string like "300sEOI" or "15dEOI"
     """
     t = str(timepoint).strip()
-    t = t.replace(' ', '')
-    t = t.replace('-', '')
-    t = t.replace('_', '')
+    t = t.replace(" ", "")
+    t = t.replace("-", "")
+    t = t.replace("_", "")
     return t
 
 
@@ -343,9 +347,9 @@ CENTROID_ROW_RE = re.compile(r"^\s*([0-9]+(?:\.[0-9]+)?)\s+")
 @dataclass
 class ReportPeak:
     """Peak identified in a Genie/LabSOCS analysis report."""
-    
+
     energy: float  # keV
-    isotope: str   # Nuclide label
+    isotope: str  # Nuclide label
     net_area: Optional[float] = None
     uncertainty: Optional[float] = None
     report_file: str = ""
@@ -354,14 +358,14 @@ class ReportPeak:
 def parse_genie_report(filepath: Union[str, Path]) -> List[ReportPeak]:
     """
     Parse Genie/LabSOCS analysis report TXT file.
-    
+
     Extracts pre-identified peaks with their isotope assignments.
-    
+
     Parameters
     ----------
     filepath : str or Path
         Path to report TXT file
-    
+
     Returns
     -------
     list of ReportPeak
@@ -369,81 +373,83 @@ def parse_genie_report(filepath: Union[str, Path]) -> List[ReportPeak]:
     """
     filepath = Path(filepath)
     peaks = []
-    
+
     try:
-        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
             lines = f.readlines()
     except OSError:
         return peaks
-    
+
     # Find NUCLIDES ANALYZED section
     start_idx = None
     for i, line in enumerate(lines):
         if NUCLIDES_HEADER_RE.match(line):
             start_idx = i
             break
-    
+
     if start_idx is None:
         return peaks
-    
+
     current_isotope = None
     in_block = False
-    
+
     for line in lines[start_idx:]:
         line_stripped = line.strip()
-        
+
         if not line_stripped:
             in_block = False
             continue
-        
+
         # Check for nuclide header line
         match = NUCLIDE_LINE_RE.match(line)
         if match:
-            current_isotope = match.group(1).replace(' ', '')
+            current_isotope = match.group(1).replace(" ", "")
             in_block = True
             continue
-        
+
         if not in_block or current_isotope is None:
             continue
-        
+
         # Skip table headers
         if ROI_HEADER_RE.match(line) or CENTROID_HEADER_RE.match(line):
             continue
-        
+
         # Parse centroid energy from data row
         match = CENTROID_ROW_RE.match(line)
         if match:
             try:
                 energy = float(match.group(1))
-                peaks.append(ReportPeak(
-                    energy=energy,
-                    isotope=current_isotope,
-                    report_file=str(filepath),
-                ))
+                peaks.append(
+                    ReportPeak(
+                        energy=energy,
+                        isotope=current_isotope,
+                        report_file=str(filepath),
+                    )
+                )
             except ValueError:
                 continue
-    
+
     return peaks
 
 
 def extract_report_id(filepath: Union[str, Path], max_lines: int = 80) -> str:
     """
     Extract the ID line from a report file.
-    
+
     Parameters
     ----------
     filepath : str or Path
         Path to report file
     max_lines : int
         Maximum lines to search
-    
+
     Returns
     -------
     str
         ID string or empty if not found
     """
     try:
-        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
             for i, line in enumerate(f):
                 if i >= max_lines:
                     break
@@ -459,10 +465,11 @@ def extract_report_id(filepath: Union[str, Path], max_lines: int = 80) -> str:
 # Batch Processing Utilities
 # ============================================================================
 
+
 @dataclass
 class SpectrumPair:
     """Paired C and N spectra for the same sample and timepoint."""
-    
+
     sample: str
     timepoint: str
     c_spectrum: Optional[GammaSpectrum] = None
@@ -472,67 +479,68 @@ class SpectrumPair:
 
 
 def discover_spectrum_pairs(
-    spectra_dir: Union[str, Path],
-    pattern: str = "*.ASC"
+    spectra_dir: Union[str, Path], pattern: str = "*.ASC"
 ) -> List[SpectrumPair]:
     """
     Discover C/N spectrum pairs in a directory.
-    
+
     Parameters
     ----------
     spectra_dir : str or Path
         Directory containing spectrum files
     pattern : str
         Glob pattern for spectrum files
-    
+
     Returns
     -------
     list of SpectrumPair
         Matched C/N pairs with their file paths
     """
     from glob import glob
-    
+
     spectra_dir = Path(spectra_dir)
     files = sorted(glob(str(spectra_dir / pattern)))
-    
+
     # Group by (sample, timepoint)
     groups: Dict[Tuple[str, str], Dict[str, str]] = {}
-    
+
     for filepath in files:
         parsed = parse_asc_filename(filepath)
         if parsed is None:
             continue
-        
+
         sample, letter, timepoint = parsed
         key = (sample, normalize_timepoint(timepoint))
-        
+
         if key not in groups:
             groups[key] = {}
         groups[key][letter] = filepath
-    
+
     # Build pairs
     pairs = []
     for (sample, timepoint), paths in groups.items():
-        if 'C' in paths and 'N' in paths:
-            pairs.append(SpectrumPair(
-                sample=sample,
-                timepoint=timepoint,
-                c_path=paths['C'],
-                n_path=paths['N'],
-            ))
-    
+        if "C" in paths and "N" in paths:
+            pairs.append(
+                SpectrumPair(
+                    sample=sample,
+                    timepoint=timepoint,
+                    c_path=paths["C"],
+                    n_path=paths["N"],
+                )
+            )
+
     return pairs
 
 
 def load_spectrum_pair(pair: SpectrumPair) -> SpectrumPair:
     """
     Load both spectra for a pair.
-    
+
     Parameters
     ----------
     pair : SpectrumPair
         Pair with paths set
-    
+
     Returns
     -------
     SpectrumPair

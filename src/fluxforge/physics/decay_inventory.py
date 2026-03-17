@@ -137,12 +137,18 @@ class DecayInventory:
             canon = normalize_nuclide_label(nuclide)
             if category == "activity":
                 hl = dataset.half_life_s(canon) or 0.0
-                atoms[canon] = atoms.get(canon, 0.0) + _convert_activity_to_atoms(value, hl, unit_final)
+                atoms[canon] = atoms.get(canon, 0.0) + _convert_activity_to_atoms(
+                    value, hl, unit_final
+                )
             elif category == "mass":
                 atomic_mass = dataset.atomic_mass(canon) or 0.0
-                atoms[canon] = atoms.get(canon, 0.0) + _convert_mass_to_atoms(value, atomic_mass, unit_final)
+                atoms[canon] = atoms.get(canon, 0.0) + _convert_mass_to_atoms(
+                    value, atomic_mass, unit_final
+                )
             elif category == "mole":
-                atoms[canon] = atoms.get(canon, 0.0) + _convert_moles_to_atoms(value, unit_final)
+                atoms[canon] = atoms.get(canon, 0.0) + _convert_moles_to_atoms(
+                    value, unit_final
+                )
             elif category == "atoms":
                 atoms[canon] = atoms.get(canon, 0.0) + float(value)
 
@@ -177,7 +183,10 @@ class DecayInventory:
     def moles(self, unit: str = "mol") -> Dict[str, float]:
         unit = unit.lower()
         factor = _MOLE_UNITS.get(unit, 1.0)
-        return {nuclide: (atoms / AVOGADRO) / factor for nuclide, atoms in self.atoms.items()}
+        return {
+            nuclide: (atoms / AVOGADRO) / factor
+            for nuclide, atoms in self.atoms.items()
+        }
 
     def numbers(self) -> Dict[str, float]:
         return dict(self.atoms)
@@ -326,7 +335,9 @@ class DecayNetwork:
         M = self._transition_matrix()
         N0 = self._vector_from_atoms(atoms)
 
-        activities: Dict[str, np.ndarray] = {nuclide: np.zeros_like(times, dtype=float) for nuclide in self.nuclides}
+        activities: Dict[str, np.ndarray] = {
+            nuclide: np.zeros_like(times, dtype=float) for nuclide in self.nuclides
+        }
 
         for idx, t in enumerate(times):
             Nt = linalg.expm(M * (t * unit_factor)) @ N0
@@ -437,7 +448,9 @@ def fit_schedule_scale(
                     rates[nuclide] = rate * scales[nuclide_index[nuclide]]
                 else:
                     rates[nuclide] = rate
-            scaled_segments.append(ProductionSegment(duration=segment.duration, rates=rates))
+            scaled_segments.append(
+                ProductionSegment(duration=segment.duration, rates=rates)
+            )
         return scaled_segments
 
     def _predict_decays(scales: np.ndarray) -> np.ndarray:

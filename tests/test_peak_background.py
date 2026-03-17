@@ -19,5 +19,7 @@ def test_five_point_smooth_short_raises():
 
 def test_snip_background_constant():
     counts = np.full(50, 10.0)
-    background = estimate_background(np.arange(len(counts)), counts, method="snip", iterations=10)
+    background = estimate_background(
+        np.arange(len(counts)), counts, method="snip", iterations=10
+    )
     assert np.allclose(background, counts, atol=1e-6)

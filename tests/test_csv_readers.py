@@ -30,7 +30,7 @@ def test_read_flux_wire_timing_csv_flags_missing_and_invalid_values(tmp_path) ->
     csv_path = tmp_path / "timing.csv"
     csv_path.write_text(
         "wire_name,base_name,category,reaction,products,irradiation_start,irradiation_end,measurement_time,irradiation_seconds,cooldown_seconds,cooldown_hours,cooldown_days\n"
-        "W1,B1,fast,\"(n,g)\",W-187,2026-03-01T00:00:00,2026-03-02T00:00:00,2026-03-03T00:00:00,,abc,12,0.5\n",
+        'W1,B1,fast,"(n,g)",W-187,2026-03-01T00:00:00,2026-03-02T00:00:00,2026-03-03T00:00:00,,abc,12,0.5\n',
         encoding="utf-8",
     )
 

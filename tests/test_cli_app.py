@@ -93,7 +93,9 @@ def test_cmd_gui_launches_module(monkeypatch, tmp_path):
 
 def test_build_parser_plots_dry_run(capsys, tmp_path):
     parser = app.build_parser()
-    args = parser.parse_args(["plots", "--example", "--dry-run", "--output-dir", str(tmp_path)])
+    args = parser.parse_args(
+        ["plots", "--example", "--dry-run", "--output-dir", str(tmp_path)]
+    )
     assert args.command == "plots"
     args.func(args)
     out = capsys.readouterr().out
@@ -133,7 +135,9 @@ def test_cmd_plots_uses_master_suite(monkeypatch, tmp_path):
         called["format"] = fmt
         return ("png",)
 
-    def fake_generate_master_plan_plots(inputs, output_dir, formats, include_response_plot):
+    def fake_generate_master_plan_plots(
+        inputs, output_dir, formats, include_response_plot
+    ):
         called["generate_args"] = {
             "inputs": inputs,
             "output_dir": output_dir,
@@ -246,7 +250,9 @@ def test_cmd_ingest_applies_manual_background_scaling(monkeypatch, tmp_path):
     assert np.allclose(captured["counts"], [9.0, 18.0, 27.0])
 
 
-def test_cmd_ingest_writes_optional_adjusted_and_final_exports(monkeypatch, tmp_path, capsys):
+def test_cmd_ingest_writes_optional_adjusted_and_final_exports(
+    monkeypatch, tmp_path, capsys
+):
     sample = GammaSpectrum(
         counts=np.array([10.0, 20.0, 30.0]),
         channels=np.array([0, 1, 2]),
@@ -340,11 +346,19 @@ def test_cmd_ingest_profile_supplies_background_and_efficiency(monkeypatch, tmp_
 
     monkeypatch.setattr(app, "read_genie_spectrum", fake_read_genie)
     monkeypatch.setattr(app, "write_spectrum_file", fake_write)
-    monkeypatch.setattr(app, "_profile_background_file", lambda _: tmp_path / "profile_background.ASC")
+    monkeypatch.setattr(
+        app, "_profile_background_file", lambda _: tmp_path / "profile_background.ASC"
+    )
     monkeypatch.setattr(
         app,
         "_profile_efficiency_override",
-        lambda _: {"C1": -20.26, "C2": 10.29, "C3": -1.655, "C4": 0.08666, "geometry_factor_A": 0.00348},
+        lambda _: {
+            "C1": -20.26,
+            "C2": 10.29,
+            "C3": -1.655,
+            "C4": 0.08666,
+            "geometry_factor_A": 0.00348,
+        },
     )
 
     in_file = tmp_path / "sample.ASC"
@@ -371,7 +385,9 @@ def test_cmd_ingest_profile_supplies_background_and_efficiency(monkeypatch, tmp_
     assert captured["efficiency"]["geometry_factor_A"] == 0.00348
 
 
-def test_cmd_ingest_batch_uses_shared_background_for_all_raw_files(monkeypatch, tmp_path, capsys):
+def test_cmd_ingest_batch_uses_shared_background_for_all_raw_files(
+    monkeypatch, tmp_path, capsys
+):
     input_dir = tmp_path / "raw_gamma_spec"
     (input_dir / "RAFM4").mkdir(parents=True)
     (input_dir / "flux_wires").mkdir(parents=True)
@@ -434,11 +450,19 @@ def test_cmd_ingest_batch_uses_shared_background_for_all_raw_files(monkeypatch, 
     assert f"Spectrum artifacts directory: {artifact_dir}" in out
     assert f"Background-adjusted counts directory: {adjusted_dir} (2 files)" in out
     assert f"Final corrected counts directory: {final_dir} (0 files)" in out
-    assert "Final corrected export requested but no usable efficiency coefficients were available for sample_a" in out
-    assert "Final corrected export requested but no usable efficiency coefficients were available for sample_b" in out
+    assert (
+        "Final corrected export requested but no usable efficiency coefficients were available for sample_a"
+        in out
+    )
+    assert (
+        "Final corrected export requested but no usable efficiency coefficients were available for sample_b"
+        in out
+    )
 
 
-def test_cmd_spectrum_plot_writes_plot_and_manual_peak_report(monkeypatch, tmp_path, capsys):
+def test_cmd_spectrum_plot_writes_plot_and_manual_peak_report(
+    monkeypatch, tmp_path, capsys
+):
     sample = GammaSpectrum(
         counts=np.array([1.0, 3.0, 12.0, 20.0, 12.0, 3.0, 1.0], dtype=float),
         channels=np.arange(7, dtype=float),
@@ -628,7 +652,11 @@ def test_cmd_peaks_activity_and_rates(monkeypatch, tmp_path):
     monkeypatch.setattr(
         app,
         "read_peak_report",
-        lambda _: {"spectrum_id": "dummy", "live_time_s": 10.0, "peaks": peak_written["payload"]["peaks"]},
+        lambda _: {
+            "spectrum_id": "dummy",
+            "live_time_s": 10.0,
+            "peaks": peak_written["payload"]["peaks"],
+        },
     )
     monkeypatch.setattr(app, "write_line_activities", fake_write_line_activities)
 
@@ -655,7 +683,11 @@ def test_cmd_peaks_activity_and_rates(monkeypatch, tmp_path):
     assert line["radioactive_mass_g"] > 0
     assert line["specific_activity_Bq_g"] == pytest.approx(line["activity_Bq"] / 2.0)
 
-    monkeypatch.setattr(app, "read_line_activities", lambda _: {"lines": lines_written["payload"]["lines"]})
+    monkeypatch.setattr(
+        app,
+        "read_line_activities",
+        lambda _: {"lines": lines_written["payload"]["lines"]},
+    )
     monkeypatch.setattr(
         app,
         "reaction_rate_from_activity",
@@ -734,9 +766,17 @@ def test_cmd_unfold_compare_and_report(monkeypatch, tmp_path):
     monkeypatch.setattr(
         app,
         "read_response_bundle",
-        lambda _: {"matrix": [[1.0]], "boundaries_eV": [1e-5, 1.0], "reactions": ["r1"]},
+        lambda _: {
+            "matrix": [[1.0]],
+            "boundaries_eV": [1e-5, 1.0],
+            "reactions": ["r1"],
+        },
     )
-    monkeypatch.setattr(app, "read_reaction_rates", lambda _: {"rates": [{"rate": 1.0, "uncertainty": 0.1}]})
+    monkeypatch.setattr(
+        app,
+        "read_reaction_rates",
+        lambda _: {"rates": [{"rate": 1.0, "uncertainty": 0.1}]},
+    )
     monkeypatch.setattr(
         app,
         "gls_adjust",
@@ -745,7 +785,9 @@ def test_cmd_unfold_compare_and_report(monkeypatch, tmp_path):
     monkeypatch.setattr(
         app,
         "write_unfold_result",
-        lambda output, **kwargs: unfold_written.update({"output": output, "payload": kwargs}),
+        lambda output, **kwargs: unfold_written.update(
+            {"output": output, "payload": kwargs}
+        ),
     )
 
     unfold_out = tmp_path / "unfold.json"
@@ -767,11 +809,15 @@ def test_cmd_unfold_compare_and_report(monkeypatch, tmp_path):
     truth_file = tmp_path / "truth.json"
     truth_file.write_text(json.dumps([1.0]), encoding="utf-8")
 
-    monkeypatch.setattr(app, "read_unfold_result", lambda _: {"flux": [1.0], "chi2": 0.1})
+    monkeypatch.setattr(
+        app, "read_unfold_result", lambda _: {"flux": [1.0], "chi2": 0.1}
+    )
     monkeypatch.setattr(
         app,
         "write_validation_bundle",
-        lambda output, **kwargs: validation_written.update({"output": output, "payload": kwargs}),
+        lambda output, **kwargs: validation_written.update(
+            {"output": output, "payload": kwargs}
+        ),
     )
     compare_out = tmp_path / "validation.json"
     app.cmd_compare(
@@ -785,16 +831,22 @@ def test_cmd_unfold_compare_and_report(monkeypatch, tmp_path):
     assert validation_written["output"] == compare_out
     assert "metrics" in validation_written["payload"]
 
-    monkeypatch.setattr(app, "read_spectrum_file", lambda _: {"spectrum": _dummy_spectrum().to_dict()})
+    monkeypatch.setattr(
+        app, "read_spectrum_file", lambda _: {"spectrum": _dummy_spectrum().to_dict()}
+    )
     monkeypatch.setattr(app, "read_peak_report", lambda _: {"peaks": [1, 2, 3]})
     monkeypatch.setattr(app, "read_line_activities", lambda _: {"lines": [1, 2]})
     monkeypatch.setattr(app, "read_reaction_rates", lambda _: {"rates": [1]})
     monkeypatch.setattr(app, "read_unfold_result", lambda _: {"chi2": 0.1})
-    monkeypatch.setattr(app, "read_validation_bundle", lambda _: {"metrics": {"mae": 0.0}})
+    monkeypatch.setattr(
+        app, "read_validation_bundle", lambda _: {"metrics": {"mae": 0.0}}
+    )
     monkeypatch.setattr(
         app,
         "write_report_bundle",
-        lambda output, **kwargs: report_written.update({"output": output, "payload": kwargs}),
+        lambda output, **kwargs: report_written.update(
+            {"output": output, "payload": kwargs}
+        ),
     )
 
     report_out = tmp_path / "report.json"
@@ -821,25 +873,39 @@ def test_cmd_unfold_compare_and_report(monkeypatch, tmp_path):
 def test_cmd_report_summarizes_activation_metrics(monkeypatch, tmp_path):
     report_written = {}
 
-    monkeypatch.setattr(app, "read_line_activities", lambda _: {
-        "lines": [
-            {
-                "activity_Bq": 12.0,
-                "radioactive_mass_g": 2.0e-12,
-                "specific_activity_Bq_g": 24.0,
-                "radioisotope_specific_activity_Bq_g": 1.5e12,
-            },
-            {
-                "activity_Bq": 8.0,
-                "radioactive_mass_g": 3.0e-12,
-                "specific_activity_Bq_g": 16.0,
-                "radioisotope_specific_activity_Bq_g": 1.1e12,
-            },
-        ]
-    })
-    monkeypatch.setattr(app, "read_reaction_rates", lambda _: {"rates": [{"rate": 3.0}, {"rate": 2.0}]})
-    monkeypatch.setattr(app, "read_unfold_result", lambda _: {"chi2": 0.1, "flux": [1.0, 2.0, 3.0]})
-    monkeypatch.setattr(app, "write_report_bundle", lambda output, **kwargs: report_written.update({"output": output, "payload": kwargs}))
+    monkeypatch.setattr(
+        app,
+        "read_line_activities",
+        lambda _: {
+            "lines": [
+                {
+                    "activity_Bq": 12.0,
+                    "radioactive_mass_g": 2.0e-12,
+                    "specific_activity_Bq_g": 24.0,
+                    "radioisotope_specific_activity_Bq_g": 1.5e12,
+                },
+                {
+                    "activity_Bq": 8.0,
+                    "radioactive_mass_g": 3.0e-12,
+                    "specific_activity_Bq_g": 16.0,
+                    "radioisotope_specific_activity_Bq_g": 1.1e12,
+                },
+            ]
+        },
+    )
+    monkeypatch.setattr(
+        app, "read_reaction_rates", lambda _: {"rates": [{"rate": 3.0}, {"rate": 2.0}]}
+    )
+    monkeypatch.setattr(
+        app, "read_unfold_result", lambda _: {"chi2": 0.1, "flux": [1.0, 2.0, 3.0]}
+    )
+    monkeypatch.setattr(
+        app,
+        "write_report_bundle",
+        lambda output, **kwargs: report_written.update(
+            {"output": output, "payload": kwargs}
+        ),
+    )
 
     report_out = tmp_path / "report.json"
     app.cmd_report(
@@ -921,11 +987,24 @@ def test_cmd_report_accepts_validation_results_root(monkeypatch, tmp_path):
         encoding="utf-8",
     )
     (unfolding_dir / "gls.json").write_text(
-        json.dumps({"flux": [1.0, 2.0], "energy_edges_eV": [0.1, 1.0, 10.0], "chi_squared": 0.5, "method": "GLS"}),
+        json.dumps(
+            {
+                "flux": [1.0, 2.0],
+                "energy_edges_eV": [0.1, 1.0, 10.0],
+                "chi_squared": 0.5,
+                "method": "GLS",
+            }
+        ),
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(app, "write_report_bundle", lambda output, **kwargs: report_written.update({"output": output, "payload": kwargs}))
+    monkeypatch.setattr(
+        app,
+        "write_report_bundle",
+        lambda output, **kwargs: report_written.update(
+            {"output": output, "payload": kwargs}
+        ),
+    )
 
     report_out = tmp_path / "report.json"
     app.cmd_report(
@@ -1014,14 +1093,32 @@ def test_cmd_k0_detector_writes_characterization(monkeypatch, tmp_path):
     points_file.write_text(
         json.dumps(
             [
-                {"position_mm": 200.0, "reference_energy_keV": 411.8, "net_counts": 4000.0, "live_time_s": 100.0, "activity_bq": 50000.0, "emission_probability": 0.95},
-                {"position_mm": 200.0, "reference_energy_keV": 1332.5, "net_counts": 500.0, "live_time_s": 100.0, "activity_bq": 50000.0, "emission_probability": 0.99},
+                {
+                    "position_mm": 200.0,
+                    "reference_energy_keV": 411.8,
+                    "net_counts": 4000.0,
+                    "live_time_s": 100.0,
+                    "activity_bq": 50000.0,
+                    "emission_probability": 0.95,
+                },
+                {
+                    "position_mm": 200.0,
+                    "reference_energy_keV": 1332.5,
+                    "net_counts": 500.0,
+                    "live_time_s": 100.0,
+                    "activity_bq": 50000.0,
+                    "emission_probability": 0.99,
+                },
             ]
         ),
         encoding="utf-8",
     )
     written = {}
-    monkeypatch.setattr(app, "write_detector_characterization", lambda output, **kwargs: written.update({"output": output, "payload": kwargs}))
+    monkeypatch.setattr(
+        app,
+        "write_detector_characterization",
+        lambda output, **kwargs: written.update({"output": output, "payload": kwargs}),
+    )
 
     app.cmd_k0_detector(
         Namespace(
@@ -1104,11 +1201,22 @@ def test_cmd_k0_analyze_writes_bundle(monkeypatch, tmp_path):
         "read_facility_characterization",
         lambda path: {
             "schema": "fluxforge.facility_characterization.v1",
-            "flux_parameters": {"f": 25.0, "f_uncertainty": 1.0, "alpha": 0.01, "alpha_uncertainty": 0.005, "phi_thermal": 1.0e12, "phi_epithermal": 4.0e10},
+            "flux_parameters": {
+                "f": 25.0,
+                "f_uncertainty": 1.0,
+                "alpha": 0.01,
+                "alpha_uncertainty": 0.005,
+                "phi_thermal": 1.0e12,
+                "phi_epithermal": 4.0e10,
+            },
             "temperature": {"value_K": 300.0},
         },
     )
-    monkeypatch.setattr(app, "write_k0_analysis_bundle", lambda output, **kwargs: written.update({"output": output, "payload": kwargs}))
+    monkeypatch.setattr(
+        app,
+        "write_k0_analysis_bundle",
+        lambda output, **kwargs: written.update({"output": output, "payload": kwargs}),
+    )
 
     app.cmd_k0_analyze(
         Namespace(
@@ -1133,9 +1241,26 @@ def test_cmd_k0_aggregate_writes_bundle(monkeypatch, tmp_path):
     monkeypatch.setattr(
         app,
         "read_k0_analysis_bundle",
-        lambda path: {"summary": {"sample_id": Path(path).stem}, "element_results": [{"sample_id": Path(path).stem, "element": "Co", "concentration_ug_g": 10.0, "concentration_unc_ug_g": 1.0, "measurement_ids": [Path(path).stem], "irradiation_ids": ["irr-1"], "line_ids": ["line-1"]}]},
+        lambda path: {
+            "summary": {"sample_id": Path(path).stem},
+            "element_results": [
+                {
+                    "sample_id": Path(path).stem,
+                    "element": "Co",
+                    "concentration_ug_g": 10.0,
+                    "concentration_unc_ug_g": 1.0,
+                    "measurement_ids": [Path(path).stem],
+                    "irradiation_ids": ["irr-1"],
+                    "line_ids": ["line-1"],
+                }
+            ],
+        },
     )
-    monkeypatch.setattr(app, "write_k0_aggregation_bundle", lambda output, **kwargs: written.update({"output": output, "payload": kwargs}))
+    monkeypatch.setattr(
+        app,
+        "write_k0_aggregation_bundle",
+        lambda output, **kwargs: written.update({"output": output, "payload": kwargs}),
+    )
 
     app.cmd_k0_aggregate(
         Namespace(
@@ -1151,10 +1276,33 @@ def test_cmd_k0_aggregate_writes_bundle(monkeypatch, tmp_path):
 
 def test_cmd_k0_qaqc_writes_bundle(monkeypatch, tmp_path):
     plan_file = tmp_path / "plan.json"
-    plan_file.write_text(json.dumps({"records": [{"role": "blank", "analysis_file": str(tmp_path / "blank.json"), "default_limit_ug_g": 0.5}]}), encoding="utf-8")
+    plan_file.write_text(
+        json.dumps(
+            {
+                "records": [
+                    {
+                        "role": "blank",
+                        "analysis_file": str(tmp_path / "blank.json"),
+                        "default_limit_ug_g": 0.5,
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
     written = {}
-    monkeypatch.setattr(app, "read_k0_analysis_bundle", lambda path: {"element_results": [{"element": "Co", "concentration_ug_g": 0.1}]})
-    monkeypatch.setattr(app, "write_k0_qaqc_bundle", lambda output, **kwargs: written.update({"output": output, "payload": kwargs}))
+    monkeypatch.setattr(
+        app,
+        "read_k0_analysis_bundle",
+        lambda path: {
+            "element_results": [{"element": "Co", "concentration_ug_g": 0.1}]
+        },
+    )
+    monkeypatch.setattr(
+        app,
+        "write_k0_qaqc_bundle",
+        lambda output, **kwargs: written.update({"output": output, "payload": kwargs}),
+    )
 
     app.cmd_k0_qaqc(
         Namespace(
@@ -1170,8 +1318,34 @@ def test_cmd_k0_qaqc_writes_bundle(monkeypatch, tmp_path):
 
 def test_cmd_k0_report_writes_report_bundle(monkeypatch, tmp_path):
     written = {}
-    monkeypatch.setattr(app, "read_k0_analysis_bundle", lambda path: {"summary": {"element_count": 1}, "element_results": [{"element": "Co", "concentration_ug_g": 10.0, "concentration_unc_ug_g": 1.0}], "line_results": [], "recognized_but_not_applied": [], "libraries": {"standard_k0_library": {"library_id": "demo", "version": "1", "status": "partial"}}})
-    monkeypatch.setattr(app, "write_report_bundle", lambda output, **kwargs: written.update({"output": output, "payload": kwargs}))
+    monkeypatch.setattr(
+        app,
+        "read_k0_analysis_bundle",
+        lambda path: {
+            "summary": {"element_count": 1},
+            "element_results": [
+                {
+                    "element": "Co",
+                    "concentration_ug_g": 10.0,
+                    "concentration_unc_ug_g": 1.0,
+                }
+            ],
+            "line_results": [],
+            "recognized_but_not_applied": [],
+            "libraries": {
+                "standard_k0_library": {
+                    "library_id": "demo",
+                    "version": "1",
+                    "status": "partial",
+                }
+            },
+        },
+    )
+    monkeypatch.setattr(
+        app,
+        "write_report_bundle",
+        lambda output, **kwargs: written.update({"output": output, "payload": kwargs}),
+    )
 
     app.cmd_k0_report(
         Namespace(
@@ -1228,9 +1402,17 @@ def test_cmd_unfold_supports_mlem(monkeypatch, tmp_path):
     monkeypatch.setattr(
         app,
         "read_response_bundle",
-        lambda _: {"matrix": [[1.0, 0.4]], "boundaries_eV": [1e-5, 1.0, 1e3], "reactions": ["r1"]},
+        lambda _: {
+            "matrix": [[1.0, 0.4]],
+            "boundaries_eV": [1e-5, 1.0, 1e3],
+            "reactions": ["r1"],
+        },
     )
-    monkeypatch.setattr(app, "read_reaction_rates", lambda _: {"rates": [{"rate": 1.0, "uncertainty": 0.1}]})
+    monkeypatch.setattr(
+        app,
+        "read_reaction_rates",
+        lambda _: {"rates": [{"rate": 1.0, "uncertainty": 0.1}]},
+    )
     monkeypatch.setattr(
         app,
         "mlem",
@@ -1246,7 +1428,9 @@ def test_cmd_unfold_supports_mlem(monkeypatch, tmp_path):
     monkeypatch.setattr(
         app,
         "write_unfold_result",
-        lambda output, **kwargs: unfold_written.update({"output": output, "payload": kwargs}),
+        lambda output, **kwargs: unfold_written.update(
+            {"output": output, "payload": kwargs}
+        ),
     )
 
     app.cmd_unfold(

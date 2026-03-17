@@ -23,7 +23,7 @@ import numpy as np
 
 class SampleGeometry(Enum):
     """Sample geometry types for attenuation calculation."""
-    
+
     POINT = "point"  # Point source approximation
     DISK = "disk"  # Thin disk/foil
     CYLINDER = "cylinder"  # Cylindrical sample
@@ -36,32 +36,32 @@ class SampleGeometry(Enum):
 class MaterialAttenuation:
     """
     Material gamma-ray attenuation properties.
-    
+
     Attributes:
         name: Material name
         density_g_cm3: Mass density
         mass_atten_coeff: Dict mapping energy (keV) to μ/ρ (cm²/g)
     """
-    
+
     name: str
     density_g_cm3: float
     mass_atten_coeff: Dict[float, float]  # energy_keV -> μ/ρ in cm²/g
-    
+
     def get_mu(self, energy_kev: float) -> float:
         """
         Get linear attenuation coefficient μ at given energy.
-        
+
         Uses log-log interpolation between tabulated points.
-        
+
         Args:
             energy_kev: Gamma energy in keV
-            
+
         Returns:
             Linear attenuation coefficient μ in cm⁻¹
         """
         energies = sorted(self.mass_atten_coeff.keys())
         mu_rho_values = [self.mass_atten_coeff[e] for e in energies]
-        
+
         if energy_kev <= energies[0]:
             mu_rho = mu_rho_values[0]
         elif energy_kev >= energies[-1]:
@@ -73,7 +73,7 @@ class MaterialAttenuation:
             log_E_target = np.log(energy_kev)
             log_mu_interp = np.interp(log_E_target, log_E, log_mu)
             mu_rho = np.exp(log_mu_interp)
-        
+
         return mu_rho * self.density_g_cm3
 
 
@@ -90,7 +90,7 @@ STANDARD_MATERIALS = {
             1000: 0.0599,
             1500: 0.0485,
             2000: 0.0426,
-        }
+        },
     ),
     "aluminum": MaterialAttenuation(
         name="Aluminum",
@@ -102,7 +102,7 @@ STANDARD_MATERIALS = {
             1000: 0.0615,
             1500: 0.0508,
             2000: 0.0454,
-        }
+        },
     ),
     "gold": MaterialAttenuation(
         name="Gold",
@@ -114,7 +114,7 @@ STANDARD_MATERIALS = {
             1000: 0.0686,
             1500: 0.0484,
             2000: 0.0414,
-        }
+        },
     ),
     "copper": MaterialAttenuation(
         name="Copper",
@@ -126,7 +126,7 @@ STANDARD_MATERIALS = {
             1000: 0.0590,
             1500: 0.0478,
             2000: 0.0420,
-        }
+        },
     ),
     "nickel": MaterialAttenuation(
         name="Nickel",
@@ -138,7 +138,7 @@ STANDARD_MATERIALS = {
             1000: 0.0588,
             1500: 0.0477,
             2000: 0.0420,
-        }
+        },
     ),
     "titanium": MaterialAttenuation(
         name="Titanium",
@@ -150,7 +150,7 @@ STANDARD_MATERIALS = {
             1000: 0.0601,
             1500: 0.0492,
             2000: 0.0436,
-        }
+        },
     ),
     "polyethylene": MaterialAttenuation(
         name="Polyethylene",
@@ -162,7 +162,7 @@ STANDARD_MATERIALS = {
             1000: 0.0628,
             1500: 0.0517,
             2000: 0.0459,
-        }
+        },
     ),
     "water": MaterialAttenuation(
         name="Water",
@@ -174,7 +174,7 @@ STANDARD_MATERIALS = {
             1000: 0.0707,
             1500: 0.0575,
             2000: 0.0493,
-        }
+        },
     ),
 }
 
@@ -183,7 +183,7 @@ STANDARD_MATERIALS = {
 class SampleConfiguration:
     """
     Sample configuration for attenuation calculation.
-    
+
     Attributes:
         geometry: Sample geometry type
         material: Sample material
@@ -192,7 +192,7 @@ class SampleConfiguration:
         height_cm: Sample height (for cylinder)
         container: Optional container material and thickness
     """
-    
+
     geometry: SampleGeometry
     material: MaterialAttenuation
     thickness_cm: float
@@ -206,7 +206,7 @@ class SampleConfiguration:
 class AttenuationCorrectionFactor:
     """
     Attenuation correction factor for a gamma line.
-    
+
     Attributes:
         energy_kev: Gamma energy
         C_att: Attenuation correction factor (>= 1)
@@ -214,7 +214,7 @@ class AttenuationCorrectionFactor:
         sample_contribution: Contribution from sample
         container_contribution: Contribution from container
     """
-    
+
     energy_kev: float
     C_att: float  # Multiply measured counts by this to get corrected
     C_att_uncertainty: float = 0.0
@@ -228,22 +228,22 @@ def disk_self_attenuation_factor(
 ) -> float:
     """
     Calculate self-attenuation factor for a thin disk sample.
-    
+
     For a disk source with uniform activity distribution:
     C_att = μt / (1 - exp(-μt))
-    
+
     For thin samples (μt << 1): C_att → 1
     For thick samples (μt >> 1): C_att → μt
-    
+
     Args:
         mu: Linear attenuation coefficient (cm⁻¹)
         thickness_cm: Sample thickness (cm)
-        
+
     Returns:
         Attenuation correction factor
     """
     x = mu * thickness_cm
-    
+
     if x < 1e-10:
         return 1.0  # No attenuation for very thin samples
     elif x > 50:
@@ -259,44 +259,44 @@ def cylinder_self_attenuation_factor(
 ) -> float:
     """
     Calculate self-attenuation factor for a cylindrical sample.
-    
+
     Uses numerical integration over the cylinder cross-section
     with uniform activity distribution.
-    
+
     Args:
         mu: Linear attenuation coefficient (cm⁻¹)
         diameter_cm: Cylinder diameter (cm)
         averaging_points: Number of integration points
-        
+
     Returns:
         Attenuation correction factor
     """
     R = diameter_cm / 2.0
-    
+
     if mu * R < 1e-10:
         return 1.0
-    
+
     # Integrate over radial positions
     total_weight = 0.0
     weighted_transmission = 0.0
-    
+
     for i in range(averaging_points):
         r = R * (i + 0.5) / averaging_points  # Radial position
         weight = 2 * np.pi * r  # Cylindrical weighting
-        
+
         # Average path length from this position
         # Simplified: use average chord length
         avg_path = np.pi * R / 4  # Average chord for random exit direction
         transmission = np.exp(-mu * avg_path)
-        
+
         weighted_transmission += weight * transmission
         total_weight += weight
-    
+
     if total_weight > 0:
         avg_transmission = weighted_transmission / total_weight
         if avg_transmission > 1e-10:
             return 1.0 / avg_transmission
-    
+
     return 1.0
 
 
@@ -306,20 +306,20 @@ def sphere_self_attenuation_factor(
 ) -> float:
     """
     Calculate self-attenuation factor for a spherical sample.
-    
+
     Uses analytical result for uniform sphere:
     C_att = 3/(μR)² * [1 - 2/(μR) + 2/(μR)² * (1 - exp(-2μR))]
-    
+
     Args:
         mu: Linear attenuation coefficient (cm⁻¹)
         diameter_cm: Sphere diameter (cm)
-        
+
     Returns:
         Attenuation correction factor
     """
     R = diameter_cm / 2.0
     x = mu * R
-    
+
     if x < 1e-10:
         return 1.0
     elif x > 50:
@@ -342,28 +342,28 @@ def calculate_sample_attenuation(
 ) -> float:
     """
     Calculate sample self-attenuation factor.
-    
+
     Args:
         config: Sample configuration
         energy_kev: Gamma energy
-        
+
     Returns:
         Sample attenuation correction factor
     """
     mu = config.material.get_mu(energy_kev)
-    
+
     if config.geometry == SampleGeometry.POINT:
         return 1.0
-    
+
     elif config.geometry == SampleGeometry.DISK:
         return disk_self_attenuation_factor(mu, config.thickness_cm)
-    
+
     elif config.geometry == SampleGeometry.CYLINDER:
         return cylinder_self_attenuation_factor(mu, config.thickness_cm)
-    
+
     elif config.geometry == SampleGeometry.SPHERE:
         return sphere_self_attenuation_factor(mu, config.thickness_cm)
-    
+
     else:
         # Default to disk approximation
         return disk_self_attenuation_factor(mu, config.thickness_cm)
@@ -375,22 +375,22 @@ def calculate_container_attenuation(
 ) -> float:
     """
     Calculate container attenuation factor.
-    
+
     Assumes gamma rays pass through container wall once on average.
-    
+
     Args:
         config: Sample configuration
         energy_kev: Gamma energy
-        
+
     Returns:
         Container attenuation correction factor
     """
     if config.container_material is None or config.container_thickness_cm <= 0:
         return 1.0
-    
+
     mu = config.container_material.get_mu(energy_kev)
     transmission = math.exp(-mu * config.container_thickness_cm)
-    
+
     if transmission > 1e-10:
         return 1.0 / transmission
     return 100.0  # Very thick container
@@ -403,30 +403,30 @@ def calculate_attenuation_correction(
 ) -> AttenuationCorrectionFactor:
     """
     Calculate total attenuation correction factor.
-    
+
     The correction factor C_att is applied to measured counts:
     counts_corrected = counts_measured * C_att
-    
+
     Args:
         config: Sample configuration
         energy_kev: Gamma energy
         include_container: Whether to include container attenuation
-        
+
     Returns:
         AttenuationCorrectionFactor with all components
     """
     C_sample = calculate_sample_attenuation(config, energy_kev)
-    
+
     if include_container:
         C_container = calculate_container_attenuation(config, energy_kev)
     else:
         C_container = 1.0
-    
+
     C_total = C_sample * C_container
-    
+
     # Estimate uncertainty (assume 5% in attenuation coefficients)
     rel_unc = 0.05 * (C_total - 1.0) if C_total > 1.0 else 0.0
-    
+
     return AttenuationCorrectionFactor(
         energy_kev=energy_kev,
         C_att=C_total,
@@ -442,42 +442,39 @@ def calculate_attenuation_corrections(
 ) -> List[AttenuationCorrectionFactor]:
     """
     Calculate attenuation corrections for multiple gamma lines.
-    
+
     Args:
         config: Sample configuration
         energies_kev: List of gamma energies
-        
+
     Returns:
         List of correction factors
     """
-    return [
-        calculate_attenuation_correction(config, E)
-        for E in energies_kev
-    ]
+    return [calculate_attenuation_correction(config, E) for E in energies_kev]
 
 
 @dataclass
 class AttenuationCorrectionLibrary:
     """
     Attenuation correction library for a sample.
-    
+
     Contains energy-dependent attenuation corrections that can
     be applied during activity inference.
     """
-    
+
     sample_id: str
     config: SampleConfiguration
     factors: List[AttenuationCorrectionFactor]
-    
+
     def get_correction(self, energy_kev: float) -> float:
         """Get interpolated correction factor at given energy."""
         if not self.factors:
             return 1.0
-        
+
         # Find bracketing energies
         energies = [f.energy_kev for f in self.factors]
         corrections = [f.C_att for f in self.factors]
-        
+
         if energy_kev <= energies[0]:
             return corrections[0]
         elif energy_kev >= energies[-1]:
@@ -489,7 +486,7 @@ class AttenuationCorrectionLibrary:
             log_E_target = np.log(energy_kev)
             log_C_interp = np.interp(log_E_target, log_E, log_C)
             return np.exp(log_C_interp)
-    
+
     def to_dict(self) -> dict:
         """Export to dictionary for serialization."""
         return {
@@ -523,26 +520,24 @@ def create_attenuation_library(
 ) -> AttenuationCorrectionLibrary:
     """
     Create attenuation correction library for a sample.
-    
+
     Generates correction factors on a logarithmic energy grid.
-    
+
     Args:
         sample_id: Sample identifier
         config: Sample configuration
         energy_range_kev: Energy range (min, max)
         n_points: Number of energy points
-        
+
     Returns:
         AttenuationCorrectionLibrary
     """
     energies = np.logspace(
-        np.log10(energy_range_kev[0]),
-        np.log10(energy_range_kev[1]),
-        n_points
+        np.log10(energy_range_kev[0]), np.log10(energy_range_kev[1]), n_points
     )
-    
+
     factors = calculate_attenuation_corrections(config, list(energies))
-    
+
     return AttenuationCorrectionLibrary(
         sample_id=sample_id,
         config=config,
@@ -555,4 +550,6 @@ def get_standard_material(name: str) -> MaterialAttenuation:
     key = name.lower()
     if key in STANDARD_MATERIALS:
         return STANDARD_MATERIALS[key]
-    raise ValueError(f"Unknown material: {name}. Available: {list(STANDARD_MATERIALS.keys())}")
+    raise ValueError(
+        f"Unknown material: {name}. Available: {list(STANDARD_MATERIALS.keys())}"
+    )

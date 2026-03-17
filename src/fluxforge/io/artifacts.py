@@ -230,7 +230,9 @@ def write_line_activities(
     lines: Iterable[Dict[str, Any]],
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    payload = make_line_activities(spectrum_id=spectrum_id, lines=lines, source_path=source_path)
+    payload = make_line_activities(
+        spectrum_id=spectrum_id, lines=lines, source_path=source_path
+    )
     write_artifact(path, payload)
     return payload
 
@@ -271,7 +273,9 @@ def write_reaction_rates(
     segments: Optional[List[Dict[str, Any]]] = None,
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    payload = make_reaction_rates(rates=rates, segments=segments, source_path=source_path)
+    payload = make_reaction_rates(
+        rates=rates, segments=segments, source_path=source_path
+    )
     write_artifact(path, payload)
     return payload
 
@@ -620,7 +624,12 @@ def make_facility_characterization(
     capability_flags: Optional[Dict[str, Any]] = None,
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    units = {"f": "ratio", "alpha": "dimensionless", "phi_thermal": "n/cm^2/s", "phi_epithermal": "n/cm^2/s"}
+    units = {
+        "f": "ratio",
+        "alpha": "dimensionless",
+        "phi_thermal": "n/cm^2/s",
+        "phi_epithermal": "n/cm^2/s",
+    }
     definitions = {
         "monitor_definitions": "traceable monitor metadata used for facility characterization",
         "flux_parameters": "facility neutron-spectrum parameters assigned to downstream k0 analyses",
@@ -795,7 +804,10 @@ def make_k0_aggregation_bundle(
     hashes = {"source": hash_file(source_path)} if source_path else None
     provenance = build_provenance(
         units=units,
-        normalization={"aggregated_results": "cross-measurement", "irradiation_summaries": "per-irradiation"},
+        normalization={
+            "aggregated_results": "cross-measurement",
+            "irradiation_summaries": "per-irradiation",
+        },
         definitions=definitions,
         source_hashes=hashes,
     )
@@ -931,7 +943,14 @@ def write_report_bundle(
     text_report: Optional[Dict[str, Any]] = None,
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    payload = make_report_bundle(summary=summary, inputs=inputs, figures=figures, tables=tables, text_report=text_report, source_path=source_path)
+    payload = make_report_bundle(
+        summary=summary,
+        inputs=inputs,
+        figures=figures,
+        tables=tables,
+        text_report=text_report,
+        source_path=source_path,
+    )
     write_artifact(path, payload)
     return payload
 

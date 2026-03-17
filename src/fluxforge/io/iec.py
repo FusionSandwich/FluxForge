@@ -51,7 +51,12 @@ def _parse_datetime(tokens: List[str]) -> Optional[datetime]:
     if len(tokens) < 2:
         return None
     candidate = f"{tokens[0]} {tokens[1]}"
-    for fmt in ("%d/%m/%y %H:%M:%S", "%m/%d/%y %H:%M:%S", "%d/%m/%Y %H:%M:%S", "%m/%d/%Y %H:%M:%S"):
+    for fmt in (
+        "%d/%m/%y %H:%M:%S",
+        "%m/%d/%y %H:%M:%S",
+        "%d/%m/%Y %H:%M:%S",
+        "%m/%d/%Y %H:%M:%S",
+    ):
         try:
             return datetime.strptime(candidate, fmt)
         except ValueError:
@@ -64,7 +69,10 @@ def read_iec_file(filepath: Union[str, Path]) -> GammaSpectrum:
     Read an IEC 62755 ASCII spectrum file and return a GammaSpectrum.
     """
     filepath = Path(filepath)
-    lines = [line.rstrip("\n") for line in filepath.read_text(encoding="utf-8", errors="ignore").splitlines()]
+    lines = [
+        line.rstrip("\n")
+        for line in filepath.read_text(encoding="utf-8", errors="ignore").splitlines()
+    ]
     stripped = [_strip_prefix(line).strip() for line in lines]
 
     if len(stripped) < 6:
@@ -111,7 +119,11 @@ def read_iec_file(filepath: Union[str, Path]) -> GammaSpectrum:
         if not tokens:
             continue
         if not started:
-            if len(tokens) >= 2 and tokens[0].lstrip("+-").isdigit() and tokens[1].lstrip("+-").isdigit():
+            if (
+                len(tokens) >= 2
+                and tokens[0].lstrip("+-").isdigit()
+                and tokens[1].lstrip("+-").isdigit()
+            ):
                 started = True
             else:
                 continue

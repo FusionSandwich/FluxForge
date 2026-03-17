@@ -156,7 +156,9 @@ def percentile(values: List[Vector], q: float) -> Vector:
         if lower == upper:
             result.append(col_values[lower])
         else:
-            interp = col_values[lower] + (col_values[upper] - col_values[lower]) * (rank - lower)
+            interp = col_values[lower] + (col_values[upper] - col_values[lower]) * (
+                rank - lower
+            )
             result.append(interp)
     return result
 

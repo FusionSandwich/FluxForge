@@ -124,29 +124,30 @@ def test_parse_mcnp_input(tmp_path):
     m2 1001.70c 2.0 8016.70c 1.0 $ Water
        6012.70c 0.5
     """
-    
+
     input_path = tmp_path / "test.i"
     input_path.write_text(input_content)
-    
+
     data = parse_mcnp_input(str(input_path))
-    
-    assert 1 in data['materials']
-    assert 2 in data['materials']
-    
-    mat1 = data['materials'][1]
-    assert len(mat1['components']) == 2
-    assert mat1['components'][0] == ('26056.70c', '0.9')
-    
-    mat2 = data['materials'][2]
-    assert len(mat2['components']) == 3
-    assert mat2['components'][2] == ('6012.70c', '0.5')
+
+    assert 1 in data["materials"]
+    assert 2 in data["materials"]
+
+    mat1 = data["materials"][1]
+    assert len(mat1["components"]) == 2
+    assert mat1["components"][0] == ("26056.70c", "0.9")
+
+    mat2 = data["materials"][2]
+    assert len(mat2["components"]) == 3
+    assert mat2["components"][2] == ("6012.70c", "0.5")
+
 
 def test_read_meshtal_hdf5_missing_file():
     """Test error handling for missing HDF5 file."""
     from fluxforge.io.mcnp import read_meshtal_hdf5, HAS_H5PY
-    
+
     if not HAS_H5PY:
         pytest.skip("h5py not installed")
-        
+
     with pytest.raises(FileNotFoundError):
         read_meshtal_hdf5("nonexistent.h5", 1)

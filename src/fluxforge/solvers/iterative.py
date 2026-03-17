@@ -36,12 +36,17 @@ def _default_flux(n_groups: int, scale: float = 1.0) -> Vector:
     return [scale for _ in range(n_groups)]
 
 
-def _compute_chi_squared(response: Matrix, flux: Vector, measurements: Vector,
-                         uncertainties: Optional[Vector] = None, floor: float = 1e-20) -> Tuple[float, Vector]:
+def _compute_chi_squared(
+    response: Matrix,
+    flux: Vector,
+    measurements: Vector,
+    uncertainties: Optional[Vector] = None,
+    floor: float = 1e-20,
+) -> Tuple[float, Vector]:
     """Compute chi-squared and residuals for current flux estimate."""
     predicted = matmul(response, flux)
     predicted = [max(p, floor) for p in predicted]
-    
+
     residuals = []
     chi2 = 0.0
     for i, (m, p) in enumerate(zip(measurements, predicted)):
@@ -52,7 +57,7 @@ def _compute_chi_squared(response: Matrix, flux: Vector, measurements: Vector,
             chi2 += r * r
         else:
             residuals.append(0.0)
-    
+
     return chi2, residuals
 
 
@@ -85,7 +90,7 @@ def gravel(
 
     n_groups = len(response[0])
     n_meas = len(measurements)
-    
+
     # Initialize flux
     if initial_flux is not None:
         phi = initial_flux[:]
@@ -93,9 +98,9 @@ def gravel(
         # Better default: scale to match average measurement
         avg_meas = sum(measurements) / len(measurements)
         phi = _default_flux(n_groups, scale=avg_meas / n_groups)
-    
+
     phi = elementwise_maximum(phi, floor)
-    
+
     # Weights from uncertainties
     weights = (
         [1.0 / (u * u) if u > 0 else 0.0 for u in measurement_uncertainty]
@@ -110,17 +115,21 @@ def gravel(
     for it in range(1, max_iters + 1):
         predicted = matmul(response, phi)
         predicted = [max(p, floor) for p in predicted]
-        
+
         # Compute chi-squared
-        chi2, residuals = _compute_chi_squared(response, phi, measurements, measurement_uncertainty, floor)
+        chi2, residuals = _compute_chi_squared(
+            response, phi, measurements, measurement_uncertainty, floor
+        )
         chi2_per_dof = chi2 / max(n_meas - 1, 1)
         chi2_history.append(chi2_per_dof)
-        
+
         if verbose and it % 100 == 0:
             print(f"  GRAVEL iter {it}: chi2/dof = {chi2_per_dof:.4f}")
-        
+
         # Compute log ratios of measurements to predictions
-        log_ratios = [math.log(max(m / p, floor)) for m, p in zip(measurements, predicted)]
+        log_ratios = [
+            math.log(max(m / p, floor)) for m, p in zip(measurements, predicted)
+        ]
 
         updated: Vector = []
         max_rel_change = 0.0
@@ -134,42 +143,48 @@ def gravel(
                     W_ig = measurements[i] * response[i][g] * phi[g] / predicted[i]
                     num += W_ig * log_ratios[i]
                     den += W_ig
-            
+
             if den <= floor:
                 updated.append(phi[g])
                 continue
-            
+
             # Calculate update with relaxation
             factor = math.exp(num / den)
             target_phi = phi[g] * factor
             new_phi = phi[g] + relaxation * (target_phi - phi[g])
             new_phi = max(new_phi, floor)
-            
-            max_rel_change = max(max_rel_change, abs(new_phi - phi[g]) / max(phi[g], floor))
+
+            max_rel_change = max(
+                max_rel_change, abs(new_phi - phi[g]) / max(phi[g], floor)
+            )
             updated.append(new_phi)
 
         phi = updated
         history.append(phi[:])
-        
+
         # Check convergence criteria
         if max_rel_change < tolerance:
             converged = True
             if verbose:
-                print(f"  GRAVEL converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/dof = {chi2_per_dof:.4f}")
+                print(
+                    f"  GRAVEL converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                )
             break
-        
+
         if chi2_per_dof < chi2_tolerance:
             converged = True
             if verbose:
                 print(f"  GRAVEL converged at iter {it}: chi2/dof = {chi2_per_dof:.4f}")
             break
 
-    final_chi2, final_residuals = _compute_chi_squared(response, phi, measurements, measurement_uncertainty, floor)
-    
+    final_chi2, final_residuals = _compute_chi_squared(
+        response, phi, measurements, measurement_uncertainty, floor
+    )
+
     return IterativeSolution(
-        flux=phi, 
-        history=history, 
-        iterations=it if 'it' in dir() else max_iters, 
+        flux=phi,
+        history=history,
+        iterations=it if "it" in dir() else max_iters,
         converged=converged,
         chi_squared=final_chi2 / max(n_meas - 1, 1),
         chi_squared_history=chi2_history,
@@ -209,20 +224,20 @@ def mlem(
 
     n_groups = len(response[0])
     n_meas = len(measurements)
-    
+
     # Initialize flux
     if initial_flux is not None:
         phi = initial_flux[:]
     else:
         avg_meas = sum(measurements) / len(measurements)
         phi = _default_flux(n_groups, scale=avg_meas / n_groups)
-    
+
     phi = elementwise_maximum(phi, floor)
 
     history: List[Vector] = [phi[:]]
     chi2_history: List[float] = []
     converged = False
-    
+
     # For ddJ convergence mode (Neutron-Unfolding style)
     J_prev = 0.0
     dJ_prev = 1.0
@@ -230,68 +245,82 @@ def mlem(
     for it in range(1, max_iters + 1):
         predicted = matmul(response, phi)
         predicted = [max(p, floor) for p in predicted]
-        
+
         # Compute chi-squared
-        chi2, residuals = _compute_chi_squared(response, phi, measurements, measurement_uncertainty, floor)
+        chi2, residuals = _compute_chi_squared(
+            response, phi, measurements, measurement_uncertainty, floor
+        )
         chi2_per_dof = chi2 / max(n_meas - 1, 1)
         chi2_history.append(chi2_per_dof)
-        
+
         # Compute J for ddJ mode (Neutron-Unfolding objective)
         if convergence_mode == "ddJ":
             sum_pred = sum(predicted)
-            J = sum((p - m)**2 for p, m in zip(predicted, measurements)) / max(sum_pred, floor)
+            J = sum((p - m) ** 2 for p, m in zip(predicted, measurements)) / max(
+                sum_pred, floor
+            )
             dJ = J_prev - J
             ddJ = abs(dJ - dJ_prev)
             J_prev = J
             dJ_prev = dJ
-        
+
         if verbose and it % 100 == 0:
             print(f"  MLEM iter {it}: chi2/dof = {chi2_per_dof:.4f}")
 
         updated: Vector = []
         max_rel_change = 0.0
         for g in range(n_groups):
-            numerator = sum(response[i][g] * measurements[i] / predicted[i] for i in range(n_meas))
+            numerator = sum(
+                response[i][g] * measurements[i] / predicted[i] for i in range(n_meas)
+            )
             denominator = sum(response[i][g] for i in range(n_meas))
             if denominator <= 0:
                 updated.append(phi[g])
                 continue
-            
+
             # Calculate update with relaxation
             target_phi = phi[g] * numerator / denominator
             new_phi = phi[g] + relaxation * (target_phi - phi[g])
             new_phi = max(new_phi, floor)
-            
-            max_rel_change = max(max_rel_change, abs(new_phi - phi[g]) / max(phi[g], floor))
+
+            max_rel_change = max(
+                max_rel_change, abs(new_phi - phi[g]) / max(phi[g], floor)
+            )
             updated.append(new_phi)
 
         phi = updated
         history.append(phi[:])
-        
+
         # Check convergence criteria
         if convergence_mode == "ddJ" and ddJ < tolerance:
             converged = True
             if verbose:
-                print(f"  MLEM converged at iter {it}: ddJ = {ddJ:.2e}, chi2/dof = {chi2_per_dof:.4f}")
+                print(
+                    f"  MLEM converged at iter {it}: ddJ = {ddJ:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                )
             break
         elif convergence_mode == "relative" and max_rel_change < tolerance:
             converged = True
             if verbose:
-                print(f"  MLEM converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/dof = {chi2_per_dof:.4f}")
+                print(
+                    f"  MLEM converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                )
             break
-        
+
         if chi2_per_dof < chi2_tolerance:
             converged = True
             if verbose:
                 print(f"  MLEM converged at iter {it}: chi2/dof = {chi2_per_dof:.4f}")
             break
 
-    final_chi2, final_residuals = _compute_chi_squared(response, phi, measurements, measurement_uncertainty, floor)
-    
+    final_chi2, final_residuals = _compute_chi_squared(
+        response, phi, measurements, measurement_uncertainty, floor
+    )
+
     return IterativeSolution(
-        flux=phi, 
-        history=history, 
-        iterations=it if 'it' in dir() else max_iters, 
+        flux=phi,
+        history=history,
+        iterations=it if "it" in dir() else max_iters,
         converged=converged,
         chi_squared=final_chi2 / max(n_meas - 1, 1),
         chi_squared_history=chi2_history,
@@ -336,52 +365,54 @@ def gradient_descent(
     """
     n_groups = len(response[0])
     n_meas = len(measurements)
-    
+
     # Initialize flux
     if initial_flux is not None:
         phi = [max(x, floor) for x in initial_flux]
     else:
         avg_meas = sum(measurements) / len(measurements)
         phi = [avg_meas / n_groups for _ in range(n_groups)]
-    
+
     history: List[Vector] = [phi[:]]
     chi2_history: List[float] = []
     loss_history: List[float] = []
     converged = False
-    
+
     # Track minimum loss for early stopping
-    min_loss = float('inf')
+    min_loss = float("inf")
     no_improvement_count = 0
     patience = 1000  # Reset if no improvement for this many iterations
-    
+
     for it in range(1, max_iters + 1):
         # Compute prediction: Ax
         predicted = matmul(response, phi)
         predicted = [max(p, floor) for p in predicted]
-        
+
         # Compute error: (Ax - b)
         errors = [p - m for p, m in zip(predicted, measurements)]
-        
+
         # MSE loss
         mse_loss = sum(e * e for e in errors) / n_meas
-        
+
         # Smoothness penalty on log(phi)
         log_phi = [math.log(max(p, floor)) for p in phi]
-        log_diffs = [log_phi[g+1] - log_phi[g] for g in range(n_groups - 1)]
+        log_diffs = [log_phi[g + 1] - log_phi[g] for g in range(n_groups - 1)]
         smoothness_penalty = sum(d * d for d in log_diffs) / max(len(log_diffs), 1)
-        
+
         # Total loss
         loss = mse_loss + smoothness_weight * smoothness_penalty
         loss_history.append(loss)
-        
+
         # Compute chi-squared
-        chi2, residuals = _compute_chi_squared(response, phi, measurements, measurement_uncertainty, floor)
+        chi2, residuals = _compute_chi_squared(
+            response, phi, measurements, measurement_uncertainty, floor
+        )
         chi2_per_dof = chi2 / max(n_meas - 1, 1)
         chi2_history.append(chi2_per_dof)
-        
+
         if verbose and it % 500 == 0:
             print(f"  GD iter {it}: loss = {loss:.4e}, chi2/dof = {chi2_per_dof:.4f}")
-        
+
         # Auto-scale on first iteration
         if it == 1 and auto_scale:
             sum_pred = sum(predicted)
@@ -392,42 +423,50 @@ def gradient_descent(
                 if verbose:
                     print(f"  Auto-scaled flux by factor {scale_factor:.4e}")
                 continue  # Re-evaluate with scaled flux
-        
+
         # Gradient: dL/dx = (2/n) * A^T @ (Ax - b)
         gradient = []
         for g in range(n_groups):
-            grad_g = sum(2.0 * errors[i] * response[i][g] / n_meas for i in range(n_meas))
-            
+            grad_g = sum(
+                2.0 * errors[i] * response[i][g] / n_meas for i in range(n_meas)
+            )
+
             # Add smoothness gradient contribution
             if smoothness_weight > 0 and n_groups > 1:
                 if g > 0:
-                    dlog_left = log_phi[g] - log_phi[g-1]
-                    grad_g += 2.0 * smoothness_weight * dlog_left / (phi[g] * (n_groups - 1))
+                    dlog_left = log_phi[g] - log_phi[g - 1]
+                    grad_g += (
+                        2.0 * smoothness_weight * dlog_left / (phi[g] * (n_groups - 1))
+                    )
                 if g < n_groups - 1:
-                    dlog_right = log_phi[g] - log_phi[g+1]
-                    grad_g += 2.0 * smoothness_weight * dlog_right / (phi[g] * (n_groups - 1))
-            
+                    dlog_right = log_phi[g] - log_phi[g + 1]
+                    grad_g += (
+                        2.0 * smoothness_weight * dlog_right / (phi[g] * (n_groups - 1))
+                    )
+
             gradient.append(grad_g)
-        
+
         # Update flux: x = x - lr * gradient
         max_rel_change = 0.0
         updated = []
         for g in range(n_groups):
             new_phi = phi[g] - learning_rate * gradient[g]
             new_phi = max(new_phi, floor)  # Enforce positivity
-            max_rel_change = max(max_rel_change, abs(new_phi - phi[g]) / max(phi[g], floor))
+            max_rel_change = max(
+                max_rel_change, abs(new_phi - phi[g]) / max(phi[g], floor)
+            )
             updated.append(new_phi)
-        
+
         phi = updated
         history.append(phi[:])
-        
+
         # Check for convergence
         if chi2_per_dof < chi2_tolerance:
             converged = True
             if verbose:
                 print(f"  GD converged at iter {it}: chi2/dof = {chi2_per_dof:.4f}")
             break
-        
+
         # Check loss plateau
         if len(loss_history) >= 500:
             recent_losses = loss_history[-500:]
@@ -437,27 +476,29 @@ def gradient_descent(
                 if verbose:
                     print(f"  GD converged at iter {it}: loss plateau detected")
                 break
-        
+
         # Track improvement and reset if stuck
         if loss < min_loss:
             min_loss = loss
             no_improvement_count = 0
         else:
             no_improvement_count += 1
-        
+
         if no_improvement_count >= patience:
             no_improvement_count = 0
-            min_loss = float('inf')
+            min_loss = float("inf")
             # Reset with some noise for exploration
             if verbose:
                 print(f"  GD iter {it}: resetting due to no improvement")
-    
-    final_chi2, final_residuals = _compute_chi_squared(response, phi, measurements, measurement_uncertainty, floor)
-    
+
+    final_chi2, final_residuals = _compute_chi_squared(
+        response, phi, measurements, measurement_uncertainty, floor
+    )
+
     return IterativeSolution(
         flux=phi,
         history=history,
-        iterations=it if 'it' in dir() else max_iters,
+        iterations=it if "it" in dir() else max_iters,
         converged=converged,
         chi_squared=final_chi2 / max(n_meas - 1, 1),
         chi_squared_history=chi2_history,

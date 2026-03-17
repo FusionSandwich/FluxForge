@@ -158,11 +158,16 @@ def test_import_kayzero_k0_library_from_directory_reports_unresolved_fields(tmp_
     assert result.library.records["U-239"].target_isotope == "U-238"
     assert result.library.records["U-239"].gamma_intensity == 0.492
     assert result.library.records["U-239"].sigma_0_barn > 0.0
-    assert result.library.records["U-239"].I0_barn > result.library.records["U-239"].sigma_0_barn
+    assert (
+        result.library.records["U-239"].I0_barn
+        > result.library.records["U-239"].sigma_0_barn
+    )
     assert result.report["summary"]["record_count"] == 5
     assert result.report["summary"]["opaque_binary_files_present"] is True
     assert result.report["summary"]["iri_text_files_present"] is True
-    unresolved = {row["product_isotope"]: row for row in result.report["unresolved_records"]}
+    unresolved = {
+        row["product_isotope"]: row for row in result.report["unresolved_records"]
+    }
     assert "Ag-110m" not in unresolved
     assert "Tc-99m" not in unresolved
     assert "U-239" not in unresolved
@@ -281,4 +286,7 @@ def test_imported_kayzero_library_can_drive_k0_analysis(tmp_path):
 
     assert bundle["summary"]["element_count"] == 1
     assert bundle["element_results"][0]["element"] == "Co"
-    assert bundle["libraries"]["standard_k0_library"]["library_id"] == result.library.library_id
+    assert (
+        bundle["libraries"]["standard_k0_library"]["library_id"]
+        == result.library.library_id
+    )

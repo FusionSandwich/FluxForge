@@ -12,7 +12,10 @@ import warnings
 
 import numpy as np
 
-from fluxforge.analysis.segmented_detection import SegmentedDetectionConfig, detect_peaks_segmented
+from fluxforge.analysis.segmented_detection import (
+    SegmentedDetectionConfig,
+    detect_peaks_segmented,
+)
 from fluxforge.analysis.spectrum_math import subtract_measured_background
 from fluxforge.analysis.k0_workflow import (
     CAPABILITY_FLAGS as K0_CAPABILITY_FLAGS,
@@ -30,10 +33,18 @@ from fluxforge.analysis.astm_e262 import analyze_astm_e262_plan
 from fluxforge.analysis.astm_e3376 import analyze_astm_e3376_plan
 from fluxforge.analysis.astm_e2005 import analyze_astm_e2005_plan
 from fluxforge.core.prior_covariance import PriorCovarianceConfig, PriorCovarianceModel
-from fluxforge.core.response import EnergyGroupStructure, ReactionCrossSection, build_response_matrix
+from fluxforge.core.response import (
+    EnergyGroupStructure,
+    ReactionCrossSection,
+    build_response_matrix,
+)
 from fluxforge.core.schemas import validate_or_raise
 from fluxforge.data.efficiency_models import EfficiencyModel
-from fluxforge.data.kayzero_k0 import import_kayzero_k0_library, write_governed_library_json, write_import_report_json
+from fluxforge.data.kayzero_k0 import (
+    import_kayzero_k0_library,
+    write_governed_library_json,
+    write_import_report_json,
+)
 from fluxforge.data.rafm_profile import list_rafm_profiles, load_rafm_profile
 from fluxforge.examples.rafm_workflow import (
     compare_rafm_completion_results,
@@ -71,7 +82,11 @@ from fluxforge.io.artifacts import (
 )
 from fluxforge.io.genie import read_genie_spectrum
 from fluxforge.io.spe import GammaSpectrum, read_spe_file
-from fluxforge.physics.activation import IrradiationSegment, activation_study_metrics, reaction_rate_from_activity
+from fluxforge.physics.activation import (
+    IrradiationSegment,
+    activation_study_metrics,
+    reaction_rate_from_activity,
+)
 from fluxforge.solvers.gls import gls_adjust
 from fluxforge.solvers.iterative import gravel, mlem
 from fluxforge.validation import spectrum_comparison_metrics
@@ -88,7 +103,9 @@ def _load_structured_rows(path: Path) -> Any:
     if suffix == ".csv":
         with path.open("r", encoding="utf-8", newline="") as handle:
             return [dict(row) for row in csv.DictReader(handle)]
-    raise ValueError(f"Unsupported structured input format for {path}. Use .json or .csv.")
+    raise ValueError(
+        f"Unsupported structured input format for {path}. Use .json or .csv."
+    )
 
 
 def _ensure_parent_dir(path: Path) -> None:
@@ -157,11 +174,17 @@ def _apply_overrides_to_spectrum(
     return spectrum
 
 
-def _profile_efficiency_override(profile_name: Optional[str]) -> Optional[Dict[str, float]]:
+def _profile_efficiency_override(
+    profile_name: Optional[str],
+) -> Optional[Dict[str, float]]:
     if not profile_name:
         return None
     profile = load_rafm_profile(profile_name)
-    return {str(key): float(value) for key, value in profile.efficiency.items() if isinstance(value, (int, float))}
+    return {
+        str(key): float(value)
+        for key, value in profile.efficiency.items()
+        if isinstance(value, (int, float))
+    }
 
 
 def _profile_background_file(profile_name: Optional[str]) -> Optional[Path]:
@@ -213,7 +236,9 @@ def _load_spectrum_from_path(
     )
 
 
-def _normalize_efficiency_coefficients(metadata_efficiency: object) -> Optional[Dict[str, float]]:
+def _normalize_efficiency_coefficients(
+    metadata_efficiency: object,
+) -> Optional[Dict[str, float]]:
     if not isinstance(metadata_efficiency, dict):
         return None
 
@@ -243,8 +268,12 @@ def _normalize_efficiency_coefficients(metadata_efficiency: object) -> Optional[
     return normalized
 
 
-def _efficiency_model_from_spectrum(spectrum: GammaSpectrum) -> Optional[EfficiencyModel]:
-    coefficients = _normalize_efficiency_coefficients(spectrum.metadata.get("efficiency", {}))
+def _efficiency_model_from_spectrum(
+    spectrum: GammaSpectrum,
+) -> Optional[EfficiencyModel]:
+    coefficients = _normalize_efficiency_coefficients(
+        spectrum.metadata.get("efficiency", {})
+    )
     if coefficients is None:
         return None
     return EfficiencyModel(
@@ -288,7 +317,9 @@ def _export_metadata_lines(
     return lines
 
 
-def _write_csv_rows(path: Path, metadata_lines: List[str], header: List[str], rows: List[List[float]]) -> None:
+def _write_csv_rows(
+    path: Path, metadata_lines: List[str], header: List[str], rows: List[List[float]]
+) -> None:
     _ensure_parent_dir(path)
     with path.open("w", encoding="utf-8", newline="") as handle:
         for line in metadata_lines:
@@ -360,7 +391,9 @@ def _write_final_corrected_csv(
         corrected_counts = spectrum.counts / efficiencies
         corrected_uncertainty = uncertainties / efficiencies
     corrected_counts = np.where(np.isfinite(corrected_counts), corrected_counts, np.nan)
-    corrected_uncertainty = np.where(np.isfinite(corrected_uncertainty), corrected_uncertainty, np.nan)
+    corrected_uncertainty = np.where(
+        np.isfinite(corrected_uncertainty), corrected_uncertainty, np.nan
+    )
 
     rows = [
         [
@@ -513,13 +546,19 @@ def _manual_peak_rows(
             {
                 "channel": int(peak_channel),
                 "energy_keV": float(raw_energies[peak_channel]),
-                "amplitude": float(np.max(local_analysis)) if local_analysis.size else 0.0,
+                "amplitude": (
+                    float(np.max(local_analysis)) if local_analysis.size else 0.0
+                ),
                 "raw_counts": float(np.max(local_raw)) if local_raw.size else 0.0,
                 "sigma_keV": 0.0,
                 "area": integrated_counts,
                 "region": f"{lo}:{hi}",
-                "is_report": bool(region.get("isotope") or region.get("report_isotope")),
-                "report_isotope": str(region.get("isotope") or region.get("report_isotope") or ""),
+                "is_report": bool(
+                    region.get("isotope") or region.get("report_isotope")
+                ),
+                "report_isotope": str(
+                    region.get("isotope") or region.get("report_isotope") or ""
+                ),
                 "report_file": str(region.get("report_file") or ""),
                 "label": str(label),
                 "manual": True,
@@ -606,7 +645,9 @@ def _print_warning_messages(messages: List[str]) -> None:
         print(f"  - {message}")
 
 
-def _relative_output_path(root_dir: Path, input_dir: Path, input_path: Path, suffix: str) -> Path:
+def _relative_output_path(
+    root_dir: Path, input_dir: Path, input_path: Path, suffix: str
+) -> Path:
     relative = input_path.relative_to(input_dir)
     return root_dir / relative.parent / f"{relative.stem}{suffix}"
 
@@ -625,7 +666,9 @@ def cmd_ingest(args: argparse.Namespace) -> None:
     input_path = args.input
     energy_override = _parse_csv_floats(getattr(args, "energy_calibration", None))
     profile_name = getattr(args, "profile", None)
-    efficiency_override = _parse_efficiency_override(getattr(args, "efficiency_coefficients", None))
+    efficiency_override = _parse_efficiency_override(
+        getattr(args, "efficiency_coefficients", None)
+    )
     if efficiency_override is None:
         efficiency_override = _profile_efficiency_override(profile_name)
     background_file: Optional[Path] = getattr(args, "background_file", None)
@@ -651,7 +694,9 @@ def cmd_ingest(args: argparse.Namespace) -> None:
         write_spectrum_file(args.output, spectrum, source_path=input_path)
         print(f"Wrote spectrum file to {args.output}")
 
-        background_adjusted_output: Optional[Path] = getattr(args, "save_background_adjusted", None)
+        background_adjusted_output: Optional[Path] = getattr(
+            args, "save_background_adjusted", None
+        )
         if background_adjusted_output is not None:
             _write_background_adjusted_csv(
                 background_adjusted_output,
@@ -660,7 +705,9 @@ def cmd_ingest(args: argparse.Namespace) -> None:
             )
             print(f"Wrote background-adjusted counts to {background_adjusted_output}")
 
-        final_corrected_output: Optional[Path] = getattr(args, "save_final_corrected", None)
+        final_corrected_output: Optional[Path] = getattr(
+            args, "save_final_corrected", None
+        )
         if final_corrected_output is not None:
             if _write_final_corrected_csv(
                 final_corrected_output,
@@ -679,7 +726,9 @@ def cmd_ingest_batch(args: argparse.Namespace) -> None:
 
     energy_override = _parse_csv_floats(getattr(args, "energy_calibration", None))
     profile_name = getattr(args, "profile", None)
-    efficiency_override = _parse_efficiency_override(getattr(args, "efficiency_coefficients", None))
+    efficiency_override = _parse_efficiency_override(
+        getattr(args, "efficiency_coefficients", None)
+    )
     if efficiency_override is None:
         efficiency_override = _profile_efficiency_override(profile_name)
     background_file: Optional[Path] = getattr(args, "background_file", None)
@@ -703,7 +752,9 @@ def cmd_ingest_batch(args: argparse.Namespace) -> None:
     final_corrected_count = 0
 
     for input_path in input_files:
-        artifact_path = _relative_output_path(args.output_dir, input_dir, input_path, ".json")
+        artifact_path = _relative_output_path(
+            args.output_dir, input_dir, input_path, ".json"
+        )
         background_adjusted_output = None
         if getattr(args, "background_adjusted_dir", None) is not None:
             background_adjusted_output = _relative_output_path(
@@ -744,7 +795,9 @@ def cmd_ingest_batch(args: argparse.Namespace) -> None:
                     background_file=background_file,
                 )
                 background_adjusted_count += 1
-                print(f"Wrote background-adjusted counts to {background_adjusted_output}")
+                print(
+                    f"Wrote background-adjusted counts to {background_adjusted_output}"
+                )
 
             if final_corrected_output is not None:
                 if _write_final_corrected_csv(
@@ -776,7 +829,9 @@ def cmd_ingest_batch(args: argparse.Namespace) -> None:
 def cmd_spectrum_plot(args: argparse.Namespace) -> None:
     profile_name = getattr(args, "profile", None)
     energy_override = _parse_csv_floats(getattr(args, "energy_calibration", None))
-    efficiency_override = _parse_efficiency_override(getattr(args, "efficiency_coefficients", None))
+    efficiency_override = _parse_efficiency_override(
+        getattr(args, "efficiency_coefficients", None)
+    )
     if efficiency_override is None:
         efficiency_override = _profile_efficiency_override(profile_name)
 
@@ -807,9 +862,13 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
             background=background,
             background_scale_mode=getattr(args, "background_scale_mode", "live"),
             background_scale_factor=getattr(args, "background_scale_factor", None),
-            use_background_subtracted=bool(getattr(args, "background_subtracted", False)),
+            use_background_subtracted=bool(
+                getattr(args, "background_subtracted", False)
+            ),
         )
-        spectrum_for_plot = analysis_spectrum if args.background_subtracted else raw_spectrum
+        spectrum_for_plot = (
+            analysis_spectrum if args.background_subtracted else raw_spectrum
+        )
 
         import matplotlib
 
@@ -825,9 +884,7 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
             x_max_keV=getattr(args, "x_max_keV", None),
             y_log=bool(getattr(args, "y_log", False)),
             subtitle=(
-                "background-subtracted"
-                if args.background_subtracted
-                else "raw counts"
+                "background-subtracted" if args.background_subtracted else "raw counts"
             ),
         )
         _ensure_parent_dir(args.output)
@@ -860,7 +917,9 @@ def cmd_peaks(args: argparse.Namespace) -> None:
     if getattr(args, "manual_peaks_file", None) is not None:
         profile_name = getattr(args, "profile", None)
         energy_override = _parse_csv_floats(getattr(args, "energy_calibration", None))
-        efficiency_override = _parse_efficiency_override(getattr(args, "efficiency_coefficients", None))
+        efficiency_override = _parse_efficiency_override(
+            getattr(args, "efficiency_coefficients", None)
+        )
         if efficiency_override is None:
             efficiency_override = _profile_efficiency_override(profile_name)
 
@@ -887,7 +946,9 @@ def cmd_peaks(args: argparse.Namespace) -> None:
                 background=background,
                 background_scale_mode=getattr(args, "background_scale_mode", "live"),
                 background_scale_factor=getattr(args, "background_scale_factor", None),
-                use_background_subtracted=bool(getattr(args, "background_subtracted", False)),
+                use_background_subtracted=bool(
+                    getattr(args, "background_subtracted", False)
+                ),
             )
             manual_regions = _load_manual_peak_regions(args.manual_peaks_file)
             peaks = _manual_peak_rows(
@@ -910,7 +971,11 @@ def cmd_peaks(args: argparse.Namespace) -> None:
     if args.validate:
         validate_or_raise(spectrum_payload)
     spectrum = GammaSpectrum.from_dict(spectrum_payload["spectrum"])
-    energies = spectrum.energies if spectrum.energies is not None else spectrum.channels.astype(float)
+    energies = (
+        spectrum.energies
+        if spectrum.energies is not None
+        else spectrum.channels.astype(float)
+    )
     if args.sensitivity == "sensitive":
         config = SegmentedDetectionConfig.sensitive()
     elif args.sensitivity == "conservative":
@@ -964,7 +1029,9 @@ def cmd_activity(args: argparse.Namespace) -> None:
         net_counts = peak.get("area") or peak.get("raw_counts") or peak.get("amplitude")
         efficiency = args.efficiency
         emission_probability = args.emission_probability
-        activity = net_counts / max(efficiency * emission_probability * live_time_s, 1e-12)
+        activity = net_counts / max(
+            efficiency * emission_probability * live_time_s, 1e-12
+        )
         activity_unc = activity / np.sqrt(max(net_counts, 1e-12))
         isotope = peak.get("report_isotope") or args.isotope or "unknown"
         reaction_id = args.reaction_id or isotope or f"reaction_{idx + 1}"
@@ -1013,8 +1080,12 @@ def cmd_rates(args: argparse.Namespace) -> None:
     rates = []
     for idx, line in enumerate(line_payload["lines"]):
         half_life_s = line.get("half_life_s", args.half_life_s)
-        rate_estimate = reaction_rate_from_activity(line["activity_Bq"], segment_objs, half_life_s)
-        reaction_id = line.get("reaction_id") or line.get("isotope") or f"reaction_{idx + 1}"
+        rate_estimate = reaction_rate_from_activity(
+            line["activity_Bq"], segment_objs, half_life_s
+        )
+        reaction_id = (
+            line.get("reaction_id") or line.get("isotope") or f"reaction_{idx + 1}"
+        )
         rates.append(
             {
                 "reaction_id": reaction_id,
@@ -1075,10 +1146,7 @@ def cmd_rafm_validate(args: argparse.Namespace) -> None:
         generic_targeted_counting_method=getattr(args, "generic_counting_method", None),
     )
     print(f"RAFM validation completed at {summary['results_root']}")
-    print(
-        "Overall passed: "
-        + ("yes" if bool(summary.get("overall_passed")) else "no")
-    )
+    print("Overall passed: " + ("yes" if bool(summary.get("overall_passed")) else "no"))
     print(f"Matched raw/QG pairs: {summary.get('n_matched_pairs', 0)}")
 
 
@@ -1113,7 +1181,11 @@ def cmd_response(args: argparse.Namespace) -> None:
     reactions = []
     number_density_values: List[float] = []
     for reaction_id, sigma in cross_sections_raw.items():
-        reactions.append(ReactionCrossSection(reaction_id=reaction_id, sigma_g=[float(s) for s in sigma]))
+        reactions.append(
+            ReactionCrossSection(
+                reaction_id=reaction_id, sigma_g=[float(s) for s in sigma]
+            )
+        )
         number_density_values.append(float(number_densities[reaction_id]))
 
     response = build_response_matrix(reactions, groups, number_density_values)
@@ -1141,7 +1213,11 @@ def _predicted_rates_and_uncertainty(
     predicted = response_np @ flux_np
 
     cov_np = np.asarray(covariance, dtype=float)
-    if cov_np.ndim == 2 and cov_np.shape == (flux_np.size, flux_np.size) and np.any(np.abs(cov_np) > 0.0):
+    if (
+        cov_np.ndim == 2
+        and cov_np.shape == (flux_np.size, flux_np.size)
+        and np.any(np.abs(cov_np) > 0.0)
+    ):
         predicted_cov = response_np @ cov_np @ response_np.T
         predicted_unc = np.sqrt(np.clip(np.diag(predicted_cov), 0.0, None))
     else:
@@ -1164,22 +1240,35 @@ def _build_unfold_diagnostics(
     payload = dict(diagnostics)
     payload["reactions"] = [str(item) for item in reactions]
     payload["measured_rates"] = [float(value) for value in measured_rates]
-    payload["measured_rate_uncertainties"] = [float(value) for value in rate_uncertainties]
+    payload["measured_rate_uncertainties"] = [
+        float(value) for value in rate_uncertainties
+    ]
     payload["prior_flux"] = [float(value) for value in prior_flux]
 
     prior_cov_np = np.asarray(prior_cov, dtype=float)
-    if prior_cov_np.ndim == 2 and prior_cov_np.shape == (len(prior_flux), len(prior_flux)):
-        payload["prior_flux_uncertainty"] = np.sqrt(np.clip(np.diag(prior_cov_np), 0.0, None)).astype(float).tolist()
+    if prior_cov_np.ndim == 2 and prior_cov_np.shape == (
+        len(prior_flux),
+        len(prior_flux),
+    ):
+        payload["prior_flux_uncertainty"] = (
+            np.sqrt(np.clip(np.diag(prior_cov_np), 0.0, None)).astype(float).tolist()
+        )
 
     cov_np = np.asarray(covariance, dtype=float)
     if cov_np.ndim == 2 and cov_np.shape == (len(flux), len(flux)):
-        payload["flux_uncertainty"] = np.sqrt(np.clip(np.diag(cov_np), 0.0, None)).astype(float).tolist()
+        payload["flux_uncertainty"] = (
+            np.sqrt(np.clip(np.diag(cov_np), 0.0, None)).astype(float).tolist()
+        )
 
-    predicted_rates, predicted_unc = _predicted_rates_and_uncertainty(response_matrix, flux, covariance)
+    predicted_rates, predicted_unc = _predicted_rates_and_uncertainty(
+        response_matrix, flux, covariance
+    )
     payload["predicted_rates"] = [float(value) for value in predicted_rates]
     payload["predicted_rate_uncertainties"] = [float(value) for value in predicted_unc]
 
-    residuals = np.asarray(predicted_rates, dtype=float) - np.asarray(measured_rates, dtype=float)
+    residuals = np.asarray(predicted_rates, dtype=float) - np.asarray(
+        measured_rates, dtype=float
+    )
     sigma = np.asarray(rate_uncertainties, dtype=float)
     pulls = np.divide(residuals, sigma, out=np.zeros_like(residuals), where=sigma > 0.0)
     payload["rate_residuals"] = residuals.astype(float).tolist()
@@ -1215,7 +1304,9 @@ def _solve_unfold_method(
         if getattr(solution, "pull", None) is not None:
             diagnostics["pull"] = [float(value) for value in solution.pull]
         if getattr(solution, "prior_posterior_change", None) is not None:
-            diagnostics["prior_posterior_change"] = [float(value) for value in solution.prior_posterior_change]
+            diagnostics["prior_posterior_change"] = [
+                float(value) for value in solution.prior_posterior_change
+            ]
         return (
             [float(value) for value in solution.flux],
             [[float(item) for item in row] for row in solution.covariance],
@@ -1241,7 +1332,9 @@ def _solve_unfold_method(
             "iterations": int(solution.iterations),
             "converged": bool(solution.converged),
             "chi2_history": [float(value) for value in solution.chi_squared_history],
-            "final_residuals": [float(value) for value in solution.final_residuals or []],
+            "final_residuals": [
+                float(value) for value in solution.final_residuals or []
+            ],
         }
         return (
             [float(value) for value in solution.flux],
@@ -1269,7 +1362,9 @@ def _solve_unfold_method(
             "iterations": int(solution.iterations),
             "converged": bool(solution.converged),
             "chi2_history": [float(value) for value in solution.chi_squared_history],
-            "final_residuals": [float(value) for value in solution.final_residuals or []],
+            "final_residuals": [
+                float(value) for value in solution.final_residuals or []
+            ],
             "convergence_mode": str(getattr(args, "convergence_mode", "relative")),
         }
         return (
@@ -1301,11 +1396,18 @@ def cmd_unfold(args: argparse.Namespace) -> None:
     if args.prior_flux_file:
         prior_flux = [float(v) for v in _load_json(args.prior_flux_file)]
     else:
-        avg_response = sum(sum(row) for row in response_matrix) / max(len(response_matrix) * len(response_matrix[0]), 1)
-        prior_flux = [sum(measured_rates) / max(avg_response, 1e-12) for _ in range(groups.group_count)]
+        avg_response = sum(sum(row) for row in response_matrix) / max(
+            len(response_matrix) * len(response_matrix[0]), 1
+        )
+        prior_flux = [
+            sum(measured_rates) / max(avg_response, 1e-12)
+            for _ in range(groups.group_count)
+        ]
 
     # Prior covariance model (K8)
-    cov_model = PriorCovarianceModel(getattr(args, "prior_cov_model", PriorCovarianceModel.DIAGONAL.value))
+    cov_model = PriorCovarianceModel(
+        getattr(args, "prior_cov_model", PriorCovarianceModel.DIAGONAL.value)
+    )
     prior_cov_config = PriorCovarianceConfig(
         model_type=cov_model,
         fractional_uncertainty=float(args.prior_uncertainty),
@@ -1317,7 +1419,10 @@ def cmd_unfold(args: argparse.Namespace) -> None:
     )
     prior_cov = prior_cov_np.tolist()
     measurement_cov = [
-        [(rate_uncertainties[i] ** 2) if i == j else 0.0 for j in range(len(measured_rates))]
+        [
+            (rate_uncertainties[i] ** 2) if i == j else 0.0
+            for j in range(len(measured_rates))
+        ]
         for i in range(len(measured_rates))
     ]
 
@@ -1388,18 +1493,26 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
-def _weighted_mean_and_uncertainty(values: List[float], uncertainties: List[float]) -> tuple[float, float]:
+def _weighted_mean_and_uncertainty(
+    values: List[float], uncertainties: List[float]
+) -> tuple[float, float]:
     if not values:
         return 0.0, 0.0
-    valid_pairs = [(value, unc) for value, unc in zip(values, uncertainties) if unc > 0.0]
+    valid_pairs = [
+        (value, unc) for value, unc in zip(values, uncertainties) if unc > 0.0
+    ]
     if valid_pairs:
         weights = [1.0 / (unc * unc) for _, unc in valid_pairs]
-        weighted_mean = sum(value * weight for (value, _), weight in zip(valid_pairs, weights)) / max(sum(weights), 1e-30)
+        weighted_mean = sum(
+            value * weight for (value, _), weight in zip(valid_pairs, weights)
+        ) / max(sum(weights), 1e-30)
         return float(weighted_mean), float(np.sqrt(1.0 / max(sum(weights), 1e-30)))
     mean_value = float(np.mean(np.asarray(values, dtype=float)))
     if len(values) == 1:
         return mean_value, float(max(uncertainties[0] if uncertainties else 0.0, 0.0))
-    spread = float(np.std(np.asarray(values, dtype=float), ddof=0) / max(np.sqrt(len(values)), 1.0))
+    spread = float(
+        np.std(np.asarray(values, dtype=float), ddof=0) / max(np.sqrt(len(values)), 1.0)
+    )
     return mean_value, spread
 
 
@@ -1417,7 +1530,9 @@ def _format_key_value_section(title: str, rows: List[tuple[str, Any]]) -> str:
     if not rows:
         return f"{title}\n{'-' * len(title)}\n(none)"
     width = max(len(label) for label, _ in rows)
-    body = "\n".join(f"{label:<{width}} : {_format_report_value(value)}" for label, value in rows)
+    body = "\n".join(
+        f"{label:<{width}} : {_format_report_value(value)}" for label, value in rows
+    )
     return f"{title}\n{'-' * len(title)}\n{body}"
 
 
@@ -1431,7 +1546,9 @@ def _format_table_section(title: str, headers: List[str], rows: List[List[Any]])
         normalized_rows.append(normalized)
         for idx, cell in enumerate(normalized):
             widths[idx] = max(widths[idx], len(cell))
-    header_line = " | ".join(f"{header:<{widths[idx]}}" for idx, header in enumerate(headers))
+    header_line = " | ".join(
+        f"{header:<{widths[idx]}}" for idx, header in enumerate(headers)
+    )
     divider = "-+-".join("-" * width for width in widths)
     body = "\n".join(
         " | ".join(f"{cell:<{widths[idx]}}" for idx, cell in enumerate(row))
@@ -1440,7 +1557,9 @@ def _format_table_section(title: str, headers: List[str], rows: List[List[Any]])
     return f"{title}\n{'-' * len(title)}\n{header_line}\n{divider}\n{body}"
 
 
-def _write_csv_table(path: Path, rows: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+def _write_csv_table(
+    path: Path, rows: List[Dict[str, Any]]
+) -> Optional[Dict[str, Any]]:
     if not rows:
         return None
     _ensure_parent_dir(path)
@@ -1476,10 +1595,15 @@ def discover_validation_report_inputs(results_root: Path) -> Dict[str, Optional[
             preferred_unfold = candidate
             break
     candidates["preferred_unfold_file"] = preferred_unfold
-    return {key: value if value is not None and value.exists() else None for key, value in candidates.items()}
+    return {
+        key: value if value is not None and value.exists() else None
+        for key, value in candidates.items()
+    }
 
 
-def _aggregate_isotope_activity_rows(lines: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _aggregate_isotope_activity_rows(
+    lines: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
     grouped: Dict[str, List[Dict[str, Any]]] = {}
     for line in lines:
         isotope = str(line.get("isotope") or "unknown")
@@ -1488,10 +1612,28 @@ def _aggregate_isotope_activity_rows(lines: List[Dict[str, Any]]) -> List[Dict[s
     rows: List[Dict[str, Any]] = []
     for isotope, isotope_lines in grouped.items():
         activities = [_safe_float(item.get("activity_Bq")) for item in isotope_lines]
-        uncertainties = [_safe_float(item.get("activity_unc_Bq")) for item in isotope_lines]
-        weighted_activity, weighted_unc = _weighted_mean_and_uncertainty(activities, uncertainties)
-        half_life_s = next((_safe_float(item.get("half_life_s")) for item in isotope_lines if _safe_float(item.get("half_life_s")) > 0.0), 0.0)
-        sample_mass_g = next((_safe_float(item.get("sample_mass_g"), default=-1.0) for item in isotope_lines if _safe_float(item.get("sample_mass_g"), default=-1.0) > 0.0), None)
+        uncertainties = [
+            _safe_float(item.get("activity_unc_Bq")) for item in isotope_lines
+        ]
+        weighted_activity, weighted_unc = _weighted_mean_and_uncertainty(
+            activities, uncertainties
+        )
+        half_life_s = next(
+            (
+                _safe_float(item.get("half_life_s"))
+                for item in isotope_lines
+                if _safe_float(item.get("half_life_s")) > 0.0
+            ),
+            0.0,
+        )
+        sample_mass_g = next(
+            (
+                _safe_float(item.get("sample_mass_g"), default=-1.0)
+                for item in isotope_lines
+                if _safe_float(item.get("sample_mass_g"), default=-1.0) > 0.0
+            ),
+            None,
+        )
         if sample_mass_g is not None and sample_mass_g <= 0.0:
             sample_mass_g = None
         metrics = activation_study_metrics(
@@ -1501,23 +1643,38 @@ def _aggregate_isotope_activity_rows(lines: List[Dict[str, Any]]) -> List[Dict[s
             isotope=isotope,
             sample_mass_g=sample_mass_g,
         )
-        energy_list = sorted({_safe_float(item.get("energy_keV")) for item in isotope_lines if _safe_float(item.get("energy_keV")) > 0.0})
+        energy_list = sorted(
+            {
+                _safe_float(item.get("energy_keV"))
+                for item in isotope_lines
+                if _safe_float(item.get("energy_keV")) > 0.0
+            }
+        )
         row = {
             "isotope": isotope,
             "n_lines": len(isotope_lines),
             "activity_Bq": weighted_activity,
             "activity_unc_Bq": weighted_unc,
-            "total_net_counts": float(sum(_safe_float(item.get("net_counts")) for item in isotope_lines)),
+            "total_net_counts": float(
+                sum(_safe_float(item.get("net_counts")) for item in isotope_lines)
+            ),
             "energies_keV": ", ".join(f"{value:.1f}" for value in energy_list),
             "half_life_s": half_life_s,
         }
         row.update(metrics)
         rows.append(row)
-    rows.sort(key=lambda item: (-_safe_float(item.get("activity_Bq")), str(item.get("isotope"))))
+    rows.sort(
+        key=lambda item: (
+            -_safe_float(item.get("activity_Bq")),
+            str(item.get("isotope")),
+        )
+    )
     return rows
 
 
-def _aggregate_validation_analysis_rows(analysis_payloads: List[Dict[str, Any]]) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+def _aggregate_validation_analysis_rows(
+    analysis_payloads: List[Dict[str, Any]]
+) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     sample_rows: List[Dict[str, Any]] = []
     isotope_rows: List[Dict[str, Any]] = []
     for payload in analysis_payloads:
@@ -1525,7 +1682,13 @@ def _aggregate_validation_analysis_rows(analysis_payloads: List[Dict[str, Any]])
         timing = payload.get("timing", {}) or {}
         isotopes = payload.get("isotopes", {}) or {}
         peaks = payload.get("peaks", []) or []
-        total_counts = float(sum(_safe_float(item.get("gross_counts")) for item in peaks if isinstance(item, dict)))
+        total_counts = float(
+            sum(
+                _safe_float(item.get("gross_counts"))
+                for item in peaks
+                if isinstance(item, dict)
+            )
+        )
         total_activity = 0.0
         total_unc_sq = 0.0
         total_radioactive_mass = 0.0
@@ -1537,15 +1700,21 @@ def _aggregate_validation_analysis_rows(analysis_payloads: List[Dict[str, Any]])
                 activity = _safe_float(values.get("activity_bq"))
                 unc = _safe_float(values.get("activity_unc_bq"))
                 radioactive_mass = _safe_float(values.get("radioactive_mass_g"))
-                specific_activity = _safe_float(values.get("specific_activity_Bq_g"), default=float("nan"))
+                specific_activity = _safe_float(
+                    values.get("specific_activity_Bq_g"), default=float("nan")
+                )
             else:
                 unc = _safe_float(values.get("activity_eoi_unc_bq"))
                 radioactive_mass = _safe_float(values.get("eoi_radioactive_mass_g"))
-                specific_activity = _safe_float(values.get("eoi_specific_activity_Bq_g"), default=float("nan"))
+                specific_activity = _safe_float(
+                    values.get("eoi_specific_activity_Bq_g"), default=float("nan")
+                )
             if radioactive_mass <= 0.0:
                 radioactive_mass = _safe_float(values.get("radioactive_mass_g"))
             if not np.isfinite(specific_activity) or specific_activity <= 0.0:
-                specific_activity = _safe_float(values.get("specific_activity_Bq_g"), default=float("nan"))
+                specific_activity = _safe_float(
+                    values.get("specific_activity_Bq_g"), default=float("nan")
+                )
             total_activity += activity
             total_unc_sq += unc * unc
             total_radioactive_mass += radioactive_mass
@@ -1559,7 +1728,11 @@ def _aggregate_validation_analysis_rows(analysis_payloads: List[Dict[str, Any]])
                     "activity_unc_Bq": unc,
                     "radioactive_mass_g": radioactive_mass,
                     "sample_mass_g": values.get("sample_mass_g"),
-                    "specific_activity_Bq_g": None if not np.isfinite(specific_activity) else specific_activity,
+                    "specific_activity_Bq_g": (
+                        None
+                        if not np.isfinite(specific_activity)
+                        else specific_activity
+                    ),
                     "n_peaks": values.get("n_peaks"),
                 }
             )
@@ -1574,11 +1747,19 @@ def _aggregate_validation_analysis_rows(analysis_payloads: List[Dict[str, Any]])
                 "total_activity_Bq": total_activity,
                 "total_activity_unc_Bq": float(np.sqrt(max(total_unc_sq, 0.0))),
                 "total_radioactive_mass_g": total_radioactive_mass,
-                "isotope_count": sum(1 for value in isotopes.values() if isinstance(value, dict)),
+                "isotope_count": sum(
+                    1 for value in isotopes.values() if isinstance(value, dict)
+                ),
             }
         )
     sample_rows.sort(key=lambda item: str(item.get("sample_id")))
-    isotope_rows.sort(key=lambda item: (str(item.get("sample_id")), -_safe_float(item.get("activity_Bq")), str(item.get("isotope"))))
+    isotope_rows.sort(
+        key=lambda item: (
+            str(item.get("sample_id")),
+            -_safe_float(item.get("activity_Bq")),
+            str(item.get("isotope")),
+        )
+    )
     return sample_rows, isotope_rows
 
 
@@ -1624,24 +1805,53 @@ def _build_standard_report_text(
                     ("Start time", spectrum.get("start_time") or "unknown"),
                     ("Live time (s)", _safe_float(spectrum.get("live_time"))),
                     ("Real time (s)", _safe_float(spectrum.get("real_time"))),
-                    ("Total counts", float(sum(_safe_float(value) for value in counts))),
+                    (
+                        "Total counts",
+                        float(sum(_safe_float(value) for value in counts)),
+                    ),
                     ("Channel count", len(counts)),
                 ],
             )
         )
 
     if peak_report is not None:
-        peaks = [item for item in (peak_report.get("peaks", []) or []) if isinstance(item, dict)]
-        strongest_peak = max(peaks, key=lambda item: _safe_float(item.get("area") or item.get("raw_counts") or item.get("amplitude")), default=None)
+        peaks = [
+            item
+            for item in (peak_report.get("peaks", []) or [])
+            if isinstance(item, dict)
+        ]
+        strongest_peak = max(
+            peaks,
+            key=lambda item: _safe_float(
+                item.get("area") or item.get("raw_counts") or item.get("amplitude")
+            ),
+            default=None,
+        )
         sections.append(
             _format_key_value_section(
                 "Peak Summary",
                 [
                     ("Peak count", len(peaks)),
-                    ("Total net peak counts", float(sum(_safe_float(item.get("area") or item.get("raw_counts") or item.get("amplitude")) for item in peaks))),
+                    (
+                        "Total net peak counts",
+                        float(
+                            sum(
+                                _safe_float(
+                                    item.get("area")
+                                    or item.get("raw_counts")
+                                    or item.get("amplitude")
+                                )
+                                for item in peaks
+                            )
+                        ),
+                    ),
                     (
                         "Strongest peak",
-                        "n/a" if strongest_peak is None else f"{_safe_float(strongest_peak.get('energy_keV')):.1f} keV ({_safe_float(strongest_peak.get('area') or strongest_peak.get('raw_counts') or strongest_peak.get('amplitude')):.6g} counts)",
+                        (
+                            "n/a"
+                            if strongest_peak is None
+                            else f"{_safe_float(strongest_peak.get('energy_keV')):.1f} keV ({_safe_float(strongest_peak.get('area') or strongest_peak.get('raw_counts') or strongest_peak.get('amplitude')):.6g} counts)"
+                        ),
                     ),
                 ],
             )
@@ -1657,7 +1867,16 @@ def _build_standard_report_text(
     sections.append(
         _format_table_section(
             "Isotope Activity Summary",
-            ["Isotope", "Lines", "Activity (Bq)", "σ (Bq)", "Net counts", "Rad. mass (g)", "Specific act. (Bq/g)", "Energies (keV)"],
+            [
+                "Isotope",
+                "Lines",
+                "Activity (Bq)",
+                "σ (Bq)",
+                "Net counts",
+                "Rad. mass (g)",
+                "Specific act. (Bq/g)",
+                "Energies (keV)",
+            ],
             [
                 [
                     row.get("isotope"),
@@ -1675,11 +1894,23 @@ def _build_standard_report_text(
     )
 
     if line_payload is not None:
-        lines = [item for item in (line_payload.get("lines", []) or []) if isinstance(item, dict)]
+        lines = [
+            item
+            for item in (line_payload.get("lines", []) or [])
+            if isinstance(item, dict)
+        ]
         sections.append(
             _format_table_section(
                 "Gamma Line Detail",
-                ["Isotope", "Energy (keV)", "Net counts", "Activity (Bq)", "σ (Bq)", "Sample mass (g)", "Specific act. (Bq/g)"],
+                [
+                    "Isotope",
+                    "Energy (keV)",
+                    "Net counts",
+                    "Activity (Bq)",
+                    "σ (Bq)",
+                    "Sample mass (g)",
+                    "Specific act. (Bq/g)",
+                ],
                 [
                     [
                         line.get("isotope"),
@@ -1688,7 +1919,9 @@ def _build_standard_report_text(
                         _safe_float(line.get("activity_Bq")),
                         _safe_float(line.get("activity_unc_Bq")),
                         _safe_float(line.get("sample_mass_g"), default=float("nan")),
-                        _safe_float(line.get("specific_activity_Bq_g"), default=float("nan")),
+                        _safe_float(
+                            line.get("specific_activity_Bq_g"), default=float("nan")
+                        ),
                     ]
                     for line in lines
                 ],
@@ -1696,7 +1929,11 @@ def _build_standard_report_text(
         )
 
     if rates_payload is not None:
-        rates = [item for item in (rates_payload.get("rates", []) or []) if isinstance(item, dict)]
+        rates = [
+            item
+            for item in (rates_payload.get("rates", []) or [])
+            if isinstance(item, dict)
+        ]
         sections.append(
             _format_table_section(
                 "Reaction Rate Summary",
@@ -1715,17 +1952,38 @@ def _build_standard_report_text(
 
     if unfold_payload is not None:
         diagnostics = unfold_payload.get("diagnostics", {}) or {}
-        energy_edges = unfold_payload.get("boundaries_eV") or unfold_payload.get("energy_edges_eV") or []
+        energy_edges = (
+            unfold_payload.get("boundaries_eV")
+            or unfold_payload.get("energy_edges_eV")
+            or []
+        )
         sections.append(
             _format_key_value_section(
                 "Flux Unfolding Summary",
                 [
                     ("Method", unfold_payload.get("method") or "unknown"),
                     ("Energy groups", max(len(energy_edges) - 1, 0)),
-                    ("Integral flux", float(sum(_safe_float(value) for value in unfold_payload.get("flux", []) or []))),
-                    ("Chi2", unfold_payload.get("chi2", unfold_payload.get("chi_squared"))),
-                    ("Iterations", diagnostics.get("iterations", unfold_payload.get("iterations"))),
-                    ("Converged", diagnostics.get("converged", unfold_payload.get("converged"))),
+                    (
+                        "Integral flux",
+                        float(
+                            sum(
+                                _safe_float(value)
+                                for value in unfold_payload.get("flux", []) or []
+                            )
+                        ),
+                    ),
+                    (
+                        "Chi2",
+                        unfold_payload.get("chi2", unfold_payload.get("chi_squared")),
+                    ),
+                    (
+                        "Iterations",
+                        diagnostics.get("iterations", unfold_payload.get("iterations")),
+                    ),
+                    (
+                        "Converged",
+                        diagnostics.get("converged", unfold_payload.get("converged")),
+                    ),
                 ],
             )
         )
@@ -1744,14 +2002,37 @@ def _build_standard_report_text(
             _format_key_value_section(
                 "RAFM Validation Run Summary",
                 [
-                    ("Overall passed", validation_results_summary.get("overall_passed")),
-                    ("Raw spectra analyzed", validation_results_summary.get("n_raw_analyzed")),
-                    ("Matched raw/QG pairs", validation_results_summary.get("n_matched_pairs")),
-                    ("Unmatched raw", validation_results_summary.get("n_unmatched_raw")),
+                    (
+                        "Overall passed",
+                        validation_results_summary.get("overall_passed"),
+                    ),
+                    (
+                        "Raw spectra analyzed",
+                        validation_results_summary.get("n_raw_analyzed"),
+                    ),
+                    (
+                        "Matched raw/QG pairs",
+                        validation_results_summary.get("n_matched_pairs"),
+                    ),
+                    (
+                        "Unmatched raw",
+                        validation_results_summary.get("n_unmatched_raw"),
+                    ),
                     ("Unmatched QG", validation_results_summary.get("n_unmatched_qg")),
-                    ("QG consistency flags", validation_results_summary.get("qg_internal_consistency_flags")),
-                    ("FluxForge consistency flags", validation_results_summary.get("fluxforge_line_consistency_flags")),
-                    ("Measurement QC flags", validation_results_summary.get("measurement_qc_flags")),
+                    (
+                        "QG consistency flags",
+                        validation_results_summary.get("qg_internal_consistency_flags"),
+                    ),
+                    (
+                        "FluxForge consistency flags",
+                        validation_results_summary.get(
+                            "fluxforge_line_consistency_flags"
+                        ),
+                    ),
+                    (
+                        "Measurement QC flags",
+                        validation_results_summary.get("measurement_qc_flags"),
+                    ),
                 ],
             )
         )
@@ -1760,7 +2041,16 @@ def _build_standard_report_text(
         sections.append(
             _format_table_section(
                 "Validation Sample Summary",
-                ["Sample", "Group", "Measurement time", "Peaks", "Total counts", "Activity (Bq)", "σ (Bq)", "Rad. mass (g)"],
+                [
+                    "Sample",
+                    "Group",
+                    "Measurement time",
+                    "Peaks",
+                    "Total counts",
+                    "Activity (Bq)",
+                    "σ (Bq)",
+                    "Rad. mass (g)",
+                ],
                 [
                     [
                         row.get("sample_id"),
@@ -1781,7 +2071,15 @@ def _build_standard_report_text(
         sections.append(
             _format_table_section(
                 "Validation Sample-Isotope Activity",
-                ["Sample", "Isotope", "Activity (Bq)", "σ (Bq)", "Rad. mass (g)", "Specific act. (Bq/g)", "Peaks"],
+                [
+                    "Sample",
+                    "Isotope",
+                    "Activity (Bq)",
+                    "σ (Bq)",
+                    "Rad. mass (g)",
+                    "Specific act. (Bq/g)",
+                    "Peaks",
+                ],
                 [
                     [
                         row.get("sample_id"),
@@ -1821,27 +2119,61 @@ def cmd_report(args: argparse.Namespace) -> None:
         summary_json = discovered.get("validation_summary_json")
         if summary_json is not None:
             validation_results_summary = _load_json(summary_json)
-            summary["validation_overall_passed"] = bool(validation_results_summary.get("overall_passed", False))
-            summary["validation_n_raw_analyzed"] = int(validation_results_summary.get("n_raw_analyzed", 0) or 0)
-            summary["validation_n_matched_pairs"] = int(validation_results_summary.get("n_matched_pairs", 0) or 0)
-            summary["validation_qg_internal_consistency_flags"] = int(validation_results_summary.get("qg_internal_consistency_flags", 0) or 0)
-            summary["validation_fluxforge_line_consistency_flags"] = int(validation_results_summary.get("fluxforge_line_consistency_flags", 0) or 0)
-            summary["validation_measurement_qc_flags"] = int(validation_results_summary.get("measurement_qc_flags", 0) or 0)
+            summary["validation_overall_passed"] = bool(
+                validation_results_summary.get("overall_passed", False)
+            )
+            summary["validation_n_raw_analyzed"] = int(
+                validation_results_summary.get("n_raw_analyzed", 0) or 0
+            )
+            summary["validation_n_matched_pairs"] = int(
+                validation_results_summary.get("n_matched_pairs", 0) or 0
+            )
+            summary["validation_qg_internal_consistency_flags"] = int(
+                validation_results_summary.get("qg_internal_consistency_flags", 0) or 0
+            )
+            summary["validation_fluxforge_line_consistency_flags"] = int(
+                validation_results_summary.get("fluxforge_line_consistency_flags", 0)
+                or 0
+            )
+            summary["validation_measurement_qc_flags"] = int(
+                validation_results_summary.get("measurement_qc_flags", 0) or 0
+            )
         analysis_dir = discovered.get("analysis_json_dir")
         if analysis_dir is not None:
-            analysis_payloads = [_load_json(path) for path in sorted(analysis_dir.glob("*.json"))]
-            validation_sample_rows, validation_isotope_rows = _aggregate_validation_analysis_rows(analysis_payloads)
+            analysis_payloads = [
+                _load_json(path) for path in sorted(analysis_dir.glob("*.json"))
+            ]
+            validation_sample_rows, validation_isotope_rows = (
+                _aggregate_validation_analysis_rows(analysis_payloads)
+            )
             summary["validation_sample_count"] = len(validation_sample_rows)
             summary["validation_isotope_rows"] = len(validation_isotope_rows)
-            summary["validation_total_activity_Bq"] = float(sum(_safe_float(row.get("activity_Bq")) for row in validation_isotope_rows))
-            summary["validation_total_radioactive_mass_g"] = float(sum(_safe_float(row.get("radioactive_mass_g")) for row in validation_isotope_rows))
-        if unfold_payload is None and discovered.get("preferred_unfold_file") is not None:
+            summary["validation_total_activity_Bq"] = float(
+                sum(
+                    _safe_float(row.get("activity_Bq"))
+                    for row in validation_isotope_rows
+                )
+            )
+            summary["validation_total_radioactive_mass_g"] = float(
+                sum(
+                    _safe_float(row.get("radioactive_mass_g"))
+                    for row in validation_isotope_rows
+                )
+            )
+        if (
+            unfold_payload is None
+            and discovered.get("preferred_unfold_file") is not None
+        ):
             preferred_unfold = discovered["preferred_unfold_file"]
             assert preferred_unfold is not None
             inputs["unfold_file"] = str(preferred_unfold)
             unfold_payload = read_unfold_result(preferred_unfold)
-            summary["chi2"] = unfold_payload.get("chi2", unfold_payload.get("chi_squared"))
-            summary["integral_flux"] = float(sum(float(value) for value in unfold_payload.get("flux", []) or []))
+            summary["chi2"] = unfold_payload.get(
+                "chi2", unfold_payload.get("chi_squared")
+            )
+            summary["integral_flux"] = float(
+                sum(float(value) for value in unfold_payload.get("flux", []) or [])
+            )
 
     if args.spectrum_file:
         inputs["spectrum_file"] = str(args.spectrum_file)
@@ -1863,28 +2195,61 @@ def cmd_report(args: argparse.Namespace) -> None:
         peak_items = peak_report.get("peaks", []) or []
         peaks = [item for item in peak_items if isinstance(item, dict)]
         summary["peak_count"] = len(peak_items)
-        summary["total_net_peak_counts"] = float(sum(_safe_float(item.get("area") or item.get("raw_counts") or item.get("amplitude")) for item in peaks))
+        summary["total_net_peak_counts"] = float(
+            sum(
+                _safe_float(
+                    item.get("area") or item.get("raw_counts") or item.get("amplitude")
+                )
+                for item in peaks
+            )
+        )
     if args.lines_file:
         inputs["lines_file"] = str(args.lines_file)
         line_payload = read_line_activities(args.lines_file)
         if args.validate:
             validate_or_raise(line_payload)
-        lines = [item for item in (line_payload.get("lines", []) or []) if isinstance(item, dict)]
+        lines = [
+            item
+            for item in (line_payload.get("lines", []) or [])
+            if isinstance(item, dict)
+        ]
         summary["line_count"] = len(lines)
         isotope_rows = _aggregate_isotope_activity_rows(lines)
         summary["isotope_count"] = len(isotope_rows)
         if lines:
             activities = [float(item.get("activity_Bq", 0.0) or 0.0) for item in lines]
-            radioactive_mass = [float(item.get("radioactive_mass_g", 0.0) or 0.0) for item in lines]
-            specific_activity = [float(item.get("specific_activity_Bq_g", 0.0) or 0.0) for item in lines]
-            intrinsic_specific_activity = [float(item.get("radioisotope_specific_activity_Bq_g", 0.0) or 0.0) for item in lines]
+            radioactive_mass = [
+                float(item.get("radioactive_mass_g", 0.0) or 0.0) for item in lines
+            ]
+            specific_activity = [
+                float(item.get("specific_activity_Bq_g", 0.0) or 0.0) for item in lines
+            ]
+            intrinsic_specific_activity = [
+                float(item.get("radioisotope_specific_activity_Bq_g", 0.0) or 0.0)
+                for item in lines
+            ]
             summary["total_activity_Bq"] = float(sum(activities))
-            isotope_mass_total = float(sum(_safe_float(item.get("radioactive_mass_g")) for item in isotope_rows)) if isotope_rows else 0.0
-            summary["total_radioactive_mass_g"] = isotope_mass_total if isotope_mass_total > 0.0 else float(sum(radioactive_mass))
+            isotope_mass_total = (
+                float(
+                    sum(
+                        _safe_float(item.get("radioactive_mass_g"))
+                        for item in isotope_rows
+                    )
+                )
+                if isotope_rows
+                else 0.0
+            )
+            summary["total_radioactive_mass_g"] = (
+                isotope_mass_total
+                if isotope_mass_total > 0.0
+                else float(sum(radioactive_mass))
+            )
             if any(value > 0.0 for value in specific_activity):
                 summary["max_specific_activity_Bq_g"] = float(max(specific_activity))
             if any(value > 0.0 for value in intrinsic_specific_activity):
-                summary["max_radioisotope_specific_activity_Bq_g"] = float(max(intrinsic_specific_activity))
+                summary["max_radioisotope_specific_activity_Bq_g"] = float(
+                    max(intrinsic_specific_activity)
+                )
         else:
             summary["total_activity_Bq"] = 0.0
             summary["total_radioactive_mass_g"] = 0.0
@@ -1893,17 +2258,25 @@ def cmd_report(args: argparse.Namespace) -> None:
         rates_payload = read_reaction_rates(args.rates_file)
         if args.validate:
             validate_or_raise(rates_payload)
-        rates = [item for item in (rates_payload.get("rates", []) or []) if isinstance(item, dict)]
+        rates = [
+            item
+            for item in (rates_payload.get("rates", []) or [])
+            if isinstance(item, dict)
+        ]
         summary["rate_count"] = len(rates)
         if rates:
-            summary["total_rate_reactions_s"] = float(sum(float(item.get("rate", 0.0) or 0.0) for item in rates))
+            summary["total_rate_reactions_s"] = float(
+                sum(float(item.get("rate", 0.0) or 0.0) for item in rates)
+            )
     if args.unfold_file:
         inputs["unfold_file"] = str(args.unfold_file)
         unfold_payload = read_unfold_result(args.unfold_file)
         if args.validate:
             validate_or_raise(unfold_payload)
         summary["chi2"] = unfold_payload.get("chi2", unfold_payload.get("chi_squared"))
-        summary["integral_flux"] = float(sum(float(value) for value in unfold_payload.get("flux", []) or []))
+        summary["integral_flux"] = float(
+            sum(float(value) for value in unfold_payload.get("flux", []) or [])
+        )
     if args.validation_file:
         inputs["validation_file"] = str(args.validation_file)
         validation_payload = read_validation_bundle(args.validation_file)
@@ -1919,38 +2292,70 @@ def cmd_report(args: argparse.Namespace) -> None:
     table_items: Dict[str, Dict[str, Any]] = {}
 
     if line_payload is not None:
-        line_rows = [item for item in (line_payload.get("lines", []) or []) if isinstance(item, dict)]
-        line_table = _write_csv_table(tables_dir / "line_activity_detail.csv", line_rows)
-        isotope_table = _write_csv_table(tables_dir / "isotope_activity_summary.csv", isotope_rows)
+        line_rows = [
+            item
+            for item in (line_payload.get("lines", []) or [])
+            if isinstance(item, dict)
+        ]
+        line_table = _write_csv_table(
+            tables_dir / "line_activity_detail.csv", line_rows
+        )
+        isotope_table = _write_csv_table(
+            tables_dir / "isotope_activity_summary.csv", isotope_rows
+        )
         if line_table is not None:
             table_items["line_activity_detail"] = line_table
         if isotope_table is not None:
             table_items["isotope_activity_summary"] = isotope_table
     if validation_sample_rows:
-        sample_table = _write_csv_table(tables_dir / "validation_sample_summary.csv", validation_sample_rows)
+        sample_table = _write_csv_table(
+            tables_dir / "validation_sample_summary.csv", validation_sample_rows
+        )
         if sample_table is not None:
             table_items["validation_sample_summary"] = sample_table
     if validation_isotope_rows:
-        validation_isotope_table = _write_csv_table(tables_dir / "validation_isotope_activity.csv", validation_isotope_rows)
+        validation_isotope_table = _write_csv_table(
+            tables_dir / "validation_isotope_activity.csv", validation_isotope_rows
+        )
         if validation_isotope_table is not None:
             table_items["validation_isotope_activity"] = validation_isotope_table
     if rates_payload is not None:
-        rate_rows = [item for item in (rates_payload.get("rates", []) or []) if isinstance(item, dict)]
-        rate_table = _write_csv_table(tables_dir / "reaction_rates_summary.csv", rate_rows)
+        rate_rows = [
+            item
+            for item in (rates_payload.get("rates", []) or [])
+            if isinstance(item, dict)
+        ]
+        rate_table = _write_csv_table(
+            tables_dir / "reaction_rates_summary.csv", rate_rows
+        )
         if rate_table is not None:
             table_items["reaction_rates_summary"] = rate_table
     if unfold_payload is not None:
         flux_rows = []
-        boundaries = list(unfold_payload.get("boundaries_eV") or unfold_payload.get("energy_edges_eV") or [])
+        boundaries = list(
+            unfold_payload.get("boundaries_eV")
+            or unfold_payload.get("energy_edges_eV")
+            or []
+        )
         flux = list(unfold_payload.get("flux", []) or [])
         covariance = list(unfold_payload.get("covariance", []) or [])
         for idx, value in enumerate(flux):
-            variance = _safe_float(covariance[idx][idx]) if idx < len(covariance) and idx < len(covariance[idx]) else 0.0
+            variance = (
+                _safe_float(covariance[idx][idx])
+                if idx < len(covariance) and idx < len(covariance[idx])
+                else 0.0
+            )
             flux_rows.append(
                 {
                     "group_index": idx + 1,
-                    "lower_eV": _safe_float(boundaries[idx]) if idx < len(boundaries) else None,
-                    "upper_eV": _safe_float(boundaries[idx + 1]) if idx + 1 < len(boundaries) else None,
+                    "lower_eV": (
+                        _safe_float(boundaries[idx]) if idx < len(boundaries) else None
+                    ),
+                    "upper_eV": (
+                        _safe_float(boundaries[idx + 1])
+                        if idx + 1 < len(boundaries)
+                        else None
+                    ),
                     "flux": _safe_float(value),
                     "flux_uncertainty": float(np.sqrt(max(variance, 0.0))),
                 }
@@ -1980,9 +2385,17 @@ def cmd_report(args: argparse.Namespace) -> None:
         "path": text_report_path.name,
         "format": "text/plain",
     }
-    tables = {"directory": tables_dir.name, "items": table_items} if table_items else None
+    tables = (
+        {"directory": tables_dir.name, "items": table_items} if table_items else None
+    )
 
-    write_report_bundle(args.output, summary=summary, inputs=inputs or None, tables=tables, text_report=text_report)
+    write_report_bundle(
+        args.output,
+        summary=summary,
+        inputs=inputs or None,
+        tables=tables,
+        text_report=text_report,
+    )
     print(f"Wrote report bundle to {args.output}")
     print(f"Wrote standardized text report to {text_report_path}")
 
@@ -1991,10 +2404,16 @@ def cmd_k0_normalize(args: argparse.Namespace) -> None:
     peak_payload = read_peak_report(args.peaks_file)
     if args.validate:
         validate_or_raise(peak_payload)
-    spectrum_payload = read_spectrum_file(args.spectrum_file) if args.spectrum_file else None
+    spectrum_payload = (
+        read_spectrum_file(args.spectrum_file) if args.spectrum_file else None
+    )
     if spectrum_payload is not None and args.validate:
         validate_or_raise(spectrum_payload)
-    detector_payload = read_detector_characterization(args.detector_characterization_file) if args.detector_characterization_file else None
+    detector_payload = (
+        read_detector_characterization(args.detector_characterization_file)
+        if args.detector_characterization_file
+        else None
+    )
     if detector_payload is not None and args.validate:
         validate_or_raise(detector_payload)
 
@@ -2018,15 +2437,32 @@ def cmd_k0_normalize(args: argparse.Namespace) -> None:
     summary = {
         "observation_count": len(observations),
         "accepted_count": sum(1 for item in observations if item.eligibility_accepted),
-        "rejected_count": sum(1 for item in observations if not item.eligibility_accepted),
+        "rejected_count": sum(
+            1 for item in observations if not item.eligibility_accepted
+        ),
         "project_id": args.project_id,
         "sample_id": args.sample_id,
         "irradiation_id": args.irradiation_id,
         "measurement_id": args.measurement_id,
     }
-    spectrum_id = str(peak_payload.get("spectrum_id") or (spectrum_payload or {}).get("spectrum", {}).get("spectrum_id") or "")
-    detector_id = str(args.detector_id or (spectrum_payload or {}).get("spectrum", {}).get("detector_id") or "")
-    geometry_id = str(args.geometry_id or (spectrum_payload or {}).get("spectrum", {}).get("metadata", {}).get("geometry_id") or "")
+    spectrum_id = str(
+        peak_payload.get("spectrum_id")
+        or (spectrum_payload or {}).get("spectrum", {}).get("spectrum_id")
+        or ""
+    )
+    detector_id = str(
+        args.detector_id
+        or (spectrum_payload or {}).get("spectrum", {}).get("detector_id")
+        or ""
+    )
+    geometry_id = str(
+        args.geometry_id
+        or (spectrum_payload or {})
+        .get("spectrum", {})
+        .get("metadata", {})
+        .get("geometry_id")
+        or ""
+    )
     write_peak_observation_bundle(
         args.output,
         spectrum_id=spectrum_id,
@@ -2154,7 +2590,12 @@ def cmd_k0_qaqc(args: argparse.Namespace) -> None:
         if args.validate:
             validate_or_raise(analysis_payload)
         records.append({**dict(row), "analysis_payload": analysis_payload})
-    bundle = evaluate_k0_qaqc(records, default_blank_limit_ug_g=float(plan.get("default_blank_limit_ug_g", 0.0) or 0.0))
+    bundle = evaluate_k0_qaqc(
+        records,
+        default_blank_limit_ug_g=float(
+            plan.get("default_blank_limit_ug_g", 0.0) or 0.0
+        ),
+    )
     write_k0_qaqc_bundle(
         args.output,
         summary=bundle["summary"],
@@ -2167,7 +2608,11 @@ def cmd_k0_qaqc(args: argparse.Namespace) -> None:
 
 def cmd_k0_report(args: argparse.Namespace) -> None:
     analysis_payload = read_k0_analysis_bundle(args.analysis_file)
-    aggregation_payload = read_k0_aggregation_bundle(args.aggregation_file) if args.aggregation_file else None
+    aggregation_payload = (
+        read_k0_aggregation_bundle(args.aggregation_file)
+        if args.aggregation_file
+        else None
+    )
     qaqc_payload = read_k0_qaqc_bundle(args.qaqc_file) if args.qaqc_file else None
     if args.validate:
         validate_or_raise(analysis_payload)
@@ -2196,7 +2641,9 @@ def cmd_k0_report(args: argparse.Namespace) -> None:
         summary=report_payload["summary"],
         inputs={
             "analysis_file": str(args.analysis_file),
-            "aggregation_file": None if args.aggregation_file is None else str(args.aggregation_file),
+            "aggregation_file": (
+                None if args.aggregation_file is None else str(args.aggregation_file)
+            ),
             "qaqc_file": None if args.qaqc_file is None else str(args.qaqc_file),
         },
         tables={"directory": tables_dir.name, "items": table_items},
@@ -2208,7 +2655,9 @@ def cmd_k0_report(args: argparse.Namespace) -> None:
 
 
 def cmd_k0_import_kayzero(args: argparse.Namespace) -> None:
-    result = import_kayzero_k0_library(args.input, preferred_version=args.preferred_version)
+    result = import_kayzero_k0_library(
+        args.input, preferred_version=args.preferred_version
+    )
     _ensure_parent_dir(args.output)
     write_governed_library_json(args.output, result.library)
     report_output = args.report_output
@@ -2223,10 +2672,10 @@ def cmd_k0_import_kayzero(args: argparse.Namespace) -> None:
 def cmd_reactions(args: argparse.Namespace) -> None:
     """Browse IRDFF-II dosimetry reactions."""
     from fluxforge.data.irdff import IRDFF_REACTIONS
-    
+
     # Get category filter
     category = args.category
-    
+
     # Get all reactions (optionally filtered)
     if category and category != "all":
         if category not in IRDFF_REACTIONS:
@@ -2236,38 +2685,41 @@ def cmd_reactions(args: argparse.Namespace) -> None:
         reactions = {category: IRDFF_REACTIONS[category]}
     else:
         reactions = IRDFF_REACTIONS
-    
+
     # Format output
     if args.format == "json":
         import json
+
         print(json.dumps(reactions, indent=2))
         return
-    
+
     # Default table format
     print(f"\n{'='*80}")
     print("  IRDFF-II DOSIMETRY REACTIONS")
     print(f"{'='*80}\n")
-    
+
     total = 0
     for cat, rxns in reactions.items():
         print(f"\n{cat.upper()} REACTIONS")
         print("-" * 60)
         print(f"{'Reaction':<30} {'Target':<10} {'Product':<10} {'Thresh (MeV)':<12}")
         print("-" * 60)
-        
+
         for rxn_name, rxn_info in sorted(rxns.items()):
             threshold = rxn_info.get("threshold", 0.0)
-            print(f"{rxn_name:<30} {rxn_info['target']:<10} {rxn_info['product']:<10} {threshold:>12.2f}")
+            print(
+                f"{rxn_name:<30} {rxn_info['target']:<10} {rxn_info['product']:<10} {threshold:>12.2f}"
+            )
             total += 1
-    
+
     print(f"\nTotal: {total} reactions")
-    
+
     # Show additional info if requested
     if args.target:
         print(f"\n\nFiltering for target: {args.target}")
         for cat, rxns in IRDFF_REACTIONS.items():
             for rxn_name, rxn_info in rxns.items():
-                if args.target.lower() in rxn_info['target'].lower():
+                if args.target.lower() in rxn_info["target"].lower():
                     print(f"  {rxn_name} ({cat})")
 
 
@@ -2355,10 +2807,14 @@ def cmd_plots(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="UWNR Flux-Wire–Driven Neutron Spectrum Reconstruction Tool")
+    parser = argparse.ArgumentParser(
+        description="UWNR Flux-Wire–Driven Neutron Spectrum Reconstruction Tool"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    ingest = subparsers.add_parser("ingest", help="Ingest spectrum files into schema artifacts")
+    ingest = subparsers.add_parser(
+        "ingest", help="Ingest spectrum files into schema artifacts"
+    )
     ingest.add_argument("--input", type=Path, required=True)
     ingest.add_argument("--output", type=Path, default=Path("spectrum.json"))
     ingest.add_argument(
@@ -2536,7 +2992,9 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional peak-report artifact generated from the manual ROI definitions",
     )
-    spectrum_plot.add_argument("--title", type=str, default=None, help="Optional plot title override")
+    spectrum_plot.add_argument(
+        "--title", type=str, default=None, help="Optional plot title override"
+    )
     spectrum_plot.add_argument("--x-min-keV", type=float, default=None)
     spectrum_plot.add_argument("--x-max-keV", type=float, default=None)
     spectrum_plot.add_argument("--y-log", action="store_true", help="Use a log y-axis")
@@ -2546,7 +3004,11 @@ def build_parser() -> argparse.ArgumentParser:
     peaks = subparsers.add_parser("peaks", help="Detect peaks from a spectrum artifact")
     peaks.add_argument("--spectrum-file", type=Path, required=True)
     peaks.add_argument("--output", type=Path, default=Path("peaks.json"))
-    peaks.add_argument("--sensitivity", choices=["default", "sensitive", "conservative"], default="default")
+    peaks.add_argument(
+        "--sensitivity",
+        choices=["default", "sensitive", "conservative"],
+        default="default",
+    )
     peaks.add_argument("--fit-window", type=int, default=6)
     peaks.add_argument(
         "--manual-peaks-file",
@@ -2599,7 +3061,9 @@ def build_parser() -> argparse.ArgumentParser:
     _add_validate_option(peaks)
     peaks.set_defaults(func=cmd_peaks)
 
-    activity = subparsers.add_parser("activity", help="Compute line activities from peak report")
+    activity = subparsers.add_parser(
+        "activity", help="Compute line activities from peak report"
+    )
     activity.add_argument("--peaks-file", type=Path, required=True)
     activity.add_argument("--output", type=Path, default=Path("activities.json"))
     activity.add_argument("--live-time-s", type=float)
@@ -2612,7 +3076,9 @@ def build_parser() -> argparse.ArgumentParser:
     _add_validate_option(activity)
     activity.set_defaults(func=cmd_activity)
 
-    rates = subparsers.add_parser("rates", help="Compute reaction rates from line activities")
+    rates = subparsers.add_parser(
+        "rates", help="Compute reaction rates from line activities"
+    )
     rates.add_argument("--lines-file", type=Path, required=True)
     rates.add_argument("--segments-file", type=Path)
     rates.add_argument("--duration-s", type=float, default=1.0)
@@ -2621,25 +3087,33 @@ def build_parser() -> argparse.ArgumentParser:
     _add_validate_option(rates)
     rates.set_defaults(func=cmd_rates)
 
-    astm_e2005 = subparsers.add_parser("astm-e2005", help="Run the ASTM E2005 reactor dosimetry workflow")
+    astm_e2005 = subparsers.add_parser(
+        "astm-e2005", help="Run the ASTM E2005 reactor dosimetry workflow"
+    )
     astm_e2005.add_argument("--plan-file", type=Path, required=True)
     astm_e2005.add_argument("--output", type=Path, default=Path("astm_e2005.json"))
     _add_validate_option(astm_e2005)
     astm_e2005.set_defaults(func=cmd_astm_e2005)
 
-    astm_e261 = subparsers.add_parser("astm-e261", help="Run the ASTM E261 reactor dosimetry workflow")
+    astm_e261 = subparsers.add_parser(
+        "astm-e261", help="Run the ASTM E261 reactor dosimetry workflow"
+    )
     astm_e261.add_argument("--plan-file", type=Path, required=True)
     astm_e261.add_argument("--output", type=Path, default=Path("astm_e261.json"))
     _add_validate_option(astm_e261)
     astm_e261.set_defaults(func=cmd_astm_e261)
 
-    astm_e262 = subparsers.add_parser("astm-e262", help="Run the ASTM E262 thermal neutron fluence workflow")
+    astm_e262 = subparsers.add_parser(
+        "astm-e262", help="Run the ASTM E262 thermal neutron fluence workflow"
+    )
     astm_e262.add_argument("--plan-file", type=Path, required=True)
     astm_e262.add_argument("--output", type=Path, default=Path("astm_e262.json"))
     _add_validate_option(astm_e262)
     astm_e262.set_defaults(func=cmd_astm_e262)
 
-    astm_e3376 = subparsers.add_parser("astm-e3376", help="Run the ASTM E3376 high-purity germanium detection workflow")
+    astm_e3376 = subparsers.add_parser(
+        "astm-e3376", help="Run the ASTM E3376 high-purity germanium detection workflow"
+    )
     astm_e3376.add_argument("--plan-file", type=Path, required=True)
     astm_e3376.add_argument("--output", type=Path, default=Path("astm_e3376.json"))
     _add_validate_option(astm_e3376)
@@ -2689,7 +3163,9 @@ def build_parser() -> argparse.ArgumentParser:
     rafm_compare.add_argument("--output-root", type=Path, default=None)
     rafm_compare.set_defaults(func=cmd_rafm_compare_branches)
 
-    response = subparsers.add_parser("response", help="Build response matrix from cross sections")
+    response = subparsers.add_parser(
+        "response", help="Build response matrix from cross sections"
+    )
     response.add_argument("--cross-section-file", type=Path, required=True)
     response.add_argument("--number-densities-file", type=Path, required=True)
     response.add_argument("--boundaries-file", type=Path, required=True)
@@ -2697,7 +3173,9 @@ def build_parser() -> argparse.ArgumentParser:
     _add_validate_option(response)
     response.set_defaults(func=cmd_response)
 
-    unfold = subparsers.add_parser("unfold", help="Infer spectrum using GLS, GRAVEL, or MLEM")
+    unfold = subparsers.add_parser(
+        "unfold", help="Infer spectrum using GLS, GRAVEL, or MLEM"
+    )
     unfold.add_argument("--rates-file", type=Path, required=True)
     unfold.add_argument("--response-file", type=Path, required=True)
     unfold.add_argument("--prior-flux-file", type=Path)
@@ -2777,14 +3255,18 @@ def build_parser() -> argparse.ArgumentParser:
     _add_validate_option(unfold)
     unfold.set_defaults(func=cmd_unfold)
 
-    compare = subparsers.add_parser("compare", help="Compare unfolded spectrum with reference")
+    compare = subparsers.add_parser(
+        "compare", help="Compare unfolded spectrum with reference"
+    )
     compare.add_argument("--unfold-file", type=Path, required=True)
     compare.add_argument("--truth-flux-file", type=Path, required=True)
     compare.add_argument("--output", type=Path, default=Path("validation.json"))
     _add_validate_option(compare)
     compare.set_defaults(func=cmd_compare)
 
-    report = subparsers.add_parser("report", help="Compile a report bundle from artifacts")
+    report = subparsers.add_parser(
+        "report", help="Compile a report bundle from artifacts"
+    )
     report.add_argument("--spectrum-file", type=Path)
     report.add_argument("--peaks-file", type=Path)
     report.add_argument("--lines-file", type=Path)
@@ -2815,7 +3297,9 @@ def build_parser() -> argparse.ArgumentParser:
     k0_normalize.add_argument("--measurement-id", type=str, default=None)
     k0_normalize.add_argument("--allow-advanced-lines", action="store_true")
     k0_normalize.add_argument("--expert-override", action="store_true")
-    k0_normalize.add_argument("--output", type=Path, default=Path("k0_observations.json"))
+    k0_normalize.add_argument(
+        "--output", type=Path, default=Path("k0_observations.json")
+    )
     _add_validate_option(k0_normalize)
     k0_normalize.set_defaults(func=cmd_k0_normalize)
 
@@ -2829,7 +3313,9 @@ def build_parser() -> argparse.ArgumentParser:
     k0_detector.add_argument("--degree", type=int, default=2)
     k0_detector.add_argument("--peak-to-total-ratio", type=float, default=None)
     k0_detector.add_argument("--coincidence-mode", type=str, default="not_applied")
-    k0_detector.add_argument("--output", type=Path, default=Path("detector_characterization.json"))
+    k0_detector.add_argument(
+        "--output", type=Path, default=Path("detector_characterization.json")
+    )
     _add_validate_option(k0_detector)
     k0_detector.set_defaults(func=cmd_k0_detector)
 
@@ -2838,7 +3324,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Characterize a thermal irradiation facility using a bare triple-monitor workflow",
     )
     k0_facility.add_argument("--input", type=Path, required=True)
-    k0_facility.add_argument("--output", type=Path, default=Path("facility_characterization.json"))
+    k0_facility.add_argument(
+        "--output", type=Path, default=Path("facility_characterization.json")
+    )
     _add_validate_option(k0_facility)
     k0_facility.set_defaults(func=cmd_k0_facility)
 
@@ -2862,7 +3350,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Aggregate k0 analysis bundles across measurements and irradiations",
     )
     k0_aggregate.add_argument("--analysis-files", type=Path, nargs="+", required=True)
-    k0_aggregate.add_argument("--output", type=Path, default=Path("k0_aggregation.json"))
+    k0_aggregate.add_argument(
+        "--output", type=Path, default=Path("k0_aggregation.json")
+    )
     _add_validate_option(k0_aggregate)
     k0_aggregate.set_defaults(func=cmd_k0_aggregate)
 
@@ -2892,12 +3382,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     k0_import_kayzero.add_argument("--input", type=Path, required=True)
     k0_import_kayzero.add_argument("--preferred-version", type=str, default=None)
-    k0_import_kayzero.add_argument("--output", type=Path, default=Path("kayzero_k0_library.json"))
+    k0_import_kayzero.add_argument(
+        "--output", type=Path, default=Path("kayzero_k0_library.json")
+    )
     k0_import_kayzero.add_argument("--report-output", type=Path, default=None)
     k0_import_kayzero.set_defaults(func=cmd_k0_import_kayzero)
 
     # Reaction browser command
-    reactions = subparsers.add_parser("reactions", help="Browse IRDFF-II dosimetry reactions")
+    reactions = subparsers.add_parser(
+        "reactions", help="Browse IRDFF-II dosimetry reactions"
+    )
     reactions.add_argument(
         "--category",
         type=str,

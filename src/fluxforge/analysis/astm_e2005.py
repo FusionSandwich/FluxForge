@@ -38,7 +38,9 @@ def calculate_fluence_rate_transfer(
     $$\phi_A = \phi_B \left(\frac{R_A}{R_B}\right)\left(\frac{\bar{\sigma}_B}{\bar{\sigma}_A}\right)$$
     """
     if rate_b == 0.0 or sigma_a == 0.0:
-        raise ValueError("Benchmark reaction rate and Field A cross section must be non-zero.")
+        raise ValueError(
+            "Benchmark reaction rate and Field A cross section must be non-zero."
+        )
 
     phi_a = phi_b * (rate_a / rate_b) * (sigma_b / sigma_a)
 
@@ -55,10 +57,7 @@ def calculate_fluence_rate_transfer(
 
 
 def calculate_spectral_index(
-    rate_a: float, 
-    rate_b: float, 
-    rate_a_unc: float = 0.0, 
-    rate_b_unc: float = 0.0
+    rate_a: float, rate_b: float, rate_a_unc: float = 0.0, rate_b_unc: float = 0.0
 ) -> tuple[float, float]:
     r"""Calculate spectral index (ratio of reaction rates)."""
     if rate_b == 0.0:
@@ -74,10 +73,7 @@ def calculate_spectral_index(
 
 
 def evaluate_spectral_index_double_ratio(
-    si_cal: float, 
-    si_meas: float, 
-    si_cal_unc: float = 0.0, 
-    si_meas_unc: float = 0.0
+    si_cal: float, si_meas: float, si_cal_unc: float = 0.0, si_meas_unc: float = 0.0
 ) -> tuple[float, float]:
     r"""Calculate the double ratio (C/E) for a spectral index."""
     if si_meas == 0.0:
@@ -124,18 +120,25 @@ def analyze_astm_e2005_plan(plan: dict[str, Any]) -> dict[str, Any]:
         sb_unc = float(field_b.get("cross_section_unc_barn", 0.0))
 
         phi_a, phi_a_unc = calculate_fluence_rate_transfer(
-            phi_b=phi_b, phi_b_unc=phi_b_unc,
-            rate_a=ra, rate_a_unc=ra_unc,
-            rate_b=rb, rate_b_unc=rb_unc,
-            sigma_a=sa, sigma_a_unc=sa_unc,
-            sigma_b=sb, sigma_b_unc=sb_unc,
+            phi_b=phi_b,
+            phi_b_unc=phi_b_unc,
+            rate_a=ra,
+            rate_a_unc=ra_unc,
+            rate_b=rb,
+            rate_b_unc=rb_unc,
+            sigma_a=sa,
+            sigma_a_unc=sa_unc,
+            sigma_b=sb,
+            sigma_b_unc=sb_unc,
         )
 
-        results["fluence_transfers"].append({
-            "transfer_id": str(ft.get("transfer_id", f"transfer_{i+1}")),
-            "fluence_rate_cm2_s": phi_a,
-            "fluence_rate_unc_cm2_s": phi_a_unc,
-        })
+        results["fluence_transfers"].append(
+            {
+                "transfer_id": str(ft.get("transfer_id", f"transfer_{i+1}")),
+                "fluence_rate_cm2_s": phi_a,
+                "fluence_rate_unc_cm2_s": phi_a_unc,
+            }
+        )
 
     # Process Spectral Indices
     for i, si in enumerate(plan.get("spectral_indices", [])):
@@ -159,7 +162,9 @@ def analyze_astm_e2005_plan(plan: dict[str, Any]) -> dict[str, Any]:
             si_meas_unc = float(meas.get("index_unc", 0.0))
         else:
             if "reaction_rate_b_s" not in meas:
-                raise ValueError("Spectral index requires 'index' or 'reaction_rate_b_s'.")
+                raise ValueError(
+                    "Spectral index requires 'index' or 'reaction_rate_b_s'."
+                )
             si_meas, si_meas_unc = calculate_spectral_index(
                 ra_meas, rb_meas, ra_meas_unc, rb_meas_unc
             )
@@ -169,7 +174,9 @@ def analyze_astm_e2005_plan(plan: dict[str, Any]) -> dict[str, Any]:
             si_cal_unc = float(cal.get("index_unc", 0.0))
         else:
             if "reaction_rate_b_s" not in cal:
-                raise ValueError("Spectral index requires 'index' or 'reaction_rate_b_s'.")
+                raise ValueError(
+                    "Spectral index requires 'index' or 'reaction_rate_b_s'."
+                )
             si_cal, si_cal_unc = calculate_spectral_index(
                 ra_cal, rb_cal, ra_cal_unc, rb_cal_unc
             )
@@ -178,14 +185,16 @@ def analyze_astm_e2005_plan(plan: dict[str, Any]) -> dict[str, Any]:
             si_cal, si_meas, si_cal_unc, si_meas_unc
         )
 
-        results["spectral_indices"].append({
-            "index_id": str(si.get("index_id", f"index_{i+1}")),
-            "measured_index": si_meas,
-            "measured_index_unc": si_meas_unc,
-            "calculated_index": si_cal,
-            "calculated_index_unc": si_cal_unc,
-            "c_e_ratio": c_e_ratio,
-            "c_e_ratio_unc": c_e_unc,
-        })
+        results["spectral_indices"].append(
+            {
+                "index_id": str(si.get("index_id", f"index_{i+1}")),
+                "measured_index": si_meas,
+                "measured_index_unc": si_meas_unc,
+                "calculated_index": si_cal,
+                "calculated_index_unc": si_cal_unc,
+                "c_e_ratio": c_e_ratio,
+                "c_e_ratio_unc": c_e_unc,
+            }
+        )
 
     return results

@@ -13,7 +13,11 @@ from typing import Dict, Iterable, List, Sequence, Tuple
 
 import numpy as np
 
-from fluxforge.core.response import EnergyGroupStructure, ReactionCrossSection, build_response_matrix
+from fluxforge.core.response import (
+    EnergyGroupStructure,
+    ReactionCrossSection,
+    build_response_matrix,
+)
 from fluxforge.core.schemas import validate_or_raise
 from fluxforge.io.artifacts import (
     read_reaction_rates,
@@ -87,7 +91,9 @@ def _parse_prior_flux(prior_flux_file: Path) -> np.ndarray:
 
 
 def _build_unfolding_result(inputs: MasterPlotInputs) -> UnfoldingResult:
-    predicted_rates = np.asarray(inputs.response_matrix @ inputs.posterior_flux, dtype=float)
+    predicted_rates = np.asarray(
+        inputs.response_matrix @ inputs.posterior_flux, dtype=float
+    )
     predicted_rates = np.maximum(predicted_rates, 1e-30)
     flux_unc = np.sqrt(np.clip(np.diag(inputs.covariance), a_min=0.0, a_max=None))
 
@@ -109,7 +115,9 @@ def _build_unfolding_result(inputs: MasterPlotInputs) -> UnfoldingResult:
     return result
 
 
-def _save_figure(fig, stem: str, output_dir: Path, formats: Sequence[str]) -> List[Path]:
+def _save_figure(
+    fig, stem: str, output_dir: Path, formats: Sequence[str]
+) -> List[Path]:
     from matplotlib import pyplot as plt
 
     saved: List[Path] = []
@@ -151,7 +159,9 @@ def generate_master_plan_plots(
         title="G1.1 Spectrum with Uncertainty Bands",
         save_path=None,
     )
-    produced["g1_spectrum_uncertainty"] = _save_figure(fig, "g1_spectrum_uncertainty", output_dir, formats)
+    produced["g1_spectrum_uncertainty"] = _save_figure(
+        fig, "g1_spectrum_uncertainty", output_dir, formats
+    )
 
     fig, _ = plot_spectrum_comparison(
         result,
@@ -173,7 +183,9 @@ def generate_master_plan_plots(
         title="G1.3 Residual/Pull Diagnostics",
         save_path=None,
     )
-    produced["g1_residuals_pulls"] = _save_figure(fig, "g1_residuals_pulls", output_dir, formats)
+    produced["g1_residuals_pulls"] = _save_figure(
+        fig, "g1_residuals_pulls", output_dir, formats
+    )
 
     fig, _ = plot_covariance_correlation_heatmaps(
         np.asarray(inputs.covariance, dtype=float),
@@ -203,7 +215,9 @@ def generate_master_plan_plots(
             title="Response Matrix",
             save_path=None,
         )
-        produced["response_matrix"] = _save_figure(fig, "response_matrix", output_dir, formats)
+        produced["response_matrix"] = _save_figure(
+            fig, "response_matrix", output_dir, formats
+        )
 
     return produced
 
@@ -246,7 +260,9 @@ def load_plot_inputs_from_artifacts(
         )
 
     measured_rates = _as_vector([float(r["rate"]) for r in rates], "measured_rates")
-    measured_unc = _as_vector([float(r.get("uncertainty", 0.0)) for r in rates], "measured_uncertainties")
+    measured_unc = _as_vector(
+        [float(r.get("uncertainty", 0.0)) for r in rates], "measured_uncertainties"
+    )
 
     if boundaries.size != posterior_flux.size + 1:
         raise ValueError("Boundaries must have one more element than posterior flux")
@@ -255,7 +271,9 @@ def load_plot_inputs_from_artifacts(
     if prior_flux.size != posterior_flux.size:
         raise ValueError("Prior flux length must match posterior flux length")
     if response_matrix.shape[1] != posterior_flux.size:
-        raise ValueError("Response matrix group dimension must match posterior flux length")
+        raise ValueError(
+            "Response matrix group dimension must match posterior flux length"
+        )
 
     return MasterPlotInputs(
         boundaries_eV=boundaries,
@@ -300,7 +318,9 @@ def load_example_plot_inputs() -> MasterPlotInputs:
         measured_rates.append(float(rate.rate))
         measured_uncertainties.append(float(rate.uncertainty))
 
-    measurement_cov = np.diag(np.asarray(measured_uncertainties, dtype=float) ** 2).tolist()
+    measurement_cov = np.diag(
+        np.asarray(measured_uncertainties, dtype=float) ** 2
+    ).tolist()
     prior_cov = np.diag((0.25 * prior_flux) ** 2).tolist()
 
     gls = gls_adjust(
@@ -323,4 +343,3 @@ def load_example_plot_inputs() -> MasterPlotInputs:
         chi2=float(gls.chi2),
         method="gls",
     )
-

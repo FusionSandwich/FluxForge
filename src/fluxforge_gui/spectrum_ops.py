@@ -71,7 +71,11 @@ def _series_to_spectrum(series: GuiSpectrumSeries) -> GammaSpectrum:
         counts=np.asarray(series.counts, dtype=float),
         channels=np.asarray(series.channels, dtype=float),
         energies=np.asarray(series.energies_keV, dtype=float),
-        calibration={"energy": list(series.calibration_coeffs)} if series.calibration_coeffs else {},
+        calibration=(
+            {"energy": list(series.calibration_coeffs)}
+            if series.calibration_coeffs
+            else {}
+        ),
         spectrum_id=series.label,
     )
 
@@ -86,7 +90,9 @@ def combine_gui_spectrum_series(
     """Combine two buffers using arithmetic suitable for multi-spectrum workflows."""
 
     if len(primary.counts) != len(secondary.counts):
-        raise ValueError("Buffer arithmetic requires spectra with the same number of channels.")
+        raise ValueError(
+            "Buffer arithmetic requires spectra with the same number of channels."
+        )
     if not np.allclose(primary.channels, secondary.channels):
         raise ValueError("Buffer arithmetic requires matching channel grids.")
 
@@ -114,27 +120,40 @@ def combine_gui_spectrum_series(
     )
 
 
-def fit_gui_energy_calibration(points: Iterable[GuiCalibrationPoint], order: int = 1) -> GuiCalibrationFit:
+def fit_gui_energy_calibration(
+    points: Iterable[GuiCalibrationPoint], order: int = 1
+) -> GuiCalibrationFit:
     """Fit an energy calibration polynomial from GUI-selected points."""
 
     calibration_points = list(points)
     if len(calibration_points) < max(2, order + 1):
-        raise ValueError("Not enough calibration points for the requested polynomial order.")
+        raise ValueError(
+            "Not enough calibration points for the requested polynomial order."
+        )
     channels = np.asarray([point.channel for point in calibration_points], dtype=float)
-    reference_energies = np.asarray([point.reference_energy_keV for point in calibration_points], dtype=float)
+    reference_energies = np.asarray(
+        [point.reference_energy_keV for point in calibration_points], dtype=float
+    )
     coefficients_desc = np.polyfit(channels, reference_energies, deg=order)
     coefficients = tuple(float(value) for value in coefficients_desc[::-1])
     fitted = np.zeros_like(channels, dtype=float)
     for power, coeff in enumerate(coefficients):
-        fitted += coeff * (channels ** power)
+        fitted += coeff * (channels**power)
     residuals = reference_energies - fitted
     ss_res = float(np.sum(residuals**2))
     ss_tot = float(np.sum((reference_energies - np.mean(reference_energies)) ** 2))
     r_squared = 1.0 - ss_res / ss_tot if ss_tot > 0.0 else 1.0
-    return GuiCalibrationFit(coefficients=coefficients, fitted_keV=fitted, residuals_keV=residuals, r_squared=r_squared)
+    return GuiCalibrationFit(
+        coefficients=coefficients,
+        fitted_keV=fitted,
+        residuals_keV=residuals,
+        r_squared=r_squared,
+    )
 
 
-def build_calibration_residual_plot(points: Iterable[GuiCalibrationPoint], fit: GuiCalibrationFit) -> GuiDiagnosticPlot:
+def build_calibration_residual_plot(
+    points: Iterable[GuiCalibrationPoint], fit: GuiCalibrationFit
+) -> GuiDiagnosticPlot:
     """Build a diagnostic residual plot for energy calibration review."""
 
     point_list = list(points)
@@ -143,21 +162,55 @@ def build_calibration_residual_plot(points: Iterable[GuiCalibrationPoint], fit: 
         title="Calibration residuals",
         x_label="Channel",
         y_label="Residual (keV)",
-        series=(GuiDiagnosticSeries(label="Residuals", x=channels, y=np.asarray(fit.residuals_keV, dtype=float), style="scatter", color="#8e44ad"),),
+        series=(
+            GuiDiagnosticSeries(
+                label="Residuals",
+                x=channels,
+                y=np.asarray(fit.residuals_keV, dtype=float),
+                style="scatter",
+                color="#8e44ad",
+            ),
+        ),
         reference_y=0.0,
     )
 
 
-def build_peak_count_diagnostic_plot(result: GuiPeakCountingResult) -> GuiDiagnosticPlot | None:
+def build_peak_count_diagnostic_plot(
+    result: GuiPeakCountingResult,
+) -> GuiDiagnosticPlot | None:
     """Return a fit/ROI diagnostic plot for a counted peak."""
 
     if result.diagnostic_channels is None or result.diagnostic_counts is None:
         return None
-    series = [GuiDiagnosticSeries(label="Counts", x=np.asarray(result.diagnostic_channels, dtype=float), y=np.asarray(result.diagnostic_counts, dtype=float), style="line", color="#1f77b4")]
+    series = [
+        GuiDiagnosticSeries(
+            label="Counts",
+            x=np.asarray(result.diagnostic_channels, dtype=float),
+            y=np.asarray(result.diagnostic_counts, dtype=float),
+            style="line",
+            color="#1f77b4",
+        )
+    ]
     if result.diagnostic_model is not None:
-        series.append(GuiDiagnosticSeries(label="Model", x=np.asarray(result.diagnostic_channels, dtype=float), y=np.asarray(result.diagnostic_model, dtype=float), style="line", color="#d62728"))
+        series.append(
+            GuiDiagnosticSeries(
+                label="Model",
+                x=np.asarray(result.diagnostic_channels, dtype=float),
+                y=np.asarray(result.diagnostic_model, dtype=float),
+                style="line",
+                color="#d62728",
+            )
+        )
     if result.diagnostic_residuals is not None:
-        series.append(GuiDiagnosticSeries(label="Residuals", x=np.asarray(result.diagnostic_channels, dtype=float), y=np.asarray(result.diagnostic_residuals, dtype=float), style="scatter", color="#2ca02c"))
+        series.append(
+            GuiDiagnosticSeries(
+                label="Residuals",
+                x=np.asarray(result.diagnostic_channels, dtype=float),
+                y=np.asarray(result.diagnostic_residuals, dtype=float),
+                style="scatter",
+                color="#2ca02c",
+            )
+        )
     return GuiDiagnosticPlot(
         title=f"Peak diagnostic ({result.method})",
         x_label="Channel",
@@ -174,7 +227,9 @@ def build_efficiency_fit_diagnostic_plot(
     """Build an efficiency-fit diagnostic plot with measured points and fitted curve."""
 
     point_list = list(points)
-    energies = np.asarray([point.reference_energy_keV for point in point_list], dtype=float)
+    energies = np.asarray(
+        [point.reference_energy_keV for point in point_list], dtype=float
+    )
     efficiencies = np.asarray([point.efficiency for point in point_list], dtype=float)
     grid = np.linspace(float(np.min(energies)), float(np.max(energies)), 200)
     fitted = np.asarray(curve.efficiency(grid), dtype=float)
@@ -183,8 +238,16 @@ def build_efficiency_fit_diagnostic_plot(
         x_label="Energy (keV)",
         y_label="Efficiency",
         series=(
-            GuiDiagnosticSeries(label="Measured", x=energies, y=efficiencies, style="scatter", color="#ff7f0e"),
-            GuiDiagnosticSeries(label="Fit", x=grid, y=fitted, style="line", color="#1f77b4"),
+            GuiDiagnosticSeries(
+                label="Measured",
+                x=energies,
+                y=efficiencies,
+                style="scatter",
+                color="#ff7f0e",
+            ),
+            GuiDiagnosticSeries(
+                label="Fit", x=grid, y=fitted, style="line", color="#1f77b4"
+            ),
         ),
         x_log=True,
         y_log=True,
@@ -210,7 +273,9 @@ def parse_gui_constraint_matrix(raw: str, n_peaks: int) -> np.ndarray:
     if matrix.ndim != 2:
         raise ValueError("Constraint matrix must be two-dimensional.")
     if matrix.shape[0] != n_peaks:
-        raise ValueError(f"Constraint matrix must have {n_peaks} row(s), one per fitted peak.")
+        raise ValueError(
+            f"Constraint matrix must have {n_peaks} row(s), one per fitted peak."
+        )
     if matrix.shape[1] < 1:
         raise ValueError("Constraint matrix must have at least one column.")
     rank = int(np.linalg.matrix_rank(matrix))
@@ -233,7 +298,9 @@ def fit_gui_constrained_multiplet(
 
     peak_channels = sorted(int(channel) for channel in peak_channels)
     if not peak_channels:
-        raise ValueError("At least one peak is required for constrained multiplet fitting.")
+        raise ValueError(
+            "At least one peak is required for constrained multiplet fitting."
+        )
     if amplitude_constraint_matrix.shape[0] != len(peak_channels):
         raise ValueError("Constraint matrix row count must match the number of peaks.")
 
@@ -249,16 +316,20 @@ def fit_gui_constrained_multiplet(
     sigma0 = np.full(len(peak_channels), max(1.0, fit_width / 4.0), dtype=float)
     if share_sigma:
         sigma0 = np.array([float(np.mean(sigma0))], dtype=float)
-    local_bg = np.array([
-        float(np.mean(y[: min(3, len(y))])),
-        0.0,
-    ])
+    local_bg = np.array(
+        [
+            float(np.mean(y[: min(3, len(y))])),
+            0.0,
+        ]
+    )
     observed_amplitudes = []
     for peak_ch in peak_channels:
         idx = int(np.argmin(np.abs(x - peak_ch)))
         observed_amplitudes.append(max(float(y[idx] - np.median(y)), 1.0))
     observed_amplitudes_arr = np.asarray(observed_amplitudes, dtype=float)
-    free_amp0, *_ = np.linalg.lstsq(amplitude_constraint_matrix, observed_amplitudes_arr, rcond=None)
+    free_amp0, *_ = np.linalg.lstsq(
+        amplitude_constraint_matrix, observed_amplitudes_arr, rcond=None
+    )
     free_amp0 = np.clip(free_amp0, 1e-3, None)
 
     params0: list[float] = list(free_amp0)
@@ -281,22 +352,28 @@ def fit_gui_constrained_multiplet(
     lower.extend([-np.inf, -np.inf])
     upper.extend([np.inf, np.inf])
 
-    def unpack(vector: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, float, float]:
+    def unpack(
+        vector: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, float, float]:
         offset = 0
-        free = np.asarray(vector[offset: offset + len(free_amp0)], dtype=float)
+        free = np.asarray(vector[offset : offset + len(free_amp0)], dtype=float)
         offset += len(free_amp0)
         amplitudes = np.maximum(amplitude_constraint_matrix @ free, 0.0)
         if fix_centroids:
             centroids = centroids0.copy()
         else:
-            centroids = np.asarray(vector[offset: offset + len(peak_channels)], dtype=float)
+            centroids = np.asarray(
+                vector[offset : offset + len(peak_channels)], dtype=float
+            )
             offset += len(peak_channels)
         if share_sigma:
             sigma_value = float(vector[offset])
             sigmas = np.full(len(peak_channels), sigma_value, dtype=float)
             offset += 1
         else:
-            sigmas = np.asarray(vector[offset: offset + len(peak_channels)], dtype=float)
+            sigmas = np.asarray(
+                vector[offset : offset + len(peak_channels)], dtype=float
+            )
             offset += len(peak_channels)
         slope = float(vector[offset])
         intercept = float(vector[offset + 1])
@@ -314,13 +391,26 @@ def fit_gui_constrained_multiplet(
         weights = 1.0 / np.maximum(np.sqrt(np.maximum(y, 0.0)), 1.0)
         return (model(vector) - y) * weights
 
-    solution = optimize.least_squares(residuals, np.asarray(params0, dtype=float), bounds=(np.asarray(lower, dtype=float), np.asarray(upper, dtype=float)), max_nfev=2000)
+    solution = optimize.least_squares(
+        residuals,
+        np.asarray(params0, dtype=float),
+        bounds=(np.asarray(lower, dtype=float), np.asarray(upper, dtype=float)),
+        max_nfev=2000,
+    )
     fitted = model(solution.x)
     amplitudes, centroids, sigmas, _slope, _intercept = unpack(solution.x)
     results: list[dict[str, float]] = []
     for amplitude, centroid, sigma in zip(amplitudes, centroids, sigmas):
         area = float(amplitude * sigma * np.sqrt(2.0 * np.pi))
-        results.append({"centroid": float(centroid), "amplitude": float(amplitude), "sigma": float(sigma), "fwhm": float(2.355 * sigma), "area": area})
+        results.append(
+            {
+                "centroid": float(centroid),
+                "amplitude": float(amplitude),
+                "sigma": float(sigma),
+                "fwhm": float(2.355 * sigma),
+                "area": area,
+            }
+        )
     return results, x, y, fitted
 
 
@@ -351,9 +441,15 @@ def auto_detect_gui_peaks(
     else:
         finder_kwargs: dict[str, Any]
         if finder_method in {"simple", "window", "chunked"}:
-            finder_kwargs = {"threshold_sigma": threshold_sigma, "min_distance": min_distance}
+            finder_kwargs = {
+                "threshold_sigma": threshold_sigma,
+                "min_distance": min_distance,
+            }
         elif finder_method == "scipy":
-            finder_kwargs = {"threshold_factor": max(1.1, 1.0 + threshold_sigma / 3.0), "distance": min_distance}
+            finder_kwargs = {
+                "threshold_factor": max(1.1, 1.0 + threshold_sigma / 3.0),
+                "distance": min_distance,
+            }
         elif finder_method == "segmented":
             baseline = float(np.median(counts))
             spread = float(np.std(counts))
@@ -362,9 +458,21 @@ def auto_detect_gui_peaks(
                 "fit_window": max(4, min_distance),
                 "gaussian_refine": True,
                 "region_params": [
-                    {"height": height, "prominence": max(5.0, 0.25 * height), "distance": max(1, min_distance)},
-                    {"height": height, "prominence": max(5.0, 0.25 * height), "distance": max(1, min_distance)},
-                    {"height": height, "prominence": max(5.0, 0.25 * height), "distance": max(1, min_distance)},
+                    {
+                        "height": height,
+                        "prominence": max(5.0, 0.25 * height),
+                        "distance": max(1, min_distance),
+                    },
+                    {
+                        "height": height,
+                        "prominence": max(5.0, 0.25 * height),
+                        "distance": max(1, min_distance),
+                    },
+                    {
+                        "height": height,
+                        "prominence": max(5.0, 0.25 * height),
+                        "distance": max(1, min_distance),
+                    },
                 ],
             }
         else:
@@ -372,18 +480,27 @@ def auto_detect_gui_peaks(
         finder = get_peak_finder(finder_method, **finder_kwargs)
         detected = finder.find_peaks(counts)
 
-    database = load_gamma_identification_source(identification_source_id, custom_path=custom_source_path)
+    database = load_gamma_identification_source(
+        identification_source_id, custom_path=custom_source_path
+    )
     candidate_hits: dict[str, list[tuple[float, Any]]] = {}
     for peak in detected:
         if not (0 <= peak.index < len(series.energies_keV)):
             continue
         energy = float(series.energies_keV[peak.index])
-        matches = database.find_matches(energy, tolerance_keV=tolerance_keV, min_intensity=min_intensity)
+        matches = database.find_matches(
+            energy, tolerance_keV=tolerance_keV, min_intensity=min_intensity
+        )
         for nuclide, line in matches:
             candidate_hits.setdefault(nuclide, []).append((energy, line))
-    consensus_candidates = {nuclide: hits for nuclide, hits in candidate_hits.items() if len(hits) >= max(1, min_matches)}
+    consensus_candidates = {
+        nuclide: hits
+        for nuclide, hits in candidate_hits.items()
+        if len(hits) >= max(1, min_matches)
+    }
     hybrid_scores = {
-        nuclide: float(len(hits)) + float(sum(line.intensity * line.norm for _, line in hits))
+        nuclide: float(len(hits))
+        + float(sum(line.intensity * line.norm for _, line in hits))
         for nuclide, hits in candidate_hits.items()
     }
 
@@ -391,7 +508,9 @@ def auto_detect_gui_peaks(
     for peak in detected:
         energy = float(series.energies_keV[peak.index])
         label = ""
-        matches = database.find_matches(energy, tolerance_keV=tolerance_keV, min_intensity=min_intensity)
+        matches = database.find_matches(
+            energy, tolerance_keV=tolerance_keV, min_intensity=min_intensity
+        )
         if identification_method == "line_match" and matches:
             nuclide, line = matches[0]
             label = f"{nuclide} {line.energy_keV:.1f}"
@@ -407,7 +526,14 @@ def auto_detect_gui_peaks(
                             best_label = f"{nuclide} {matched_line.energy_keV:.1f}"
             label = best_label
         elif identification_method == "hybrid_ranked" and matches:
-            ranked = sorted(matches, key=lambda item: (hybrid_scores.get(item[0], 0.0), item[1].intensity * item[1].norm), reverse=True)
+            ranked = sorted(
+                matches,
+                key=lambda item: (
+                    hybrid_scores.get(item[0], 0.0),
+                    item[1].intensity * item[1].norm,
+                ),
+                reverse=True,
+            )
             nuclide, line = ranked[0]
             label = f"{nuclide} {line.energy_keV:.1f}"
         rows.append(
@@ -421,47 +547,126 @@ def auto_detect_gui_peaks(
     return tuple(sorted(rows, key=lambda item: item.energy_keV))
 
 
-def count_gui_peak(series: GuiSpectrumSeries, peak: GuiSpectrumPeak, method: str) -> GuiPeakCountingResult:
+def count_gui_peak(
+    series: GuiSpectrumSeries, peak: GuiSpectrumPeak, method: str
+) -> GuiPeakCountingResult:
     """Count a selected peak using one of the GUI-exposed counting methods."""
 
     counts = np.asarray(series.counts, dtype=float)
-    peak_channel = int(round(float(peak.channel if peak.channel is not None else np.interp(peak.energy_keV, series.energies_keV, series.channels))))
+    peak_channel = int(
+        round(
+            float(
+                peak.channel
+                if peak.channel is not None
+                else np.interp(peak.energy_keV, series.energies_keV, series.channels)
+            )
+        )
+    )
     peak_channel = max(0, min(len(counts) - 1, peak_channel))
     fwhm_channels = _estimate_local_fwhm_channels(counts, peak_channel)
     uncertainty = np.sqrt(np.maximum(counts, 0.0))
     method_key = method.strip().lower()
 
     if method_key == "gaussian_fit":
-        result = fit_single_peak(series.channels, counts, peak_channel=peak_channel, fit_width=int(max(6, round(2.5 * fwhm_channels))), background_model="linear")
+        result = fit_single_peak(
+            series.channels,
+            counts,
+            peak_channel=peak_channel,
+            fit_width=int(max(6, round(2.5 * fwhm_channels))),
+            background_model="linear",
+        )
         lo, hi = result.fit_region
-        gross = float(np.sum(counts[int(lo): int(hi) + 1]))
-        roi_x = np.asarray(series.channels[int(lo): int(hi) + 1], dtype=float)
-        roi_counts = np.asarray(counts[int(lo): int(hi) + 1], dtype=float)
-        model = np.asarray(result.background, dtype=float) + np.asarray(result.peak.evaluate(roi_x), dtype=float)
-        return GuiPeakCountingResult(method=method_key, net_counts=float(result.net_counts), net_uncertainty=float(result.net_counts_uncertainty), gross_counts=gross, gross_uncertainty=float(np.sqrt(max(gross, 0.0))), roi_bounds=(int(lo), int(hi)), diagnostic_channels=roi_x, diagnostic_counts=roi_counts, diagnostic_model=model, diagnostic_residuals=np.asarray(result.residuals, dtype=float))
+        gross = float(np.sum(counts[int(lo) : int(hi) + 1]))
+        roi_x = np.asarray(series.channels[int(lo) : int(hi) + 1], dtype=float)
+        roi_counts = np.asarray(counts[int(lo) : int(hi) + 1], dtype=float)
+        model = np.asarray(result.background, dtype=float) + np.asarray(
+            result.peak.evaluate(roi_x), dtype=float
+        )
+        return GuiPeakCountingResult(
+            method=method_key,
+            net_counts=float(result.net_counts),
+            net_uncertainty=float(result.net_counts_uncertainty),
+            gross_counts=gross,
+            gross_uncertainty=float(np.sqrt(max(gross, 0.0))),
+            roi_bounds=(int(lo), int(hi)),
+            diagnostic_channels=roi_x,
+            diagnostic_counts=roi_counts,
+            diagnostic_model=model,
+            diagnostic_residuals=np.asarray(result.residuals, dtype=float),
+        )
     if method_key == "hypermet":
-        hypermet_peak, result = fit_hypermet_peak(series.channels, counts, peak_channel=peak_channel, fit_width=int(max(8, round(3.0 * fwhm_channels))), enable_tail=True, enable_step=True)
+        hypermet_peak, result = fit_hypermet_peak(
+            series.channels,
+            counts,
+            peak_channel=peak_channel,
+            fit_width=int(max(8, round(3.0 * fwhm_channels))),
+            enable_tail=True,
+            enable_step=True,
+        )
         lo, hi = result.fit_region
-        gross = float(np.sum(counts[int(lo): int(hi) + 1]))
-        roi_x = np.asarray(series.channels[int(lo): int(hi) + 1], dtype=float)
-        roi_counts = np.asarray(counts[int(lo): int(hi) + 1], dtype=float)
-        model = np.asarray(result.background, dtype=float) + np.asarray(result.peak.evaluate(roi_x), dtype=float)
-        return GuiPeakCountingResult(method=method_key, net_counts=float(hypermet_peak.area), net_uncertainty=float(max(result.net_counts_uncertainty, np.sqrt(max(hypermet_peak.area, 0.0)))), gross_counts=gross, gross_uncertainty=float(np.sqrt(max(gross, 0.0))), roi_bounds=(int(lo), int(hi)), diagnostic_channels=roi_x, diagnostic_counts=roi_counts, diagnostic_model=model, diagnostic_residuals=np.asarray(result.residuals, dtype=float))
+        gross = float(np.sum(counts[int(lo) : int(hi) + 1]))
+        roi_x = np.asarray(series.channels[int(lo) : int(hi) + 1], dtype=float)
+        roi_counts = np.asarray(counts[int(lo) : int(hi) + 1], dtype=float)
+        model = np.asarray(result.background, dtype=float) + np.asarray(
+            result.peak.evaluate(roi_x), dtype=float
+        )
+        return GuiPeakCountingResult(
+            method=method_key,
+            net_counts=float(hypermet_peak.area),
+            net_uncertainty=float(
+                max(
+                    result.net_counts_uncertainty, np.sqrt(max(hypermet_peak.area, 0.0))
+                )
+            ),
+            gross_counts=gross,
+            gross_uncertainty=float(np.sqrt(max(gross, 0.0))),
+            roi_bounds=(int(lo), int(hi)),
+            diagnostic_channels=roi_x,
+            diagnostic_counts=roi_counts,
+            diagnostic_model=model,
+            diagnostic_residuals=np.asarray(result.residuals, dtype=float),
+        )
 
     if method_key == "covell_local":
-        net, unc, gross, _, bounds = _covell_style_local_continuum_counts(counts, peak_channel, fwhm_channels, spectrum_uncertainty=uncertainty)
+        net, unc, gross, _, bounds = _covell_style_local_continuum_counts(
+            counts, peak_channel, fwhm_channels, spectrum_uncertainty=uncertainty
+        )
     elif method_key == "gilmore_minimum":
-        net, unc, gross, _, bounds = _gilmore_moving_minimum_counts(counts, peak_channel, fwhm_channels, spectrum_uncertainty=uncertainty)
+        net, unc, gross, _, bounds = _gilmore_moving_minimum_counts(
+            counts, peak_channel, fwhm_channels, spectrum_uncertainty=uncertainty
+        )
     elif method_key == "iec_tiered":
-        net, unc, gross, _ = _standards_tiered_counts(raw_counts=counts, raw_counts_uncertainty=uncertainty, peak_channel=peak_channel, fwhm_channels=fwhm_channels, group_size=1, fit_net=0.0, fit_unc=0.0)
+        net, unc, gross, _ = _standards_tiered_counts(
+            raw_counts=counts,
+            raw_counts_uncertainty=uncertainty,
+            peak_channel=peak_channel,
+            fwhm_channels=fwhm_channels,
+            group_size=1,
+            fit_net=0.0,
+            fit_unc=0.0,
+        )
         half_width = int(max(3, round(2.0 * fwhm_channels)))
-        bounds = (max(0, peak_channel - half_width), min(len(counts) - 1, peak_channel + half_width))
+        bounds = (
+            max(0, peak_channel - half_width),
+            min(len(counts) - 1, peak_channel + half_width),
+        )
     else:
         raise ValueError(f"Unknown GUI peak counting method: {method}")
     gross_unc = float(np.sqrt(max(gross, 0.0)))
-    roi_x = np.asarray(series.channels[int(bounds[0]): int(bounds[1]) + 1], dtype=float)
-    roi_counts = np.asarray(counts[int(bounds[0]): int(bounds[1]) + 1], dtype=float)
-    return GuiPeakCountingResult(method=method_key, net_counts=float(net), net_uncertainty=float(unc), gross_counts=float(gross), gross_uncertainty=gross_unc, roi_bounds=(int(bounds[0]), int(bounds[1])), diagnostic_channels=roi_x, diagnostic_counts=roi_counts)
+    roi_x = np.asarray(
+        series.channels[int(bounds[0]) : int(bounds[1]) + 1], dtype=float
+    )
+    roi_counts = np.asarray(counts[int(bounds[0]) : int(bounds[1]) + 1], dtype=float)
+    return GuiPeakCountingResult(
+        method=method_key,
+        net_counts=float(net),
+        net_uncertainty=float(unc),
+        gross_counts=float(gross),
+        gross_uncertainty=gross_unc,
+        roi_bounds=(int(bounds[0]), int(bounds[1])),
+        diagnostic_channels=roi_x,
+        diagnostic_counts=roi_counts,
+    )
 
 
 def _gui_spectrum_energies(spectrum: GammaSpectrum) -> np.ndarray:
@@ -498,7 +703,9 @@ def _load_gui_peaks(path: Path) -> tuple[GuiSpectrumPeak, ...]:
                 continue
             area = item.get("area", item.get("net_counts", item.get("raw_counts", 0.0)))
             channel = item.get("channel")
-            label = item.get("label") or item.get("isotope") or item.get("nuclide") or ""
+            label = (
+                item.get("label") or item.get("isotope") or item.get("nuclide") or ""
+            )
             peaks.append(
                 GuiSpectrumPeak(
                     energy_keV=float(energy_keV),
@@ -542,7 +749,9 @@ def build_gui_spectrum_preview(
         channels=np.asarray(primary_spectrum.channels, dtype=float),
         energies_keV=_gui_spectrum_energies(primary_spectrum),
         counts=np.asarray(primary_spectrum.counts, dtype=float),
-        calibration_coeffs=tuple(float(value) for value in primary_spectrum.calibration.get("energy", ())),
+        calibration_coeffs=tuple(
+            float(value) for value in primary_spectrum.calibration.get("energy", ())
+        ),
     )
     overlays: list[GuiSpectrumSeries] = []
     for overlay_path in overlay_paths:
@@ -554,11 +763,15 @@ def build_gui_spectrum_preview(
                 channels=np.asarray(spectrum.channels, dtype=float),
                 energies_keV=_gui_spectrum_energies(spectrum),
                 counts=np.asarray(spectrum.counts, dtype=float),
-                calibration_coeffs=tuple(float(value) for value in spectrum.calibration.get("energy", ())),
+                calibration_coeffs=tuple(
+                    float(value) for value in spectrum.calibration.get("energy", ())
+                ),
             )
         )
     peaks = _load_gui_peaks(Path(peaks_path)) if peaks_path else ()
-    return GuiSpectrumPreview(primary=primary, overlays=tuple(overlays), peaks=tuple(peaks))
+    return GuiSpectrumPreview(
+        primary=primary, overlays=tuple(overlays), peaks=tuple(peaks)
+    )
 
 
 def render_gui_spectrum_preview(
@@ -576,7 +789,9 @@ def render_gui_spectrum_preview(
     """Render a spectrum preview with optional overlays and peak markers."""
 
     if Figure is None:
-        raise ImportError("matplotlib is required for the FluxForge GUI spectrum preview")
+        raise ImportError(
+            "matplotlib is required for the FluxForge GUI spectrum preview"
+        )
 
     fig = figure or Figure(figsize=(8.8, 4.8), dpi=100)
     fig.clear()
@@ -602,13 +817,35 @@ def render_gui_spectrum_preview(
 
     for idx, region in enumerate(manual_regions):
         lo_keV, hi_keV = sorted((float(region.left_keV), float(region.right_keV)))
-        is_selected = selected_region_label is not None and region.label == selected_region_label
-        ax.axvspan(lo_keV, hi_keV, color="#8e44ad", alpha=0.18 if is_selected else 0.10, zorder=1)
-        ax.axvline(lo_keV, color="#8e44ad", linewidth=1.3 if is_selected else 0.8, alpha=0.50 if is_selected else 0.30)
-        ax.axvline(hi_keV, color="#8e44ad", linewidth=1.3 if is_selected else 0.8, alpha=0.50 if is_selected else 0.30)
+        is_selected = (
+            selected_region_label is not None and region.label == selected_region_label
+        )
+        ax.axvspan(
+            lo_keV,
+            hi_keV,
+            color="#8e44ad",
+            alpha=0.18 if is_selected else 0.10,
+            zorder=1,
+        )
+        ax.axvline(
+            lo_keV,
+            color="#8e44ad",
+            linewidth=1.3 if is_selected else 0.8,
+            alpha=0.50 if is_selected else 0.30,
+        )
+        ax.axvline(
+            hi_keV,
+            color="#8e44ad",
+            linewidth=1.3 if is_selected else 0.8,
+            alpha=0.50 if is_selected else 0.30,
+        )
         ax.text(
             (lo_keV + hi_keV) * 0.5,
-            float(np.nanmax(preview.primary.counts)) * 0.82 if preview.primary.counts.size else 1.0,
+            (
+                float(np.nanmax(preview.primary.counts)) * 0.82
+                if preview.primary.counts.size
+                else 1.0
+            ),
             region.label or f"ROI {idx + 1}",
             rotation=90,
             ha="center",
@@ -618,7 +855,9 @@ def render_gui_spectrum_preview(
         )
 
     if preview.peaks:
-        peak_energies = np.asarray([peak.energy_keV for peak in preview.peaks], dtype=float)
+        peak_energies = np.asarray(
+            [peak.energy_keV for peak in preview.peaks], dtype=float
+        )
         peak_counts = np.interp(
             peak_energies,
             preview.primary.energies_keV,
@@ -626,8 +865,14 @@ def render_gui_spectrum_preview(
             left=np.nan,
             right=np.nan,
         )
-        ax.scatter(peak_energies, peak_counts, color="#c44e52", s=20, zorder=5, label="Peaks")
-        y_top = float(np.nanmax(preview.primary.counts)) if preview.primary.counts.size else 1.0
+        ax.scatter(
+            peak_energies, peak_counts, color="#c44e52", s=20, zorder=5, label="Peaks"
+        )
+        y_top = (
+            float(np.nanmax(preview.primary.counts))
+            if preview.primary.counts.size
+            else 1.0
+        )
         text_y = y_top * (0.92 if y_top > 0.0 else 1.0)
         for peak in preview.peaks[:20]:
             ax.axvline(peak.energy_keV, color="#c44e52", linewidth=0.8, alpha=0.18)
@@ -668,11 +913,25 @@ def render_gui_spectrum_preview(
     if diag_ax is not None and diagnostic_plot is not None:
         for series in diagnostic_plot.series:
             if series.style == "scatter":
-                diag_ax.scatter(series.x, series.y, s=18, color=series.color, label=series.label)
+                diag_ax.scatter(
+                    series.x, series.y, s=18, color=series.color, label=series.label
+                )
             else:
-                diag_ax.plot(series.x, series.y, color=series.color, linewidth=1.1, label=series.label)
+                diag_ax.plot(
+                    series.x,
+                    series.y,
+                    color=series.color,
+                    linewidth=1.1,
+                    label=series.label,
+                )
         if diagnostic_plot.reference_y is not None:
-            diag_ax.axhline(diagnostic_plot.reference_y, color="#7f8c8d", linewidth=0.9, linestyle="--", alpha=0.75)
+            diag_ax.axhline(
+                diagnostic_plot.reference_y,
+                color="#7f8c8d",
+                linewidth=0.9,
+                linestyle="--",
+                alpha=0.75,
+            )
         diag_ax.set_title(diagnostic_plot.title, fontsize=9)
         diag_ax.set_xlabel(diagnostic_plot.x_label)
         diag_ax.set_ylabel(diagnostic_plot.y_label)

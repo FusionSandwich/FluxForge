@@ -31,9 +31,9 @@ Phases and Milestones
 
 | Task | Status | Priority | Reference |
 |------|--------|----------|-----------|
-| Canonical artifact schemas with units + normalization | 🔄 | P0 | core/schemas.py |
-| Provenance tracking (hashes, versions) | ✅ | P0 | core/provenance.py |
-| CLI skeleton with all stage subcommands | 🔄 | P0 | cli/app.py |
+| Canonical artifact schemas with units + normalization |  | P0 | core/schemas.py |
+| Provenance tracking (hashes, versions) |  | P0 | core/provenance.py |
+| CLI skeleton with all stage subcommands |  | P0 | cli/app.py |
 | Round-trip I/O tests for core artifacts | ⬜ | P0 | tests/ |
 | Unit handling module (group-integrated vs averaged) | ⬜ | P0 | core/units.py (new) |
 
@@ -49,9 +49,9 @@ Phases and Milestones
 #### 1.1 File Format Support
 | Format | Status | Reference Implementation |
 |--------|--------|-------------------------|
-| SPE (Ortec) | ✅ | io/spe.py (existing) |
+| SPE (Ortec) |  | io/spe.py (existing) |
 | CHN | ⬜ | testing/gamma_spec_analysis |
-| CNF (Genie-2000) | 🔄 | io/genie.py (partial) |
+| CNF (Genie-2000) |  | io/genie.py (partial) |
 | N42 (XML) | ⬜ | testing/hdtv patterns |
 | CSV exports | ⬜ | io/csv_readers.py |
 | ROOT histograms | ⬜ | testing/hdtv (pure-Python reader) |
@@ -67,7 +67,7 @@ Phases and Milestones
 #### 1.3 Peak Detection (Reference: testing/peakingduck)
 | Algorithm | Status | Notes |
 |-----------|--------|-------|
-| Derivative/DoG filters | 🔄 | analysis/peakfit.py (partial) |
+| Derivative/DoG filters |  | analysis/peakfit.py (partial) |
 | CWT maxima | ⬜ | scipy.signal.find_peaks_cwt |
 | Windowed local methods | ⬜ | peakingduck.WindowPeakFinder |
 | Chunked detection | ⬜ | peakingduck.ChunkedSimplePeakFinder |
@@ -76,7 +76,7 @@ Phases and Milestones
 #### 1.4 Peak Fitting (Reference: testing/hdtv)
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Gaussian | ✅ | analysis/peakfit.py |
+| Gaussian |  | analysis/peakfit.py |
 | Voigt | ⬜ | hdtv.peakmodels |
 | EMG / Hypermet | ⬜ | hdtv.peakmodels |
 | Poisson likelihood | ⬜ | Low-count preference |
@@ -94,23 +94,23 @@ Phases and Milestones
 #### 2.1 Detector Calibration
 | Feature | Status | Reference |
 |---------|--------|-----------|
-| Energy calibration with uncertainty | 🔄 | io/spe.py (partial) |
+| Energy calibration with uncertainty |  | io/spe.py (partial) |
 | Resolution model FWHM(E) | ⬜ | data/efficiency.py |
-| Efficiency curve ε(E) with covariance | 🔄 | data/efficiency_models.py |
+| Efficiency curve ε(E) with covariance |  | data/efficiency_models.py |
 
 #### 2.2 Activity Computation
 | Feature | Status | Reference |
 |---------|--------|-----------|
-| Dead-time correction | ✅ | physics/activation.py |
-| Decay correction | ✅ | physics/activation.py |
+| Dead-time correction |  | physics/activation.py |
+| Decay correction |  | physics/activation.py |
 | Coincidence summing correction | ⬜ | New module |
 | Self-attenuation correction | ⬜ | New module |
-| Multi-line weighted combination | ✅ | physics/activation.py |
+| Multi-line weighted combination |  | physics/activation.py |
 
 #### 2.3 Irradiation History Engine
 | Feature | Status | Reference |
 |---------|--------|-----------|
-| Multi-segment piecewise-constant | ✅ | physics/activation.py |
+| Multi-segment piecewise-constant |  | physics/activation.py |
 | Interruptions/pulses | ⬜ | Enhance existing |
 | Repeated counts per sample | ⬜ | New logic |
 | Parent/daughter build-in/out | ⬜ | Complex chains |
@@ -127,7 +127,7 @@ Phases and Milestones
 #### 3.1 Group Structures
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Built-in structures (10g/31g/50g/100g/175g/640g/725g) | 🔄 | core/response.py (partial) |
+| Built-in structures (10g/31g/50g/100g/175g/640g/725g) |  | core/response.py (partial) |
 | User-defined structures | ⬜ | JSON/YAML input |
 | Integral-conserving conversions | ⬜ | New utility |
 | Lethargy plotting | ⬜ | plots/unfolding.py |
@@ -142,7 +142,7 @@ Phases and Milestones
 #### 3.3 Response Matrix
 | Feature | Status | Reference |
 |---------|--------|-----------|
-| R[i,g] construction | 🔄 | core/response.py |
+| R[i,g] construction |  | core/response.py |
 | Multiple products/branches | ⬜ | MonitorReaction class |
 | Condition number diagnostics | ⬜ | New |
 | Matrix stabilization | ⬜ | SVD-based |
@@ -150,9 +150,9 @@ Phases and Milestones
 #### 3.4 Solvers
 | Solver | Status | Reference |
 |--------|--------|-----------|
-| GLS / STAYSL-like | ✅ | solvers/gls.py (enhance for full GLSQM) |
-| GRAVEL | ✅ | solvers/iterative.py |
-| MLEM | ✅ | solvers/iterative.py |
+| GLS / STAYSL-like |  | solvers/gls.py (enhance for full GLSQM) |
+| GRAVEL |  | solvers/iterative.py |
+| MLEM |  | solvers/iterative.py |
 | MLEM-STOP criteria | ⬜ | testing/Neutron-Spectrometry |
 | Bayesian MCMC | ⬜ | solvers/bayesian.py (new) |
 | SpecKit-style gradient | ⬜ | solvers/gradient.py (new) |
@@ -214,14 +214,14 @@ Phases and Milestones
 ### Phase 5 - Advanced Features (M5) — Weeks 17-20
 **Status:** PARTIALLY COMPLETE
 
-#### 5.1 TRIGA-Specific Modules ✅ COMPLETE
+#### 5.1 TRIGA-Specific Modules  COMPLETE
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Cd-ratio + (f, α) characterization | ✅ | `fluxforge.triga.cd_ratio` - CdRatioAnalyzer |
-| k₀ standardization | ✅ | `fluxforge.triga.k0` - TRIGAk0Workflow |
-| k₀ constants database | ✅ | STANDARD_MONITORS, TRIPLE_MONITOR_DATA |
-| Triple-monitor method | ✅ | `triple_monitor_method()` for bare Zr-94/Zr-96/Au-197 |
-| SDC factors | ✅ | `calculate_sdc_factors()` - Saturation, Decay, Counting |
+| Cd-ratio + (f, α) characterization |  | `fluxforge.triga.cd_ratio` - CdRatioAnalyzer |
+| k₀ standardization |  | `fluxforge.triga.k0` - TRIGAk0Workflow |
+| k₀ constants database |  | STANDARD_MONITORS, TRIPLE_MONITOR_DATA |
+| Triple-monitor method |  | `triple_monitor_method()` for bare Zr-94/Zr-96/Au-197 |
+| SDC factors |  | `calculate_sdc_factors()` - Saturation, Decay, Counting |
 
 See `examples/triga_k0naa_workflow.py` for complete demonstration.
 
@@ -229,7 +229,7 @@ See `examples/triga_k0naa_workflow.py` for complete demonstration.
 | Feature | Status | Notes |
 |---------|--------|-------|
 | SpecKit-style multi-start | ⬜ | Local minima detection |
-| Bayesian MCMC with R-hat/ESS | ✅ | `fluxforge.solvers.mcmc` |
+| Bayesian MCMC with R-hat/ESS |  | `fluxforge.solvers.mcmc` |
 
 #### 5.3 Experimental Locking
 | Feature | Status | Notes |
@@ -266,6 +266,6 @@ All reference repositories are cloned in `testing/`:
 
 Legend
 ------
-- ✅ Complete
-- 🔄 In Progress / Partial
+-  Complete
+-  In Progress / Partial
 - ⬜ Not Started

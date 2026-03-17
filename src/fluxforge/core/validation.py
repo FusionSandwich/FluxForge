@@ -31,7 +31,7 @@ from scipy import stats
 
 class ValidationStatus(Enum):
     """Overall validation status."""
-    
+
     PASSED = "passed"  # All metrics within tolerance
     MARGINAL = "marginal"  # Some metrics borderline
     FAILED = "failed"  # Significant discrepancies
@@ -42,7 +42,7 @@ class ValidationStatus(Enum):
 class CEEntry:
     """
     Single C/E (Calculated/Experimental) entry.
-    
+
     Attributes:
         identifier: Reaction or group identifier
         calculated: Calculated value (C)
@@ -54,7 +54,7 @@ class CEEntry:
         pull: Standardized residual (C-E)/σ
         within_tolerance: Whether C/E is within acceptable range
     """
-    
+
     identifier: str
     calculated: float
     experimental: float
@@ -64,22 +64,24 @@ class CEEntry:
     ce_uncertainty: float = 0.0
     pull: float = 0.0
     within_tolerance: bool = True
-    
+
     def __post_init__(self):
         """Calculate derived values."""
         if self.experimental > 0:
             self.ce_ratio = self.calculated / self.experimental
-            
+
             # Propagate uncertainty
             rel_c = self.c_uncertainty / self.calculated if self.calculated > 0 else 0
-            rel_e = self.e_uncertainty / self.experimental if self.experimental > 0 else 0
+            rel_e = (
+                self.e_uncertainty / self.experimental if self.experimental > 0 else 0
+            )
             self.ce_uncertainty = self.ce_ratio * np.sqrt(rel_c**2 + rel_e**2)
-            
+
             # Calculate pull (standardized residual)
             combined_unc = np.sqrt(self.c_uncertainty**2 + self.e_uncertainty**2)
             if combined_unc > 0:
                 self.pull = (self.calculated - self.experimental) / combined_unc
-        
+
         # Check tolerance (default: within 2σ of C/E = 1)
         if self.ce_uncertainty > 0:
             self.within_tolerance = abs(self.ce_ratio - 1.0) < 2 * self.ce_uncertainty
@@ -89,63 +91,63 @@ class CEEntry:
 class CETable:
     """
     Complete C/E ratio table for validation.
-    
+
     Attributes:
         entries: List of C/E entries
         description: Description of comparison
         tolerance: Acceptable deviation from C/E = 1
         created_at: Timestamp of table creation
     """
-    
+
     entries: List[CEEntry] = field(default_factory=list)
     description: str = ""
     tolerance: float = 0.1  # 10% default tolerance
     created_at: datetime = field(default_factory=datetime.now)
-    
+
     @property
     def n_entries(self) -> int:
         """Number of entries."""
         return len(self.entries)
-    
+
     @property
     def mean_ce(self) -> float:
         """Mean C/E ratio."""
         if not self.entries:
             return 0.0
         return np.mean([e.ce_ratio for e in self.entries])
-    
+
     @property
     def std_ce(self) -> float:
         """Standard deviation of C/E ratios."""
         if len(self.entries) < 2:
             return 0.0
         return np.std([e.ce_ratio for e in self.entries], ddof=1)
-    
+
     @property
     def fraction_within_tolerance(self) -> float:
         """Fraction of entries within tolerance."""
         if not self.entries:
             return 0.0
         return sum(1 for e in self.entries if e.within_tolerance) / len(self.entries)
-    
+
     def to_markdown(self) -> str:
         """Generate markdown table."""
         lines = [
             "| Reaction | C | E | C/E | σ(C/E) | Pull | Status |",
             "|----------|---|---|-----|--------|------|--------|",
         ]
-        
+
         for e in self.entries:
             status = "OK" if e.within_tolerance else "FAIL"
             lines.append(
                 f"| {e.identifier} | {e.calculated:.4e} | {e.experimental:.4e} | "
                 f"{e.ce_ratio:.3f} | {e.ce_uncertainty:.3f} | {e.pull:+.2f} | {status} |"
             )
-        
+
         lines.append("")
         lines.append(f"Mean C/E: {self.mean_ce:.3f} ± {self.std_ce:.3f}")
         lines.append(f"Within tolerance: {self.fraction_within_tolerance:.1%}")
-        
+
         return "\n".join(lines)
 
 
@@ -153,7 +155,7 @@ class CETable:
 class ClosureMetrics:
     """
     Statistical metrics for validation closure.
-    
+
     Attributes:
         chi_square: Chi-square statistic
         dof: Degrees of freedom
@@ -165,7 +167,7 @@ class ClosureMetrics:
         ks_statistic: Kolmogorov-Smirnov statistic for pull distribution
         ks_pvalue: K-S p-value (should be > 0.05 for normal pulls)
     """
-    
+
     chi_square: float = 0.0
     dof: int = 0
     reduced_chi2: float = 0.0
@@ -175,17 +177,17 @@ class ClosureMetrics:
     max_pull: float = 0.0
     ks_statistic: float = 0.0
     ks_pvalue: float = 0.0
-    
+
     @property
     def chi2_acceptable(self) -> bool:
         """Check if chi-square is acceptable (p > 0.05)."""
         return self.p_value > 0.05
-    
+
     @property
     def pulls_normal(self) -> bool:
         """Check if pulls are consistent with normal distribution."""
         return self.ks_pvalue > 0.05
-    
+
     def summary(self) -> str:
         """Generate summary string."""
         lines = [
@@ -203,7 +205,7 @@ class ClosureMetrics:
 class ValidationBundle:
     """
     Complete validation bundle for spectrum comparison.
-    
+
     Attributes:
         ce_table: C/E ratio table
         closure: Closure metrics
@@ -215,7 +217,7 @@ class ValidationBundle:
         notes: Additional notes
         provenance: Provenance information
     """
-    
+
     ce_table: CETable = field(default_factory=CETable)
     closure: ClosureMetrics = field(default_factory=ClosureMetrics)
     reference_type: str = "reference"
@@ -225,54 +227,54 @@ class ValidationBundle:
     status: ValidationStatus = ValidationStatus.INCOMPLETE
     notes: str = ""
     provenance: Dict[str, Any] = field(default_factory=dict)
-    
+
     def determine_status(self) -> ValidationStatus:
         """Determine overall validation status based on metrics."""
         if not self.ce_table.entries:
             return ValidationStatus.INCOMPLETE
-        
+
         # Check multiple criteria
         chi2_ok = self.closure.chi2_acceptable
         fraction_ok = self.ce_table.fraction_within_tolerance > 0.9
         pulls_ok = self.closure.max_pull < 3.0
-        
+
         if chi2_ok and fraction_ok and pulls_ok:
             return ValidationStatus.PASSED
         elif chi2_ok or fraction_ok:
             return ValidationStatus.MARGINAL
         else:
             return ValidationStatus.FAILED
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
-            'schema': 'fluxforge://validation_bundle/v1',
-            'reference_type': self.reference_type,
-            'reference_label': self.reference_label,
-            'test_label': self.test_label,
-            'status': self.status.value,
-            'metrics': {
-                'chi_square': self.closure.chi_square,
-                'reduced_chi2': self.closure.reduced_chi2,
-                'p_value': self.closure.p_value,
-                'mean_ce': self.ce_table.mean_ce,
-                'std_ce': self.ce_table.std_ce,
-                'fraction_within_tolerance': self.ce_table.fraction_within_tolerance,
+            "schema": "fluxforge://validation_bundle/v1",
+            "reference_type": self.reference_type,
+            "reference_label": self.reference_label,
+            "test_label": self.test_label,
+            "status": self.status.value,
+            "metrics": {
+                "chi_square": self.closure.chi_square,
+                "reduced_chi2": self.closure.reduced_chi2,
+                "p_value": self.closure.p_value,
+                "mean_ce": self.ce_table.mean_ce,
+                "std_ce": self.ce_table.std_ce,
+                "fraction_within_tolerance": self.ce_table.fraction_within_tolerance,
             },
-            'ce_entries': [
+            "ce_entries": [
                 {
-                    'identifier': e.identifier,
-                    'calculated': e.calculated,
-                    'experimental': e.experimental,
-                    'ce_ratio': e.ce_ratio,
-                    'pull': e.pull,
+                    "identifier": e.identifier,
+                    "calculated": e.calculated,
+                    "experimental": e.experimental,
+                    "ce_ratio": e.ce_ratio,
+                    "pull": e.pull,
                 }
                 for e in self.ce_table.entries
             ],
-            'notes': self.notes,
-            'provenance': self.provenance,
+            "notes": self.notes,
+            "provenance": self.provenance,
         }
-    
+
     def full_report(self) -> str:
         """Generate full validation report."""
         lines = [
@@ -290,10 +292,10 @@ class ValidationBundle:
             self.closure.summary(),
             "",
         ]
-        
+
         if self.notes:
             lines.extend(["--- Notes ---", self.notes, ""])
-        
+
         lines.append("=" * 70)
         return "\n".join(lines)
 
@@ -308,7 +310,7 @@ def calculate_ce_table(
 ) -> CETable:
     """
     Calculate C/E table from arrays.
-    
+
     Parameters
     ----------
     calculated : np.ndarray
@@ -323,21 +325,21 @@ def calculate_ce_table(
         Identifiers for each entry (default: numbered).
     tolerance : float
         Acceptable C/E deviation from 1.0.
-        
+
     Returns
     -------
     CETable
         Populated C/E table.
     """
     n = len(calculated)
-    
+
     if c_uncertainties is None:
         c_uncertainties = np.zeros(n)
     if e_uncertainties is None:
         e_uncertainties = np.zeros(n)
     if identifiers is None:
         identifiers = [f"Entry_{i+1}" for i in range(n)]
-    
+
     entries = []
     for i in range(n):
         entry = CEEntry(
@@ -350,7 +352,7 @@ def calculate_ce_table(
         # Check tolerance
         entry.within_tolerance = abs(entry.ce_ratio - 1.0) < tolerance
         entries.append(entry)
-    
+
     return CETable(entries=entries, tolerance=tolerance)
 
 
@@ -363,7 +365,7 @@ def calculate_closure_metrics(
 ) -> ClosureMetrics:
     """
     Calculate closure metrics for validation.
-    
+
     Parameters
     ----------
     calculated : np.ndarray
@@ -376,7 +378,7 @@ def calculate_closure_metrics(
         Uncertainties in calculated (if no covariance).
     e_uncertainties : np.ndarray, optional
         Uncertainties in experimental (if no covariance).
-        
+
     Returns
     -------
     ClosureMetrics
@@ -384,7 +386,7 @@ def calculate_closure_metrics(
     """
     residuals = calculated - experimental
     n = len(residuals)
-    
+
     # Build covariance if not provided
     if covariance is None:
         if c_uncertainties is None:
@@ -394,38 +396,38 @@ def calculate_closure_metrics(
         # Assume independent
         variances = c_uncertainties**2 + e_uncertainties**2
         covariance = np.diag(variances)
-    
+
     # Handle near-zero variances
     diag = np.diag(covariance).copy()
     diag[diag < 1e-30] = 1e-30
-    
+
     # Chi-square
     try:
         cov_inv = np.linalg.pinv(covariance)
         chi2 = float(residuals @ cov_inv @ residuals)
     except np.linalg.LinAlgError:
         chi2 = 0.0
-    
+
     dof = max(1, n)
     reduced_chi2 = chi2 / dof if dof > 0 else 0
-    
+
     # P-value
     p_value = 1.0 - stats.chi2.cdf(chi2, dof) if chi2 > 0 else 1.0
-    
+
     # Residual statistics
     rms = float(np.sqrt(np.mean(residuals**2)))
     mean_res = float(np.mean(residuals))
-    
+
     # Pull values
     pulls = residuals / np.sqrt(diag)
     max_pull = float(np.max(np.abs(pulls)))
-    
+
     # K-S test for normality of pulls
     try:
-        ks_stat, ks_p = stats.kstest(pulls, 'norm')
+        ks_stat, ks_p = stats.kstest(pulls, "norm")
     except:
         ks_stat, ks_p = 0.0, 0.0
-    
+
     return ClosureMetrics(
         chi_square=chi2,
         dof=dof,
@@ -453,7 +455,7 @@ def create_validation_bundle(
 ) -> ValidationBundle:
     """
     Create complete validation bundle.
-    
+
     Parameters
     ----------
     calculated : np.ndarray
@@ -476,31 +478,33 @@ def create_validation_bundle(
         Label for test data.
     tolerance : float
         C/E tolerance.
-        
+
     Returns
     -------
     ValidationBundle
         Complete validation bundle.
-        
+
     Examples
     --------
     >>> calc = np.array([1.02, 0.98, 1.05, 0.95])
     >>> expt = np.array([1.00, 1.00, 1.00, 1.00])
-    >>> bundle = create_validation_bundle(calc, expt, 
+    >>> bundle = create_validation_bundle(calc, expt,
     ...     reference_label="MCNP flux", test_label="Unfolded flux")
     >>> print(bundle.status)
     """
     ce_table = calculate_ce_table(
-        calculated, experimental,
-        c_uncertainties, e_uncertainties,
-        identifiers, tolerance
+        calculated,
+        experimental,
+        c_uncertainties,
+        e_uncertainties,
+        identifiers,
+        tolerance,
     )
-    
+
     closure = calculate_closure_metrics(
-        calculated, experimental,
-        covariance, c_uncertainties, e_uncertainties
+        calculated, experimental, covariance, c_uncertainties, e_uncertainties
     )
-    
+
     bundle = ValidationBundle(
         ce_table=ce_table,
         closure=closure,
@@ -508,12 +512,12 @@ def create_validation_bundle(
         reference_label=reference_label,
         test_label=test_label,
     )
-    
+
     bundle.status = bundle.determine_status()
     bundle.provenance = {
-        'created_at': datetime.now().isoformat(),
-        'n_entries': len(calculated),
-        'tolerance': tolerance,
+        "created_at": datetime.now().isoformat(),
+        "n_entries": len(calculated),
+        "tolerance": tolerance,
     }
-    
+
     return bundle

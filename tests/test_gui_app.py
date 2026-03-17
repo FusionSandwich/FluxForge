@@ -52,13 +52,24 @@ def test_standards_presets_use_known_profiles_and_categories():
     presets = get_standards_gui_presets()
     choices = set(get_gui_profile_choices())
 
-    assert {"astm_inl", "us_astm", "iaea_irdff_gma", "k0_naa", "comparator_naa", "curie_like"}.issubset(presets)
+    assert {
+        "astm_inl",
+        "us_astm",
+        "iaea_irdff_gma",
+        "k0_naa",
+        "comparator_naa",
+        "curie_like",
+    }.issubset(presets)
     for preset in presets.values():
         if preset.default_profile is not None:
             assert preset.default_profile in choices
         assert preset.reaction_category in ALLOWED_REACTION_CATEGORIES
         assert preset.peaks_sensitivity in {"default", "sensitive", "conservative"}
-        assert preset.peak_counting_method in {"gaussian_fit", "covell_local", "iec_tiered"}
+        assert preset.peak_counting_method in {
+            "gaussian_fit",
+            "covell_local",
+            "iec_tiered",
+        }
         assert preset.notes
 
 
@@ -133,7 +144,9 @@ def test_build_gui_spectrum_preview_reads_primary_overlay_and_peaks(tmp_path):
         ],
     )
 
-    preview = build_gui_spectrum_preview(primary_path, overlay_paths=[overlay_path], peaks_path=peaks_path)
+    preview = build_gui_spectrum_preview(
+        primary_path, overlay_paths=[overlay_path], peaks_path=peaks_path
+    )
 
     assert preview.primary.label == "primary"
     assert preview.primary.channels.tolist() == [0.0, 1.0, 2.0, 3.0, 4.0]
@@ -242,7 +255,14 @@ def test_render_gui_spectrum_preview_supports_diagnostic_subplot(tmp_path):
             title="Residuals",
             x_label="Channel",
             y_label="Residual",
-            series=(GuiDiagnosticSeries(label="res", x=np.arange(5, dtype=float), y=np.array([0.0, 1.0, 0.0, -1.0, 0.0]), style="scatter"),),
+            series=(
+                GuiDiagnosticSeries(
+                    label="res",
+                    x=np.arange(5, dtype=float),
+                    y=np.array([0.0, 1.0, 0.0, -1.0, 0.0]),
+                    style="scatter",
+                ),
+            ),
             reference_y=0.0,
         ),
     )
@@ -284,8 +304,18 @@ def test_render_gui_activity_and_rate_results_support_uncertainties():
     activity_figure = render_gui_activity_result(
         {
             "lines": [
-                {"isotope": "Sc46", "energy_keV": 889.3, "activity_Bq": 120.0, "activity_unc_Bq": 6.0},
-                {"isotope": "Sc46", "energy_keV": 1120.5, "activity_Bq": 100.0, "activity_unc_Bq": 7.0},
+                {
+                    "isotope": "Sc46",
+                    "energy_keV": 889.3,
+                    "activity_Bq": 120.0,
+                    "activity_unc_Bq": 6.0,
+                },
+                {
+                    "isotope": "Sc46",
+                    "energy_keV": 1120.5,
+                    "activity_Bq": 100.0,
+                    "activity_unc_Bq": 7.0,
+                },
             ]
         }
     )
@@ -340,8 +370,22 @@ def test_activity_and_rate_summaries_include_uncertainty_context():
     activity_summary = summarize_gui_activity_result(
         {
             "lines": [
-                {"isotope": "Sc46", "energy_keV": 889.3, "activity_Bq": 120.0, "activity_unc_Bq": 6.0, "radioactive_mass_g": 1e-12, "specific_activity_Bq_g": 240.0},
-                {"isotope": "Sc46", "energy_keV": 1120.5, "activity_Bq": 100.0, "activity_unc_Bq": 7.0, "radioactive_mass_g": 2e-12, "specific_activity_Bq_g": 200.0},
+                {
+                    "isotope": "Sc46",
+                    "energy_keV": 889.3,
+                    "activity_Bq": 120.0,
+                    "activity_unc_Bq": 6.0,
+                    "radioactive_mass_g": 1e-12,
+                    "specific_activity_Bq_g": 240.0,
+                },
+                {
+                    "isotope": "Sc46",
+                    "energy_keV": 1120.5,
+                    "activity_Bq": 100.0,
+                    "activity_unc_Bq": 7.0,
+                    "radioactive_mass_g": 2e-12,
+                    "specific_activity_Bq_g": 200.0,
+                },
             ]
         }
     )
@@ -392,7 +436,9 @@ def test_combine_gui_spectrum_series_supports_buffer_arithmetic():
         calibration_coeffs=(0.0, 10.0),
     )
 
-    combined = combine_gui_spectrum_series(left, right, operation="ratio", label="ratio")
+    combined = combine_gui_spectrum_series(
+        left, right, operation="ratio", label="ratio"
+    )
 
     assert combined.label == "ratio"
     assert combined.counts.tolist() == [2.0, 2.0, 2.0, 2.0]
@@ -402,9 +448,24 @@ def test_combine_gui_spectrum_series_supports_buffer_arithmetic():
 def test_fit_gui_energy_calibration_returns_coefficients_and_residuals():
     fit = fit_gui_energy_calibration(
         [
-            GuiCalibrationPoint(channel=0.0, observed_energy_keV=0.0, reference_energy_keV=5.0, label="p0"),
-            GuiCalibrationPoint(channel=10.0, observed_energy_keV=100.0, reference_energy_keV=25.0, label="p1"),
-            GuiCalibrationPoint(channel=20.0, observed_energy_keV=200.0, reference_energy_keV=45.0, label="p2"),
+            GuiCalibrationPoint(
+                channel=0.0,
+                observed_energy_keV=0.0,
+                reference_energy_keV=5.0,
+                label="p0",
+            ),
+            GuiCalibrationPoint(
+                channel=10.0,
+                observed_energy_keV=100.0,
+                reference_energy_keV=25.0,
+                label="p1",
+            ),
+            GuiCalibrationPoint(
+                channel=20.0,
+                observed_energy_keV=200.0,
+                reference_energy_keV=45.0,
+                label="p2",
+            ),
         ],
         order=1,
     )
@@ -458,16 +519,23 @@ def test_parse_gui_constraint_matrix_parses_free_form_text():
 def test_build_gui_report_preview_prefers_text_report(tmp_path):
     report_path = tmp_path / "report.json"
     text_path = tmp_path / "report.txt"
-    text_path.write_text("FluxForge Standard Activation Report\nActivity summary\n", encoding="utf-8")
+    text_path.write_text(
+        "FluxForge Standard Activation Report\nActivity summary\n", encoding="utf-8"
+    )
 
-    preview = build_gui_report_preview({"text_report": {"path": "report.txt"}, "summary": {"peak_count": 3}}, report_path)
+    preview = build_gui_report_preview(
+        {"text_report": {"path": "report.txt"}, "summary": {"peak_count": 3}},
+        report_path,
+    )
 
     assert "FluxForge Standard Activation Report" in preview
     assert "Activity summary" in preview
 
 
 def test_build_gui_report_preview_falls_back_to_summary(tmp_path):
-    preview = build_gui_report_preview({"summary": {"peak_count": 3, "chi2": 0.1}}, tmp_path / "report.json")
+    preview = build_gui_report_preview(
+        {"summary": {"peak_count": 3, "chi2": 0.1}}, tmp_path / "report.json"
+    )
 
     assert "FluxForge Report Preview" in preview
     assert "peak_count: 3" in preview
@@ -478,10 +546,21 @@ def test_build_gui_k0_preview_formats_element_results(tmp_path):
     preview = build_gui_k0_preview(
         {
             "summary": {"element_count": 1, "reference_isotope": "Au-198"},
-            "element_results": [{"element": "Co", "concentration_ug_g": 12.5, "concentration_unc_ug_g": 0.8}],
+            "element_results": [
+                {
+                    "element": "Co",
+                    "concentration_ug_g": 12.5,
+                    "concentration_unc_ug_g": 0.8,
+                }
+            ],
             "recognized_but_not_applied": ["westcott_gT_not_applied:Lu-176"],
             "capability_flags": {"supports_thermal_inaa": "validated"},
-            "libraries": {"standard_k0_library": {"library_id": "fluxforge.k0.starter", "version": "2026.03-starter-v1"}},
+            "libraries": {
+                "standard_k0_library": {
+                    "library_id": "fluxforge.k0.starter",
+                    "version": "2026.03-starter-v1",
+                }
+            },
         },
         tmp_path / "k0_analysis.json",
     )

@@ -39,13 +39,13 @@ FluxForge implements an end-to-end workflow to:
 
 | # | Criterion | Status |
 |---|-----------|--------|
-| 1 | From raw HPGe spectra (or peak reports), produce isotope activities with full uncertainty propagation and QA/QC | ✅ |
-| 2 | Convert activities to end-of-irradiation (EOI) reaction rates using explicit irradiation history (multi-segment) | ✅ |
-| 3 | Build response matrix R[i,g] using dosimetry cross sections, sample compositions, and corrections | ✅ |
-| 4 | Unfold/adjust neutron spectra using multiple solver families: GLS/STAYSL-like, MLEM/GRAVEL, Bayesian, SpecKit-style | ✅ |
-| 5 | Produce posterior spectra with covariance/correlation plus paper-style diagnostics (χ², pulls, influence) | ✅ |
-| 6 | Ingest OpenMC and MCNP(+ALARA) outputs, collapse to common group structures, compare with clear metrics (C/E, parity, residuals) | ✅ |
-| 7 | Output reproducible "run bundle" per analysis: config, input hashes, nuclear-data versions, all artifacts, final report | ✅ |
+| 1 | From raw HPGe spectra (or peak reports), produce isotope activities with full uncertainty propagation and QA/QC |  |
+| 2 | Convert activities to end-of-irradiation (EOI) reaction rates using explicit irradiation history (multi-segment) |  |
+| 3 | Build response matrix R[i,g] using dosimetry cross sections, sample compositions, and corrections |  |
+| 4 | Unfold/adjust neutron spectra using multiple solver families: GLS/STAYSL-like, MLEM/GRAVEL, Bayesian, SpecKit-style |  |
+| 5 | Produce posterior spectra with covariance/correlation plus paper-style diagnostics (χ², pulls, influence) |  |
+| 6 | Ingest OpenMC and MCNP(+ALARA) outputs, collapse to common group structures, compare with clear metrics (C/E, parity, residuals) |  |
+| 7 | Output reproducible "run bundle" per analysis: config, input hashes, nuclear-data versions, all artifacts, final report |  |
 
 ### 1.2 STAYSL Parity Definition (NEW)
 
@@ -98,7 +98,7 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 | Z: NAA-ANN Neural Networks | 9 | 0 | 0 | 9 |
 | **Total** | **112** | **0** | **0** | **112** |
 
-**Implementation Coverage: 100% Complete ✅**
+**Implementation Coverage: 100% Complete **
 **Test Suite: 762 tests passing**
 **Last Updated: March 16, 2026**
 
@@ -180,18 +180,18 @@ All "C/E" comparisons and all GLS adjustments must explicitly declare and record
 
 | Object | Description | Status |
 |--------|-------------|--------|
-| `SpectrumFile` | counts vs channel/energy, live/real time, dead time, detector id | ✅ |
-| `Peak`, `ROI`, `PeakReport` | peak centroids, net areas, fit covariance, QC flags | ✅ |
-| `DetectorModel` | energy calibration, FWHM(E), efficiency ε(E) with covariance | ✅ |
-| `DecayData` | half-lives, gamma yields, branching, chains (versioned) | ✅ |
-| `Sample` | composition, mass/density, geometry, covers, container params | ✅ |
-| `IrradiationHistory` | time segments, interruptions, cooling/counting windows | ✅ |
-| `MonitorReaction` | target isotope + MT, product, gamma lines, interference map | ✅ |
-| `GroupStructure` | energy boundaries, lethargy widths, labels | ✅ |
-| `ResponseMatrix` / `ResponseBundle` | R[i,g], σ_g,eff, correction factors + uncertainties | ✅ |
-| `PriorSpectrum` | OpenMC/MCNP spectrum + covariance (or assumed structure) | ✅ |
-| `UnfoldResult` | posterior flux, covariance, χ², residuals, influence | ✅ |
-| `ValidationBundle` | C/E tables with explicit definitions, closure metrics | ✅ |
+| `SpectrumFile` | counts vs channel/energy, live/real time, dead time, detector id |  |
+| `Peak`, `ROI`, `PeakReport` | peak centroids, net areas, fit covariance, QC flags |  |
+| `DetectorModel` | energy calibration, FWHM(E), efficiency ε(E) with covariance |  |
+| `DecayData` | half-lives, gamma yields, branching, chains (versioned) |  |
+| `Sample` | composition, mass/density, geometry, covers, container params |  |
+| `IrradiationHistory` | time segments, interruptions, cooling/counting windows |  |
+| `MonitorReaction` | target isotope + MT, product, gamma lines, interference map |  |
+| `GroupStructure` | energy boundaries, lethargy widths, labels |  |
+| `ResponseMatrix` / `ResponseBundle` | R[i,g], σ_g,eff, correction factors + uncertainties |  |
+| `PriorSpectrum` | OpenMC/MCNP spectrum + covariance (or assumed structure) |  |
+| `UnfoldResult` | posterior flux, covariance, χ², residuals, influence |  |
+| `ValidationBundle` | C/E tables with explicit definitions, closure metrics |  |
 
 ---
 
@@ -217,26 +217,26 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| A1.1 | SPE format reader | ✅ | `io.spe.read_spe_file()` | Full support |
-| A1.2 | CHN format reader | ✅ | `io.hpge` | Full ORTEC/Maestro CHN binary support |
-| A1.3 | CNF (Canberra) format | ✅ | `io.cnf.read_cnf_file()` | Binary parser + tests |
-| A1.4 | N42/IEC XML format | ✅ | `io.n42` | Reader/writer + tests |
-| A1.9 | IEC ASCII (.iec) reader | ✅ | `io.iec.read_iec_file()` | IEC 62755-style ASCII import |
-| A1.5 | Background estimation (SNIP) | ✅ | `analysis.peakfit` | Full support |
-| A1.6 | Dead-time validation | ✅ | `io.spe` | `dead_time_fraction` |
-| A1.7 | PRA histogram reader | ✅ | `io.pra.read_pra_histogram()` | PRA ASCII import |
-| A1.8 | Text calibration import | ✅ | `io.calibration_text.read_pygammaspec_calibration()` | PyGammaSpec-style |
+| A1.1 | SPE format reader |  | `io.spe.read_spe_file()` | Full support |
+| A1.2 | CHN format reader |  | `io.hpge` | Full ORTEC/Maestro CHN binary support |
+| A1.3 | CNF (Canberra) format |  | `io.cnf.read_cnf_file()` | Binary parser + tests |
+| A1.4 | N42/IEC XML format |  | `io.n42` | Reader/writer + tests |
+| A1.9 | IEC ASCII (.iec) reader |  | `io.iec.read_iec_file()` | IEC 62755-style ASCII import |
+| A1.5 | Background estimation (SNIP) |  | `analysis.peakfit` | Full support |
+| A1.6 | Dead-time validation |  | `io.spe` | `dead_time_fraction` |
+| A1.7 | PRA histogram reader |  | `io.pra.read_pra_histogram()` | PRA ASCII import |
+| A1.8 | Text calibration import |  | `io.calibration_text.read_pygammaspec_calibration()` | PyGammaSpec-style |
 
 ### Epic B — Peak Detection & Fitting
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| B1.1 | Automated peak finding | ✅ | `analysis.peak_finders` | scipy, window, chunked, simple |
-| B1.2 | Gaussian peak fitting | ✅ | `analysis.peakfit` | `GaussianPeak` |
-| B1.3 | Hypermet peak shapes | ✅ | `analysis.hypermet` | `HypermetPeak`, `fit_hypermet_peak()` |
-| B1.4 | Multiplet handling | ✅ | `analysis.peakfit` | Shared width/background |
-| B1.5 | Peak fit covariance | ✅ | `analysis.peakfit` | `PeakFitResult.covariance` |
-| B1.6 | Spectrum arithmetic + smoothing | ✅ | `analysis.spectrum_math` | Add/subtract + moving average |
+| B1.1 | Automated peak finding |  | `analysis.peak_finders` | scipy, window, chunked, simple |
+| B1.2 | Gaussian peak fitting |  | `analysis.peakfit` | `GaussianPeak` |
+| B1.3 | Hypermet peak shapes |  | `analysis.hypermet` | `HypermetPeak`, `fit_hypermet_peak()` |
+| B1.4 | Multiplet handling |  | `analysis.peakfit` | Shared width/background |
+| B1.5 | Peak fit covariance |  | `analysis.peakfit` | `PeakFitResult.covariance` |
+| B1.6 | Spectrum arithmetic + smoothing |  | `analysis.spectrum_math` | Add/subtract + moving average |
 | B1.7 | Derivative & Top-hat peak search | Planned | `analysis.peak_finders` | First/second derivative and top-hat filtering (QG parity) |
 | B1.8 | Quadratic smoothing | Planned | `analysis.spectrum_math` | Savitzky-Golay / quadratic pre-filters (QG parity) |
 | B1.9 | Dynamic ROI sizing | Planned | `analysis.peakfit` | ROI width scaled automatically by FWHM(E) resolution calibration |
@@ -249,14 +249,14 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| C1.1 | Efficiency curve fitting | ✅ | `analysis.detector_calibration.fit_efficiency_curve()` | Log-log polynomial fits + curve export |
-| C1.2 | Activity from peak area | ✅ | `physics.activation` | Full dead-time and decay correction |
-| C1.3 | Weighted activity (multi-line) | ✅ | `physics.activation` | `weighted_activity()` |
-| C1.4 | Coincidence summing corrections | ✅ | `corrections.coincidence` | Full decay scheme TCS for Co60/Y88/Cs134/Eu152/Na24 + tests |
-| C1.5 | **Gamma self-attenuation (NEW)** | ✅ | `corrections.gamma_attenuation` | Sample/container attenuation correction + tests |
-| C1.6 | Decay inventory + unit conversions | ✅ | `physics.decay_inventory` | Activity/mass/mole/atom conversions |
-| C1.7 | Resolution curve fitting | ✅ | `analysis.detector_calibration.fit_resolution_curve()` | FWHM vs energy models |
-| C1.8 | Material attenuation helpers | ✅ | `physics.attenuation` | XCOM-backed transmission for materials/mixtures |
+| C1.1 | Efficiency curve fitting |  | `analysis.detector_calibration.fit_efficiency_curve()` | Log-log polynomial fits + curve export |
+| C1.2 | Activity from peak area |  | `physics.activation` | Full dead-time and decay correction |
+| C1.3 | Weighted activity (multi-line) |  | `physics.activation` | `weighted_activity()` |
+| C1.4 | Coincidence summing corrections |  | `corrections.coincidence` | Full decay scheme TCS for Co60/Y88/Cs134/Eu152/Na24 + tests |
+| C1.5 | **Gamma self-attenuation (NEW)** |  | `corrections.gamma_attenuation` | Sample/container attenuation correction + tests |
+| C1.6 | Decay inventory + unit conversions |  | `physics.decay_inventory` | Activity/mass/mole/atom conversions |
+| C1.7 | Resolution curve fitting |  | `analysis.detector_calibration.fit_resolution_curve()` | FWHM vs energy models |
+| C1.8 | Material attenuation helpers |  | `physics.attenuation` | XCOM-backed transmission for materials/mixtures |
 | C1.9 | ROI-directed operation mode | Planned | `physics.activation` | Direct activity from ROIs skipping library search (QG parity) |
 | C1.10 | Zero-count MDA reporting | Planned | `physics.mda` | Decision thresholds and bounds even for missing peaks (QG parity) |
 
@@ -264,85 +264,85 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| D1.1 | Multi-segment irradiation history | ✅ | `physics.activation` | `IrradiationSegment` |
-| D1.2 | Decay corrections | ✅ | `physics.activation` | `irradiation_buildup_factor()` |
-| D1.3 | EOI reaction rate | ✅ | `physics.activation` | `reaction_rate_from_activity()` |
-| D1.4 | **SigPhi saturation rates (NEW)** | ✅ | `physics.sigphi` | SigPhi-equivalent R_sat + full factors |
-| D1.5 | **Burnup/transmutation (NEW)** | ✅ | `physics.sigphi` | Threshold-based burnup correction + tests |
+| D1.1 | Multi-segment irradiation history |  | `physics.activation` | `IrradiationSegment` |
+| D1.2 | Decay corrections |  | `physics.activation` | `irradiation_buildup_factor()` |
+| D1.3 | EOI reaction rate |  | `physics.activation` | `reaction_rate_from_activity()` |
+| D1.4 | **SigPhi saturation rates (NEW)** |  | `physics.sigphi` | SigPhi-equivalent R_sat + full factors |
+| D1.5 | **Burnup/transmutation (NEW)** |  | `physics.sigphi` | Threshold-based burnup correction + tests |
 
 ### Epic E — Response Matrix
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| E1.1 | Energy group structure | ✅ | `core.response` | 640/725g support |
-| E1.2 | Response matrix construction | ✅ | `core.response` | `build_response_matrix()` |
-| E1.3 | IRDFF cross sections | ✅ | `data.irdff` | `IRDFFDatabase` |
-| E1.4 | Self-shielding corrections | ✅ | `corrections.self_shielding` | SHIELD-style geometry support + tests |
-| E1.5 | Cadmium cover corrections | ✅ | `corrections.covers` | Cd/Gd/B/Au cover transmission + tests |
+| E1.1 | Energy group structure |  | `core.response` | 640/725g support |
+| E1.2 | Response matrix construction |  | `core.response` | `build_response_matrix()` |
+| E1.3 | IRDFF cross sections |  | `data.irdff` | `IRDFFDatabase` |
+| E1.4 | Self-shielding corrections |  | `corrections.self_shielding` | SHIELD-style geometry support + tests |
+| E1.5 | Cadmium cover corrections |  | `corrections.covers` | Cd/Gd/B/Au cover transmission + tests |
 
 ### Epic F — Unfolding Solvers
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| F1.1 | GLS adjustment | ✅ | `solvers.gls` | `gls_adjust()` |
-| F1.2 | GRAVEL iterative | ✅ | `solvers.iterative` | `gravel()` - validated |
-| F1.3 | MLEM iterative | ✅ | `solvers.iterative` | `mlem()` |
-| F1.4 | Gradient descent | ✅ | `solvers.iterative` | `gradient_descent()` |
-| F1.5 | Bayesian MCMC | ✅ | `solvers.mcmc` | `mcmc_unfold()` |
-| F1.6 | Positivity constraints | ✅ | All solvers | Enforced |
-| F1.7 | Chi-square diagnostics | ✅ | All solvers | Solution objects |
+| F1.1 | GLS adjustment |  | `solvers.gls` | `gls_adjust()` |
+| F1.2 | GRAVEL iterative |  | `solvers.iterative` | `gravel()` - validated |
+| F1.3 | MLEM iterative |  | `solvers.iterative` | `mlem()` |
+| F1.4 | Gradient descent |  | `solvers.iterative` | `gradient_descent()` |
+| F1.5 | Bayesian MCMC |  | `solvers.mcmc` | `mcmc_unfold()` |
+| F1.6 | Positivity constraints |  | All solvers | Enforced |
+| F1.7 | Chi-square diagnostics |  | All solvers | Solution objects |
 
 ### Epic G — Plotting & Reporting
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| G1.1 | Spectrum with uncertainty bands | ✅ | `fluxforge plots --example` / `plots.master_suite` |
-| G1.2 | Prior vs posterior overlay | ✅ | `plots.master_suite` |
-| G1.3 | Residual/pull plots | ✅ | `plots.unfolding.plot_residuals_pulls()` |
-| G1.4 | Covariance/correlation heatmaps | ✅ | `plots.unfolding.plot_covariance_correlation_heatmaps()` |
-| G1.5 | Parity plot | ✅ | `plots.unfolding.plot_measured_vs_predicted()` |
+| G1.1 | Spectrum with uncertainty bands |  | `fluxforge plots --example` / `plots.master_suite` |
+| G1.2 | Prior vs posterior overlay |  | `plots.master_suite` |
+| G1.3 | Residual/pull plots |  | `plots.unfolding.plot_residuals_pulls()` |
+| G1.4 | Covariance/correlation heatmaps |  | `plots.unfolding.plot_covariance_correlation_heatmaps()` |
+| G1.5 | Parity plot |  | `plots.unfolding.plot_measured_vs_predicted()` |
 
 ### Epic H — Model Comparison (OpenMC/MCNP)
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| H1.1 | OpenMC statepoint ingestion | ✅ | `io.openmc.read_openmc_flux_spectrum()`, `OpenMCSpectrum` |
-| H1.2 | MCNP tally ingestion | ✅ | `io.mcnp.read_mctal()`, `read_mcnp_flux_tally()`, `MCTALFile` |
-| H1.3 | ALARA input generation | ✅ | `io.alara.create_alara_activation_input()`, `ALARAInputGenerator` |
-| H1.4 | ALARA output parsing | ✅ | `io.alara.read_alara_output()`, `parse_alara_output()`, `ALARAOutput` |
+| H1.1 | OpenMC statepoint ingestion |  | `io.openmc.read_openmc_flux_spectrum()`, `OpenMCSpectrum` |
+| H1.2 | MCNP tally ingestion |  | `io.mcnp.read_mctal()`, `read_mcnp_flux_tally()`, `MCTALFile` |
+| H1.3 | ALARA input generation |  | `io.alara.create_alara_activation_input()`, `ALARAInputGenerator` |
+| H1.4 | ALARA output parsing |  | `io.alara.read_alara_output()`, `parse_alara_output()`, `ALARAOutput` |
 
-### Epic I — TRIGA / k₀-NAA ✅ COMPLETE
-
-| ID | Capability | Status | Module |
-|----|------------|--------|--------|
-| I1.1 | Cd-ratio calculations | ✅ | `triga.cd_ratio.CdRatioAnalyzer` |
-| I1.2 | f and α parameter fitting | ✅ | `triga.cd_ratio.estimate_f/alpha_multi()` |
-| I1.3 | k₀-standardization module | ✅ | `triga.k0.TRIGAk0Workflow` |
-| I1.4 | Triple-monitor method | ✅ | `triga.k0.triple_monitor_method()` |
-| I1.5 | TRIGA flux validation | ✅ | `triga.k0.validate_triga_flux_params()` |
-
-### Epic J — Artifacts & Provenance ✅ COMPLETE
+### Epic I — TRIGA / k₀-NAA  COMPLETE
 
 | ID | Capability | Status | Module |
 |----|------------|--------|--------|
-| J1.1 | JSON artifact output | ✅ | `io.artifacts` |
-| J1.2 | Provenance metadata | ✅ | `core.provenance` |
-| J1.3 | Unit metadata validation | ✅ | `core.schemas` |
+| I1.1 | Cd-ratio calculations |  | `triga.cd_ratio.CdRatioAnalyzer` |
+| I1.2 | f and α parameter fitting |  | `triga.cd_ratio.estimate_f/alpha_multi()` |
+| I1.3 | k₀-standardization module |  | `triga.k0.TRIGAk0Workflow` |
+| I1.4 | Triple-monitor method |  | `triga.k0.triple_monitor_method()` |
+| I1.5 | TRIGA flux validation |  | `triga.k0.validate_triga_flux_params()` |
+
+### Epic J — Artifacts & Provenance  COMPLETE
+
+| ID | Capability | Status | Module |
+|----|------------|--------|--------|
+| J1.1 | JSON artifact output |  | `io.artifacts` |
+| J1.2 | Provenance metadata |  | `core.provenance` |
+| J1.3 | Unit metadata validation |  | `core.schemas` |
 
 ### Epic K — Reactor Dosimetry Workflow (INL)
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| K1 | Flux Wire Selection | ✅ | `analysis.flux_wire_selection` | IRDFF reactions |
-| K2 | Irradiation Modeling | ✅ | `physics.activation` | `IrradiationSegment` |
-| K3 | Flux Wire Measurement | ✅ | `io.flux_wire` | HPGe processing |
-| K4 | A Priori Spectrum | ✅ | `SpectrumUnfolder` | 640/725 groups |
-| K5 | Spectrum Unfolding | ✅ | `solvers` | GLS, GRAVEL, MLEM, MCMC |
-| K6 | Adjusted Spectrum | ✅ | `UnfoldingResult` | `compare_with_mcnp()` |
-| K7 | Fluences of Interest | ✅ | — | 1-MeV eq, DPA |
-| K8 | A Priori Covariance | ✅ | `core.prior_covariance` | Prior covariance models + CLI wiring for GLS |
-| K9 | ASTM E261 reduction workflow | ✅ | `analysis.astm_e261` | Dedicated `astm-e261` CLI command + Standards-tab GUI runner |
-| K10 | INL Raw Spectra Peak Finding (ASTM E3376) | ✅ | `workflows.astm_inl_dosimetry` | FWHM-scaled ROIs, Covell subtraction, matching QG outputs |
+| K1 | Flux Wire Selection |  | `analysis.flux_wire_selection` | IRDFF reactions |
+| K2 | Irradiation Modeling |  | `physics.activation` | `IrradiationSegment` |
+| K3 | Flux Wire Measurement |  | `io.flux_wire` | HPGe processing |
+| K4 | A Priori Spectrum |  | `SpectrumUnfolder` | 640/725 groups |
+| K5 | Spectrum Unfolding |  | `solvers` | GLS, GRAVEL, MLEM, MCMC |
+| K6 | Adjusted Spectrum |  | `UnfoldingResult` | `compare_with_mcnp()` |
+| K7 | Fluences of Interest |  | — | 1-MeV eq, DPA |
+| K8 | A Priori Covariance |  | `core.prior_covariance` | Prior covariance models + CLI wiring for GLS |
+| K9 | ASTM E261 reduction workflow |  | `analysis.astm_e261` | Dedicated `astm-e261` CLI command + Standards-tab GUI runner |
+| K10 | INL Raw Spectra Peak Finding (ASTM E3376) |  | `workflows.astm_inl_dosimetry` | FWHM-scaled ROIs, Covell subtraction, matching QG outputs |
 
 ---
 
@@ -354,42 +354,42 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| M1.1 | Saturation activity corrections | ✅ | Multi-segment history in `physics.sigphi` |
-| M1.2 | BCF-like computation pathway | ✅ | `flux_history_correction_factor()` |
-| M1.3 | Saturation with sampling decay | ✅ | `CorrectionType.SATURATION_WITH_SAMPLING_DECAY` |
-| M1.4 | Saturated reaction rates artifact | ✅ | `SaturationRateResult` + burnup model |
+| M1.1 | Saturation activity corrections |  | Multi-segment history in `physics.sigphi` |
+| M1.2 | BCF-like computation pathway |  | `flux_history_correction_factor()` |
+| M1.3 | Saturation with sampling decay |  | `CorrectionType.SATURATION_WITH_SAMPLING_DECAY` |
+| M1.4 | Saturated reaction rates artifact |  | `SaturationRateResult` + burnup model |
 
 ### M2. Neutron Self-Shielding (SHIELD-Style)
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| M2.1 | Geometry-aware calculator | ✅ | `corrections.self_shielding` - slab/cylinder/sphere |
-| M2.2 | Fine internal energy grid | ✅ | `calculate_group_self_shielding()` with subgroup resolution |
-| M2.3 | Self-shielding library artifact | ✅ | `SelfShieldingLibrary`, `create_self_shielding_library()` |
-| M2.4 | Isotropic vs beam flux type | ✅ | `FluxType.ISOTROPIC`, `FluxType.BEAM` |
+| M2.1 | Geometry-aware calculator |  | `corrections.self_shielding` - slab/cylinder/sphere |
+| M2.2 | Fine internal energy grid |  | `calculate_group_self_shielding()` with subgroup resolution |
+| M2.3 | Self-shielding library artifact |  | `SelfShieldingLibrary`, `create_self_shielding_library()` |
+| M2.4 | Isotropic vs beam flux type |  | `FluxType.ISOTROPIC`, `FluxType.BEAM` |
 
 ### M3. Cover Correction Factors
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| M3.1 | Cadmium cover model | ✅ | `corrections.covers.CoverMaterial.CADMIUM` |
-| M3.2 | Gadolinium cover model | ✅ | `corrections.covers.CoverMaterial.GADOLINIUM` |
-| M3.3 | Boron cover model | ✅ | `corrections.covers.CoverMaterial.BORON` |
-| M3.4 | Gold cover model | ✅ | `corrections.covers.CoverMaterial.GOLD` |
-| M3.5 | Uncertainty propagation | ✅ | `CoverCorrectionFactor.F_c_uncertainty` |
-| M3.6 | **STAYSL CCF parity mode** | ✅ | `CoverSpec`, `compute_ccf_staysl()`, E₂(x) integral |
-| M3.7 | **Energy-dependent T(E)** | ✅ | `compute_energy_dependent_cover_corrections()` |
-| M3.8 | **Beam vs isotropic flux models** | ✅ | `FluxAngularModel.BEAM`, `FluxAngularModel.ISOTROPIC` |
-| M3.9 | **STAYSL parity report** | ✅ | `create_staysl_parity_report()` for sta_spe.dat comparison |
+| M3.1 | Cadmium cover model |  | `corrections.covers.CoverMaterial.CADMIUM` |
+| M3.2 | Gadolinium cover model |  | `corrections.covers.CoverMaterial.GADOLINIUM` |
+| M3.3 | Boron cover model |  | `corrections.covers.CoverMaterial.BORON` |
+| M3.4 | Gold cover model |  | `corrections.covers.CoverMaterial.GOLD` |
+| M3.5 | Uncertainty propagation |  | `CoverCorrectionFactor.F_c_uncertainty` |
+| M3.6 | **STAYSL CCF parity mode** |  | `CoverSpec`, `compute_ccf_staysl()`, E₂(x) integral |
+| M3.7 | **Energy-dependent T(E)** |  | `compute_energy_dependent_cover_corrections()` |
+| M3.8 | **Beam vs isotropic flux models** |  | `FluxAngularModel.BEAM`, `FluxAngularModel.ISOTROPIC` |
+| M3.9 | **STAYSL parity report** |  | `create_staysl_parity_report()` for sta_spe.dat comparison |
 
 ### M4. GLS Spectral Adjustment (STAYSL Core)
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| M4.1 | Full covariance treatment | ✅ | `solvers.gls` |
-| M4.2 | Response covariance option | ✅ | `ResponseCovariancePolicy` enum + AUGMENT_VY, MONTE_CARLO modes |
-| M4.3 | Prior covariance model (NEW) | ✅ | `core.prior_covariance` (regional + lethargy-correlated defaults) |
-| M4.4 | Response uncertainty policy (NEW) | ✅ | `core.prior_covariance` (augment V_y / nuisance / MC policy enum) |
+| M4.1 | Full covariance treatment |  | `solvers.gls` |
+| M4.2 | Response covariance option |  | `ResponseCovariancePolicy` enum + AUGMENT_VY, MONTE_CARLO modes |
+| M4.3 | Prior covariance model (NEW) |  | `core.prior_covariance` (regional + lethargy-correlated defaults) |
+| M4.4 | Response uncertainty policy (NEW) |  | `core.prior_covariance` (augment V_y / nuisance / MC policy enum) |
 
 **Prior Covariance V_φ0 (REQUIRED):**
 - User-supplied V_φ0, OR
@@ -406,19 +406,19 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| M5.1 | Dosimetry input correlation matrix | ✅ | `reporting.CorrelationMatrix` |
-| M5.2 | Input vs output flux correlations | ✅ | `reporting.CorrelationMatrix.from_covariance()` |
-| M5.3 | Differential flux tables | ✅ | `reporting.DifferentialFluxTable` |
-| M5.4 | Spectral-averaged reaction rates | ✅ | `reporting.ReactionRateTable` |
-| M5.5 | Plot-ready stepwise spectrum | ✅ | `reporting.StepwiseSpectrum` |
+| M5.1 | Dosimetry input correlation matrix |  | `reporting.CorrelationMatrix` |
+| M5.2 | Input vs output flux correlations |  | `reporting.CorrelationMatrix.from_covariance()` |
+| M5.3 | Differential flux tables |  | `reporting.DifferentialFluxTable` |
+| M5.4 | Spectral-averaged reaction rates |  | `reporting.ReactionRateTable` |
+| M5.5 | Plot-ready stepwise spectrum |  | `reporting.StepwiseSpectrum` |
 
 ### M6. Interoperability
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| M6.1 | Import saturation rates from spreadsheet | ✅ | `io.interop.read_saturation_rates_csv()` |
-| M6.2 | Export STAYSL-compatible bundle | ✅ | `io.interop.export_staysl_bundle()` |
-| M6.3 | Lower-triangular symmetric matrix ingestion | ✅ | `io.interop.read_lower_triangular_matrix()` |
+| M6.1 | Import saturation rates from spreadsheet |  | `io.interop.read_saturation_rates_csv()` |
+| M6.2 | Export STAYSL-compatible bundle |  | `io.interop.export_staysl_bundle()` |
+| M6.3 | Lower-triangular symmetric matrix ingestion |  | `io.interop.read_lower_triangular_matrix()` |
 
 ---
 
@@ -428,15 +428,15 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| N1.1 | Multi-group library ingestion | ✅ | `data.irdff` | IAEA download |
-| N1.2 | ENDF-6 evaluation processing | ✅ | `data.irdff` | Full tabulated format support |
-| N1.3 | Energy grid / boundaries | ✅ | `data.irdff` | 119 reactions |
-| N1.4 | Covariance support | ✅ | `data.irdff` | Full MF33 + endf_covariance module |
-| N1.5 | Reaction metadata (MT, product, thresholds) | ✅ | `data.irdff` | Full |
-| N1.6 | Reaction browser CLI/API | ✅ | `cli.app reactions` | Category/target filter |
-| N1.7 | NJOY processing pipeline | ✅ | `data.njoy` | Reproducible group XS |
-| N1.8 | Wire set robustness diagnostics | ✅ | `analysis.robustness` | Condition/coverage/LOO analysis |
-| N1.9 | Offline placeholder XS library + search | ✅ | `data.crosssections` | `CrossSectionLibrary.search()` + `create_irdff_placeholder_library()` |
+| N1.1 | Multi-group library ingestion |  | `data.irdff` | IAEA download |
+| N1.2 | ENDF-6 evaluation processing |  | `data.irdff` | Full tabulated format support |
+| N1.3 | Energy grid / boundaries |  | `data.irdff` | 119 reactions |
+| N1.4 | Covariance support |  | `data.irdff` | Full MF33 + endf_covariance module |
+| N1.5 | Reaction metadata (MT, product, thresholds) |  | `data.irdff` | Full |
+| N1.6 | Reaction browser CLI/API |  | `cli.app reactions` | Category/target filter |
+| N1.7 | NJOY processing pipeline |  | `data.njoy` | Reproducible group XS |
+| N1.8 | Wire set robustness diagnostics |  | `analysis.robustness` | Condition/coverage/LOO analysis |
+| N1.9 | Offline placeholder XS library + search |  | `data.crosssections` | `CrossSectionLibrary.search()` + `create_irdff_placeholder_library()` |
 
 ---
 
@@ -446,12 +446,12 @@ The remaining external gaps are now primarily **workflow, UI, and optional integ
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| O1.1 | Unified NuclearData interface | ✅ | CE and MG XS |
-| O1.2 | Thermal scattering metadata | ✅ | `data.thermal_scattering` S(α,β) material-TSL mapping |
-| O1.3 | Decay data link-outs | ✅ | `data.gamma_database` |
-| O1.4 | Multi-temperature support | ✅ | Temperature tags |
-| O1.5 | ENDF ↔ IRDFF bridge utilities | ✅ | Explicit mapping |
-| O1.6 | Library provenance enforcement | ✅ | `ProvenanceBundle` + `validate_library_provenance()` |
+| O1.1 | Unified NuclearData interface |  | CE and MG XS |
+| O1.2 | Thermal scattering metadata |  | `data.thermal_scattering` S(α,β) material-TSL mapping |
+| O1.3 | Decay data link-outs |  | `data.gamma_database` |
+| O1.4 | Multi-temperature support |  | Temperature tags |
+| O1.5 | ENDF ↔ IRDFF bridge utilities |  | Explicit mapping |
+| O1.6 | Library provenance enforcement |  | `ProvenanceBundle` + `validate_library_provenance()` |
 
 ### ENDF-6 Covariance Requirements (NEW)
 
@@ -468,10 +468,10 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| O2.1 | MF33 (XS covariance) ingestion | ✅ | `data.endf_covariance` + tests |
-| O2.2 | Covariance degraded flag | ✅ | Explicit flag + warnings when defaults/padding used |
-| O2.3 | Covariance integrity checks | ✅ | Symmetry/PD/conditioning diagnostics |
-| O2.4 | Documented conditioning | ✅ | SVD truncation and PD projection utilities |
+| O2.1 | MF33 (XS covariance) ingestion |  | `data.endf_covariance` + tests |
+| O2.2 | Covariance degraded flag |  | Explicit flag + warnings when defaults/padding used |
+| O2.3 | Covariance integrity checks |  | Symmetry/PD/conditioning diagnostics |
+| O2.4 | Documented conditioning |  | SVD truncation and PD projection utilities |
 
 ---
 
@@ -481,16 +481,16 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Module | Notes |
 |----|------------|--------|--------|-------|
-| P1.1 | k₀ factors database | ✅ | `triga.k0` | `STANDARD_MONITORS` |
-| P1.2 | Resonance integrals | ✅ | `triga.k0` | In database |
-| P1.3 | Q₀(α) parameters | ✅ | `triga.k0` | Implemented |
-| P1.4 | Westcott g(T) factors | ✅ | `triga.k0` | `WestcottFactors`, 17 isotopes with polynomial g(T) |
-| P1.5 | Recommended lines + interference | ✅ | `triga.k0` | In database |
-| P1.6 | Canonical k₀ pipeline | ✅ | `triga.k0` | `TRIGAk0Workflow` |
-| P1.7 | Cd-ratio with uncertainty | ✅ | `triga.cd_ratio` | `calculate_cd_ratio()` |
-| P1.8 | f/α reconciliation vs unfolded | ✅ | `triga.reconcile` | Cross-validation hook |
-| P1.9 | Separate uncertainty components | ✅ | `uncertainty.budget` | `UncertaintyBudget` with category breakdown |
-| P1.10 | Cd + self-shielding factors in k₀ calc | ✅ | `analysis.k0_naa` | `K0Measurement.g_th/g_ep/cd_factor` |
+| P1.1 | k₀ factors database |  | `triga.k0` | `STANDARD_MONITORS` |
+| P1.2 | Resonance integrals |  | `triga.k0` | In database |
+| P1.3 | Q₀(α) parameters |  | `triga.k0` | Implemented |
+| P1.4 | Westcott g(T) factors |  | `triga.k0` | `WestcottFactors`, 17 isotopes with polynomial g(T) |
+| P1.5 | Recommended lines + interference |  | `triga.k0` | In database |
+| P1.6 | Canonical k₀ pipeline |  | `triga.k0` | `TRIGAk0Workflow` |
+| P1.7 | Cd-ratio with uncertainty |  | `triga.cd_ratio` | `calculate_cd_ratio()` |
+| P1.8 | f/α reconciliation vs unfolded |  | `triga.reconcile` | Cross-validation hook |
+| P1.9 | Separate uncertainty components |  | `uncertainty.budget` | `UncertaintyBudget` with category breakdown |
+| P1.10 | Cd + self-shielding factors in k₀ calc |  | `analysis.k0_naa` | `K0Measurement.g_th/g_ep/cd_factor` |
 
 ---
 
@@ -500,15 +500,15 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| Q1.1 | Detector response matrix D | ✅ | `solvers.rmle` provides ResponseMatrix + Gaussian response builder |
-| Q1.2 | Smearing matrices | ✅ | Gaussian smearing via resolution (FWHM(E)) model |
-| Q1.3 | RMLE solver | ✅ | Poisson-likelihood + regularization + positivity |
-| Q1.4 | Background component modeling (NEW) | ✅ | Explicit b in m = R_γ μ + b (constant/vector) |
-| Q1.5 | Contaminant peak components | ✅ | `prior_activities/uncertainties` in `PoissonRMLEConfig` for constrained priors |
-| Q1.6 | Calibration uncertainty propagation (NEW) | ✅ | Response-operator MC hook (response_sampler) + count resampling |
-| Q1.7 | Unfolded spectrum uncertainty | ✅ | MC-based bands (counts + optional response sampling) |
-| Q1.8 | Refolding/closure diagnostics | ✅ | Refold residual/χ² guardrails |
-| Q1.9 | Integration with activation path | ✅ | `workflows.activation_pipeline.ActivationPipeline` for end-to-end ALARA workflow |
+| Q1.1 | Detector response matrix D |  | `solvers.rmle` provides ResponseMatrix + Gaussian response builder |
+| Q1.2 | Smearing matrices |  | Gaussian smearing via resolution (FWHM(E)) model |
+| Q1.3 | RMLE solver |  | Poisson-likelihood + regularization + positivity |
+| Q1.4 | Background component modeling (NEW) |  | Explicit b in m = R_γ μ + b (constant/vector) |
+| Q1.5 | Contaminant peak components |  | `prior_activities/uncertainties` in `PoissonRMLEConfig` for constrained priors |
+| Q1.6 | Calibration uncertainty propagation (NEW) |  | Response-operator MC hook (response_sampler) + count resampling |
+| Q1.7 | Unfolded spectrum uncertainty |  | MC-based bands (counts + optional response sampling) |
+| Q1.8 | Refolding/closure diagnostics |  | Refold residual/χ² guardrails |
+| Q1.9 | Integration with activation path |  | `workflows.activation_pipeline.ActivationPipeline` for end-to-end ALARA workflow |
 
 ---
 
@@ -518,16 +518,16 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| R1.1 | ExpGauss peak fitting | ✅ | `analysis.peakfit.expgauss()` - Exponentially-modified Gaussian |
-| R1.2 | Double-exponential tail fitting | ✅ | `analysis.peakfit.gauss_dbl_exp()` - Left+right exponential tails |
-| R1.3 | Poisson-likelihood fitting backend | ✅ | `analysis.peakfit.fit_peak_poisson()` with Nelder-Mead |
-| R1.4 | CPS-keV spectrum representation | ✅ | `core.spectrum_ops.cpskev` - Counts/keV spectral density |
-| R1.5 | Auto-calibration via known isotopes | ✅ | `analysis.auto_calibration.auto_calibrate()` |
-| R1.6 | NNDC nuclear data access | ✅ | `data.nndc` - Isotope data fetching from NNDC |
-| R1.7 | XCOM attenuation coefficients | ✅ | `data.xcom` - 12 materials, interpolated μ/ρ, HVL, transmission |
-| R1.8 | NIST materials database | ✅ | `data.materials` - 45+ NIST/Compendium materials with compositions |
-| R1.9 | Isotope/element metadata | ✅ | Already in `data.isotope_data` |
-| R1.10 | Expression-based calibration | ✅ | Already in `calibration.energy_calibration` |
+| R1.1 | ExpGauss peak fitting |  | `analysis.peakfit.expgauss()` - Exponentially-modified Gaussian |
+| R1.2 | Double-exponential tail fitting |  | `analysis.peakfit.gauss_dbl_exp()` - Left+right exponential tails |
+| R1.3 | Poisson-likelihood fitting backend |  | `analysis.peakfit.fit_peak_poisson()` with Nelder-Mead |
+| R1.4 | CPS-keV spectrum representation |  | `core.spectrum_ops.cpskev` - Counts/keV spectral density |
+| R1.5 | Auto-calibration via known isotopes |  | `analysis.auto_calibration.auto_calibrate()` |
+| R1.6 | NNDC nuclear data access |  | `data.nndc` - Isotope data fetching from NNDC |
+| R1.7 | XCOM attenuation coefficients |  | `data.xcom` - 12 materials, interpolated μ/ρ, HVL, transmission |
+| R1.8 | NIST materials database |  | `data.materials` - 45+ NIST/Compendium materials with compositions |
+| R1.9 | Isotope/element metadata |  | Already in `data.isotope_data` |
+| R1.10 | Expression-based calibration |  | Already in `calibration.energy_calibration` |
 
 ---
 
@@ -537,14 +537,14 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| S1.1 | Sparse GLS with cholmod | ✅ | `solvers.advanced.gls_update_numpy()` with sparse option |
-| S1.2 | Levenberg-Marquardt optimization | ✅ | `solvers.advanced.levenberg_marquardt()` for nonlinear GLS |
-| S1.3 | Adaptive Romberg integration | ✅ | `solvers.advanced.romberg_integrate()`, `spectrum_averaged_cross_section()` |
-| S1.4 | PPP (Prior-Predictive-Posterior) correction | ✅ | `solvers.advanced.apply_ppp_correction()` Chiba-Smith method |
-| S1.5 | Unknown uncertainty estimation | ✅ | `solvers.advanced.estimate_unknown_uncertainty()` ML/Birge methods |
-| S1.6 | GMA workflow manager | ✅ | `evaluation.gma_workflow.GMAWorkflow` - Full GMA pipeline |
-| S1.7 | Sensitivity matrix builder | ✅ | Already in `unfolding.sensitivity_matrix` |
-| S1.8 | JSON experimental database format | ✅ | `evaluation.gma_workflow.ExperimentalDatabase` with JSON I/O |
+| S1.1 | Sparse GLS with cholmod |  | `solvers.advanced.gls_update_numpy()` with sparse option |
+| S1.2 | Levenberg-Marquardt optimization |  | `solvers.advanced.levenberg_marquardt()` for nonlinear GLS |
+| S1.3 | Adaptive Romberg integration |  | `solvers.advanced.romberg_integrate()`, `spectrum_averaged_cross_section()` |
+| S1.4 | PPP (Prior-Predictive-Posterior) correction |  | `solvers.advanced.apply_ppp_correction()` Chiba-Smith method |
+| S1.5 | Unknown uncertainty estimation |  | `solvers.advanced.estimate_unknown_uncertainty()` ML/Birge methods |
+| S1.6 | GMA workflow manager |  | `evaluation.gma_workflow.GMAWorkflow` - Full GMA pipeline |
+| S1.7 | Sensitivity matrix builder |  | Already in `unfolding.sensitivity_matrix` |
+| S1.8 | JSON experimental database format |  | `evaluation.gma_workflow.ExperimentalDatabase` with JSON I/O |
 
 ---
 
@@ -554,15 +554,15 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| T1.1 | Spe/Chn/CNF/IEC format readers | ✅ | Full support in `io.spe`, `io.hpge`, `io.cnf`, `io.n42` |
-| T1.2 | SNIP background algorithm | ✅ | Already in `analysis.peakfit` |
-| T1.3 | DecayChain (Bateman solver) | ✅ | `physics.decay_chain.DecayChain` with matrix exponential |
-| T1.4 | Stack (stacked-target characterization) | ✅ | `physics.stacked_target.StackedTarget` - Energy degradation |
-| T1.5 | Multi-library cross sections | ✅ | `physics.stacked_target.CrossSectionLibrary` - IRDFF, ENDF, TENDL |
-| T1.6 | Library cross-section search | ✅ | `CrossSectionLibrary.search_reactions()` - By target, product, projectile |
-| T1.7 | 5-parameter efficiency calibration | ✅ | Available in `calibration.efficiency_calibration` |
-| T1.8 | Geometry attenuation corrections | ✅ | `data.xcom` transmission + geometry in `corrections` |
-| T1.9 | Multi-format spectrum export | ✅ | `io.spectrum_export.SpectrumExporter` - SPE/CNF/IEC/MCNP |
+| T1.1 | Spe/Chn/CNF/IEC format readers |  | Full support in `io.spe`, `io.hpge`, `io.cnf`, `io.n42` |
+| T1.2 | SNIP background algorithm |  | Already in `analysis.peakfit` |
+| T1.3 | DecayChain (Bateman solver) |  | `physics.decay_chain.DecayChain` with matrix exponential |
+| T1.4 | Stack (stacked-target characterization) |  | `physics.stacked_target.StackedTarget` - Energy degradation |
+| T1.5 | Multi-library cross sections |  | `physics.stacked_target.CrossSectionLibrary` - IRDFF, ENDF, TENDL |
+| T1.6 | Library cross-section search |  | `CrossSectionLibrary.search_reactions()` - By target, product, projectile |
+| T1.7 | 5-parameter efficiency calibration |  | Available in `calibration.efficiency_calibration` |
+| T1.8 | Geometry attenuation corrections |  | `data.xcom` transmission + geometry in `corrections` |
+| T1.9 | Multi-format spectrum export |  | `io.spectrum_export.SpectrumExporter` - SPE/CNF/IEC/MCNP |
 
 ---
 
@@ -572,12 +572,12 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| U1.1 | Ziegler stopping power | ✅ | `physics.stopping_power.electronic_stopping_ziegler()` |
-| U1.2 | Energy loss through foil stack | ✅ | `physics.stopping_power.calculate_energy_loss()` |
-| U1.3 | Range tables | ✅ | `physics.stopping_power.calculate_range()` |
-| U1.4 | Straggling estimates | ✅ | `physics.stopping_power.calculate_straggling()` - Bohr |
-| U1.5 | Compound stopping power | ✅ | `physics.stopping_power.total_stopping_power()` - Bragg |
-| U1.6 | IAEA charged-particle database | ✅ | `physics.stacked_target.CrossSectionLibrary` with IRDFF |
+| U1.1 | Ziegler stopping power |  | `physics.stopping_power.electronic_stopping_ziegler()` |
+| U1.2 | Energy loss through foil stack |  | `physics.stopping_power.calculate_energy_loss()` |
+| U1.3 | Range tables |  | `physics.stopping_power.calculate_range()` |
+| U1.4 | Straggling estimates |  | `physics.stopping_power.calculate_straggling()` - Bohr |
+| U1.5 | Compound stopping power |  | `physics.stopping_power.total_stopping_power()` - Bragg |
+| U1.6 | IAEA charged-particle database |  | `physics.stacked_target.CrossSectionLibrary` with IRDFF |
 
 ---
 
@@ -587,14 +587,14 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| V1.1 | Becquerel comparison suite | ✅ | Peak fitting (ExpGauss, Poisson) via `cross_repo_comparison.py` |
-| V1.2 | GMApy comparison suite | ✅ | GLS, LM, Romberg, PPP via `cross_repo_comparison.py` |
-| V1.3 | Curie comparison suite | ✅ | Decay chains, Bateman, saturation via `cross_repo_comparison.py` |
-| V1.4 | NPAT comparison suite | ✅ | Stopping power validated in `test_epic_implementations.py` |
-| V1.5 | STAYSL comparison suite | ✅ | Already implemented |
-| V1.6 | Cross-repo consistency tests | ✅ | 25/27 tests pass (2 skipped: becquerel not installed) |
-| V1.7 | Performance benchmarks | ✅ | Inline timing in module tests |
-| V1.8 | Numerical precision validation | ✅ | Tolerance checks validated in comparison tests |
+| V1.1 | Becquerel comparison suite |  | Peak fitting (ExpGauss, Poisson) via `cross_repo_comparison.py` |
+| V1.2 | GMApy comparison suite |  | GLS, LM, Romberg, PPP via `cross_repo_comparison.py` |
+| V1.3 | Curie comparison suite |  | Decay chains, Bateman, saturation via `cross_repo_comparison.py` |
+| V1.4 | NPAT comparison suite |  | Stopping power validated in `test_epic_implementations.py` |
+| V1.5 | STAYSL comparison suite |  | Already implemented |
+| V1.6 | Cross-repo consistency tests |  | 25/27 tests pass (2 skipped: becquerel not installed) |
+| V1.7 | Performance benchmarks |  | Inline timing in module tests |
+| V1.8 | Numerical precision validation |  | Tolerance checks validated in comparison tests |
 
 **Future benchmark note:** add the official TECDOC-2026 supplementary benchmark dataset to the repository verification harness once it is available in-tree. Until then, use local deterministic benchmark assets and synthetic golden cases for k0 workflow regression.
 
@@ -608,14 +608,14 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| W1.1 | D'Agostini iterative Bayesian unfolding | ✅ | Already in FluxForge as iterative method |
-| W1.2 | Spline regularization (SplineRegularizer) | ✅ | `solvers/test_statistics.py:SplineRegularizer` |
-| W1.3 | Jeffreys prior support | ✅ | `jeffreys_prior()`, `power_law_prior()` in test_statistics.py |
-| W1.4 | Multiple test statistics (KS, Chi2, BF, RMD) | ✅ | All 4 in `solvers/test_statistics.py` |
-| W1.5 | Multinomial/Poisson covariance options | ✅ | `solvers.advanced_unfolding.CovarianceModel` - 4 models |
-| W1.6 | Adye error propagation corrections | ✅ | `solvers.advanced_unfolding.adye_error_propagation()` |
-| W1.7 | Callback system for iteration hooks | ✅ | Via regularizer callable in `iterative_bayesian_unfold()` |
-| W1.8 | Iteration DataFrame output | ✅ | UnfoldingResult with history |
+| W1.1 | D'Agostini iterative Bayesian unfolding |  | Already in FluxForge as iterative method |
+| W1.2 | Spline regularization (SplineRegularizer) |  | `solvers/test_statistics.py:SplineRegularizer` |
+| W1.3 | Jeffreys prior support |  | `jeffreys_prior()`, `power_law_prior()` in test_statistics.py |
+| W1.4 | Multiple test statistics (KS, Chi2, BF, RMD) |  | All 4 in `solvers/test_statistics.py` |
+| W1.5 | Multinomial/Poisson covariance options |  | `solvers.advanced_unfolding.CovarianceModel` - 4 models |
+| W1.6 | Adye error propagation corrections |  | `solvers.advanced_unfolding.adye_error_propagation()` |
+| W1.7 | Callback system for iteration hooks |  | Via regularizer callable in `iterative_bayesian_unfold()` |
+| W1.8 | Iteration DataFrame output |  | UnfoldingResult with history |
 
 ---
 
@@ -625,14 +625,14 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| X1.1 | Decay line database (JSON) | ✅ | `physics.gamma_spectrum.DECAY_LINES` - 30+ nuclides |
-| X1.2 | Energy bin specification | ✅ | Already in FluxForge spectrum handling |
-| X1.3 | Line-to-bin mapping | ✅ | `physics.gamma_spectrum.bin_decay_lines()` |
-| X1.4 | Energy conservation scaling | ✅ | `bin_decay_lines(energy_conservation=True)` |
-| X1.5 | Multi-emission aggregation | ✅ | `get_decay_lines(emission_types=['gamma','x-ray'])` |
-| X1.6 | Nuclide identification from peaks | ✅ | `physics.gamma_spectrum.identify_nuclides()` |
-| X1.7 | Activity-to-atoms conversion | ✅ | Already in physics/decay_chain.py |
-| X1.8 | Metastable state support | ✅ | `normalize_nuclide_name()`, `parse_nuclide()` - Tc-99m, In-116m |
+| X1.1 | Decay line database (JSON) |  | `physics.gamma_spectrum.DECAY_LINES` - 30+ nuclides |
+| X1.2 | Energy bin specification |  | Already in FluxForge spectrum handling |
+| X1.3 | Line-to-bin mapping |  | `physics.gamma_spectrum.bin_decay_lines()` |
+| X1.4 | Energy conservation scaling |  | `bin_decay_lines(energy_conservation=True)` |
+| X1.5 | Multi-emission aggregation |  | `get_decay_lines(emission_types=['gamma','x-ray'])` |
+| X1.6 | Nuclide identification from peaks |  | `physics.gamma_spectrum.identify_nuclides()` |
+| X1.7 | Activity-to-atoms conversion |  | Already in physics/decay_chain.py |
+| X1.8 | Metastable state support |  | `normalize_nuclide_name()`, `parse_nuclide()` - Tc-99m, In-116m |
 
 ---
 
@@ -642,14 +642,14 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| Y1.1 | Log-smoothness regularization | ✅ | `solvers.advanced_unfolding.log_smoothness_penalty()` |
-| Y1.2 | Gradient descent optimization | ✅ | `solvers.iterative.gradient_descent()` |
-| Y1.3 | Chi-square convergence criterion | ✅ | 95% confidence threshold (already implemented) |
-| Y1.4 | Monte Carlo uncertainty propagation | ✅ | Via `run_monte_carlo_trials()` |
-| Y1.5 | GRAVEL algorithm | ✅ | `solvers.iterative.gravel()` - SAND-II variant |
-| Y1.6 | MLEM algorithm | ✅ | `solvers.iterative.mlem()` |
-| Y1.7 | Second-derivative convergence (f'') | ✅ | `solvers.advanced_unfolding.compute_ddJ_convergence()` |
-| Y1.8 | Zero-channel elimination | ✅ | Handled in preprocessing |
+| Y1.1 | Log-smoothness regularization |  | `solvers.advanced_unfolding.log_smoothness_penalty()` |
+| Y1.2 | Gradient descent optimization |  | `solvers.iterative.gradient_descent()` |
+| Y1.3 | Chi-square convergence criterion |  | 95% confidence threshold (already implemented) |
+| Y1.4 | Monte Carlo uncertainty propagation |  | Via `run_monte_carlo_trials()` |
+| Y1.5 | GRAVEL algorithm |  | `solvers.iterative.gravel()` - SAND-II variant |
+| Y1.6 | MLEM algorithm |  | `solvers.iterative.mlem()` |
+| Y1.7 | Second-derivative convergence (f'') |  | `solvers.advanced_unfolding.compute_ddJ_convergence()` |
+| Y1.8 | Zero-channel elimination |  | Handled in preprocessing |
 
 ---
 
@@ -659,15 +659,15 @@ SVD truncation and/or diagonal loading ("nugget"). Conditioning method + paramet
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| Z1.1 | TensorFlow integration | ✅ | `analysis.naa_ann` - optional import, `HAS_TENSORFLOW` flag |
-| Z1.2 | GPU configuration | ✅ | `configure_gpu()`, `get_tensorflow_info()` |
-| Z1.3 | Spectral data augmentation | ✅ | `SpectralAugmentor` - noise, shifts, intensity variation |
-| Z1.4 | Patch-based CNN architecture | ✅ | `NAAANNModel` - multi-output with embedding layers |
-| Z1.5 | Multi-output predictions | ✅ | Concentration, uncertainty, detection limit |
-| Z1.6 | MC dropout uncertainty | ✅ | `predict_with_uncertainty()` |
-| Z1.7 | Model serialization | ✅ | `.keras` format with config.json |
-| Z1.8 | Training pipeline | ✅ | `train_naa_ann_model()`, `create_training_dataset()` |
-| Z1.9 | 4e parity dataset loader | ✅ | `load_naa_ann4e_dataset()`, `prepare_naa_ann4e_dataset()` |
+| Z1.1 | TensorFlow integration |  | `analysis.naa_ann` - optional import, `HAS_TENSORFLOW` flag |
+| Z1.2 | GPU configuration |  | `configure_gpu()`, `get_tensorflow_info()` |
+| Z1.3 | Spectral data augmentation |  | `SpectralAugmentor` - noise, shifts, intensity variation |
+| Z1.4 | Patch-based CNN architecture |  | `NAAANNModel` - multi-output with embedding layers |
+| Z1.5 | Multi-output predictions |  | Concentration, uncertainty, detection limit |
+| Z1.6 | MC dropout uncertainty |  | `predict_with_uncertainty()` |
+| Z1.7 | Model serialization |  | `.keras` format with config.json |
+| Z1.8 | Training pipeline |  | `train_naa_ann_model()`, `create_training_dataset()` |
+| Z1.9 | 4e parity dataset loader |  | `load_naa_ann4e_dataset()`, `prepare_naa_ann4e_dataset()` |
 
 **Notes:**
 - TensorFlow is an **optional** dependency - FluxForge core works without it
@@ -784,20 +784,20 @@ Claims that an element is "not present" are forbidden. The system must instead r
 
 | Test Category | File | Tests | Status |
 |---------------|------|-------|--------|
-| Master Plan Goals | `test_master_plan_goals.py` | 8 | ✅ |
-| Pipeline Validation | `test_pipeline_validation.py` | 12 | ✅ |
-| Hypermet Peak Shapes | `test_hypermet.py` | 15 | ✅ |
-| MCMC Solver | `test_mcmc.py` | 18 | ✅ |
-| Peak Finders | `test_peak_finders.py` | 20 | ✅ |
-| GLS Solver | `test_gls.py` | 15 | ✅ |
-| Flux Wire Parity | `test_flux_wire_parity.py` | 2 | ✅ |
-| 10-bin Unfolding Regression | `test_flux_unfolding_10bin.py` | 1 | ✅ |
-| k₀-NAA | `test_k0_naa.py` | 4 | ✅ |
-| NAA-ANN 4e Dataset | `test_naa_ann_4e_dataset.py` | 2 | ✅ |
-| Reference Model Parity | `test_reference_model_parity.py` | 4 | ✅ |
-| Spectrum IO Parity | `test_spectrum_io_parity.py` | 4 | ✅ |
-| Unfolding External Baseline Parity | `test_unfolding_parity_baseline.py` | 2 | ✅ |
-| Stopping Power Helpers | `test_stopping_tools.py` | 1 | ✅ |
+| Master Plan Goals | `test_master_plan_goals.py` | 8 |  |
+| Pipeline Validation | `test_pipeline_validation.py` | 12 |  |
+| Hypermet Peak Shapes | `test_hypermet.py` | 15 |  |
+| MCMC Solver | `test_mcmc.py` | 18 |  |
+| Peak Finders | `test_peak_finders.py` | 20 |  |
+| GLS Solver | `test_gls.py` | 15 |  |
+| Flux Wire Parity | `test_flux_wire_parity.py` | 2 |  |
+| 10-bin Unfolding Regression | `test_flux_unfolding_10bin.py` | 1 |  |
+| k₀-NAA | `test_k0_naa.py` | 4 |  |
+| NAA-ANN 4e Dataset | `test_naa_ann_4e_dataset.py` | 2 |  |
+| Reference Model Parity | `test_reference_model_parity.py` | 4 |  |
+| Spectrum IO Parity | `test_spectrum_io_parity.py` | 4 |  |
+| Unfolding External Baseline Parity | `test_unfolding_parity_baseline.py` | 2 |  |
+| Stopping Power Helpers | `test_stopping_tools.py` | 1 |  |
 
 ### 11.2 Validation Artifact Scripts (NEW)
 
@@ -806,13 +806,13 @@ Claims that an element is "not present" are forbidden. The system must instead r
 | `examples/validation/flux_wire_parity.py` | RAFM raw vs processed activity parity (±2%) | `artifacts/validation/flux_wire_parity/*` |
 | `examples/validation/flux_unfolding_10bin_regression.py` | 10-bin unfolding (raw vs processed) + plot | `artifacts/validation/flux_unfolding_10bin/*` |
 | `examples/validation/spectrum_io_parity.py` | SPE/CHN/CNF/IEC IO parity from stored baselines | `artifacts/validation/spectrum_io/*` |
-| GRAVEL/MLEM | `test_iterative.py` | 18 | ✅ |
-| SPE Reading | `test_spe.py` | 10 | ✅ |
-| IRDFF Database | `test_irdff.py` | 12 | ✅ |
-| k₀-NAA | `test_k0_naa.py` | 4 | ✅ |
-| NAA-ANN Neural Networks | `test_naa_ann.py` | 22 | ✅ |
-| Transport Code I/O | `test_transport_io.py` | 13 | ✅ |
-| Peak Finder Methods | `test_peak_finder_methods.py` | 16 | ✅ |
+| GRAVEL/MLEM | `test_iterative.py` | 18 |  |
+| SPE Reading | `test_spe.py` | 10 |  |
+| IRDFF Database | `test_irdff.py` | 12 |  |
+| k₀-NAA | `test_k0_naa.py` | 4 |  |
+| NAA-ANN Neural Networks | `test_naa_ann.py` | 22 |  |
+| Transport Code I/O | `test_transport_io.py` | 13 |  |
+| Peak Finder Methods | `test_peak_finder_methods.py` | 16 |  |
 
 ### 11.2 Running Tests
 
@@ -856,10 +856,10 @@ python examples/validation/spectrum_io_parity.py
 
 | Test | Status | Correlation | Notes |
 |------|--------|-------------|-------|
-| GRAVEL | ✅ PASS | 0.9826 | FluxForge matches testing code |
-| MLEM | ✅ PASS | 0.9965 | Added `convergence_mode="ddJ"` for parity |
-| SPE File Reading | ✅ PASS | 1.0000 | Exact match |
-| Gamma Database | ✅ PASS | 1.0000 | All 1,913 nuclides match |
+| GRAVEL |  PASS | 0.9826 | FluxForge matches testing code |
+| MLEM |  PASS | 0.9965 | Added `convergence_mode="ddJ"` for parity |
+| SPE File Reading |  PASS | 1.0000 | Exact match |
+| Gamma Database |  PASS | 1.0000 | All 1,913 nuclides match |
 
 ### 12.1.1 Testing Repository Validation Checklist
 
@@ -867,23 +867,23 @@ Cross-validation of FluxForge against 10 repositories in `testing/`:
 
 | Repository | Test | Status | Correlation | Notes |
 |------------|------|--------|-------------|-------|
-| **Neutron-Unfolding** | GRAVEL | ✅ | 0.9826 | Direct comparison |
-| **Neutron-Unfolding** | MLEM (ddJ mode) | ✅ | 0.9965 | Matches original convergence |
-| **SpecKit** | XS file reading | ✅ | 1.0000 | ENDF/IRDFF format |
-| **SpecKit** | Gradient descent | ✅ | 0.95+ | Log-smoothness regularization |
-| **gamma_spec_analysis** | SPE reading | ✅ | 1.0000 | Exact channel match |
-| **gamma_spec_analysis** | Peak finding | ✅ | 1.0000 | Same peaks identified |
-| **pyunfold** | D'Agostini MLEM | ✅ | 0.9965 | Two-peak test passes |
-| **peakingduck** | SNIP background | ✅ | 0.98+ | Background extraction |
-| **peakingduck** | Peak identification | ✅ | 0.95+ | Peak detection |
-| **actigamma** | Decay database | ✅ | 1.0000 | Gamma lines match ENSDF |
-| **actigamma** | Activity→spectra | ✅ | 0.99+ | Gamma cascade modeling |
-| **hdtv** | ROOT file reading | ✅ | 1.0000 | TH1 histogram support |
-| **hdtv** | Calibration | ✅ | 0.999+ | Energy calibration |
-| **irrad_spectroscopy** | Isotope ID | ✅ | 0.95+ | Database matching |
-| **irrad_spectroscopy** | Activity calc | ✅ | 0.98+ | Decay correction |
-| **NAA-ANN-1** | Real spectra | ✅ | 1.00 | 20/20 spectra read, 20 with peaks |
-| **Neutron-Spectrometry** | NNS response | ✅ | 1.0000 | Matrix format |
+| **Neutron-Unfolding** | GRAVEL |  | 0.9826 | Direct comparison |
+| **Neutron-Unfolding** | MLEM (ddJ mode) |  | 0.9965 | Matches original convergence |
+| **SpecKit** | XS file reading |  | 1.0000 | ENDF/IRDFF format |
+| **SpecKit** | Gradient descent |  | 0.95+ | Log-smoothness regularization |
+| **gamma_spec_analysis** | SPE reading |  | 1.0000 | Exact channel match |
+| **gamma_spec_analysis** | Peak finding |  | 1.0000 | Same peaks identified |
+| **pyunfold** | D'Agostini MLEM |  | 0.9965 | Two-peak test passes |
+| **peakingduck** | SNIP background |  | 0.98+ | Background extraction |
+| **peakingduck** | Peak identification |  | 0.95+ | Peak detection |
+| **actigamma** | Decay database |  | 1.0000 | Gamma lines match ENSDF |
+| **actigamma** | Activity→spectra |  | 0.99+ | Gamma cascade modeling |
+| **hdtv** | ROOT file reading |  | 1.0000 | TH1 histogram support |
+| **hdtv** | Calibration |  | 0.999+ | Energy calibration |
+| **irrad_spectroscopy** | Isotope ID |  | 0.95+ | Database matching |
+| **irrad_spectroscopy** | Activity calc |  | 0.98+ | Decay correction |
+| **NAA-ANN-1** | Real spectra |  | 1.00 | 20/20 spectra read, 20 with peaks |
+| **Neutron-Spectrometry** | NNS response |  | 1.0000 | Matrix format |
 
 **Summary:** All 17 validation tests PASS (correlation > 0.90)
 
@@ -895,22 +895,22 @@ All new FluxForge capabilities have been validated against actual APIs:
 
 | Category | Test | Status | Notes |
 |----------|------|--------|-------|
-| **STAYSL-M1** | SigPhi saturation rates | ✅ | R_sat=9.17e-09 |
-| **STAYSL-M2** | Self-shielding | ✅ | Au SSF=0.9810 |
-| **STAYSL-M3** | Cover corrections | ✅ | Cd CCF=0.3479 |
-| **STAYSL-M4** | GLS with covariance | ✅ | χ²_red=5.65 |
-| **Epic-N** | IRDFF-II database | ✅ | 36 reactions |
-| **Epic-O** | ENDF covariance | ✅ | MF33 validated |
-| **Epic-O** | Thermal scattering | ✅ | H2O, graphite |
-| **Epic-O** | Library provenance | ✅ | ENDF/B-VIII.0 + IRDFF-II |
-| **Epic-P** | k₀-NAA workflow | ✅ | Cd-ratio=10.00 |
-| **Epic-P** | Uncertainty budget | ✅ | 3 components |
-| **Epic-Q** | RMLE gamma unfolding | ✅ | converged=True |
-| **Epic-H** | Transport comparison | ✅ | C/E=0.981 |
-| **Workflow** | Activation pipeline | ✅ | ALARA interface |
-| **Corrections** | Coincidence summing | ✅ | Co-60 batch |
-| **Corrections** | Gamma attenuation | ✅ | factor=1.15 |
-| **Data** | Gamma database | ✅ | API verified |
+| **STAYSL-M1** | SigPhi saturation rates |  | R_sat=9.17e-09 |
+| **STAYSL-M2** | Self-shielding |  | Au SSF=0.9810 |
+| **STAYSL-M3** | Cover corrections |  | Cd CCF=0.3479 |
+| **STAYSL-M4** | GLS with covariance |  | χ²_red=5.65 |
+| **Epic-N** | IRDFF-II database |  | 36 reactions |
+| **Epic-O** | ENDF covariance |  | MF33 validated |
+| **Epic-O** | Thermal scattering |  | H2O, graphite |
+| **Epic-O** | Library provenance |  | ENDF/B-VIII.0 + IRDFF-II |
+| **Epic-P** | k₀-NAA workflow |  | Cd-ratio=10.00 |
+| **Epic-P** | Uncertainty budget |  | 3 components |
+| **Epic-Q** | RMLE gamma unfolding |  | converged=True |
+| **Epic-H** | Transport comparison |  | C/E=0.981 |
+| **Workflow** | Activation pipeline |  | ALARA interface |
+| **Corrections** | Coincidence summing |  | Co-60 batch |
+| **Corrections** | Gamma attenuation |  | factor=1.15 |
+| **Data** | Gamma database |  | API verified |
 
 **Validation script:** `testing_validation/comprehensive_validation.py`
 
@@ -951,49 +951,49 @@ W_ig = measurements[i] * response[i][g] * phi[g] / predicted[i]
 ```
 fluxforge/
 ├── io/               # Spectrum + model readers/writers
-│   ├── spe.py        # SPE format reader (✅)
-│   ├── hpge.py       # Generic HPGe reader (✅)
-│   ├── artifacts.py  # JSON artifact I/O (✅)
-│   └── flux_wire.py  # Flux wire data (✅)
+│   ├── spe.py        # SPE format reader ()
+│   ├── hpge.py       # Generic HPGe reader ()
+│   ├── artifacts.py  # JSON artifact I/O ()
+│   └── flux_wire.py  # Flux wire data ()
 │
 ├── analysis/         # Peak finding and fitting
-│   ├── peak_finders.py   # All peak finder methods (✅)
-│   ├── peakfit.py        # Gaussian fitting (✅)
-│   ├── hypermet.py       # Hypermet model (✅)
-│   └── flux_wire_selection.py  # Wire advisor (✅)
+│   ├── peak_finders.py   # All peak finder methods ()
+│   ├── peakfit.py        # Gaussian fitting ()
+│   ├── hypermet.py       # Hypermet model ()
+│   └── flux_wire_selection.py  # Wire advisor ()
 │
 ├── physics/          # Activation physics
-│   └── activation.py     # Decay, buildup, rates (✅)
+│   └── activation.py     # Decay, buildup, rates ()
 │
 ├── data/             # Nuclear data
-│   ├── irdff.py          # IRDFF-II database (✅)
-│   ├── gamma_database.py # Gamma library (✅)
-│   ├── elements.py       # Element data (✅)
-│   └── efficiency.py     # Detector efficiency (✅)
+│   ├── irdff.py          # IRDFF-II database ()
+│   ├── gamma_database.py # Gamma library ()
+│   ├── elements.py       # Element data ()
+│   └── efficiency.py     # Detector efficiency ()
 │
 ├── core/             # Core functionality
-│   ├── response.py       # Response matrix (✅)
-│   ├── provenance.py     # Provenance tracking (✅)
-│   ├── validation.py     # ValidationBundle, C/E tables (✅)
-│   └── schemas.py        # Artifact schemas (✅)
+│   ├── response.py       # Response matrix ()
+│   ├── provenance.py     # Provenance tracking ()
+│   ├── validation.py     # ValidationBundle, C/E tables ()
+│   └── schemas.py        # Artifact schemas ()
 │
 ├── solvers/          # Unfolding algorithms
-│   ├── gls.py            # GLS adjustment (✅)
-│   ├── iterative.py      # GRAVEL/MLEM/gradient (✅)
-│   └── mcmc.py           # Bayesian MCMC (✅)
+│   ├── gls.py            # GLS adjustment ()
+│   ├── iterative.py      # GRAVEL/MLEM/gradient ()
+│   └── mcmc.py           # Bayesian MCMC ()
 │
 ├── triga/            # TRIGA-specific
-│   ├── cd_ratio.py       # Cd-ratio analysis (✅)
-│   ├── k0.py             # k₀-NAA workflow (✅)
-│   └── reconcile.py      # f/α reconciliation (✅)
+│   ├── cd_ratio.py       # Cd-ratio analysis ()
+│   ├── k0.py             # k₀-NAA workflow ()
+│   └── reconcile.py      # f/α reconciliation ()
 │
 ├── io/               # Transport code interfaces
-│   ├── openmc.py         # OpenMC statepoint ingestion (✅)
-│   ├── mcnp.py           # MCNP tally/meshtal ingestion (✅)
-│   └── alara.py          # ALARA I/O interface (✅)
+│   ├── openmc.py         # OpenMC statepoint ingestion ()
+│   ├── mcnp.py           # MCNP tally/meshtal ingestion ()
+│   └── alara.py          # ALARA I/O interface ()
 │
 └── cli/              # Command-line interface
-    └── app.py            # CLI entry points (✅)
+    └── app.py            # CLI entry points ()
 ```
 
 ### 13.2 CLI Entry Points
@@ -1142,7 +1142,7 @@ The following documents are superseded by this consolidated master:
 
 All major implementation phases have been completed. The following capabilities are now available:
 
-### Completed Phases ✅
+### Completed Phases 
 
 1. **STAYSL Parity (Epic M)** - All 10 capabilities implemented
 2. **IRDFF-II Data Access (Epic N)** - All 8 capabilities implemented  

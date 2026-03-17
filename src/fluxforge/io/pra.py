@@ -26,7 +26,9 @@ class PRAHistogram:
     header: Optional[str] = None
 
 
-def _parse_pra_lines(lines: Iterable[str]) -> Tuple[List[float], List[float], Optional[str]]:
+def _parse_pra_lines(
+    lines: Iterable[str],
+) -> Tuple[List[float], List[float], Optional[str]]:
     channels: List[float] = []
     counts: List[float] = []
     header: Optional[str] = None

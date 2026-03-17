@@ -67,7 +67,9 @@ def configure_tensorflow_cuda_runtime() -> Tuple[str, ...]:
     if not lib_dirs:
         return ()
 
-    existing = [entry for entry in os.environ.get("LD_LIBRARY_PATH", "").split(":") if entry]
+    existing = [
+        entry for entry in os.environ.get("LD_LIBRARY_PATH", "").split(":") if entry
+    ]
     combined: list[str] = []
     for entry in (*lib_dirs, *existing):
         if entry and entry not in combined:
