@@ -93,7 +93,9 @@ def _load_fluxforge_io_readers() -> dict[str, Callable[[Path], np.ndarray]]:
 
     return {
         "spe_eu_calib_7cm": lambda p: np.asarray(read_spe_file(p).counts, dtype=float),
-        "cnf_canberra_sample": lambda p: np.asarray(read_cnf_file(p).counts, dtype=float),
+        "cnf_canberra_sample": lambda p: np.asarray(
+            read_cnf_file(p).counts, dtype=float
+        ),
         "iec_hpge_dummy_01": lambda p: np.asarray(read_iec_file(p).counts, dtype=float),
     }
 
@@ -184,7 +186,14 @@ def run_comparison() -> tuple[list[CompareResult], dict[str, object]]:
     # CHN baseline: local sample copy generated from reference workflow.
     from fluxforge.io.hpge import read_chn_file
 
-    chn_path = FLUXFORGE_DIR / "tests" / "data" / "spectrum_io" / "samples" / "eu_calib_7cm.Chn"
+    chn_path = (
+        FLUXFORGE_DIR
+        / "tests"
+        / "data"
+        / "spectrum_io"
+        / "samples"
+        / "eu_calib_7cm.Chn"
+    )
     chn_counts = np.asarray(read_chn_file(chn_path).counts, dtype=float)
     chn_entry = _summarize_int_counts(chn_counts)
     chn_entry["input_path"] = str(chn_path.relative_to(FLUXFORGE_DIR))
@@ -193,7 +202,9 @@ def run_comparison() -> tuple[list[CompareResult], dict[str, object]]:
     # ------------------------------------------------------------------
     # Unfolding comparison (reference algorithms from testing/Neutron-Unfolding)
     # ------------------------------------------------------------------
-    data_root = FLUXFORGE_DIR / "tests" / "data" / "external_cases" / "unfolding_case_001"
+    data_root = (
+        FLUXFORGE_DIR / "tests" / "data" / "external_cases" / "unfolding_case_001"
+    )
     response = _read_response_matrix(data_root / "response_matrix.txt")
     measurements = _read_unfolding_measurements(data_root / "reduced_data.csv")
     initial_flux = np.ones(response.shape[1], dtype=float)

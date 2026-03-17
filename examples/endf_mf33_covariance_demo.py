@@ -71,7 +71,9 @@ def main() -> None:
         vres2 = validate_covariance_matrix(cov2)
 
         print("\n=== After SVD conditioning ===")
-        print(f"Truncated: {diag['n_truncated']}, new condition ~ {diag['new_condition']:.2e}")
+        print(
+            f"Truncated: {diag['n_truncated']}, new condition ~ {diag['new_condition']:.2e}"
+        )
         print(vres2.summary())
 
         # Show diagonal std devs (sqrt of variances)

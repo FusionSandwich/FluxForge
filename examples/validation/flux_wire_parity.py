@@ -76,22 +76,22 @@ class ParityRow:
 def run_parity(proc_dir: Path, raw_dir: Path) -> Dict[str, object]:
     processed = load_processed_files(proc_dir)
     raw = load_raw_files(raw_dir)
-    
+
     rows: List[ParityRow] = []
     missing: List[str] = []
-    
+
     for key, raw_data in raw.items():
         if key not in processed:
             continue
         ref = processed[key]
         apply_reference_calibration(raw_data, ref)
-        
+
         analysis = analyze_flux_wire_targeted(
             data=raw_data,
             reference_data=ref,
             peak_threshold=0.0,
         )
-        
+
         for nuclide in ref.nuclides:
             ref_bq = nuclide.activity_bq
             if nuclide.isotope not in analysis.nuclide_activities:
@@ -100,24 +100,36 @@ def run_parity(proc_dir: Path, raw_dir: Path) -> Dict[str, object]:
             calc_bq = analysis.nuclide_activities[nuclide.isotope]["activity_bq"]
             ratio = calc_bq / ref_bq if ref_bq > 0 else 0.0
             diff_pct = (ratio - 1.0) * 100.0
-            rows.append(ParityRow(
-                sample_id=raw_data.sample_id,
-                isotope=nuclide.isotope,
-                ref_bq=ref_bq,
-                calc_bq=calc_bq,
-                ratio=ratio,
-                diff_pct=diff_pct,
-            ))
-    
+            rows.append(
+                ParityRow(
+                    sample_id=raw_data.sample_id,
+                    isotope=nuclide.isotope,
+                    ref_bq=ref_bq,
+                    calc_bq=calc_bq,
+                    ratio=ratio,
+                    diff_pct=diff_pct,
+                )
+            )
+
     ratios = [r.ratio for r in rows if r.ref_bq > 0]
     summary = {
         "comparisons": len(rows),
         "missing": missing,
         "ratio_mean": float(sum(ratios) / len(ratios)) if ratios else 0.0,
-        "ratio_std": float((sum((x - (sum(ratios) / len(ratios))) ** 2 for x in ratios) / len(ratios)) ** 0.5) if ratios else 0.0,
+        "ratio_std": (
+            float(
+                (
+                    sum((x - (sum(ratios) / len(ratios))) ** 2 for x in ratios)
+                    / len(ratios)
+                )
+                ** 0.5
+            )
+            if ratios
+            else 0.0
+        ),
         "max_abs_diff_pct": float(max(abs(r.diff_pct) for r in rows)) if rows else 0.0,
     }
-    
+
     return {"rows": rows, "summary": summary}
 
 
@@ -127,20 +139,26 @@ def main() -> int:
     parser.add_argument("--raw-dir", type=Path, default=None)
     parser.add_argument("--output-dir", type=Path, default=None)
     args = parser.parse_args()
-    
+
     repo_root = Path(__file__).resolve().parents[2]
     alara_root = repo_root.parent
-    
-    proc_dir = args.processed_dir or (alara_root / "rafm_irradiation_ldrd" / "irradiation_QG_processed" / "flux_wires")
-    raw_dir = args.raw_dir or (alara_root / "rafm_irradiation_ldrd" / "raw_gamma_spec" / "flux_wires")
-    output_dir = args.output_dir or (repo_root / "artifacts" / "validation" / "flux_wire_parity")
-    
+
+    proc_dir = args.processed_dir or (
+        alara_root / "rafm_irradiation_ldrd" / "irradiation_QG_processed" / "flux_wires"
+    )
+    raw_dir = args.raw_dir or (
+        alara_root / "rafm_irradiation_ldrd" / "raw_gamma_spec" / "flux_wires"
+    )
+    output_dir = args.output_dir or (
+        repo_root / "artifacts" / "validation" / "flux_wire_parity"
+    )
+
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     results = run_parity(proc_dir, raw_dir)
     rows: List[ParityRow] = results["rows"]
     summary = results["summary"]
-    
+
     csv_path = output_dir / "raw_vs_processed_parity.csv"
     with open(csv_path, "w", encoding="utf-8") as f:
         f.write("sample_id,isotope,ref_bq,calc_bq,ratio,diff_pct\n")
@@ -149,19 +167,23 @@ def main() -> int:
                 f"{row.sample_id},{row.isotope},{row.ref_bq:.6e},"
                 f"{row.calc_bq:.6e},{row.ratio:.6f},{row.diff_pct:.3f}\n"
             )
-    
+
     json_path = output_dir / "summary.json"
     with open(json_path, "w", encoding="utf-8") as f:
-        json.dump({
-            "summary": summary,
-            "rows": [r.to_dict() for r in rows],
-        }, f, indent=2)
-    
+        json.dump(
+            {
+                "summary": summary,
+                "rows": [r.to_dict() for r in rows],
+            },
+            f,
+            indent=2,
+        )
+
     print("Flux wire parity summary:")
     print(json.dumps(summary, indent=2))
     print(f"Saved {csv_path}")
     print(f"Saved {json_path}")
-    
+
     return 0
 
 

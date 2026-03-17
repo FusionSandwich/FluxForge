@@ -17,7 +17,9 @@ from fluxforge.io.spe import read_spe_file
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEST_DATA_DIR = REPO_ROOT / "tests" / "data"
 BASELINE_PATH = TEST_DATA_DIR / "parity_baselines" / "external_reference.json"
-OUTPUT_PATH = REPO_ROOT / "artifacts" / "validation" / "spectrum_io" / "spectrum_io_parity.json"
+OUTPUT_PATH = (
+    REPO_ROOT / "artifacts" / "validation" / "spectrum_io" / "spectrum_io_parity.json"
+)
 SPECTRUM_DATA_DIR = TEST_DATA_DIR / "spectrum_io"
 
 
@@ -52,7 +54,9 @@ def main() -> None:
             ).counts
         ),
         "iec_hpge_dummy_01": _summarize(
-            read_iec_file(SPECTRUM_DATA_DIR / "samples" / "hpge_dummy_test_01.iec").counts
+            read_iec_file(
+                SPECTRUM_DATA_DIR / "samples" / "hpge_dummy_test_01.iec"
+            ).counts
         ),
         "chn_eu_calib_7cm": _summarize(
             read_chn_file(SPECTRUM_DATA_DIR / "samples" / "eu_calib_7cm.Chn").counts

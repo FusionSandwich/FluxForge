@@ -19,13 +19,17 @@ def main() -> None:
 
     comparisons = []
     for energy in ref_energies:
-        closest = min(ff_energies, key=lambda e: abs(e - energy)) if ff_energies else None
+        closest = (
+            min(ff_energies, key=lambda e: abs(e - energy)) if ff_energies else None
+        )
         if closest is None:
             continue
         diff_pct = 100.0 * abs(closest - energy) / energy if energy else 0.0
         comparisons.append([energy, closest, diff_pct])
 
-    with (output_dir / "pra_peak_comparison.csv").open("w", newline="", encoding="utf-8") as handle:
+    with (output_dir / "pra_peak_comparison.csv").open(
+        "w", newline="", encoding="utf-8"
+    ) as handle:
         writer = csv.writer(handle)
         writer.writerow(["ref_energy_keV", "fluxforge_energy_keV", "pct_diff"])
         writer.writerows(comparisons)

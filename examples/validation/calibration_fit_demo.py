@@ -36,7 +36,9 @@ def main() -> None:
 
     # Synthetic resolution curve
     res_coeffs = [1.0, 0.01, 1e-5]
-    fwhm = np.sqrt(res_coeffs[0] + res_coeffs[1] * energies + res_coeffs[2] * energies**2)
+    fwhm = np.sqrt(
+        res_coeffs[0] + res_coeffs[1] * energies + res_coeffs[2] * energies**2
+    )
     res_fit = fit_resolution_curve(energies, fwhm, model="sqrt_poly")
     print("Resolution coefficients:", res_fit.coefficients)
 

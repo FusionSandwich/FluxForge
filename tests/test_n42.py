@@ -5,14 +5,10 @@ Tests the ANSI N42.42 XML format reader for gamma spectrum data.
 """
 
 import pytest
-import tempfile
-import os
-from pathlib import Path
 import numpy as np
 
 from fluxforge.io.n42 import (
     N42Measurement,
-    N42Document,
     read_n42_file,
     read_n42_spectrum,
     write_n42_file,

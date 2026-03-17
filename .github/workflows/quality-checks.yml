@@ -35,7 +35,7 @@ jobs:
 
       - name: Black (check)
         run: |
-          black --check src tests examples/RAFM_irradiation
+          black --check src tests examples tools testing_validation
 
       - name: Flake8 (baseline scope)
         run: |
@@ -50,3 +50,16 @@ jobs:
           PYTHONPATH: src
         run: |
           pytest -q tests/test_k0_physics.py tests/test_k0_naa.py tests/test_k0_workflow.py tests/test_kayzero_k0.py
+
+      - name: RAFM workflow regression tests
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_rafm_workflow.py \
+            tests/test_rafm_background_integration.py \
+            tests/test_flux_wire_analysis.py \
+            tests/test_flux_wire_parity.py \
+            tests/test_peak_count_method_benchmark.py \
+            tests/test_genie_overrides.py \
+            tests/test_pipeline_validation.py

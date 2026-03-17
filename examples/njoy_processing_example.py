@@ -48,10 +48,10 @@ def example_group_structures():
     print("=" * 70)
     print("Available Group Structures for NJOY Processing")
     print("=" * 70)
-    
+
     print(f"\n{'Structure':<20} {'Groups':<10} {'Description':<40}")
     print("-" * 70)
-    
+
     for gs, data in GROUP_STRUCTURE_DATA.items():
         print(f"{gs.name:<20} {data['n_groups']:<10} {data['description']:<40}")
 
@@ -63,7 +63,7 @@ def example_njoy_input_specification():
     print("\n" + "=" * 70)
     print("NJOY Input Specification")
     print("=" * 70)
-    
+
     # Create input specification for Au-197(n,γ) dosimetry reaction
     njoy_input = NJOYInput(
         endf_file=Path("/path/to/n-079_Au_197.endf"),
@@ -79,7 +79,7 @@ def example_njoy_input_specification():
         mt_list=[102],  # (n,γ) reaction only
         description="Au-197 dosimetry cross section for TRIGA analysis",
     )
-    
+
     print(f"\nNJOY Input Configuration:")
     print(f"  ENDF file: {njoy_input.endf_file}")
     print(f"  MAT number: {njoy_input.mat_number}")
@@ -88,7 +88,7 @@ def example_njoy_input_specification():
     print(f"  Modules: {[m.value for m in njoy_input.modules]}")
     print(f"  MT list: {njoy_input.mt_list}")
     print(f"  Tolerance: {njoy_input.tolerance}")
-    
+
     return njoy_input
 
 
@@ -99,17 +99,17 @@ def example_generate_reconr_input():
     print("\n" + "=" * 70)
     print("RECONR Input Deck Generation")
     print("=" * 70)
-    
+
     reconr_input = generate_reconr_input(
         mat=7925,
         tape_in=21,
         tape_out=22,
     )
-    
+
     print("\nGenerated RECONR input:")
     print("-" * 50)
     print(reconr_input)
-    
+
     return reconr_input
 
 
@@ -120,7 +120,7 @@ def example_generate_broadr_input():
     print("\n" + "=" * 70)
     print("BROADR Input Deck Generation")
     print("=" * 70)
-    
+
     broadr_input = generate_broadr_input(
         mat=7925,
         temperatures=[300.0, 600.0],
@@ -128,11 +128,11 @@ def example_generate_broadr_input():
         tape_in_pendf=21,
         tape_out=22,
     )
-    
+
     print("\nGenerated BROADR input:")
     print("-" * 50)
     print(broadr_input)
-    
+
     return broadr_input
 
 
@@ -143,7 +143,7 @@ def example_generate_groupr_input():
     print("\n" + "=" * 70)
     print("GROUPR Input Deck Generation")
     print("=" * 70)
-    
+
     groupr_input = generate_groupr_input(
         mat=7925,
         group_structure=GroupStructure.SAND_II.value,
@@ -152,11 +152,11 @@ def example_generate_groupr_input():
         tape_in_pendf=22,
         tape_out=23,
     )
-    
+
     print("\nGenerated GROUPR input:")
     print("-" * 50)
     print(groupr_input)
-    
+
     return groupr_input
 
 
@@ -167,7 +167,7 @@ def example_full_njoy_input():
     print("\n" + "=" * 70)
     print("Complete NJOY Input Deck")
     print("=" * 70)
-    
+
     njoy_input = NJOYInput(
         endf_file=Path("/path/to/n-079_Au_197.endf"),
         mat_number=7925,
@@ -176,13 +176,13 @@ def example_full_njoy_input():
         modules=[NJOYModule.RECONR, NJOYModule.BROADR, NJOYModule.GROUPR],
         mt_list=[102],
     )
-    
+
     full_input = generate_njoy_input(njoy_input)
-    
+
     print("\nGenerated complete NJOY input:")
     print("-" * 50)
     print(full_input)
-    
+
     return full_input
 
 
@@ -193,10 +193,10 @@ def example_dosimetry_pipeline():
     print("\n" + "=" * 70)
     print("Dosimetry Cross Section Processing Pipeline")
     print("=" * 70)
-    
+
     # Create pipeline specification using the factory function
     pipeline = create_dosimetry_pipeline()
-    
+
     # Customize for a specific set of reactions
     pipeline.materials = [
         {"mat": 7925, "za": 79197, "name": "Au-197"},
@@ -204,7 +204,7 @@ def example_dosimetry_pipeline():
         {"mat": 2825, "za": 28058, "name": "Ni-58"},
     ]
     pipeline.temperatures = [293.6, 600.0]
-    
+
     print(f"\nPipeline Specification:")
     print(f"  Name: {pipeline.name}")
     print(f"  Library: {pipeline.endf_library}")
@@ -212,15 +212,15 @@ def example_dosimetry_pipeline():
     print(f"  Group structure: {pipeline.group_structure.name}")
     print(f"  Modules: {[m.value for m in pipeline.modules]}")
     print(f"  Materials: {len(pipeline.materials)}")
-    
+
     print(f"\n  Processing steps:")
     for i, module in enumerate(pipeline.modules, 1):
         print(f"    {i}. {module.value.upper()}")
-    
+
     print(f"\n  Materials to process:")
     for mat_info in pipeline.materials:
         print(f"    - {mat_info['name']} (MAT={mat_info['mat']})")
-    
+
     return pipeline
 
 
@@ -231,9 +231,9 @@ def example_check_njoy():
     print("\n" + "=" * 70)
     print("NJOY Availability Check")
     print("=" * 70)
-    
+
     is_available, njoy_path = check_njoy_available()
-    
+
     if is_available:
         print(f"\nOK NJOY is available at: {njoy_path}")
     else:
@@ -246,24 +246,24 @@ def main():
     """Run all examples."""
     # Show available group structures
     example_group_structures()
-    
+
     # Create input specification
     njoy_input = example_njoy_input_specification()
-    
+
     # Generate individual module inputs
     example_generate_reconr_input()
     example_generate_broadr_input()
     example_generate_groupr_input()
-    
+
     # Generate complete input
     example_full_njoy_input()
-    
+
     # Create dosimetry pipeline
     pipeline = example_dosimetry_pipeline()
-    
+
     # Check NJOY availability
     example_check_njoy()
-    
+
     print("\n" + "=" * 70)
     print("Example complete!")
     print("=" * 70)

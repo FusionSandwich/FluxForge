@@ -17,8 +17,8 @@ for f in files:
     # Skip already numbered files
     if re.match(r"^\d+_", f):
         continue
-    
-    if not f.endswith('.md'):
+
+    if not f.endswith(".md"):
         continue
 
     # Rename file

@@ -16,10 +16,10 @@ for line in planned_lines:
     if len(parts) >= 3:
         issue_id = parts[0]
         title = parts[1]
-        
+
         filename = f"{issue_id}_{re.sub(r'[^A-Za-z0-9]', '_', title)}.md"
         filepath = os.path.join(issues_dir, filename)
-        
+
         with open(filepath, "w") as f:
             f.write(f"# Issue: {issue_id} - {title}\n\n")
             f.write(f"**Status:** Planned\n")
@@ -27,7 +27,9 @@ for line in planned_lines:
                 if part != "Planned":
                     f.write(f"**Context:** {part}\n")
             f.write(f"\n## Description\n")
-            f.write(f"This issue is generated from the master plan and needs implementation.\n")
+            f.write(
+                f"This issue is generated from the master plan and needs implementation.\n"
+            )
         count += 1
 
 print(f"Created {count} planned issues.")
