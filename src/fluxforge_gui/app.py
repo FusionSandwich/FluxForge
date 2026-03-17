@@ -56,6 +56,7 @@ from fluxforge.analysis.peakfit import (
     fit_single_peak,
 )
 from fluxforge.cli import app as cli_app
+from fluxforge.core.runtime import offline_mode_enabled
 from fluxforge.data.efficiency import CALIBRATION_SOURCES, EfficiencyCurve
 from fluxforge.data.flux_wire_catalog import (
     get_flux_wire_catalog_entry,
@@ -74,6 +75,7 @@ from fluxforge.io.artifacts import (
     read_peak_report,
     read_report_bundle,
     read_reaction_rates,
+    read_response_bundle,
     read_spectrum_file,
     read_unfold_result,
     read_validation_bundle,
@@ -116,6 +118,7 @@ from fluxforge_gui.reporting import (
     build_gui_astm_e2005_preview,
     build_gui_astm_e261_preview,
     build_gui_astm_e262_preview,
+    build_gui_astm_e3376_preview,
     build_gui_k0_preview,
     build_gui_report_preview,
     discover_gui_validation_report_inputs,
@@ -158,6 +161,7 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self.root.title("FluxForge GUI (Spectrum + Workflow MVP)")
         self.root.geometry("1400x900")
         self.project_dir = Path(project_dir) if project_dir else Path.cwd()
+        self.offline_mode = offline_mode_enabled()
         self.last_cli_command = ""
         self._executor = ThreadPoolExecutor(max_workers=1)
         self._busy = False
@@ -190,6 +194,11 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._build_standards_tab()
         self._build_physics_tab()
         self._build_report_tab()
+        self._append_log("FluxForge GUI is a native desktop application; no browser runtime is required.")
+        if self.offline_mode:
+            self._append_log(
+                "Offline mode enabled: remote HTTP(S) data sources and runtime downloads are disabled."
+            )
         self._append_log(f"Project directory: {self.project_dir}")
 
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -764,9 +773,14 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._refresh_standards_source_summary()
         if self.preview_database_source.get() == "custom_gamma_file":
             self._refresh_preview_data_source_summary()
-        self.preview_database_summary.set(
-            "Registered custom gamma source. Supported locators: local JSON/CSV/YAML, sqlite:///... URIs, python://module:loader, and HTTP(S) JSON/CSV/YAML endpoints."
+        summary = (
+            "Registered custom gamma source. Supported locators: local JSON/CSV/YAML, sqlite:///... URIs, and python://module:loader."
         )
+        if not self.offline_mode:
+            summary += " HTTP(S) JSON/CSV/YAML endpoints are also available."
+        else:
+            summary += " HTTP(S) endpoints remain disabled because offline mode is active."
+        self.preview_database_summary.set(summary)
 
     def _refresh_efficiency_line_choices(self) -> None:
         source = self.preview_efficiency_source.get()
@@ -1997,6 +2011,60 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             "Loaded k0 preview from the latest analysis/report artifact."
         )
 
+    def _after_k0_import_run(self) -> None:
+        self.k0_status.set(
+            "Imported Kayzero content into a governed FluxForge k0 library. The imported library path is now available for k0 analysis."
+        )
+
+    def _load_response_preview(self) -> None:
+        path = self._optional_path(self.response_output.get())
+        if path is None or not path.exists():
+            messagebox.showerror(
+                "FluxForge GUI", "Choose an existing response bundle artifact first."
+            )
+            return
+        payload = read_response_bundle(path)
+        matrix = payload.get("matrix", [])
+        reactions = payload.get("reactions", [])
+        boundaries = payload.get("boundaries_eV", [])
+        group_count = max(len(boundaries) - 1, 0)
+        self.response_status.set(
+            f"Loaded response bundle with {len(reactions)} reactions and {group_count} energy groups from {path.name}."
+        )
+        self._append_log(self.response_status.get())
+
+    def _load_astm_e3376_preview(self) -> None:
+        path = self._optional_path(self.astm_e3376_output.get())
+        if path is None or not path.exists():
+            messagebox.showerror(
+                "FluxForge GUI", "Choose an existing ASTM E3376 output artifact first."
+            )
+            return
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        preview = build_gui_astm_e3376_preview(payload, path)
+        self.astm_e3376_preview.configure(state="normal")
+        self.astm_e3376_preview.delete("1.0", "end")
+        self.astm_e3376_preview.insert("1.0", preview)
+        self.astm_e3376_preview.configure(state="disabled")
+        self.astm_e3376_status.set(
+            "Loaded ASTM E3376 preview from the latest workflow artifact."
+        )
+
+    def _after_rafm_validate_run(self) -> None:
+        self.rafm_status.set(
+            "Completed RAFM raw-spectrum validation. Review the run log and results root for generated artifacts."
+        )
+
+    def _after_rafm_qg_benchmark_run(self) -> None:
+        self.rafm_status.set(
+            "Completed RAFM QuantumGold benchmark processing. Review the run log and QG results root for generated artifacts."
+        )
+
+    def _after_rafm_compare_run(self) -> None:
+        self.rafm_status.set(
+            "Completed RAFM branch comparison. Review the run log and comparison root for generated artifacts."
+        )
+
     def _load_astm_e2005_preview(self) -> None:
         if not hasattr(self, "astm_e2005_output"):
             return
@@ -2079,6 +2147,12 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._load_report_preview()
         if self.report_export_figures.get():
             self._export_report_figures()
+
+    def _after_master_plots_run(self) -> None:
+        self.plots_status.set(
+            f"Generated master plot suite in {self.plots_output_dir.get().strip() or self.project_dir / 'plots'}."
+        )
+        self._append_log(self.plots_status.get())
 
     def _on_close(self) -> None:
         self._executor.shutdown(wait=False, cancel_futures=True)

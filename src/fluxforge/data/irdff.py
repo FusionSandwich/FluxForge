@@ -29,6 +29,7 @@ from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
 
 import numpy as np
+from fluxforge.core.runtime import require_network_access
 
 # NumPy 2.0 renamed trapz to trapezoid - provide compatibility
 try:
@@ -509,6 +510,8 @@ class IRDFFDatabase:
         """Download a file from URL."""
         if self.verbose:
             print(f"Downloading {url}...")
+
+        require_network_access("IRDFF-II auto-download", url)
 
         try:
             req = Request(url, headers={"User-Agent": "FluxForge/1.0"})

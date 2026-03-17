@@ -16,6 +16,11 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 from urllib.parse import parse_qs, urlparse
 from urllib.request import urlopen
 
+from fluxforge.core.runtime import (
+    is_remote_locator,
+    offline_mode_enabled,
+    require_network_access,
+)
 from fluxforge.data.efficiency import CALIBRATION_SOURCES
 from fluxforge.data.flux_wire_catalog import list_flux_wire_isotopes
 from fluxforge.data.gamma_database import (
@@ -177,6 +182,7 @@ def _load_custom_gamma_source_from_locator(locator: str | Path) -> GammaDatabase
         return _load_custom_gamma_source(local_path)
 
     if scheme in {"http", "https"}:
+        require_network_access("Remote gamma-data source", source)
         with urlopen(
             source
         ) as response:  # nosec - user-supplied public source by design
@@ -411,6 +417,8 @@ def summarize_nuclear_data_source(
         parts.append(details)
     if record.capabilities:
         parts.append("capabilities=" + ", ".join(record.capabilities))
+    if custom_path and is_remote_locator(str(custom_path)) and offline_mode_enabled():
+        parts.append("offline_mode=remote HTTP(S) access disabled")
     return " | ".join(parts)
 
 

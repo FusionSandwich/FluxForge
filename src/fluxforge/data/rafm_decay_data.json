@@ -1,6 +1,6 @@
 {
   "_metadata": {
-    "source": "testing/actigamma/actigamma/data/lines_decay_2012.min.json",
+    "source": "curated decay_2012-derived reference dataset vendored into FluxForge",
     "origin": "decay_2012 via actigamma",
     "energy_window_keV": [
       80.0,

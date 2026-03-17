@@ -91,6 +91,7 @@ from fluxforge_gui.constants import (
     GUI_BUFFER_OPERATIONS,
     GUI_PEAK_COUNTING_METHODS,
     GUI_PEAK_IDENTIFICATION_METHODS,
+    GUI_RAFM_COUNTING_METHODS,
     GUI_UNFOLD_METHODS,
     GUI_UNFOLD_MLEM_CONVERGENCE_MODES,
 )
@@ -151,22 +152,34 @@ class UiBuilderMixin:
     def _configure_styles(self) -> None:
         """Apply a sleeker ttk look while staying cross-platform and open-source."""
 
-        self.root.configure(background="#eef2f7")
+        self.root.configure(background="#edf2f7")
         style = ttk.Style(self.root)
         with contextlib.suppress(tk.TclError):
             style.theme_use("clam")
-        style.configure("TFrame", background="#eef2f7")
-        style.configure("TLabelframe", background="#eef2f7", padding=8)
+        style.configure("TFrame", background="#edf2f7")
+        style.configure("Toolbar.TFrame", background="#dbe7f3")
+        style.configure("TLabelframe", background="#edf2f7", padding=10)
         style.configure(
             "TLabelframe.Label",
-            background="#eef2f7",
+            background="#edf2f7",
             foreground="#1f2937",
             font=("Segoe UI", 10, "bold"),
         )
-        style.configure("TLabel", background="#eef2f7", foreground="#1f2937")
-        style.configure("TNotebook", background="#eef2f7", borderwidth=0)
-        style.configure("TNotebook.Tab", padding=(14, 8), font=("Segoe UI", 10, "bold"))
-        style.map("TNotebook.Tab", background=[("selected", "#ffffff")])
+        style.configure("TLabel", background="#edf2f7", foreground="#1f2937")
+        style.configure("Hint.TLabel", background="#edf2f7", foreground="#4b5563")
+        style.configure("Status.TLabel", background="#dbe7f3", foreground="#111827")
+        style.configure("Offline.TLabel", background="#dbe7f3", foreground="#8b1e3f")
+        style.configure("TNotebook", background="#edf2f7", borderwidth=0)
+        style.configure(
+            "TNotebook.Tab",
+            padding=(14, 8),
+            font=("Segoe UI", 10, "bold"),
+        )
+        style.map(
+            "TNotebook.Tab",
+            background=[("selected", "#ffffff")],
+            foreground=[("selected", "#111827")],
+        )
         style.configure("TButton", padding=(10, 6), font=("Segoe UI", 9, "bold"))
         style.configure("Treeview", rowheight=24, font=("Segoe UI", 9))
         style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
@@ -176,7 +189,7 @@ class UiBuilderMixin:
         self.root.rowconfigure(1, weight=1)
         self.root.rowconfigure(2, weight=1)
 
-        toolbar = ttk.Frame(self.root, padding=8)
+        toolbar = ttk.Frame(self.root, padding=10, style="Toolbar.TFrame")
         toolbar.grid(row=0, column=0, sticky="ew")
         toolbar.columnconfigure(2, weight=1)
 
@@ -190,6 +203,15 @@ class UiBuilderMixin:
         self.status_var = tk.StringVar(value="Idle")
         ttk.Label(toolbar, textvariable=self.status_var).grid(
             row=0, column=2, sticky="e"
+        )
+        mode_text = (
+            "Offline mode: remote sources/downloads disabled"
+            if getattr(self, "offline_mode", False)
+            else "Offline-ready workflow"
+        )
+        mode_style = "Offline.TLabel" if getattr(self, "offline_mode", False) else "Status.TLabel"
+        ttk.Label(toolbar, text=mode_text, style=mode_style).grid(
+            row=0, column=3, sticky="e", padx=(12, 0)
         )
 
         self.notebook = ttk.Notebook(self.root)
@@ -262,6 +284,106 @@ class UiBuilderMixin:
             row=9, column=1, sticky="w"
         )
 
+        ingest_batch_frame = ttk.LabelFrame(
+            frame, text="Batch ingest workflow", padding=10
+        )
+        ingest_batch_frame.grid(
+            row=10, column=0, columnspan=3, sticky="nsew", pady=(14, 0)
+        )
+        ingest_batch_frame.columnconfigure(1, weight=1)
+
+        self.ingest_batch_input_dir = tk.StringVar(value=str(self.project_dir))
+        self.ingest_batch_output_dir = tk.StringVar(
+            value=str(self.project_dir / "batch_artifacts")
+        )
+        self.ingest_batch_profile = tk.StringVar(value="")
+        self.ingest_batch_background_file = tk.StringVar(value="")
+        self.ingest_batch_background_scale_mode = tk.StringVar(value="live")
+        self.ingest_batch_background_scale_factor = tk.StringVar(value="")
+        self.ingest_batch_energy_calibration = tk.StringVar(value="")
+        self.ingest_batch_efficiency_coefficients = tk.StringVar(value="")
+        self.ingest_batch_background_adjusted_dir = tk.StringVar(
+            value=str(self.project_dir / "background_adjusted")
+        )
+        self.ingest_batch_final_corrected_dir = tk.StringVar(
+            value=str(self.project_dir / "final_corrected")
+        )
+        self.ingest_batch_validate = tk.BooleanVar(value=True)
+
+        self._directory_row(
+            ingest_batch_frame, 0, "Input directory:", self.ingest_batch_input_dir
+        )
+        self._directory_row(
+            ingest_batch_frame, 1, "Output directory:", self.ingest_batch_output_dir
+        )
+        ttk.Label(ingest_batch_frame, text="Bundled profile:").grid(
+            row=2, column=0, sticky="w", padx=(0, 8), pady=4
+        )
+        ttk.Combobox(
+            ingest_batch_frame,
+            textvariable=self.ingest_batch_profile,
+            values=get_gui_profile_choices(),
+            state="readonly",
+            width=28,
+        ).grid(row=2, column=1, sticky="w")
+        self._path_row(
+            ingest_batch_frame,
+            3,
+            "Background spectrum:",
+            self.ingest_batch_background_file,
+            save=False,
+        )
+        ttk.Label(ingest_batch_frame, text="Background scale mode:").grid(
+            row=4, column=0, sticky="w", padx=(0, 8), pady=4
+        )
+        ttk.Combobox(
+            ingest_batch_frame,
+            textvariable=self.ingest_batch_background_scale_mode,
+            values=["live", "real", "manual"],
+            state="readonly",
+            width=16,
+        ).grid(row=4, column=1, sticky="w")
+        self._entry_row(
+            ingest_batch_frame,
+            5,
+            "Background scale factor:",
+            self.ingest_batch_background_scale_factor,
+        )
+        self._entry_row(
+            ingest_batch_frame,
+            6,
+            "Energy calibration CSV:",
+            self.ingest_batch_energy_calibration,
+        )
+        self._entry_row(
+            ingest_batch_frame,
+            7,
+            "Efficiency coefficients CSV:",
+            self.ingest_batch_efficiency_coefficients,
+        )
+        self._directory_row(
+            ingest_batch_frame,
+            8,
+            "Background-adjusted CSV dir:",
+            self.ingest_batch_background_adjusted_dir,
+        )
+        self._directory_row(
+            ingest_batch_frame,
+            9,
+            "Final-corrected CSV dir:",
+            self.ingest_batch_final_corrected_dir,
+        )
+        ttk.Checkbutton(
+            ingest_batch_frame,
+            text="Validate artifact schema",
+            variable=self.ingest_batch_validate,
+        ).grid(row=10, column=1, sticky="w", pady=(0, 8))
+        ttk.Button(
+            ingest_batch_frame,
+            text="Run Batch Ingest",
+            command=self._run_ingest_batch,
+        ).grid(row=11, column=1, sticky="w")
+
     def _build_spectrum_tab(self) -> None:
         frame = ttk.Frame(self.notebook, padding=12)
         self.notebook.add(frame, text="2. Spectrum")
@@ -282,6 +404,11 @@ class UiBuilderMixin:
         self.preview_png_output = tk.StringVar(
             value=str(self.project_dir / "gui_preview.png")
         )
+        self.preview_plot_title = tk.StringVar(value="")
+        self.preview_manual_peak_report = tk.StringVar(
+            value=str(self.project_dir / "manual_peak_report.json")
+        )
+        self.preview_plot_background_subtracted = tk.BooleanVar(value=False)
         self.preview_status = tk.StringVar(
             value="Load a spectrum artifact or raw file to preview it."
         )
@@ -384,22 +511,38 @@ class UiBuilderMixin:
         self._path_row(
             source_frame, 6, "Save preview PNG:", self.preview_png_output, save=True
         )
+        self._entry_row(source_frame, 7, "CLI plot title (optional):", self.preview_plot_title)
+        self._path_row(
+            source_frame,
+            8,
+            "CLI manual peak report:",
+            self.preview_manual_peak_report,
+            save=True,
+        )
+        ttk.Checkbutton(
+            source_frame,
+            text="Use background-subtracted spectrum for CLI plot export",
+            variable=self.preview_plot_background_subtracted,
+        ).grid(row=9, column=1, sticky="w", pady=(0, 4))
 
         button_row = ttk.Frame(source_frame)
-        button_row.grid(row=7, column=1, sticky="w", pady=(6, 8))
+        button_row.grid(row=10, column=1, sticky="w", pady=(6, 8))
         ttk.Button(
             button_row, text="Load Preview", command=self._load_spectrum_preview
         ).grid(row=0, column=0, padx=(0, 8))
         ttk.Button(
             button_row, text="Save PNG", command=self._save_spectrum_preview_png
-        ).grid(row=0, column=1)
+        ).grid(row=0, column=1, padx=(0, 8))
+        ttk.Button(
+            button_row, text="Run CLI Plot Export", command=self._run_spectrum_plot
+        ).grid(row=0, column=2)
 
         ttk.Label(
             source_frame,
             textvariable=self.preview_status,
             wraplength=340,
             justify="left",
-        ).grid(row=8, column=0, columnspan=3, sticky="ew", pady=(2, 10))
+        ).grid(row=11, column=0, columnspan=3, sticky="ew", pady=(2, 10))
 
         data_source_frame = ttk.LabelFrame(controls, text="Nuclear data sources")
         data_source_frame.grid(row=1, column=0, columnspan=3, sticky="ew", pady=(10, 0))
@@ -1226,6 +1369,20 @@ class UiBuilderMixin:
         self.unfold_response = tk.StringVar(
             value=str(self.project_dir / "response.json")
         )
+        self.response_cross_section_file = tk.StringVar(
+            value=str(self.project_dir / "cross_sections.json")
+        )
+        self.response_number_densities_file = tk.StringVar(
+            value=str(self.project_dir / "number_densities.json")
+        )
+        self.response_boundaries_file = tk.StringVar(
+            value=str(self.project_dir / "boundaries.json")
+        )
+        self.response_output = self.unfold_response
+        self.response_validate = tk.BooleanVar(value=True)
+        self.response_status = tk.StringVar(
+            value="Build a response bundle from cross sections, number densities, and group boundaries."
+        )
         self.unfold_prior = tk.StringVar(value="")
         self.unfold_method = tk.StringVar(value="gls")
         self.unfold_unc = tk.StringVar(value="0.25")
@@ -1245,15 +1402,62 @@ class UiBuilderMixin:
             value="Run an unfolding workflow to render the adjusted spectrum and solver diagnostics."
         )
 
-        self._path_row(controls, 0, "Rates artifact:", self.unfold_rates, save=False)
+        response_frame = ttk.LabelFrame(controls, text="Response builder")
+        response_frame.grid(row=0, column=0, columnspan=3, sticky="ew", pady=(0, 10))
+        response_frame.columnconfigure(1, weight=1)
         self._path_row(
-            controls, 1, "Response artifact:", self.unfold_response, save=False
+            response_frame,
+            0,
+            "Cross sections JSON:",
+            self.response_cross_section_file,
+            save=False,
         )
         self._path_row(
-            controls, 2, "Prior flux JSON (optional):", self.unfold_prior, save=False
+            response_frame,
+            1,
+            "Number densities JSON:",
+            self.response_number_densities_file,
+            save=False,
+        )
+        self._path_row(
+            response_frame,
+            2,
+            "Group boundaries JSON:",
+            self.response_boundaries_file,
+            save=False,
+        )
+        self._path_row(
+            response_frame, 3, "Response artifact:", self.response_output, save=True
+        )
+        response_buttons = ttk.Frame(response_frame)
+        response_buttons.grid(row=4, column=1, sticky="w", pady=(4, 4))
+        ttk.Button(
+            response_buttons, text="Build Response", command=self._run_response
+        ).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(
+            response_buttons,
+            text="Load Response Summary",
+            command=self._load_response_preview,
+        ).grid(row=0, column=1)
+        ttk.Checkbutton(
+            response_frame, text="Validate artifact schema", variable=self.response_validate
+        ).grid(row=5, column=1, sticky="w")
+        ttk.Label(
+            response_frame,
+            textvariable=self.response_status,
+            wraplength=360,
+            justify="left",
+        ).grid(row=6, column=0, columnspan=3, sticky="ew", pady=(2, 0))
+
+        self._path_row(controls, 7, "Rates artifact:", self.unfold_rates, save=False)
+        self._path_row(
+            controls, 8, "Response artifact:", self.unfold_response, save=False
+        )
+        self._path_row(
+            controls, 9, "Prior flux JSON (optional):", self.unfold_prior, save=False
         )
         ttk.Label(controls, text="Method:").grid(
-            row=3, column=0, sticky="w", padx=(0, 8), pady=4
+            row=10, column=0, sticky="w", padx=(0, 8), pady=4
         )
         method_combo = ttk.Combobox(
             controls,
@@ -1262,13 +1466,13 @@ class UiBuilderMixin:
             state="readonly",
             width=20,
         )
-        method_combo.grid(row=3, column=1, sticky="w")
+        method_combo.grid(row=10, column=1, sticky="w")
         method_combo.bind(
             "<<ComboboxSelected>>", lambda _event: self._refresh_unfold_method_summary()
         )
-        self._entry_row(controls, 4, "Prior uncertainty:", self.unfold_unc)
+        self._entry_row(controls, 11, "Prior uncertainty:", self.unfold_unc)
         ttk.Label(controls, text="Prior covariance model:").grid(
-            row=5, column=0, sticky="w", padx=(0, 8), pady=4
+            row=12, column=0, sticky="w", padx=(0, 8), pady=4
         )
         ttk.Combobox(
             controls,
@@ -1276,15 +1480,15 @@ class UiBuilderMixin:
             values=[m.value for m in cli_app.PriorCovarianceModel],
             state="readonly",
             width=20,
-        ).grid(row=5, column=1, sticky="w")
-        self._entry_row(controls, 6, "Prior correlation length:", self.unfold_corr_len)
-        self._entry_row(controls, 7, "Max iterations:", self.unfold_max_iters)
-        self._entry_row(controls, 8, "Tolerance:", self.unfold_tolerance)
-        self._entry_row(controls, 9, "Chi² tolerance:", self.unfold_chi2_tolerance)
-        self._entry_row(controls, 10, "Relaxation:", self.unfold_relaxation)
-        self._entry_row(controls, 11, "Positive floor:", self.unfold_floor)
+        ).grid(row=12, column=1, sticky="w")
+        self._entry_row(controls, 13, "Prior correlation length:", self.unfold_corr_len)
+        self._entry_row(controls, 14, "Max iterations:", self.unfold_max_iters)
+        self._entry_row(controls, 15, "Tolerance:", self.unfold_tolerance)
+        self._entry_row(controls, 16, "Chi² tolerance:", self.unfold_chi2_tolerance)
+        self._entry_row(controls, 17, "Relaxation:", self.unfold_relaxation)
+        self._entry_row(controls, 18, "Positive floor:", self.unfold_floor)
         ttk.Label(controls, text="MLEM convergence:").grid(
-            row=12, column=0, sticky="w", padx=(0, 8), pady=4
+            row=19, column=0, sticky="w", padx=(0, 8), pady=4
         )
         ttk.Combobox(
             controls,
@@ -1292,28 +1496,28 @@ class UiBuilderMixin:
             values=list(GUI_UNFOLD_MLEM_CONVERGENCE_MODES),
             state="readonly",
             width=20,
-        ).grid(row=12, column=1, sticky="w")
+        ).grid(row=19, column=1, sticky="w")
         ttk.Checkbutton(
             controls,
             text="Enforce non-negativity (GLS)",
             variable=self.unfold_enforce_nonnegativity,
-        ).grid(row=13, column=1, sticky="w", pady=(0, 2))
+        ).grid(row=20, column=1, sticky="w", pady=(0, 2))
         ttk.Checkbutton(
             controls,
             text="Verbose iterative solver log",
             variable=self.unfold_verbose_solver,
-        ).grid(row=14, column=1, sticky="w", pady=(0, 2))
+        ).grid(row=21, column=1, sticky="w", pady=(0, 2))
         self._path_row(
-            controls, 15, "Output unfold artifact:", self.unfold_output, save=True
+            controls, 22, "Output unfold artifact:", self.unfold_output, save=True
         )
         ttk.Label(
             controls, textvariable=self.unfold_summary, wraplength=360, justify="left"
-        ).grid(row=16, column=0, columnspan=3, sticky="ew", pady=(2, 4))
+        ).grid(row=23, column=0, columnspan=3, sticky="ew", pady=(2, 4))
         ttk.Checkbutton(
             controls, text="Validate artifact schema", variable=self.unfold_validate
-        ).grid(row=17, column=1, sticky="w", pady=(0, 8))
+        ).grid(row=24, column=1, sticky="w", pady=(0, 8))
         unfold_buttons = ttk.Frame(controls)
-        unfold_buttons.grid(row=18, column=1, sticky="w")
+        unfold_buttons.grid(row=25, column=1, sticky="w")
         ttk.Button(unfold_buttons, text="Run Unfold", command=self._run_unfold).grid(
             row=0, column=0, padx=(0, 6)
         )
@@ -1495,7 +1699,7 @@ class UiBuilderMixin:
         k0_frame = ttk.LabelFrame(frame, text="k0 workflow", padding=10)
         k0_frame.grid(row=10, column=0, columnspan=3, sticky="nsew", pady=(8, 8))
         k0_frame.columnconfigure(1, weight=1)
-        k0_frame.rowconfigure(26, weight=1)
+        k0_frame.rowconfigure(31, weight=1)
 
         self.k0_detector_points = tk.StringVar(
             value=str(self.project_dir / "k0_detector_points.json")
@@ -1520,6 +1724,14 @@ class UiBuilderMixin:
             value=str(self.project_dir / "k0_analysis.json")
         )
         self.k0_library_file = tk.StringVar(value="")
+        self.k0_import_input = tk.StringVar(
+            value=str(self.project_dir / "kayzero_library")
+        )
+        self.k0_import_preferred_version = tk.StringVar(value="")
+        self.k0_import_output = self.k0_library_file
+        self.k0_import_report_output = tk.StringVar(
+            value=str(self.project_dir / "kayzero_import_report.json")
+        )
         self.k0_aux_library_file = tk.StringVar(value="")
         self.k0_project_id = tk.StringVar(value="")
         self.k0_sample_id = tk.StringVar(value="")
@@ -1546,59 +1758,78 @@ class UiBuilderMixin:
         )
 
         self._path_row(
-            k0_frame, 0, "Detector points:", self.k0_detector_points, save=False
+            k0_frame, 0, "Kayzero folder / zip:", self.k0_import_input, save=False
+        )
+        self._entry_row(
+            k0_frame, 1, "Preferred version (opt):", self.k0_import_preferred_version
         )
         self._path_row(
-            k0_frame, 1, "Detector artifact:", self.k0_detector_output, save=True
-        )
-        self._path_row(
-            k0_frame, 2, "Facility input:", self.k0_facility_input, save=False
-        )
-        self._path_row(
-            k0_frame, 3, "Facility artifact:", self.k0_facility_output, save=True
-        )
-        self._path_row(k0_frame, 4, "Peaks artifact:", self.k0_peaks_input, save=False)
-        self._path_row(
-            k0_frame, 5, "Spectrum artifact:", self.k0_spectrum_input, save=False
+            k0_frame, 2, "Governed k0 library:", self.k0_import_output, save=True
         )
         self._path_row(
             k0_frame,
-            6,
+            3,
+            "Import report artifact:",
+            self.k0_import_report_output,
+            save=True,
+        )
+        ttk.Button(
+            k0_frame, text="Import Kayzero", command=self._run_k0_import_kayzero
+        ).grid(row=4, column=1, sticky="w", pady=(0, 8))
+        self._path_row(
+            k0_frame, 5, "Detector points:", self.k0_detector_points, save=False
+        )
+        self._path_row(
+            k0_frame, 6, "Detector artifact:", self.k0_detector_output, save=True
+        )
+        self._path_row(
+            k0_frame, 7, "Facility input:", self.k0_facility_input, save=False
+        )
+        self._path_row(
+            k0_frame, 8, "Facility artifact:", self.k0_facility_output, save=True
+        )
+        self._path_row(k0_frame, 9, "Peaks artifact:", self.k0_peaks_input, save=False)
+        self._path_row(
+            k0_frame, 10, "Spectrum artifact:", self.k0_spectrum_input, save=False
+        )
+        self._path_row(
+            k0_frame,
+            11,
             "Observations artifact:",
             self.k0_observations_output,
             save=True,
         )
         self._path_row(
-            k0_frame, 7, "Analysis artifact:", self.k0_analysis_output, save=True
+            k0_frame, 12, "Analysis artifact:", self.k0_analysis_output, save=True
         )
         self._path_row(
-            k0_frame, 8, "k0 library (opt):", self.k0_library_file, save=False
+            k0_frame, 13, "k0 library (opt):", self.k0_library_file, save=False
         )
         self._path_row(
-            k0_frame, 9, "Aux library (opt):", self.k0_aux_library_file, save=False
+            k0_frame, 14, "Aux library (opt):", self.k0_aux_library_file, save=False
         )
-        self._entry_row(k0_frame, 10, "Project ID:", self.k0_project_id)
-        self._entry_row(k0_frame, 11, "Sample ID:", self.k0_sample_id)
-        self._entry_row(k0_frame, 12, "Irradiation ID:", self.k0_irradiation_id)
-        self._entry_row(k0_frame, 13, "Measurement ID:", self.k0_measurement_id)
-        self._entry_row(k0_frame, 14, "Sample mass (g):", self.k0_sample_mass_g)
-        self._entry_row(k0_frame, 15, "Reference mass (g):", self.k0_reference_mass_g)
-        self._entry_row(k0_frame, 16, "Reference isotope:", self.k0_reference_isotope)
+        self._entry_row(k0_frame, 15, "Project ID:", self.k0_project_id)
+        self._entry_row(k0_frame, 16, "Sample ID:", self.k0_sample_id)
+        self._entry_row(k0_frame, 17, "Irradiation ID:", self.k0_irradiation_id)
+        self._entry_row(k0_frame, 18, "Measurement ID:", self.k0_measurement_id)
+        self._entry_row(k0_frame, 19, "Sample mass (g):", self.k0_sample_mass_g)
+        self._entry_row(k0_frame, 20, "Reference mass (g):", self.k0_reference_mass_g)
+        self._entry_row(k0_frame, 21, "Reference isotope:", self.k0_reference_isotope)
         self._entry_row(
-            k0_frame, 17, "Irradiation time (s):", self.k0_irradiation_time_s
+            k0_frame, 22, "Irradiation time (s):", self.k0_irradiation_time_s
         )
-        self._entry_row(k0_frame, 18, "Decay time (s):", self.k0_decay_time_s)
+        self._entry_row(k0_frame, 23, "Decay time (s):", self.k0_decay_time_s)
         self._path_row(
-            k0_frame, 19, "Aggregation artifact:", self.k0_aggregation_output, save=True
+            k0_frame, 24, "Aggregation artifact:", self.k0_aggregation_output, save=True
         )
-        self._path_row(k0_frame, 20, "QA/QC plan:", self.k0_qaqc_plan, save=False)
-        self._path_row(k0_frame, 21, "QA/QC artifact:", self.k0_qaqc_output, save=True)
+        self._path_row(k0_frame, 25, "QA/QC plan:", self.k0_qaqc_plan, save=False)
+        self._path_row(k0_frame, 26, "QA/QC artifact:", self.k0_qaqc_output, save=True)
         self._path_row(
-            k0_frame, 22, "Report artifact:", self.k0_report_output, save=True
+            k0_frame, 27, "Report artifact:", self.k0_report_output, save=True
         )
 
         k0_button_row = ttk.Frame(k0_frame)
-        k0_button_row.grid(row=23, column=0, columnspan=3, sticky="w", pady=(6, 0))
+        k0_button_row.grid(row=28, column=0, columnspan=3, sticky="w", pady=(6, 0))
         ttk.Button(
             k0_button_row, text="Run Detector", command=self._run_k0_detector
         ).grid(row=0, column=0, padx=(0, 6))
@@ -1625,12 +1856,12 @@ class UiBuilderMixin:
         ).grid(row=0, column=7)
         ttk.Checkbutton(
             k0_frame, text="Validate artifacts", variable=self.k0_validate
-        ).grid(row=24, column=1, sticky="w")
+        ).grid(row=29, column=1, sticky="w")
         ttk.Label(
             k0_frame, textvariable=self.k0_status, wraplength=760, justify="left"
-        ).grid(row=25, column=0, columnspan=3, sticky="ew", pady=(6, 0))
+        ).grid(row=30, column=0, columnspan=3, sticky="ew", pady=(6, 0))
         self.k0_preview = ScrolledText(k0_frame, height=10, wrap="word")
-        self.k0_preview.grid(row=26, column=0, columnspan=3, sticky="nsew", pady=(8, 0))
+        self.k0_preview.grid(row=31, column=0, columnspan=3, sticky="nsew", pady=(8, 0))
         self.k0_preview.configure(state="disabled")
 
         astm_frame = ttk.LabelFrame(frame, text="ASTM E261 workflow", padding=10)
@@ -1778,13 +2009,156 @@ class UiBuilderMixin:
         )
         self.astm_e2005_preview.configure(state="disabled")
 
+        astm_e3376_frame = ttk.LabelFrame(frame, text="ASTM E3376 workflow", padding=10)
+        astm_e3376_frame.grid(
+            row=14, column=0, columnspan=3, sticky="nsew", pady=(0, 8)
+        )
+        astm_e3376_frame.columnconfigure(1, weight=1)
+        astm_e3376_frame.rowconfigure(5, weight=1)
+
+        self.astm_e3376_plan = tk.StringVar(
+            value=str(self.project_dir / "astm_e3376_plan.json")
+        )
+        self.astm_e3376_output = tk.StringVar(
+            value=str(self.project_dir / "astm_e3376.json")
+        )
+        self.astm_e3376_validate = tk.BooleanVar(value=True)
+        self.astm_e3376_status = tk.StringVar(
+            value="Provide an ASTM E3376 JSON plan, then run the workflow to produce HPGe detection metrics."
+        )
+
+        self._path_row(
+            astm_e3376_frame, 0, "Plan file:", self.astm_e3376_plan, save=False
+        )
+        self._path_row(
+            astm_e3376_frame, 1, "Output artifact:", self.astm_e3376_output, save=True
+        )
+        astm_e3376_button_row = ttk.Frame(astm_e3376_frame)
+        astm_e3376_button_row.grid(
+            row=2, column=0, columnspan=3, sticky="w", pady=(6, 0)
+        )
+        ttk.Button(
+            astm_e3376_button_row,
+            text="Run ASTM E3376",
+            command=self._run_astm_e3376,
+        ).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(
+            astm_e3376_button_row,
+            text="Load Preview",
+            command=self._load_astm_e3376_preview,
+        ).grid(row=0, column=1)
+        ttk.Checkbutton(
+            astm_e3376_frame,
+            text="Validate artifacts",
+            variable=self.astm_e3376_validate,
+        ).grid(row=3, column=1, sticky="w")
+        ttk.Label(
+            astm_e3376_frame,
+            textvariable=self.astm_e3376_status,
+            wraplength=760,
+            justify="left",
+        ).grid(row=4, column=0, columnspan=3, sticky="ew", pady=(6, 0))
+        self.astm_e3376_preview = ScrolledText(astm_e3376_frame, height=8, wrap="word")
+        self.astm_e3376_preview.grid(
+            row=5, column=0, columnspan=3, sticky="nsew", pady=(8, 0)
+        )
+        self.astm_e3376_preview.configure(state="disabled")
+
+        rafm_frame = ttk.LabelFrame(
+            frame, text="RAFM validation + benchmark workflows", padding=10
+        )
+        rafm_frame.grid(row=15, column=0, columnspan=3, sticky="nsew", pady=(0, 8))
+        rafm_frame.columnconfigure(1, weight=1)
+
+        self.rafm_example_root = tk.StringVar(
+            value=str(self.project_dir / "examples" / "RAFM_irradiation")
+        )
+        self.rafm_raw_results_root = tk.StringVar(
+            value=str(self.project_dir / "artifacts" / "rafm_raw")
+        )
+        self.rafm_qg_results_root = tk.StringVar(
+            value=str(self.project_dir / "artifacts" / "rafm_qg")
+        )
+        self.rafm_comparison_root = tk.StringVar(
+            value=str(self.project_dir / "artifacts" / "rafm_compare")
+        )
+        self.rafm_max_spectra = tk.StringVar(value="")
+        self.rafm_flux_wire_counting_method = tk.StringVar(value="iec_tiered")
+        self.rafm_generic_counting_method = tk.StringVar(value="gaussian_fit")
+        self.rafm_enforce_thresholds = tk.BooleanVar(value=True)
+        self.rafm_status = tk.StringVar(
+            value="Run native FluxForge validation against bundled RAFM examples. This remains a desktop workflow with no browser dependency."
+        )
+
+        self._directory_row(rafm_frame, 0, "Example root:", self.rafm_example_root)
+        self._directory_row(
+            rafm_frame, 1, "Raw results root:", self.rafm_raw_results_root
+        )
+        self._directory_row(
+            rafm_frame, 2, "QG results root:", self.rafm_qg_results_root
+        )
+        self._directory_row(
+            rafm_frame, 3, "Comparison root:", self.rafm_comparison_root
+        )
+        self._entry_row(rafm_frame, 4, "Max spectra (opt):", self.rafm_max_spectra)
+        ttk.Label(rafm_frame, text="Flux-wire counting:").grid(
+            row=5, column=0, sticky="w", padx=(0, 8), pady=4
+        )
+        ttk.Combobox(
+            rafm_frame,
+            textvariable=self.rafm_flux_wire_counting_method,
+            values=list(GUI_RAFM_COUNTING_METHODS),
+            state="readonly",
+            width=18,
+        ).grid(row=5, column=1, sticky="w")
+        ttk.Label(rafm_frame, text="Generic counting:").grid(
+            row=6, column=0, sticky="w", padx=(0, 8), pady=4
+        )
+        ttk.Combobox(
+            rafm_frame,
+            textvariable=self.rafm_generic_counting_method,
+            values=list(GUI_RAFM_COUNTING_METHODS),
+            state="readonly",
+            width=18,
+        ).grid(row=6, column=1, sticky="w")
+        ttk.Checkbutton(
+            rafm_frame,
+            text="Enforce parity thresholds",
+            variable=self.rafm_enforce_thresholds,
+        ).grid(row=7, column=1, sticky="w")
+        rafm_buttons = ttk.Frame(rafm_frame)
+        rafm_buttons.grid(row=8, column=0, columnspan=3, sticky="w", pady=(6, 0))
+        ttk.Button(
+            rafm_buttons,
+            text="Run RAFM Validation",
+            command=self._run_rafm_validate,
+        ).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(
+            rafm_buttons,
+            text="Run QG Benchmark",
+            command=self._run_rafm_qg_benchmark,
+        ).grid(row=0, column=1, padx=(0, 6))
+        ttk.Button(
+            rafm_buttons,
+            text="Compare Branches",
+            command=self._run_rafm_compare_branches,
+        ).grid(row=0, column=2)
+        ttk.Label(
+            rafm_frame,
+            textvariable=self.rafm_status,
+            wraplength=760,
+            justify="left",
+        ).grid(row=9, column=0, columnspan=3, sticky="ew", pady=(6, 0))
+
         notes = ScrolledText(frame, wrap="word", height=12)
-        notes.grid(row=14, column=0, columnspan=3, sticky="nsew", pady=(4, 0))
+        notes.grid(row=16, column=0, columnspan=3, sticky="nsew", pady=(4, 0))
         frame.rowconfigure(10, weight=1)
         frame.rowconfigure(11, weight=1)
         frame.rowconfigure(12, weight=1)
         frame.rowconfigure(13, weight=1)
         frame.rowconfigure(14, weight=1)
+        frame.rowconfigure(15, weight=1)
+        frame.rowconfigure(16, weight=1)
         self.standards_notes_box = notes
         self._sync_standards_notes()
         self._refresh_standards_source_summary()
@@ -1936,6 +2310,18 @@ class UiBuilderMixin:
         self.report_figure_dir = tk.StringVar(
             value=str(self.project_dir / "report_figures")
         )
+        self.plots_unfold = self.report_unfold
+        self.plots_rates = self.report_rates
+        self.plots_response = tk.StringVar(value=str(self.project_dir / "response.json"))
+        self.plots_prior_flux = tk.StringVar(value="")
+        self.plots_output_dir = tk.StringVar(value=str(self.project_dir / "plots"))
+        self.plots_format = tk.StringVar(value="png")
+        self.plots_example = tk.BooleanVar(value=False)
+        self.plots_include_response_plot = tk.BooleanVar(value=True)
+        self.plots_validate = tk.BooleanVar(value=True)
+        self.plots_status = tk.StringVar(
+            value="Generate the headless master plot suite from bundled example inputs or current workflow artifacts."
+        )
         self.report_validate = tk.BooleanVar(value=True)
         self.report_export_figures = tk.BooleanVar(value=True)
         self.report_status = tk.StringVar(
@@ -1962,16 +2348,66 @@ class UiBuilderMixin:
         self._directory_row(
             frame, 8, "Figure bundle directory:", self.report_figure_dir
         )
+        plots_frame = ttk.LabelFrame(frame, text="Master plot suite", padding=10)
+        plots_frame.grid(row=9, column=0, columnspan=4, sticky="nsew", pady=(10, 8))
+        plots_frame.columnconfigure(1, weight=1)
+        self._path_row(
+            plots_frame, 0, "Unfold artifact:", self.plots_unfold, save=False
+        )
+        self._path_row(
+            plots_frame, 1, "Response artifact:", self.plots_response, save=False
+        )
+        self._path_row(plots_frame, 2, "Rates artifact:", self.plots_rates, save=False)
+        self._path_row(
+            plots_frame, 3, "Prior flux JSON:", self.plots_prior_flux, save=False
+        )
+        self._directory_row(
+            plots_frame, 4, "Plot output directory:", self.plots_output_dir
+        )
+        ttk.Label(plots_frame, text="Format:").grid(
+            row=5, column=0, sticky="w", padx=(0, 8), pady=4
+        )
+        ttk.Combobox(
+            plots_frame,
+            textvariable=self.plots_format,
+            values=["png", "pdf", "both"],
+            state="readonly",
+            width=12,
+        ).grid(row=5, column=1, sticky="w")
+        ttk.Checkbutton(
+            plots_frame,
+            text="Use bundled example inputs",
+            variable=self.plots_example,
+        ).grid(row=6, column=1, sticky="w")
+        ttk.Checkbutton(
+            plots_frame,
+            text="Include response matrix plot",
+            variable=self.plots_include_response_plot,
+        ).grid(row=7, column=1, sticky="w")
+        ttk.Checkbutton(
+            plots_frame,
+            text="Validate artifact schema",
+            variable=self.plots_validate,
+        ).grid(row=8, column=1, sticky="w")
+        ttk.Button(
+            plots_frame, text="Run Plot Suite", command=self._run_plots
+        ).grid(row=9, column=1, sticky="w", pady=(4, 4))
+        ttk.Label(
+            plots_frame,
+            textvariable=self.plots_status,
+            wraplength=520,
+            justify="left",
+        ).grid(row=10, column=0, columnspan=4, sticky="ew", pady=(4, 0))
         ttk.Checkbutton(
             frame, text="Validate artifact schema", variable=self.report_validate
-        ).grid(row=9, column=1, sticky="w", pady=(0, 4))
+        ).grid(row=10, column=1, sticky="w", pady=(0, 4))
         ttk.Checkbutton(
             frame,
             text="Export figure bundle after report",
             variable=self.report_export_figures,
-        ).grid(row=10, column=1, sticky="w", pady=(0, 8))
+        ).grid(row=11, column=1, sticky="w", pady=(0, 8))
         button_row = ttk.Frame(frame)
-        button_row.grid(row=11, column=1, sticky="w")
+        button_row.grid(row=12, column=1, sticky="w")
         ttk.Button(button_row, text="Run Report", command=self._run_report).grid(
             row=0, column=0, sticky="w"
         )
@@ -1983,11 +2419,11 @@ class UiBuilderMixin:
         ).grid(row=0, column=2, sticky="w", padx=(8, 0))
         ttk.Label(
             frame, textvariable=self.report_status, wraplength=520, justify="left"
-        ).grid(row=12, column=0, columnspan=4, sticky="ew", pady=(8, 0))
-        frame.rowconfigure(13, weight=1)
+        ).grid(row=13, column=0, columnspan=4, sticky="ew", pady=(8, 0))
+        frame.rowconfigure(14, weight=1)
         self.report_preview = ScrolledText(frame, height=18, wrap="word")
         self.report_preview.grid(
-            row=13, column=0, columnspan=4, sticky="nsew", pady=(10, 0)
+            row=14, column=0, columnspan=4, sticky="nsew", pady=(10, 0)
         )
         self.report_preview.configure(state="disabled")
 

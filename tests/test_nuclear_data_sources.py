@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
@@ -76,3 +78,13 @@ def test_load_python_identification_source(tmp_path, monkeypatch):
 
     assert matches
     assert matches[0][0] == "Co60"
+
+
+def test_offline_mode_blocks_remote_gamma_source(monkeypatch):
+    monkeypatch.setenv("FLUXFORGE_OFFLINE", "1")
+
+    with pytest.raises(RuntimeError, match="FLUXFORGE_OFFLINE=1"):
+        load_gamma_identification_source(
+            "custom_gamma_file",
+            custom_path="https://example.invalid/gamma_lines.json",
+        )

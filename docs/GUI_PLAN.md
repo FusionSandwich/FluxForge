@@ -11,14 +11,17 @@
 - **CLI-first and fully scriptable:** the GUI is an optional front-end; every GUI action maps to a CLI command or core API call.
 - **Cross-platform desktop:** **Windows + Linux required**; macOS optional.
 - **Globally usable + free + open source:** no paywalls, no account gates, no region restrictions; permissive licensing preferred (MIT/BSD/Apache/LGPL).
+- **Project license target:** keep FluxForge itself under a permissive open-source license, with `MIT` preferred for the project root and packaging metadata.
 - **Offline-first:** no license servers, no mandatory network access.
 - **No external APIs:** all GUI features must function without network calls or cloud services.
 - **Low overhead:** avoid heavyweight runtimes (no embedded browser engine if it can be avoided).
+- **No sibling-repo dependency:** FluxForge must install, run, and package correctly even when the top-level `testing/` tree is absent.
+- **Dependency policy:** keep shipped GUI/runtime dependencies permissive and cross-platform; external GPL projects may inform behavior but are not copied into FluxForge runtime code or packaging.
 - **Simple setup:** "one executable" for students/labs + standard Python install for developers.
 - **Feature parity target:** provide the *interactive analysis ergonomics* users expect from tools like **PeakEasy** and **QuantumGold** (spectrum interaction, ROI/peak workflows, calibration UIs, batch operations, exports), while supporting FluxForge's neutron dosimetry / unfolding / validation pipeline.
 - **Replacement targets:** FluxForge should replace PeakEasy, QuantumGold, and STAYSL while remaining usable with PyNE, OpenMC, and ALARA.
 
-## Current Implemented Prototype Status (2026-03-16)
+## Current Implemented Prototype Status (2026-03-17)
 
 The current shipped GUI prototype is implemented with **Tkinter + ttk + Matplotlib**.
 
@@ -26,14 +29,19 @@ Why this is acceptable right now:
 - fully open source and Python-native,
 - works on **Linux and Windows**,
 - no proprietary runtimes or license restrictions,
+- no browser requirement for the shipped GUI,
 - low-friction for local labs and remote X/virtual-display testing,
 - already integrated with FluxForge's CLI-first workflow model.
 
 What is already implemented and working in the current prototype:
 - tabbed workflow shell for ingest, spectrum, peaks, activity, rates, unfold, compare, standards, and report,
+- native desktop runtime with explicit `FLUXFORGE_OFFLINE=1` gating for remote HTTP(S) sources and runtime downloads,
+- ingest tab now includes both **single-spectrum** and **batch ingest** workflows,
 - standards-oriented presets for ASTM/INL, US ASTM, IAEA IRDFF/GMA, `k0-NAA`, comparator NAA, and Curie-style workflows,
 - standards tab now includes a first-pass stepwise `k0-NAA` workflow section for detector characterization, facility characterization, peak normalization, selectable governed library inputs, multi-measurement aggregation, blank/CRM QA-QC, and k0 report preview/loading,
+- standards tab now also surfaces **Kayzero import**, **ASTM E3376**, and **RAFM validation / benchmark** workflows that previously existed only as orphan handlers,
 - spectrum viewer with pan/zoom toolbar, overlays, log/linear scaling, and PNG export,
+- spectrum tab now includes a direct **CLI spectrum-plot export** surface using the same desktop workflow state,
 - **multi-buffer manager** for keeping multiple spectra in memory and using them as primary/overlay buffers,
 - **buffer arithmetic** for sum/subtract/average/ratio combination of selected spectra into a reusable artifact,
 - **manual ROI draw/edit** support via plot clicks plus ROI load/save JSON helpers,
@@ -48,9 +56,11 @@ What is already implemented and working in the current prototype:
 - **activity**, **reaction-rate**, and **compare/validation** tabs now load post-run summaries that surface propagated uncertainty and final agreement metrics,
 - **unfolded spectrum display** in the Unfold tab with embedded plotting and solver-summary text,
 - selectable **GLS / GRAVEL / MLEM** unfolding workflows with GUI-exposed covariance and iterative solver parameters, plus uncertainty-aware measured/predicted, residual/pull, and flux-correlation diagnostics,
+- unfold tab now includes a visible **response-matrix builder** surface for the CLI `response` command,
 - **efficiency calibration workflow** with reference-source line selection, counted-point capture, curve fitting, residual diagnostics, and JSON export,
 - **Curie-style stacked-target and decay-chain tabs** backed by existing FluxForge physics APIs,
 - reproducible "copy as CLI" workflow behavior,
+- report tab now includes a visible **master plot suite** surface for the CLI `plots` command,
 - automated GUI smoke coverage and screenshot capture under headless Linux using Xvfb.
 
 What is only partially implemented today:
@@ -90,12 +100,25 @@ Tests still needed:
 - end-to-end GUI smoke coverage for the expanded `k0-NAA` section, especially external-library selection, aggregation, QA/QC, and report-generation actions.
 
 Latest validation snapshot for this phase:
-- focused regression suite: `40 passed` (`tests/test_gui_app.py`, `tests/test_cli_app.py`, `tests/test_nuclear_data_sources.py`),
+- focused regression suite: native parity/offline subset `36 passed` (`tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`),
+- expanded GUI/offline regression suite: `89 passed` (`tests/test_gui_app.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`),
 - Xvfb GUI startup smoke: passes with preview/peaks/activity/standards source selectors plus unfolding controls initialized,
 - ASTM/INL preset smoke check: applies `iec_tiered` counting, IRDFF source selection, and background-subtracted workflow defaults.
 
 Conda environment note:
 - [environment.yml](environment.yml) now explicitly includes `tk` and `pillow` alongside `matplotlib`/`scipy` for the desktop GUI runtime.
+
+## GUI QA Tooling
+
+- The current FluxForge GUI is a native desktop application built with **Tkinter + ttk + Matplotlib**.
+- The shipped FluxForge GUI must remain usable **offline and without a browser** on Windows and Linux.
+- Because of that, **Playwright is not the primary automation tool for the current shipping GUI**.
+- Maintain two explicit QA lanes:
+  - **Reference / web lane:** use Playwright only for browser-based reference GUIs and any future FluxForge web/Electron prototype.
+  - **Native desktop lane:** use Tk-native event tests, Xvfb screenshot/smoke runs, artifact-comparison tests, and Windows/Linux packaging smoke tests for the current FluxForge GUI.
+- A `js_repl`-enabled Codex session may be useful for reference-GUI inspection, but that is a developer-tooling concern rather than a FluxForge runtime dependency.
+- Do not claim that Playwright directly covers the current Tk desktop GUI until FluxForge has a web or Electron surface that Playwright can actually drive.
+- Reference GUI work under `testing/` is inspiration-only and optional; it is not part of FluxForge's build, install, packaging, or runtime contract.
 
 ## Out of Scope (v1)
 
@@ -106,7 +129,7 @@ Conda environment note:
 
 ## Reference Insights
 
-### From `testing/` (internal comparisons)
+### From internal inspiration audits in `testing/` (non-dependency)
 - **SpecKit:** tabbed workflow UI; file pickers; CSV interchange; real-time plots.
 - **HDTV:** interactive spectrum viewer; keyboard-driven workflows; calibration focus; ROOT matrix workflows.
 - **Gamma-MCA:** PWA spectrum viewer; live serial plotting; import/export; auto peak detection; calibration; offline install.

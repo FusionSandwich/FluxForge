@@ -1166,17 +1166,25 @@ The following are optional enhancements that may be added based on user needs:
 
 The following capabilities are planned and not counted in current completion metrics:
 
+Current release direction: the shipping FluxForge GUI remains a native offline-capable desktop application. Any future browser/PWA prototype is optional and not part of the Windows/Linux release requirement.
+
+Current implementation snapshot for this release branch:
+- GUI/CLI parity is now tracked by a repo-owned parity registry and native Tk probe tests.
+- The desktop GUI now exposes the previously missing `ingest-batch`, `spectrum-plot`, `response`, `k0-import-kayzero`, `plots`, `astm-e3376`, and RAFM validation/benchmark workflows.
+- Offline execution is now explicitly enforced with `FLUXFORGE_OFFLINE=1`, which blocks remote HTTP(S) sources and IRDFF auto-download paths while preserving local-file and bundled-data workflows.
+- FluxForge remains a native desktop application and does not require a browser runtime for supported Windows/Linux workflows.
+
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
 | C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Partial | Viewer, overlays, ROI editing, and PNG export are working in the current Tk/ttk prototype |
 | C2 | ROI/peak workflows with multiplet deconvolution | Partial | Peak tables, auto-finding, counting-method selection, ROI plot selection, plotted diagnostics, constrained-fit widgets, free-form constraint-matrix editing, and ASTM/INL preset-driven IEC-tiered counting defaults are wired; richer tied-parameter UX still remains |
 | C3 | Energy/efficiency calibration UI | Partial | Polynomial coefficient editor, calibration-point picking, residual plots, efficiency-point capture, and fitted-curve JSON export are implemented; detector-profile import/wizards remain |
-| C4 | Batch operations (sum/append/convert, ROI integration) | Partial | Multi-buffer management and buffer arithmetic are implemented; broader batch orchestration remains |
+| C4 | Batch operations (sum/append/convert, ROI integration) | Partial | Multi-buffer management, buffer arithmetic, and GUI `ingest-batch` orchestration are implemented; broader workspace/session orchestration remains |
 | C5 | GUI-to-CLI macro recorder + project file | Planned | Reproducible workflows |
 | C6 | Interactive CLI shell (HDTV-style) | Planned | Batch scripts + keybindings |
-| C7 | Config-driven CLI tools (Neutron-Spectrometry-style) | Partial | GUI/CLI now expose GLS, GRAVEL, and MLEM unfold configuration plus embedded unfolded-spectrum plotting, uncertainty-aware rate residual/pull diagnostics, and correlation heatmaps; broader trend/plot-lines dashboards still remain |
+| C7 | Config-driven CLI tools (Neutron-Spectrometry-style) | Partial | GUI/CLI now expose GLS, GRAVEL, and MLEM unfold configuration, response-matrix building, embedded unfolded-spectrum plotting, uncertainty-aware rate residual/pull diagnostics, and correlation heatmaps; broader trend/plot-lines dashboards still remain |
 | C8 | STAYSL parity UI panels (SigPhi/SHIELD/BCF) | Planned | Spreadsheet-style workflow |
-| C9 | Online GUI/PWA (Gamma-MCA-style) | Planned | Offline-first browser UI |
+| C9 | Optional GUI/PWA prototype (Gamma-MCA-style) | Planned | Reference-only future prototype; not part of the required native desktop release path |
 | C10 | MCA acquisition plugin (future) | Planned | Serial/WebUSB-class devices |
 | C11 | Dose rate + isotope ID workflows | Planned | From `testing/irrad_spectroscopy` |
 | C12 | Gamma line synthesis from activities | Planned | From `testing/actigamma` |
@@ -1191,16 +1199,16 @@ The following capabilities are planned and not counted in current completion met
 | C21 | Comparator-standard mass worksheet | Planned | Reference-driven mass/concentration estimation with uncertainty propagation |
 | C22 | Irradiation / decay / count-time planner | Planned | Short-lived vs long-lived isotope timing studies |
 | C23 | MDA detection-limit worksheet | Planned | Report-ready detection thresholds and upper bounds |
-| C24 | Analysis checklist + figure-pack export | Planned | Abstract prompts, settings tables, plots, and completion checklist |
+| C24 | Analysis checklist + figure-pack export | Partial | Report tab now exposes the master plot suite and figure export helpers; checklist/project packaging still remains |
 | C25 | Curie-style stacked-target and decay-chain tabs | Partial | MVP tabs now call existing backend APIs and summarize energy-loss / Bateman results |
 | C26 | Additional nuclear-data backends in GUI/browser workflows | Partial | Provenance-aware source registry now exposes actigamma, FluxForge bundled gamma, NNDC offline activation, IRDFF-II, k0 monitor, calibration-source, flux-wire, and user custom JSON/CSV/YAML, HTTP(S), SQLite, and Python-plugin sources; broader downstream wiring beyond Peaks/Activity/Standards still remains |
 
 ---
 
-**Document Version:** 3.1  
-**Last Updated:** 2026-03-11  
+**Document Version:** 3.2  
+**Last Updated:** 2026-03-17  
 **Prepared by:** FluxForge Development Team
-**Test Suite:** 762 tests passing, 0 skipped
+**Focused GUI/Offline Regression:** 89 passed, 5 warnings (`tests/test_gui_app.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`)
 **GPU Support:** NVIDIA T600, CUDA 12.5.1, cuDNN 9
 
 ## 13. Documentation Appendices

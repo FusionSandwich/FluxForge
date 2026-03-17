@@ -4,6 +4,10 @@
 
 FluxForge is a pure-Python package, dual CLI, and desktop GUI that converts HPGe-derived spectrum counts into activities, reaction rates, and infers neutron flux spectra with generalized least squares and Monte Carlo uncertainty propagation. It acts as an open-source, reproducible replacement for standard tools like STAYSL, PeakEasy, and QuantumGold, conforming directly to ASTM E3376, ASTM E261, and INL standard metrology practices.
 
+FluxForge is intentionally self-contained. It must install, package, and run without any dependency on sibling repositories or anything under `../testing`; that tree is for inspiration, audits, and optional developer-side comparisons only.
+
+FluxForge's shipping GUI is a native `Tkinter + ttk + Matplotlib` desktop application. It does **not** require a browser, an embedded web runtime, or any internet connection for supported offline workflows.
+
 ## Key Capabilities
 - **Full Workflow Parity**: Implements raw ASCII/IEC spectral processing, deterministic Peak Identification, Activity/Reaction rate generation matching Quantum Gold and PeakEasy.
 - **Standards Compliant**: Direct integration with ASTM E3376 two-stream analysis, FWHM-scaled Covell continuum subtraction, and ASTM E261 reactor dosimetry schemas.
@@ -22,6 +26,9 @@ conda activate fluxforge
 
 pip install -e .
 
+# Optional: enforce offline-only execution
+export FLUXFORGE_OFFLINE=1
+
 # Launch the interactive GUI
 python -m fluxforge_gui.app
 # or: fluxforge-gui
@@ -29,6 +36,16 @@ python -m fluxforge_gui.app
 # Or use the CLI
 python -m fluxforge.cli.app --help
 # or: fluxforge --help
+```
+
+For offline delivery and native packaging helpers, use the repo-local tooling:
+
+```bash
+# Build a wheelhouse for air-gapped installs
+python tools/build_offline_wheelhouse.py
+
+# Build native CLI/GUI bundles with PyInstaller
+python tools/build_native_bundle.py --target both
 ```
 
 Synthetic validation and inference routines expect JSON inputs; see `src/fluxforge/cli/app.py` for expected schemas. For dedicated ASTM workflows, explore `examples/astm_e261_plan.json` or run the testing parity scripts under `examples/RAFM_irradiation/`.

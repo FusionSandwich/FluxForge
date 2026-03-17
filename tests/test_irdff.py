@@ -5,6 +5,7 @@ Tests for IRDFF-II database access and spectrum unfolding workflow.
 import unittest
 import numpy as np
 from pathlib import Path
+import pytest
 
 
 # =============================================================================
@@ -114,6 +115,16 @@ class TestIRDFFDatabase(unittest.TestCase):
 
         # Thermal group should have highest cross section
         self.assertGreater(group_xs[0], group_xs[2])  # thermal > fast
+
+
+def test_offline_mode_blocks_irdff_auto_download(tmp_path, monkeypatch):
+    from fluxforge.data.irdff import IRDFFDatabase
+
+    monkeypatch.setenv("FLUXFORGE_OFFLINE", "1")
+    database = IRDFFDatabase(cache_dir=tmp_path, auto_download=True, verbose=False)
+
+    with pytest.raises(RuntimeError, match="FLUXFORGE_OFFLINE=1"):
+        database._ensure_tab_data()
 
 
 class TestEnergyStructures(unittest.TestCase):

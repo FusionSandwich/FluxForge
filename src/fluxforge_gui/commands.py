@@ -352,6 +352,74 @@ class CommandsMixin:
             tokens.append("--no-validate")
         self._dispatch(cli_app.cmd_ingest_batch, args, tokens)
 
+    def _run_spectrum_plot(self) -> None:
+        profile = self.ingest_profile.get().strip() or None
+        background_file = self.ingest_background_file.get().strip()
+        background_scale_factor = self.ingest_background_scale_factor.get().strip()
+        energy_calibration = self.ingest_energy_calibration.get().strip() or None
+        efficiency_coefficients = (
+            self.ingest_efficiency_coefficients.get().strip() or None
+        )
+        manual_peaks_file = self.preview_roi_file.get().strip()
+        save_peak_report = self.preview_manual_peak_report.get().strip()
+        title = self.preview_plot_title.get().strip() or None
+        x_min = self.preview_x_min.get().strip()
+        x_max = self.preview_x_max.get().strip()
+        if self._manual_regions and manual_peaks_file:
+            self._save_manual_rois_file()
+        args = Namespace(
+            input=Path(self.preview_input.get()),
+            output=Path(self.preview_png_output.get()),
+            profile=profile,
+            background_file=Path(background_file) if background_file else None,
+            background_scale_mode=self.ingest_background_scale_mode.get(),
+            background_scale_factor=(
+                float(background_scale_factor) if background_scale_factor else None
+            ),
+            energy_calibration=energy_calibration,
+            efficiency_coefficients=efficiency_coefficients,
+            background_subtracted=self.preview_plot_background_subtracted.get(),
+            manual_peaks_file=Path(manual_peaks_file) if manual_peaks_file else None,
+            save_peak_report=Path(save_peak_report) if save_peak_report else None,
+            title=title,
+            x_min_keV=float(x_min) if x_min else None,
+            x_max_keV=float(x_max) if x_max else None,
+            y_log=self.preview_y_scale.get() == "log",
+            validate=self.ingest_validate.get(),
+        )
+        tokens = ["spectrum-plot", "--input", str(args.input), "--output", str(args.output)]
+        if args.profile:
+            tokens.extend(["--profile", args.profile])
+        if args.background_file:
+            tokens.extend(["--background-file", str(args.background_file)])
+        if args.background_scale_mode != "live":
+            tokens.extend(["--background-scale-mode", args.background_scale_mode])
+        if args.background_scale_factor is not None:
+            tokens.extend(
+                ["--background-scale-factor", str(args.background_scale_factor)]
+            )
+        if args.energy_calibration:
+            tokens.extend(["--energy-calibration", args.energy_calibration])
+        if args.efficiency_coefficients:
+            tokens.extend(["--efficiency-coefficients", args.efficiency_coefficients])
+        if args.background_subtracted:
+            tokens.append("--background-subtracted")
+        if args.manual_peaks_file:
+            tokens.extend(["--manual-peaks-file", str(args.manual_peaks_file)])
+        if args.save_peak_report:
+            tokens.extend(["--save-peak-report", str(args.save_peak_report)])
+        if args.title:
+            tokens.extend(["--title", args.title])
+        if args.x_min_keV is not None:
+            tokens.extend(["--x-min-keV", str(args.x_min_keV)])
+        if args.x_max_keV is not None:
+            tokens.extend(["--x-max-keV", str(args.x_max_keV)])
+        if args.y_log:
+            tokens.append("--y-log")
+        if not args.validate:
+            tokens.append("--no-validate")
+        self._dispatch(cli_app.cmd_spectrum_plot, args, tokens)
+
     def _run_peaks(self) -> None:
         manual_peaks_file = self.peaks_manual_file.get().strip()
         background_file = self.peaks_background_file.get().strip()
@@ -587,6 +655,34 @@ class CommandsMixin:
             on_success=self._load_compare_result_summary,
         )
 
+    def _run_response(self) -> None:
+        args = Namespace(
+            cross_section_file=Path(self.response_cross_section_file.get()),
+            number_densities_file=Path(self.response_number_densities_file.get()),
+            boundaries_file=Path(self.response_boundaries_file.get()),
+            output=Path(self.response_output.get()),
+            validate=self.response_validate.get(),
+        )
+        tokens = [
+            "response",
+            "--cross-section-file",
+            str(args.cross_section_file),
+            "--number-densities-file",
+            str(args.number_densities_file),
+            "--boundaries-file",
+            str(args.boundaries_file),
+            "--output",
+            str(args.output),
+        ]
+        if not args.validate:
+            tokens.append("--no-validate")
+        self._dispatch(
+            cli_app.cmd_response,
+            args,
+            tokens,
+            on_success=self._load_response_preview,
+        )
+
     def _run_reactions(self) -> None:
         source_id = self.standards_data_source.get()
         if source_id != "irdff_ii_dosimetry":
@@ -808,6 +904,33 @@ class CommandsMixin:
             cli_app.cmd_k0_report, args, tokens, on_success=self._load_k0_preview
         )
 
+    def _run_k0_import_kayzero(self) -> None:
+        preferred_version = self.k0_import_preferred_version.get().strip() or None
+        report_output = self.k0_import_report_output.get().strip()
+        args = Namespace(
+            input=Path(self.k0_import_input.get()),
+            preferred_version=preferred_version,
+            output=Path(self.k0_import_output.get()),
+            report_output=Path(report_output) if report_output else None,
+        )
+        tokens = [
+            "k0-import-kayzero",
+            "--input",
+            str(args.input),
+            "--output",
+            str(args.output),
+        ]
+        if args.preferred_version:
+            tokens.extend(["--preferred-version", args.preferred_version])
+        if args.report_output:
+            tokens.extend(["--report-output", str(args.report_output)])
+        self._dispatch(
+            cli_app.cmd_k0_import_kayzero,
+            args,
+            tokens,
+            on_success=self._after_k0_import_run,
+        )
+
     def _run_astm_e2005(self) -> None:
         args = Namespace(
             plan_file=(
@@ -1027,4 +1150,40 @@ class CommandsMixin:
             tokens.append("--no-validate")
         self._dispatch(
             cli_app.cmd_report, args, tokens, on_success=self._after_report_run
+        )
+
+    def _run_plots(self) -> None:
+        args = Namespace(
+            example=self.plots_example.get(),
+            unfold_file=self._optional_path(self.plots_unfold.get()),
+            response_file=self._optional_path(self.plots_response.get()),
+            rates_file=self._optional_path(self.plots_rates.get()),
+            prior_flux_file=self._optional_path(self.plots_prior_flux.get()),
+            output_dir=Path(self.plots_output_dir.get()),
+            format=self.plots_format.get(),
+            include_response_plot=self.plots_include_response_plot.get(),
+            dry_run=False,
+            validate=self.plots_validate.get(),
+        )
+        tokens = ["plots"]
+        if args.example:
+            tokens.append("--example")
+        if args.unfold_file:
+            tokens.extend(["--unfold-file", str(args.unfold_file)])
+        if args.response_file:
+            tokens.extend(["--response-file", str(args.response_file)])
+        if args.rates_file:
+            tokens.extend(["--rates-file", str(args.rates_file)])
+        if args.prior_flux_file:
+            tokens.extend(["--prior-flux-file", str(args.prior_flux_file)])
+        tokens.extend(["--output-dir", str(args.output_dir), "--format", args.format])
+        if not args.include_response_plot:
+            tokens.append("--no-response-plot")
+        if not args.validate:
+            tokens.append("--no-validate")
+        self._dispatch(
+            cli_app.cmd_plots,
+            args,
+            tokens,
+            on_success=self._after_master_plots_run,
         )
