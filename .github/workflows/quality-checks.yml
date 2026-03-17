@@ -72,4 +72,4 @@ jobs:
             tests/test_gui_app.py \
             tests/test_astm_e261.py \
             tests/test_astm_e262.py \
-            tests/test_cli_app.py -k gui
+            tests/test_cli_app.py
