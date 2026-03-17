@@ -14,6 +14,7 @@ FluxForge's shipping GUI is a native `Tkinter + ttk + Matplotlib` desktop applic
 - **Spectrum Unfolding**: Multi-algorithm backend featuring Iterative GRAVEL, MLEM, and GLS with optional non-negativity enforcement and robust Monte Carlo uncertainty propagation.
 - **Nuclear Data Integrations**: Bundled access to ENDF/B-VIII.0, IRDFF-II test schemas, and custom user dosimetry libraries.
 - **GUI and CLI parity**: Fully featured UI using Tkinter+Matplotlib available everywhere, mapping directly onto highly scriptable CLI functions.
+- **Interactive plot review**: Spectrum inspection defaults to log counts with isotope-colored peak markers, and Activity/Rates now include live zoomable plot panels alongside the existing unfold diagnostics.
 - **Rigorous Test Suite**: Backed by 960+ unit and integration tests spanning MCNP workflows, ASTM paths, GUI logic, and transport/IO integrations.
 
 ## Getting started

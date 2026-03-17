@@ -304,6 +304,32 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         render_gui_unfold_result(payload, figure=self.unfold_figure)
         self.unfold_canvas.draw_idle()
 
+    def _render_activity_result_preview(self, payload: dict[str, Any]) -> None:
+        if (
+            getattr(self, "activity_canvas", None) is None
+            or getattr(self, "activity_figure", None) is None
+        ):
+            return
+        render_gui_activity_result(
+            payload,
+            figure=self.activity_figure,
+            y_scale=self.activity_plot_y_scale.get(),
+        )
+        self.activity_canvas.draw_idle()
+
+    def _render_rates_result_preview(self, payload: dict[str, Any]) -> None:
+        if (
+            getattr(self, "rates_canvas", None) is None
+            or getattr(self, "rates_figure", None) is None
+        ):
+            return
+        render_gui_rate_result(
+            payload,
+            figure=self.rates_figure,
+            y_scale=self.rates_plot_y_scale.get(),
+        )
+        self.rates_canvas.draw_idle()
+
     def _load_unfold_result_preview(self) -> None:
         try:
             payload = read_unfold_result(Path(self.unfold_output.get()))
@@ -322,6 +348,7 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             messagebox.showerror("FluxForge GUI", str(exc))
             return
         self.activity_result_summary.set(summarize_gui_activity_result(payload))
+        self._render_activity_result_preview(payload)
         self._append_log(f"Loaded activity summary from {self.activity_output.get()}")
 
     def _load_rates_result_summary(self) -> None:
@@ -332,7 +359,18 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             messagebox.showerror("FluxForge GUI", str(exc))
             return
         self.rates_result_summary.set(summarize_gui_rate_result(payload))
+        self._render_rates_result_preview(payload)
         self._append_log(f"Loaded reaction-rate summary from {self.rates_output.get()}")
+
+    def _refresh_activity_plot_if_ready(self) -> None:
+        output = Path(self.activity_output.get().strip())
+        if output.exists():
+            self._load_activity_result_summary()
+
+    def _refresh_rates_plot_if_ready(self) -> None:
+        output = Path(self.rates_output.get().strip())
+        if output.exists():
+            self._load_rates_result_summary()
 
     def _load_compare_result_summary(self) -> None:
         try:
@@ -592,8 +630,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
             selected_region_label=self._selected_region_label(),
             diagnostic_plot=self._preview_diagnostic_plot,
             y_log=self.preview_y_scale.get() == "log",
+            x_log=self.preview_x_scale.get() == "log",
             x_min_keV=self._optional_float(self.preview_x_min.get()),
             x_max_keV=self._optional_float(self.preview_x_max.get()),
+            group_peak_colors=self.preview_peak_color_mode.get() == "isotope",
             figure=self.preview_figure,
         )
         self.preview_canvas.draw_idle()
@@ -1885,8 +1925,10 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 selected_region_label=self._selected_region_label(),
                 diagnostic_plot=self._preview_diagnostic_plot,
                 y_log=self.preview_y_scale.get() == "log",
+                x_log=self.preview_x_scale.get() == "log",
                 x_min_keV=self._optional_float(self.preview_x_min.get()),
                 x_max_keV=self._optional_float(self.preview_x_max.get()),
+                group_peak_colors=self.preview_peak_color_mode.get() == "isotope",
             )
         except Exception as exc:
             self._append_log(f"ERROR saving spectrum preview: {exc}")

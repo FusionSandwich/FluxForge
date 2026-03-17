@@ -188,6 +188,49 @@ class UiBuilderMixin:
         canvas.bind("<Leave>", _unbind_wheel)
         return interior, canvas
 
+    def _build_embedded_plot_panel(
+        self,
+        parent: ttk.Frame,
+        *,
+        row: int,
+        column: int,
+        title: str,
+        description: str,
+        figure_size: tuple[float, float] = (8.8, 5.2),
+    ):
+        """Create a live Matplotlib panel with a navigation toolbar."""
+
+        plot_frame = ttk.LabelFrame(parent, text=title, padding=6)
+        plot_frame.grid(row=row, column=column, sticky="nsew")
+        plot_frame.columnconfigure(0, weight=1)
+        plot_frame.rowconfigure(1, weight=1)
+
+        ttk.Label(
+            plot_frame,
+            text=description,
+            wraplength=760,
+            justify="left",
+            style="Hint.TLabel",
+        ).grid(row=0, column=0, sticky="ew", pady=(0, 6))
+
+        if Figure is None or FigureCanvasTkAgg is None:
+            ttk.Label(
+                plot_frame,
+                text="matplotlib is not available, so this live plot cannot be rendered.",
+                foreground="#8b0000",
+            ).grid(row=1, column=0, sticky="nw")
+            return plot_frame, None, None
+
+        figure = Figure(figsize=figure_size, dpi=100)
+        canvas = FigureCanvasTkAgg(figure, master=plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=0, sticky="nsew")
+        if NavigationToolbar2Tk is not None:
+            toolbar = NavigationToolbar2Tk(canvas, plot_frame, pack_toolbar=False)
+            toolbar.update()
+            toolbar.grid(row=2, column=0, sticky="ew", pady=(6, 0))
+        return plot_frame, figure, canvas
+
     def _build_ingest_tab(self) -> None:
         frame = ttk.Frame(self.notebook, padding=12)
         self.notebook.add(frame, text="1. Ingest")
@@ -365,9 +408,11 @@ class UiBuilderMixin:
         self.preview_input = tk.StringVar(value=str(self.project_dir / "spectrum.json"))
         self.preview_overlay_inputs = tk.StringVar(value="")
         self.preview_peaks = tk.StringVar(value=str(self.project_dir / "peaks.json"))
-        self.preview_y_scale = tk.StringVar(value="linear")
+        self.preview_y_scale = tk.StringVar(value="log")
+        self.preview_x_scale = tk.StringVar(value="linear")
         self.preview_x_min = tk.StringVar(value="")
         self.preview_x_max = tk.StringVar(value="")
+        self.preview_peak_color_mode = tk.StringVar(value="isotope")
         self.preview_png_output = tk.StringVar(
             value=str(self.project_dir / "gui_preview.png")
         )
@@ -463,27 +508,59 @@ class UiBuilderMixin:
             self.preview_peaks,
             save=False,
         )
-        ttk.Label(source_frame, text="Y scale:").grid(
+        ttk.Label(source_frame, text="X scale:").grid(
             row=3, column=0, sticky="w", padx=(0, 8), pady=4
         )
-        ttk.Combobox(
+        preview_x_scale_combo = ttk.Combobox(
+            source_frame,
+            textvariable=self.preview_x_scale,
+            values=["linear", "log"],
+            state="readonly",
+            width=16,
+        )
+        preview_x_scale_combo.grid(row=3, column=1, sticky="w")
+        preview_x_scale_combo.bind(
+            "<<ComboboxSelected>>", lambda _event: self._render_current_preview()
+        )
+        ttk.Label(source_frame, text="Y scale:").grid(
+            row=4, column=0, sticky="w", padx=(0, 8), pady=4
+        )
+        preview_y_scale_combo = ttk.Combobox(
             source_frame,
             textvariable=self.preview_y_scale,
             values=["linear", "log"],
             state="readonly",
             width=16,
-        ).grid(row=3, column=1, sticky="w")
-        self._entry_row(source_frame, 4, "X min keV (optional):", self.preview_x_min)
-        self._entry_row(source_frame, 5, "X max keV (optional):", self.preview_x_max)
+        )
+        preview_y_scale_combo.grid(row=4, column=1, sticky="w")
+        preview_y_scale_combo.bind(
+            "<<ComboboxSelected>>", lambda _event: self._render_current_preview()
+        )
+        ttk.Label(source_frame, text="Peak colors:").grid(
+            row=5, column=0, sticky="w", padx=(0, 8), pady=4
+        )
+        peak_color_combo = ttk.Combobox(
+            source_frame,
+            textvariable=self.preview_peak_color_mode,
+            values=["isotope", "single"],
+            state="readonly",
+            width=16,
+        )
+        peak_color_combo.grid(row=5, column=1, sticky="w")
+        peak_color_combo.bind(
+            "<<ComboboxSelected>>", lambda _event: self._render_current_preview()
+        )
+        self._entry_row(source_frame, 6, "X min keV (optional):", self.preview_x_min)
+        self._entry_row(source_frame, 7, "X max keV (optional):", self.preview_x_max)
         self._path_row(
-            source_frame, 6, "Save preview PNG:", self.preview_png_output, save=True
+            source_frame, 8, "Save preview PNG:", self.preview_png_output, save=True
         )
         self._entry_row(
-            source_frame, 7, "CLI plot title (optional):", self.preview_plot_title
+            source_frame, 9, "CLI plot title (optional):", self.preview_plot_title
         )
         self._path_row(
             source_frame,
-            8,
+            10,
             "CLI manual peak report:",
             self.preview_manual_peak_report,
             save=True,
@@ -492,26 +569,29 @@ class UiBuilderMixin:
             source_frame,
             text="Use background-subtracted spectrum for CLI plot export",
             variable=self.preview_plot_background_subtracted,
-        ).grid(row=9, column=1, sticky="w", pady=(0, 4))
+        ).grid(row=11, column=1, sticky="w", pady=(0, 4))
 
         button_row = ttk.Frame(source_frame)
-        button_row.grid(row=10, column=1, sticky="w", pady=(6, 8))
+        button_row.grid(row=12, column=1, sticky="w", pady=(6, 8))
         ttk.Button(
             button_row, text="Load Preview", command=self._load_spectrum_preview
         ).grid(row=0, column=0, padx=(0, 8))
         ttk.Button(
-            button_row, text="Save PNG", command=self._save_spectrum_preview_png
+            button_row, text="Apply View", command=self._render_current_preview
         ).grid(row=0, column=1, padx=(0, 8))
         ttk.Button(
+            button_row, text="Save PNG", command=self._save_spectrum_preview_png
+        ).grid(row=0, column=2, padx=(0, 8))
+        ttk.Button(
             button_row, text="Run CLI Plot Export", command=self._run_spectrum_plot
-        ).grid(row=0, column=2)
+        ).grid(row=0, column=3)
 
         ttk.Label(
             source_frame,
             textvariable=self.preview_status,
             wraplength=340,
             justify="left",
-        ).grid(row=11, column=0, columnspan=3, sticky="ew", pady=(2, 10))
+        ).grid(row=13, column=0, columnspan=3, sticky="ew", pady=(2, 10))
 
         data_source_frame = ttk.LabelFrame(controls, text="Nuclear data sources")
         data_source_frame.grid(row=1, column=0, columnspan=3, sticky="ew", pady=(10, 0))
@@ -1046,11 +1126,13 @@ class UiBuilderMixin:
         ttk.Label(
             plot_frame,
             text=(
-                "This viewer is modeled after the GUI plan and the reference patterns from "
-                "PeakEasy, QuantumGold, SpecKit, Gamma-MCA, HDTV, and Physics-backed workflows."
+                "This viewer uses a QuantumGold-style main display plus an auxiliary lower panel. "
+                "Use the toolbar to pan, zoom, and reset the current view, or use the x-range fields "
+                "and peak zoom helpers for precise navigation."
             ),
             wraplength=820,
             justify="left",
+            style="Hint.TLabel",
         ).grid(row=0, column=0, sticky="ew", pady=(0, 6))
 
         if Figure is None or FigureCanvasTkAgg is None:
@@ -1197,7 +1279,13 @@ class UiBuilderMixin:
     def _build_activity_tab(self) -> None:
         frame = ttk.Frame(self.notebook, padding=12)
         self.notebook.add(frame, text="4. Activity")
+        frame.columnconfigure(0, weight=0)
         frame.columnconfigure(1, weight=1)
+        frame.rowconfigure(0, weight=1)
+
+        controls = ttk.Frame(frame)
+        controls.grid(row=0, column=0, sticky="nsw", padx=(0, 12))
+        controls.columnconfigure(1, weight=1)
 
         self.activity_input = tk.StringVar(value=str(self.project_dir / "peaks.json"))
         self.activity_output = tk.StringVar(
@@ -1219,25 +1307,32 @@ class UiBuilderMixin:
             value="Activity results will summarize line-by-line uncertainty after a run."
         )
         self.activity_validate = tk.BooleanVar(value=True)
+        self.activity_plot_y_scale = tk.StringVar(value="auto")
 
-        self._path_row(frame, 0, "Peaks artifact:", self.activity_input, save=False)
-        self._path_row(frame, 1, "Output activities:", self.activity_output, save=True)
-        self._entry_row(frame, 2, "Live time (s, optional):", self.activity_live_time)
-        self._entry_row(frame, 3, "Efficiency:", self.activity_eff)
-        self._entry_row(frame, 4, "Emission probability:", self.activity_emission)
-        self._entry_row(frame, 5, "Half-life (s):", self.activity_half_life)
-        self._entry_row(
-            frame, 6, "Sample mass (g, optional):", self.activity_sample_mass_g
+        self._path_row(controls, 0, "Peaks artifact:", self.activity_input, save=False)
+        self._path_row(
+            controls, 1, "Output activities:", self.activity_output, save=True
         )
-        self._entry_row(frame, 7, "Isotope override (optional):", self.activity_isotope)
         self._entry_row(
-            frame, 8, "Reaction ID override (optional):", self.activity_reaction
+            controls, 2, "Live time (s, optional):", self.activity_live_time
         )
-        ttk.Label(frame, text="Reference source:").grid(
+        self._entry_row(controls, 3, "Efficiency:", self.activity_eff)
+        self._entry_row(controls, 4, "Emission probability:", self.activity_emission)
+        self._entry_row(controls, 5, "Half-life (s):", self.activity_half_life)
+        self._entry_row(
+            controls, 6, "Sample mass (g, optional):", self.activity_sample_mass_g
+        )
+        self._entry_row(
+            controls, 7, "Isotope override (optional):", self.activity_isotope
+        )
+        self._entry_row(
+            controls, 8, "Reaction ID override (optional):", self.activity_reaction
+        )
+        ttk.Label(controls, text="Reference source:").grid(
             row=9, column=0, sticky="w", padx=(0, 8), pady=4
         )
         activity_source_combo = ttk.Combobox(
-            frame,
+            controls,
             textvariable=self.activity_data_source,
             values=get_gui_data_source_choices(self._custom_data_sources),
             state="readonly",
@@ -1249,9 +1344,9 @@ class UiBuilderMixin:
             lambda _event: self._refresh_activity_source_summary(),
         )
         self._entry_row(
-            frame, 10, "Custom source (optional):", self.activity_custom_source
+            controls, 10, "Custom source (optional):", self.activity_custom_source
         )
-        activity_buttons = ttk.Frame(frame)
+        activity_buttons = ttk.Frame(controls)
         activity_buttons.grid(row=11, column=1, sticky="w", pady=(2, 4))
         ttk.Button(
             activity_buttons,
@@ -1263,30 +1358,62 @@ class UiBuilderMixin:
             text="Load Summary",
             command=self._load_activity_result_summary,
         ).grid(row=0, column=1)
+        ttk.Label(activity_buttons, text="Plot y scale:").grid(
+            row=0, column=2, padx=(12, 6)
+        )
+        activity_scale_combo = ttk.Combobox(
+            activity_buttons,
+            textvariable=self.activity_plot_y_scale,
+            values=["auto", "linear", "log"],
+            state="readonly",
+            width=10,
+        )
+        activity_scale_combo.grid(row=0, column=3, sticky="w")
+        activity_scale_combo.bind(
+            "<<ComboboxSelected>>",
+            lambda _event: self._refresh_activity_plot_if_ready(),
+        )
         ttk.Label(
-            frame,
+            controls,
             textvariable=self.activity_source_summary,
             wraplength=420,
             justify="left",
         ).grid(row=12, column=0, columnspan=3, sticky="ew", pady=(2, 4))
         ttk.Label(
-            frame,
+            controls,
             textvariable=self.activity_result_summary,
             wraplength=420,
             justify="left",
         ).grid(row=13, column=0, columnspan=3, sticky="ew", pady=(0, 4))
         ttk.Checkbutton(
-            frame, text="Validate artifact schema", variable=self.activity_validate
+            controls, text="Validate artifact schema", variable=self.activity_validate
         ).grid(row=14, column=1, sticky="w", pady=(0, 8))
-        ttk.Button(frame, text="Run Activity", command=self._run_activity).grid(
+        ttk.Button(controls, text="Run Activity", command=self._run_activity).grid(
             row=15, column=1, sticky="w"
+        )
+        _, self.activity_figure, self.activity_canvas = self._build_embedded_plot_panel(
+            frame,
+            row=0,
+            column=1,
+            title="Activity plot",
+            description=(
+                "This live panel mirrors the activity summary export. Use the toolbar "
+                "to zoom or pan, and switch the y-scale when comparing strong and weak lines."
+            ),
+            figure_size=(8.8, 5.4),
         )
         self._refresh_activity_source_summary()
 
     def _build_rates_tab(self) -> None:
         frame = ttk.Frame(self.notebook, padding=12)
         self.notebook.add(frame, text="5. Rates")
+        frame.columnconfigure(0, weight=0)
         frame.columnconfigure(1, weight=1)
+        frame.rowconfigure(0, weight=1)
+
+        controls = ttk.Frame(frame)
+        controls.grid(row=0, column=0, sticky="nsw", padx=(0, 12))
+        controls.columnconfigure(1, weight=1)
 
         self.rates_input = tk.StringVar(value=str(self.project_dir / "activities.json"))
         self.rates_output = tk.StringVar(value=str(self.project_dir / "rates.json"))
@@ -1297,30 +1424,60 @@ class UiBuilderMixin:
             value="Reaction-rate results will summarize propagated uncertainty after a run."
         )
         self.rates_validate = tk.BooleanVar(value=True)
+        self.rates_plot_y_scale = tk.StringVar(value="auto")
 
-        self._path_row(frame, 0, "Activities artifact:", self.rates_input, save=False)
-        self._path_row(frame, 1, "Output rates artifact:", self.rates_output, save=True)
         self._path_row(
-            frame, 2, "Segments JSON (optional):", self.rates_segments, save=False
+            controls, 0, "Activities artifact:", self.rates_input, save=False
         )
-        self._entry_row(frame, 3, "Duration (s):", self.rates_duration)
-        self._entry_row(frame, 4, "Half-life fallback (s):", self.rates_half_life)
-        rates_buttons = ttk.Frame(frame)
+        self._path_row(
+            controls, 1, "Output rates artifact:", self.rates_output, save=True
+        )
+        self._path_row(
+            controls, 2, "Segments JSON (optional):", self.rates_segments, save=False
+        )
+        self._entry_row(controls, 3, "Duration (s):", self.rates_duration)
+        self._entry_row(controls, 4, "Half-life fallback (s):", self.rates_half_life)
+        rates_buttons = ttk.Frame(controls)
         rates_buttons.grid(row=5, column=1, sticky="w", pady=(0, 4))
         ttk.Button(
             rates_buttons, text="Load Summary", command=self._load_rates_result_summary
         ).grid(row=0, column=0)
+        ttk.Label(rates_buttons, text="Plot y scale:").grid(
+            row=0, column=1, padx=(12, 6)
+        )
+        rates_scale_combo = ttk.Combobox(
+            rates_buttons,
+            textvariable=self.rates_plot_y_scale,
+            values=["auto", "linear", "log"],
+            state="readonly",
+            width=10,
+        )
+        rates_scale_combo.grid(row=0, column=2, sticky="w")
+        rates_scale_combo.bind(
+            "<<ComboboxSelected>>", lambda _event: self._refresh_rates_plot_if_ready()
+        )
         ttk.Label(
-            frame,
+            controls,
             textvariable=self.rates_result_summary,
             wraplength=420,
             justify="left",
         ).grid(row=6, column=0, columnspan=3, sticky="ew", pady=(0, 4))
         ttk.Checkbutton(
-            frame, text="Validate artifact schema", variable=self.rates_validate
+            controls, text="Validate artifact schema", variable=self.rates_validate
         ).grid(row=7, column=1, sticky="w", pady=(0, 8))
-        ttk.Button(frame, text="Run Rates", command=self._run_rates).grid(
+        ttk.Button(controls, text="Run Rates", command=self._run_rates).grid(
             row=8, column=1, sticky="w"
+        )
+        _, self.rates_figure, self.rates_canvas = self._build_embedded_plot_panel(
+            frame,
+            row=0,
+            column=1,
+            title="Reaction-rate plot",
+            description=(
+                "This live panel mirrors the rate summary export. Use the toolbar "
+                "to zoom or pan, and switch the y-scale when comparing reaction-rate spreads."
+            ),
+            figure_size=(8.8, 5.4),
         )
 
     def _build_unfold_tab(self) -> None:

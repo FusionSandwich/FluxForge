@@ -272,6 +272,7 @@ def test_render_gui_spectrum_preview_supports_diagnostic_subplot(tmp_path):
 
     assert figure is not None
     assert axes.get_title() == "FluxForge Spectrum Viewer"
+    assert axes.get_xlabel() == ""
     assert len(figure.axes) == 2
 
 
@@ -320,7 +321,8 @@ def test_render_gui_activity_and_rate_results_support_uncertainties():
                     "activity_unc_Bq": 7.0,
                 },
             ]
-        }
+        },
+        y_scale="log",
     )
     rate_figure = render_gui_rate_result(
         {
@@ -328,13 +330,16 @@ def test_render_gui_activity_and_rate_results_support_uncertainties():
                 {"reaction_id": "Ti-46(n,p)Sc-46", "rate": 5.0, "uncertainty": 0.4},
                 {"reaction_id": "Fe-54(n,p)Mn-54", "rate": 2.0, "uncertainty": 0.3},
             ]
-        }
+        },
+        y_scale="log",
     )
 
     assert activity_figure is not None
     assert rate_figure is not None
     assert activity_figure.axes[0].get_ylabel() == "Activity (Bq)"
     assert rate_figure.axes[0].get_ylabel() == "Rate (reactions/s)"
+    assert activity_figure.axes[0].get_yscale() == "log"
+    assert rate_figure.axes[0].get_yscale() == "log"
 
 
 def test_render_gui_validation_result_plots_flux_and_residuals():

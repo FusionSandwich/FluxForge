@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 from typing import Any, Iterable
 
 import numpy as np
@@ -37,6 +38,19 @@ from fluxforge_gui.models import (
     GuiSpectrumPeak,
     GuiSpectrumPreview,
     GuiSpectrumSeries,
+)
+
+
+_PEAK_ISOTOPE_PATTERN = re.compile(r"([A-Za-z]{1,3}-?\d{1,3}m?)")
+_PEAK_GROUP_PALETTE = (
+    "#5eead4",
+    "#fbbf24",
+    "#60a5fa",
+    "#f472b6",
+    "#a78bfa",
+    "#34d399",
+    "#fb7185",
+    "#22d3ee",
 )
 
 
@@ -680,6 +694,27 @@ def _gui_spectrum_energies(spectrum: GammaSpectrum) -> np.ndarray:
     return np.asarray(spectrum.channels, dtype=float)
 
 
+def _peak_group_key(label: str) -> str | None:
+    """Return a normalized isotope-like token from a GUI peak label."""
+
+    match = _PEAK_ISOTOPE_PATTERN.search(label or "")
+    if match is None:
+        return None
+    return match.group(1).replace(" ", "")
+
+
+def _peak_group_colors(peaks: Iterable[GuiSpectrumPeak]) -> dict[str, str]:
+    """Assign a stable color to each isotope-like peak group."""
+
+    colors: dict[str, str] = {}
+    for peak in peaks:
+        key = _peak_group_key(peak.label)
+        if key is None or key in colors:
+            continue
+        colors[key] = _PEAK_GROUP_PALETTE[len(colors) % len(_PEAK_GROUP_PALETTE)]
+    return colors
+
+
 def _load_gui_spectrum(path: Path) -> GammaSpectrum:
     """Load either a raw spectrum or a serialized spectrum artifact for the GUI."""
 
@@ -783,8 +818,11 @@ def render_gui_spectrum_preview(
     selected_region_label: str | None = None,
     diagnostic_plot: GuiDiagnosticPlot | None = None,
     y_log: bool = False,
+    x_log: bool = False,
     x_min_keV: float | None = None,
     x_max_keV: float | None = None,
+    group_peak_colors: bool = True,
+    plot_title: str = "FluxForge Spectrum Viewer",
     figure: Figure | None = None,
 ):
     """Render a spectrum preview with optional overlays and peak markers."""
@@ -796,23 +834,48 @@ def render_gui_spectrum_preview(
 
     fig = create_offscreen_figure(figsize=(8.8, 4.8), dpi=100, figure=figure)
     fig.clear()
+    fig.patch.set_facecolor("#e9eff5")
     if diagnostic_plot is not None:
-        gridspec = fig.add_gridspec(2, 1, height_ratios=[3.2, 1.25], hspace=0.18)
+        gridspec = fig.add_gridspec(2, 1, height_ratios=[3.25, 1.3], hspace=0.18)
         ax = fig.add_subplot(gridspec[0, 0])
         diag_ax = fig.add_subplot(gridspec[1, 0])
     else:
         ax = fig.add_subplot(111)
         diag_ax = None
 
-    palette = ("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b")
+    plot_palette = (
+        "#c7f9cc",
+        "#f9e2ae",
+        "#93c5fd",
+        "#fda4af",
+        "#d8b4fe",
+        "#a7f3d0",
+    )
     all_series = (preview.primary, *preview.overlays)
+    max_counts = (
+        float(np.nanmax(preview.primary.counts)) if preview.primary.counts.size else 1.0
+    )
+    text_y = max_counts * (0.92 if max_counts > 0.0 else 1.0)
+
+    for axis in (ax, diag_ax):
+        if axis is None:
+            continue
+        axis.set_facecolor("#05070b")
+        for spine in axis.spines.values():
+            spine.set_color("#64748b")
+        axis.tick_params(colors="#e5eef8", which="both")
+        axis.xaxis.label.set_color("#e5eef8")
+        axis.yaxis.label.set_color("#e5eef8")
+        axis.title.set_color("#f8fafc")
+        axis.grid(True, alpha=0.18, linewidth=0.5, color="#cbd5e1")
+
     for index, series in enumerate(all_series):
         ax.plot(
             series.energies_keV,
             series.counts,
             linewidth=1.0 if index == 0 else 0.9,
             alpha=0.95 if index == 0 else 0.72,
-            color=palette[index % len(palette)],
+            color=plot_palette[index % len(plot_palette)],
             label=series.label,
         )
 
@@ -842,20 +905,19 @@ def render_gui_spectrum_preview(
         )
         ax.text(
             (lo_keV + hi_keV) * 0.5,
-            (
-                float(np.nanmax(preview.primary.counts)) * 0.82
-                if preview.primary.counts.size
-                else 1.0
-            ),
+            max_counts * 0.82 if preview.primary.counts.size else 1.0,
             region.label or f"ROI {idx + 1}",
             rotation=90,
             ha="center",
             va="top",
             fontsize=7,
-            color="#6c3483",
+            color="#d8b4fe",
         )
 
     if preview.peaks:
+        peak_color_lookup = (
+            _peak_group_colors(preview.peaks) if group_peak_colors else {}
+        )
         peak_energies = np.asarray(
             [peak.energy_keV for peak in preview.peaks], dtype=float
         )
@@ -866,17 +928,15 @@ def render_gui_spectrum_preview(
             left=np.nan,
             right=np.nan,
         )
-        ax.scatter(
-            peak_energies, peak_counts, color="#c44e52", s=20, zorder=5, label="Peaks"
-        )
-        y_top = (
-            float(np.nanmax(preview.primary.counts))
-            if preview.primary.counts.size
-            else 1.0
-        )
-        text_y = y_top * (0.92 if y_top > 0.0 else 1.0)
-        for peak in preview.peaks[:20]:
-            ax.axvline(peak.energy_keV, color="#c44e52", linewidth=0.8, alpha=0.18)
+        scatter_colors = []
+        for peak in preview.peaks:
+            key = _peak_group_key(peak.label)
+            scatter_colors.append(
+                peak_color_lookup.get(key, "#f97316" if key is None else "#f97316")
+            )
+        ax.scatter(peak_energies, peak_counts, color=scatter_colors, s=22, zorder=5)
+        for peak, color in zip(preview.peaks[:24], scatter_colors[:24]):
+            ax.axvline(peak.energy_keV, color=color, linewidth=0.85, alpha=0.24)
             label = peak.label or f"{peak.energy_keV:.1f} keV"
             ax.text(
                 peak.energy_keV,
@@ -886,7 +946,7 @@ def render_gui_spectrum_preview(
                 ha="center",
                 va="top",
                 fontsize=7,
-                color="#7a1f24",
+                color=color,
             )
 
     if selected_peak_energy_keV is not None:
@@ -899,14 +959,22 @@ def render_gui_spectrum_preview(
             label="Selected peak",
         )
 
-    ax.set_title("FluxForge Spectrum Viewer")
-    ax.set_xlabel("Energy (keV)")
+    ax.set_title(plot_title)
+    ax.set_xlabel("" if diag_ax is not None else "Energy (keV)")
     ax.set_ylabel("Counts")
-    ax.grid(True, alpha=0.25, linewidth=0.5)
     if y_log:
         ax.set_yscale("log")
     else:
         ax.set_yscale("linear")
+    if x_log:
+        positive_energies = np.asarray(preview.primary.energies_keV, dtype=float)
+        positive_energies = positive_energies[positive_energies > 0.0]
+        if positive_energies.size:
+            ax.set_xscale("log")
+            if x_min_keV is None:
+                x_min_keV = float(np.min(positive_energies))
+    else:
+        ax.set_xscale("linear")
     if x_min_keV is not None or x_max_keV is not None:
         ax.set_xlim(left=x_min_keV, right=x_max_keV)
     if len(all_series) > 1 or preview.peaks:
@@ -936,7 +1004,6 @@ def render_gui_spectrum_preview(
         diag_ax.set_title(diagnostic_plot.title, fontsize=9)
         diag_ax.set_xlabel(diagnostic_plot.x_label)
         diag_ax.set_ylabel(diagnostic_plot.y_label)
-        diag_ax.grid(True, alpha=0.25, linewidth=0.5)
         if diagnostic_plot.x_log:
             diag_ax.set_xscale("log")
         if diagnostic_plot.y_log:
@@ -944,7 +1011,7 @@ def render_gui_spectrum_preview(
         if diagnostic_plot.series:
             diag_ax.legend(loc="best", fontsize=7)
     if diagnostic_plot is not None:
-        fig.subplots_adjust(left=0.08, right=0.985, bottom=0.08, top=0.94, hspace=0.22)
+        fig.subplots_adjust(left=0.08, right=0.985, bottom=0.08, top=0.94, hspace=0.28)
     else:
         apply_tight_layout(fig)
     return fig, ax
@@ -958,8 +1025,10 @@ def save_gui_spectrum_preview_image(
     selected_region_label: str | None = None,
     diagnostic_plot: GuiDiagnosticPlot | None = None,
     y_log: bool = False,
+    x_log: bool = False,
     x_min_keV: float | None = None,
     x_max_keV: float | None = None,
+    group_peak_colors: bool = True,
 ) -> Path:
     """Save a GUI-style spectrum preview image for smoke testing and demos."""
 
@@ -971,8 +1040,10 @@ def save_gui_spectrum_preview_image(
         selected_region_label=selected_region_label,
         diagnostic_plot=diagnostic_plot,
         y_log=y_log,
+        x_log=x_log,
         x_min_keV=x_min_keV,
         x_max_keV=x_max_keV,
+        group_peak_colors=group_peak_colors,
     )
     figure.savefig(output, dpi=140)
     return output

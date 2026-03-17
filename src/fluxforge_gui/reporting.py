@@ -18,6 +18,55 @@ from fluxforge.cli import app as cli_app
 from fluxforge_gui.mpl_helpers import apply_tight_layout, create_offscreen_figure
 
 
+_GROUP_PLOT_PALETTE = (
+    "#2563eb",
+    "#dc2626",
+    "#16a34a",
+    "#ea580c",
+    "#7c3aed",
+    "#0891b2",
+    "#db2777",
+    "#65a30d",
+)
+
+
+def _group_color_map(labels: list[str]) -> dict[str, str]:
+    """Assign a stable plotting color to each group label."""
+
+    colors: dict[str, str] = {}
+    for label in labels:
+        if label in colors:
+            continue
+        colors[label] = _GROUP_PLOT_PALETTE[len(colors) % len(_GROUP_PLOT_PALETTE)]
+    return colors
+
+
+def _should_use_log_scale(values: np.ndarray, requested_scale: str) -> bool:
+    """Resolve GUI plot scale requests, including automatic log selection."""
+
+    scale = requested_scale.strip().lower()
+    if scale == "log":
+        return True
+    if scale == "linear":
+        return False
+    return bool(values.size and np.all(values > 0.0))
+
+
+def _unique_dense_labels(labels: list[str], prefix: str) -> list[str]:
+    """Make repeated or empty plot labels unique enough for dense GUI plots."""
+
+    counts: dict[str, int] = {}
+    unique: list[str] = []
+    for index, label in enumerate(labels, start=1):
+        base = label.strip() or f"{prefix} {index}"
+        counts[base] = counts.get(base, 0) + 1
+        if base.lower() == "unknown" or counts[base] > 1:
+            unique.append(f"{prefix} {index}: {base}")
+        else:
+            unique.append(base)
+    return unique
+
+
 def summarize_gui_unfold_result(payload: dict[str, Any]) -> str:
     """Build a short human-readable summary for an unfold artifact."""
 
@@ -376,6 +425,7 @@ def render_gui_activity_result(
     payload: dict[str, Any],
     *,
     figure: Figure | None = None,
+    y_scale: str = "auto",
 ) -> Figure | None:
     """Render line-activity uncertainties for report exports."""
 
@@ -408,43 +458,105 @@ def render_gui_activity_result(
         [float(item.get("radioactive_mass_g", 0.0) or 0.0) for item in lines],
         dtype=float,
     )
+    isotope_labels = [str(item.get("isotope", "line") or "line") for item in lines]
+    color_lookup = _group_color_map(isotope_labels)
     labels = [
         f"{item.get('isotope', 'line')}\n{float(item.get('energy_keV', 0.0) or 0.0):.1f} keV"
         for item in lines
     ]
+    dense_layout = len(lines) > 8
     x = np.arange(len(lines), dtype=float)
-    ax.errorbar(
-        x,
-        activities,
-        yerr=uncertainties if uncertainties.size == activities.size else None,
-        fmt="o",
-        color="#1f77b4",
-        ecolor="#9ecae1",
-        elinewidth=1.1,
-        capsize=3,
-        label="Activity",
-    )
-    ax.set_title("Line activity summary")
-    ax.set_xlabel("Gamma line")
-    ax.set_ylabel("Activity (Bq)")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=8)
-    ax.grid(True, axis="y", alpha=0.25)
-    if np.all(activities > 0.0):
-        ax.set_yscale("log")
-    if np.any(radioactive_mass > 0.0):
-        mass_ax = ax.twinx()
-        mass_ax.plot(
-            x,
-            radioactive_mass,
-            color="#d62728",
-            marker="s",
-            linewidth=1.0,
-            label="Radioactive mass",
+    seen_groups: set[str] = set()
+    if dense_layout:
+        order = np.argsort(np.abs(activities))[::-1]
+        dense_labels = _unique_dense_labels(
+            [
+                f"{item.get('isotope', 'line') or 'line'} @ {float(item.get('energy_keV', 0.0) or 0.0):.1f} keV"
+                for item in lines
+            ],
+            "Line",
         )
-        mass_ax.set_ylabel("Radioactive mass (g)")
-        if np.all(radioactive_mass > 0.0):
-            mass_ax.set_yscale("log")
+        y_positions = np.arange(len(lines), dtype=float)
+        ordered_dense_labels = [dense_labels[index] for index in order]
+        ordered_isotopes = [isotope_labels[index] for index in order]
+        ordered_activities = activities[order]
+        ordered_uncertainties = (
+            uncertainties[order] if uncertainties.size == activities.size else None
+        )
+        for y_position, isotope, activity, uncertainty in zip(
+            y_positions,
+            ordered_isotopes,
+            ordered_activities,
+            (
+                ordered_uncertainties
+                if ordered_uncertainties is not None
+                else np.full(len(lines), np.nan)
+            ),
+        ):
+            color = color_lookup[isotope]
+            ax.errorbar(
+                [activity],
+                [y_position],
+                xerr=None if np.isnan(uncertainty) else [uncertainty],
+                fmt="o",
+                color=color,
+                ecolor=color,
+                elinewidth=1.1,
+                capsize=3,
+            )
+        ax.set_title("Line activity summary")
+        ax.set_xlabel("Activity (Bq)")
+        ax.set_ylabel("Gamma line")
+        ax.set_yticks(y_positions)
+        ax.set_yticklabels(ordered_dense_labels, fontsize=7)
+        ax.grid(True, axis="x", alpha=0.25)
+        if _should_use_log_scale(activities, y_scale):
+            ax.set_xscale("log")
+        fig.subplots_adjust(left=0.33, right=0.97, bottom=0.12, top=0.92)
+    else:
+        for index, isotope in enumerate(isotope_labels):
+            color = color_lookup[isotope]
+            label = isotope if isotope not in seen_groups else None
+            seen_groups.add(isotope)
+            ax.errorbar(
+                [x[index]],
+                [activities[index]],
+                yerr=(
+                    [uncertainties[index]]
+                    if uncertainties.size == activities.size
+                    else None
+                ),
+                fmt="o",
+                color=color,
+                ecolor=color,
+                elinewidth=1.1,
+                capsize=3,
+                label=label,
+            )
+        ax.set_title("Line activity summary")
+        ax.set_xlabel("Gamma line")
+        ax.set_ylabel("Activity (Bq)")
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=8)
+        ax.grid(True, axis="y", alpha=0.25)
+        if _should_use_log_scale(activities, y_scale):
+            ax.set_yscale("log")
+        if seen_groups:
+            ax.legend(loc="upper right", fontsize=8, ncol=min(3, len(seen_groups)))
+        if np.any(radioactive_mass > 0.0):
+            mass_ax = ax.twinx()
+            mass_ax.plot(
+                x,
+                radioactive_mass,
+                color="#d62728",
+                marker="s",
+                linewidth=1.0,
+                label="Radioactive mass",
+            )
+            mass_ax.set_ylabel("Radioactive mass (g)")
+            if np.all(radioactive_mass > 0.0):
+                mass_ax.set_yscale("log")
+        fig.subplots_adjust(bottom=0.28)
     apply_tight_layout(fig)
     return fig
 
@@ -453,6 +565,7 @@ def render_gui_rate_result(
     payload: dict[str, Any],
     *,
     figure: Figure | None = None,
+    y_scale: str = "auto",
 ) -> Figure | None:
     """Render reaction-rate uncertainties for report exports."""
 
@@ -481,26 +594,75 @@ def render_gui_rate_result(
     uncertainties = np.asarray(
         [float(item.get("uncertainty", 0.0) or 0.0) for item in rates], dtype=float
     )
-    labels = [str(item.get("reaction_id", f"R{i + 1}")) for i, item in enumerate(rates)]
-    x = np.arange(len(rates), dtype=float)
-    ax.errorbar(
-        x,
-        values,
-        yerr=uncertainties if uncertainties.size == values.size else None,
-        fmt="o",
-        color="#2ca02c",
-        ecolor="#98df8a",
-        elinewidth=1.1,
-        capsize=3,
+    labels = _unique_dense_labels(
+        [str(item.get("reaction_id", f"R{i + 1}")) for i, item in enumerate(rates)],
+        "Reaction",
     )
-    ax.set_title("Reaction rate summary")
-    ax.set_xlabel("Reaction")
-    ax.set_ylabel("Rate (reactions/s)")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=8)
-    ax.grid(True, axis="y", alpha=0.25)
-    if np.all(values > 0.0):
-        ax.set_yscale("log")
+    dense_layout = len(rates) > 8
+    x = np.arange(len(rates), dtype=float)
+    if dense_layout:
+        order = np.argsort(np.abs(values))[::-1]
+        ordered_values = values[order]
+        ordered_uncertainties = (
+            uncertainties[order] if uncertainties.size == values.size else None
+        )
+        ordered_labels = [labels[index] for index in order]
+        y_positions = np.arange(len(rates), dtype=float)
+        ax.barh(
+            y_positions,
+            ordered_values,
+            color="#93c5fd",
+            edgecolor="#1d4ed8",
+            linewidth=0.9,
+            alpha=0.92,
+        )
+        ax.errorbar(
+            ordered_values,
+            y_positions,
+            xerr=ordered_uncertainties,
+            fmt="none",
+            ecolor="#1d4ed8",
+            elinewidth=1.1,
+            capsize=3,
+        )
+        ax.set_title("Reaction rate summary")
+        ax.set_xlabel("Rate (reactions/s)")
+        ax.set_ylabel("Reaction")
+        ax.set_yticks(y_positions)
+        ax.set_yticklabels(ordered_labels, fontsize=7)
+        ax.grid(True, axis="x", alpha=0.25)
+        if _should_use_log_scale(values, y_scale):
+            ax.set_xscale("log")
+        fig.subplots_adjust(left=0.33, right=0.97, bottom=0.12, top=0.92)
+    else:
+        bars = ax.bar(
+            x,
+            values,
+            color="#93c5fd",
+            edgecolor="#1d4ed8",
+            linewidth=0.9,
+            alpha=0.92,
+        )
+        ax.errorbar(
+            x,
+            values,
+            yerr=uncertainties if uncertainties.size == values.size else None,
+            fmt="none",
+            ecolor="#1d4ed8",
+            elinewidth=1.1,
+            capsize=3,
+        )
+        ax.set_title("Reaction rate summary")
+        ax.set_xlabel("Reaction")
+        ax.set_ylabel("Rate (reactions/s)")
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=8)
+        ax.grid(True, axis="y", alpha=0.25)
+        if _should_use_log_scale(values, y_scale):
+            ax.set_yscale("log")
+        if len(bars):
+            ax.margins(x=0.03)
+        fig.subplots_adjust(bottom=0.25)
     apply_tight_layout(fig)
     return fig
 

@@ -313,6 +313,9 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             REPO_ROOT / "examples" / "RAFM_irradiation" / "background.ASC"
         )
         spectrum_input = output_dir / "ti_rafm_1a_25cm_ingested.json"
+        peaks_output = output_dir / "peaks.json"
+        activity_output = output_dir / "activities.json"
+        rates_output = output_dir / "rates.json"
         gui_preview_output = output_dir / "gui_preview_native.png"
         cli_plot_output = output_dir / "cli_spectrum_plot.png"
         roi_output = output_dir / "manual_rois.json"
@@ -368,6 +371,12 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         app.preview_roi_file.set(str(roi_output))
         app.preview_manual_peak_report.set(str(peak_report_output))
         app.preview_plot_title.set("FluxForge RAFM Native Desktop Acceptance")
+        app.peaks_input.set(str(spectrum_input))
+        app.peaks_output.set(str(peaks_output))
+        app.activity_input.set(str(peaks_output))
+        app.activity_output.set(str(activity_output))
+        app.rates_input.set(str(activity_output))
+        app.rates_output.set(str(rates_output))
         app.response_output.set(str(response_output))
         app.unfold_response.set(str(response_output))
         app.unfold_output.set(str(unfold_output))
@@ -630,6 +639,9 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         evidence["artifacts"].extend(
             [
                 str(cli_plot_output),
+                str(peaks_output),
+                str(activity_output),
+                str(rates_output),
                 str(roi_output),
                 str(peak_report_output),
                 str(response_output),
@@ -643,6 +655,63 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             "run_spectrum_plot",
             command=root.clipboard_get(),
             last_cli=app.last_cli_command,
+        )
+
+        _click_notebook_tab(root, backend, app.notebook, "3. Peaks")
+        run_peaks_btn = _find_widget_by_text(
+            root, "Run Peak Detection", {"TButton", "Button"}
+        )
+        _click_widget(root, backend, run_peaks_btn)
+        _wait_for(
+            root,
+            lambda: peaks_output.exists(),
+            timeout=20.0,
+            description="peaks artifact generation",
+        )
+        peaks_shot = _take_screenshot(
+            root, backend, output_dir, "04-peaks-artifact.png"
+        )
+        evidence["screenshots"].append(str(peaks_shot))
+        log_step("run_peaks", output=str(peaks_output))
+
+        _click_notebook_tab(root, backend, app.notebook, "4. Activity")
+        run_activity_btn = _find_widget_by_text(
+            root, "Run Activity", {"TButton", "Button"}
+        )
+        _click_widget(root, backend, run_activity_btn)
+        _wait_for(
+            root,
+            lambda: activity_output.exists()
+            and "Total activity:" in app.activity_result_summary.get(),
+            timeout=20.0,
+            description="activity artifact generation",
+        )
+        activity_shot = _take_screenshot(
+            root, backend, output_dir, "05-activity-summary.png"
+        )
+        evidence["screenshots"].append(str(activity_shot))
+        log_step(
+            "run_activity",
+            output=str(activity_output),
+            summary=app.activity_result_summary.get(),
+        )
+
+        _click_notebook_tab(root, backend, app.notebook, "5. Rates")
+        run_rates_btn = _find_widget_by_text(root, "Run Rates", {"TButton", "Button"})
+        _click_widget(root, backend, run_rates_btn)
+        _wait_for(
+            root,
+            lambda: rates_output.exists()
+            and "Sum rate:" in app.rates_result_summary.get(),
+            timeout=20.0,
+            description="rates artifact generation",
+        )
+        rates_shot = _take_screenshot(root, backend, output_dir, "06-rates-summary.png")
+        evidence["screenshots"].append(str(rates_shot))
+        log_step(
+            "run_rates",
+            output=str(rates_output),
+            summary=app.rates_result_summary.get(),
         )
 
         _click_notebook_tab(root, backend, app.notebook, "8. Standards")
@@ -659,7 +728,7 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             description="k0 standards preset",
         )
         standards_shot = _take_screenshot(
-            root, backend, output_dir, "04-standards-preset.png"
+            root, backend, output_dir, "07-standards-preset.png"
         )
         evidence["screenshots"].append(str(standards_shot))
         log_step(
@@ -708,7 +777,7 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             description="compare summary load",
         )
         compare_shot = _take_screenshot(
-            root, backend, output_dir, "05-unfold-compare.png"
+            root, backend, output_dir, "08-unfold-compare.png"
         )
         evidence["screenshots"].append(str(compare_shot))
         log_step("compare_summary", summary=app.compare_summary.get())
@@ -744,7 +813,7 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             timeout=5.0,
             description="clipboard capture for plot suite",
         )
-        report_shot = _take_screenshot(root, backend, output_dir, "06-report-plots.png")
+        report_shot = _take_screenshot(root, backend, output_dir, "09-report-plots.png")
         evidence["screenshots"].append(str(report_shot))
         evidence["artifacts"].append(str(plots_output_dir))
         evidence["cli_commands"]["plot_suite"] = root.clipboard_get()

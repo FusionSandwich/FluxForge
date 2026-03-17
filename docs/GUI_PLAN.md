@@ -40,7 +40,7 @@ What is already implemented and working in the current prototype:
 - standards-oriented presets for ASTM/INL, US ASTM, IAEA IRDFF/GMA, `k0-NAA`, comparator NAA, and Curie-style workflows,
 - standards tab now includes a first-pass stepwise `k0-NAA` workflow section for detector characterization, facility characterization, peak normalization, selectable governed library inputs, multi-measurement aggregation, blank/CRM QA-QC, and k0 report preview/loading,
 - standards tab now also surfaces **Kayzero import**, **ASTM E3376**, and **RAFM validation / benchmark** workflows that previously existed only as orphan handlers,
-- spectrum viewer with pan/zoom toolbar, overlays, log/linear scaling, and PNG export,
+- spectrum viewer with pan/zoom toolbar, default **log counts**, x/y scale controls, isotope-colored peak markers, and PNG export,
 - spectrum tab now includes a direct **CLI spectrum-plot export** surface using the same desktop workflow state,
 - **multi-buffer manager** for keeping multiple spectra in memory and using them as primary/overlay buffers,
 - **buffer arithmetic** for sum/subtract/average/ratio combination of selected spectra into a reusable artifact,
@@ -54,7 +54,8 @@ What is already implemented and working in the current prototype:
 - selectable **automatic peak finding**, **peak identification**, and **peak counting** methods with uncertainty-aware summaries, including ASTM/INL-oriented IEC-tiered counting defaults when the dosimetry preset is applied,
 - selectable **nuclear-data source UI** for peak identification plus downstream Peaks / Activity / Standards panels with built-in actigamma, FluxForge bundled, NNDC offline, IRDFF, k0 monitor, calibration-source, flux-wire, and user custom-source connectors,
 - **constrained multiplet / Hypermet fit widgets** for selected peak groups, including free-form constraint-matrix editing and template fills,
-- **activity**, **reaction-rate**, and **compare/validation** tabs now load post-run summaries that surface propagated uncertainty and final agreement metrics,
+- **activity** and **reaction-rate** tabs now include live embedded Matplotlib panels with zoom/pan toolbars and y-scale controls in addition to their post-run uncertainty summaries,
+- **compare/validation** tab now loads post-run summaries that surface final agreement metrics, while unfold retains the embedded live diagnostics panel,
 - **unfolded spectrum display** in the Unfold tab with embedded plotting and solver-summary text,
 - selectable **GLS / GRAVEL / MLEM** unfolding workflows with GUI-exposed covariance and iterative solver parameters, plus uncertainty-aware measured/predicted, residual/pull, and flux-correlation diagnostics,
 - unfold tab now includes a visible **response-matrix builder** surface for the CLI `response` command,
@@ -64,6 +65,7 @@ What is already implemented and working in the current prototype:
 - report tab now includes a visible **master plot suite** surface for the CLI `plots` command,
 - native desktop acceptance coverage that opens the real GUI, drives ROI/calibration/report workflows, captures screenshots, saves artifacts, and verifies copied CLI commands,
 - native desktop evidence now also captures a standards/k0 preset interaction and unfold/compare summary flow,
+- native desktop evidence now also captures RAFM-backed peak picking plus Activity and Rates tab screenshots from the real GUI,
 - native desktop review artifacts are now saved directly as raw screenshots and `run.json` bundles under `artifacts/gui_review/...`.
 
 What is only partially implemented today:
@@ -75,6 +77,7 @@ What is only partially implemented today:
 - Curie tabs are functional MVP panels, but they currently summarize backend results in text instead of dedicated diagnostic plots/tables,
 - downstream non-gamma source selectors are now exposed in Peaks / Activity / Standards, but Rates / Unfold / Compare still need broader provenance-aware source plumbing where applicable,
 - unfolding plots now show solved spectra, measured/predicted rate agreement, residual/pull behavior, and correlation heatmaps, but they still do not yet expose the full standalone master-plot suite or report packaging for every diagnostic figure.
+- standards/manual coverage is now explicitly tracked: ASTM E261/E262/E3376, response/unfold/compare/report, and current k0 GUI/CLI surfaces are implemented; advanced coincidence, pile-up, f/alpha facility-characterization, MDA, and QA-trending helpers remain open roadmap items.
 
 Known issues / not yet correct:
 - ROI dragging is intentionally limited to the selected ROI row to keep the interaction deterministic,
@@ -107,7 +110,7 @@ Latest validation snapshot for this phase:
 - expanded GUI/offline/native-desktop regression suite: `102 passed` (`tests/test_gui_app.py`, `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_gui_desktop_native.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`, `tests/test_no_external_repo_paths.py`),
 - native desktop acceptance: passes with screenshots, ROI/calibration interaction, standards/k0 preset application, unfold/compare summary loading, report plot-suite generation, and copied CLI verification,
 - review artifacts: `tests/gui_desktop_driver.py` now produces `run.json` plus raw screenshots for manual review,
-- current Linux review bundle: `artifacts/gui_review/current_linux/` with all six checkpoint screenshots aligned to the committed Linux baselines,
+- current Linux review bundle: `artifacts/gui_review/current_linux/` with RAFM-backed screenshots for launch, spectrum, peaks, activity, rates, standards, unfold/compare, and report tabs,
 - ASTM/INL preset regression still applies `iec_tiered` counting, IRDFF source selection, and background-subtracted workflow defaults.
 
 Conda environment note:

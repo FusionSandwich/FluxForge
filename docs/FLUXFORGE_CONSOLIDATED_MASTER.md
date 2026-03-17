@@ -1173,15 +1173,18 @@ Current implementation snapshot for this release branch:
 - The desktop GUI now exposes the previously missing `ingest-batch`, `spectrum-plot`, `response`, `k0-import-kayzero`, `plots`, `astm-e3376`, and RAFM validation/benchmark workflows.
 - Offline execution is now explicitly enforced with `FLUXFORGE_OFFLINE=1`, which blocks remote HTTP(S) sources and IRDFF auto-download paths while preserving local-file and bundled-data workflows.
 - Off-screen GUI/report render helpers now attach an Agg canvas before layout/export so Matplotlib deprecation warnings do not leak into regression runs.
-- The Spectrum workspace now uses a scrollable controls rail so ROI, calibration, efficiency, and fit tools remain reachable during native desktop use.
+- The Spectrum workspace now uses a scrollable controls rail, defaults to log-count viewing, exposes x/y scale controls, and groups isotope peak markers by color so ROI, calibration, efficiency, and fit tools remain reachable and visually legible during native desktop use.
+- Activity and Rates now include live embedded plot panels with native Matplotlib zoom/pan toolbars, matching the existing spectrum/unfold inspection model.
 - Native desktop acceptance now includes a real GUI workflow run with screenshots, artifacts, ROI/calibration interaction, standards/k0 preset application, unfold/compare summary loading, report plot-suite generation, and copied CLI verification.
+- The native desktop evidence bundle now also captures RAFM-backed Peaks, Activity, and Rates tab screenshots so visual review extends beyond the spectrum-only shell.
 - Review tooling now includes a cleanup workstream inventory snapshot plus native screenshot bundles written directly by the desktop driver.
 - The first GUI-folder cleanup pass removed duplicated import boilerplate and dead locals from the split GUI modules while preserving the legacy `fluxforge_gui.app` helper exports used by tests and tooling.
 - FluxForge remains a native desktop application and does not require a browser runtime for supported Windows/Linux workflows.
+- Standards/manual review now distinguishes implemented surfaces from open work: current GUI/CLI coverage includes ASTM E261/E262/E3376, response/unfold/compare/report, and current k0/Kayzero workflows, while coincidence/pile-up corrections, explicit f/alpha facility-characterization assistants, MDA workflows, and richer QA trending remain roadmap items.
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Partial | Viewer, overlays, ROI editing, PNG export, and a scrollable analysis-controls rail are working in the current Tk/ttk prototype |
+| C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Partial | Viewer, overlays, isotope-colored peak markers, log-count default, ROI editing, PNG export, CLI plot export, and a scrollable analysis-controls rail are working in the current Tk/ttk prototype |
 | C2 | ROI/peak workflows with multiplet deconvolution | Partial | Peak tables, auto-finding, counting-method selection, ROI plot selection, plotted diagnostics, constrained-fit widgets, free-form constraint-matrix editing, and ASTM/INL preset-driven IEC-tiered counting defaults are wired; richer tied-parameter UX still remains |
 | C3 | Energy/efficiency calibration UI | Partial | Polynomial coefficient editor, calibration-point picking, residual plots, efficiency-point capture, fitted-curve JSON export, and native desktop calibration acceptance are implemented; detector-profile import/wizards remain |
 | C4 | Batch operations (sum/append/convert, ROI integration) | Partial | Multi-buffer management, buffer arithmetic, and GUI `ingest-batch` orchestration are implemented; broader workspace/session orchestration remains |
@@ -1204,7 +1207,7 @@ Current implementation snapshot for this release branch:
 | C21 | Comparator-standard mass worksheet | Planned | Reference-driven mass/concentration estimation with uncertainty propagation |
 | C22 | Irradiation / decay / count-time planner | Planned | Short-lived vs long-lived isotope timing studies |
 | C23 | MDA detection-limit worksheet | Planned | Report-ready detection thresholds and upper bounds |
-| C24 | Analysis checklist + figure-pack export | Partial | Report tab now exposes the master plot suite, figure export helpers, and native desktop plot-suite acceptance; checklist/project packaging still remains |
+| C24 | Analysis checklist + figure-pack export | Partial | Report tab now exposes the master plot suite, figure export helpers, native desktop plot-suite acceptance, and RAFM-backed screenshot review bundles; checklist/project packaging still remains |
 | C25 | Curie-style stacked-target and decay-chain tabs | Partial | MVP tabs now call existing backend APIs and summarize energy-loss / Bateman results |
 | C26 | Additional nuclear-data backends in GUI/browser workflows | Partial | Provenance-aware source registry now exposes actigamma, FluxForge bundled gamma, NNDC offline activation, IRDFF-II, k0 monitor, calibration-source, flux-wire, and user custom JSON/CSV/YAML, HTTP(S), SQLite, and Python-plugin sources; broader downstream wiring beyond Peaks/Activity/Standards still remains |
 

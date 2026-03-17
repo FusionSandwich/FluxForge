@@ -71,7 +71,7 @@ def test_native_desktop_gui_workflow_generates_evidence(tmp_path):
 
     assert result["status"] == "ok"
     assert result["offline_mode"] is True
-    assert len(result["screenshots"]) >= 6
+    assert len(result["screenshots"]) >= 9
     for screenshot in result["screenshots"]:
         assert Path(screenshot).exists()
 
@@ -80,6 +80,9 @@ def test_native_desktop_gui_workflow_generates_evidence(tmp_path):
         assert artifact.exists()
     assert any(path.name == "gui_preview_native.png" for path in artifact_paths)
     assert any(path.name == "cli_spectrum_plot.png" for path in artifact_paths)
+    assert any(path.name == "peaks.json" for path in artifact_paths)
+    assert any(path.name == "activities.json" for path in artifact_paths)
+    assert any(path.name == "rates.json" for path in artifact_paths)
     assert any(path.name == "response.json" for path in artifact_paths)
     assert any(path.name == "unfold.json" for path in artifact_paths)
     assert any(path.name == "validation.json" for path in artifact_paths)
@@ -102,6 +105,8 @@ def test_native_desktop_gui_workflow_generates_evidence(tmp_path):
     assert "ROI channels" in steps["peak_selection"]["count_summary"]
     assert steps["roi_edit"]["roi_count"] == 1
     assert steps["calibration"]["point_count"] == 2
+    assert steps["run_activity"]["summary"]
+    assert steps["run_rates"]["summary"]
     assert steps["standards_preset"]["data_source"] == "k0_naa_monitors"
     assert "Method: GLS" in steps["unfold_preview"]["unfold_summary"]
     assert "MAE" in steps["compare_summary"]["summary"]

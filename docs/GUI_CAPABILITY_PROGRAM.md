@@ -44,6 +44,29 @@ Detailed provenance and repo-by-repo comparison notes remain in the developer-si
   - report figure bundles and master plot suites.
 - New plot work is not complete until both GUI and CLI paths produce the same artifact class and a parity test exists.
 
+### Standards-driven coverage review
+
+- FluxForge now exposes first-pass GUI and CLI surfaces for the standards backbone already called out in the product review:
+  - ASTM E261 / activation-foil reduction,
+  - ASTM E262,
+  - ASTM E3376 detector-calibration workflow support,
+  - HPGe spectrum review and activity/rate derivation,
+  - response build, unfold, compare, report, and master plot export,
+  - k0 workflows including Kayzero import and governed-library preview/reporting.
+- The desktop GUI now includes live plot panels for:
+  - spectrum inspection with default log-count view, grouped isotope-colored peak markers, ROI overlays, and CLI-equivalent export,
+  - activity uncertainty review,
+  - reaction-rate uncertainty review,
+  - unfold diagnostics.
+- The standards/manual review also identifies remaining gaps that are still tracked as product work rather than being silently implied as complete:
+  - true-coincidence summing and pile-up/random-summing correction workflows,
+  - full detector-profile and geometry-transfer wizards,
+  - explicit f/alpha multi-monitor facility-characterization assistants,
+  - formal MDA / peak-free-region detection-limit workflows,
+  - richer QA/QC trending across multiple irradiations and spectra,
+  - broader accepted-format import beyond the current SPE / Genie / FluxForge artifact path.
+- Any standards-aligned claim in docs must keep this distinction explicit: implemented surfaces are available in both CLI and GUI; advanced correction and QA modules remain roadmap items until their artifact-backed tests exist.
+
 ### Notebook-to-workflow translation
 
 - Notebook-only analysis behavior must be translated into explicit FluxForge workflows, tables, plots, and saved artifacts.
