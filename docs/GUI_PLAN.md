@@ -47,6 +47,7 @@ What is already implemented and working in the current prototype:
 - **manual ROI draw/edit** support via plot clicks plus ROI load/save JSON helpers,
 - **drag-resize ROI handles on-canvas** for the selected manual ROI,
 - **calibration editor** for previewing updated polynomial energy coefficients in the viewer,
+- **scrollable control rail** in the Spectrum workspace so ROI, calibration, efficiency, and fit tooling remain reachable on standard desktop displays,
 - **calibration-point picking + polynomial fit + residual summary** for manual calibration workflows,
 - **residual / diagnostic subplot rendering** for calibration, counting, multiplet, Hypermet, and efficiency-fit review,
 - **peak-fit / deconvolution inspector** for selected peaks with local multiplet-neighbor context,
@@ -61,7 +62,7 @@ What is already implemented and working in the current prototype:
 - **Curie-style stacked-target and decay-chain tabs** backed by existing FluxForge physics APIs,
 - reproducible "copy as CLI" workflow behavior,
 - report tab now includes a visible **master plot suite** surface for the CLI `plots` command,
-- automated GUI smoke coverage and screenshot capture under headless Linux using Xvfb.
+- native desktop acceptance coverage that opens the real GUI, drives ROI/calibration/report workflows, captures screenshots, saves artifacts, and verifies copied CLI commands.
 
 What is only partially implemented today:
 - ROI drag-resize is now working for the selected ROI, but overlap handles and full click-drag ROI creation still need more polish,
@@ -93,17 +94,17 @@ Tests already added for this phase:
 
 Tests still needed:
 - GUI-event coverage for ROI drag-resize edge cases,
-- screenshot/smoke validation for the new calibration and Curie panels,
+- broader native desktop acceptance coverage for the new calibration, standards/k0, unfold/compare, and Curie-style panels,
 - integration tests for multiplet fit and Hypermet constraint controls,
 - broader end-to-end tests for buffer arithmetic feeding downstream GUI workflows,
-- GUI smoke coverage that exercises the newly added downstream source selectors and custom connector registration flows.
-- end-to-end GUI smoke coverage for the expanded `k0-NAA` section, especially external-library selection, aggregation, QA/QC, and report-generation actions.
+- native desktop coverage that exercises the newly added downstream source selectors and custom connector registration flows.
+- end-to-end native desktop coverage for the expanded `k0-NAA` section, especially external-library selection, aggregation, QA/QC, and report-generation actions.
 
 Latest validation snapshot for this phase:
-- focused regression suite: native parity/offline subset `36 passed` (`tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`),
-- expanded GUI/offline regression suite: `89 passed` (`tests/test_gui_app.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`),
-- Xvfb GUI startup smoke: passes with preview/peaks/activity/standards source selectors plus unfolding controls initialized,
-- ASTM/INL preset smoke check: applies `iec_tiered` counting, IRDFF source selection, and background-subtracted workflow defaults.
+- warning-regression subset: `28 passed` (`tests/test_gui_app.py`, `tests/test_gui_desktop_native.py`) with `MatplotlibDeprecationWarning` treated as an error,
+- expanded GUI/offline/native-desktop regression suite: `102 passed` (`tests/test_gui_app.py`, `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_gui_desktop_native.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`, `tests/test_no_external_repo_paths.py`),
+- native desktop acceptance: passes with screenshots, ROI/calibration interaction, spectrum export, report plot-suite generation, and copied CLI verification,
+- ASTM/INL preset regression still applies `iec_tiered` counting, IRDFF source selection, and background-subtracted workflow defaults.
 
 Conda environment note:
 - [environment.yml](environment.yml) now explicitly includes `tk` and `pillow` alongside `matplotlib`/`scipy` for the desktop GUI runtime.
@@ -115,10 +116,11 @@ Conda environment note:
 - Because of that, **Playwright is not the primary automation tool for the current shipping GUI**.
 - Maintain two explicit QA lanes:
   - **Reference / web lane:** use Playwright only for browser-based reference GUIs and any future FluxForge web/Electron prototype.
-  - **Native desktop lane:** use Tk-native event tests, Xvfb screenshot/smoke runs, artifact-comparison tests, and Windows/Linux packaging smoke tests for the current FluxForge GUI.
+  - **Native desktop lane:** use real desktop-driven acceptance runs, helper-level Tk regressions, artifact-comparison tests, and Windows/Linux packaging checks for the current FluxForge GUI.
 - A `js_repl`-enabled Codex session may be useful for reference-GUI inspection, but that is a developer-tooling concern rather than a FluxForge runtime dependency.
 - Do not claim that Playwright directly covers the current Tk desktop GUI until FluxForge has a web or Electron surface that Playwright can actually drive.
 - Reference GUI work under `testing/` is inspiration-only and optional; it is not part of FluxForge's build, install, packaging, or runtime contract.
+- The standing product contract for adopted GUI behaviors now lives in [GUI_CAPABILITY_PROGRAM.md](GUI_CAPABILITY_PROGRAM.md).
 
 ## Out of Scope (v1)
 
@@ -537,12 +539,12 @@ FluxForge is primarily analysis-scale, but interactive UX benefits from fast ker
 3. **Calibration UI** (energy + efficiency) + exportable calibration artifacts. ◑ partially implemented
 4. **Pipeline tabs** (activities -> reaction rates -> unfolding) + run dashboard.
 5. **Validation dashboards** (C/E plots, parity, uncertainty/covariance views).
-6. **Packaging automation** for Windows/Linux with CI smoke tests.
+6. **Packaging automation** for Windows/Linux with CI native desktop acceptance checks.
 
 ### Immediate next GUI tasks
-- add drag-edit handles for ROIs directly on the plot,
+- extend native desktop acceptance beyond Spectrum/Report into Peaks, Standards/k0, and Unfold/Compare,
 - add explicit buffer arithmetic (`A+B`, `A-B`, normalize, sum live times),
-- add calibration-point picking and regression residual plots,
+- expand the new scrollable-control treatment to other dense tabs, especially Report and Standards,
 - add true multi-peak deconvolution widgets and residual panels,
 - add Curie-inspired stacked-target and decay-chain workflow tabs,
 - continue polishing the visual style while staying on open-source, Linux/Windows-safe toolchains.

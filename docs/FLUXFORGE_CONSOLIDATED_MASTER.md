@@ -1172,13 +1172,16 @@ Current implementation snapshot for this release branch:
 - GUI/CLI parity is now tracked by a repo-owned parity registry and native Tk probe tests.
 - The desktop GUI now exposes the previously missing `ingest-batch`, `spectrum-plot`, `response`, `k0-import-kayzero`, `plots`, `astm-e3376`, and RAFM validation/benchmark workflows.
 - Offline execution is now explicitly enforced with `FLUXFORGE_OFFLINE=1`, which blocks remote HTTP(S) sources and IRDFF auto-download paths while preserving local-file and bundled-data workflows.
+- Off-screen GUI/report render helpers now attach an Agg canvas before layout/export so Matplotlib deprecation warnings do not leak into regression runs.
+- The Spectrum workspace now uses a scrollable controls rail so ROI, calibration, efficiency, and fit tools remain reachable during native desktop use.
+- Native desktop acceptance now includes a real GUI workflow run with screenshots, artifacts, ROI/calibration interaction, report plot-suite generation, and copied CLI verification.
 - FluxForge remains a native desktop application and does not require a browser runtime for supported Windows/Linux workflows.
 
 | ID | Capability | Status | Notes |
 |----|------------|--------|-------|
-| C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Partial | Viewer, overlays, ROI editing, and PNG export are working in the current Tk/ttk prototype |
+| C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Partial | Viewer, overlays, ROI editing, PNG export, and a scrollable analysis-controls rail are working in the current Tk/ttk prototype |
 | C2 | ROI/peak workflows with multiplet deconvolution | Partial | Peak tables, auto-finding, counting-method selection, ROI plot selection, plotted diagnostics, constrained-fit widgets, free-form constraint-matrix editing, and ASTM/INL preset-driven IEC-tiered counting defaults are wired; richer tied-parameter UX still remains |
-| C3 | Energy/efficiency calibration UI | Partial | Polynomial coefficient editor, calibration-point picking, residual plots, efficiency-point capture, and fitted-curve JSON export are implemented; detector-profile import/wizards remain |
+| C3 | Energy/efficiency calibration UI | Partial | Polynomial coefficient editor, calibration-point picking, residual plots, efficiency-point capture, fitted-curve JSON export, and native desktop calibration acceptance are implemented; detector-profile import/wizards remain |
 | C4 | Batch operations (sum/append/convert, ROI integration) | Partial | Multi-buffer management, buffer arithmetic, and GUI `ingest-batch` orchestration are implemented; broader workspace/session orchestration remains |
 | C5 | GUI-to-CLI macro recorder + project file | Planned | Reproducible workflows |
 | C6 | Interactive CLI shell (HDTV-style) | Planned | Batch scripts + keybindings |
@@ -1199,7 +1202,7 @@ Current implementation snapshot for this release branch:
 | C21 | Comparator-standard mass worksheet | Planned | Reference-driven mass/concentration estimation with uncertainty propagation |
 | C22 | Irradiation / decay / count-time planner | Planned | Short-lived vs long-lived isotope timing studies |
 | C23 | MDA detection-limit worksheet | Planned | Report-ready detection thresholds and upper bounds |
-| C24 | Analysis checklist + figure-pack export | Partial | Report tab now exposes the master plot suite and figure export helpers; checklist/project packaging still remains |
+| C24 | Analysis checklist + figure-pack export | Partial | Report tab now exposes the master plot suite, figure export helpers, and native desktop plot-suite acceptance; checklist/project packaging still remains |
 | C25 | Curie-style stacked-target and decay-chain tabs | Partial | MVP tabs now call existing backend APIs and summarize energy-loss / Bateman results |
 | C26 | Additional nuclear-data backends in GUI/browser workflows | Partial | Provenance-aware source registry now exposes actigamma, FluxForge bundled gamma, NNDC offline activation, IRDFF-II, k0 monitor, calibration-source, flux-wire, and user custom JSON/CSV/YAML, HTTP(S), SQLite, and Python-plugin sources; broader downstream wiring beyond Peaks/Activity/Standards still remains |
 
@@ -1208,7 +1211,7 @@ Current implementation snapshot for this release branch:
 **Document Version:** 3.2  
 **Last Updated:** 2026-03-17  
 **Prepared by:** FluxForge Development Team
-**Focused GUI/Offline Regression:** 89 passed, 5 warnings (`tests/test_gui_app.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`)
+**Focused GUI/Offline Regression:** 102 passed, 0 warnings (`tests/test_gui_app.py`, `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_gui_desktop_native.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`, `tests/test_no_external_repo_paths.py`)
 **GPU Support:** NVIDIA T600, CUDA 12.5.1, cuDNN 9
 
 ## 13. Documentation Appendices

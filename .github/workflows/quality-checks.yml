@@ -8,10 +8,14 @@ on:
       - add_gui
       - chore/repo-cleanup-phase1-safety-20260317
     paths:
-      - 'src/fluxforge/**.py'
-      - 'tests/**.py'
+      - 'src/fluxforge/**/*.py'
+      - 'src/fluxforge_gui/**/*.py'
+      - 'tests/**/*.py'
       - '.flake8'
       - 'pyproject.toml'
+      - 'setup.cfg'
+      - 'README.md'
+      - 'docs/**/*.md'
       - '.github/workflows/quality-checks.yml'
 
 jobs:
@@ -31,8 +35,10 @@ jobs:
 
       - name: Install tooling and runtime deps
         run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk
           python -m pip install --upgrade pip
-          python -m pip install black==24.10.0 flake8 pytest numpy scipy matplotlib
+          python -m pip install -e '.[dev]'
 
       - name: Black (check)
         run: |
@@ -73,4 +79,52 @@ jobs:
             tests/test_gui_app.py \
             tests/test_astm_e261.py \
             tests/test_astm_e262.py \
-            tests/test_cli_app.py
+            tests/test_cli_app.py \
+            -W error::matplotlib.MatplotlibDeprecationWarning
+
+  native-desktop-gui-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Linux desktop GUI deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk xvfb xauth imagemagick
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,gui-test]'
+
+      - name: Native desktop GUI acceptance (Linux/Xvfb)
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q tests/test_gui_desktop_native.py
+
+  native-desktop-gui-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Windows desktop GUI deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,gui-test]"
+
+      - name: Native desktop GUI acceptance (Windows)
+        env:
+          PYTHONPATH: src
+          FLUXFORGE_OFFLINE: '1'
+        run: |
+          pytest -q tests/test_gui_desktop_native.py

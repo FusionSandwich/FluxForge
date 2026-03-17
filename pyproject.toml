@@ -22,6 +22,11 @@ dev = [
     "black==24.10.*",
     "flake8==7.3.*",
 ]
+gui-test = [
+    "pyautogui>=0.9.54; platform_system != 'Windows'",
+    "python-xlib>=0.33; platform_system != 'Windows'",
+    "pywinauto>=0.6.8; platform_system == 'Windows'",
+]
 ml = [
     "tensorflow==2.15.1",
 ]

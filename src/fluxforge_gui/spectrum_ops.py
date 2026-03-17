@@ -25,6 +25,7 @@ from fluxforge.data.efficiency import EfficiencyCurve
 from fluxforge.data.nuclear_data_sources import load_gamma_identification_source
 from fluxforge.io.artifacts import read_peak_report, read_spectrum_file
 from fluxforge.io.spe import GammaSpectrum
+from fluxforge_gui.mpl_helpers import apply_tight_layout, create_offscreen_figure
 from fluxforge_gui.models import (
     GuiCalibrationFit,
     GuiCalibrationPoint,
@@ -793,7 +794,7 @@ def render_gui_spectrum_preview(
             "matplotlib is required for the FluxForge GUI spectrum preview"
         )
 
-    fig = figure or Figure(figsize=(8.8, 4.8), dpi=100)
+    fig = create_offscreen_figure(figsize=(8.8, 4.8), dpi=100, figure=figure)
     fig.clear()
     if diagnostic_plot is not None:
         gridspec = fig.add_gridspec(2, 1, height_ratios=[3.2, 1.25], hspace=0.18)
@@ -945,7 +946,7 @@ def render_gui_spectrum_preview(
     if diagnostic_plot is not None:
         fig.subplots_adjust(left=0.08, right=0.985, bottom=0.08, top=0.94, hspace=0.22)
     else:
-        fig.tight_layout()
+        apply_tight_layout(fig)
     return fig, ax
 
 

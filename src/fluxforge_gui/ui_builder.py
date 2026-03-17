@@ -225,6 +225,69 @@ class UiBuilderMixin:
         self.log_box.grid(row=0, column=0, sticky="nsew")
         self.log_box.configure(state="disabled")
 
+    def _build_scrollable_controls_panel(
+        self,
+        parent: ttk.Frame,
+        *,
+        row: int,
+        column: int,
+        width: int = 430,
+    ) -> tuple[ttk.Frame, tk.Canvas]:
+        """Create a vertically scrollable side panel for dense workflow controls."""
+
+        shell = ttk.Frame(parent)
+        shell.grid(row=row, column=column, sticky="nsw", padx=(0, 12))
+        shell.rowconfigure(0, weight=1)
+        shell.columnconfigure(0, weight=1)
+
+        canvas = tk.Canvas(
+            shell,
+            width=width,
+            highlightthickness=0,
+            bd=0,
+            background="#edf2f7",
+        )
+        scrollbar = ttk.Scrollbar(shell, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.grid(row=0, column=0, sticky="ns")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        interior = ttk.Frame(canvas)
+        window_id = canvas.create_window((0, 0), window=interior, anchor="nw")
+
+        def _sync_scroll_region(_event=None) -> None:
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        def _sync_width(event) -> None:
+            canvas.itemconfigure(window_id, width=event.width)
+
+        def _on_mousewheel(event) -> None:
+            delta = getattr(event, "delta", 0)
+            if delta:
+                canvas.yview_scroll(int(-delta / 120), "units")
+                return
+            num = getattr(event, "num", None)
+            if num == 4:
+                canvas.yview_scroll(-3, "units")
+            elif num == 5:
+                canvas.yview_scroll(3, "units")
+
+        def _bind_wheel(_event=None) -> None:
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)
+            canvas.bind_all("<Button-4>", _on_mousewheel)
+            canvas.bind_all("<Button-5>", _on_mousewheel)
+
+        def _unbind_wheel(_event=None) -> None:
+            canvas.unbind_all("<MouseWheel>")
+            canvas.unbind_all("<Button-4>")
+            canvas.unbind_all("<Button-5>")
+
+        interior.bind("<Configure>", _sync_scroll_region)
+        canvas.bind("<Configure>", _sync_width)
+        canvas.bind("<Enter>", _bind_wheel)
+        canvas.bind("<Leave>", _unbind_wheel)
+        return interior, canvas
+
     def _build_ingest_tab(self) -> None:
         frame = ttk.Frame(self.notebook, padding=12)
         self.notebook.add(frame, text="1. Ingest")
@@ -391,8 +454,12 @@ class UiBuilderMixin:
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(0, weight=1)
 
-        controls = ttk.Frame(frame)
-        controls.grid(row=0, column=0, sticky="nsw", padx=(0, 12))
+        controls, self.preview_controls_canvas = self._build_scrollable_controls_panel(
+            frame,
+            row=0,
+            column=0,
+            width=430,
+        )
         controls.columnconfigure(1, weight=1)
 
         self.preview_input = tk.StringVar(value=str(self.project_dir / "spectrum.json"))

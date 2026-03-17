@@ -25,6 +25,8 @@ conda env create -f environment.yml
 conda activate fluxforge
 
 pip install -e .
+# Optional: developer lint/test extras, including native desktop GUI automation
+pip install -e '.[dev,gui-test]'
 
 # Optional: enforce offline-only execution
 export FLUXFORGE_OFFLINE=1
@@ -46,6 +48,12 @@ python tools/build_offline_wheelhouse.py
 
 # Build native CLI/GUI bundles with PyInstaller
 python tools/build_native_bundle.py --target both
+```
+
+Native GUI acceptance is no longer limited to startup/smoke coverage. The desktop regression path now includes a real interactive run that opens the Tk GUI, loads a spectrum, edits ROI/calibration controls, exports artifacts, runs the report plot suite, captures screenshots, and verifies copied CLI commands:
+
+```bash
+python -m pytest -q tests/test_gui_desktop_native.py
 ```
 
 Synthetic validation and inference routines expect JSON inputs; see `src/fluxforge/cli/app.py` for expected schemas. For dedicated ASTM workflows, explore `examples/astm_e261_plan.json` or run the testing parity scripts under `examples/RAFM_irradiation/`.

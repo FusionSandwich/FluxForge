@@ -15,6 +15,7 @@ except ImportError:  # pragma: no cover - optional GUI plotting dependency
     Figure = None
 
 from fluxforge.cli import app as cli_app
+from fluxforge_gui.mpl_helpers import apply_tight_layout, create_offscreen_figure
 
 
 def summarize_gui_unfold_result(payload: dict[str, Any]) -> str:
@@ -380,7 +381,7 @@ def render_gui_activity_result(
 
     if Figure is None:
         return None
-    fig = figure or Figure(figsize=(8.2, 4.4), dpi=100)
+    fig = create_offscreen_figure(figsize=(8.2, 4.4), dpi=100, figure=figure)
     fig.clf()
     ax = fig.add_subplot(111)
     lines = payload.get("lines", []) or []
@@ -394,7 +395,7 @@ def render_gui_activity_result(
             va="center",
             transform=ax.transAxes,
         )
-        fig.tight_layout()
+        apply_tight_layout(fig)
         return fig
 
     activities = np.asarray(
@@ -444,7 +445,7 @@ def render_gui_activity_result(
         mass_ax.set_ylabel("Radioactive mass (g)")
         if np.all(radioactive_mass > 0.0):
             mass_ax.set_yscale("log")
-    fig.tight_layout()
+    apply_tight_layout(fig)
     return fig
 
 
@@ -457,7 +458,7 @@ def render_gui_rate_result(
 
     if Figure is None:
         return None
-    fig = figure or Figure(figsize=(8.4, 4.4), dpi=100)
+    fig = create_offscreen_figure(figsize=(8.4, 4.4), dpi=100, figure=figure)
     fig.clf()
     ax = fig.add_subplot(111)
     rates = payload.get("rates", []) or []
@@ -471,7 +472,7 @@ def render_gui_rate_result(
             va="center",
             transform=ax.transAxes,
         )
-        fig.tight_layout()
+        apply_tight_layout(fig)
         return fig
 
     values = np.asarray(
@@ -500,7 +501,7 @@ def render_gui_rate_result(
     ax.grid(True, axis="y", alpha=0.25)
     if np.all(values > 0.0):
         ax.set_yscale("log")
-    fig.tight_layout()
+    apply_tight_layout(fig)
     return fig
 
 
@@ -513,7 +514,7 @@ def render_gui_validation_result(
 
     if Figure is None:
         return None
-    fig = figure or Figure(figsize=(8.4, 4.8), dpi=100)
+    fig = create_offscreen_figure(figsize=(8.4, 4.8), dpi=100, figure=figure)
     fig.clf()
     truth_flux = np.asarray(payload.get("truth_flux", []), dtype=float)
     predicted_flux = np.asarray(payload.get("predicted_flux", []), dtype=float)
@@ -532,7 +533,7 @@ def render_gui_validation_result(
             transform=top_ax.transAxes,
         )
         bottom_ax.axis("off")
-        fig.tight_layout()
+        apply_tight_layout(fig)
         return fig
 
     x = np.arange(1, max(truth_flux.size, predicted_flux.size) + 1, dtype=float)
@@ -575,7 +576,7 @@ def render_gui_validation_result(
         bottom_ax.grid(True, axis="y", alpha=0.25)
     else:
         bottom_ax.axis("off")
-    fig.tight_layout()
+    apply_tight_layout(fig)
     return fig
 
 
@@ -588,7 +589,7 @@ def render_gui_unfold_result(
 
     if Figure is None:
         return None
-    fig = figure or Figure(figsize=(8.4, 4.6), dpi=100)
+    fig = create_offscreen_figure(figsize=(8.4, 4.6), dpi=100, figure=figure)
     fig.clf()
 
     boundaries = np.asarray(payload.get("boundaries_eV", []), dtype=float)
@@ -652,7 +653,7 @@ def render_gui_unfold_result(
             va="center",
             transform=flux_ax.transAxes,
         )
-        fig.tight_layout()
+        apply_tight_layout(fig)
         return fig
 
     if boundaries.size == flux.size + 1:
@@ -820,7 +821,7 @@ def render_gui_unfold_result(
         else:
             diagnostics_ax.axis("off")
 
-    fig.tight_layout()
+    apply_tight_layout(fig)
     return fig
 
 

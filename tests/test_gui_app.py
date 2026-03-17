@@ -1,6 +1,8 @@
 import sys
+import warnings
 from pathlib import Path
 
+import matplotlib
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -31,6 +33,7 @@ from fluxforge_gui.app import (
     render_gui_unfold_result,
     render_gui_validation_result,
     render_gui_spectrum_preview,
+    save_gui_spectrum_preview_image,
     summarize_gui_activity_result,
     summarize_gui_rate_result,
     summarize_gui_unfold_result,
@@ -348,6 +351,104 @@ def test_render_gui_validation_result_plots_flux_and_residuals():
     assert len(figure.axes) == 2
     assert figure.axes[0].get_title() == "Validation flux comparison"
     assert figure.axes[1].get_title() == "Validation residuals"
+
+
+def test_gui_render_helpers_avoid_matplotlib_deprecation(tmp_path):
+    spectrum = GammaSpectrum(
+        counts=np.array([0.0, 4.0, 8.0, 4.0, 0.0]),
+        live_time=10.0,
+        real_time=10.0,
+        spectrum_id="demo",
+        calibration={"energy": [0.0, 50.0]},
+    )
+    spectrum_path = tmp_path / "demo.json"
+    peaks_path = tmp_path / "demo_peaks.json"
+    write_spectrum_file(spectrum_path, spectrum)
+    write_peak_report(
+        peaks_path,
+        spectrum_id="demo",
+        live_time_s=10.0,
+        peaks=[{"channel": 2, "energy_keV": 100.0, "area": 8.0, "label": "peak"}],
+    )
+    preview = build_gui_spectrum_preview(spectrum_path, peaks_path=peaks_path)
+    preview_png = tmp_path / "preview.png"
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", matplotlib.MatplotlibDeprecationWarning)
+        save_gui_spectrum_preview_image(preview, preview_png)
+        activity_figure = render_gui_activity_result(
+            {
+                "lines": [
+                    {
+                        "isotope": "Sc46",
+                        "energy_keV": 889.3,
+                        "activity_Bq": 120.0,
+                        "activity_unc_Bq": 6.0,
+                    },
+                    {
+                        "isotope": "Sc46",
+                        "energy_keV": 1120.5,
+                        "activity_Bq": 100.0,
+                        "activity_unc_Bq": 7.0,
+                    },
+                ]
+            }
+        )
+        rate_figure = render_gui_rate_result(
+            {
+                "rates": [
+                    {
+                        "reaction_id": "Ti-46(n,p)Sc-46",
+                        "rate": 5.0,
+                        "uncertainty": 0.4,
+                    },
+                    {
+                        "reaction_id": "Fe-54(n,p)Mn-54",
+                        "rate": 2.0,
+                        "uncertainty": 0.3,
+                    },
+                ]
+            }
+        )
+        validation_figure = render_gui_validation_result(
+            {
+                "metrics": {"mae": 0.02},
+                "truth_flux": [1.0, 2.0, 3.0],
+                "predicted_flux": [1.1, 1.9, 2.8],
+                "residuals": [0.1, -0.1, -0.2],
+            }
+        )
+        unfold_figure = render_gui_unfold_result(
+            {
+                "method": "mlem",
+                "boundaries_eV": [1e-5, 1e-3, 1.0, 1e3],
+                "flux": [2.0, 5.0, 1.5],
+                "covariance": [
+                    [0.04, 0.0, 0.0],
+                    [0.0, 0.09, 0.0],
+                    [0.0, 0.0, 0.01],
+                ],
+                "chi2": 0.42,
+                "diagnostics": {
+                    "iterations": 12,
+                    "converged": True,
+                    "chi2_history": [4.0, 1.5, 0.42],
+                    "measured_rates": [1.0, 2.0],
+                    "measured_rate_uncertainties": [0.1, 0.2],
+                    "predicted_rates": [1.1, 1.8],
+                    "predicted_rate_uncertainties": [0.05, 0.08],
+                    "rate_residuals": [0.1, -0.2],
+                    "rate_pulls": [1.0, -1.0],
+                    "reactions": ["Au", "Co"],
+                },
+            }
+        )
+
+    assert preview_png.exists()
+    assert activity_figure is not None
+    assert rate_figure is not None
+    assert validation_figure is not None
+    assert unfold_figure is not None
 
 
 def test_summarize_gui_unfold_result_reports_method_and_iterations():
