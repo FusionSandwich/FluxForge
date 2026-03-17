@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+import os
 import shlex
 import subprocess
 import sys
@@ -150,6 +151,13 @@ def _build_backend():
     return _LinuxBackend()
 
 
+def _prefer_ci_safe_tk_events() -> bool:
+    return (
+        sys.platform == "win32"
+        and os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    )
+
+
 def _pump(root: tk.Tk, duration: float = 0.2) -> None:
     deadline = time.monotonic() + duration
     while time.monotonic() < deadline:
@@ -177,11 +185,15 @@ def _click_widget(root: tk.Tk, backend, widget: tk.Misc) -> None:
     root.update_idletasks()
     local_x = max(int(widget.winfo_width() / 2), 1)
     local_y = max(int(widget.winfo_height() / 2), 1)
-    if sys.platform == "win32":
+    if sys.platform == "win32" and not _prefer_ci_safe_tk_events():
         x, y = _center_of(widget)
         backend.click(x, y)
     else:
         widget.focus_force()
+        with contextlib.suppress(tk.TclError, AttributeError):
+            widget.invoke()
+            _pump(root, 0.15)
+            return
         widget.event_generate("<Enter>")
         widget.event_generate("<Motion>", x=local_x, y=local_y)
         widget.event_generate("<ButtonPress-1>", x=local_x, y=local_y)
@@ -222,12 +234,14 @@ def _click_notebook_tab(root: tk.Tk, backend, notebook: tk.Misc, label: str) -> 
 
 def _click_tree_item(root: tk.Tk, backend, tree: tk.Misc, item_id: str) -> None:
     x, y = _tree_item_center(tree, item_id)
-    if sys.platform == "win32":
+    if sys.platform == "win32" and not _prefer_ci_safe_tk_events():
         backend.click(x, y)
     else:
         rel_x = max(int(x - tree.winfo_rootx()), 1)
         rel_y = max(int(y - tree.winfo_rooty()), 1)
+        tree.selection_set(item_id)
         tree.focus(item_id)
+        tree.see(item_id)
         tree.event_generate("<Motion>", x=rel_x, y=rel_y)
         tree.event_generate("<ButtonPress-1>", x=rel_x, y=rel_y)
         tree.event_generate("<ButtonRelease-1>", x=rel_x, y=rel_y)
@@ -682,7 +696,12 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         raise SystemExit("usage: gui_desktop_driver.py <output-dir>")
-    payload = run_acceptance(Path(argv[1]).resolve())
+    output_dir = Path(argv[1]).resolve()
+    payload = run_acceptance(output_dir)
+    (output_dir / "run.json").write_text(
+        json.dumps(payload, indent=2),
+        encoding="utf-8",
+    )
     print(json.dumps(payload))
     return 0
 

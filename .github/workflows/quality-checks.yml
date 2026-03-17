@@ -20,7 +20,7 @@ on:
       - '.github/workflows/quality-checks.yml'
 
 jobs:
-  phase2-quality-and-gui:
+  phase2-core-analysis:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -72,22 +72,15 @@ jobs:
             tests/test_genie_overrides.py \
             tests/test_pipeline_validation.py
 
-      - name: GUI regression tests
+      - name: CLI and standards regression tests
         env:
           PYTHONPATH: src
         run: |
           pytest -q \
-            tests/test_gui_app.py \
             tests/test_astm_e261.py \
             tests/test_astm_e262.py \
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
-
-      - name: Cleanup inventory and gallery tool tests
-        env:
-          PYTHONPATH: src
-        run: |
-          pytest -q tests/test_cleanup_inventory_tool.py tests/test_gui_review_gallery.py
 
   native-desktop-gui-linux:
     runs-on: ubuntu-latest
@@ -111,11 +104,17 @@ jobs:
         env:
           PYTHONPATH: src
         run: |
-          pytest -q tests/test_gui_desktop_native.py
+          pytest -q \
+            tests/test_gui_app.py \
+            tests/test_gui_desktop_native.py \
+            -W error::matplotlib.MatplotlibDeprecationWarning
 
       - name: Build Linux GUI evidence bundle
+        env:
+          PYTHONPATH: src
+          FLUXFORGE_OFFLINE: '1'
         run: |
-          python tools/qa/run_native_gui_evidence.py --output-dir artifacts/gui_review/linux
+          xvfb-run -a python tests/gui_desktop_driver.py artifacts/gui_review/linux
 
       - name: Upload Linux GUI evidence
         uses: actions/upload-artifact@v4
@@ -151,7 +150,7 @@ jobs:
           PYTHONPATH: src
           FLUXFORGE_OFFLINE: '1'
         run: |
-          python tools/qa/run_native_gui_evidence.py --output-dir artifacts/gui_review/windows
+          python tests/gui_desktop_driver.py artifacts/gui_review/windows
 
       - name: Upload Windows GUI evidence
         uses: actions/upload-artifact@v4

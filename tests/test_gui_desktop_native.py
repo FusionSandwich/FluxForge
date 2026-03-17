@@ -42,14 +42,26 @@ def _run_native_desktop_driver(output_dir: Path) -> dict[str, object]:
             pytest.skip("No DISPLAY available and xvfb-run is not installed.")
         command = [xvfb_run, "-a", *command]
 
-    result = subprocess.run(
-        command,
-        cwd=REPO_ROOT,
-        env=env,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as exc:  # pragma: no cover - CI diagnostics
+        message = [
+            "Native desktop GUI driver failed.",
+            f"command: {exc.cmd}",
+            f"returncode: {exc.returncode}",
+            "stdout:",
+            exc.stdout or "<empty>",
+            "stderr:",
+            exc.stderr or "<empty>",
+        ]
+        pytest.fail("\n".join(message))
     lines = [line for line in result.stdout.splitlines() if line.strip()]
     return json.loads(lines[-1])
 

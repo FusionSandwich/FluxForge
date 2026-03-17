@@ -42,11 +42,11 @@ This document tracks active cleanup steps for FluxForge repository deduplication
   - `src/fluxforge/cli/app.py`: `3501` lines
   - `src/fluxforge/analysis/flux_wire_analysis.py`: `2792` lines
 - Additional cleanup hotspots outside the main packages:
-  - `docs/REPO_CLEANUP_WORKSTREAM.csv` now records the folder-by-folder keep/refactor/split/archive/delete queue.
+  - `docs/REPO_CLEANUP_WORKSTREAM.csv` now records the folder-by-folder keep/refactor/split/archive/delete snapshot.
   - `src/fluxforge_gui/split_app.py`, `_sync_probe.txt`, and `xyz.txt` have been removed from the shipped GUI package.
   - `tools/github_issues/*.py` still use hard-coded local filesystem paths.
   - `examples/` and parts of `docs/` still contain workstation-specific absolute paths that should be converted to repo-relative usage or clearly marked as local-only examples.
-  - Native screenshot evidence now has a committed Linux baseline under `tests/data/gui_review_baselines/linux/` plus a review-gallery manifest.
+  - Native screenshot evidence now has committed Linux baselines under `tests/data/gui_review_baselines/linux/`.
   - The latest native Linux evidence bundle is reproducible under `artifacts/gui_review/current_linux/` and currently matches all six baseline checkpoints.
 
 ## Verified Earlier Cleanup Work
@@ -98,13 +98,13 @@ This document tracks active cleanup steps for FluxForge repository deduplication
    - Mark developer-only scripts explicitly.
    - Keep shipped docs and examples runnable from a clean checkout.
 
-## New Supporting Tooling On This Branch
-- `tools/qa/build_cleanup_inventory.py`
-  - regenerates `docs/REPO_CLEANUP_WORKSTREAM.csv` and `docs/REPO_CLEANUP_WORKSTREAM.md`
-- `tools/qa/run_native_gui_evidence.py`
+## Native Review Inputs On This Branch
+- `docs/REPO_CLEANUP_WORKSTREAM.csv` and `docs/REPO_CLEANUP_WORKSTREAM.md`
+  - current folder-by-folder cleanup snapshot
+- `tests/gui_desktop_driver.py`
   - runs the real desktop GUI driver, saves screenshots/artifacts, and writes `run.json`
-- `tools/qa/build_gui_review_gallery.py`
-  - builds `review_gallery/index.html` from a captured evidence bundle plus platform baselines
+- `tests/data/gui_review_baselines/linux/`
+  - committed Linux screenshot baselines for manual comparison
 
 ## Formatting and Audit Commands
 Run from repository root.

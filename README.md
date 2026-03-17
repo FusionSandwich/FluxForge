@@ -56,17 +56,13 @@ Native GUI acceptance is no longer limited to startup/smoke coverage. The deskto
 python -m pytest -q tests/test_gui_desktop_native.py
 ```
 
-For repeatable evidence capture and screenshot review, use the repo-local QA helpers:
+For repeatable native GUI evidence capture, run the desktop driver directly:
 
 ```bash
-# Generate the folder-by-folder cleanup inventory
-python tools/qa/build_cleanup_inventory.py
-
-# Capture a native GUI evidence bundle and build a review gallery
-python tools/qa/run_native_gui_evidence.py --output-dir artifacts/gui_review/current_linux
+PYTHONPATH=src FLUXFORGE_OFFLINE=1 xvfb-run -a \
+  python tests/gui_desktop_driver.py artifacts/gui_review/current_linux
 ```
 
-The generated review gallery lives under `artifacts/gui_review/.../review_gallery/index.html`, and the committed Linux screenshot baseline plus manifest live under `tests/data/gui_review_baselines/`.
-The latest local native-review run currently writes screenshots such as `01-launch.png`, `03-roi-calibration.png`, and `06-report-plots.png` under `artifacts/gui_review/current_linux/` for manual inspection.
+The latest local native-review run writes screenshots such as `01-launch.png`, `03-roi-calibration.png`, and `06-report-plots.png` under `artifacts/gui_review/current_linux/` for manual inspection. The committed Linux screenshot baselines live under `tests/data/gui_review_baselines/linux/`.
 
 Synthetic validation and inference routines expect JSON inputs; see `src/fluxforge/cli/app.py` for expected schemas. For dedicated ASTM workflows, explore `examples/astm_e261_plan.json` or run the testing parity scripts under `examples/RAFM_irradiation/`.

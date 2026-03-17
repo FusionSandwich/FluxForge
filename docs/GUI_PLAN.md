@@ -64,7 +64,7 @@ What is already implemented and working in the current prototype:
 - report tab now includes a visible **master plot suite** surface for the CLI `plots` command,
 - native desktop acceptance coverage that opens the real GUI, drives ROI/calibration/report workflows, captures screenshots, saves artifacts, and verifies copied CLI commands,
 - native desktop evidence now also captures a standards/k0 preset interaction and unfold/compare summary flow,
-- a static screenshot-review gallery can now be generated from native evidence bundles using the committed manifest under `tests/data/gui_review_baselines/`.
+- native desktop review artifacts are now saved directly as raw screenshots and `run.json` bundles under `artifacts/gui_review/...`.
 
 What is only partially implemented today:
 - ROI drag-resize is now working for the selected ROI, but overlap handles and full click-drag ROI creation still need more polish,
@@ -104,10 +104,10 @@ Tests still needed:
 
 Latest validation snapshot for this phase:
 - warning-regression subset: `28 passed` (`tests/test_gui_app.py`, `tests/test_gui_desktop_native.py`) with `MatplotlibDeprecationWarning` treated as an error,
-- expanded GUI/offline/native-desktop regression suite: `104 passed` (`tests/test_gui_app.py`, `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_gui_desktop_native.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`, `tests/test_no_external_repo_paths.py`, `tests/test_cleanup_inventory_tool.py`, `tests/test_gui_review_gallery.py`),
+- expanded GUI/offline/native-desktop regression suite: `102 passed` (`tests/test_gui_app.py`, `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_cli_app.py`, `tests/test_gui_parity_registry.py`, `tests/test_gui_native_app.py`, `tests/test_gui_desktop_native.py`, `tests/test_nuclear_data_sources.py`, `tests/test_irdff.py`, `tests/test_no_external_repo_paths.py`),
 - native desktop acceptance: passes with screenshots, ROI/calibration interaction, standards/k0 preset application, unfold/compare summary loading, report plot-suite generation, and copied CLI verification,
-- review artifacts: `tools/qa/run_native_gui_evidence.py` now produces `run.json`, raw screenshots, and a static `review_gallery/index.html` bundle for manual review,
-- current Linux review bundle: `artifacts/gui_review/current_linux/` with all six checkpoint screenshots matching the committed baseline manifest,
+- review artifacts: `tests/gui_desktop_driver.py` now produces `run.json` plus raw screenshots for manual review,
+- current Linux review bundle: `artifacts/gui_review/current_linux/` with all six checkpoint screenshots aligned to the committed Linux baselines,
 - ASTM/INL preset regression still applies `iec_tiered` counting, IRDFF source selection, and background-subtracted workflow defaults.
 
 Conda environment note:
@@ -126,9 +126,9 @@ Conda environment note:
 - Reference GUI work under `testing/` is inspiration-only and optional; it is not part of FluxForge's build, install, packaging, or runtime contract.
 - The standing product contract for adopted GUI behaviors now lives in [GUI_CAPABILITY_PROGRAM.md](GUI_CAPABILITY_PROGRAM.md).
 - The screenshot review path now uses:
-  - `tools/qa/run_native_gui_evidence.py` for native evidence capture,
-  - `tools/qa/build_gui_review_gallery.py` for static gallery generation,
-  - `tests/data/gui_review_baselines/manifest.json` for platform checkpoint definitions.
+  - `tests/gui_desktop_driver.py` for native evidence capture,
+  - raw screenshot artifacts under `artifacts/gui_review/...`,
+  - committed Linux baseline screenshots under `tests/data/gui_review_baselines/linux/`.
 
 ## Out of Scope (v1)
 
