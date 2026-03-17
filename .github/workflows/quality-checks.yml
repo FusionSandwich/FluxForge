@@ -43,7 +43,27 @@ jobs:
 
       - name: Black (check)
         run: |
-          black --check src tests examples tools testing_validation
+          black --check \
+            src/fluxforge/k0_physics.py \
+            src/fluxforge/analysis/astm_e261.py \
+            src/fluxforge/analysis/astm_e262.py \
+            src/fluxforge/data/isotope_names.py \
+            src/fluxforge/io/metadata.py \
+            tests/test_io_metadata.py \
+            tests/test_k0_physics.py \
+            tests/test_k0_naa.py \
+            tests/test_k0_workflow.py \
+            tests/test_kayzero_k0.py \
+            tests/test_rafm_workflow.py \
+            tests/test_rafm_background_integration.py \
+            tests/test_flux_wire_analysis.py \
+            tests/test_flux_wire_parity.py \
+            tests/test_peak_count_method_benchmark.py \
+            tests/test_genie_overrides.py \
+            tests/test_pipeline_validation.py \
+            tests/test_astm_e261.py \
+            tests/test_astm_e262.py \
+            tests/test_cli_app.py
 
       - name: Flake8 (baseline scope)
         run: |

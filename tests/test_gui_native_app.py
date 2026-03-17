@@ -13,7 +13,9 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
-def _run_gui_probe(*args: str, env_overrides: dict[str, str] | None = None) -> dict[str, object]:
+def _run_gui_probe(
+    *args: str, env_overrides: dict[str, str] | None = None
+) -> dict[str, object]:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
     if env_overrides:

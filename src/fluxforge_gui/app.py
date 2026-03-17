@@ -158,7 +158,9 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._build_standards_tab()
         self._build_physics_tab()
         self._build_report_tab()
-        self._append_log("FluxForge GUI is a native desktop application; no browser runtime is required.")
+        self._append_log(
+            "FluxForge GUI is a native desktop application; no browser runtime is required."
+        )
         if self.offline_mode:
             self._append_log(
                 "Offline mode enabled: remote HTTP(S) data sources and runtime downloads are disabled."
@@ -737,13 +739,13 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
         self._refresh_standards_source_summary()
         if self.preview_database_source.get() == "custom_gamma_file":
             self._refresh_preview_data_source_summary()
-        summary = (
-            "Registered custom gamma source. Supported locators: local JSON/CSV/YAML, sqlite:///... URIs, and python://module:loader."
-        )
+        summary = "Registered custom gamma source. Supported locators: local JSON/CSV/YAML, sqlite:///... URIs, and python://module:loader."
         if not self.offline_mode:
             summary += " HTTP(S) JSON/CSV/YAML endpoints are also available."
         else:
-            summary += " HTTP(S) endpoints remain disabled because offline mode is active."
+            summary += (
+                " HTTP(S) endpoints remain disabled because offline mode is active."
+            )
         self.preview_database_summary.set(summary)
 
     def _refresh_efficiency_line_choices(self) -> None:

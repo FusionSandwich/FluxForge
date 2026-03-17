@@ -95,7 +95,11 @@ def test_native_desktop_gui_workflow_generates_evidence(tmp_path):
 
     steps = {entry["step"]: entry for entry in result["steps"]}
     assert "launch" in steps
+    assert steps["ingest_raw"]["input"].endswith("Ti-RAFM-1a_25cm.ASC")
     assert steps["load_preview"]["spectrum_label"]
+    assert steps["peak_selection"]["peak_count"] >= 1
+    assert steps["peak_selection"]["selected_peak_energy_keV"] is not None
+    assert "ROI channels" in steps["peak_selection"]["count_summary"]
     assert steps["roi_edit"]["roi_count"] == 1
     assert steps["calibration"]["point_count"] == 2
     assert steps["standards_preset"]["data_source"] == "k0_naa_monitors"

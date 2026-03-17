@@ -478,7 +478,9 @@ class UiBuilderMixin:
         self._path_row(
             source_frame, 6, "Save preview PNG:", self.preview_png_output, save=True
         )
-        self._entry_row(source_frame, 7, "CLI plot title (optional):", self.preview_plot_title)
+        self._entry_row(
+            source_frame, 7, "CLI plot title (optional):", self.preview_plot_title
+        )
         self._path_row(
             source_frame,
             8,
@@ -1407,7 +1409,9 @@ class UiBuilderMixin:
             command=self._load_response_preview,
         ).grid(row=0, column=1)
         ttk.Checkbutton(
-            response_frame, text="Validate artifact schema", variable=self.response_validate
+            response_frame,
+            text="Validate artifact schema",
+            variable=self.response_validate,
         ).grid(row=5, column=1, sticky="w")
         ttk.Label(
             response_frame,
@@ -2279,7 +2283,9 @@ class UiBuilderMixin:
         )
         self.plots_unfold = self.report_unfold
         self.plots_rates = self.report_rates
-        self.plots_response = tk.StringVar(value=str(self.project_dir / "response.json"))
+        self.plots_response = tk.StringVar(
+            value=str(self.project_dir / "response.json")
+        )
         self.plots_prior_flux = tk.StringVar(value="")
         self.plots_output_dir = tk.StringVar(value=str(self.project_dir / "plots"))
         self.plots_format = tk.StringVar(value="png")
@@ -2356,9 +2362,9 @@ class UiBuilderMixin:
             text="Validate artifact schema",
             variable=self.plots_validate,
         ).grid(row=8, column=1, sticky="w")
-        ttk.Button(
-            plots_frame, text="Run Plot Suite", command=self._run_plots
-        ).grid(row=9, column=1, sticky="w", pady=(4, 4))
+        ttk.Button(plots_frame, text="Run Plot Suite", command=self._run_plots).grid(
+            row=9, column=1, sticky="w", pady=(4, 4)
+        )
         ttk.Label(
             plots_frame,
             textvariable=self.plots_status,

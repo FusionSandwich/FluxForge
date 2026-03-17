@@ -12,8 +12,6 @@ import time
 from pathlib import Path
 import tkinter as tk
 
-import numpy as np
-
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -21,13 +19,10 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from fluxforge_gui.app import FluxForgeGui
 from fluxforge.io.artifacts import (
-    write_peak_report,
     write_report_bundle,
-    write_spectrum_file,
     write_unfold_result,
     write_validation_bundle,
 )
-from fluxforge.io.spe import GammaSpectrum
 
 
 def _walk_widgets(widget: tk.Misc):
@@ -70,7 +65,9 @@ def _center_of(widget: tk.Misc) -> tuple[int, int]:
     )
 
 
-def _tree_item_center(tree: tk.Misc, item_id: str, column: str = "#1") -> tuple[int, int]:
+def _tree_item_center(
+    tree: tk.Misc, item_id: str, column: str = "#1"
+) -> tuple[int, int]:
     tree.update_idletasks()
     bbox = tree.bbox(item_id, column)
     if not bbox:
@@ -304,8 +301,18 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
     app._dispatch = sync_dispatch  # type: ignore[method-assign]
 
     try:
-        spectrum_input = output_dir / "desktop_demo_spectrum.json"
-        peaks_input = output_dir / "desktop_demo_peaks.json"
+        raw_spectrum_input = (
+            REPO_ROOT
+            / "examples"
+            / "RAFM_irradiation"
+            / "raw_gamma_spec"
+            / "flux_wires"
+            / "Ti-RAFM-1a_25cm.ASC"
+        )
+        background_input = (
+            REPO_ROOT / "examples" / "RAFM_irradiation" / "background.ASC"
+        )
+        spectrum_input = output_dir / "ti_rafm_1a_25cm_ingested.json"
         gui_preview_output = output_dir / "gui_preview_native.png"
         cli_plot_output = output_dir / "cli_spectrum_plot.png"
         roi_output = output_dir / "manual_rois.json"
@@ -316,30 +323,6 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         k0_report_output = output_dir / "k0_report.json"
         k0_text_output = output_dir / "k0_report.txt"
         plots_output_dir = output_dir / "plot_suite"
-
-        write_spectrum_file(
-            spectrum_input,
-            GammaSpectrum(
-                counts=np.array([0.0, 4.0, 8.0, 4.0, 0.0]),
-                live_time=10.0,
-                real_time=10.0,
-                spectrum_id="desktop-demo",
-                calibration={"energy": [0.0, 50.0]},
-            ),
-        )
-        write_peak_report(
-            peaks_input,
-            spectrum_id="desktop-demo",
-            live_time_s=10.0,
-            peaks=[
-                {
-                    "channel": 2,
-                    "energy_keV": 100.0,
-                    "area": 8.0,
-                    "label": "desktop-peak",
-                }
-            ],
-        )
         response_output.write_text(
             json.dumps(
                 {
@@ -376,12 +359,15 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             text_report={"path": k0_text_output.name, "format": "text/plain"},
         )
 
+        app.ingest_input.set(str(raw_spectrum_input))
+        app.ingest_output.set(str(spectrum_input))
+        app.ingest_background_file.set(str(background_input))
         app.preview_input.set(str(spectrum_input))
-        app.preview_peaks.set(str(peaks_input))
+        app.preview_peaks.set("")
         app.preview_png_output.set(str(gui_preview_output))
         app.preview_roi_file.set(str(roi_output))
         app.preview_manual_peak_report.set(str(peak_report_output))
-        app.preview_plot_title.set("FluxForge Native Desktop Acceptance")
+        app.preview_plot_title.set("FluxForge RAFM Native Desktop Acceptance")
         app.response_output.set(str(response_output))
         app.unfold_response.set(str(response_output))
         app.unfold_output.set(str(unfold_output))
@@ -394,21 +380,85 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         evidence["screenshots"].append(str(launch_shot))
         log_step("launch", title=root.title())
 
+        _click_notebook_tab(root, backend, app.notebook, "1. Ingest")
+        run_ingest_btn = _find_widget_by_text(root, "Run Ingest", {"TButton", "Button"})
+        _click_widget(root, backend, run_ingest_btn)
+        _wait_for(
+            root,
+            lambda: spectrum_input.exists(),
+            timeout=20.0,
+            description="raw RAFM ingest",
+        )
+        evidence["artifacts"].append(str(spectrum_input))
+        log_step(
+            "ingest_raw",
+            input=str(raw_spectrum_input),
+            background=str(background_input),
+            output=str(spectrum_input),
+        )
+
         _click_notebook_tab(root, backend, app.notebook, "2. Spectrum")
-        load_preview_btn = _find_widget_by_text(root, "Load Preview", {"TButton", "Button"})
+        load_preview_btn = _find_widget_by_text(
+            root, "Load Preview", {"TButton", "Button"}
+        )
         _click_widget(root, backend, load_preview_btn)
         _wait_for(
             root,
-            lambda: app._preview_state is not None and "Loaded" in app.preview_status.get(),
+            lambda: app._preview_state is not None
+            and "Loaded" in app.preview_status.get(),
             timeout=15.0,
             description="spectrum preview load",
         )
-        loaded_shot = _take_screenshot(root, backend, output_dir, "02-spectrum-loaded.png")
+        auto_detect_btn = _find_widget_by_text(
+            root, "Auto-detect peaks", {"TButton", "Button"}
+        )
+        _click_widget(root, backend, auto_detect_btn)
+        _wait_for(
+            root,
+            lambda: app._preview_state is not None
+            and len(app._preview_state.peaks) > 0,
+            timeout=15.0,
+            description="preview peak detection",
+        )
+        peak_items = app.preview_peak_table.get_children()
+        if not peak_items:
+            raise LookupError("Peak table is empty after auto-detection.")
+        _click_tree_item(root, backend, app.preview_peak_table, peak_items[0])
+        _wait_for(
+            root,
+            lambda: app._selected_peak() is not None,
+            timeout=5.0,
+            description="peak row selection",
+        )
+        count_peak_btn = _find_widget_by_text(
+            root, "Count selected peak", {"TButton", "Button"}
+        )
+        _click_widget(root, backend, count_peak_btn)
+        _wait_for(
+            root,
+            lambda: "ROI channels" in app.preview_count_summary.get(),
+            timeout=10.0,
+            description="selected peak count",
+        )
+        loaded_shot = _take_screenshot(
+            root, backend, output_dir, "02-spectrum-loaded.png"
+        )
         evidence["screenshots"].append(str(loaded_shot))
         log_step(
             "load_preview",
             preview_status=app.preview_status.get(),
-            spectrum_label=app._preview_state.primary.label if app._preview_state else "",
+            spectrum_label=(
+                app._preview_state.primary.label if app._preview_state else ""
+            ),
+        )
+        selected_peak = app._selected_peak()
+        log_step(
+            "peak_selection",
+            peak_count=len(app._preview_state.peaks) if app._preview_state else 0,
+            selected_peak_energy_keV=(
+                selected_peak.energy_keV if selected_peak is not None else None
+            ),
+            count_summary=app.preview_count_summary.get(),
         )
 
         app.preview_controls_canvas.yview_moveto(0.32)
@@ -423,7 +473,9 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         roi_right_entry = _grid_widget(
             roi_frame, row=3, column=1, classes={"TEntry", "Entry"}
         )
-        add_roi_btn = _find_widget_by_text(root, "Add / Update ROI", {"TButton", "Button"})
+        add_roi_btn = _find_widget_by_text(
+            root, "Add / Update ROI", {"TButton", "Button"}
+        )
 
         _set_entry_text(root, backend, roi_label_entry, "Native ROI")
         _set_entry_text(root, backend, roi_left_entry, "350")
@@ -457,7 +509,10 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         log_step(
             "roi_edit",
             roi_count=len(app._manual_regions),
-            roi_bounds=[app._manual_regions[0].left_keV, app._manual_regions[0].right_keV],
+            roi_bounds=[
+                app._manual_regions[0].left_keV,
+                app._manual_regions[0].right_keV,
+            ],
         )
 
         app.preview_controls_canvas.yview_moveto(0.48)
@@ -476,6 +531,9 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             calibration_frame, row=9, column=1, classes={"TEntry", "Entry"}
         )
         add_point_btn = _find_widget_by_text(root, "Add point", {"TButton", "Button"})
+        pick_selected_peak_btn = _find_widget_by_text(
+            root, "Pick selected peak", {"TButton", "Button"}
+        )
         fit_calibration_btn = _find_widget_by_text(
             root, "Fit calibration", {"TButton", "Button"}
         )
@@ -483,15 +541,22 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
             root, "Apply calibration", {"TButton", "Button"}
         )
 
-        for channel, observed, reference, label in (
-            ("0", "0", "0", "origin"),
-            ("100", "100", "120", "line120"),
-        ):
-            _set_entry_text(root, backend, picked_channel_entry, channel)
-            _set_entry_text(root, backend, observed_entry, observed)
-            _set_entry_text(root, backend, reference_entry, reference)
-            _set_entry_text(root, backend, point_label_entry, label)
-            _click_widget(root, backend, add_point_btn)
+        _set_entry_text(root, backend, picked_channel_entry, "0")
+        _set_entry_text(root, backend, observed_entry, "0")
+        _set_entry_text(root, backend, reference_entry, "0")
+        _set_entry_text(root, backend, point_label_entry, "origin")
+        _click_widget(root, backend, add_point_btn)
+
+        _click_widget(root, backend, pick_selected_peak_btn)
+        _wait_for(
+            root,
+            lambda: bool(picked_channel_entry.get()) and bool(observed_entry.get()),
+            timeout=5.0,
+            description="selected peak calibration pick",
+        )
+        _set_entry_text(root, backend, reference_entry, observed_entry.get())
+        _set_entry_text(root, backend, point_label_entry, "selected_peak")
+        _click_widget(root, backend, add_point_btn)
 
         _wait_for(
             root,
@@ -510,7 +575,8 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         _click_widget(root, backend, apply_calibration_btn)
         _wait_for(
             root,
-            lambda: "Applied calibration editor coefficients" in app.preview_status.get(),
+            lambda: "Applied calibration editor coefficients"
+            in app.preview_status.get(),
             timeout=5.0,
             description="calibration apply",
         )
@@ -607,7 +673,9 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
         load_response_btn = _find_widget_by_text(
             root, "Load Response Summary", {"TButton", "Button"}
         )
-        load_unfold_btn = _find_widget_by_text(root, "Load Result", {"TButton", "Button"})
+        load_unfold_btn = _find_widget_by_text(
+            root, "Load Result", {"TButton", "Button"}
+        )
         _click_widget(root, backend, load_response_btn)
         _wait_for(
             root,

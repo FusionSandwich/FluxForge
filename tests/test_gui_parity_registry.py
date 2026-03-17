@@ -13,7 +13,9 @@ from fluxforge_gui.parity_registry import GUI_PARITY_REGISTRY
 def _cli_commands() -> set[str]:
     parser = build_parser()
     subparser_action = next(
-        action for action in parser._actions if isinstance(action, argparse._SubParsersAction)
+        action
+        for action in parser._actions
+        if isinstance(action, argparse._SubParsersAction)
     )
     return set(subparser_action.choices)
 

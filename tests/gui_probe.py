@@ -24,7 +24,10 @@ def _walk_widgets(widget: tk.Misc):
 
 def _find_button(root: tk.Misc, text: str):
     for widget in _walk_widgets(root):
-        if widget.winfo_class() in {"TButton", "Button"} and widget.cget("text") == text:
+        if (
+            widget.winfo_class() in {"TButton", "Button"}
+            and widget.cget("text") == text
+        ):
             return widget
     raise LookupError(f"Button not found: {text}")
 
@@ -58,7 +61,9 @@ def snapshot() -> dict[str, object]:
         )
         return {
             "title": root.title(),
-            "tabs": [app.notebook.tab(tab_id, "text") for tab_id in app.notebook.tabs()],
+            "tabs": [
+                app.notebook.tab(tab_id, "text") for tab_id in app.notebook.tabs()
+            ],
             "buttons": buttons,
             "status": app.status_var.get(),
             "offline_mode": bool(app.offline_mode),
@@ -70,22 +75,42 @@ def snapshot() -> dict[str, object]:
 def capture_button_cli(button_text: str) -> dict[str, object]:
     root, app = _build_app()
     try:
-        app.preview_input.set(str(REPO_ROOT / "examples" / "spectroscopy_data" / "sample.spe"))
-        app.preview_png_output.set(str(REPO_ROOT / "artifacts" / "manual_review" / "gui_probe_plot.png"))
-        app.preview_roi_file.set(str(REPO_ROOT / "artifacts" / "manual_review" / "gui_probe_rois.json"))
-        app.preview_manual_peak_report.set(
-            str(REPO_ROOT / "artifacts" / "manual_review" / "gui_probe_peak_report.json")
+        app.preview_input.set(
+            str(REPO_ROOT / "examples" / "spectroscopy_data" / "sample.spe")
         )
-        app.response_cross_section_file.set(str(REPO_ROOT / "examples" / "unfolding_benchmark" / "cross_sections.json"))
-        app.response_number_densities_file.set(str(REPO_ROOT / "examples" / "unfolding_benchmark" / "number_densities.json"))
-        app.response_boundaries_file.set(str(REPO_ROOT / "examples" / "unfolding_benchmark" / "group_boundaries.json"))
+        app.preview_png_output.set(
+            str(REPO_ROOT / "artifacts" / "manual_review" / "gui_probe_plot.png")
+        )
+        app.preview_roi_file.set(
+            str(REPO_ROOT / "artifacts" / "manual_review" / "gui_probe_rois.json")
+        )
+        app.preview_manual_peak_report.set(
+            str(
+                REPO_ROOT / "artifacts" / "manual_review" / "gui_probe_peak_report.json"
+            )
+        )
+        app.response_cross_section_file.set(
+            str(REPO_ROOT / "examples" / "unfolding_benchmark" / "cross_sections.json")
+        )
+        app.response_number_densities_file.set(
+            str(
+                REPO_ROOT / "examples" / "unfolding_benchmark" / "number_densities.json"
+            )
+        )
+        app.response_boundaries_file.set(
+            str(
+                REPO_ROOT / "examples" / "unfolding_benchmark" / "group_boundaries.json"
+            )
+        )
         app.k0_import_input.set(str(REPO_ROOT / "artifacts" / "k0_import"))
         app.rafm_example_root.set(str(REPO_ROOT / "examples" / "RAFM_irradiation"))
 
         captured: dict[str, object] = {}
 
         def fake_dispatch(func, args, cli_tokens, on_success=None):
-            command_line = "fluxforge " + " ".join(shlex.quote(token) for token in cli_tokens)
+            command_line = "fluxforge " + " ".join(
+                shlex.quote(token) for token in cli_tokens
+            )
             app.last_cli_command = command_line
             app.copy_btn.configure(state="normal")
             captured["func_name"] = getattr(func, "__name__", str(func))
@@ -93,7 +118,9 @@ def capture_button_cli(button_text: str) -> dict[str, object]:
             captured["command_line"] = command_line
             captured["args"] = _to_jsonable(vars(args))
             if on_success is not None:
-                captured["on_success"] = getattr(on_success, "__name__", str(on_success))
+                captured["on_success"] = getattr(
+                    on_success, "__name__", str(on_success)
+                )
 
         app._dispatch = fake_dispatch  # type: ignore[method-assign]
         button = _find_button(root, button_text)
