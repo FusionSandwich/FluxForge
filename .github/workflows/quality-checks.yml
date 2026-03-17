@@ -31,7 +31,7 @@ jobs:
       - name: Install tooling and runtime deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install black==24.10.0 flake8 pytest numpy
+          python -m pip install black==24.10.0 flake8 pytest numpy scipy
 
       - name: Black (check)
         run: |
@@ -63,3 +63,10 @@ jobs:
             tests/test_peak_count_method_benchmark.py \
             tests/test_genie_overrides.py \
             tests/test_pipeline_validation.py
+
+      - name: RAFM example smoke run
+        run: |
+          python examples/RAFM_irradiation/run_validation.py \
+            --max-spectra 1 \
+            --no-fail \
+            --results-root /tmp/fluxforge-rafm-results
