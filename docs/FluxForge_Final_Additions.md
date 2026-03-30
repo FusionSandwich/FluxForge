@@ -120,8 +120,9 @@ be completed before any Phase 1 code is committed on the branch.
   `tests/spectra/` scaffold.
 - Ordered execution tracker: `.github/project-management/implementation_steps.json`.
 - Canonical status tracker: `docs/ROADMAP_EXECUTION_STATUS.md`.
-- The current formal sequence gate is still Stage 0 remote tracker application; additive
-  Phase 1 implementation is repo-complete but is still tracked as blocked until Stage 0 closes.
+- Stage 0 live tracker application was verified complete on GitHub on 2026-03-30.
+- Phase 1 implementation is repo-complete and formally complete in sequence.
+- The current roadmap next step is Phase 2.1, the unified energy + FWHM calibration workspace.
 - GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
   repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide search, and overlay wiring, while

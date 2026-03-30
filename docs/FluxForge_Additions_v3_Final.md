@@ -89,8 +89,9 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   workflow, and `tests/spectra/`.
 - Ordered execution tracker: `.github/project-management/implementation_steps.json`.
 - Canonical status tracker: `docs/ROADMAP_EXECUTION_STATUS.md`.
-- Additive Phase 1 implementation is now repo-complete, but the formal next step remains
-  Stage 0 live tracker application on GitHub.
+- Stage 0 live tracker application was verified complete on GitHub on 2026-03-30.
+- Phase 1 implementation is repo-complete and formally complete in sequence.
+- The current roadmap next step is Phase 2.1, the unified energy + FWHM calibration workspace.
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for
   roadmap items `1.3` through `1.18`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide database, and instant overlay search;

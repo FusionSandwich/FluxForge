@@ -21,21 +21,17 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| S0.1 | `next` | `repo-complete-remote-pending` | The repo contains milestones, labels, board config, templates, and sync automation, but the live GitHub tracker has not been applied yet. |
-| S0.2 | `blocked` | `repo-complete-remote-pending` | Epic definitions exist in `.github/project-management/issues.json`, but they are not yet live on GitHub. |
-| S0.3 | `blocked` | `repo-complete-remote-pending` | Initial issue seeds exist in `.github/project-management/issues.json`, but they are not yet live on GitHub. |
+| 2.1 | `next` | `not-started` | Stage 0 and Phase 1 are complete, so the formal next step is the unified energy + FWHM calibration workspace. |
 
 ## Completed In Sequence
 
 | Step | Repo Status | Evidence |
 |---|---|---|
+| S0.1 | `complete` | Live GitHub labels, milestones, issue templates, board config source, and successful `Sync Project Planning` run on 2026-03-30 |
+| S0.2 | `complete` | All 10 epic tracker issues from `.github/project-management/issues.json` are now live on GitHub |
+| S0.3 | `complete` | The seed issue set from `.github/project-management/issues.json` is now live on GitHub |
 | S0.4 | `complete` | `docs/adr/ADR-001` through `ADR-007` |
 | S0.5 | `complete` | `docs/adr/`, `tests/spectra/`, `.github/ISSUE_TEMPLATE/` |
-
-## Implemented Ahead of the Formal Gate
-
-These items exist additively in the repository, but the roadmap does not credit them as the
-active next step until Stage 0 is fully satisfied.
 
 | Step | Repo Status | Evidence |
 |---|---|---|
@@ -78,10 +74,10 @@ active next step until Stage 0 is fully satisfied.
 - `pytest` was upgraded in the user environment to `8.4.2`.
 - The TensorFlow-specific tests were run explicitly in this round, and the only remaining skips are the CUDA library checks that are correct for this CPU-only workspace.
 - The full suite now passes in this workspace: `1011 passed, 2 skipped`.
+- GitHub verification on 2026-03-30 confirmed the synced Stage 0 tracker assets are live: all required labels, all 7 milestones, all 10 epics, and the full seed issue set from the manifest are present on `FusionSandwich/FluxForge`.
 
 ## Review Result
 
-- Stage 0 is complete only in-repo. The live GitHub tracker application steps remain
-  remote-pending until the sync workflow has been pushed and verified on GitHub.
-- Phase 1 is now repo-complete, but it remains sequence-blocked in the tracker until
-  Stage 0 is closed on the live GitHub project side.
+- Stage 0 is complete both in-repo and on the live GitHub repository.
+- Phase 1 is complete in the repository and formally complete in sequence.
+- The roadmap's current next step is Phase 2.1: the unified energy + FWHM calibration dialog.
