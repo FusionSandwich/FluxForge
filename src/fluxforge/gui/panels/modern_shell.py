@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
+from fluxforge.gui.nuclide_search import NuclideSearchController
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
@@ -14,6 +15,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QGridLayout,
         QHBoxLayout,
         QLabel,
+        QLineEdit,
         QListWidget,
         QListWidgetItem,
         QPlainTextEdit,
@@ -46,6 +48,8 @@ def _selection_summary(state: SelectionState) -> str:
         fragments.append(
             f"ROI {state.roi_bounds_keV[0]:.1f}-{state.roi_bounds_keV[1]:.1f} keV"
         )
+    if state.reference_lines_keV:
+        fragments.append(f"{len(state.reference_lines_keV)} ref lines")
     return " | ".join(fragments) if fragments else "No active selection"
 
 
@@ -199,6 +203,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             return widget
 
+        def load_spectrum(self, spectrum) -> None:
+            """Load a GammaSpectrum-like object into the primary canvas."""
+
+            if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
+                return
+            self.canvas.set_spectrum(tuple(float(value) for value in spectrum.counts))
+            if getattr(spectrum, "gps", {}):
+                self.selection_bus.publish(
+                    SelectionState(
+                        peak_energy_keV=self.selection_bus.state.peak_energy_keV,
+                        roi_bounds_keV=self.selection_bus.state.roi_bounds_keV,
+                        nuclide=self.selection_bus.state.nuclide,
+                        reference_lines_keV=self.selection_bus.state.reference_lines_keV,
+                    )
+                )
+
         def _build_dashboard_tab(self) -> QWidget:
             widget = QWidget(self)
             layout = QVBoxLayout(widget)
@@ -257,6 +277,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def __init__(self, selection_bus: SelectionBus, parent=None) -> None:
             super().__init__(parent)
             self.selection_bus = selection_bus
+            self.nuclide_controller = NuclideSearchController(selection_bus)
 
             layout = QVBoxLayout(self)
             layout.setContentsMargins(12, 12, 12, 12)
@@ -277,15 +298,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 QListWidgetItem(text, devices)
             layout.addWidget(devices, 1)
 
-            nuclides = QListWidget(self)
-            nuclides.setObjectName("SidebarList")
-            for text in (
-                "Cs-137 · 661.657 keV",
-                "Co-60 · 1173 / 1332 keV",
-                "Eu-152 · calibration set",
-            ):
-                QListWidgetItem(text, nuclides)
-            layout.addWidget(nuclides, 1)
+            self.nuclide_query = QLineEdit(self)
+            self.nuclide_query.setObjectName("NuclideSearchInput")
+            self.nuclide_query.setPlaceholderText("Nuclide search...")
+            layout.addWidget(self.nuclide_query)
+
+            self.nuclides = QListWidget(self)
+            self.nuclides.setObjectName("SidebarList")
+            layout.addWidget(self.nuclides, 1)
+            self._refresh_nuclide_results("cs")
 
             self.selection_note = QTextEdit(self)
             self.selection_note.setObjectName("SidebarNote")
@@ -304,11 +325,34 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(qa, 1)
 
             self.selection_bus.subscribe(self._sync_selection)
+            self.nuclide_query.textChanged.connect(self._refresh_nuclide_results)
+            self.nuclides.itemSelectionChanged.connect(self._activate_selected_nuclide)
 
         def _sync_selection(self, state: SelectionState) -> None:
             self.selection_note.setPlainText(
                 "Selection sync\n\n" + _selection_summary(state)
             )
+
+        def _refresh_nuclide_results(self, query: str) -> None:
+            self.nuclides.clear()
+            for hit in self.nuclide_controller.search(query or "c"):
+                label = hit.display_name
+                if hit.strongest_lines_keV:
+                    label += (
+                        " · "
+                        + " / ".join(f"{energy:.3f}" for energy in hit.strongest_lines_keV)
+                        + " keV"
+                    )
+                item = QListWidgetItem(label, self.nuclides)
+                item.setData(0x0100, hit.nuclide)
+
+        def _activate_selected_nuclide(self) -> None:
+            item = self.nuclides.currentItem()
+            if item is None:
+                return
+            nuclide = item.data(0x0100)
+            if nuclide:
+                self.nuclide_controller.activate(str(nuclide))
 
 
     class BottomWorkspaceTabs(QTabWidget):

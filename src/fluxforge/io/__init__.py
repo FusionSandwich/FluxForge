@@ -75,12 +75,27 @@ from fluxforge.io.cnf import (
 )
 from fluxforge.io.iec import read_iec_file, IECSpectrum
 from fluxforge.io.n42 import (
+    LXML_AVAILABLE,
     N42Measurement,
     N42Document,
     read_n42_file,
     read_n42_spectrum,
+    validate_n42_file,
     write_n42_file,
 )
+from fluxforge.io.reader_factory import (
+    SpectrumReaderFactory,
+    create_reader_factory,
+    read_spectrum_any,
+)
+from fluxforge.io.session import (
+    FluxForgeSession,
+    read_ffs_session,
+    session_from_spectra,
+    write_ffs_session,
+)
+from fluxforge.io.spc import read_spc_file
+from fluxforge.io.spectrum_csv import read_spectrum_csv
 from fluxforge.io.pra import (
     PRAHistogram,
     read_pra_histogram,
@@ -194,9 +209,23 @@ __all__ = [
     # N42 I/O
     "N42Measurement",
     "N42Document",
+    "LXML_AVAILABLE",
     "read_n42_file",
     "read_n42_spectrum",
+    "validate_n42_file",
     "write_n42_file",
+    # Session I/O
+    "FluxForgeSession",
+    "read_ffs_session",
+    "session_from_spectra",
+    "write_ffs_session",
+    # Reader factory
+    "SpectrumReaderFactory",
+    "create_reader_factory",
+    "read_spectrum_any",
+    # Additional spectrum readers
+    "read_spc_file",
+    "read_spectrum_csv",
     # PRA I/O
     "PRAHistogram",
     "read_pra_histogram",

@@ -17,6 +17,8 @@ from fluxforge.gui.main_window import (
     modern_gui_unavailable_message,
 )
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState
+from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
+from fluxforge.gui.nuclide_search import NuclideSearchController
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import (
@@ -41,6 +43,7 @@ __all__ = [
     "PYQTGRAPH_AVAILABLE",
     "QT_AVAILABLE",
     "PyQtGraphSpectrumCanvas",
+    "RecentFilesManager",
     "ReferenceLine",
     "RendererCapabilities",
     "SelectionBus",
@@ -54,5 +57,7 @@ __all__ = [
     "launch_modern_gui",
     "main",
     "modern_gui_unavailable_message",
+    "normalize_dropped_paths",
+    "NuclideSearchController",
     "register_builtin_render_backends",
 ]

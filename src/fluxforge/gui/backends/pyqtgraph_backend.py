@@ -122,6 +122,8 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.status_label.setText("No spectrum loaded")
 
         def _on_selection_changed(self, state: SelectionState) -> None:
+            if state.reference_lines_keV:
+                self.set_reference_lines(state.reference_lines_keV)
             fragments = []
             if state.peak_energy_keV is not None:
                 fragments.append(f"{state.peak_energy_keV:.3f} keV")

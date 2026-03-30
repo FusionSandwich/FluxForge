@@ -121,6 +121,13 @@ from fluxforge.data.nuclear_data_sources import (
     load_gamma_identification_source,
     summarize_nuclear_data_source,
 )
+from fluxforge.data.nuclide_library import (
+    NuclideSearchHit,
+    build_nuclide_library,
+    ensure_bundled_nuclide_database,
+    reference_lines_for_nuclide,
+    search_nuclides,
+)
 
 __all__ = [
     # Efficiency curves (calibration-based)
@@ -224,4 +231,10 @@ __all__ = [
     "list_nuclear_data_sources",
     "load_gamma_identification_source",
     "summarize_nuclear_data_source",
+    # SQLite-backed nuclide search
+    "NuclideSearchHit",
+    "build_nuclide_library",
+    "ensure_bundled_nuclide_database",
+    "reference_lines_for_nuclide",
+    "search_nuclides",
 ]

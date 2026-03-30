@@ -5,9 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
+from fluxforge.io import read_ffs_session, read_spectrum_any
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import available_renderer_status
@@ -104,11 +106,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.settings = QSettings(self.ORGANIZATION, self.APPLICATION)
             self.mode_manager = mode_manager or ModeManager(settings=self.settings)
             self.selection_bus = selection_bus or SelectionBus.shared()
+            self.recent_files = RecentFilesManager(self.settings)
             self.setDockOptions(
                 QMainWindow.AllowNestedDocks
                 | QMainWindow.AllowTabbedDocks
                 | QMainWindow.AnimatedDocks
             )
+            self.setAcceptDrops(True)
 
             self._build_menu_bar()
             self._build_toolbar()
@@ -279,6 +283,51 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.cursor_label.setText(
                 "Cursor: " + (" | ".join(cursor_parts) if cursor_parts else "--")
             )
+
+        def open_path(self, path: str | Path) -> None:
+            """Open a spectrum or session file without a modal file dialog."""
+
+            source = Path(path)
+            if source.suffix.lower() == ".ffs":
+                session = read_ffs_session(source)
+                if session.spectra and hasattr(self.central_tabs, "load_spectrum"):
+                    self.central_tabs.load_spectrum(session.spectra[session.active_spectrum_index])
+                self.recent_files.record_many(session.recent_files or [source])
+            else:
+                spectrum = read_spectrum_any(source)
+                if hasattr(self.central_tabs, "load_spectrum"):
+                    self.central_tabs.load_spectrum(spectrum)
+                self.recent_files.record(source)
+            self.file_label.setText(f"File: {source.name}")
+
+        def dragEnterEvent(self, event) -> None:
+            mime_data = event.mimeData()
+            paths = []
+            if mime_data.hasUrls():
+                paths = [url.toLocalFile() for url in mime_data.urls()]
+            elif mime_data.hasText():
+                paths = mime_data.text().splitlines()
+            if normalize_dropped_paths(paths):
+                event.acceptProposedAction()
+                return
+            super().dragEnterEvent(event)
+
+        def dropEvent(self, event) -> None:
+            mime_data = event.mimeData()
+            paths = []
+            if mime_data.hasUrls():
+                paths = [url.toLocalFile() for url in mime_data.urls()]
+            elif mime_data.hasText():
+                paths = mime_data.text().splitlines()
+
+            normalized = normalize_dropped_paths(paths)
+            if not normalized:
+                super().dropEvent(event)
+                return
+
+            for path in normalized:
+                self.open_path(path)
+            event.acceptProposedAction()
 
         def closeEvent(self, event) -> None:
             self._save_layout()

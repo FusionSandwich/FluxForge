@@ -13,6 +13,7 @@ class SelectionState:
     peak_energy_keV: float | None = None
     roi_bounds_keV: tuple[float, float] | None = None
     nuclide: str | None = None
+    reference_lines_keV: tuple[float, ...] = ()
 
 
 SelectionListener = Callable[[SelectionState], None]
@@ -66,6 +67,7 @@ class SelectionBus:
                 peak_energy_keV=float(peak_energy_keV),
                 roi_bounds_keV=self._state.roi_bounds_keV,
                 nuclide=nuclide or self._state.nuclide,
+                reference_lines_keV=self._state.reference_lines_keV,
             )
         )
 
@@ -78,10 +80,16 @@ class SelectionBus:
                 peak_energy_keV=self._state.peak_energy_keV,
                 roi_bounds_keV=(lower, upper),
                 nuclide=self._state.nuclide,
+                reference_lines_keV=self._state.reference_lines_keV,
             )
         )
 
-    def publish_nuclide(self, nuclide: str) -> SelectionState:
+    def publish_nuclide(
+        self,
+        nuclide: str,
+        *,
+        reference_lines_keV: tuple[float, ...] = (),
+    ) -> SelectionState:
         """Publish a nuclide-centric selection update."""
 
         return self.publish(
@@ -89,6 +97,7 @@ class SelectionBus:
                 peak_energy_keV=self._state.peak_energy_keV,
                 roi_bounds_keV=self._state.roi_bounds_keV,
                 nuclide=nuclide,
+                reference_lines_keV=reference_lines_keV,
             )
         )
 
@@ -104,5 +113,6 @@ class SelectionBus:
             "peak_energy_keV": self._state.peak_energy_keV,
             "roi_bounds_keV": self._state.roi_bounds_keV,
             "nuclide": self._state.nuclide,
+            "reference_lines_keV": self._state.reference_lines_keV,
             "listener_count": len(self._listeners),
         }

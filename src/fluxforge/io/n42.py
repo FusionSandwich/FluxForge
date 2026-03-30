@@ -22,6 +22,7 @@ import base64
 import struct
 from dataclasses import dataclass, field
 from datetime import datetime
+from importlib import resources
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 from xml.etree import ElementTree as ET
@@ -34,6 +35,14 @@ N42_NAMESPACES = {
     "n42": "http://physics.nist.gov/N42/2011/N42",
     "n42_2006": "http://physics.nist.gov/Divisions/Div846/Gp4/ANSIN4242/2005/ANSIN4242",
 }
+
+try:  # pragma: no cover - optional dependency branch
+    from lxml import etree as LET
+
+    LXML_AVAILABLE = True
+except Exception:  # pragma: no cover - optional dependency branch
+    LET = None
+    LXML_AVAILABLE = False
 
 
 @dataclass
@@ -123,8 +132,11 @@ class N42Measurement:
             live_time=self.live_time,
             real_time=self.real_time,
             start_time=self.start_time,
-            energy_calibration=self.energy_calibration,
-            description=self.detector_description,
+            spectrum_id=self.spectrum_id,
+            calibration={"energy": list(self.energy_calibration)},
+            detector_id=self.detector_description,
+            gps=dict(self.metadata.get("gps", {})),
+            metadata=dict(self.metadata),
         )
 
 
@@ -368,7 +380,53 @@ def _parse_measurement(
             if nuc_name:
                 measurement.nuclides_identified.append(nuc_name)
 
+    location_description = _get_text(
+        meas_elem, "MeasurementLocationDescription", namespaces
+    )
+    if location_description:
+        measurement.metadata["measurement_location_description"] = (
+            location_description
+        )
+
+    geo_elem = _find_element(meas_elem, "GeographicPoint", namespaces)
+    if geo_elem is not None:
+        gps: dict[str, float] = {}
+        for xml_tag, key in (
+            ("LatitudeValue", "latitude"),
+            ("LongitudeValue", "longitude"),
+            ("ElevationValue", "elevation_m"),
+        ):
+            value = _get_text(geo_elem, xml_tag, namespaces)
+            if value:
+                try:
+                    gps[key] = float(value)
+                except ValueError:
+                    continue
+        if gps:
+            measurement.metadata["gps"] = gps
+
     return measurement
+
+
+def n42_2012_schema_path() -> Path:
+    """Return the bundled N42.42 schema path used for export validation."""
+
+    base = resources.files("fluxforge")
+    return Path(base.joinpath("resources", "schemas", "n42_2012.xsd"))
+
+
+def validate_n42_file(filepath: Union[str, Path]) -> tuple[bool, list[str]]:
+    """Validate an N42 file against the bundled FluxForge 2012 schema."""
+
+    if not LXML_AVAILABLE:
+        raise RuntimeError("lxml is required for N42 schema validation.")
+
+    schema_doc = LET.parse(str(n42_2012_schema_path()))
+    schema = LET.XMLSchema(schema_doc)
+    document = LET.parse(str(Path(filepath)))
+    is_valid = schema.validate(document)
+    errors = [str(entry) for entry in schema.error_log]
+    return is_valid, errors
 
 
 def parse_iso8601_duration(duration_str: str) -> Optional[float]:
@@ -616,8 +674,9 @@ def write_n42_file(
     filepath: Union[str, Path],
     measurements: Union[N42Measurement, List[N42Measurement]],
     instrument_info: Optional[Dict[str, str]] = None,
-    version: str = "2011",
-) -> None:
+    version: str = "2012",
+    validate: bool = True,
+) -> Path:
     """
     Write measurements to an N42.42 XML file.
 
@@ -630,7 +689,9 @@ def write_n42_file(
     instrument_info : Dict, optional
         Instrument information
     version : str
-        N42 version ('2006' or '2011')
+        N42 version ('2006', '2011', or '2012')
+    validate : bool
+        Validate 2012 output against the bundled XSD when lxml is available
     """
     filepath = Path(filepath)
 
@@ -638,7 +699,7 @@ def write_n42_file(
         measurements = [measurements]
 
     # Select namespace
-    if version == "2011":
+    if version in {"2011", "2012"}:
         ns = N42_NAMESPACES["n42"]
     else:
         ns = N42_NAMESPACES["n42_2006"]
@@ -647,19 +708,39 @@ def write_n42_file(
     ET.register_namespace("", ns)
 
     # Create root element
-    root = ET.Element(f"{{{ns}}}N42InstrumentData")
+    root = ET.Element(f"{{{ns}}}RadInstrumentData")
 
     # Add instrument information
     if instrument_info:
-        instr = ET.SubElement(root, f"{{{ns}}}InstrumentInformation")
+        instr = ET.SubElement(root, f"{{{ns}}}RadInstrumentInformation")
         for key, value in instrument_info.items():
             elem = ET.SubElement(instr, f"{{{ns}}}{key}")
             elem.text = value
+
+    detector_records: list[tuple[str, str]] = []
+    for meas in measurements:
+        record = (meas.detector_type, meas.detector_description)
+        if record not in detector_records and any(record):
+            detector_records.append(record)
+
+    for detector_type, detector_description in detector_records:
+        det_elem = ET.SubElement(root, f"{{{ns}}}RadDetectorInformation")
+        if detector_type:
+            det_type_elem = ET.SubElement(det_elem, f"{{{ns}}}DetectorType")
+            det_type_elem.text = detector_type
+        if detector_description:
+            desc_elem = ET.SubElement(det_elem, f"{{{ns}}}DetectorDescription")
+            desc_elem.text = detector_description
 
     # Add measurements
     for i, meas in enumerate(measurements):
         meas_elem = ET.SubElement(root, f"{{{ns}}}RadMeasurement")
         meas_elem.set("id", meas.spectrum_id or f"Measurement{i}")
+
+        class_elem = ET.SubElement(meas_elem, f"{{{ns}}}MeasurementClassCode")
+        class_elem.text = str(
+            meas.metadata.get("measurement_class_code", "Foreground")
+        )
 
         # Start time
         if meas.start_time:
@@ -671,11 +752,7 @@ def write_n42_file(
 
         # Live time
         lt_elem = ET.SubElement(spec_elem, f"{{{ns}}}LiveTimeDuration")
-        lt_elem.text = f"PT{meas.live_time}S"
-
-        # Real time
-        rt_elem = ET.SubElement(spec_elem, f"{{{ns}}}RealTimeDuration")
-        rt_elem.text = f"PT{meas.real_time}S"
+        lt_elem.text = f"PT{meas.live_time:.3f}S"
 
         # Channel data
         data_elem = ET.SubElement(spec_elem, f"{{{ns}}}ChannelData")
@@ -683,13 +760,35 @@ def write_n42_file(
 
         # Energy calibration
         if len(meas.energy_calibration) > 1:
-            cal_elem = ET.SubElement(meas_elem, f"{{{ns}}}EnergyCalibration")
+            cal_elem = ET.SubElement(spec_elem, f"{{{ns}}}EnergyCalibration")
             coef_elem = ET.SubElement(cal_elem, f"{{{ns}}}CoefficientValues")
             coef_elem.text = " ".join(str(c) for c in meas.energy_calibration)
+
+        # Real time
+        rt_elem = ET.SubElement(meas_elem, f"{{{ns}}}RealTimeDuration")
+        rt_elem.text = f"PT{meas.real_time:.3f}S"
+
+        gps = meas.metadata.get("gps", {})
+        if isinstance(gps, dict) and gps:
+            geo_elem = ET.SubElement(meas_elem, f"{{{ns}}}GeographicPoint")
+            for xml_tag, key in (
+                ("LatitudeValue", "latitude"),
+                ("LongitudeValue", "longitude"),
+                ("ElevationValue", "elevation_m"),
+            ):
+                if key in gps:
+                    point_elem = ET.SubElement(geo_elem, f"{{{ns}}}{xml_tag}")
+                    point_elem.text = str(gps[key])
 
     # Write file
     tree = ET.ElementTree(root)
     tree.write(filepath, encoding="utf-8", xml_declaration=True)
+    if validate and version == "2012":
+        valid, errors = validate_n42_file(filepath)
+        if not valid:
+            message = "\n".join(errors) if errors else "Unknown schema validation error."
+            raise ValueError(f"N42 schema validation failed for {filepath}:\n{message}")
+    return filepath
 
 
 # =============================================================================
@@ -699,7 +798,9 @@ def write_n42_file(
 __all__ = [
     "N42Measurement",
     "N42Document",
+    "LXML_AVAILABLE",
     "read_n42_file",
     "read_n42_spectrum",
+    "validate_n42_file",
     "write_n42_file",
 ]

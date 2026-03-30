@@ -47,12 +47,12 @@ active next step until Stage 0 is fully satisfied.
 | 1.6 | `complete` | `src/fluxforge/gui/spectrum_canvas.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` provide the abstraction and default backend |
 | 1.7 | `complete` | `src/fluxforge/gui/backends/vispy_backend.py` provides the required additive stub |
 | 1.8 | `complete` | `src/fluxforge/gui/spectrum_canvas.py` implements `HierarchicalSpectrumBuffer` |
-| 1.9 | `partial` | `src/fluxforge/hal/base.py` without session/device-registry integration |
-| 1.10 | `partial` | `src/fluxforge/io/spe.py` and `src/fluxforge/io/artifacts.py` provide a spectrum model and JSON artifacts, but the roadmap `.ffs` session format is not implemented yet |
-| 1.11 | `partial` | `src/fluxforge/io/hpge.py` provides an auto-detect reader path and multiple file readers exist, but SPC support plus GUI drag/drop and recent-files are still missing |
-| 1.12 | `partial` | `src/fluxforge/io/n42.py` writes N42 XML, but the 2012 XSD validation path is still missing |
-| 1.13 | `partial` | Bundled nuclide data exists in `src/fluxforge/data/`, but the Phase 1 SQLite schema with `decay_chains` and FTS5 search is not implemented |
-| 1.14 | `partial` | The Qt shell reserves a nuclide-search surface, but live search and instant overlay wiring are not complete |
+| 1.9 | `complete` | `src/fluxforge/hal/base.py` + `src/fluxforge/io/session.py` + `src/fluxforge/io/spe.py` now cover the device registry, mock-device snapshotting, and spectrum source metadata wiring |
+| 1.10 | `complete` | `src/fluxforge/io/spe.py` + `src/fluxforge/io/session.py` now provide the `.ffs` session container, round-trip persistence, and GPS/source fields |
+| 1.11 | `complete` | `src/fluxforge/io/reader_factory.py` + `src/fluxforge/io/spc.py` + `src/fluxforge/io/spectrum_csv.py` + `src/fluxforge/gui/file_workflow.py` + `src/fluxforge/gui/main_window.py` now cover factory dispatch, SPC/CSV support, recent files, and drag/drop opening |
+| 1.12 | `complete` | `src/fluxforge/io/n42.py` + `src/fluxforge/resources/schemas/n42_2012.xsd` now validate 2012 exports with lxml |
+| 1.13 | `complete` | `src/fluxforge/data/nuclide_library.py` now builds the SQLite schema with `decay_chains` and FTS5-backed search when available |
+| 1.14 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/nuclide_search.py` + `src/fluxforge/gui/selection_bus.py` now provide live nuclide search and instant overlay wiring |
 | 1.15 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` now reserves the QA & Standards sidebar section |
 | 1.16 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` reserves the Dashboard tab in Zone C |
 | 1.17 | `complete` | `src/fluxforge/gui/widgets/hardware_led.py` + `src/fluxforge/gui/main_window.py` add the status-bar hardware LED |
@@ -75,12 +75,13 @@ active next step until Stage 0 is fully satisfied.
 - New scaffolding modules compile under the workspace Python.
 - Direct Python verification passed for the tracker assets, ordered step tracker, plugin
   registries, GUI scaffolding, and mock HAL device.
-- `pytest` was upgraded in the user environment to `8.4.2` and the full suite now passes:
-  `997 passed, 8 skipped` in this workspace.
+- `pytest` was upgraded in the user environment to `8.4.2`.
+- The TensorFlow-specific tests were run explicitly in this round, and the only remaining skips are the CUDA library checks that are correct for this CPU-only workspace.
+- The full suite now passes in this workspace: `1011 passed, 2 skipped`.
 
 ## Review Result
 
 - Stage 0 is complete only in-repo. The live GitHub tracker application steps remain
-  remote-pending because this workspace has no `gh` CLI or authenticated GitHub API path.
-- Phase 1 is not fully complete yet. The remaining repo-side gaps are `1.9` through `1.14`
-  as documented above.
+  remote-pending until the sync workflow has been pushed and verified on GitHub.
+- Phase 1 is now repo-complete, but it remains sequence-blocked in the tracker until
+  Stage 0 is closed on the live GitHub project side.

@@ -89,12 +89,12 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   workflow, and `tests/spectra/`.
 - Ordered execution tracker: `.github/project-management/implementation_steps.json`.
 - Canonical status tracker: `docs/ROADMAP_EXECUTION_STATUS.md`.
-- Additive Phase 1 scaffolding exists in-repo, but the formal next step remains Stage 0
-  live tracker application on GitHub.
+- Additive Phase 1 implementation is now repo-complete, but the formal next step remains
+  Stage 0 live tracker application on GitHub.
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for
-  roadmap items `1.3` through `1.8`, plus the reserved Dashboard tab, hardware LED, and
-  dark/light/system theme system; the older Tk GUI remains in place as a legacy/archive
-  fallback while parity work continues.
+  roadmap items `1.3` through `1.18`, including the `.ffs` session path, reader
+  factory, validated N42 export, SQLite nuclide database, and instant overlay search;
+  the older Tk GUI remains in place as a legacy/archive fallback while parity work continues.
 - Legacy GUI planning references are now archived as `docs/GUI_PLAN_old.md` and
   `docs/GUI_CAPABILITY_PROGRAM_old.md` so the active GUI plan set remains this document,
   `docs/FluxForge_Final_Additions.md`, and `docs/FluxForge_Improvement_Guide.docx`.

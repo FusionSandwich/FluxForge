@@ -67,6 +67,10 @@ class GammaSpectrum:
     spectrum_id: str = ""
     detector_id: str = ""
     calibration: Dict[str, Any] = field(default_factory=dict)
+    source_type: str = "file"
+    device_id: str = ""
+    device_label: str = ""
+    gps: Dict[str, Any] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -205,6 +209,13 @@ class GammaSpectrum:
             return self.counts.sum() / self.live_time
         return 0.0
 
+    @property
+    def energy_calibration(self) -> tuple[float, ...]:
+        """Compatibility alias for callers that expect an energy tuple."""
+
+        values = self.calibration.get("energy", ())
+        return tuple(float(value) for value in values)
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
@@ -222,6 +233,10 @@ class GammaSpectrum:
             "spectrum_id": self.spectrum_id,
             "detector_id": self.detector_id,
             "calibration": self.calibration,
+            "source_type": self.source_type,
+            "device_id": self.device_id,
+            "device_label": self.device_label,
+            "gps": self.gps,
             "metadata": self.metadata,
         }
 
@@ -247,6 +262,10 @@ class GammaSpectrum:
             spectrum_id=data.get("spectrum_id", ""),
             detector_id=data.get("detector_id", ""),
             calibration=data.get("calibration", {}),
+            source_type=data.get("source_type", "file"),
+            device_id=data.get("device_id", ""),
+            device_label=data.get("device_label", ""),
+            gps=data.get("gps", {}),
             metadata=data.get("metadata", {}),
         )
 

@@ -216,12 +216,14 @@
       "title": "Implement MCADevice base class and mock device",
       "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 1",
       "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 1-11",
-      "repo_status": "partial",
+      "repo_status": "complete",
       "sequence_status": "blocked",
       "evidence": [
-        "src/fluxforge/hal/base.py"
+        "src/fluxforge/hal/base.py",
+        "src/fluxforge/io/session.py",
+        "src/fluxforge/io/spe.py"
       ],
-      "notes": "HAL base and mock device exist, but the session-model and device-registry integration are still pending."
+      "notes": "The HAL layer now includes a device registry, mock-device snapshot support, and spectrum/session metadata wiring for `source_type`, `device_id`, and `device_label`."
     },
     {
       "id": "1.10",
@@ -229,13 +231,13 @@
       "title": "Implement Spectrum dataclass + .ffs session file read/write",
       "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 1",
       "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 1-7",
-      "repo_status": "partial",
+      "repo_status": "complete",
       "sequence_status": "blocked",
       "evidence": [
         "src/fluxforge/io/spe.py",
-        "src/fluxforge/io/artifacts.py"
+        "src/fluxforge/io/session.py"
       ],
-      "notes": "GammaSpectrum and JSON artifact serialization exist, but the dedicated `.ffs` session container and round-trip support are not yet implemented."
+      "notes": "GammaSpectrum now carries the required source/GPS metadata and `.ffs` sessions round-trip through the new `FluxForgeSession` model."
     },
     {
       "id": "1.11",
@@ -243,16 +245,20 @@
       "title": "Implement reader factory + N42 / CHN / SPC / CNF / SPE / CSV readers",
       "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 1",
       "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 1-8",
-      "repo_status": "partial",
+      "repo_status": "complete",
       "sequence_status": "blocked",
       "evidence": [
         "src/fluxforge/io/hpge.py",
         "src/fluxforge/io/n42.py",
         "src/fluxforge/io/cnf.py",
         "src/fluxforge/io/spe.py",
-        "src/fluxforge/io/csv_readers.py"
+        "src/fluxforge/io/spc.py",
+        "src/fluxforge/io/spectrum_csv.py",
+        "src/fluxforge/io/reader_factory.py",
+        "src/fluxforge/gui/file_workflow.py",
+        "src/fluxforge/gui/main_window.py"
       ],
-      "notes": "Most reader primitives and an HPGe auto-detect path exist, but SPC support and the GUI-level drag/drop and recent-files workflow are still missing."
+      "notes": "The Phase 1 factory now dispatches N42, CHN, SPC, CNF, SPE, and CSV spectra, and the modern shell has recent-file plus drag/drop open-path handling."
     },
     {
       "id": "1.12",
@@ -260,12 +266,13 @@
       "title": "Implement N42.42 (2012) export writer with XSD schema validation",
       "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 1",
       "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 1-9",
-      "repo_status": "partial",
+      "repo_status": "complete",
       "sequence_status": "blocked",
       "evidence": [
-        "src/fluxforge/io/n42.py"
+        "src/fluxforge/io/n42.py",
+        "src/fluxforge/resources/schemas/n42_2012.xsd"
       ],
-      "notes": "An N42 writer exists, but the roadmap-required 2012 schema bundle and XSD validation path are not yet present."
+      "notes": "The writer now emits the RadInstrumentData-based 2012 path and validates exports with lxml against the bundled schema."
     },
     {
       "id": "1.13",
@@ -273,13 +280,14 @@
       "title": "Build nuclide DB SQLite schema including decay_chains table",
       "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 1",
       "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 1-10",
-      "repo_status": "partial",
+      "repo_status": "complete",
       "sequence_status": "blocked",
       "evidence": [
+        "src/fluxforge/data/nuclide_library.py",
         "src/fluxforge/data/gamma_database.py",
         "src/fluxforge/data/gamma_lines.json"
       ],
-      "notes": "Bundled nuclide/line data exists, but the Phase 1 SQLite schema with `decay_chains` and FTS5 search has not been implemented."
+      "notes": "The new SQLite builder creates `nuclides`, `gamma_lines`, and `decay_chains` tables plus an FTS5-backed `nuclide_search` index when the local SQLite build supports it."
     },
     {
       "id": "1.14",
@@ -287,13 +295,15 @@
       "title": "Implement Nuclide Search panel with instant reference line overlay",
       "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 1",
       "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 1-10",
-      "repo_status": "partial",
+      "repo_status": "complete",
       "sequence_status": "blocked",
       "evidence": [
         "src/fluxforge/gui/panels/modern_shell.py",
-        "src/fluxforge/data/gamma_database.py"
+        "src/fluxforge/gui/nuclide_search.py",
+        "src/fluxforge/gui/selection_bus.py",
+        "src/fluxforge/data/nuclide_library.py"
       ],
-      "notes": "The shell reserves the panel surface and bundled nuclide data exists, but the live search widget and overlay wiring are still incomplete."
+      "notes": "The sidebar now has search-as-you-type nuclide lookup backed by the SQLite library, and the selection bus carries reference-line overlays straight to the canvas."
     },
     {
       "id": "1.15",

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://physics.nist.gov/N42/2011/N42"
+  xmlns="http://physics.nist.gov/N42/2011/N42"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+  <xs:element name="RadInstrumentData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="RadInstrumentInformation" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="RadDetectorInformation" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DetectorType" type="xs:string" minOccurs="0"/>
+              <xs:element name="DetectorDescription" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="RadMeasurement" minOccurs="1" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="MeasurementClassCode" type="xs:string" minOccurs="0"/>
+              <xs:element name="StartDateTime" type="xs:dateTime" minOccurs="0"/>
+              <xs:element name="Spectrum">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LiveTimeDuration" type="xs:string"/>
+                    <xs:element name="ChannelData" type="xs:string"/>
+                    <xs:element name="EnergyCalibration" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="CoefficientValues" type="xs:string"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="RealTimeDuration" type="xs:string" minOccurs="0"/>
+              <xs:element name="GeographicPoint" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LatitudeValue" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="LongitudeValue" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="ElevationValue" type="xs:decimal" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -46,11 +46,11 @@ def test_gui_phase1_repo_progress_is_recorded_without_advancing_sequence():
         assert steps[step_id]["sequence_status"] == "blocked"
 
 
-def test_remaining_phase1_foundation_gaps_are_explicitly_tracked():
+def test_phase1_foundation_repo_completion_is_explicitly_tracked():
     steps = {step["id"]: step for step in load_steps()["steps"]}
 
     for step_id in ("1.9", "1.10", "1.11", "1.12", "1.13", "1.14"):
-        assert steps[step_id]["repo_status"] == "partial"
+        assert steps[step_id]["repo_status"] == "complete"
         assert steps[step_id]["sequence_status"] == "blocked"
 
     assert steps["1.15"]["repo_status"] == "complete"

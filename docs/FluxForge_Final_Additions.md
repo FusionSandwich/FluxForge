@@ -121,9 +121,10 @@ be completed before any Phase 1 code is committed on the branch.
 - Ordered execution tracker: `.github/project-management/implementation_steps.json`.
 - Canonical status tracker: `docs/ROADMAP_EXECUTION_STATUS.md`.
 - The current formal sequence gate is still Stage 0 remote tracker application; additive
-  Phase 1 scaffolding exists in-repo but is tracked as blocked until Stage 0 closes.
-- GUI redesign status in-repo: Phase 1 items `1.3` through `1.8`, `1.16`, `1.17`, and
-  `1.18` now exist in the repository under `src/fluxforge/gui/`, while
+  Phase 1 implementation is repo-complete but is still tracked as blocked until Stage 0 closes.
+- GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
+  repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader
+  factory, validated N42 export, SQLite nuclide search, and overlay wiring, while
   `src/fluxforge_gui/` is retained as the legacy/archive fallback rather than removed.
 - Legacy GUI planning references are now explicitly archived in `docs/GUI_PLAN_old.md`
   and `docs/GUI_CAPABILITY_PROGRAM_old.md` so the controlling GUI plan set stays limited
