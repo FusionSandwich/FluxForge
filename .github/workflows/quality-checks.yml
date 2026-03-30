@@ -111,6 +111,53 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
+  modern-native-gui:
+    name: Modern GUI Smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      MPLBACKEND: Agg
+      PYTHONPATH: src
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Linux native GUI runtime deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libopengl0
+
+      - name: Install modern GUI deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,native-gui]'
+
+      - name: Modern Qt GUI regression tests
+        run: |
+          pytest -q \
+            tests/test_modern_gui_shell.py \
+            tests/test_project_tracker_assets.py \
+            tests/test_analysis_workspace_qt.py \
+            tests/test_calibration_workspace_qt.py \
+            tests/test_unfolding_workspace_qt.py \
+            tests/test_module3_workflows_qt.py \
+            tests/test_predictive_dashboard_qt.py
+
   native-desktop-gui-linux:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
