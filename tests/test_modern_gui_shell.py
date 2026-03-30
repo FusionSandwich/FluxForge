@@ -96,6 +96,8 @@ def test_current_gui_regression_files_target_modern_qt_stack():
         ROOT / "tests" / "test_modern_gui_shell.py",
         ROOT / "tests" / "test_phase2_calibration_workspace.py",
         ROOT / "tests" / "gui_phase2_calibration_probe.py",
+        ROOT / "tests" / "gui_phase2_completion_probe.py",
+        ROOT / "tests" / "test_phase2_remaining_features.py",
     )
 
     for path in modern_gui_files:

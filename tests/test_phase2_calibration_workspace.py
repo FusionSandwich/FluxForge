@@ -116,6 +116,7 @@ def test_peak_fitter_registry_contains_phase2_gaussian_and_skew_entries():
 
     assert "gaussian" in entries
     assert "gaussian_skew" in entries
+    assert "bayesian_gaussian" in entries
     assert entries["gaussian"].metadata.recommended is True
     assert entries["gaussian"].metadata.standards_locked is True
     assert available_background_models("gaussian_skew") == ("linear", "constant")
@@ -133,7 +134,7 @@ def test_method_selector_widget_tracks_modern_peak_fitter_registry():
     widget.show()
     _qapp().processEvents()
 
-    assert widget.combo.count() == 2
+    assert widget.combo.count() == 3
     assert widget.current_key() == "gaussian"
     assert widget.badge_label.text() == "Recommended"
 
@@ -367,7 +368,7 @@ def test_calibration_dialog_exposes_phase2_tools_and_roi_fitting():
     _qapp().processEvents()
     assert dialog._roi_fit is not None
     assert dialog._roi_fit.centroid_channel == pytest.approx(1173.0, abs=12.0)
-    assert dialog.roi_method_selector.combo.count() >= 2
+    assert dialog.roi_method_selector.combo.count() >= 3
     dialog.roi_method_selector.set_current_key("gaussian_skew")
     _qapp().processEvents()
     assert dialog.roi_background_combo.count() >= 2

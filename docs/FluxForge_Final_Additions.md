@@ -128,13 +128,23 @@ be completed before any Phase 1 code is committed on the branch.
 - Phase 2.2 through 2.6 are now implemented in the redesigned Qt path as well,
   including quick-slider anchors, deviation-pair fine tuning, draggable ROI peak
   fitting, the registered skew fitter, and the registry-driven method selector.
+- Phase 2.7 through 2.20 are now implemented in the redesigned Qt path too,
+  including undoable peak-table operations, auto peak review, Bayesian library
+  matching, efficiency fitting, activity calculation, source-age correction,
+  background subtraction, mini residual strips, survey-map rendering,
+  multi-spectrum tabs, pinned nuclides, cascade-sum overlays, and the Bayesian
+  Gaussian fitter.
 - Additional audit evidence now exists for the redesigned Qt GUI: mouse-driven peak
   picking, governed data-library selectors, library-assisted calibration-line assignment,
   both Manual and Standards calibration workflows, quick-slider mode, deviation-pair
   tuning, and ROI fitter interaction were exercised in the modern shell.
-- Phase 2 as a whole is not complete yet; roadmap items `2.1` through `2.6` are now
-  complete and the next required implementation step is `2.7`.
-- The current roadmap next step is Phase 2.7, undo/redo support for peak operations.
+- Additional audit evidence now exists for the completed Phase 2 shell as well:
+  auto peak review, undo/redo, Bayesian matching, efficiency fitting, activity
+  calculation, background subtraction, pinned nuclides, survey-map rendering,
+  multi-spectrum switching, and Playwright-reviewed completion screenshots.
+- Phase 2 as a whole is now complete; roadmap items `2.1` through `2.20` are
+  complete and the next required implementation step is `3.1`.
+- The current roadmap next step is Phase 3.1, GRAVEL.
 - GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
   repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide search, and overlay wiring, while

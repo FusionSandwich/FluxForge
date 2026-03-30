@@ -54,7 +54,7 @@ class InteractivePeakFitResult:
 def register_builtin_peak_fitters(
     registries: PluginRegistries,
 ) -> PluginRegistries:
-    """Register the built-in Phase 2 Gaussian and skew fitters."""
+    """Register the built-in Phase 2 Gaussian, skew, and Bayesian fitters."""
 
     registries.peak_fitters.clear()
     registries.peak_fitters.register(
@@ -84,6 +84,18 @@ def register_builtin_peak_fitters(
         description="Optional skewed Gaussian ROI fitter with asymmetric tail terms for tailed or charge-collection-distorted peaks.",
         tags=("phase2", "skew", "roi"),
     )
+    registries.peak_fitters.register(
+        "bayesian_gaussian",
+        PeakFitterDefinition(
+            key="bayesian_gaussian",
+            label="Bayesian Gaussian",
+            model_key="bayesian_gaussian",
+            background_models=("linear", "constant", "step"),
+            summary="Gaussian fit regularized by the local FWHM prior from the active calibration.",
+        ),
+        description="Bayesian Gaussian ROI fitter using the current FWHM calibration as a sigma prior.",
+        tags=("phase2", "bayesian", "roi"),
+    )
     return registries
 
 
@@ -103,6 +115,7 @@ def fit_roi_peak(
     *,
     fitter_key: str = "gaussian",
     background_model: str = "linear",
+    prior_fwhm_channels: float | None = None,
     registries: PluginRegistries | None = None,
 ) -> InteractivePeakFitResult:
     """Fit the peak inside an ROI using a registered fitter."""
@@ -132,7 +145,7 @@ def fit_roi_peak(
     initial_centroid = float(x_roi[int(np.argmax(y_roi))])
     initial_sigma = max((upper - lower) / 6.0, 1.0)
 
-    if definition.model_key == "gaussian":
+    if definition.model_key in {"gaussian", "bayesian_gaussian"}:
         result = fit_single_peak(
             x,
             y,
@@ -140,6 +153,13 @@ def fit_roi_peak(
             fit_width=max(int(round((upper - lower) / 2.0)), 3),
             background_model=fit_background,
         )
+        if definition.model_key == "bayesian_gaussian":
+            result = _apply_bayesian_fwhm_prior(
+                x,
+                y,
+                result,
+                prior_fwhm_channels=prior_fwhm_channels,
+            )
     else:
         result = fit_peak_poisson(
             x,
@@ -221,6 +241,58 @@ def _fit_counts_from_result(
     if observed.shape != result.residuals.shape:
         observed = np.resize(observed, result.residuals.shape)
     return observed - np.asarray(result.residuals, dtype=float)
+
+
+def _apply_bayesian_fwhm_prior(
+    channels: np.ndarray,
+    counts: np.ndarray,
+    result: PeakFitResult,
+    *,
+    prior_fwhm_channels: float | None,
+) -> PeakFitResult:
+    """Regularize the fitted Gaussian width with an FWHM prior."""
+
+    from fluxforge.analysis.peakfit import GaussianPeak, gaussian
+
+    prior_sigma = None
+    if prior_fwhm_channels is not None and prior_fwhm_channels > 0.0:
+        prior_sigma = float(prior_fwhm_channels) / 2.355
+    if prior_sigma is None:
+        prior_sigma = float(result.peak.sigma)
+    posterior_sigma = max((2.0 * float(result.peak.sigma) + prior_sigma) / 3.0, 1e-6)
+    sigma_scale = posterior_sigma / max(float(result.peak.sigma), 1e-6)
+
+    fit_channels = _fit_channels_from_result(channels, result)
+    background = np.asarray(result.background, dtype=float)
+    if background.shape != fit_channels.shape:
+        background = np.resize(background, fit_channels.shape)
+    observed = _observed_counts_from_channels(channels, np.asarray(counts, dtype=float), fit_channels)
+    centroid = float(result.peak.centroid)
+    amplitude = float(result.peak.amplitude)
+    fit_counts = gaussian(fit_channels, amplitude, centroid, posterior_sigma) + background
+    residuals = observed - fit_counts
+
+    peak = GaussianPeak(
+        centroid=centroid,
+        amplitude=amplitude,
+        sigma=posterior_sigma,
+        centroid_unc=float(result.peak.centroid_unc),
+        amplitude_unc=float(result.peak.amplitude_unc),
+        sigma_unc=float(result.peak.sigma_unc) * sigma_scale,
+    )
+    chi_squared = float(np.sum(np.square(residuals) / np.clip(fit_counts, 1.0, None)))
+    return PeakFitResult(
+        peak=peak,
+        background=background,
+        background_model=result.background_model,
+        residuals=np.asarray(residuals, dtype=float),
+        chi_squared=chi_squared,
+        dof=max(int(len(fit_channels) - 4), 1),
+        fit_region=result.fit_region,
+        covariance=result.covariance,
+        success=result.success,
+        message="Bayesian Gaussian with FWHM prior",
+    )
 
 
 __all__ = [

@@ -486,13 +486,230 @@
       "title": "Implement undo/redo via QUndoStack for all peak operations",
       "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
       "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-7",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/main_window.py",
+        "src/fluxforge/gui/phase2_workspace.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "The modern Qt shell now routes peak-table mutations through a shared QUndoStack-backed workspace-state command path."
+    },
+    {
+      "id": "2.8",
+      "phase": "Phase 2",
+      "title": "Implement Peak Table with CMV synchronization via SelectionBus",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-8",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/selection_bus.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "The bottom peak table is now live in the Qt shell with status dots, candidate columns, selection synchronization, pinning, and tagging."
+    },
+    {
+      "id": "2.9",
+      "phase": "Phase 2",
+      "title": "Implement auto peak search (Ctrl+A) with review dialog",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-9",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/gui/dialogs/auto_peak_review_dialog.py",
+        "src/fluxforge/gui/main_window.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "Ctrl+A now opens an auto-peak review flow in the modern Qt stack before committing detected peaks to the shared table."
+    },
+    {
+      "id": "2.10",
+      "phase": "Phase 2",
+      "title": "Implement Bayesian library matching and register it in the id registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-10",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/plugins/registry.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "A Bayesian line-matching engine is now registered and wired into the peak workflow for multi-line nuclide ranking."
+    },
+    {
+      "id": "2.11",
+      "phase": "Phase 2",
+      "title": "Implement efficiency calibration dialog with registered models",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-11",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/gui/dialogs/efficiency_dialog.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "The redesigned Qt stack now ships a dedicated efficiency dialog with four registered model families and activity-panel integration."
+    },
+    {
+      "id": "2.12",
+      "phase": "Phase 2",
+      "title": "Implement activity calculation with uncertainty propagation",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-12",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "The Activity Results panel now computes activities from selected peaks using the active efficiency fit and propagated counting uncertainty."
+    },
+    {
+      "id": "2.13",
+      "phase": "Phase 2",
+      "title": "Implement source age correction and Bateman equation support",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-13",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/physics/decay_chain.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "The activity workflow now exposes source-age correction and Bateman-based decay-chain summaries in the modern Qt path."
+    },
+    {
+      "id": "2.14",
+      "phase": "Phase 2",
+      "title": "Implement background subtraction (simple / scaled / statistical)",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-14",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "Foreground/background subtraction is now configurable from the Activity panel and reflected in the central spectrum canvas."
+    },
+    {
+      "id": "2.15",
+      "phase": "Phase 2",
+      "title": "Implement mini residual sub-plots on the canvas",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-15",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/backends/pyqtgraph_backend.py",
+        "src/fluxforge/core/phase2_analysis.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "The PyQtGraph canvas now shows a residual strip for the active peaks in Expert and Standards modes."
+    },
+    {
+      "id": "2.16",
+      "phase": "Phase 2",
+      "title": "Implement GPS extraction and Survey Map panel",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-16",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/io/n42.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "GPS metadata extraction is now surfaced through the dedicated Survey Map panel in the modern bottom workspace."
+    },
+    {
+      "id": "2.17",
+      "phase": "Phase 2",
+      "title": "Add multi-spectrum tabs above the canvas",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-17",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/main_window.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "Foreground, Background, and Secondary Overlay tabs now sit above the central canvas in the redesigned Qt shell."
+    },
+    {
+      "id": "2.18",
+      "phase": "Phase 2",
+      "title": "Implement pinned nuclides and nuclide tagging",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-18",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/phase2_workspace.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "Pinned nuclides now persist in the shared workspace state and peaks can be tagged directly from the live Qt table."
+    },
+    {
+      "id": "2.19",
+      "phase": "Phase 2",
+      "title": "Implement cascade sum line display",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-19",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/gui/backends/pyqtgraph_backend.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_remaining_features.py"
+      ],
+      "notes": "Pinned nuclides now drive dotted cascade-sum overlays on the modern PyQtGraph canvas."
+    },
+    {
+      "id": "2.20",
+      "phase": "Phase 2",
+      "title": "Implement Bayesian peak fitting and register it in fitter_registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-20",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/peak_fitting.py",
+        "src/fluxforge/gui/dialogs/calibration_dialog.py",
+        "tests/test_phase2_calibration_workspace.py"
+      ],
+      "notes": "The ROI fitter registry now includes a Bayesian Gaussian option regularized by the active FWHM calibration."
+    },
+    {
+      "id": "3.1",
+      "phase": "Phase 3",
+      "title": "Implement GRAVEL in unfolding/gravel.py and register it",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-1",
       "repo_status": "not-started",
       "sequence_status": "next",
       "evidence": [
         "docs/FluxForge_Final_Additions.md",
         "docs/FluxForge_Additions_v3_Final.md"
       ],
-      "notes": "Phase 2.2 through 2.6 are complete, so the formal next step is undo/redo support for peak operations."
+      "notes": "Phase 2 is now complete, so the formal next implementation step is Phase 3.1: GRAVEL."
     }
   ]
 }

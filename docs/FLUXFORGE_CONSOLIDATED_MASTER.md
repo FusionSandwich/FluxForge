@@ -7,11 +7,12 @@
 **Last Updated:** 2026-03-16  
 **Scope:** End-to-end, reproducible pipeline from raw HPGe spectra to (a) unfolded/group spectra with covariance and (b) rigorous model-to-experiment comparisons for TRIGA irradiations (flux wires/foils + larger samples).
 
-**Roadmap Execution Note:** Stage 0 governance assets are now live on GitHub and the
-next-generation GUI Phase 1 is complete under `src/fluxforge/gui/`, `src/fluxforge/io/`,
-`src/fluxforge/hal/`, and `src/fluxforge/data/`. The roadmap status tracker remains
+**Roadmap Execution Note:** Stage 0 governance assets are live on GitHub, Phase 1 is
+complete under `src/fluxforge/gui/`, `src/fluxforge/io/`, `src/fluxforge/hal/`, and
+`src/fluxforge/data/`, and Phase 2 is now complete in the redesigned Qt shell under
+`src/fluxforge/gui/` and `src/fluxforge/core/`. The roadmap status tracker remains
 `docs/ROADMAP_EXECUTION_STATUS.md`, and the Tk shell under `src/fluxforge_gui/` is
-retained as a legacy/archive fallback during migration.
+retained as a legacy/archive fallback during migration while Phase 3 begins.
 
 ---
 

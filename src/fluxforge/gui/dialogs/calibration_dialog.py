@@ -1335,6 +1335,15 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 return
             roi_bounds = tuple(float(value) for value in self.roi_region.getRegion())
             try:
+                prior_fwhm_channels = None
+                if self._fwhm_fit is not None:
+                    centroid_estimate = float(np.mean(roi_bounds))
+                    centroid_energy = float(self._spectrum.channel_to_energy(centroid_estimate))
+                    fwhm_keV = float(
+                        np.asarray(self._fwhm_fit.curve.fwhm(np.asarray([centroid_energy], dtype=float)))[0]
+                    )
+                    scale_keV = max(self._energy_scale_at_channel(centroid_estimate), 1e-6)
+                    prior_fwhm_channels = fwhm_keV / scale_keV
                 fit = fit_roi_peak(
                     channels,
                     counts,
@@ -1343,6 +1352,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     background_model=str(
                         self.roi_background_combo.currentData() or "linear"
                     ),
+                    prior_fwhm_channels=prior_fwhm_channels,
                 )
             except Exception as exc:
                 self._clear_roi_fit_visuals(str(exc))

@@ -1,5 +1,11 @@
 """Dialog exports for the next-generation GUI."""
 
+from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog
 from fluxforge.gui.dialogs.calibration_dialog import CalibrationWorkspaceDialog
+from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 
-__all__ = ["CalibrationWorkspaceDialog"]
+__all__ = [
+    "AutoPeakReviewDialog",
+    "CalibrationWorkspaceDialog",
+    "EfficiencyCalibrationDialog",
+]

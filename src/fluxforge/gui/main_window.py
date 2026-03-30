@@ -8,6 +8,12 @@ from pathlib import Path
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
 from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
+from fluxforge.gui.phase2_workspace import (
+    LoadedSpectrumRecord,
+    Phase2WorkspaceController,
+    Phase2WorkspaceState,
+    SpectrumSlot,
+)
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.io import read_ffs_session, read_spectrum_any
@@ -21,6 +27,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         SidebarPanel,
         ToolContextPanel,
     )
+    from fluxforge.gui.panels.modern_shell import (
+        build_demo_background_spectrum,
+        build_demo_overlay_spectrum,
+        build_demo_spectrum,
+    )
     from fluxforge.gui.qt_compat import (
         QAction,
         QApplication,
@@ -33,6 +44,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QSettings,
         QStatusBar,
         QToolBar,
+        QUndoStack,
         Qt,
     )
     from fluxforge.gui.theme_manager import load_stylesheet, resolve_theme
@@ -110,6 +122,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_bus = selection_bus or SelectionBus.shared()
             self.library_manager = DataLibraryManager(settings=self.settings)
             self.recent_files = RecentFilesManager(self.settings)
+            self.undo_stack = QUndoStack(self)
+            self.phase2_workspace = Phase2WorkspaceController(
+                self._build_initial_workspace_state()
+            )
             self._calibration_dialog = None
             self.setDockOptions(
                 QMainWindow.AllowNestedDocks
@@ -124,10 +140,61 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._build_docks()
             self._build_status_bar()
             self._restore_layout()
+            self._refresh_phase2_workspace_derivatives()
 
             self.mode_manager.subscribe(self._on_mode_state_changed)
             self.selection_bus.subscribe(self._on_selection_changed)
             self._on_mode_state_changed(self.mode_manager.state)
+
+        def _build_initial_workspace_state(self) -> Phase2WorkspaceState:
+            foreground = build_demo_spectrum()
+            background = build_demo_background_spectrum()
+            overlay = build_demo_overlay_spectrum()
+            loaded_spectra = (
+                LoadedSpectrumRecord(
+                    key="demo-foreground",
+                    label="Demo Foreground",
+                    spectrum=foreground,
+                ),
+                LoadedSpectrumRecord(
+                    key="demo-background",
+                    label="Demo Background",
+                    spectrum=background,
+                ),
+                LoadedSpectrumRecord(
+                    key="demo-overlay",
+                    label="Demo Overlay",
+                    spectrum=overlay,
+                ),
+            )
+            spectra = (
+                SpectrumSlot(
+                    key="foreground",
+                    label="Foreground",
+                    spectrum=foreground,
+                    source_key="demo-foreground",
+                    source_label="Demo Foreground",
+                ),
+                SpectrumSlot(
+                    key="background",
+                    label="Background",
+                    spectrum=background,
+                    source_key="demo-background",
+                    source_label="Demo Background",
+                ),
+                SpectrumSlot(
+                    key="overlay",
+                    label="Secondary Overlay",
+                    spectrum=overlay,
+                    source_key="demo-overlay",
+                    source_label="Demo Overlay",
+                ),
+            )
+            return Phase2WorkspaceState(
+                spectra=spectra,
+                loaded_spectra=loaded_spectra,
+                active_spectrum_key="foreground",
+            )
 
         def _build_menu_bar(self) -> None:
             file_menu = self.menuBar().addMenu("&File")
@@ -138,8 +205,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             file_menu.addAction(self._action("Export ANSI N42.42...", "Ctrl+Shift+E"))
 
             edit_menu = self.menuBar().addMenu("&Edit")
-            edit_menu.addAction(self._action("Undo", "Ctrl+Z"))
-            edit_menu.addAction(self._action("Redo", "Ctrl+Shift+Z"))
+            undo_action = self.undo_stack.createUndoAction(self, "Undo")
+            undo_action.setShortcut(QKeySequence("Ctrl+Z"))
+            edit_menu.addAction(undo_action)
+            redo_action = self.undo_stack.createRedoAction(self, "Redo")
+            redo_action.setShortcut(QKeySequence("Ctrl+Shift+Z"))
+            edit_menu.addAction(redo_action)
 
             view_menu = self.menuBar().addMenu("&View")
             view_menu.addAction(self._action("Toggle Full Canvas", "F11"))
@@ -152,7 +223,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 renderer_menu.addAction(self._action(label))
 
             analysis_menu = self.menuBar().addMenu("&Analysis")
-            analysis_menu.addAction(self._action("Auto Find Peaks", "Ctrl+A"))
+            analysis_menu.addAction(
+                self._action(
+                    "Auto Find Peaks",
+                    "Ctrl+A",
+                    enabled=True,
+                    handler=self._run_auto_peak_search,
+                )
+            )
             analysis_menu.addAction(self._action("Nuclide Search"))
 
             calibration_menu = self.menuBar().addMenu("&Calibration")
@@ -204,6 +282,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.central_tabs = CentralWorkspaceTabs(
                 mode_manager=self.mode_manager,
                 selection_bus=self.selection_bus,
+                workspace_controller=self.phase2_workspace,
                 parent=self,
             )
             self.setCentralWidget(self.central_tabs)
@@ -225,6 +304,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Workspace",
                 SidebarPanel(
                     selection_bus=self.selection_bus,
+                    workspace_controller=self.phase2_workspace,
                     library_manager=self.library_manager,
                     parent=self,
                 ),
@@ -235,6 +315,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 BottomWorkspaceTabs(
                     mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
+                    workspace_controller=self.phase2_workspace,
+                    library_manager=self.library_manager,
+                    undo_stack=self.undo_stack,
                     open_calibration_workspace=self._open_energy_fwhm_workspace,
                     open_quick_slider_calibration_workspace=self._open_quick_slider_calibration_mode,
                     open_manual_calibration_workspace=self._open_manual_calibration_workflow,
@@ -248,6 +331,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 ToolContextPanel(
                     mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
+                    workspace_controller=self.phase2_workspace,
                     parent=self,
                 ),
                 Qt.RightDockWidgetArea,
@@ -338,6 +422,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _on_library_state_changed(self, _state) -> None:
             label = self.library_manager.record_for_category("gamma_identification").label
             self.library_label.setText(f"Library: {label}")
+            self._refresh_phase2_workspace_derivatives()
 
         def open_path(self, path: str | Path) -> None:
             """Open a spectrum or session file without a modal file dialog."""
@@ -345,15 +430,54 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             source = Path(path)
             if source.suffix.lower() == ".ffs":
                 session = read_ffs_session(source)
-                if session.spectra and hasattr(self.central_tabs, "load_spectrum"):
-                    self.central_tabs.load_spectrum(session.spectra[session.active_spectrum_index])
+                loaded_keys: list[str] = []
+                for index, spectrum in enumerate(session.spectra):
+                    session_source = (
+                        session.source_files[index]
+                        if index < len(session.source_files)
+                        else None
+                    )
+                    label = (
+                        Path(session_source).name
+                        if session_source
+                        else (spectrum.spectrum_id or f"{source.stem} spectrum {index + 1}")
+                    )
+                    loaded_keys.append(
+                        self.phase2_workspace.register_loaded_spectrum(
+                            spectrum,
+                            label=label,
+                            source_path=session_source,
+                        )
+                    )
+                if loaded_keys:
+                    active_index = min(
+                        max(session.active_spectrum_index, 0),
+                        len(loaded_keys) - 1,
+                    )
+                    active_key = loaded_keys[active_index]
+                    slot_key = self.phase2_workspace.state.active_spectrum_key
+                    self.phase2_workspace.assign_loaded_spectrum_to_slot(
+                        active_key,
+                        slot_key,
+                    )
                 self.recent_files.record_many(session.recent_files or [source])
             else:
                 spectrum = read_spectrum_any(source)
+                loaded_key = self.phase2_workspace.register_loaded_spectrum(
+                    spectrum,
+                    label=source.name,
+                    source_path=str(source),
+                )
                 if hasattr(self.central_tabs, "load_spectrum"):
-                    self.central_tabs.load_spectrum(spectrum)
+                    self.central_tabs.load_spectrum(
+                        spectrum,
+                        source_key=loaded_key,
+                        source_label=source.name,
+                        source_path=str(source),
+                    )
                 self.recent_files.record(source)
             self.file_label.setText(f"File: {source.name}")
+            self._refresh_phase2_workspace_derivatives()
 
         def dragEnterEvent(self, event) -> None:
             mime_data = event.mimeData()
@@ -422,6 +546,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _open_quick_slider_calibration_mode(self) -> None:
             self._open_energy_fwhm_workspace(phase2_tab="quick_slider")
 
+        def _run_auto_peak_search(self) -> None:
+            bottom_widget = self.bottom_dock.widget()
+            if hasattr(bottom_widget, "run_auto_peak_search"):
+                bottom_widget.run_auto_peak_search()
+
         def _apply_calibration_workspace_result(
             self,
             spectrum,
@@ -430,6 +559,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         ) -> None:
             if hasattr(self.central_tabs, "load_spectrum"):
                 self.central_tabs.load_spectrum(spectrum)
+            self._refresh_phase2_workspace_derivatives()
             self.file_label.setText(
                 f"File: {spectrum.spectrum_id or 'workspace spectrum'}"
             )
@@ -442,6 +572,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.statusBar().showMessage(message, 6000)
             self.progress.setValue(72)
             self.progress.setFormat("Calibration applied")
+
+        def _refresh_phase2_workspace_derivatives(self) -> None:
+            from fluxforge.core.phase2_analysis import compute_cascade_sum_lines, extract_survey_points
+
+            spectra = [
+                (slot.key, slot.spectrum)
+                for slot in self.phase2_workspace.state.spectra
+            ]
+            self.phase2_workspace.set_survey_points(extract_survey_points(spectra))
+            self.phase2_workspace.set_cascade_sum_lines(
+                compute_cascade_sum_lines(
+                    self.phase2_workspace.state.pinned_nuclides,
+                    source_id=self.library_manager.state.gamma_identification_source_id,
+                    custom_path=self.library_manager.state.custom_gamma_path,
+                )
+            )
 
         def closeEvent(self, event) -> None:
             self._save_layout()

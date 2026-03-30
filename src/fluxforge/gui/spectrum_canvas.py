@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
+from fluxforge.core.phase2_analysis import PeakCandidate
+
 
 @dataclass(frozen=True)
 class RendererCapabilities:
@@ -124,6 +126,22 @@ class SpectrumCanvas:
             self.clear()
             return
         self.set_spectrum(traces[0].counts)
+
+    def set_peak_candidates(self, peaks: Sequence[PeakCandidate]) -> None:
+        """Optional bulk update for detected peak overlays."""
+
+        del peaks
+
+    def set_cascade_sum_lines(self, energies_keV: Sequence[float]) -> None:
+        """Optional bulk update for cascade-sum overlays."""
+
+        del energies_keV
+
+    def set_peak_residuals(self, peaks: Sequence[PeakCandidate], *, visible: bool) -> None:
+        """Optional update for mini residual subplots."""
+
+        del peaks
+        del visible
 
 
 def _downsample_counts(counts: Sequence[float], *, factor: int) -> tuple[float, ...]:
