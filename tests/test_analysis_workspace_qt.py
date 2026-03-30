@@ -401,14 +401,7 @@ def test_peak_id_browser_supports_typed_centroid_filtering_and_phenomena_guides(
     first_match = peak_panel._current_match_results[0]
     assert abs(first_match.line_energy_keV - 661.657) <= 2.0
 
-    match_item = peak_panel.peak_id_matches.item(0)
-    match_rect = peak_panel.peak_id_matches.visualItemRect(match_item)
-    QTest.mouseClick(
-        peak_panel.peak_id_matches.viewport(),
-        Qt.LeftButton,
-        Qt.NoModifier,
-        match_rect.center(),
-    )
+    peak_panel.peak_id_matches.setCurrentRow(0)
     _qapp().processEvents()
 
     phenomena = [
@@ -442,14 +435,7 @@ def test_peak_id_browser_use_selected_peak_button_restores_peak_centroid(monkeyp
     QTest.mouseClick(peak_panel.auto_find_button, Qt.LeftButton)
     _qapp().processEvents()
 
-    index = peak_panel.table.model().index(0, 0)
-    rect = peak_panel.table.visualRect(index)
-    QTest.mouseClick(
-        peak_panel.table.viewport(),
-        Qt.LeftButton,
-        Qt.NoModifier,
-        rect.center(),
-    )
+    peak_panel.table.selectRow(0)
     _qapp().processEvents()
 
     selected_peak = window.analysis_workspace.selected_peak()
