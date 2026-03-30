@@ -1,0 +1,58 @@
+"""Next-generation GUI scaffolding exports."""
+
+from fluxforge.gui.app import describe_gui_scaffold, launch_modern_gui, main
+from fluxforge.gui.backends import (
+    PYQTGRAPH_AVAILABLE,
+    VISPY_AVAILABLE,
+    PyQtGraphSpectrumCanvas,
+    VispySpectrumCanvas,
+    available_renderer_status,
+    register_builtin_render_backends,
+)
+from fluxforge.gui.main_window import (
+    DEFAULT_DOCK_ZONES,
+    DockZone,
+    FluxForgeMainWindow,
+    MainWindowScaffold,
+    modern_gui_unavailable_message,
+)
+from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState
+from fluxforge.gui.qt_compat import QT_AVAILABLE
+from fluxforge.gui.selection_bus import SelectionBus, SelectionState
+from fluxforge.gui.spectrum_canvas import (
+    HierarchicalSpectrumBuffer,
+    HierarchicalSpectrumLevel,
+    ReferenceLine,
+    RendererCapabilities,
+    SpectrumCanvas,
+    SpectrumTrace,
+)
+
+__all__ = [
+    "DEFAULT_DOCK_ZONES",
+    "DockZone",
+    "FluxForgeMainWindow",
+    "HierarchicalSpectrumBuffer",
+    "HierarchicalSpectrumLevel",
+    "GUIMode",
+    "MainWindowScaffold",
+    "ModeManager",
+    "ModeState",
+    "PYQTGRAPH_AVAILABLE",
+    "QT_AVAILABLE",
+    "PyQtGraphSpectrumCanvas",
+    "ReferenceLine",
+    "RendererCapabilities",
+    "SelectionBus",
+    "SelectionState",
+    "SpectrumCanvas",
+    "SpectrumTrace",
+    "VISPY_AVAILABLE",
+    "VispySpectrumCanvas",
+    "available_renderer_status",
+    "describe_gui_scaffold",
+    "launch_modern_gui",
+    "main",
+    "modern_gui_unavailable_message",
+    "register_builtin_render_backends",
+]

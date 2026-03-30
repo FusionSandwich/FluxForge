@@ -1,4 +1,4 @@
-"""FluxForge desktop GUI package."""
+"""Legacy FluxForge Tk desktop GUI package kept during the Qt redesign."""
 
 from fluxforge_gui.app import launch_gui, main
 

@@ -1,0 +1,501 @@
+{
+  "epics": [
+    {
+      "id": "E1",
+      "title": "GUI shell and docking framework",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/epic",
+      "priority": "priority/p0-blocking",
+      "summary": "Scaffold the dockable main window, mode controls, layout persistence, and user-facing shell for the next-generation GUI.",
+      "definition_of_done": [
+        "Main window shell exists with the planned docking zones.",
+        "Mode switching and persistent layout are wired into the shell.",
+        "Theme hooks and status surfaces are in place."
+      ],
+      "children": ["I05", "I06", "I07", "I25"]
+    },
+    {
+      "id": "E2",
+      "title": "Spectrum canvas and renderer abstraction",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/epic",
+      "priority": "priority/p0-blocking",
+      "summary": "Create the abstract spectrum canvas and register production and stub render backends.",
+      "definition_of_done": [
+        "SpectrumCanvas abstraction exists.",
+        "PyQtGraph backend is registered as the recommended default.",
+        "Vispy remains additive as an optional backend stub."
+      ],
+      "children": ["I09", "I10", "I11"]
+    },
+    {
+      "id": "E3",
+      "title": "File I/O, session model, and N42.42 export",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/io",
+      "type": "type/epic",
+      "priority": "priority/p0-blocking",
+      "summary": "Define the session model, file readers, and N42.42 export path needed for the shell.",
+      "definition_of_done": [
+        "Session model and `.ffs` persistence exist.",
+        "Planned file readers are routed through a single factory.",
+        "N42.42 export path exists with validation hooks."
+      ],
+      "children": ["I12", "I14", "I15"]
+    },
+    {
+      "id": "E4",
+      "title": "Nuclide library database",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/nuclide-db",
+      "type": "type/epic",
+      "priority": "priority/p1-critical",
+      "summary": "Build the nuclide database schema and search surfaces needed for interactive line overlay workflows.",
+      "definition_of_done": [
+        "SQLite schema exists with decay-chain support.",
+        "Search surfaces can query the library efficiently.",
+        "Canvas overlays can be driven from the search result model."
+      ],
+      "children": ["I16", "I17"]
+    },
+    {
+      "id": "E5",
+      "title": "Core spectroscopy workflows (calibration, fitting, ID, activity)",
+      "milestone": "M2 \u2014 Core Analysis Parity",
+      "area": "area/core",
+      "type": "type/epic",
+      "priority": "priority/p0-blocking",
+      "summary": "Deliver calibration, peak fitting, identification, and activity workflows with coordinated GUI surfaces.",
+      "definition_of_done": [
+        "Peak and calibration shells exist in the new GUI architecture.",
+        "Selection state is shared across canvas and tables.",
+        "Activity workflows have an obvious integration path."
+      ],
+      "children": ["I18", "I19"]
+    },
+    {
+      "id": "E6",
+      "title": "Standards and QA framework",
+      "milestone": "M4 \u2014 Standards & QA",
+      "area": "area/standards",
+      "type": "type/epic",
+      "priority": "priority/p1-critical",
+      "summary": "Establish standards modules, QA tracking, and standards-mode locking surfaces.",
+      "definition_of_done": [
+        "Standards module interface exists.",
+        "QA tracking and history surfaces have storage scaffolding.",
+        "Standards locking has a dedicated architectural path."
+      ],
+      "children": ["I21", "I22"]
+    },
+    {
+      "id": "E7",
+      "title": "Unfolding workspace (GRAVEL + MAXED + RMLE + ML)",
+      "milestone": "M3 \u2014 Advanced Analysis",
+      "area": "area/unfolding",
+      "type": "type/epic",
+      "priority": "priority/p1-critical",
+      "summary": "Provide the additive unfolding workspace and algorithm registry foundation.",
+      "definition_of_done": [
+        "Unfolding workspace scaffold exists.",
+        "Algorithm registry includes additive support for all planned methods.",
+        "Method provenance is designed into the workflow."
+      ],
+      "children": ["I23"]
+    },
+    {
+      "id": "E8",
+      "title": "HAL, live acquisition, and dashboard foundation",
+      "milestone": "M5 \u2014 MCA Foundations",
+      "area": "area/hal",
+      "type": "type/epic",
+      "priority": "priority/p2-normal",
+      "summary": "Define HAL contracts early so live acquisition can be added later without GUI rewrites.",
+      "definition_of_done": [
+        "Device abstractions and mock devices exist.",
+        "GUI surfaces reserve dashboard and hardware status integration points.",
+        "Session model can carry hardware provenance."
+      ],
+      "children": ["I13"]
+    },
+    {
+      "id": "E9",
+      "title": "Reporting engine and packaging",
+      "milestone": "M6 \u2014 Packaging & Release",
+      "area": "area/reporting",
+      "type": "type/epic",
+      "priority": "priority/p1-critical",
+      "summary": "Scaffold reporting and packaging surfaces early enough to record provenance and later deliver native bundles.",
+      "definition_of_done": [
+        "Reporting skeleton exists with a template-driven path.",
+        "Packaging and release work have explicit tracker entries.",
+        "Report provenance remains part of the design."
+      ],
+      "children": ["I20", "I24"]
+    },
+    {
+      "id": "E10",
+      "title": "Plugin/registry architecture",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/registry",
+      "type": "type/epic",
+      "priority": "priority/p0-blocking",
+      "summary": "Create the shared plugin registry layer that keeps new methods additive and discoverable.",
+      "definition_of_done": [
+        "Generic registry implementation exists.",
+        "Named registries exist for the planned analytical dimensions.",
+        "Built-in bootstrap path exists without locking the project to a single implementation."
+      ],
+      "children": ["I08"]
+    }
+  ],
+  "issues": [
+    {
+      "id": "I01",
+      "title": "ADR: adopt PySide6 and additive capability policy",
+      "milestone": "M0 \u2014 Planning & Backlog",
+      "area": "area/adr",
+      "type": "type/adr",
+      "priority": "priority/p0-blocking",
+      "summary": "Formalize the strategic GUI stack and additive migration rule.",
+      "acceptance_criteria": [
+        "ADR-001 and ADR-003 are accepted in `docs/adr/`.",
+        "Contributor guidance references the additive migration rule."
+      ]
+    },
+    {
+      "id": "I02",
+      "title": "ADR: renderer abstraction \u2014 PyQtGraph first, Vispy optional",
+      "milestone": "M0 \u2014 Planning & Backlog",
+      "area": "area/adr",
+      "type": "type/adr",
+      "priority": "priority/p0-blocking",
+      "summary": "Formalize renderer abstraction and backend policy before canvas work begins.",
+      "acceptance_criteria": [
+        "ADR-002 is accepted in `docs/adr/`.",
+        "The tracker reflects PyQtGraph-first, Vispy-optional rendering."
+      ]
+    },
+    {
+      "id": "I03",
+      "title": "ADR: Standards-mode design and user-choice policy",
+      "milestone": "M0 \u2014 Planning & Backlog",
+      "area": "area/adr",
+      "type": "type/adr",
+      "priority": "priority/p0-blocking",
+      "summary": "Formalize the three-mode GUI and standards locking behavior.",
+      "acceptance_criteria": [
+        "ADR-005 is accepted in `docs/adr/`.",
+        "Contributor guidance references standards locking and user-choice rules."
+      ]
+    },
+    {
+      "id": "I04",
+      "title": "ADR: plugin/registry architecture \u2014 fitters, unfolding, calibration, ID",
+      "milestone": "M0 \u2014 Planning & Backlog",
+      "area": "area/adr",
+      "type": "type/adr",
+      "priority": "priority/p0-blocking",
+      "summary": "Formalize the shared plugin/registry architecture.",
+      "acceptance_criteria": [
+        "ADR-004 is accepted in `docs/adr/`.",
+        "The initial registry scaffolding exists in the codebase."
+      ]
+    },
+    {
+      "id": "I05",
+      "title": "Scaffold `MainWindow` with dockable zones A\u2013F",
+      "epic": "E1",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Create the next-generation main window shell with the planned dockable zones.",
+      "acceptance_criteria": [
+        "Main window module exists under `src/fluxforge/gui/`.",
+        "Docking-zone structure is represented in code or scaffolding."
+      ]
+    },
+    {
+      "id": "I06",
+      "title": "Implement `ModeManager` (Simple / Expert / Standards)",
+      "epic": "E1",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Introduce three-mode GUI state management.",
+      "acceptance_criteria": [
+        "ModeManager scaffold exists in the new GUI package.",
+        "The standards context is part of the design."
+      ]
+    },
+    {
+      "id": "I07",
+      "title": "Implement `SelectionBus` for coordinated multiple views",
+      "epic": "E1",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Create the shared selection state surface for coordinated view updates.",
+      "acceptance_criteria": [
+        "Selection bus scaffold exists.",
+        "The issue seed links it to the canvas and table workflows."
+      ]
+    },
+    {
+      "id": "I08",
+      "title": "Implement plugin registry base classes (all six registries)",
+      "epic": "E10",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/registry",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Implement the generic plugin registry and named built-in registries.",
+      "acceptance_criteria": [
+        "Generic registry code exists and is tested.",
+        "Named registries cover renderers, fitters, unfolding, calibration, ID, and standards."
+      ]
+    },
+    {
+      "id": "I09",
+      "title": "Implement `SpectrumCanvas` abstraction interface",
+      "epic": "E2",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Define the renderer-facing canvas abstraction.",
+      "acceptance_criteria": [
+        "Canvas scaffold exists in the GUI package.",
+        "The abstraction is separate from backend choice."
+      ]
+    },
+    {
+      "id": "I10",
+      "title": "Implement PyQtGraph backend for `SpectrumCanvas`",
+      "epic": "E2",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Provide the recommended production renderer backend.",
+      "acceptance_criteria": [
+        "PyQtGraph backend is represented in the scaffold plan.",
+        "Registry metadata can represent the backend as recommended."
+      ]
+    },
+    {
+      "id": "I11",
+      "title": "Add Vispy backend stub and renderer capability flags",
+      "epic": "E2",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Preserve additive renderer support with a backend stub.",
+      "acceptance_criteria": [
+        "Tracker item exists for the Vispy stub.",
+        "Renderer policy keeps the stub additive rather than replacing PyQtGraph."
+      ]
+    },
+    {
+      "id": "I12",
+      "title": "Define `Spectrum` session model and `.ffs` session file",
+      "epic": "E3",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/io",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Create the dedicated session model for the next-generation GUI.",
+      "acceptance_criteria": [
+        "Session-model path is tracked explicitly.",
+        "The issue seed records `.ffs` as the session format."
+      ]
+    },
+    {
+      "id": "I13",
+      "title": "Define `MCADevice` abstract base class and mock device",
+      "epic": "E8",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/hal",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Create HAL contracts and a mock device foundation.",
+      "acceptance_criteria": [
+        "HAL base package exists.",
+        "A mock-device path is part of the tracked work."
+      ]
+    },
+    {
+      "id": "I14",
+      "title": "Implement reader factory and N42 / CHN / SPC / CNF / SPE / CSV readers",
+      "epic": "E3",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/io",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Route supported reader formats through a single factory surface.",
+      "acceptance_criteria": [
+        "The tracker lists the initial supported formats.",
+        "Reader work remains tied to the shared session model."
+      ]
+    },
+    {
+      "id": "I15",
+      "title": "Implement N42.42 (2012) export writer with XSD validation",
+      "epic": "E3",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/io",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Provide standards-compatible export for external interoperability.",
+      "acceptance_criteria": [
+        "N42.42 export is tracked explicitly.",
+        "Validation is part of the acceptance criteria."
+      ]
+    },
+    {
+      "id": "I16",
+      "title": "Build nuclide library SQLite schema with decay-chain support",
+      "epic": "E4",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/nuclide-db",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Create the nuclide database schema with decay-chain support.",
+      "acceptance_criteria": [
+        "Schema work is tracked under the nuclide-db area.",
+        "Decay-chain support is recorded in the issue seed."
+      ]
+    },
+    {
+      "id": "I17",
+      "title": "Implement nuclide search panel with FTS5 and instant overlay",
+      "epic": "E4",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Expose fast nuclide search and immediate overlay interaction.",
+      "acceptance_criteria": [
+        "The issue seed ties search UX to the nuclide database.",
+        "Instant overlay behavior is part of the tracked outcome."
+      ]
+    },
+    {
+      "id": "I18",
+      "title": "Implement peak table and canvas SelectionBus synchronization",
+      "epic": "E5",
+      "milestone": "M2 \u2014 Core Analysis Parity",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Coordinate peak selection between table and canvas.",
+      "acceptance_criteria": [
+        "Peak-table synchronization has an explicit issue.",
+        "The work depends on the SelectionBus scaffold."
+      ]
+    },
+    {
+      "id": "I19",
+      "title": "Implement calibration workspace shell with shared main canvas",
+      "epic": "E5",
+      "milestone": "M2 \u2014 Core Analysis Parity",
+      "area": "area/calibration",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Create the calibration workspace shell around the shared canvas.",
+      "acceptance_criteria": [
+        "Calibration workspace is tracked as a dedicated issue.",
+        "The issue references the shared canvas direction."
+      ]
+    },
+    {
+      "id": "I20",
+      "title": "Implement Jinja2 report engine skeleton",
+      "epic": "E9",
+      "milestone": "M6 \u2014 Packaging & Release",
+      "area": "area/reporting",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Create the report-engine entry point and template-driven direction.",
+      "acceptance_criteria": [
+        "Reporting engine work is represented explicitly.",
+        "Template-driven reporting remains part of the tracked direction."
+      ]
+    },
+    {
+      "id": "I21",
+      "title": "Scaffold ASTM standards module interface",
+      "epic": "E6",
+      "milestone": "M4 \u2014 Standards & QA",
+      "area": "area/standards",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Create the standards module extension point needed for standards mode.",
+      "acceptance_criteria": [
+        "Standards module work is tracked independently.",
+        "The standards interface remains compatible with registry-driven selection."
+      ]
+    },
+    {
+      "id": "I22",
+      "title": "Scaffold QA monitor storage and history plot",
+      "epic": "E6",
+      "milestone": "M4 \u2014 Standards & QA",
+      "area": "area/standards",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Track QA state and history as part of the standards framework.",
+      "acceptance_criteria": [
+        "QA monitor scaffolding has a dedicated issue.",
+        "History and storage are part of the tracked scope."
+      ]
+    },
+    {
+      "id": "I23",
+      "title": "Scaffold unfolding workspace with algorithm registry",
+      "epic": "E7",
+      "milestone": "M3 \u2014 Advanced Analysis",
+      "area": "area/unfolding",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Create the unfolding workspace shell and its algorithm registration path.",
+      "acceptance_criteria": [
+        "Workspace scaffold is tracked explicitly.",
+        "Algorithm selection is registry-backed."
+      ]
+    },
+    {
+      "id": "I24",
+      "title": "Add test harness: sample spectra, regression snapshots, CI baseline",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/testing",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Create the test harness scaffolding for the roadmap migration.",
+      "acceptance_criteria": [
+        "`tests/spectra/` exists for planned fixtures.",
+        "Tracker validation tests exist for Stage 0 assets."
+      ]
+    },
+    {
+      "id": "I25",
+      "title": "Add dark/light theme QSS files and ModeManager theme hook",
+      "epic": "E1",
+      "milestone": "M1 \u2014 GUI Shell & Architecture",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Create theme assets and tie them into the planned mode system.",
+      "acceptance_criteria": [
+        "Theme asset files exist in the new GUI package.",
+        "Theme switching remains tracked alongside ModeManager."
+      ]
+    }
+  ]
+}

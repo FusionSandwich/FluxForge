@@ -73,6 +73,16 @@ jobs:
             src/fluxforge/io/metadata.py \
             tests/test_io_metadata.py
 
+      - name: Stage 0 / Phase 1 scaffold checks
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_plugin_registry.py \
+            tests/test_project_tracker_assets.py \
+            tests/test_implementation_steps.py \
+            tests/test_modern_gui_shell.py
+
       - name: Targeted k0 regression tests
         env:
           PYTHONPATH: src
@@ -103,6 +113,7 @@ jobs:
             -W error::matplotlib.MatplotlibDeprecationWarning
 
   native-desktop-gui-linux:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -120,7 +131,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev,gui-test]'
 
-      - name: Native desktop GUI acceptance (Linux/Xvfb)
+      - name: Legacy desktop GUI acceptance (Linux/Xvfb)
         env:
           PYTHONPATH: src
         run: |
@@ -129,20 +140,21 @@ jobs:
             tests/test_gui_desktop_native.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
-      - name: Build Linux GUI evidence bundle
+      - name: Build Linux legacy GUI evidence bundle
         env:
           PYTHONPATH: src
           FLUXFORGE_OFFLINE: '1'
         run: |
           xvfb-run -a python tests/gui_desktop_driver.py artifacts/gui_review/linux
 
-      - name: Upload Linux GUI evidence
+      - name: Upload Linux legacy GUI evidence
         uses: actions/upload-artifact@v4
         with:
-          name: fluxforge-gui-review-linux
+          name: fluxforge-gui-legacy-review-linux
           path: artifacts/gui_review/linux
 
   native-desktop-gui-windows:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -158,22 +170,22 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev,gui-test]"
 
-      - name: Native desktop GUI acceptance (Windows)
+      - name: Legacy desktop GUI acceptance (Windows)
         env:
           PYTHONPATH: src
           FLUXFORGE_OFFLINE: '1'
         run: |
           pytest -q tests/test_gui_desktop_native.py
 
-      - name: Build Windows GUI evidence bundle
+      - name: Build Windows legacy GUI evidence bundle
         env:
           PYTHONPATH: src
           FLUXFORGE_OFFLINE: '1'
         run: |
           python tests/gui_desktop_driver.py artifacts/gui_review/windows
 
-      - name: Upload Windows GUI evidence
+      - name: Upload Windows legacy GUI evidence
         uses: actions/upload-artifact@v4
         with:
-          name: fluxforge-gui-review-windows
+          name: fluxforge-gui-legacy-review-windows
           path: artifacts/gui_review/windows

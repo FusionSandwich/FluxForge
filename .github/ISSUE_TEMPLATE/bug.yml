@@ -1,0 +1,92 @@
+name: Bug Report
+description: Report a defect or regression.
+title: "[Bug]: "
+labels: ["type/bug", "priority/p1-critical"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - area/gui
+        - area/core
+        - area/io
+        - area/ml
+        - area/unfolding
+        - area/standards
+        - area/hal
+        - area/reporting
+        - area/performance
+        - area/testing
+        - area/calibration
+        - area/nuclide-db
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - priority/p0-blocking
+        - priority/p1-critical
+        - priority/p2-normal
+        - priority/p3-nice-to-have
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - platform/both
+        - platform/linux
+        - platform/windows
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - blocker
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected vs Actual
+    validations:
+      required: true
+  - type: textarea
+    id: stack_trace
+    attributes:
+      label: Stack Trace
+  - type: textarea
+    id: spectrum
+    attributes:
+      label: Spectrum File
+      description: Attach or describe the relevant spectrum file when applicable.
+  - type: dropdown
+    id: regression
+    attributes:
+      label: Regression Test Required?
+      options:
+        - "yes"
+        - "no"
+    validations:
+      required: true

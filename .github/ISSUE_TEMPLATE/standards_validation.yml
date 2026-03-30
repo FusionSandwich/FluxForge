@@ -1,0 +1,47 @@
+name: Standards Validation
+description: Track standards-compliance work.
+title: "[Standards]: "
+labels: ["type/validation", "area/standards", "priority/p1-critical"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+    validations:
+      required: true
+  - type: input
+    id: standard
+    attributes:
+      label: Standard
+      description: Example: ASTM E181, ASTM E261, ASTM C1030.
+    validations:
+      required: true
+  - type: input
+    id: edition
+    attributes:
+      label: Edition / Year
+    validations:
+      required: true
+  - type: input
+    id: section
+    attributes:
+      label: Section of Standard
+    validations:
+      required: true
+  - type: textarea
+    id: required_change
+    attributes:
+      label: Required Change
+    validations:
+      required: true
+  - type: textarea
+    id: test_plan
+    attributes:
+      label: Validation Test Plan
+    validations:
+      required: true
+  - type: textarea
+    id: locked
+    attributes:
+      label: Locked Parameters
+      description: List equations, thresholds, or steps that must not be user-editable.

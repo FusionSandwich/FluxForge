@@ -1,0 +1,86 @@
+from fluxforge.gui import (
+    GUIMode,
+    HierarchicalSpectrumBuffer,
+    ModeManager,
+    SelectionBus,
+    describe_gui_scaffold,
+    modern_gui_unavailable_message,
+    register_builtin_render_backends,
+)
+from fluxforge.plugins import PluginRegistries
+
+
+class FakeSettings:
+    def __init__(self) -> None:
+        self._values = {}
+        self.sync_count = 0
+
+    def value(self, key, default=None):
+        return self._values.get(key, default)
+
+    def setValue(self, key, value) -> None:
+        self._values[key] = value
+
+    def sync(self) -> None:
+        self.sync_count += 1
+
+
+def test_describe_gui_scaffold_exposes_primary_and_legacy_entrypoints():
+    scaffold = describe_gui_scaffold()
+
+    assert scaffold["modern_entrypoint"] == "fluxforge-gui"
+    assert scaffold["legacy_entrypoint"] == "fluxforge-gui-legacy"
+    assert scaffold["renderer_backends"][0]["key"] == "pyqtgraph"
+
+
+def test_mode_manager_persists_state_with_settings_backend():
+    settings = FakeSettings()
+    manager = ModeManager(settings=settings)
+
+    manager.set_standard("ASTM E181")
+    manager.set_theme("light")
+
+    assert settings._values["gui/mode"] == "standards"
+    assert settings._values["gui/standard"] == "ASTM E181"
+    assert settings._values["gui/theme"] == "light"
+    assert settings.sync_count >= 2
+
+    reloaded = ModeManager(settings=settings)
+    assert reloaded.state.mode is GUIMode.STANDARDS
+    assert reloaded.state.standard == "ASTM E181"
+    assert reloaded.state.theme == "light"
+
+
+def test_selection_bus_helper_publishers_preserve_shared_context():
+    bus = SelectionBus()
+
+    bus.publish_peak(661.657, nuclide="Cs-137")
+    bus.publish_roi(640.0, 680.0)
+
+    state = bus.publish_nuclide("Ba-137m")
+    assert state.peak_energy_keV == 661.657
+    assert state.roi_bounds_keV == (640.0, 680.0)
+    assert bus.describe()["nuclide"] == "Ba-137m"
+
+
+def test_hierarchical_buffer_builds_multiple_levels():
+    counts = [float(index % 17) for index in range(256)]
+    buffer = HierarchicalSpectrumBuffer.from_counts(counts, max_levels=5)
+
+    assert buffer.describe()["level_count"] == 5
+    assert buffer.levels[0].stride == 1
+    assert buffer.levels[-1].stride == 16
+    assert buffer.choose_level(pixel_width=20).sample_count <= 40
+
+
+def test_register_builtin_render_backends_tracks_default_and_stub():
+    registries = register_builtin_render_backends(PluginRegistries())
+
+    assert registries.render_backends.default_key == "pyqtgraph"
+    assert registries.render_backends.keys() == ("pyqtgraph", "vispy")
+
+
+def test_modern_gui_unavailable_message_mentions_legacy_fallback():
+    message = modern_gui_unavailable_message()
+
+    assert "fluxforge-gui-legacy" in message

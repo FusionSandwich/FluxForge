@@ -1,4 +1,7 @@
-"""Desktop GUI shell for FluxForge.
+"""Legacy Tk desktop GUI shell for FluxForge.
+
+This package is kept as an archive/legacy fallback while the native Qt shell is
+rebuilt under ``fluxforge.gui``.
 
 The GUI is intentionally CLI-first:
 - Every button maps to an existing ``fluxforge`` subcommand handler.

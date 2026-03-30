@@ -1,0 +1,170 @@
+/* FluxForge Next dark shell */
+QWidget {
+  background-color: #101826;
+  color: #e8edf7;
+  font-family: "Inter";
+  font-size: 13px;
+}
+
+QMainWindow#FluxForgeMainWindow {
+  background: qlineargradient(
+    x1: 0, y1: 0, x2: 1, y2: 1,
+    stop: 0 #0f1724,
+    stop: 0.55 #101826,
+    stop: 1 #162133
+  );
+}
+
+QMenuBar, QMenuBar::item {
+  background: transparent;
+  color: #d6deea;
+}
+
+QMenuBar::item:selected,
+QMenu::item:selected {
+  background-color: rgba(74, 158, 255, 0.14);
+  border-radius: 8px;
+}
+
+QMenu {
+  background-color: #162133;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  padding: 8px;
+}
+
+QToolBar#PrimaryToolbar {
+  background-color: rgba(9, 14, 24, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 16px;
+  margin: 12px;
+  padding: 10px 14px;
+  spacing: 8px;
+}
+
+QDockWidget {
+  color: #d8e2f0;
+}
+
+QDockWidget::title {
+  text-align: left;
+  background-color: rgba(244, 184, 96, 0.08);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+QStatusBar#FluxForgeStatusBar {
+  background-color: rgba(9, 14, 24, 0.86);
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+QProgressBar#StatusProgress {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 10px;
+  background-color: #121b2a;
+  min-height: 20px;
+  text-align: center;
+}
+
+QProgressBar#StatusProgress::chunk {
+  background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #4a9eff, stop: 1 #f4b860);
+  border-radius: 9px;
+}
+
+QTabWidget::pane,
+QTreeWidget,
+QListWidget,
+QPlainTextEdit,
+QTextEdit,
+QComboBox,
+QLineEdit {
+  background-color: #121b2a;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 14px;
+}
+
+QTabBar::tab {
+  background-color: rgba(18, 27, 42, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-bottom: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 10px 16px;
+  margin-right: 6px;
+}
+
+QTabBar::tab:selected {
+  background-color: rgba(74, 158, 255, 0.14);
+  color: #ffffff;
+}
+
+QToolButton#ModeButton {
+  background-color: rgba(18, 27, 42, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 18px;
+  padding: 8px 14px;
+  font-weight: 700;
+}
+
+QToolButton#ModeButton:checked {
+  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #4a9eff, stop:1 #f4b860);
+  color: #08111d;
+  border-color: transparent;
+}
+
+QLabel#ModeMetaLabel {
+  color: #93a1b6;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+QWidget#HeroCanvas,
+QFrame#HeroCanvas {
+  background: qlineargradient(
+    x1: 0, y1: 0, x2: 1, y2: 1,
+    stop: 0 rgba(74, 158, 255, 0.14),
+    stop: 0.45 rgba(16, 24, 38, 0.96),
+    stop: 1 rgba(244, 184, 96, 0.12)
+  );
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 24px;
+}
+
+QFrame#HeroCard {
+  background-color: rgba(18, 27, 42, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 18px;
+}
+
+QLabel#HeroEyebrow {
+  color: #f4b860;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+QLabel#HeroHeader,
+QLabel#PanelHeading,
+QLabel#HeroCardTitle {
+  color: #f8fbff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+QLabel#HeroSubhead,
+QLabel#PanelBody,
+QLabel#HeroCardBody {
+  color: #93a1b6;
+  line-height: 1.4em;
+}
+
+QLabel#HeroCardAccent {
+  color: #77c1ff;
+  font-weight: 700;
+}
+
+QTreeWidget::item,
+QListWidget::item {
+  padding: 8px;
+}

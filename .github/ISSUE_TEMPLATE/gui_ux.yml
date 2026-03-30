@@ -1,0 +1,51 @@
+name: GUI / UX Change
+description: Track an interface-specific change.
+title: "[GUI]: "
+labels: ["type/design", "area/gui", "priority/p2-normal"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+    validations:
+      required: true
+  - type: input
+    id: screen
+    attributes:
+      label: Screen / Panel Affected
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - Simple
+        - Expert
+        - Standards
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Desired Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: mockup
+    attributes:
+      label: Mockup / Screenshot
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility Impact
+  - type: textarea
+    id: performance
+    attributes:
+      label: Performance Impact

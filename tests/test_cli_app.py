@@ -79,16 +79,46 @@ def test_build_parser_k0_commands(tmp_path):
 def test_cmd_gui_launches_module(monkeypatch, tmp_path):
     called = {}
 
-    dummy_module = types.ModuleType("fluxforge_gui.app")
+    modern_module = types.ModuleType("fluxforge.gui.app")
+    qt_module = types.ModuleType("fluxforge.gui.qt_compat")
 
     def fake_launch_gui(project_dir):
         called["project_dir"] = Path(project_dir)
 
-    dummy_module.launch_gui = fake_launch_gui
-    monkeypatch.setitem(sys.modules, "fluxforge_gui.app", dummy_module)
+    modern_module.launch_modern_gui = fake_launch_gui
+    qt_module.QT_AVAILABLE = True
+    monkeypatch.setitem(sys.modules, "fluxforge.gui.app", modern_module)
+    monkeypatch.setitem(sys.modules, "fluxforge.gui.qt_compat", qt_module)
 
     app.cmd_gui(Namespace(project_dir=tmp_path, dry_run=False))
     assert called["project_dir"] == tmp_path
+
+
+def test_cmd_gui_falls_back_to_legacy_when_qt_is_unavailable(monkeypatch, tmp_path):
+    called = {}
+
+    modern_module = types.ModuleType("fluxforge.gui.app")
+    qt_module = types.ModuleType("fluxforge.gui.qt_compat")
+    legacy_module = types.ModuleType("fluxforge_gui.app")
+
+    def fake_modern_launch(project_dir):
+        called["modern_project_dir"] = Path(project_dir)
+
+    def fake_legacy_launch(project_dir):
+        called["legacy_project_dir"] = Path(project_dir)
+
+    modern_module.launch_modern_gui = fake_modern_launch
+    qt_module.QT_AVAILABLE = False
+    legacy_module.launch_gui = fake_legacy_launch
+
+    monkeypatch.setitem(sys.modules, "fluxforge.gui.app", modern_module)
+    monkeypatch.setitem(sys.modules, "fluxforge.gui.qt_compat", qt_module)
+    monkeypatch.setitem(sys.modules, "fluxforge_gui.app", legacy_module)
+
+    app.cmd_gui(Namespace(project_dir=tmp_path, dry_run=False))
+
+    assert "modern_project_dir" not in called
+    assert called["legacy_project_dir"] == tmp_path
 
 
 def test_build_parser_plots_dry_run(capsys, tmp_path):

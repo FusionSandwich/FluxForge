@@ -7,6 +7,11 @@
 **Last Updated:** 2026-03-16  
 **Scope:** End-to-end, reproducible pipeline from raw HPGe spectra to (a) unfolded/group spectra with covariance and (b) rigorous model-to-experiment comparisons for TRIGA irradiations (flux wires/foils + larger samples).
 
+**Roadmap Execution Note:** Stage 0 governance assets and the next-generation GUI
+execution status are tracked in `docs/ROADMAP_EXECUTION_STATUS.md`. The Qt shell
+under `src/fluxforge/gui/` is now the primary redesign path; the Tk shell under
+`src/fluxforge_gui/` is retained as a legacy/archive fallback during migration.
+
 ---
 
 ## Table of Contents

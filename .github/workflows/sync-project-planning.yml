@@ -1,0 +1,210 @@
+name: Sync Project Planning
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - add_gui
+      - chore/folder-audit-native-gui-review-20260317
+    paths:
+      - ".github/project-management/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/sync-project-planning.yml"
+      - "docs/adr/**"
+      - "CONTRIBUTING.md"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync-tracker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync labels and milestones
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const labels = JSON.parse(
+              fs.readFileSync(path.join(".github", "project-management", "labels.json"), "utf8")
+            );
+            const milestones = JSON.parse(
+              fs.readFileSync(path.join(".github", "project-management", "milestones.json"), "utf8")
+            );
+
+            const existingLabels = await github.paginate(
+              github.rest.issues.listLabelsForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+              }
+            );
+            const labelMap = new Map(existingLabels.map((label) => [label.name, label]));
+
+            for (const label of labels) {
+              if (labelMap.has(label.name)) {
+                const current = labelMap.get(label.name);
+                if (current.color !== label.color || current.description !== label.description) {
+                  await github.rest.issues.updateLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label.name,
+                    new_name: label.name,
+                    color: label.color,
+                    description: label.description,
+                  });
+                }
+              } else {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description,
+                });
+              }
+            }
+
+            const existingMilestones = await github.paginate(
+              github.rest.issues.listMilestones,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "all",
+                per_page: 100,
+              }
+            );
+            const milestoneMap = new Map(existingMilestones.map((ms) => [ms.title, ms]));
+
+            for (const milestone of milestones) {
+              if (milestoneMap.has(milestone.title)) {
+                const current = milestoneMap.get(milestone.title);
+                if (current.description !== milestone.description) {
+                  await github.rest.issues.updateMilestone({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    milestone_number: current.number,
+                    title: milestone.title,
+                    description: milestone.description,
+                    state: current.state,
+                  });
+                }
+              } else {
+                await github.rest.issues.createMilestone({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: milestone.title,
+                  description: milestone.description,
+                });
+              }
+            }
+
+      - name: Sync seed issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const issueSpec = JSON.parse(
+              fs.readFileSync(path.join(".github", "project-management", "issues.json"), "utf8")
+            );
+            const milestoneSpec = JSON.parse(
+              fs.readFileSync(path.join(".github", "project-management", "milestones.json"), "utf8")
+            );
+
+            const existingIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "all",
+                per_page: 100,
+              }
+            );
+            const existingTitles = new Set(existingIssues.filter((item) => !item.pull_request).map((item) => item.title));
+
+            const milestones = await github.paginate(
+              github.rest.issues.listMilestones,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "all",
+                per_page: 100,
+              }
+            );
+            const milestoneMap = new Map(milestones.map((ms) => [ms.title, ms.number]));
+
+            const items = [...issueSpec.epics, ...issueSpec.issues];
+            const epicMap = new Map(issueSpec.epics.map((epic) => [epic.id, epic.title]));
+
+            function renderBody(item) {
+              const lines = [];
+              lines.push(`# ${item.title}`);
+              lines.push("");
+              lines.push(`- Tracker ID: ${item.id}`);
+              lines.push(`- Milestone: ${item.milestone}`);
+              if (item.epic) {
+                lines.push(`- Epic: ${item.epic} — ${epicMap.get(item.epic)}`);
+              }
+              lines.push(`- Area: ${item.area}`);
+              lines.push(`- Type: ${item.type}`);
+              lines.push(`- Priority: ${item.priority}`);
+              lines.push("");
+              lines.push("## Summary");
+              lines.push(item.summary);
+              lines.push("");
+              if (item.definition_of_done) {
+                lines.push("## Definition of Done");
+                for (const criterion of item.definition_of_done) {
+                  lines.push(`- ${criterion}`);
+                }
+                lines.push("");
+              }
+              if (item.acceptance_criteria) {
+                lines.push("## Acceptance Criteria");
+                for (const criterion of item.acceptance_criteria) {
+                  lines.push(`- ${criterion}`);
+                }
+                lines.push("");
+              }
+              if (item.children) {
+                lines.push("## Child Issues");
+                for (const childId of item.children) {
+                  lines.push(`- ${childId}`);
+                }
+                lines.push("");
+              }
+              lines.push("## Source");
+              lines.push("- Generated from `.github/project-management/issues.json`.");
+              return lines.join("\n");
+            }
+
+            for (const item of items) {
+              if (existingTitles.has(item.title)) {
+                continue;
+              }
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: item.title,
+                body: renderBody(item),
+                labels: [item.area, item.type, item.priority].filter(Boolean),
+                milestone: milestoneMap.get(item.milestone),
+              });
+            }
+
+      - name: Summarize board configuration
+        run: |
+          echo "Project board configuration stored in .github/project-management/board.json" >> "$GITHUB_STEP_SUMMARY"
+          echo "Apply the board manually or via future PAT-backed automation." >> "$GITHUB_STEP_SUMMARY"

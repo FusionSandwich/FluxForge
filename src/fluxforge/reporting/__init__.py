@@ -21,6 +21,8 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
+from fluxforge.reporting.engine import ReportTemplateSpec, ReportingEngine
+
 
 @dataclass
 class FluxTableEntry:
@@ -700,3 +702,17 @@ def create_unfolding_report(
         chi_squared=chi_squared,
         degrees_of_freedom=degrees_of_freedom,
     )
+
+
+__all__ = [
+    "CorrelationMatrix",
+    "DifferentialFluxTable",
+    "FluxTableEntry",
+    "ReactionRateTable",
+    "ReportTemplateSpec",
+    "ReportingEngine",
+    "SpectralReactionRate",
+    "StepwiseSpectrum",
+    "UnfoldingReport",
+    "create_unfolding_report",
+]

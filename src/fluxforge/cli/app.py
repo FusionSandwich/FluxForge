@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -2730,13 +2731,29 @@ def cmd_gui(args: argparse.Namespace) -> None:
         return
 
     try:
+        from fluxforge.gui.app import launch_modern_gui
+        from fluxforge.gui.qt_compat import QT_AVAILABLE
+    except Exception:  # pragma: no cover - import/runtime environment specific
+        launch_modern_gui = None
+        QT_AVAILABLE = False
+
+    if QT_AVAILABLE and launch_modern_gui is not None:
+        launch_modern_gui(project_dir=args.project_dir)
+        return
+
+    try:
         from fluxforge_gui.app import launch_gui
     except Exception as exc:  # pragma: no cover - import/runtime environment specific
         raise RuntimeError(
-            "Unable to start FluxForge GUI. Ensure Tk is available and the "
-            "fluxforge_gui package is installed."
+            "Unable to start FluxForge GUI. The modern Qt shell is unavailable and "
+            "the archived Tk fallback could not be imported either."
         ) from exc
 
+    print(
+        "Modern Qt GUI extras are unavailable in this environment; launching the "
+        "archived Tk fallback.",
+        file=sys.stderr,
+    )
     launch_gui(project_dir=args.project_dir)
 
 
