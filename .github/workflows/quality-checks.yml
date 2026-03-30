@@ -151,8 +151,31 @@ jobs:
       - name: GUI scaffold regression tests
         run: pytest -q tests/test_modern_gui_shell.py tests/test_project_tracker_assets.py
 
-      - name: Analysis workspace Qt tests
-        run: pytest -q tests/test_analysis_workspace_qt.py
+      - name: Analysis workspace core helper tests
+        run: |
+          pytest -q \
+            tests/test_analysis_workspace_qt.py::test_analysis_core_helpers_cover_workspace_surfaces \
+            tests/test_analysis_workspace_qt.py::test_efficiency_models_and_activity_results_are_available \
+            tests/test_analysis_workspace_qt.py::test_line_match_browser_and_gamma_phenomena_estimates_are_available \
+            tests/test_analysis_workspace_qt.py::test_analysis_workspace_tracks_loaded_spectra_and_role_assignments
+
+      - name: Analysis workspace peak workflow tests
+        run: |
+          pytest -q \
+            tests/test_analysis_workspace_qt.py::test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync \
+            tests/test_analysis_workspace_qt.py::test_peak_id_browser_supports_manual_assignment_reassignment_and_guides
+
+      - name: Analysis workspace peak browser tests
+        run: |
+          pytest -q \
+            tests/test_analysis_workspace_qt.py::test_peak_id_browser_supports_typed_centroid_filtering_and_phenomena_guides \
+            tests/test_analysis_workspace_qt.py::test_peak_id_browser_use_selected_peak_button_restores_peak_centroid
+
+      - name: Analysis workspace survey and overlay tests
+        run: |
+          pytest -q \
+            tests/test_analysis_workspace_qt.py::test_main_window_activity_background_and_survey_map_workflows \
+            tests/test_analysis_workspace_qt.py::test_main_window_background_selector_updates_subtracted_foreground_and_overlay
 
       - name: Calibration workspace Qt tests
         run: pytest -q tests/test_calibration_workspace_qt.py
