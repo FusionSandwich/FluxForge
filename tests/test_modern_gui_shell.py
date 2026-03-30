@@ -1,3 +1,6 @@
+import ast
+from pathlib import Path
+
 from fluxforge.gui import (
     GUIMode,
     HierarchicalSpectrumBuffer,
@@ -8,6 +11,8 @@ from fluxforge.gui import (
     register_builtin_render_backends,
 )
 from fluxforge.plugins import PluginRegistries
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class FakeSettings:
@@ -84,3 +89,22 @@ def test_modern_gui_unavailable_message_mentions_legacy_fallback():
     message = modern_gui_unavailable_message()
 
     assert "fluxforge-gui-legacy" in message
+
+
+def test_current_gui_regression_files_target_modern_qt_stack():
+    modern_gui_files = (
+        ROOT / "tests" / "test_modern_gui_shell.py",
+        ROOT / "tests" / "test_phase2_calibration_workspace.py",
+        ROOT / "tests" / "gui_phase2_calibration_probe.py",
+    )
+
+    for path in modern_gui_files:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        imports = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imports.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                imports.add(node.module)
+        assert all(not name.startswith("fluxforge_gui") for name in imports)
+        assert any(name.startswith("fluxforge.gui") for name in imports)

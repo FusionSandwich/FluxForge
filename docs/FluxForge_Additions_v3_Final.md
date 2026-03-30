@@ -94,7 +94,16 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
 - Phase 2.1 is now implemented in the redesigned Qt path, including the unified
   calibration dialog, residual-first plots, ASTM E181 order locking, and the native
   review probe used for Playwright inspection.
-- The current roadmap next step is Phase 2.2, the additive quick slider calibration mode.
+- Phase 2.2 through 2.6 are now implemented in the redesigned Qt path as well,
+  including quick-slider anchors, deviation-pair fine tuning, draggable ROI peak
+  fitting, the registered skew fitter, and the registry-driven method selector.
+- Additional audit evidence now exists for the redesigned Qt GUI: mouse-driven peak
+  picking, governed data-library selectors, library-assisted calibration-line assignment,
+  both Manual and Standards calibration workflows, quick-slider mode, deviation-pair
+  tuning, and ROI fitter interaction were exercised successfully.
+- Phase 2 as a whole is not complete yet; roadmap items `2.1` through `2.6` are now
+  complete and the next required implementation step is `2.7`.
+- The current roadmap next step is Phase 2.7, undo/redo support for peak operations.
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for
   roadmap items `1.3` through `1.18`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide database, and instant overlay search;

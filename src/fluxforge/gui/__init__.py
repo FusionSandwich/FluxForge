@@ -17,6 +17,7 @@ from fluxforge.gui.main_window import (
     modern_gui_unavailable_message,
 )
 from fluxforge.gui.dialogs import CalibrationWorkspaceDialog
+from fluxforge.gui.library_manager import DataLibraryManager, DataLibraryState
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
 from fluxforge.gui.nuclide_search import NuclideSearchController
@@ -30,6 +31,7 @@ from fluxforge.gui.spectrum_canvas import (
     SpectrumCanvas,
     SpectrumTrace,
 )
+from fluxforge.gui.widgets import MethodSelectorWidget
 
 __all__ = [
     "DEFAULT_DOCK_ZONES",
@@ -40,8 +42,11 @@ __all__ = [
     "HierarchicalSpectrumLevel",
     "GUIMode",
     "MainWindowScaffold",
+    "MethodSelectorWidget",
     "ModeManager",
     "ModeState",
+    "DataLibraryManager",
+    "DataLibraryState",
     "PYQTGRAPH_AVAILABLE",
     "QT_AVAILABLE",
     "PyQtGraphSpectrumCanvas",

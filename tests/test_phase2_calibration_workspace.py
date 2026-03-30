@@ -8,21 +8,46 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from fluxforge.core.calibration import (  # noqa: E402
     ASTM_E181_LOCKED_ORDER,
     EnergyCalibrationPoint,
+    EnergyDeviationPair,
     FWHMCalibrationPoint,
     fit_energy_calibration,
     fit_fwhm_calibration,
+    fit_quick_slider_calibration,
+)
+from fluxforge.core.peak_fitting import (  # noqa: E402
+    available_background_models,
+    peak_fitter_entries,
+    register_builtin_peak_fitters,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
 from fluxforge.gui.dialogs import CalibrationWorkspaceDialog  # noqa: E402
+from fluxforge.gui.library_manager import DataLibraryManager  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState  # noqa: E402
 from fluxforge.gui.panels.modern_shell import build_demo_spectrum  # noqa: E402
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QApplication  # noqa: E402
 from fluxforge.gui.selection_bus import SelectionBus  # noqa: E402
+from fluxforge.gui.widgets import MethodSelectorWidget  # noqa: E402
+from fluxforge.plugins import PluginRegistries  # noqa: E402
+
+if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # noqa: E402
+    import pyqtgraph as pg  # noqa: E402
+    from PySide6.QtCore import Qt  # noqa: E402
+    from PySide6.QtTest import QTest  # noqa: E402
+    from PySide6.QtWidgets import QPushButton  # noqa: E402
 
 
 def _qapp():
     return QApplication.instance() or QApplication([])
+
+
+def _plot_click_point(dialog, channel: float):
+    counts = np.asarray(dialog._spectrum.counts, dtype=float)
+    y_value = float(counts[int(round(channel))])
+    scene_point = dialog.spectrum_plot.plotItem.vb.mapViewToScene(
+        pg.Point(float(channel), y_value)
+    )
+    return dialog.spectrum_plot.mapFromScene(scene_point)
 
 
 def test_fit_energy_calibration_locks_astm_order_and_flags_outliers():
@@ -56,6 +81,75 @@ def test_fit_fwhm_calibration_returns_resolution_metrics():
     assert len(fit.coefficients) == 3
     assert fit.fitted_fwhm_keV.shape == (3,)
     assert fit.rms_keV >= 0.0
+
+
+def test_quick_slider_calibration_builds_linear_preview():
+    preview = fit_quick_slider_calibration(
+        anchor_channels=(100.0, 500.0),
+        reference_energies_keV=(121.78, 661.657),
+    )
+
+    assert preview.slope_keV_per_channel == pytest.approx((661.657 - 121.78) / 400.0)
+    assert preview.evaluate([100.0, 500.0]).tolist() == pytest.approx([121.78, 661.657])
+
+
+def test_energy_calibration_accepts_deviation_pairs():
+    fit = fit_energy_calibration(
+        [
+            EnergyCalibrationPoint(channel=100.0, reference_energy_keV=120.0),
+            EnergyCalibrationPoint(channel=500.0, reference_energy_keV=660.0),
+            EnergyCalibrationPoint(channel=900.0, reference_energy_keV=1180.0),
+        ],
+        order=2,
+        deviation_pairs=(
+            EnergyDeviationPair(energy_keV=660.0, correction_keV=0.25, label="mid"),
+        ),
+    )
+
+    assert len(fit.deviation_pairs) == 1
+    assert fit.correction_keV.shape == fit.fitted_keV.shape
+    assert np.max(np.abs(fit.correction_keV)) >= 0.25 - 1e-6
+
+
+def test_peak_fitter_registry_contains_phase2_gaussian_and_skew_entries():
+    entries = {entry.key: entry for entry in peak_fitter_entries()}
+
+    assert "gaussian" in entries
+    assert "gaussian_skew" in entries
+    assert entries["gaussian"].metadata.recommended is True
+    assert entries["gaussian"].metadata.standards_locked is True
+    assert available_background_models("gaussian_skew") == ("linear", "constant")
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
+def test_method_selector_widget_tracks_modern_peak_fitter_registry():
+    _qapp()
+    registries = register_builtin_peak_fitters(PluginRegistries())
+    manager = ModeManager()
+    widget = MethodSelectorWidget(registries.peak_fitters, manager, title="Peak fitter")
+    widget.show()
+    _qapp().processEvents()
+
+    assert widget.combo.count() == 2
+    assert widget.current_key() == "gaussian"
+    assert widget.badge_label.text() == "Recommended"
+
+    widget.set_current_key("gaussian_skew")
+    _qapp().processEvents()
+    assert widget.current_key() == "gaussian_skew"
+    assert widget.badge_label.text() == "Alternative"
+    assert "skewed gaussian" in widget.detail_label.text().lower()
+
+    manager.set_standard("ASTM E181")
+    _qapp().processEvents()
+    assert widget.combo.count() == 1
+    assert widget.current_key() == "gaussian"
+    assert widget.badge_label.text() == "Standards Locked"
+    assert widget.combo.isEnabled() is False
+    widget.close()
 
 
 @pytest.mark.skipif(
@@ -123,3 +217,231 @@ def test_main_window_opens_phase2_calibration_workspace():
 
     window._calibration_dialog.close()
     window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
+def test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment():
+    _qapp()
+    manager = ModeManager()
+    bus = SelectionBus()
+    dialog = CalibrationWorkspaceDialog(
+        spectrum=build_demo_spectrum(),
+        mode_manager=manager,
+        selection_bus=bus,
+        library_manager=DataLibraryManager(),
+    )
+    dialog.show()
+    _qapp().processEvents()
+
+    dialog.energy_table.selectRow(0)
+    click_point = _plot_click_point(dialog, 1173.0)
+    QTest.mouseClick(dialog.spectrum_plot.viewport(), Qt.LeftButton, Qt.NoModifier, click_point)
+    _qapp().processEvents()
+
+    channel = float(dialog.energy_table.item(0, 1).text())
+    observed = float(dialog.energy_table.item(0, 2).text())
+    assert channel == pytest.approx(1173.0, abs=20.0)
+    assert observed == pytest.approx(1173.0, abs=20.0)
+    assert bus.state.peak_energy_keV == pytest.approx(observed, abs=1.0)
+
+    assert dialog.library_source_combo.count() >= 4
+    dialog.library_search.setText("co")
+    _qapp().processEvents()
+    assert dialog.library_results.count() >= 1
+
+    target_index = 0
+    for index in range(dialog.library_results.count()):
+        item = dialog.library_results.item(index)
+        if "co" in item.text().lower():
+            target_index = index
+            break
+    dialog.library_results.setCurrentRow(target_index)
+    _qapp().processEvents()
+    assert dialog.library_lines.count() >= 1
+
+    line_index = 0
+    for index in range(dialog.library_lines.count()):
+        item = dialog.library_lines.item(index)
+        if "1173" in item.text():
+            line_index = index
+            break
+    dialog.library_lines.setCurrentRow(line_index)
+    dialog._assign_selected_library_line()
+    _qapp().processEvents()
+
+    assert "co" in dialog.energy_table.item(0, 0).text().lower()
+    assert float(dialog.energy_table.item(0, 3).text()) == pytest.approx(1173.228, abs=1.0)
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
+def test_main_window_exposes_manual_and_standards_workflows_and_library_selectors():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    sidebar = window.left_dock.widget()
+    assert sidebar.gamma_source_combo.count() >= 4
+    assert sidebar.calibration_source_combo.count() >= 1
+    assert sidebar.naa_source_combo.count() >= 1
+    assert sidebar.dosimetry_source_combo.count() >= 1
+    assert sidebar.activation_source_combo.count() >= 1
+    assert "Identification" in sidebar.library_summary.toPlainText()
+
+    bottom_tabs = window.bottom_dock.widget()
+    bottom_tabs.setCurrentIndex(1)
+    _qapp().processEvents()
+    manual_button = bottom_tabs.findChild(QPushButton, "ManualCalibrationWorkflowButton")
+    quick_button = bottom_tabs.findChild(QPushButton, "QuickSliderCalibrationWorkflowButton")
+    standards_button = bottom_tabs.findChild(QPushButton, "StandardsCalibrationWorkflowButton")
+    assert manual_button is not None
+    assert quick_button is not None
+    assert standards_button is not None
+
+    QTest.mouseClick(manual_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window.mode_manager.state.mode is GUIMode.EXPERT
+    assert window._calibration_dialog is not None
+    assert window._calibration_dialog.energy_order.isEnabled() is True
+
+    QTest.mouseClick(standards_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window.mode_manager.state.mode is GUIMode.STANDARDS
+    assert window.mode_manager.state.standard == "ASTM E181"
+    assert window._calibration_dialog.energy_order.isEnabled() is False
+
+    QTest.mouseClick(quick_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window._calibration_dialog.phase2_tabs.currentWidget() is window._calibration_dialog.quick_slider_tab
+
+    window._calibration_dialog.close()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
+def test_calibration_dialog_exposes_phase2_tools_and_roi_fitting():
+    _qapp()
+    manager = ModeManager()
+    dialog = CalibrationWorkspaceDialog(
+        spectrum=build_demo_spectrum(),
+        mode_manager=manager,
+        selection_bus=SelectionBus(),
+        library_manager=DataLibraryManager(),
+    )
+    dialog.show()
+    _qapp().processEvents()
+
+    dialog.phase2_tabs.setCurrentWidget(dialog.quick_slider_tab)
+    dialog.quick_anchor_a_combo.setCurrentIndex(0)
+    dialog.quick_anchor_b_combo.setCurrentIndex(dialog.quick_anchor_b_combo.count() - 1)
+    dialog.quick_anchor_a_slider.setValue(662)
+    dialog.quick_anchor_b_slider.setValue(1332)
+    _qapp().processEvents()
+    assert dialog._quick_fit is not None
+    dialog.quick_promote_button.click()
+    _qapp().processEvents()
+    assert dialog.energy_table.item(0, 0).text() == "Quick Anchor A"
+
+    dialog.energy_table.item(2, 3).setText("1515.0")
+    _qapp().processEvents()
+    dialog.seed_deviation_pairs_button.click()
+    _qapp().processEvents()
+    assert dialog.deviation_table.rowCount() >= 1
+    assert len(dialog._energy_fit.deviation_pairs) >= 1
+
+    dialog.phase2_tabs.setCurrentWidget(dialog.roi_fit_tab)
+    dialog.roi_region.setRegion((1160.0, 1190.0))
+    _qapp().processEvents()
+    assert dialog._roi_fit is not None
+    assert dialog._roi_fit.centroid_channel == pytest.approx(1173.0, abs=12.0)
+    assert dialog.roi_method_selector.combo.count() >= 2
+    dialog.roi_method_selector.set_current_key("gaussian_skew")
+    _qapp().processEvents()
+    assert dialog.roi_background_combo.count() >= 2
+
+    dialog.energy_table.selectRow(1)
+    dialog.apply_roi_energy_button.click()
+    dialog.fwhm_table.selectRow(1)
+    dialog.apply_roi_fwhm_button.click()
+    _qapp().processEvents()
+    assert float(dialog.energy_table.item(1, 1).text()) == pytest.approx(
+        dialog._roi_fit.centroid_channel,
+        abs=1.0,
+    )
+    assert float(dialog.fwhm_table.item(1, 2).text()) > 0.0
+
+    manager.set_standard("ASTM E181")
+    _qapp().processEvents()
+    assert dialog.roi_method_selector.current_key() == "gaussian"
+    assert dialog.roi_method_selector.combo.count() == 1
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
+def test_apply_workspace_results_persists_phase2_qt_state_to_spectrum():
+    _qapp()
+    spectrum = build_demo_spectrum()
+    bus = SelectionBus()
+    dialog = CalibrationWorkspaceDialog(
+        spectrum=spectrum,
+        mode_manager=ModeManager(),
+        selection_bus=bus,
+        library_manager=DataLibraryManager(),
+    )
+    dialog.show()
+    _qapp().processEvents()
+
+    dialog.phase2_tabs.setCurrentWidget(dialog.quick_slider_tab)
+    dialog.quick_anchor_a_slider.setValue(662)
+    dialog.quick_anchor_b_slider.setValue(1332)
+    dialog.quick_promote_button.click()
+    _qapp().processEvents()
+
+    dialog.energy_table.item(2, 3).setText("1515.0")
+    _qapp().processEvents()
+    dialog.seed_deviation_pairs_button.click()
+    _qapp().processEvents()
+
+    dialog.phase2_tabs.setCurrentWidget(dialog.roi_fit_tab)
+    dialog.roi_region.setRegion((1160.0, 1190.0))
+    _qapp().processEvents()
+
+    dialog._apply_workspace_results()
+
+    assert spectrum.calibration["energy"] == pytest.approx(dialog._energy_fit.coefficients)
+    assert spectrum.calibration["deviation_pairs"]
+    assert bus.state.roi_bounds_keV is not None
+    assert spectrum.energies is not None
+    dialog.close()
+
+
+def test_data_library_manager_tracks_gui_library_categories():
+    manager = DataLibraryManager()
+
+    gamma_ids = {record.source_id for record in manager.available_sources("gamma_identification")}
+    assert {
+        "fluxforge_bundled_gamma",
+        "actigamma_2012",
+        "nndc_offline_activation",
+        "custom_gamma_file",
+    }.issubset(gamma_ids)
+    assert manager.available_sources("calibration")[0].source_id == "calibration_standard_sources"
+    assert manager.available_sources("naa_monitor")[0].source_id == "k0_naa_monitors"
+    assert manager.available_sources("dosimetry")[0].source_id == "irdff_ii_dosimetry"
+    assert manager.available_sources("activation")[0].source_id == "flux_wire_catalog"

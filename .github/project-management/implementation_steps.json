@@ -404,13 +404,95 @@
       "title": "Add quick slider calibration mode (PeakEasy-inspired)",
       "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
       "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-2",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/calibration.py",
+        "src/fluxforge/gui/dialogs/calibration_dialog.py",
+        "src/fluxforge/gui/main_window.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_calibration_workspace.py",
+        "tests/gui_phase2_calibration_probe.py"
+      ],
+      "notes": "The modern Qt calibration workspace now includes additive quick-slider anchor controls, shell launch points, and native review coverage."
+    },
+    {
+      "id": "2.3",
+      "phase": "Phase 2",
+      "title": "Add non-linear deviation pairs (InterSpec-style)",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-3",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/calibration.py",
+        "src/fluxforge/io/spe.py",
+        "src/fluxforge/gui/dialogs/calibration_dialog.py",
+        "tests/test_phase2_calibration_workspace.py"
+      ],
+      "notes": "Deviation-pair fine tuning is now available in the calibration dialog and persists through the spectrum calibration path."
+    },
+    {
+      "id": "2.4",
+      "phase": "Phase 2",
+      "title": "Implement ROI drag + real-time Gaussian peak fitting",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-4",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/peak_fitting.py",
+        "src/fluxforge/gui/dialogs/calibration_dialog.py",
+        "tests/test_phase2_calibration_workspace.py",
+        "tests/gui_phase2_calibration_probe.py"
+      ],
+      "notes": "The spectrum canvas now exposes a draggable ROI with live fit overlays, ROI residuals, and calibration-table application actions."
+    },
+    {
+      "id": "2.5",
+      "phase": "Phase 2",
+      "title": "Implement skew model fitter; register all fitters in fitter_registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-5",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/peak_fitting.py",
+        "src/fluxforge/plugins/registry.py",
+        "tests/test_phase2_calibration_workspace.py",
+        "tests/gui_phase2_calibration_probe.py"
+      ],
+      "notes": "The shared peak fitter registry now includes the recommended Gaussian fitter and the additive skewed-Gaussian fitter."
+    },
+    {
+      "id": "2.6",
+      "phase": "Phase 2",
+      "title": "Implement MethodSelectorWidget and wire to fitter_registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-6",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/widgets/method_selector.py",
+        "src/fluxforge/gui/dialogs/calibration_dialog.py",
+        "src/fluxforge/gui/__init__.py",
+        "tests/test_phase2_calibration_workspace.py"
+      ],
+      "notes": "The reusable method selector now drives the ROI fitter selection from the shared registry and respects Standards mode locking."
+    },
+    {
+      "id": "2.7",
+      "phase": "Phase 2",
+      "title": "Implement undo/redo via QUndoStack for all peak operations",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-7",
       "repo_status": "not-started",
       "sequence_status": "next",
       "evidence": [
         "docs/FluxForge_Final_Additions.md",
         "docs/FluxForge_Additions_v3_Final.md"
       ],
-      "notes": "Phase 2.1 is complete, so the formal next step is the additive quick-calibration slider mode."
+      "notes": "Phase 2.2 through 2.6 are complete, so the formal next step is undo/redo support for peak operations."
     }
   ]
 }

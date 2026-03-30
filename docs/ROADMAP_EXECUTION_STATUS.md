@@ -21,7 +21,7 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| 2.2 | `next` | `not-started` | Phase 2.1 is complete, so the formal next step is the additive quick slider calibration mode. |
+| 2.7 | `next` | `not-started` | Phase 2.2 through 2.6 are now complete, so the formal next step is undo/redo support for peak operations. |
 
 ## Completed In Sequence
 
@@ -55,6 +55,11 @@ officially in progress.
 | 1.18 | `complete` | `src/fluxforge/gui/theme_manager.py` + `src/fluxforge/gui/themes/` provide dark/light/system theme handling |
 | 1.19 | `complete` | `tests/spectra/`, `tests/test_n42.py`, `tests/test_cnf_io.py`, `tests/test_csv_readers.py`, and CI provide the current Phase 1 test harness baseline |
 | 2.1 | `complete` | `src/fluxforge/core/calibration.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` + `src/fluxforge/gui/main_window.py` now provide the live Qt calibration workspace with embedded spectrum review, energy/FWHM fits, ASTM E181 order locking, and residual-first diagnostics |
+| 2.2 | `complete` | `src/fluxforge/core/calibration.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` + `src/fluxforge/gui/main_window.py` + `src/fluxforge/gui/panels/modern_shell.py` now provide the additive quick-slider calibration mode and launch points |
+| 2.3 | `complete` | `src/fluxforge/core/calibration.py` + `src/fluxforge/io/spe.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` now provide InterSpec-style deviation-pair fine tuning and persistence |
+| 2.4 | `complete` | `src/fluxforge/core/peak_fitting.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` now provide draggable ROI fitting with live Gaussian diagnostics and table application actions |
+| 2.5 | `complete` | `src/fluxforge/core/peak_fitting.py` + `src/fluxforge/plugins/registry.py` now register the additive skewed-Gaussian fitter beside the default Gaussian fitter |
+| 2.6 | `complete` | `src/fluxforge/gui/widgets/method_selector.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` now drive fitter choice from the shared registry with Standards-mode locking |
 
 ## GUI Direction
 
@@ -74,7 +79,15 @@ officially in progress.
   registries, GUI scaffolding, and mock HAL device.
 - `pytest` was upgraded in the user environment to `8.4.2`.
 - The TensorFlow-specific tests were run explicitly in this round, and the only remaining skips are the CUDA library checks that are correct for this CPU-only workspace.
-- The full suite now passes in this workspace: `1011 passed, 2 skipped`.
+- The full suite now passes in this workspace: `1023 passed, 2 skipped`.
+- The redesigned Qt GUI was verified beyond unit tests in this round:
+  mouse-driven peak picking in the calibration canvas, governed data-library
+  selectors in the sidebar, library-assisted calibration-line assignment, and
+  both Manual and Standards calibration workflows were exercised successfully.
+- Native review artifacts for the Phase 2 calibration tools were generated at
+  `artifacts/gui_review/phase2_tools_review/`, including quick-slider,
+  deviation-pair, Gaussian ROI, skew ROI, and standards-workflow states in a
+  browser review gallery inspected with Playwright.
 - GitHub verification on 2026-03-30 confirmed the synced Stage 0 tracker assets are live: all required labels, all 7 milestones, all 10 epics, and the full seed issue set from the manifest are present on `FusionSandwich/FluxForge`.
 
 ## Review Result
@@ -82,4 +95,6 @@ officially in progress.
 - Stage 0 is complete both in-repo and on the live GitHub repository.
 - Phase 1 is complete in the repository and formally complete in sequence.
 - Phase 2.1 is complete in the repository and formally complete in sequence.
-- The roadmap's current next step is Phase 2.2: the quick slider calibration mode.
+- Phase 2.2 through 2.6 are complete in the repository and formally complete in sequence.
+- Phase 2 as a whole is not complete yet; the next unimplemented roadmap step is now 2.7.
+- The roadmap's current next step is Phase 2.7: undo/redo support for peak operations.

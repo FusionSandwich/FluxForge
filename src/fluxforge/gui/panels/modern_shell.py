@@ -7,6 +7,7 @@ from typing import Callable
 import numpy as np
 
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
+from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.nuclide_search import NuclideSearchController
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
@@ -16,8 +17,10 @@ from fluxforge.io.spe import GammaSpectrum
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import PyQtGraphSpectrumCanvas
     from fluxforge.gui.qt_compat import (
+        QComboBox,
         QFrame,
         QGridLayout,
+        QGroupBox,
         QHBoxLayout,
         QLabel,
         QLineEdit,
@@ -299,12 +302,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
 
     class SidebarPanel(QWidget):
-        """Left-side shell for files, devices, nuclides, results, and QA."""
+        """Left-side shell for files, devices, libraries, results, and QA."""
 
-        def __init__(self, selection_bus: SelectionBus, parent=None) -> None:
+        def __init__(
+            self,
+            selection_bus: SelectionBus,
+            library_manager: DataLibraryManager | None = None,
+            parent=None,
+        ) -> None:
             super().__init__(parent)
             self.selection_bus = selection_bus
-            self.nuclide_controller = NuclideSearchController(selection_bus)
+            self.library_manager = library_manager or DataLibraryManager()
+            self.nuclide_controller = NuclideSearchController(
+                selection_bus,
+                library_manager=self.library_manager,
+            )
 
             layout = QVBoxLayout(self)
             layout.setContentsMargins(12, 12, 12, 12)
@@ -318,6 +330,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             files.addTopLevelItem(root)
             files.expandAll()
             layout.addWidget(files, 2)
+
+            layout.addWidget(self._build_library_panel(), 2)
 
             devices = QListWidget(self)
             devices.setObjectName("SidebarList")
@@ -352,8 +366,190 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(qa, 1)
 
             self.selection_bus.subscribe(self._sync_selection)
+            self.library_manager.subscribe(self._sync_library_state)
             self.nuclide_query.textChanged.connect(self._refresh_nuclide_results)
             self.nuclides.itemSelectionChanged.connect(self._activate_selected_nuclide)
+            self.custom_gamma_path.editingFinished.connect(self._apply_custom_gamma_path)
+            self.gamma_source_combo.currentIndexChanged.connect(self._gamma_source_changed)
+            self.calibration_source_combo.currentIndexChanged.connect(
+                self._calibration_source_changed
+            )
+            self.naa_source_combo.currentIndexChanged.connect(self._naa_source_changed)
+            self.dosimetry_source_combo.currentIndexChanged.connect(
+                self._dosimetry_source_changed
+            )
+            self.activation_source_combo.currentIndexChanged.connect(
+                self._activation_source_changed
+            )
+            self._populate_library_combos()
+            self._sync_library_state(self.library_manager.state)
+
+        def _build_library_panel(self) -> QWidget:
+            group = QGroupBox("Data Libraries", self)
+            group.setObjectName("SidebarLibraryPanel")
+            layout = QVBoxLayout(group)
+            layout.setContentsMargins(12, 12, 12, 12)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "The modern Qt shell reads from the governed library registry. "
+                    "Manual and standards workflows use these selectors instead of legacy Tk state."
+                ),
+                group,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            layout.addWidget(QLabel("Identification library", group))
+            self.gamma_source_combo = QComboBox(group)
+            self.gamma_source_combo.setObjectName("GammaLibraryCombo")
+            layout.addWidget(self.gamma_source_combo)
+
+            self.custom_gamma_path = QLineEdit(group)
+            self.custom_gamma_path.setObjectName("CustomGammaPathInput")
+            self.custom_gamma_path.setPlaceholderText(
+                "Optional custom gamma locator (JSON/CSV/YAML/sqlite://.../python://...)"
+            )
+            layout.addWidget(self.custom_gamma_path)
+
+            layout.addWidget(QLabel("Calibration sources", group))
+            self.calibration_source_combo = QComboBox(group)
+            self.calibration_source_combo.setObjectName("CalibrationLibraryCombo")
+            layout.addWidget(self.calibration_source_combo)
+
+            layout.addWidget(QLabel("Standards / monitors", group))
+            self.naa_source_combo = QComboBox(group)
+            self.naa_source_combo.setObjectName("NaaMonitorLibraryCombo")
+            layout.addWidget(self.naa_source_combo)
+
+            layout.addWidget(QLabel("Dosimetry catalog", group))
+            self.dosimetry_source_combo = QComboBox(group)
+            self.dosimetry_source_combo.setObjectName("DosimetryLibraryCombo")
+            layout.addWidget(self.dosimetry_source_combo)
+
+            layout.addWidget(QLabel("Activation catalog", group))
+            self.activation_source_combo = QComboBox(group)
+            self.activation_source_combo.setObjectName("ActivationLibraryCombo")
+            layout.addWidget(self.activation_source_combo)
+
+            self.library_summary = QPlainTextEdit(group)
+            self.library_summary.setObjectName("LibrarySummary")
+            self.library_summary.setReadOnly(True)
+            layout.addWidget(self.library_summary)
+            return group
+
+        def _populate_library_combos(self) -> None:
+            self._populate_combo(
+                self.gamma_source_combo,
+                self.library_manager.available_sources("gamma_identification"),
+            )
+            self._populate_combo(
+                self.calibration_source_combo,
+                self.library_manager.available_sources("calibration"),
+            )
+            self._populate_combo(
+                self.naa_source_combo,
+                self.library_manager.available_sources("naa_monitor"),
+            )
+            self._populate_combo(
+                self.dosimetry_source_combo,
+                self.library_manager.available_sources("dosimetry"),
+            )
+            self._populate_combo(
+                self.activation_source_combo,
+                self.library_manager.available_sources("activation"),
+            )
+
+        def _populate_combo(self, combo: QComboBox, records) -> None:
+            combo.blockSignals(True)
+            combo.clear()
+            for record in records:
+                combo.addItem(record.label, record.source_id)
+            combo.blockSignals(False)
+
+        def _sync_library_state(self, state) -> None:
+            self._set_combo_value(
+                self.gamma_source_combo,
+                state.gamma_identification_source_id,
+            )
+            self._set_combo_value(
+                self.calibration_source_combo,
+                state.calibration_source_id,
+            )
+            self._set_combo_value(self.naa_source_combo, state.naa_monitor_source_id)
+            self._set_combo_value(self.dosimetry_source_combo, state.dosimetry_source_id)
+            self._set_combo_value(
+                self.activation_source_combo,
+                state.activation_catalog_source_id,
+            )
+            self.custom_gamma_path.blockSignals(True)
+            self.custom_gamma_path.setText(state.custom_gamma_path or "")
+            self.custom_gamma_path.setEnabled(
+                state.gamma_identification_source_id == "custom_gamma_file"
+            )
+            self.custom_gamma_path.blockSignals(False)
+            self.library_summary.setPlainText(
+                "\n\n".join(
+                    [
+                        "Identification\n"
+                        + self.library_manager.summary_for_category("gamma_identification"),
+                        "Calibration\n"
+                        + self.library_manager.summary_for_category("calibration"),
+                        "Standards / monitors\n"
+                        + self.library_manager.summary_for_category("naa_monitor"),
+                        "Dosimetry\n"
+                        + self.library_manager.summary_for_category("dosimetry"),
+                        "Activation\n"
+                        + self.library_manager.summary_for_category("activation"),
+                    ]
+                )
+            )
+            self._refresh_nuclide_results(self.nuclide_query.text())
+
+        def _set_combo_value(self, combo: QComboBox, source_id: str) -> None:
+            index = combo.findData(source_id)
+            if index >= 0:
+                combo.blockSignals(True)
+                combo.setCurrentIndex(index)
+                combo.blockSignals(False)
+
+        def _gamma_source_changed(self) -> None:
+            source_id = self.gamma_source_combo.currentData()
+            if source_id:
+                self.library_manager.set_gamma_identification_source(
+                    str(source_id),
+                    custom_gamma_path=self.custom_gamma_path.text().strip() or None,
+                )
+
+        def _calibration_source_changed(self) -> None:
+            source_id = self.calibration_source_combo.currentData()
+            if source_id:
+                self.library_manager.set_calibration_source(str(source_id))
+
+        def _naa_source_changed(self) -> None:
+            source_id = self.naa_source_combo.currentData()
+            if source_id:
+                self.library_manager.set_naa_monitor_source(str(source_id))
+
+        def _dosimetry_source_changed(self) -> None:
+            source_id = self.dosimetry_source_combo.currentData()
+            if source_id:
+                self.library_manager.set_dosimetry_source(str(source_id))
+
+        def _activation_source_changed(self) -> None:
+            source_id = self.activation_source_combo.currentData()
+            if source_id:
+                self.library_manager.set_activation_catalog_source(str(source_id))
+
+        def _apply_custom_gamma_path(self) -> None:
+            if self.gamma_source_combo.currentData() != "custom_gamma_file":
+                return
+            self.library_manager.set_gamma_identification_source(
+                "custom_gamma_file",
+                custom_gamma_path=self.custom_gamma_path.text().strip() or None,
+            )
 
         def _sync_selection(self, state: SelectionState) -> None:
             self.selection_note.setPlainText(
@@ -390,12 +586,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
             open_calibration_workspace: Callable[[], None] | None = None,
+            open_quick_slider_calibration_workspace: Callable[[], None] | None = None,
+            open_manual_calibration_workspace: Callable[[], None] | None = None,
+            open_standards_calibration_workspace: Callable[[], None] | None = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self._open_calibration_workspace = open_calibration_workspace
+            self._open_quick_slider_calibration_workspace = (
+                open_quick_slider_calibration_workspace
+            )
+            self._open_manual_calibration_workspace = open_manual_calibration_workspace
+            self._open_standards_calibration_workspace = open_standards_calibration_workspace
             self.addTab(
                 self._text_panel(
                     "Peak Table",
@@ -483,11 +687,42 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.calibration_mode_note.setWordWrap(True)
             layout.addWidget(self.calibration_mode_note)
 
-            launch_button = QPushButton("Open Energy + FWHM Workspace", widget)
+            action_row = QHBoxLayout()
+            action_row.setSpacing(10)
+
+            manual_button = QPushButton("Manual Workflow", widget)
+            manual_button.setObjectName("ManualCalibrationWorkflowButton")
+            manual_button.setEnabled(self._open_manual_calibration_workspace is not None)
+            if self._open_manual_calibration_workspace is not None:
+                manual_button.clicked.connect(self._open_manual_calibration_workspace)
+            action_row.addWidget(manual_button)
+
+            quick_button = QPushButton("Quick Slider", widget)
+            quick_button.setObjectName("QuickSliderCalibrationWorkflowButton")
+            quick_button.setEnabled(
+                self._open_quick_slider_calibration_workspace is not None
+            )
+            if self._open_quick_slider_calibration_workspace is not None:
+                quick_button.clicked.connect(self._open_quick_slider_calibration_workspace)
+            action_row.addWidget(quick_button)
+
+            standards_button = QPushButton("Standards Workflow", widget)
+            standards_button.setObjectName("StandardsCalibrationWorkflowButton")
+            standards_button.setEnabled(
+                self._open_standards_calibration_workspace is not None
+            )
+            if self._open_standards_calibration_workspace is not None:
+                standards_button.clicked.connect(self._open_standards_calibration_workspace)
+            action_row.addWidget(standards_button)
+
+            launch_button = QPushButton("Open Shared Workspace", widget)
+            launch_button.setObjectName("SharedCalibrationWorkspaceButton")
             launch_button.setEnabled(self._open_calibration_workspace is not None)
             if self._open_calibration_workspace is not None:
                 launch_button.clicked.connect(self._open_calibration_workspace)
-            layout.addWidget(launch_button)
+            action_row.addWidget(launch_button)
+            action_row.addStretch(1)
+            layout.addLayout(action_row)
             layout.addStretch(1)
 
             self.mode_manager.subscribe(self._sync_calibration_note)
@@ -591,8 +826,14 @@ else:
 
 
     class SidebarPanel:  # pragma: no cover - placeholder without Qt
-        def __init__(self, selection_bus: SelectionBus, parent=None) -> None:
+        def __init__(
+            self,
+            selection_bus: SelectionBus,
+            library_manager: DataLibraryManager | None = None,
+            parent=None,
+        ) -> None:
             self.selection_bus = selection_bus
+            self.library_manager = library_manager
             self.parent = parent
 
 
@@ -602,11 +843,15 @@ else:
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
             open_calibration_workspace: Callable[[], None] | None = None,
+            open_manual_calibration_workspace: Callable[[], None] | None = None,
+            open_standards_calibration_workspace: Callable[[], None] | None = None,
             parent=None,
         ) -> None:
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.open_calibration_workspace = open_calibration_workspace
+            self.open_manual_calibration_workspace = open_manual_calibration_workspace
+            self.open_standards_calibration_workspace = open_standards_calibration_workspace
             self.parent = parent
 
 

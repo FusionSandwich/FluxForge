@@ -18,6 +18,11 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
+from fluxforge.core.calibration import (
+    EnergyDeviationPair,
+    apply_energy_deviation_pairs,
+)
+
 
 @dataclass
 class GammaSpectrum:
@@ -123,7 +128,7 @@ class GammaSpectrum:
         for i, coeff in enumerate(coefficients):
             energies += coeff * (self.channels**i)
 
-        return energies
+        return apply_energy_deviation_pairs(energies, self._deviation_pairs())
 
     def channel_to_energy(
         self, channel: Union[int, np.ndarray]
@@ -131,13 +136,33 @@ class GammaSpectrum:
         """Convert channel number to energy using calibration."""
         coeffs = self.calibration.get("energy", [0.0, 1.0])
         result = sum(c * (channel**i) for i, c in enumerate(coeffs))
-        return result
+        corrected = apply_energy_deviation_pairs(result, self._deviation_pairs())
+        if np.isscalar(channel):
+            return float(np.asarray(corrected, dtype=float))
+        return corrected
 
     def energy_to_channel(
         self, energy: Union[float, np.ndarray]
     ) -> Union[int, np.ndarray]:
         """Convert energy to channel number using calibration."""
         coeffs = self.calibration.get("energy", [0.0, 1.0])
+        deviation_pairs = self._deviation_pairs()
+
+        if deviation_pairs:
+            from scipy import optimize
+
+            def _invert_scalar(target_energy: float) -> int:
+                upper = max(len(self.channels) - 1, 1)
+
+                def energy_diff(ch):
+                    return float(self.channel_to_energy(ch)) - target_energy
+
+                return int(np.round(optimize.brentq(energy_diff, 0, upper)))
+
+            if np.isscalar(energy):
+                return _invert_scalar(float(energy))
+            values = np.asarray(energy, dtype=float)
+            return np.asarray([_invert_scalar(float(value)) for value in values], dtype=int)
 
         if len(coeffs) == 2:
             # Linear: E = a0 + a1*ch => ch = (E - a0) / a1
@@ -163,6 +188,23 @@ class GammaSpectrum:
             if np.isscalar(channel)
             else np.round(channel).astype(int)
         )
+
+    def _deviation_pairs(self) -> tuple[EnergyDeviationPair, ...]:
+        raw_pairs = self.calibration.get("deviation_pairs") or ()
+        pairs: list[EnergyDeviationPair] = []
+        for raw in raw_pairs:
+            if isinstance(raw, EnergyDeviationPair):
+                pairs.append(raw)
+                continue
+            if isinstance(raw, dict):
+                pairs.append(
+                    EnergyDeviationPair(
+                        energy_keV=float(raw.get("energy_keV", 0.0)),
+                        correction_keV=float(raw.get("correction_keV", 0.0)),
+                        label=str(raw.get("label", "")),
+                    )
+                )
+        return tuple(pairs)
 
     def counts_in_range(
         self, e_min: float, e_max: float, use_energy: bool = True

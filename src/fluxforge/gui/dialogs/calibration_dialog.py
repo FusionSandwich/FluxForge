@@ -1,4 +1,4 @@
-"""Unified energy and FWHM calibration workspace for Phase 2.1."""
+"""Unified calibration workspace for the modern Phase 2 GUI stack."""
 
 from __future__ import annotations
 
@@ -10,20 +10,31 @@ from fluxforge.core.calibration import (
     ASTM_E181_ENERGY_LIMIT_KEV,
     EnergyCalibrationFit,
     EnergyCalibrationPoint,
+    EnergyDeviationPair,
     FWHMCalibrationFit,
     FWHMCalibrationPoint,
     energy_calibration_slope,
     estimate_local_fwhm_channels,
     fit_energy_calibration,
     fit_fwhm_calibration,
+    fit_quick_slider_calibration,
     resolve_energy_calibration_order,
 )
+from fluxforge.core.peak_fitting import (
+    InteractivePeakFitResult,
+    available_background_models,
+    fit_roi_peak,
+)
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE
+from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.mode_manager import ModeManager
+from fluxforge.gui.nuclide_search import NuclideSearchController
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus
 from fluxforge.gui.theme_manager import theme_tokens
+from fluxforge.gui.widgets import MethodSelectorWidget
 from fluxforge.io.spe import GammaSpectrum
+from fluxforge.plugins import bootstrap_builtin_registries
 
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
     import pyqtgraph as pg
@@ -32,15 +43,22 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
     from fluxforge.gui.qt_compat import (
         QAbstractItemView,
         QDialog,
+        QFormLayout,
         QFrame,
         QGridLayout,
         QGroupBox,
         QHBoxLayout,
         QHeaderView,
         QLabel,
+        QLineEdit,
+        QListWidget,
+        QListWidgetItem,
         QPushButton,
+        QComboBox,
+        QSlider,
         QSpinBox,
         QSplitter,
+        QTabWidget,
         QTableWidget,
         QTableWidgetItem,
         QVBoxLayout,
@@ -84,6 +102,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             spectrum: GammaSpectrum | None,
             mode_manager: ModeManager,
             selection_bus: SelectionBus | None = None,
+            library_manager: DataLibraryManager | None = None,
             on_apply: Callable[
                 [GammaSpectrum, EnergyCalibrationFit, FWHMCalibrationFit | None], None
             ]
@@ -98,12 +117,22 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus or SelectionBus.shared()
+            self.library_manager = library_manager or DataLibraryManager()
+            self.nuclide_controller = NuclideSearchController(
+                self.selection_bus,
+                library_manager=self.library_manager,
+            )
             self.on_apply = on_apply
             self._syncing_energy_table = False
             self._syncing_fwhm_table = False
+            self._syncing_deviation_table = False
+            self._syncing_quick_controls = False
             self._spectrum = spectrum or build_demo_spectrum()
             self._energy_fit: EnergyCalibrationFit | None = None
             self._fwhm_fit: FWHMCalibrationFit | None = None
+            self._quick_fit = None
+            self._roi_fit: InteractivePeakFitResult | None = None
+            self._peak_fitter_registry = bootstrap_builtin_registries().peak_fitters
 
             self._build_ui()
             self.mode_manager.subscribe(self._on_mode_state_changed)
@@ -117,6 +146,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
         def _cleanup(self, *_args) -> None:
             self.mode_manager.unsubscribe(self._on_mode_state_changed)
+            self.library_manager.unsubscribe(self._sync_library_state)
 
         def _build_ui(self) -> None:
             root = QVBoxLayout(self)
@@ -179,11 +209,35 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 symbol="o",
                 symbolSize=10,
             )
+            self.spectrum_roi_fit_curve = self.spectrum_plot.plot(
+                pen=pg.mkPen(width=2),
+            )
+            self.spectrum_roi_background_curve = self.spectrum_plot.plot(
+                pen=pg.mkPen(width=1, style=Qt.DashLine),
+            )
+            self.quick_anchor_a_line = pg.InfiniteLine(angle=90, movable=False)
+            self.quick_anchor_b_line = pg.InfiniteLine(angle=90, movable=False)
+            self.roi_centroid_line = pg.InfiniteLine(angle=90, movable=False)
+            self.quick_anchor_a_line.setVisible(False)
+            self.quick_anchor_b_line.setVisible(False)
+            self.roi_centroid_line.setVisible(False)
+            self.roi_region = pg.LinearRegionItem(
+                values=self._initial_roi_bounds(),
+                movable=True,
+            )
+            self.spectrum_plot.addItem(self.quick_anchor_a_line)
+            self.spectrum_plot.addItem(self.quick_anchor_b_line)
+            self.spectrum_plot.addItem(self.roi_region)
+            self.spectrum_plot.addItem(self.roi_centroid_line)
+            self.roi_region.sigRegionChanged.connect(self._handle_roi_region_changed)
             self.spectrum_plot.scene().sigMouseClicked.connect(self._handle_spectrum_click)
             plots_layout.addWidget(
                 self._wrap_plot_card(
                     "Embedded spectrum canvas",
-                    "Click the spectrum to update the selected calibration row.",
+                    (
+                        "Click the spectrum to update the selected calibration row. "
+                        "Drag the ROI band for live Gaussian or skew fitting."
+                    ),
                     self.spectrum_plot,
                 ),
                 5,
@@ -258,6 +312,48 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     "Resolution curve",
                     "The FWHM model updates alongside the energy fit.",
                     self.fwhm_plot,
+                )
+            )
+
+            self.roi_detail_plot = self._create_plot_widget(
+                "ROI fit preview",
+                "Channel",
+                "Counts",
+            )
+            self.roi_detail_observed_curve = self.roi_detail_plot.plot(
+                pen=None,
+                symbol="o",
+                symbolSize=7,
+            )
+            self.roi_detail_fit_curve = self.roi_detail_plot.plot(
+                pen=pg.mkPen(width=2),
+            )
+            self.roi_detail_background_curve = self.roi_detail_plot.plot(
+                pen=pg.mkPen(width=1, style=Qt.DashLine),
+            )
+            self.roi_residual_plot = self._create_plot_widget(
+                "ROI residuals",
+                "Channel",
+                "(data-model) / sqrt(model)",
+            )
+            self.roi_residual_curve = self.roi_residual_plot.plot(
+                pen=None,
+                symbol="o",
+                symbolSize=7,
+            )
+            self.roi_residual_zero = pg.InfiniteLine(pos=0.0, angle=0, movable=False)
+            self.roi_residual_plot.addItem(self.roi_residual_zero)
+            roi_plot_container = QWidget(plots_panel)
+            roi_plot_layout = QVBoxLayout(roi_plot_container)
+            roi_plot_layout.setContentsMargins(0, 0, 0, 0)
+            roi_plot_layout.setSpacing(10)
+            roi_plot_layout.addWidget(self.roi_detail_plot, 3)
+            roi_plot_layout.addWidget(self.roi_residual_plot, 2)
+            lower_splitter.addWidget(
+                self._wrap_plot_card(
+                    "ROI peak fitter",
+                    "Drag the ROI band on the canvas and compare data, fit, and normalized residuals live.",
+                    roi_plot_container,
                 )
             )
 
@@ -359,6 +455,72 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             fwhm_layout.addWidget(self.fwhm_summary)
             controls_layout.addWidget(fwhm_group, 2)
 
+            library_group = QGroupBox("Library-assisted point assignment", controls_panel)
+            library_group.setObjectName("CalibrationGroup")
+            library_layout = QVBoxLayout(library_group)
+            library_layout.setSpacing(10)
+
+            library_intro = QLabel(
+                (
+                    "Search the active identification library, overlay its reference lines, "
+                    "and assign a selected line to the current calibration row."
+                ),
+                library_group,
+            )
+            library_intro.setObjectName("PanelBody")
+            library_intro.setWordWrap(True)
+            library_layout.addWidget(library_intro)
+
+            self.library_source_combo = QComboBox(library_group)
+            self.library_source_combo.setObjectName("CalibrationLibrarySourceCombo")
+            library_layout.addWidget(self.library_source_combo)
+
+            self.library_search = QLineEdit(library_group)
+            self.library_search.setObjectName("CalibrationLibrarySearchInput")
+            self.library_search.setPlaceholderText("Search calibration library...")
+            library_layout.addWidget(self.library_search)
+
+            library_lists = QHBoxLayout()
+            library_lists.setSpacing(10)
+
+            self.library_results = QListWidget(library_group)
+            self.library_results.setObjectName("CalibrationLibraryResults")
+            library_lists.addWidget(self.library_results, 3)
+
+            self.library_lines = QListWidget(library_group)
+            self.library_lines.setObjectName("CalibrationLibraryLines")
+            library_lists.addWidget(self.library_lines, 2)
+
+            library_layout.addLayout(library_lists)
+
+            self.assign_line_button = QPushButton(
+                "Assign line to selected row",
+                library_group,
+            )
+            self.assign_line_button.clicked.connect(self._assign_selected_library_line)
+            library_layout.addWidget(self.assign_line_button)
+
+            self.library_summary = QLabel("", library_group)
+            self.library_summary.setObjectName("PanelBody")
+            self.library_summary.setWordWrap(True)
+            library_layout.addWidget(self.library_summary)
+            controls_layout.addWidget(library_group, 2)
+
+            advanced_group = QGroupBox("Phase 2 calibration tools", controls_panel)
+            advanced_group.setObjectName("CalibrationGroup")
+            advanced_layout = QVBoxLayout(advanced_group)
+            advanced_layout.setSpacing(10)
+            self.phase2_tabs = QTabWidget(advanced_group)
+            self.phase2_tabs.setObjectName("CalibrationPhase2Tabs")
+            self.quick_slider_tab = self._build_quick_slider_tab(self.phase2_tabs)
+            self.deviation_pairs_tab = self._build_deviation_pairs_tab(self.phase2_tabs)
+            self.roi_fit_tab = self._build_roi_fit_tab(self.phase2_tabs)
+            self.phase2_tabs.addTab(self.quick_slider_tab, "Quick Slider")
+            self.phase2_tabs.addTab(self.deviation_pairs_tab, "Fine Tuning")
+            self.phase2_tabs.addTab(self.roi_fit_tab, "ROI Fit")
+            advanced_layout.addWidget(self.phase2_tabs)
+            controls_layout.addWidget(advanced_group, 3)
+
             provenance = QFrame(controls_panel)
             provenance.setObjectName("HeroCard")
             provenance_layout = QVBoxLayout(provenance)
@@ -388,6 +550,215 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             splitter.addWidget(controls_panel)
             splitter.setStretchFactor(0, 3)
             splitter.setStretchFactor(1, 2)
+
+            self.library_manager.subscribe(self._sync_library_state)
+            self.library_source_combo.currentIndexChanged.connect(self._library_source_changed)
+            self.library_search.textChanged.connect(self._refresh_library_results)
+            self.library_results.itemSelectionChanged.connect(self._library_result_selected)
+            self.library_lines.itemDoubleClicked.connect(
+                lambda _item: self._assign_selected_library_line()
+            )
+            self._populate_library_sources()
+            self._sync_library_state(self.library_manager.state)
+
+        def _build_quick_slider_tab(self, parent: QWidget) -> QWidget:
+            widget = QWidget(parent)
+            layout = QVBoxLayout(widget)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "PeakEasy-style quick anchors provide a fast linear preview that can "
+                    "be promoted into the full calibration table without replacing it."
+                ),
+                widget,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            form = QFormLayout()
+            form.setContentsMargins(0, 0, 0, 0)
+            form.setSpacing(8)
+
+            self.quick_anchor_a_combo = QComboBox(widget)
+            self.quick_anchor_a_combo.currentIndexChanged.connect(
+                self._refresh_quick_slider_preview
+            )
+            form.addRow("Anchor A line", self.quick_anchor_a_combo)
+
+            self.quick_anchor_a_slider = QSlider(Qt.Horizontal, widget)
+            self.quick_anchor_a_slider.setObjectName("QuickAnchorASlider")
+            self.quick_anchor_a_slider.valueChanged.connect(self._refresh_quick_slider_preview)
+            form.addRow("Anchor A channel", self.quick_anchor_a_slider)
+
+            self.quick_anchor_a_label = QLabel("--", widget)
+            self.quick_anchor_a_label.setObjectName("PanelBody")
+            form.addRow("Anchor A preview", self.quick_anchor_a_label)
+
+            self.quick_anchor_b_combo = QComboBox(widget)
+            self.quick_anchor_b_combo.currentIndexChanged.connect(
+                self._refresh_quick_slider_preview
+            )
+            form.addRow("Anchor B line", self.quick_anchor_b_combo)
+
+            self.quick_anchor_b_slider = QSlider(Qt.Horizontal, widget)
+            self.quick_anchor_b_slider.setObjectName("QuickAnchorBSlider")
+            self.quick_anchor_b_slider.valueChanged.connect(self._refresh_quick_slider_preview)
+            form.addRow("Anchor B channel", self.quick_anchor_b_slider)
+
+            self.quick_anchor_b_label = QLabel("--", widget)
+            self.quick_anchor_b_label.setObjectName("PanelBody")
+            form.addRow("Anchor B preview", self.quick_anchor_b_label)
+            layout.addLayout(form)
+
+            button_row = QHBoxLayout()
+            button_row.setSpacing(8)
+            self.quick_reset_button = QPushButton("Reset to seeded anchors", widget)
+            self.quick_reset_button.clicked.connect(self._reset_quick_slider_anchors)
+            button_row.addWidget(self.quick_reset_button)
+            self.quick_promote_button = QPushButton("Promote anchors to table", widget)
+            self.quick_promote_button.clicked.connect(
+                self._promote_quick_slider_to_energy_rows
+            )
+            button_row.addWidget(self.quick_promote_button)
+            button_row.addStretch(1)
+            layout.addLayout(button_row)
+
+            self.quick_preview_summary = QLabel("", widget)
+            self.quick_preview_summary.setObjectName("PanelBody")
+            self.quick_preview_summary.setWordWrap(True)
+            layout.addWidget(self.quick_preview_summary)
+            self._populate_quick_reference_options()
+            self._reset_quick_slider_anchors()
+            return widget
+
+        def _build_deviation_pairs_tab(self, parent: QWidget) -> QWidget:
+            widget = QWidget(parent)
+            layout = QVBoxLayout(widget)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "Fine calibration pairs apply piecewise-linear energy corrections on "
+                    "top of the polynomial fit for InterSpec-style local cleanup."
+                ),
+                widget,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            button_row = QHBoxLayout()
+            button_row.setSpacing(8)
+            self.add_deviation_pair_button = QPushButton("Add pair", widget)
+            self.add_deviation_pair_button.clicked.connect(self._add_empty_deviation_row)
+            button_row.addWidget(self.add_deviation_pair_button)
+            self.remove_deviation_pair_button = QPushButton("Remove selected", widget)
+            self.remove_deviation_pair_button.clicked.connect(
+                self._remove_selected_deviation_rows
+            )
+            button_row.addWidget(self.remove_deviation_pair_button)
+            self.seed_deviation_pairs_button = QPushButton("Seed from residuals", widget)
+            self.seed_deviation_pairs_button.clicked.connect(
+                self._seed_deviation_pairs_from_residuals
+            )
+            button_row.addWidget(self.seed_deviation_pairs_button)
+            self.clear_deviation_pairs_button = QPushButton("Clear", widget)
+            self.clear_deviation_pairs_button.clicked.connect(self._clear_deviation_pairs)
+            button_row.addWidget(self.clear_deviation_pairs_button)
+            button_row.addStretch(1)
+            layout.addLayout(button_row)
+
+            self.deviation_table = QTableWidget(0, 3, widget)
+            self.deviation_table.setObjectName("CalibrationTable")
+            self.deviation_table.setHorizontalHeaderLabels(
+                ("Energy keV", "Correction keV", "Label")
+            )
+            self.deviation_table.verticalHeader().setVisible(False)
+            self.deviation_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.deviation_table.setSelectionMode(QAbstractItemView.SingleSelection)
+            self.deviation_table.itemChanged.connect(self._handle_deviation_table_change)
+            deviation_header = self.deviation_table.horizontalHeader()
+            deviation_header.setSectionResizeMode(QHeaderView.Stretch)
+            deviation_header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+            layout.addWidget(self.deviation_table, 1)
+
+            self.deviation_summary = QLabel(
+                "No deviation pairs are active. The polynomial fit is currently unwarped.",
+                widget,
+            )
+            self.deviation_summary.setObjectName("PanelBody")
+            self.deviation_summary.setWordWrap(True)
+            layout.addWidget(self.deviation_summary)
+            return widget
+
+        def _build_roi_fit_tab(self, parent: QWidget) -> QWidget:
+            widget = QWidget(parent)
+            layout = QVBoxLayout(widget)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "Drag the ROI directly on the spectrum canvas. The fitter updates in "
+                    "real time and can push the centroid or FWHM into the calibration tables."
+                ),
+                widget,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            self.roi_method_selector = MethodSelectorWidget(
+                self._peak_fitter_registry,
+                self.mode_manager,
+                title="Peak fitter",
+                parent=widget,
+            )
+            self.roi_method_selector.combo.currentIndexChanged.connect(
+                self._handle_roi_fitter_changed
+            )
+            layout.addWidget(self.roi_method_selector)
+
+            form = QFormLayout()
+            form.setContentsMargins(0, 0, 0, 0)
+            form.setSpacing(8)
+            self.roi_background_combo = QComboBox(widget)
+            self.roi_background_combo.currentIndexChanged.connect(self._refresh_roi_fit)
+            form.addRow("Background", self.roi_background_combo)
+            layout.addLayout(form)
+
+            button_row = QHBoxLayout()
+            button_row.setSpacing(8)
+            self.snap_roi_button = QPushButton("Snap ROI to selected point", widget)
+            self.snap_roi_button.clicked.connect(self._snap_roi_to_selected_energy_row)
+            button_row.addWidget(self.snap_roi_button)
+            self.apply_roi_energy_button = QPushButton("Use centroid for energy row", widget)
+            self.apply_roi_energy_button.clicked.connect(
+                self._apply_roi_fit_to_selected_energy_row
+            )
+            button_row.addWidget(self.apply_roi_energy_button)
+            self.apply_roi_fwhm_button = QPushButton("Use FWHM for resolution row", widget)
+            self.apply_roi_fwhm_button.clicked.connect(
+                self._apply_roi_fit_to_selected_fwhm_row
+            )
+            button_row.addWidget(self.apply_roi_fwhm_button)
+            button_row.addStretch(1)
+            layout.addLayout(button_row)
+
+            self.roi_fit_summary = QLabel(
+                "Move the ROI band to generate a live fit.",
+                widget,
+            )
+            self.roi_fit_summary.setObjectName("PanelBody")
+            self.roi_fit_summary.setWordWrap(True)
+            layout.addWidget(self.roi_fit_summary)
+
+            self._refresh_roi_background_models()
+            return widget
 
         def _build_kpi_card(self, label: str, value: str) -> tuple[QFrame, QLabel]:
             card = QFrame(self)
@@ -441,6 +812,27 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             widget.setLabel("left", left_label)
             return widget
 
+        def _initial_roi_bounds(self) -> tuple[float, float]:
+            counts = np.asarray(self._spectrum.counts, dtype=float)
+            if counts.size == 0:
+                return (0.0, 32.0)
+            reference_channel = self._snap_channel_to_peak(min(661.0, counts.size - 1))
+            half_width = max(min(counts.size / 40.0, 24.0), 12.0)
+            return (
+                float(max(reference_channel - half_width, 0.0)),
+                float(min(reference_channel + half_width, counts.size - 1)),
+            )
+
+        def set_active_phase2_tab(self, key: str) -> None:
+            widget_map = {
+                "quick_slider": self.quick_slider_tab,
+                "deviation_pairs": self.deviation_pairs_tab,
+                "roi_fit": self.roi_fit_tab,
+            }
+            widget = widget_map.get(key)
+            if widget is not None:
+                self.phase2_tabs.setCurrentWidget(widget)
+
         def _on_mode_state_changed(self, state) -> None:
             resolved = resolve_energy_calibration_order(
                 self.energy_order.value(),
@@ -454,12 +846,34 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.provenance_summary.setText(
                 self._format_provenance_summary(resolved.locked_by)
             )
+            simple_mode = state.mode.value == "simple"
+            if hasattr(self.phase2_tabs, "setTabVisible"):
+                self.phase2_tabs.setTabVisible(
+                    self.phase2_tabs.indexOf(self.deviation_pairs_tab),
+                    not simple_mode,
+                )
+                self.phase2_tabs.setTabVisible(
+                    self.phase2_tabs.indexOf(self.roi_fit_tab),
+                    not simple_mode,
+                )
+            if simple_mode and self.phase2_tabs.currentWidget() in (
+                self.deviation_pairs_tab,
+                self.roi_fit_tab,
+            ):
+                self.phase2_tabs.setCurrentWidget(self.quick_slider_tab)
             self._apply_plot_palette()
             self._refresh_energy_fit()
+            self._refresh_roi_background_models()
+            self._refresh_quick_slider_preview()
+            self._refresh_roi_fit()
 
         def _format_provenance_summary(self, locked_by: str | None) -> str:
             spectrum_name = self._spectrum.spectrum_id or "Untitled spectrum"
             mode_state = self.mode_manager.state
+            calibration_library = self.library_manager.record_for_category("calibration").label
+            identification_library = self.library_manager.record_for_category(
+                "gamma_identification"
+            ).label
             lines = [
                 f"Spectrum: {spectrum_name}",
                 f"Mode: {mode_state.mode.value.title()}",
@@ -473,10 +887,128 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 lines.append(f"Order lock: {locked_by}")
             else:
                 lines.append("Order lock: none")
+            lines.append(f"Calibration sources: {calibration_library}")
+            lines.append(f"Identification library: {identification_library}")
             lines.append(
                 "Residual-first rule: energy residuals remain visible with the ASTM band."
             )
             return "\n".join(lines)
+
+        def _populate_library_sources(self) -> None:
+            self.library_source_combo.blockSignals(True)
+            self.library_source_combo.clear()
+            for record in self.library_manager.available_sources("gamma_identification"):
+                self.library_source_combo.addItem(record.label, record.source_id)
+            self.library_source_combo.blockSignals(False)
+
+        def _reference_line_options(self) -> tuple[tuple[str, float], ...]:
+            options: list[tuple[str, float]] = list(REFERENCE_LINES_KEV)
+            for energy in self.selection_bus.state.reference_lines_keV or ():
+                options.append((f"Active line {energy:.3f} keV", float(energy)))
+            unique: dict[float, tuple[str, float]] = {}
+            for label, energy in options:
+                unique[round(float(energy), 6)] = (label, float(energy))
+            return tuple(sorted(unique.values(), key=lambda item: item[1]))
+
+        def _populate_quick_reference_options(self) -> None:
+            current_a = (
+                float(self.quick_anchor_a_combo.currentData())
+                if self.quick_anchor_a_combo.count()
+                else None
+            )
+            current_b = (
+                float(self.quick_anchor_b_combo.currentData())
+                if self.quick_anchor_b_combo.count()
+                else None
+            )
+            options = self._reference_line_options()
+            for combo, fallback in (
+                (self.quick_anchor_a_combo, REFERENCE_LINES_KEV[0][1]),
+                (self.quick_anchor_b_combo, REFERENCE_LINES_KEV[-1][1]),
+            ):
+                combo.blockSignals(True)
+                combo.clear()
+                for label, energy in options:
+                    combo.addItem(f"{label} · {energy:.3f} keV", float(energy))
+                combo.blockSignals(False)
+                target = current_a if combo is self.quick_anchor_a_combo else current_b
+                if target is None:
+                    target = float(fallback)
+                index = combo.findData(float(target))
+                if index < 0 and combo.count() > 0:
+                    index = 0 if combo is self.quick_anchor_a_combo else combo.count() - 1
+                if index >= 0:
+                    combo.setCurrentIndex(index)
+
+        def _sync_library_state(self, state) -> None:
+            index = self.library_source_combo.findData(state.gamma_identification_source_id)
+            if index >= 0:
+                self.library_source_combo.blockSignals(True)
+                self.library_source_combo.setCurrentIndex(index)
+                self.library_source_combo.blockSignals(False)
+            self.library_summary.setText(
+                self.library_manager.summary_for_category("gamma_identification")
+            )
+            self._refresh_library_results(self.library_search.text())
+            self._populate_quick_reference_options()
+            self.provenance_summary.setText(
+                self._format_provenance_summary(
+                    resolve_energy_calibration_order(
+                        self.energy_order.value(),
+                        standard=self.mode_manager.state.standard,
+                    ).locked_by
+                )
+            )
+
+        def _library_source_changed(self) -> None:
+            source_id = self.library_source_combo.currentData()
+            if source_id:
+                self.library_manager.set_gamma_identification_source(str(source_id))
+
+        def _refresh_library_results(self, query: str) -> None:
+            self.library_results.clear()
+            self.library_lines.clear()
+            for hit in self.nuclide_controller.search(query or "c", limit=18):
+                label = hit.display_name
+                if hit.strongest_lines_keV:
+                    label += " · " + ", ".join(
+                        f"{energy:.3f}" for energy in hit.strongest_lines_keV[:3]
+                    )
+                    label += " keV"
+                item = QListWidgetItem(label, self.library_results)
+                item.setData(Qt.UserRole, hit.nuclide)
+
+        def _library_result_selected(self) -> None:
+            item = self.library_results.currentItem()
+            if item is None:
+                self.library_lines.clear()
+                return
+            nuclide = str(item.data(Qt.UserRole))
+            state = self.nuclide_controller.activate(nuclide)
+            self.library_lines.clear()
+            for energy in state.reference_lines_keV:
+                line_item = QListWidgetItem(
+                    f"{nuclide} · {energy:.3f} keV",
+                    self.library_lines,
+                )
+                line_item.setData(Qt.UserRole, (nuclide, float(energy)))
+            self._populate_quick_reference_options()
+
+        def _assign_selected_library_line(self) -> None:
+            item = self.library_lines.currentItem()
+            if item is None:
+                return
+            nuclide, energy = item.data(Qt.UserRole)
+            row = self.energy_table.currentRow()
+            if row < 0:
+                row = self.energy_table.rowCount()
+                self._add_empty_energy_row(select_row=False)
+            self._set_energy_cell(row, 0, str(nuclide), editable=True)
+            self._set_energy_cell(row, 3, float(energy), editable=True)
+            if not self._table_text(self.energy_table, row, 4):
+                self._set_energy_cell(row, 4, 0.12, editable=True)
+            self.energy_table.selectRow(row)
+            self._refresh_energy_fit()
 
         def _apply_plot_palette(self) -> None:
             tokens = theme_tokens(self.mode_manager.state.theme)
@@ -518,10 +1050,387 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.fwhm_measured_curve.setSymbolBrush(pg.mkBrush(accent_warm))
             self.fwhm_measured_curve.setSymbolPen(pg.mkPen(color=accent_warm, width=1.5))
             self.fwhm_fit_curve.setPen(pg.mkPen(color=accent, width=2))
+            self.spectrum_roi_fit_curve.setPen(pg.mkPen(color=success, width=2))
+            self.spectrum_roi_background_curve.setPen(
+                pg.mkPen(color=accent_warm, width=1, style=Qt.DashLine)
+            )
+            self.quick_anchor_a_line.setPen(pg.mkPen(color=accent_warm, width=1.5))
+            self.quick_anchor_b_line.setPen(pg.mkPen(color=accent, width=1.5))
+            self.roi_centroid_line.setPen(pg.mkPen(color=success, width=1))
+            self.roi_region.setBrush(pg.mkBrush(26, 108, 192, 26))
+            for line in self.roi_region.lines:
+                line.setPen(pg.mkPen(color=accent, width=1))
+            self.roi_detail_observed_curve.setSymbolBrush(pg.mkBrush(accent_warm))
+            self.roi_detail_observed_curve.setSymbolPen(
+                pg.mkPen(color=accent_warm, width=1.25)
+            )
+            self.roi_detail_fit_curve.setPen(pg.mkPen(color=success, width=2))
+            self.roi_detail_background_curve.setPen(
+                pg.mkPen(color=accent_warm, width=1, style=Qt.DashLine)
+            )
+            self.roi_residual_curve.setSymbolBrush(pg.mkBrush(accent))
+            self.roi_residual_curve.setSymbolPen(pg.mkPen(color=accent, width=1.25))
+            self.roi_residual_zero.setPen(pg.mkPen(color=text, width=1))
+
+        def _reset_quick_slider_anchors(self) -> None:
+            points = self._read_energy_points()[:2]
+            if len(points) < 2:
+                points = self._seed_energy_points()[:2]
+            max_channel = max(len(self._spectrum.counts) - 1, 1)
+            self._syncing_quick_controls = True
+            self.quick_anchor_a_slider.setRange(0, max_channel)
+            self.quick_anchor_b_slider.setRange(0, max_channel)
+            anchor_a = float(points[0].channel) if len(points) >= 1 else 128.0
+            anchor_b = float(points[1].channel) if len(points) >= 2 else max_channel * 0.65
+            self.quick_anchor_a_slider.setValue(int(np.clip(round(anchor_a), 0, max_channel)))
+            self.quick_anchor_b_slider.setValue(int(np.clip(round(anchor_b), 0, max_channel)))
+            self._syncing_quick_controls = False
+            self._refresh_quick_slider_preview()
+
+        def _refresh_quick_slider_preview(self, *_args) -> None:
+            if self._syncing_quick_controls:
+                return
+            if self.quick_anchor_a_combo.count() == 0 or self.quick_anchor_b_combo.count() == 0:
+                return
+            anchor_channels = (
+                float(self.quick_anchor_a_slider.value()),
+                float(self.quick_anchor_b_slider.value()),
+            )
+            reference_energies = (
+                float(self.quick_anchor_a_combo.currentData()),
+                float(self.quick_anchor_b_combo.currentData()),
+            )
+            self.quick_anchor_a_line.setVisible(True)
+            self.quick_anchor_b_line.setVisible(True)
+            self.quick_anchor_a_line.setPos(anchor_channels[0])
+            self.quick_anchor_b_line.setPos(anchor_channels[1])
+            try:
+                self._quick_fit = fit_quick_slider_calibration(
+                    anchor_channels,
+                    reference_energies,
+                )
+            except ValueError as exc:
+                self.quick_preview_summary.setText(str(exc))
+                self.quick_promote_button.setEnabled(False)
+                return
+
+            self.quick_promote_button.setEnabled(True)
+            predicted = self._quick_fit.evaluate(np.asarray(anchor_channels, dtype=float))
+            self.quick_anchor_a_label.setText(
+                f"ch {anchor_channels[0]:.0f} -> {predicted[0]:.3f} keV"
+            )
+            self.quick_anchor_b_label.setText(
+                f"ch {anchor_channels[1]:.0f} -> {predicted[1]:.3f} keV"
+            )
+            standards_note = ""
+            if self.mode_manager.state.standard:
+                standards_note = (
+                    " Standards mode still requires the locked polynomial workflow on apply."
+                )
+            self.quick_preview_summary.setText(
+                (
+                    f"Linear preview: E = {self._quick_fit.coefficients[0]:.4f} + "
+                    f"{self._quick_fit.slope_keV_per_channel:.6f} ch. "
+                    f"Anchor separation: {abs(anchor_channels[1] - anchor_channels[0]):.0f} channels."
+                    f"{standards_note}"
+                )
+            )
+
+        def _promote_quick_slider_to_energy_rows(self) -> None:
+            if self._quick_fit is None:
+                return
+            while self.energy_table.rowCount() < 2:
+                self._add_empty_energy_row(select_row=False)
+            previews = self._quick_fit.evaluate(
+                np.asarray(self._quick_fit.anchor_channels, dtype=float)
+            )
+            for row, label, channel, preview_energy, reference_energy in (
+                (
+                    0,
+                    "Quick Anchor A",
+                    self._quick_fit.anchor_channels[0],
+                    float(previews[0]),
+                    self._quick_fit.reference_energies_keV[0],
+                ),
+                (
+                    1,
+                    "Quick Anchor B",
+                    self._quick_fit.anchor_channels[1],
+                    float(previews[1]),
+                    self._quick_fit.reference_energies_keV[1],
+                ),
+            ):
+                self._set_energy_cell(row, 0, label, editable=True)
+                self._set_energy_cell(row, 1, channel)
+                self._set_energy_cell(row, 2, preview_energy)
+                self._set_energy_cell(row, 3, reference_energy)
+                if not self._table_text(self.energy_table, row, 4):
+                    self._set_energy_cell(row, 4, 0.12, editable=True)
+            self.energy_table.selectRow(0)
+            self._refresh_energy_fit()
+
+        def _read_deviation_pairs(self) -> tuple[EnergyDeviationPair, ...]:
+            pairs: list[EnergyDeviationPair] = []
+            for row in range(self.deviation_table.rowCount()):
+                energy = self._table_float(self.deviation_table, row, 0)
+                correction = self._table_float(self.deviation_table, row, 1)
+                label = self._table_text(self.deviation_table, row, 2)
+                if energy is None or correction is None:
+                    continue
+                pairs.append(
+                    EnergyDeviationPair(
+                        energy_keV=float(energy),
+                        correction_keV=float(correction),
+                        label=label,
+                    )
+                )
+            return tuple(sorted(pairs, key=lambda pair: pair.energy_keV))
+
+        def _add_empty_deviation_row(self) -> None:
+            row = self.deviation_table.rowCount()
+            self._syncing_deviation_table = True
+            self.deviation_table.insertRow(row)
+            for column in range(3):
+                self._set_deviation_cell(row, column, "")
+            self._syncing_deviation_table = False
+
+        def _set_deviation_cell(self, row: int, column: int, value) -> None:
+            item = QTableWidgetItem("" if value is None else self._format_table_value(value))
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
+            self.deviation_table.setItem(row, column, item)
+
+        def _remove_selected_deviation_rows(self) -> None:
+            row = self.deviation_table.currentRow()
+            if row < 0:
+                return
+            self.deviation_table.removeRow(row)
+            self._refresh_energy_fit()
+
+        def _clear_deviation_pairs(self) -> None:
+            self._syncing_deviation_table = True
+            self.deviation_table.setRowCount(0)
+            self._syncing_deviation_table = False
+            self._refresh_energy_fit()
+
+        def _seed_deviation_pairs_from_residuals(self) -> None:
+            if self._energy_fit is None:
+                return
+            points = self._read_energy_points()
+            candidate_pairs = [
+                EnergyDeviationPair(
+                    energy_keV=float(point.reference_energy_keV),
+                    correction_keV=float(self._energy_fit.residuals_keV[index]),
+                    label=point.label or f"Pair {index + 1}",
+                )
+                for index, point in enumerate(points)
+                if index < len(self._energy_fit.residuals_keV)
+                and abs(float(self._energy_fit.residuals_keV[index])) >= 0.02
+            ]
+            if not candidate_pairs and points:
+                candidate_pairs = [
+                    EnergyDeviationPair(
+                        energy_keV=float(points[0].reference_energy_keV),
+                        correction_keV=float(self._energy_fit.residuals_keV[0]),
+                        label=points[0].label or "Pair 1",
+                    )
+                ]
+            self._syncing_deviation_table = True
+            self.deviation_table.setRowCount(0)
+            for pair in candidate_pairs:
+                row = self.deviation_table.rowCount()
+                self.deviation_table.insertRow(row)
+                self._set_deviation_cell(row, 0, pair.energy_keV)
+                self._set_deviation_cell(row, 1, pair.correction_keV)
+                self._set_deviation_cell(row, 2, pair.label)
+            self._syncing_deviation_table = False
+            self._refresh_energy_fit()
+
+        def _handle_deviation_table_change(self, _item) -> None:
+            if self._syncing_deviation_table:
+                return
+            self._refresh_energy_fit()
+
+        def _update_deviation_pairs_summary(
+            self,
+            pairs: tuple[EnergyDeviationPair, ...],
+        ) -> None:
+            if not pairs:
+                self.deviation_summary.setText(
+                    "No deviation pairs are active. The polynomial fit is currently unwarped."
+                )
+                return
+            max_correction = max(abs(pair.correction_keV) for pair in pairs)
+            self.deviation_summary.setText(
+                (
+                    f"{len(pairs)} deviation pairs active. "
+                    f"Max local correction = {max_correction:.4f} keV."
+                )
+            )
+
+        def _refresh_roi_background_models(self) -> None:
+            fitter_key = (
+                self.roi_method_selector.current_key()
+                or self._peak_fitter_registry.default_key
+                or "gaussian"
+            )
+            current = self.roi_background_combo.currentData()
+            self.roi_background_combo.blockSignals(True)
+            self.roi_background_combo.clear()
+            for model in available_background_models(fitter_key):
+                self.roi_background_combo.addItem(model.replace("_", " ").title(), model)
+            self.roi_background_combo.blockSignals(False)
+            if current is not None:
+                index = self.roi_background_combo.findData(current)
+                if index >= 0:
+                    self.roi_background_combo.setCurrentIndex(index)
+            if self.roi_background_combo.currentIndex() < 0 and self.roi_background_combo.count():
+                self.roi_background_combo.setCurrentIndex(0)
+
+        def _handle_roi_fitter_changed(self, *_args) -> None:
+            self._refresh_roi_background_models()
+            self._refresh_roi_fit()
+
+        def _handle_roi_region_changed(self, *_args) -> None:
+            self._refresh_roi_fit()
+
+        def _snap_roi_to_selected_energy_row(self) -> None:
+            row = self.energy_table.currentRow()
+            channel = None
+            if row >= 0:
+                channel = self._table_float(self.energy_table, row, 1)
+            if channel is None and self.selection_bus.state.peak_energy_keV is not None:
+                try:
+                    channel = float(
+                        self._spectrum.energy_to_channel(self.selection_bus.state.peak_energy_keV)
+                    )
+                except Exception:
+                    channel = None
+            if channel is None:
+                return
+            half_width = max(estimate_local_fwhm_channels(self._spectrum.counts, int(round(channel))) * 3.0, 10.0)
+            self.roi_region.setRegion((channel - half_width, channel + half_width))
+            self._refresh_roi_fit()
+
+        def _clear_roi_fit_visuals(self, message: str) -> None:
+            self._roi_fit = None
+            self.roi_centroid_line.setVisible(False)
+            for curve in (
+                self.spectrum_roi_fit_curve,
+                self.spectrum_roi_background_curve,
+                self.roi_detail_observed_curve,
+                self.roi_detail_fit_curve,
+                self.roi_detail_background_curve,
+                self.roi_residual_curve,
+            ):
+                curve.setData([], [])
+            self.roi_fit_summary.setText(message)
+
+        def _refresh_roi_fit(self, *_args) -> None:
+            counts = np.asarray(self._spectrum.counts, dtype=float)
+            channels = np.asarray(self._spectrum.channels, dtype=float)
+            if channels.size == 0:
+                channels = np.arange(len(counts), dtype=float)
+            if counts.size < 5:
+                self._clear_roi_fit_visuals("Not enough channels are available for ROI fitting.")
+                return
+            roi_bounds = tuple(float(value) for value in self.roi_region.getRegion())
+            try:
+                fit = fit_roi_peak(
+                    channels,
+                    counts,
+                    roi_bounds,
+                    fitter_key=self.roi_method_selector.current_key() or "gaussian",
+                    background_model=str(
+                        self.roi_background_combo.currentData() or "linear"
+                    ),
+                )
+            except Exception as exc:
+                self._clear_roi_fit_visuals(str(exc))
+                return
+
+            self._roi_fit = fit
+            normalized_residuals = (
+                fit.observed_counts - fit.fit_counts
+            ) / np.sqrt(np.clip(fit.fit_counts, 1.0, None))
+            self.spectrum_roi_fit_curve.setData(fit.channels, fit.fit_counts)
+            self.spectrum_roi_background_curve.setData(
+                fit.channels,
+                fit.background_counts,
+            )
+            self.roi_centroid_line.setVisible(True)
+            self.roi_centroid_line.setPos(fit.centroid_channel)
+            self.roi_detail_observed_curve.setData(fit.channels, fit.observed_counts)
+            self.roi_detail_fit_curve.setData(fit.channels, fit.fit_counts)
+            self.roi_detail_background_curve.setData(fit.channels, fit.background_counts)
+            self.roi_residual_curve.setData(fit.channels, normalized_residuals)
+            centroid_energy = float(self._spectrum.channel_to_energy(fit.centroid_channel))
+            roi_energy_bounds = (
+                float(self._spectrum.channel_to_energy(min(fit.roi_bounds))),
+                float(self._spectrum.channel_to_energy(max(fit.roi_bounds))),
+            )
+            self.selection_bus.publish_roi(*roi_energy_bounds)
+            self.selection_bus.publish_peak(centroid_energy)
+            self.roi_fit_summary.setText(
+                (
+                    f"{fit.fitter_label} with {fit.background_model} background | "
+                    f"centroid {fit.centroid_channel:.3f} ch ({centroid_energy:.3f} keV) | "
+                    f"FWHM {fit.fwhm_channels:.3f} ch | area {fit.area_counts:.1f} counts | "
+                    f"reduced chi^2 {fit.peak_result.reduced_chi_squared:.3f}"
+                )
+            )
+
+        def _energy_scale_at_channel(self, channel: float) -> float:
+            low = max(float(channel) - 0.5, 0.0)
+            high = min(float(channel) + 0.5, max(len(self._spectrum.channels) - 1, 1))
+            return abs(
+                float(self._spectrum.channel_to_energy(high))
+                - float(self._spectrum.channel_to_energy(low))
+            )
+
+        def _apply_roi_fit_to_selected_energy_row(self) -> None:
+            if self._roi_fit is None:
+                return
+            row = self.energy_table.currentRow()
+            if row < 0:
+                row = self.energy_table.rowCount()
+                self._add_empty_energy_row(select_row=False)
+            channel = float(self._roi_fit.centroid_channel)
+            observed_energy = float(self._spectrum.channel_to_energy(channel))
+            self._set_energy_cell(row, 0, self._roi_fit.fitter_label, editable=True)
+            self._set_energy_cell(row, 1, channel)
+            self._set_energy_cell(row, 2, observed_energy)
+            if not self._table_text(self.energy_table, row, 3):
+                reference_lines = tuple(self.selection_bus.state.reference_lines_keV or ())
+                if reference_lines:
+                    nearest = min(reference_lines, key=lambda value: abs(value - observed_energy))
+                    self._set_energy_cell(row, 3, nearest)
+            if not self._table_text(self.energy_table, row, 4):
+                self._set_energy_cell(row, 4, 0.12, editable=True)
+            self.energy_table.selectRow(row)
+            self._refresh_energy_fit()
+
+        def _apply_roi_fit_to_selected_fwhm_row(self) -> None:
+            if self._roi_fit is None:
+                return
+            row = self.fwhm_table.currentRow()
+            if row < 0:
+                self._add_empty_fwhm_row()
+                row = self.fwhm_table.currentRow()
+            channel = float(self._roi_fit.centroid_channel)
+            observed_energy = float(self._spectrum.channel_to_energy(channel))
+            fwhm_keV = max(self._roi_fit.fwhm_channels * self._energy_scale_at_channel(channel), 0.05)
+            self._set_fwhm_cell(row, 0, self._roi_fit.fitter_label)
+            self._set_fwhm_cell(row, 1, observed_energy)
+            self._set_fwhm_cell(row, 2, fwhm_keV)
+            if not self._table_text(self.fwhm_table, row, 3):
+                self._set_fwhm_cell(row, 3, max(fwhm_keV * 0.05, 0.05), editable=True)
+            self.fwhm_table.selectRow(row)
+            self._refresh_fwhm_fit()
 
         def _seed_tables(self) -> None:
             self._seed_energy_table()
             self._seed_fwhm_table()
+            self._reset_quick_slider_anchors()
 
         def _seed_energy_table(self) -> None:
             self._syncing_energy_table = True
@@ -615,6 +1524,8 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
             self.spectrum_kpi[1].setText(self._spectrum.spectrum_id or "Demo spectrum")
             self._refresh_spectrum_markers()
+            self._refresh_quick_slider_preview()
+            self._refresh_roi_fit()
 
         def _refresh_spectrum_markers(self) -> None:
             points = self._read_energy_points()
@@ -635,6 +1546,11 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             scene_point = event.scenePos()
             plot_point = self.spectrum_plot.plotItem.vb.mapSceneToView(scene_point)
             clicked_channel = self._snap_channel_to_peak(plot_point.x())
+            half_width = max(
+                estimate_local_fwhm_channels(self._spectrum.counts, int(round(clicked_channel))) * 3.0,
+                10.0,
+            )
+            self.roi_region.setRegion((clicked_channel - half_width, clicked_channel + half_width))
             row = self.energy_table.currentRow()
             if row < 0:
                 row = self.energy_table.rowCount()
@@ -654,6 +1570,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.energy_table.selectRow(row)
             self.selection_bus.publish_peak(observed_energy)
             self._refresh_energy_fit()
+            self._refresh_roi_fit()
 
         def _read_energy_points(self) -> tuple[EnergyCalibrationPoint, ...]:
             points: list[EnergyCalibrationPoint] = []
@@ -703,6 +1620,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     points,
                     order=self.energy_order.value(),
                     standard=self.mode_manager.state.standard,
+                    deviation_pairs=self._read_deviation_pairs(),
                 )
             except ValueError as exc:
                 self._energy_fit = None
@@ -712,6 +1630,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 self.energy_residual_out_spec.setData([], [])
                 self.apply_button.setEnabled(False)
                 self._update_energy_table_diagnostics(None)
+                self._update_deviation_pairs_summary(self._read_deviation_pairs())
                 return
 
             self._energy_fit = fit
@@ -723,7 +1642,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 (
                     f"Coefficients: [{coefficients}] | R^2={fit.r_squared:.6f} | "
                     f"chi^2={fit.chi_squared:.3f} | reduced chi^2={fit.reduced_chi_squared:.3f} | "
-                    f"RMS={fit.rms_keV:.4f} keV"
+                    f"RMS={fit.rms_keV:.4f} keV | deviation pairs={len(fit.deviation_pairs)}"
                 )
             )
             reference_energies = np.asarray(
@@ -744,6 +1663,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 residuals[~in_spec_mask],
             )
             self._update_energy_table_diagnostics(fit)
+            self._update_deviation_pairs_summary(fit.deviation_pairs)
             self.apply_button.setEnabled(True)
 
         def _refresh_fwhm_fit(self) -> None:
@@ -813,9 +1733,15 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             if self._energy_fit is None:
                 return
             self._spectrum.calibration["energy"] = list(self._energy_fit.coefficients)
-            self._spectrum.energies = self._spectrum.calibrate_channels(
-                list(self._energy_fit.coefficients)
-            )
+            self._spectrum.calibration["deviation_pairs"] = [
+                {
+                    "energy_keV": pair.energy_keV,
+                    "correction_keV": pair.correction_keV,
+                    "label": pair.label,
+                }
+                for pair in self._energy_fit.deviation_pairs
+            ]
+            self._spectrum.energies = self._spectrum.calibrate_channels()
             self.selection_bus.publish(
                 self.selection_bus.state.__class__(
                     peak_energy_keV=self.selection_bus.state.peak_energy_keV,

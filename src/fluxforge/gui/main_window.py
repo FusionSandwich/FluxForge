@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
+from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
@@ -107,6 +108,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.settings = QSettings(self.ORGANIZATION, self.APPLICATION)
             self.mode_manager = mode_manager or ModeManager(settings=self.settings)
             self.selection_bus = selection_bus or SelectionBus.shared()
+            self.library_manager = DataLibraryManager(settings=self.settings)
             self.recent_files = RecentFilesManager(self.settings)
             self._calibration_dialog = None
             self.setDockOptions(
@@ -156,12 +158,32 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             calibration_menu = self.menuBar().addMenu("&Calibration")
             calibration_menu.addAction(
                 self._action(
+                    "Manual Workflow",
+                    enabled=True,
+                    handler=self._open_manual_calibration_workflow,
+                )
+            )
+            calibration_menu.addAction(
+                self._action(
+                    "Standards Workflow",
+                    enabled=True,
+                    handler=self._open_standards_calibration_workflow,
+                )
+            )
+            calibration_menu.addAction(
+                self._action(
                     "Energy + FWHM Workspace",
                     enabled=True,
                     handler=self._open_energy_fwhm_workspace,
                 )
             )
-            calibration_menu.addAction(self._action("Quick Slider Mode"))
+            calibration_menu.addAction(
+                self._action(
+                    "Quick Slider Mode",
+                    enabled=True,
+                    handler=self._open_quick_slider_calibration_mode,
+                )
+            )
 
             tools_menu = self.menuBar().addMenu("&Tools")
             tools_menu.addAction(self._action("QA History"))
@@ -201,7 +223,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _build_docks(self) -> None:
             self.left_dock = self._wrap_dock(
                 "Workspace",
-                SidebarPanel(selection_bus=self.selection_bus, parent=self),
+                SidebarPanel(
+                    selection_bus=self.selection_bus,
+                    library_manager=self.library_manager,
+                    parent=self,
+                ),
                 Qt.LeftDockWidgetArea,
             )
             self.bottom_dock = self._wrap_dock(
@@ -210,6 +236,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
                     open_calibration_workspace=self._open_energy_fwhm_workspace,
+                    open_quick_slider_calibration_workspace=self._open_quick_slider_calibration_mode,
+                    open_manual_calibration_workspace=self._open_manual_calibration_workflow,
+                    open_standards_calibration_workspace=self._open_standards_calibration_workflow,
                     parent=self,
                 ),
                 Qt.BottomDockWidgetArea,
@@ -232,6 +261,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.cursor_label = QLabel("Cursor: --", self)
             self.file_label = QLabel("File: none", self)
             self.mode_label = QLabel("Mode: Expert", self)
+            self.library_label = QLabel("Library: bundled gamma", self)
             self.renderer_label = QLabel("Renderer: PyQtGraph", self)
             self.progress = QProgressBar(self)
             self.progress.setObjectName("StatusProgress")
@@ -244,10 +274,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.addWidget(self.cursor_label, 1)
             status.addWidget(self.file_label, 1)
             status.addPermanentWidget(self.mode_label)
+            status.addPermanentWidget(self.library_label)
             status.addPermanentWidget(self.renderer_label)
             status.addPermanentWidget(self.progress)
             status.addPermanentWidget(self.hardware_led)
             self.hardware_led.set_status("offline", "NO DEVICE")
+            self.library_manager.subscribe(self._on_library_state_changed)
+            self._on_library_state_changed(self.library_manager.state)
 
         def _action(
             self,
@@ -302,6 +335,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Cursor: " + (" | ".join(cursor_parts) if cursor_parts else "--")
             )
 
+        def _on_library_state_changed(self, _state) -> None:
+            label = self.library_manager.record_for_category("gamma_identification").label
+            self.library_label.setText(f"Library: {label}")
+
         def open_path(self, path: str | Path) -> None:
             """Open a spectrum or session file without a modal file dialog."""
 
@@ -347,8 +384,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.open_path(path)
             event.acceptProposedAction()
 
-        def _open_energy_fwhm_workspace(self) -> None:
+        def _open_energy_fwhm_workspace(self, phase2_tab: str | None = None) -> None:
             if self._calibration_dialog is not None and self._calibration_dialog.isVisible():
+                if phase2_tab is not None:
+                    self._calibration_dialog.set_active_phase2_tab(phase2_tab)
                 self._calibration_dialog.raise_()
                 self._calibration_dialog.activateWindow()
                 return
@@ -361,10 +400,27 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 spectrum=current_spectrum,
                 mode_manager=self.mode_manager,
                 selection_bus=self.selection_bus,
+                library_manager=self.library_manager,
                 on_apply=self._apply_calibration_workspace_result,
                 parent=self,
             )
+            if phase2_tab is not None:
+                self._calibration_dialog.set_active_phase2_tab(phase2_tab)
             self._calibration_dialog.show()
+
+        def _open_manual_calibration_workflow(self) -> None:
+            if self.mode_manager.state.mode is not GUIMode.EXPERT:
+                self.mode_manager.set_mode(GUIMode.EXPERT)
+            self._open_energy_fwhm_workspace()
+
+        def _open_standards_calibration_workflow(self) -> None:
+            state = self.mode_manager.state
+            if state.mode is not GUIMode.STANDARDS:
+                self.mode_manager.set_standard(state.standard or "ASTM E181")
+            self._open_energy_fwhm_workspace()
+
+        def _open_quick_slider_calibration_mode(self) -> None:
+            self._open_energy_fwhm_workspace(phase2_tab="quick_slider")
 
         def _apply_calibration_workspace_result(
             self,

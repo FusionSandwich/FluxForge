@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Iterable, Sequence
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Iterable, Sequence
 
 import numpy as np
 
-from fluxforge.analysis.detector_calibration import (
-    ResolutionCurve,
-    fit_resolution_curve,
-)
+if TYPE_CHECKING:
+    from fluxforge.analysis.detector_calibration import ResolutionCurve
 
 
 ASTM_E181_ENERGY_LIMIT_KEV = 0.5
@@ -41,12 +39,23 @@ class EnergyCalibrationPoint:
 
 
 @dataclass(frozen=True)
+class EnergyDeviationPair:
+    """Fine-calibration deviation pair applied on top of the polynomial fit."""
+
+    energy_keV: float
+    correction_keV: float
+    label: str = ""
+
+
+@dataclass(frozen=True)
 class EnergyCalibrationFit:
     """Polynomial energy-calibration fit with residual-first metrics."""
 
     order: int
     coefficients: tuple[float, ...]
+    base_fitted_keV: np.ndarray
     fitted_keV: np.ndarray
+    correction_keV: np.ndarray
     residuals_keV: np.ndarray
     uncertainties_keV: np.ndarray
     chi_squared: float
@@ -55,6 +64,7 @@ class EnergyCalibrationFit:
     degrees_of_freedom: int
     astm_limit_keV: float
     out_of_tolerance: tuple[bool, ...]
+    deviation_pairs: tuple[EnergyDeviationPair, ...] = field(default_factory=tuple)
     locked_by: str | None = None
 
     @property
@@ -95,6 +105,22 @@ class FWHMCalibrationFit:
         return float(np.sqrt(np.mean(self.residuals_keV**2)))
 
 
+@dataclass(frozen=True)
+class QuickCalibrationResult:
+    """Linear quick-calibration preview driven by two slider anchors."""
+
+    anchor_channels: tuple[float, float]
+    reference_energies_keV: tuple[float, float]
+    coefficients: tuple[float, float]
+
+    @property
+    def slope_keV_per_channel(self) -> float:
+        return float(self.coefficients[1])
+
+    def evaluate(self, channels: Sequence[float] | np.ndarray) -> np.ndarray:
+        return evaluate_energy_calibration(self.coefficients, channels)
+
+
 def standard_requires_astm_e181(standard: str | None) -> bool:
     """Return True when the active standard should lock the Phase 2.1 workflow."""
 
@@ -133,6 +159,50 @@ def evaluate_energy_calibration(
     return energies
 
 
+def evaluate_energy_deviation_pairs(
+    energies_keV: float | Sequence[float] | np.ndarray,
+    pairs: Iterable[EnergyDeviationPair],
+) -> np.ndarray:
+    """Evaluate piecewise-linear energy corrections from deviation pairs."""
+
+    values = np.asarray(energies_keV, dtype=float)
+    pair_list = sorted(
+        (
+            EnergyDeviationPair(
+                energy_keV=float(pair.energy_keV),
+                correction_keV=float(pair.correction_keV),
+                label=pair.label,
+            )
+            for pair in pairs
+        ),
+        key=lambda item: item.energy_keV,
+    )
+    if not pair_list:
+        return np.zeros_like(values, dtype=float)
+    if len(pair_list) == 1:
+        return np.full_like(values, pair_list[0].correction_keV, dtype=float)
+
+    anchor_energies = np.asarray([pair.energy_keV for pair in pair_list], dtype=float)
+    corrections = np.asarray([pair.correction_keV for pair in pair_list], dtype=float)
+    return np.interp(
+        values,
+        anchor_energies,
+        corrections,
+        left=float(corrections[0]),
+        right=float(corrections[-1]),
+    )
+
+
+def apply_energy_deviation_pairs(
+    energies_keV: float | Sequence[float] | np.ndarray,
+    pairs: Iterable[EnergyDeviationPair],
+) -> np.ndarray:
+    """Apply deviation-pair corrections to calibrated energies."""
+
+    values = np.asarray(energies_keV, dtype=float)
+    return values + evaluate_energy_deviation_pairs(values, pairs)
+
+
 def energy_calibration_slope(
     coefficients: Sequence[float],
     channel: float,
@@ -153,6 +223,7 @@ def fit_energy_calibration(
     standard: str | None = None,
     astm_limit_keV: float = ASTM_E181_ENERGY_LIMIT_KEV,
     default_uncertainty_keV: float | None = None,
+    deviation_pairs: Iterable[EnergyDeviationPair] = (),
 ) -> EnergyCalibrationFit:
     """Fit a weighted energy-calibration polynomial."""
 
@@ -190,7 +261,17 @@ def fit_energy_calibration(
         w=1.0 / np.clip(uncertainties, 1e-6, None),
     )
     coefficients = tuple(float(value) for value in coefficients_desc[::-1])
-    fitted = evaluate_energy_calibration(coefficients, channels)
+    normalized_pairs = tuple(
+        EnergyDeviationPair(
+            energy_keV=float(pair.energy_keV),
+            correction_keV=float(pair.correction_keV),
+            label=pair.label,
+        )
+        for pair in deviation_pairs
+    )
+    base_fitted = evaluate_energy_calibration(coefficients, channels)
+    corrections = evaluate_energy_deviation_pairs(base_fitted, normalized_pairs)
+    fitted = base_fitted + corrections
     residuals = reference_energies - fitted
     chi_squared = float(
         np.sum((residuals / np.clip(uncertainties, 1e-6, None)) ** 2)
@@ -209,7 +290,9 @@ def fit_energy_calibration(
     return EnergyCalibrationFit(
         order=resolution.order,
         coefficients=coefficients,
+        base_fitted_keV=np.asarray(base_fitted, dtype=float),
         fitted_keV=np.asarray(fitted, dtype=float),
+        correction_keV=np.asarray(corrections, dtype=float),
         residuals_keV=np.asarray(residuals, dtype=float),
         uncertainties_keV=uncertainties,
         chi_squared=chi_squared,
@@ -218,7 +301,32 @@ def fit_energy_calibration(
         degrees_of_freedom=degrees_of_freedom,
         astm_limit_keV=float(astm_limit_keV),
         out_of_tolerance=out_of_tolerance,
+        deviation_pairs=normalized_pairs,
         locked_by=resolution.locked_by,
+    )
+
+
+def fit_quick_slider_calibration(
+    anchor_channels: Sequence[float],
+    reference_energies_keV: Sequence[float],
+) -> QuickCalibrationResult:
+    """Create a linear preview calibration from two slider anchors."""
+
+    if len(anchor_channels) != 2 or len(reference_energies_keV) != 2:
+        raise ValueError("Quick slider calibration requires exactly two anchors.")
+    channel_a, channel_b = (float(anchor_channels[0]), float(anchor_channels[1]))
+    energy_a, energy_b = (
+        float(reference_energies_keV[0]),
+        float(reference_energies_keV[1]),
+    )
+    if abs(channel_b - channel_a) < 1e-9:
+        raise ValueError("Quick slider anchors must occupy distinct channels.")
+    slope = (energy_b - energy_a) / (channel_b - channel_a)
+    intercept = energy_a - slope * channel_a
+    return QuickCalibrationResult(
+        anchor_channels=(channel_a, channel_b),
+        reference_energies_keV=(energy_a, energy_b),
+        coefficients=(intercept, slope),
     )
 
 
@@ -230,6 +338,8 @@ def fit_fwhm_calibration(
     minimum_uncertainty_keV: float = 0.03,
 ) -> FWHMCalibrationFit:
     """Fit the detector resolution curve used by the Phase 2.1 workspace."""
+
+    from fluxforge.analysis.detector_calibration import fit_resolution_curve
 
     point_list = list(points)
     parameter_count = 3 if model == "sqrt_poly" else 2
@@ -302,15 +412,20 @@ __all__ = [
     "ASTM_E181_LOCKED_ORDER",
     "ASTM_E181_LOCK_REASON",
     "CalibrationOrderResolution",
+    "EnergyDeviationPair",
     "EnergyCalibrationFit",
     "EnergyCalibrationPoint",
     "FWHMCalibrationFit",
     "FWHMCalibrationPoint",
+    "QuickCalibrationResult",
+    "apply_energy_deviation_pairs",
     "energy_calibration_slope",
     "estimate_local_fwhm_channels",
     "evaluate_energy_calibration",
+    "evaluate_energy_deviation_pairs",
     "fit_energy_calibration",
     "fit_fwhm_calibration",
+    "fit_quick_slider_calibration",
     "resolve_energy_calibration_order",
     "standard_requires_astm_e181",
 ]
