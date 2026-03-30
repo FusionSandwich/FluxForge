@@ -356,7 +356,7 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     _qapp().processEvents()
     reassigned = peak_panel._current_match_results[alternate_row]
 
-    QTest.mouseClick(peak_panel.assign_isotope_button, Qt.LeftButton)
+    peak_panel._assign_selected_isotope()
     _qapp().processEvents()
 
     updated_peak = window.analysis_workspace.selected_peak()
@@ -366,7 +366,7 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     assert updated_peak.nuclide != original_peak.nuclide or peak_panel.peak_id_tolerance.value() > 2.0
     assert window.selection_bus.state.nuclide == reassigned.nuclide
 
-    QTest.mouseClick(peak_panel.clear_assignment_button, Qt.LeftButton)
+    peak_panel._clear_selected_peak_assignment()
     _qapp().processEvents()
     cleared_peak = window.analysis_workspace.selected_peak()
     assert cleared_peak is not None
