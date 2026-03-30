@@ -105,8 +105,10 @@ def test_current_gui_regression_files_target_modern_qt_stack():
         ROOT / "tests" / "gui_analysis_workspace_probe.py",
         ROOT / "tests" / "gui_unfolding_workspace_probe.py",
         ROOT / "tests" / "gui_module3_workflows_probe.py",
+        ROOT / "tests" / "gui_predictive_dashboard_probe.py",
         ROOT / "tests" / "test_analysis_workspace_qt.py",
         ROOT / "tests" / "test_module3_workflows_qt.py",
+        ROOT / "tests" / "test_predictive_dashboard_qt.py",
     )
 
     for path in modern_gui_files:

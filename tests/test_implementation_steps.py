@@ -123,3 +123,11 @@ def test_phase4_next_step_is_explicit_after_module3_completion():
     assert steps["4.1"]["sequence_status"] == "next"
     for step_id in ("4.2", "4.3", "4.4"):
         assert steps[step_id]["sequence_status"] == "pending"
+
+
+def test_predictive_phase4_plus_detour_is_recorded_as_complete():
+    steps = {step["id"]: step for step in load_steps()["steps"]}
+
+    for step_id in ("4P.1", "4P.2", "4P.3"):
+        assert steps[step_id]["repo_status"] == "complete"
+        assert steps[step_id]["sequence_status"] == "complete"

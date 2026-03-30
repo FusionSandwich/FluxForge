@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
@@ -17,6 +18,10 @@ from fluxforge.gui.phase2_workspace import (
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.io import read_ffs_session, read_spectrum_any
+from fluxforge.core.predictive import (
+    estimate_count_target_forecast,
+    estimate_recalibration_forecast,
+)
 from fluxforge.reporting.engine import ReportingEngine
 from fluxforge.standards import QAMonitor, StandardsEvaluationContext, register_builtin_standards_modules
 from fluxforge.plugins import bootstrap_builtin_registries
@@ -162,7 +167,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.mode_manager.subscribe(self._on_mode_state_changed)
             self.selection_bus.subscribe(self._on_selection_changed)
+            self.phase2_workspace.subscribe(self._on_workspace_state_changed)
             self._on_mode_state_changed(self.mode_manager.state)
+            self._on_workspace_state_changed(self.phase2_workspace.state)
 
         def _build_initial_workspace_state(self) -> Phase2WorkspaceState:
             foreground = build_demo_spectrum()
@@ -325,6 +332,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 mode_manager=self.mode_manager,
                 selection_bus=self.selection_bus,
                 workspace_controller=self.phase2_workspace,
+                qa_monitor=self.qa_monitor,
                 parent=self,
             )
             self.setCentralWidget(self.central_tabs)
@@ -391,6 +399,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mode_label = QLabel("Mode: Expert", self)
             self.library_label = QLabel("Library: bundled gamma", self)
             self.renderer_label = QLabel("Renderer: PyQtGraph", self)
+            self.predictive_label = QLabel("Predictive: --", self)
             self.progress = QProgressBar(self)
             self.progress.setObjectName("StatusProgress")
             self.progress.setMaximumWidth(180)
@@ -404,11 +413,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.addPermanentWidget(self.mode_label)
             status.addPermanentWidget(self.library_label)
             status.addPermanentWidget(self.renderer_label)
+            status.addPermanentWidget(self.predictive_label)
             status.addPermanentWidget(self.progress)
             status.addPermanentWidget(self.hardware_led)
             self.hardware_led.set_status("offline", "NO DEVICE")
             self.library_manager.subscribe(self._on_library_state_changed)
             self._on_library_state_changed(self.library_manager.state)
+            self._update_predictive_status()
 
         def _action(
             self,
@@ -464,11 +475,55 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.cursor_label.setText(
                 "Cursor: " + (" | ".join(cursor_parts) if cursor_parts else "--")
             )
+            self._update_predictive_status()
 
         def _on_library_state_changed(self, _state) -> None:
             label = self.library_manager.record_for_category("gamma_identification").label
             self.library_label.setText(f"Library: {label}")
-            self._refresh_phase2_workspace_derivatives()
+
+        def _on_workspace_state_changed(self, state) -> None:
+            active_slot = next(
+                (slot for slot in state.spectra if slot.key == state.active_spectrum_key),
+                None,
+            )
+            if active_slot is not None:
+                self.file_label.setText(
+                    f"File: {active_slot.source_label or active_slot.spectrum.spectrum_id or active_slot.label}"
+                )
+            self._update_predictive_status()
+
+        def _update_predictive_status(self) -> None:
+            active = self.phase2_workspace.spectrum()
+            if active is None:
+                self.predictive_label.setText("Predictive: --")
+                return
+            records = list(self.phase2_workspace.loaded_spectrum_records())
+            records.sort(
+                key=lambda record: (
+                    record.spectrum.start_time or datetime.max,
+                    record.label,
+                )
+            )
+            history = tuple(record.spectrum for record in records) or (active,)
+            forecast = estimate_count_target_forecast(
+                active,
+                roi_bounds_keV=self.selection_bus.state.roi_bounds_keV,
+                target_counts=10000.0,
+                history_spectra=history,
+            )
+            recalibration = estimate_recalibration_forecast(self.qa_monitor.history())
+            eta_text = (
+                f"{int(round(forecast.eta_seconds / 60.0))}m"
+                if forecast.eta_seconds and forecast.eta_seconds > 60.0
+                else f"{int(round(forecast.eta_seconds or 0.0))}s"
+            )
+            qa_text = (
+                f"QA {int(round(recalibration.days_until_recalibration))}d"
+                if recalibration is not None
+                and recalibration.days_until_recalibration is not None
+                else "QA stable"
+            )
+            self.predictive_label.setText(f"Predictive: ETA {eta_text} | {qa_text}")
 
         def open_path(self, path: str | Path) -> None:
             """Open a spectrum or session file without a modal file dialog."""

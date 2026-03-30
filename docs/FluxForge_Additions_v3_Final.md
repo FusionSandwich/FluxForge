@@ -166,6 +166,10 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   `src/fluxforge/gui/panels/modern_shell.py` with visible progress, and optional
   CuPy backend selection now exists in `src/fluxforge/unfolding/gpu_backend.py`.
 - Module 3 is now complete in sequence and in-repo.
+- The user-directed Predictive Features (Phase 4+) slice from Section 16 is now
+  implemented in-repo as well: the modern Qt dashboard, QA sidebar, and status
+  bar now forecast ROI target-count timing, dead-time saturation, and
+  recalibration timing using offline spectra plus QA history.
 - The current controlling-roadmap next step is Phase 4.1, real HAL driver work
   (local Phase 4 work in this document).
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for
@@ -1403,6 +1407,11 @@ Predictive features (Phase 4+):
   ● Dead time trend  → saturation warning if dead time is rising
   ● FWHM trend       → predicted recalibration date from QA history slope
 ```
+
+Status: implemented ahead of live MCA work at user direction. The modern Qt
+dashboard, QA sidebar, and status bar now surface these predictive forecasts
+using offline spectra plus `QAMonitor` history, while HAL-driven telemetry
+remains deferred.
 
 ---
 

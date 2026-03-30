@@ -198,6 +198,10 @@ be completed before any Phase 1 code is committed on the branch.
   outputs, and optional CuPy-backed batch/ML backend selection with a clean CPU
   fallback.
 - Module 3 is now complete in sequence and in-repo.
+- The user-directed Phase 4+ predictive slice from the secondary GUI plan is now
+  implemented in-repo too: the modern Qt dashboard, QA sidebar, and status bar
+  now forecast ROI time-to-target counts, dead-time saturation risk, and QA-based
+  recalibration timing using offline spectra plus `QAMonitor` history.
 - The current roadmap next step is Phase 4.1, real HAL driver work.
 - GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
   repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader
@@ -1132,6 +1136,17 @@ by dependency and impact. All Stage 0 items must complete before Stage 1 begins.
 | 4.3 | Implement Digital Twin dashboard (§13 additions; §15.2 positions) | area/gui | Activates the reserved Dashboard tab |
 | 4.4 | Implement Spectrogram panel (time–energy color map) | area/gui | Activates the reserved Spectrogram tab |
 | 4.5 | Implement live spectrum canvas update path (incremental counts append) | area/gui | Uses HAL callback; SelectionBus aware |
+
+### User-Directed Predictive Detour (Phase 4+ from Secondary Plan)
+
+These items come from the secondary GUI plan and were implemented ahead of the live-MCA
+HAL work at explicit user direction. They do not mark Phase 4 HAL as complete.
+
+| # | Action | Area | Notes |
+|---|---|---|---|
+| 4P.1 | Implement ROI count-rate ETA forecasting in the modern Qt shell | area/gui | Uses current ROI counts, live time, and loaded-spectrum history |
+| 4P.2 | Implement dead-time saturation forecasting in the modern Qt shell | area/gui | Uses loaded-spectrum dead-time trend; no live MCA dependency |
+| 4P.3 | Implement QA-history recalibration forecasting in the dashboard, sidebar, and status bar | area/gui | Uses `QAMonitor` slope analysis from ASTM-style QA history |
 
 ### Packaging (Continuous — Target M6)
 

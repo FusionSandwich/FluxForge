@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from datetime import datetime
 from typing import Callable
 
 import numpy as np
@@ -12,6 +13,11 @@ from fluxforge.core.batch_analysis import (
     BatchAnalysisJob,
     run_batch_analysis_queue,
     write_batch_outputs,
+)
+from fluxforge.core.predictive import (
+    estimate_count_target_forecast,
+    estimate_dead_time_forecast,
+    estimate_recalibration_forecast,
 )
 from fluxforge.core.phase2_analysis import (
     PeakCandidate,
@@ -44,6 +50,9 @@ from fluxforge.standards import (
 )
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
+    if PYQTGRAPH_AVAILABLE:
+        import pyqtgraph as pg
+
     from fluxforge.gui.backends import PyQtGraphSpectrumCanvas
     from fluxforge.gui.qt_compat import (
         QAbstractItemView,
@@ -107,6 +116,23 @@ def _selection_summary(state: SelectionState) -> str:
     return " | ".join(fragments) if fragments else "No active selection"
 
 
+def _format_duration(seconds: float | None) -> str:
+    if seconds is None:
+        return "n/a"
+    total = max(int(round(seconds)), 0)
+    hours, rem = divmod(total, 3600)
+    minutes, secs = divmod(rem, 60)
+    if hours:
+        return f"{hours:d}h {minutes:02d}m"
+    if minutes:
+        return f"{minutes:d}m {secs:02d}s"
+    return f"{secs:d}s"
+
+
+def _format_percent(value: float) -> str:
+    return f"{value * 100.0:.2f}%"
+
+
 def _demo_counts() -> tuple[float, ...]:
     """Synthetic spectrum used to keep the shell visually alive before I/O lands."""
 
@@ -125,14 +151,22 @@ def build_demo_spectrum() -> GammaSpectrum:
 
     counts = _demo_counts()
     channels = tuple(float(index) for index in range(len(counts)))
+    start_time = datetime(2026, 3, 30, 11, 0)
     return GammaSpectrum(
         counts=np.asarray(counts, dtype=float),
         channels=np.asarray(channels, dtype=float),
         calibration={"energy": [0.0, 1.0]},
+        live_time=300.0,
+        real_time=321.0,
+        start_time=start_time,
         spectrum_id="demo_hpge_workspace",
         detector_id="demo-hpge",
         gps={"latitude": 43.0731, "longitude": -89.4012},
-        metadata={"source": "phase2-demo", "gps": {"latitude": 43.0731, "longitude": -89.4012}},
+        metadata={
+            "source": "phase2-demo",
+            "gps": {"latitude": 43.0731, "longitude": -89.4012},
+            "input_count_rate_cps": 47500.0,
+        },
     )
 
 
@@ -141,14 +175,22 @@ def build_demo_background_spectrum() -> GammaSpectrum:
 
     counts = np.asarray(_demo_counts(), dtype=float) * 0.16
     channels = np.arange(len(counts), dtype=float)
+    start_time = datetime(2026, 3, 30, 10, 0)
     return GammaSpectrum(
         counts=counts,
         channels=channels,
         calibration={"energy": [0.0, 1.0]},
+        live_time=300.0,
+        real_time=309.0,
+        start_time=start_time,
         spectrum_id="demo_hpge_background",
         detector_id="demo-hpge",
         gps={"latitude": 43.0736, "longitude": -89.4019},
-        metadata={"source": "phase2-demo-background", "gps": {"latitude": 43.0736, "longitude": -89.4019}},
+        metadata={
+            "source": "phase2-demo-background",
+            "gps": {"latitude": 43.0736, "longitude": -89.4019},
+            "input_count_rate_cps": 13800.0,
+        },
     )
 
 
@@ -158,14 +200,22 @@ def build_demo_overlay_spectrum() -> GammaSpectrum:
     counts = np.asarray(_demo_counts(), dtype=float) * 0.62
     counts[540:620] *= 1.18
     channels = np.arange(len(counts), dtype=float)
+    start_time = datetime(2026, 3, 30, 10, 30)
     return GammaSpectrum(
         counts=counts,
         channels=channels,
         calibration={"energy": [0.0, 1.0]},
+        live_time=300.0,
+        real_time=316.0,
+        start_time=start_time,
         spectrum_id="demo_hpge_overlay",
         detector_id="demo-hpge",
         gps={"latitude": 43.0742, "longitude": -89.4024},
-        metadata={"source": "phase2-demo-overlay", "gps": {"latitude": 43.0742, "longitude": -89.4024}},
+        metadata={
+            "source": "phase2-demo-overlay",
+            "gps": {"latitude": 43.0742, "longitude": -89.4024},
+            "input_count_rate_cps": 29800.0,
+        },
     )
 
 
@@ -1052,6 +1102,226 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
 
+    class PredictiveDashboardPanel(QWidget):
+        """Offline predictive dashboard derived from current spectra and QA history."""
+
+        def __init__(
+            self,
+            *,
+            selection_bus: SelectionBus,
+            workspace_controller: Phase2WorkspaceController,
+            qa_monitor: QAMonitor,
+            parent=None,
+        ) -> None:
+            super().__init__(parent)
+            self.selection_bus = selection_bus
+            self.workspace_controller = workspace_controller
+            self.qa_monitor = qa_monitor
+            self._selection_state = SelectionState()
+
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(16, 16, 16, 16)
+            layout.setSpacing(12)
+
+            intro = QLabel(
+                (
+                    "Predictive analytics use the current ROI, loaded-spectrum history, "
+                    "and QA trend data to estimate target-count timing, dead-time saturation, "
+                    "and recalibration risk without requiring live MCA acquisition."
+                ),
+                self,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            controls = QHBoxLayout()
+            controls.addWidget(QLabel("Target ROI counts", self))
+            self.target_counts_spin = QDoubleSpinBox(self)
+            self.target_counts_spin.setObjectName("PredictiveTargetCountsSpin")
+            self.target_counts_spin.setRange(100.0, 1_000_000.0)
+            self.target_counts_spin.setDecimals(0)
+            self.target_counts_spin.setSingleStep(500.0)
+            self.target_counts_spin.setValue(10000.0)
+            controls.addWidget(self.target_counts_spin)
+            controls.addStretch(1)
+            layout.addLayout(controls)
+
+            self.metrics_browser = QTextBrowser(self)
+            self.metrics_browser.setObjectName("PredictiveMetricsBrowser")
+            layout.addWidget(self.metrics_browser)
+
+            if PYQTGRAPH_AVAILABLE:
+                self.count_rate_plot = pg.PlotWidget(self)
+                self.count_rate_plot.setObjectName("PredictiveCountRatePlot")
+                self.count_rate_plot.setBackground("#0f172a")
+                self.count_rate_plot.setLabel("left", "ROI cps")
+                self.count_rate_plot.setLabel("bottom", "History Index")
+                layout.addWidget(self.count_rate_plot, 1)
+
+                self.dead_time_plot = pg.PlotWidget(self)
+                self.dead_time_plot.setObjectName("PredictiveDeadTimePlot")
+                self.dead_time_plot.setBackground("#0f172a")
+                self.dead_time_plot.setLabel("left", "Dead Time (%)")
+                self.dead_time_plot.setLabel("bottom", "History Index")
+                layout.addWidget(self.dead_time_plot, 1)
+
+            self.summary_browser = QTextBrowser(self)
+            self.summary_browser.setObjectName("PredictiveSummaryBrowser")
+            layout.addWidget(self.summary_browser, 1)
+
+            self.selection_bus.subscribe(self._selection_changed)
+            self.workspace_controller.subscribe(lambda _state: self.refresh())
+            self.target_counts_spin.valueChanged.connect(lambda _value: self.refresh())
+            self.refresh()
+
+        def _selection_changed(self, state: SelectionState) -> None:
+            self._selection_state = state
+            self.refresh()
+
+        def _history_spectra(self):
+            records = list(self.workspace_controller.loaded_spectrum_records())
+            records.sort(
+                key=lambda record: (
+                    record.spectrum.start_time or datetime.max,
+                    record.label,
+                )
+            )
+            return tuple(record.spectrum for record in records)
+
+        def _selected_roi_bounds(self) -> tuple[float, float] | None:
+            if self._selection_state.roi_bounds_keV is not None:
+                return self._selection_state.roi_bounds_keV
+            selected_peak = self.workspace_controller.selected_peak()
+            if selected_peak is not None:
+                return selected_peak.roi_bounds_keV
+            return None
+
+        def refresh(self) -> None:
+            active = self.workspace_controller.spectrum()
+            if active is None:
+                self.metrics_browser.setHtml("<p>No active spectrum available.</p>")
+                self.summary_browser.setHtml("<p>No predictive forecast available.</p>")
+                return
+
+            history = self._history_spectra() or (active,)
+            roi_bounds = self._selected_roi_bounds()
+            count_forecast = estimate_count_target_forecast(
+                active,
+                roi_bounds_keV=roi_bounds,
+                target_counts=float(self.target_counts_spin.value()),
+                history_spectra=history,
+            )
+            dead_time_forecast = estimate_dead_time_forecast(history)
+            recalibration_forecast = estimate_recalibration_forecast(
+                self.qa_monitor.history()
+            )
+
+            input_rate = float(active.metadata.get("input_count_rate_cps", active.count_rate))
+            metrics_lines = [
+                "<h3>Predictive Dashboard</h3>",
+                (
+                    "<p><strong>Current metrics:</strong> "
+                    f"Input {input_rate:,.1f} cps | "
+                    f"Output {active.count_rate:,.1f} cps | "
+                    f"Dead time {_format_percent(active.dead_time_fraction)} | "
+                    f"Live {active.live_time:.0f}s</p>"
+                ),
+                (
+                    "<p><strong>ROI scope:</strong> "
+                    + (
+                        f"{roi_bounds[0]:.1f}-{roi_bounds[1]:.1f} keV"
+                        if roi_bounds is not None
+                        else "Full spectrum"
+                    )
+                    + "</p>"
+                ),
+            ]
+            self.metrics_browser.setHtml("".join(metrics_lines))
+
+            summary_lines = [
+                "<h3>Predictions</h3>",
+                (
+                    "<p><strong>Count target:</strong> "
+                    f"{count_forecast.current_counts:.1f} ± {count_forecast.current_uncertainty:.1f} counts | "
+                    f"{count_forecast.count_rate_cps:.2f} ± {count_forecast.count_rate_uncertainty_cps:.2f} cps | "
+                    f"ETA {_format_duration(count_forecast.eta_seconds)}"
+                ),
+            ]
+            if count_forecast.eta_uncertainty_seconds is not None:
+                summary_lines[-1] += (
+                    f" ± {_format_duration(count_forecast.eta_uncertainty_seconds)}</p>"
+                )
+            else:
+                summary_lines[-1] += "</p>"
+            summary_lines.append(
+                (
+                    "<p><strong>Count-rate trend:</strong> "
+                    f"{count_forecast.trend.slope:+.2f} ± {count_forecast.trend.slope_stderr:.2f} cps/h "
+                    f"(R² {count_forecast.trend.r_squared:.3f})</p>"
+                )
+            )
+            summary_lines.append(
+                (
+                    "<p><strong>Dead-time trend:</strong> "
+                    f"{_format_percent(dead_time_forecast.current_dead_time_fraction)} now | "
+                    f"{_format_percent(dead_time_forecast.projected_dead_time_fraction_1h)} projected in 1h | "
+                    f"saturation {_format_duration(dead_time_forecast.eta_to_saturation_seconds)}</p>"
+                )
+            )
+            if recalibration_forecast is not None:
+                summary_lines.append(
+                    (
+                        "<p><strong>QA recalibration forecast:</strong> "
+                        f"{recalibration_forecast.nuclide} {recalibration_forecast.energy_keV:.2f} keV | "
+                        f"trigger {recalibration_forecast.trigger_metric} | "
+                        f"target date "
+                        + (
+                            recalibration_forecast.predicted_recalibration_at.strftime("%Y-%m-%d")
+                            if recalibration_forecast.predicted_recalibration_at is not None
+                            else "stable"
+                        )
+                        + (
+                            f" ({recalibration_forecast.days_until_recalibration:.1f} d)"
+                            if recalibration_forecast.days_until_recalibration is not None
+                            else ""
+                        )
+                        + "</p>"
+                    )
+                )
+            self.summary_browser.setHtml("".join(summary_lines))
+
+            if PYQTGRAPH_AVAILABLE and hasattr(self, "count_rate_plot"):
+                indices = np.arange(len(history), dtype=float)
+                if roi_bounds is not None:
+                    rate_values = [
+                        spectrum.counts_in_range(*roi_bounds)[0]
+                        / max(float(spectrum.live_time), 1e-12)
+                        for spectrum in history
+                    ]
+                else:
+                    rate_values = [spectrum.count_rate for spectrum in history]
+                dead_values = [
+                    float(spectrum.dead_time_fraction) * 100.0 for spectrum in history
+                ]
+                self.count_rate_plot.clear()
+                self.dead_time_plot.clear()
+                self.count_rate_plot.plot(
+                    indices,
+                    rate_values,
+                    pen=pg.mkPen(color="#72d6ff", width=2),
+                    symbol="o",
+                    symbolBrush=pg.mkBrush("#72d6ff"),
+                )
+                self.dead_time_plot.plot(
+                    indices,
+                    dead_values,
+                    pen=pg.mkPen(color="#f59e0b", width=2),
+                    symbol="o",
+                    symbolBrush=pg.mkBrush("#f59e0b"),
+                )
+
+
     class CentralWorkspaceTabs(QTabWidget):
         """Center-zone tab stack with the modern spectrum and survey surfaces."""
 
@@ -1060,12 +1330,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
             workspace_controller: Phase2WorkspaceController,
+            qa_monitor: QAMonitor,
             parent=None,
         ) -> None:
             super().__init__(parent)
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
+            self.qa_monitor = qa_monitor
             self._current_spectrum = workspace_controller.spectrum() or build_demo_spectrum()
             self.setObjectName("CentralWorkspaceTabs")
             self.addTab(self._build_spectrum_tab(), "Spectrum")
@@ -1221,28 +1493,24 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             subtitle.setObjectName("HeroSubhead")
             layout.addWidget(subtitle)
 
-            cards = QGridLayout()
-            cards.setHorizontalSpacing(18)
-            cards.setVerticalSpacing(18)
-            cards.addWidget(
-                _card(
-                    "Device Cards",
-                    "Auto-discovery, live rate, and health telemetry will be surfaced as native cards instead of hidden in dialogs.",
-                    "Current phase: layout reserved to avoid later shell rewrites.",
+            predictive_note = QLabel(
+                (
+                    "Live MCA transport remains deferred, but the predictive subset from the "
+                    "GUI plan is now active here using offline spectra and QA history."
                 ),
-                0,
-                0,
+                widget,
             )
-            cards.addWidget(
-                _card(
-                    "Acquisition Timeline",
-                    "The Dashboard tab will host count-rate history and the future spectrogram view without displacing the spectrum tab.",
-                    "Current phase: placeholder only, but the tab is permanent.",
-                ),
-                0,
-                1,
+            predictive_note.setObjectName("HeroCardAccent")
+            predictive_note.setWordWrap(True)
+            layout.addWidget(predictive_note)
+
+            self.predictive_dashboard = PredictiveDashboardPanel(
+                selection_bus=self.selection_bus,
+                workspace_controller=self.workspace_controller,
+                qa_monitor=self.qa_monitor,
+                parent=widget,
             )
-            layout.addLayout(cards)
+            layout.addWidget(self.predictive_dashboard, 1)
             layout.addStretch(1)
             return widget
 
@@ -1854,6 +2122,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _sync_qa_summary(self) -> None:
             statuses = self.qa_monitor.status_snapshot()
             latest_status = statuses[0] if statuses else None
+            active_spectrum = self.workspace_controller.spectrum()
+            records = list(self.workspace_controller.loaded_spectrum_records())
+            records.sort(
+                key=lambda record: (
+                    record.spectrum.start_time or datetime.max,
+                    record.label,
+                )
+            )
+            history_spectra = tuple(record.spectrum for record in records) or (
+                (active_spectrum,) if active_spectrum is not None else ()
+            )
             context = StandardsEvaluationContext(
                 calibration_order=2,
                 max_residual_keV=0.18,
@@ -1902,6 +2181,46 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     f"FWHM @ {latest_status.energy_keV:.2f} keV: {latest_status.fwhm_degradation_pct:+.2f}% | "
                     f"Drift: {latest_status.centroid_drift_keV:+.3f} keV<br/>"
                     f"Last check: {latest_status.last_check.isoformat(sep=' ', timespec='minutes')}</p>"
+                )
+            if active_spectrum is not None:
+                roi_bounds = self.selection_bus.state.roi_bounds_keV
+                count_forecast = estimate_count_target_forecast(
+                    active_spectrum,
+                    roi_bounds_keV=roi_bounds,
+                    target_counts=10000.0,
+                    history_spectra=history_spectra,
+                )
+                dead_time_forecast = estimate_dead_time_forecast(history_spectra)
+                lines.append(
+                    (
+                        "<p><strong>Predictive:</strong> "
+                        f"ROI ETA {_format_duration(count_forecast.eta_seconds)} | "
+                        f"Dead time {_format_percent(dead_time_forecast.current_dead_time_fraction)}"
+                    )
+                    + (
+                        f" → {_format_percent(dead_time_forecast.projected_dead_time_fraction_1h)} in 1h"
+                    )
+                    + "</p>"
+                )
+            recalibration_forecast = estimate_recalibration_forecast(
+                self.qa_monitor.history()
+            )
+            if recalibration_forecast is not None:
+                lines.append(
+                    "<p><strong>Recalibration forecast:</strong> "
+                    + (
+                        recalibration_forecast.predicted_recalibration_at.strftime(
+                            "%Y-%m-%d"
+                        )
+                        if recalibration_forecast.predicted_recalibration_at is not None
+                        else "Stable"
+                    )
+                    + (
+                        f" ({recalibration_forecast.days_until_recalibration:.1f} d)"
+                        if recalibration_forecast.days_until_recalibration is not None
+                        else ""
+                    )
+                    + "</p>"
                 )
             active_standard = self.mode_manager.state.standard
             if active_standard and active_standard in self.registries.standards_modules:

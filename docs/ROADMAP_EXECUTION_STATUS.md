@@ -21,7 +21,7 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| 4.1 | `next` | `not-started` | Module 3 is now complete in sequence, so the formal next step is Phase 4.1: real HAL driver work. |
+| 4.1 | `next` | `not-started` | The formal next step is still Phase 4.1 HAL work, but the user-directed Phase 4+ predictive slice from the secondary GUI plan has now been implemented ahead of it. |
 
 ## Completed In Sequence
 
@@ -93,6 +93,9 @@ officially in progress.
 | 3.13 | `complete` | `src/fluxforge/reporting/engine.py` + `src/fluxforge/reporting/templates/` + `src/fluxforge/gui/dialogs/report_export_dialog.py` now provide the Jinja2 report engine with the three bundled templates and HTML/PDF export |
 | 3.14 | `complete` | `src/fluxforge/core/batch_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` now provide the ProcessPoolExecutor-backed batch queue, visible progress tracking, and JSON/CSV outputs |
 | 3.15 | `complete` | `src/fluxforge/unfolding/gpu_backend.py` + `src/fluxforge/ml/peak_analysis.py` + `src/fluxforge/core/batch_analysis.py` now provide optional CuPy backend selection with clean CPU fallback |
+| 4P.1 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast ROI time-to-target counts from offline spectra |
+| 4P.2 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now project dead-time trend and saturation warnings without live MCA transport |
+| 4P.3 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/main_window.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast recalibration timing from `QAMonitor` history and surface it in the dashboard, sidebar, and status bar |
 
 ## GUI Direction
 
@@ -112,7 +115,7 @@ officially in progress.
   registries, GUI scaffolding, and mock HAL device.
 - `pytest` was upgraded in the user environment to `8.4.2`.
 - The TensorFlow-specific tests were run explicitly in this round, and the only remaining skips are the CUDA library checks that are correct for this CPU-only workspace.
-- The full suite now passes in this workspace: `1124 passed, 2 skipped`.
+- The full suite now passes in this workspace: `1129 passed, 2 skipped`.
 - The redesigned Qt GUI was verified beyond unit tests in this round:
   mouse-driven peak picking in the calibration canvas, governed data-library
   selectors in the sidebar, library-assisted calibration-line assignment, and
@@ -159,6 +162,17 @@ officially in progress.
 - A native Module 3 review probe now exists at `tests/gui_module3_workflows_probe.py`
   so the QA history, report export, Pu isotopics, and batch queue surfaces can
   be inspected visually in the artifact-gallery flow as well.
+- Additional predictive backend coverage now exists in `tests/test_predictive_features.py`:
+  ROI count-target ETA, dead-time saturation forecasting, and QA-history
+  recalibration prediction are exercised directly from deterministic spectra and
+  QA records.
+- Additional predictive Qt coverage now exists in `tests/test_predictive_dashboard_qt.py`:
+  mouse navigation into the Dashboard tab, predictive summary rendering, QA sidebar
+  predictive lines, count/dead-time trend plots, and the status-bar forecast label
+  are now exercised in the modern shell.
+- A native predictive review probe now exists at `tests/gui_predictive_dashboard_probe.py`
+  so the offline predictive dashboard and QA sidebar can be inspected visually in
+  the artifact-gallery flow as well.
 - Native Qt review artifacts for the peak-ID browser were generated at
   `artifacts/gui_review/mouse_peak_id_review/`, and the resulting browser
   gallery was inspected with Playwright against the `06-peak-id-browser` state

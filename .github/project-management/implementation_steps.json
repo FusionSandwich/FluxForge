@@ -1034,7 +1034,7 @@
         "docs/FluxForge_Final_Additions.md",
         "docs/FluxForge_Additions_v3_Final.md"
       ],
-      "notes": "Module 3 is now complete in sequence, so the next formal step is the first real HAL driver work."
+      "notes": "The formal next roadmap step is still the first real HAL driver work, but the user-directed Phase 4+ predictive slice from the secondary GUI plan has now been implemented ahead of this step."
     },
     {
       "id": "4.2",
@@ -1077,6 +1077,56 @@
         "docs/FluxForge_Additions_v3_Final.md"
       ],
       "notes": "The Spectrogram tab remains reserved until live acquisition and time-energy data streams land."
+    },
+    {
+      "id": "4P.1",
+      "phase": "Phase 4+",
+      "title": "Implement ROI count-rate ETA forecasting",
+      "primary_reference": "FluxForge_Additions_v3_Final.md §16 / Predictive features (Phase 4+)",
+      "secondary_reference": "FluxForge_Final_Additions.md user-directed predictive detour note",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/predictive.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_predictive_features.py",
+        "tests/test_predictive_dashboard_qt.py"
+      ],
+      "notes": "The Dashboard, sidebar, and status bar now estimate time-to-target counts for the active ROI using current count rate plus loaded-spectrum history."
+    },
+    {
+      "id": "4P.2",
+      "phase": "Phase 4+",
+      "title": "Implement dead-time saturation forecasting",
+      "primary_reference": "FluxForge_Additions_v3_Final.md §16 / Predictive features (Phase 4+)",
+      "secondary_reference": "FluxForge_Final_Additions.md user-directed predictive detour note",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/predictive.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_predictive_features.py",
+        "tests/test_predictive_dashboard_qt.py"
+      ],
+      "notes": "Dead-time history from loaded spectra is now trended in the Qt dashboard, with projected one-hour dead time and saturation warnings."
+    },
+    {
+      "id": "4P.3",
+      "phase": "Phase 4+",
+      "title": "Implement QA-history recalibration forecasting",
+      "primary_reference": "FluxForge_Additions_v3_Final.md §16 / Predictive features (Phase 4+)",
+      "secondary_reference": "FluxForge_Final_Additions.md user-directed predictive detour note",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/predictive.py",
+        "src/fluxforge/gui/main_window.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_predictive_features.py",
+        "tests/test_predictive_dashboard_qt.py",
+        "tests/gui_predictive_dashboard_probe.py"
+      ],
+      "notes": "QA slope analysis now predicts the next recalibration trigger date and surfaces it in the predictive dashboard, QA sidebar, and status bar."
     }
   ]
 }
