@@ -272,11 +272,7 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
     window.close()
 
 
-@pytest.mark.skipif(
-    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
-    reason="Qt analysis workspace dependencies are unavailable.",
-)
-def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monkeypatch):
+def _prepare_reassignable_peak_assignment(monkeypatch):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -292,11 +288,9 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     peak_panel = window.bottom_dock.widget().peak_table_panel
     peak_panel.run_auto_peak_search()
     peak_panel.run_bayesian_match()
+    peak_panel.peak_id_filter.setText("")
     _qapp().processEvents()
 
-    original_peak = None
-    alternate_row = None
-    peak_panel.peak_id_filter.setText("")
     for row in range(peak_panel.table.rowCount()):
         peak_panel.table.setCurrentCell(row, 0)
         peak_panel.table.selectRow(row)
@@ -304,57 +298,62 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
         peak_panel.peak_id_tolerance.setValue(2.0)
         _qapp().processEvents()
 
-        candidate_peak = window.analysis_workspace.selected_peak()
-        if candidate_peak is None:
+        original_peak = window.analysis_workspace.selected_peak()
+        if original_peak is None:
             continue
 
-        candidate_row = next(
+        alternate_row = next(
             (
                 index
                 for index, match in enumerate(peak_panel._current_match_results)
-                if match.nuclide != candidate_peak.nuclide
+                if match.nuclide != original_peak.nuclide
             ),
             None,
         )
-        if candidate_row is None:
+        if alternate_row is None:
             peak_panel.peak_id_tolerance.setValue(25.0)
             _qapp().processEvents()
-            candidate_row = next(
+            alternate_row = next(
                 (
                     index
                     for index, match in enumerate(peak_panel._current_match_results)
-                    if match.nuclide != candidate_peak.nuclide
+                    if match.nuclide != original_peak.nuclide
                 ),
                 None,
             )
-        if candidate_row is None:
+        if alternate_row is None:
             peak_panel.peak_id_tolerance.setValue(250.0)
             _qapp().processEvents()
-            candidate_row = next(
+            alternate_row = next(
                 (
                     index
                     for index, match in enumerate(peak_panel._current_match_results)
-                    if match.nuclide != candidate_peak.nuclide
+                    if match.nuclide != original_peak.nuclide
                 ),
                 None,
             )
-        if candidate_row is not None:
-            original_peak = candidate_peak
-            alternate_row = candidate_row
-            break
+        if alternate_row is not None:
+            peak_panel.peak_id_matches.setCurrentRow(alternate_row)
+            peak_panel._match_selection_changed()
+            _qapp().processEvents()
+            return window, peak_panel, original_peak, peak_panel._current_match_results[alternate_row]
 
-    assert original_peak is not None
-    assert alternate_row is not None
+    window.close()
+    pytest.fail("Expected at least one reassignable peak in the demo analysis workspace.")
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_peak_id_browser_supports_manual_isotope_reassignment(monkeypatch):
+    window, peak_panel, original_peak, reassigned = _prepare_reassignable_peak_assignment(monkeypatch)
+
     assert peak_panel.peak_id_energy.value() == pytest.approx(
         original_peak.energy_keV,
         abs=1.0,
     )
     assert peak_panel.peak_id_matches.count() >= 1
-
-    peak_panel.peak_id_matches.setCurrentRow(alternate_row)
-    peak_panel._match_selection_changed()
-    _qapp().processEvents()
-    reassigned = peak_panel._current_match_results[alternate_row]
 
     peak_panel._assign_selected_isotope()
     _qapp().processEvents()
@@ -364,6 +363,20 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     assert updated_peak.status == "manual"
     assert updated_peak.nuclide == reassigned.nuclide
     assert updated_peak.nuclide != original_peak.nuclide or peak_panel.peak_id_tolerance.value() > 2.0
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_peak_id_browser_supports_clearing_manual_assignment(monkeypatch):
+    window, peak_panel, _original_peak, _reassigned = _prepare_reassignable_peak_assignment(monkeypatch)
+
+    peak_panel._assign_selected_isotope()
+    _qapp().processEvents()
+    assert window.analysis_workspace.selected_peak() is not None
+    assert window.analysis_workspace.selected_peak().nuclide is not None
 
     peak_panel._clear_selected_peak_assignment()
     _qapp().processEvents()

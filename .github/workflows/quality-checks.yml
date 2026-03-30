@@ -165,7 +165,9 @@ jobs:
 
       - name: Analysis workspace peak assignment workflow test
         run: |
-          pytest -q tests/test_analysis_workspace_qt.py::test_peak_id_browser_supports_manual_assignment_reassignment_and_guides
+          pytest -q \
+            tests/test_analysis_workspace_qt.py::test_peak_id_browser_supports_manual_isotope_reassignment \
+            tests/test_analysis_workspace_qt.py::test_peak_id_browser_supports_clearing_manual_assignment
 
       - name: Analysis workspace peak browser tests
         run: |
