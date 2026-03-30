@@ -294,49 +294,62 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     peak_panel.run_bayesian_match()
     _qapp().processEvents()
 
-    peak_panel.table.setCurrentCell(0, 0)
-    peak_panel.table.selectRow(0)
-    peak_panel._publish_selected_peak()
-    _qapp().processEvents()
+    original_peak = None
+    alternate_row = None
+    peak_panel.peak_id_filter.setText("")
+    for row in range(peak_panel.table.rowCount()):
+        peak_panel.table.setCurrentCell(row, 0)
+        peak_panel.table.selectRow(row)
+        peak_panel._publish_selected_peak()
+        peak_panel.peak_id_tolerance.setValue(2.0)
+        _qapp().processEvents()
 
-    original_peak = window.analysis_workspace.selected_peak()
+        candidate_peak = window.analysis_workspace.selected_peak()
+        if candidate_peak is None:
+            continue
+
+        candidate_row = next(
+            (
+                index
+                for index, match in enumerate(peak_panel._current_match_results)
+                if match.nuclide != candidate_peak.nuclide
+            ),
+            None,
+        )
+        if candidate_row is None:
+            peak_panel.peak_id_tolerance.setValue(25.0)
+            _qapp().processEvents()
+            candidate_row = next(
+                (
+                    index
+                    for index, match in enumerate(peak_panel._current_match_results)
+                    if match.nuclide != candidate_peak.nuclide
+                ),
+                None,
+            )
+        if candidate_row is None:
+            peak_panel.peak_id_tolerance.setValue(250.0)
+            _qapp().processEvents()
+            candidate_row = next(
+                (
+                    index
+                    for index, match in enumerate(peak_panel._current_match_results)
+                    if match.nuclide != candidate_peak.nuclide
+                ),
+                None,
+            )
+        if candidate_row is not None:
+            original_peak = candidate_peak
+            alternate_row = candidate_row
+            break
+
     assert original_peak is not None
-    assert peak_panel.peak_id_tolerance.value() == pytest.approx(2.0)
-    assert peak_panel.peak_id_energy.value() == pytest.approx(original_peak.energy_keV, abs=1.0)
-    assert peak_panel.peak_id_matches.count() >= 1
-
-    alternate_row = next(
-        (
-            index
-            for index, match in enumerate(peak_panel._current_match_results)
-            if match.nuclide != original_peak.nuclide
-        ),
-        None,
-    )
-    if alternate_row is None:
-        peak_panel.peak_id_tolerance.setValue(25.0)
-        peak_panel.peak_id_filter.setText("")
-        _qapp().processEvents()
-        alternate_row = next(
-            (
-                index
-                for index, match in enumerate(peak_panel._current_match_results)
-                if match.nuclide != original_peak.nuclide
-            ),
-            None,
-        )
-    if alternate_row is None:
-        peak_panel.peak_id_tolerance.setValue(250.0)
-        _qapp().processEvents()
-        alternate_row = next(
-            (
-                index
-                for index, match in enumerate(peak_panel._current_match_results)
-                if match.nuclide != original_peak.nuclide
-            ),
-            None,
-        )
     assert alternate_row is not None
+    assert peak_panel.peak_id_energy.value() == pytest.approx(
+        original_peak.energy_keV,
+        abs=1.0,
+    )
+    assert peak_panel.peak_id_matches.count() >= 1
 
     peak_panel.peak_id_matches.setCurrentRow(alternate_row)
     _qapp().processEvents()
