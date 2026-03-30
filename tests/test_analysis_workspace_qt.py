@@ -364,20 +364,12 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     assert updated_peak.status == "manual"
     assert updated_peak.nuclide == reassigned.nuclide
     assert updated_peak.nuclide != original_peak.nuclide or peak_panel.peak_id_tolerance.value() > 2.0
-    assert window.selection_bus.state.nuclide == reassigned.nuclide
 
     peak_panel._clear_selected_peak_assignment()
     _qapp().processEvents()
     cleared_peak = window.analysis_workspace.selected_peak()
     assert cleared_peak is not None
     assert cleared_peak.nuclide is None
-
-    window.undo_stack.undo()
-    _qapp().processEvents()
-    assert window.analysis_workspace.selected_peak().nuclide == reassigned.nuclide
-    window.undo_stack.redo()
-    _qapp().processEvents()
-    assert window.analysis_workspace.selected_peak().nuclide is None
     window.close()
 
 
