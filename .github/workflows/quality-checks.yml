@@ -148,16 +148,23 @@ jobs:
           python -m pip install -e '.[dev,native-gui]'
           python -m pip install "Jinja2>=3.1"
 
-      - name: Modern Qt GUI regression tests
-        run: |
-          pytest -q \
-            tests/test_modern_gui_shell.py \
-            tests/test_project_tracker_assets.py \
-            tests/test_analysis_workspace_qt.py \
-            tests/test_calibration_workspace_qt.py \
-            tests/test_unfolding_workspace_qt.py \
-            tests/test_module3_workflows_qt.py \
-            tests/test_predictive_dashboard_qt.py
+      - name: GUI scaffold regression tests
+        run: pytest -q tests/test_modern_gui_shell.py tests/test_project_tracker_assets.py
+
+      - name: Analysis workspace Qt tests
+        run: pytest -q tests/test_analysis_workspace_qt.py
+
+      - name: Calibration workspace Qt tests
+        run: pytest -q tests/test_calibration_workspace_qt.py
+
+      - name: Unfolding workspace Qt tests
+        run: pytest -q tests/test_unfolding_workspace_qt.py
+
+      - name: Module 3 workflow Qt tests
+        run: pytest -q tests/test_module3_workflows_qt.py
+
+      - name: Predictive dashboard Qt tests
+        run: pytest -q tests/test_predictive_dashboard_qt.py
 
   native-desktop-gui-linux:
     if: github.event_name == 'workflow_dispatch'
