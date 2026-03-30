@@ -159,11 +159,13 @@ jobs:
             tests/test_analysis_workspace_qt.py::test_line_match_browser_and_gamma_phenomena_estimates_are_available \
             tests/test_analysis_workspace_qt.py::test_analysis_workspace_tracks_loaded_spectra_and_role_assignments
 
-      - name: Analysis workspace peak workflow tests
+      - name: Analysis workspace peak table workflow test
         run: |
-          pytest -q \
-            tests/test_analysis_workspace_qt.py::test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync \
-            tests/test_analysis_workspace_qt.py::test_peak_id_browser_supports_manual_assignment_reassignment_and_guides
+          pytest -q tests/test_analysis_workspace_qt.py::test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync
+
+      - name: Analysis workspace peak assignment workflow test
+        run: |
+          pytest -q tests/test_analysis_workspace_qt.py::test_peak_id_browser_supports_manual_assignment_reassignment_and_guides
 
       - name: Analysis workspace peak browser tests
         run: |
