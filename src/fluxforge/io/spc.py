@@ -1,4 +1,4 @@
-"""Minimal SPC reader support used by the Phase 1 reader factory.
+"""Minimal SPC reader support used by the reader factory.
 
 This reader handles the common ASCII-export SPC interchange layout used for
 portable handoff between spectroscopy tools:

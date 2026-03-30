@@ -10,7 +10,7 @@ from typing import Callable, Sequence
 
 import numpy as np
 
-from fluxforge.core.phase2_analysis import detect_peak_candidates
+from fluxforge.core.analysis_workspace import detect_peak_candidates
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.ml import MLPeakAnalysisEngine
 from fluxforge.unfolding.gpu_backend import resolve_array_backend

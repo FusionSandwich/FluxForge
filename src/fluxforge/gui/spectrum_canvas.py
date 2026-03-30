@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
-from fluxforge.core.phase2_analysis import PeakCandidate
+from fluxforge.core.analysis_workspace import PeakCandidate
 
 
 @dataclass(frozen=True)

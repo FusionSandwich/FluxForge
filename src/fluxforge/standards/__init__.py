@@ -45,7 +45,7 @@ def register_builtin_standards_modules(
             description=module.description(),
             recommended=recommended,
             standards_locked=True,
-            tags=("phase3", "standards", module.standard_id.lower().replace(" ", "_")),
+            tags=("standards", module.standard_id.lower().replace(" ", "_")),
             set_default=recommended,
         )
     return registries

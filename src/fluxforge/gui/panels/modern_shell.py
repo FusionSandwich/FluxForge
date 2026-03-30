@@ -19,7 +19,7 @@ from fluxforge.core.predictive import (
     estimate_dead_time_forecast,
     estimate_recalibration_forecast,
 )
-from fluxforge.core.phase2_analysis import (
+from fluxforge.core.analysis_workspace import (
     PeakCandidate,
     apply_ml_peak_predictions,
     bayesian_match_peak_candidates,
@@ -37,7 +37,7 @@ from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.nuclide_search import GammaLineMatchResult, NuclideSearchController
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
-from fluxforge.gui.phase2_workspace import Phase2WorkspaceController, SpectrumSlot, WorkspaceStateCommand
+from fluxforge.gui.analysis_workspace import AnalysisWorkspaceController, SpectrumSlot, WorkspaceStateCommand
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
@@ -163,7 +163,7 @@ def build_demo_spectrum() -> GammaSpectrum:
         detector_id="demo-hpge",
         gps={"latitude": 43.0731, "longitude": -89.4012},
         metadata={
-            "source": "phase2-demo",
+            "source": "analysis-demo",
             "gps": {"latitude": 43.0731, "longitude": -89.4012},
             "input_count_rate_cps": 47500.0,
         },
@@ -171,7 +171,7 @@ def build_demo_spectrum() -> GammaSpectrum:
 
 
 def build_demo_background_spectrum() -> GammaSpectrum:
-    """Return the background companion spectrum for the Phase 2 demo shell."""
+    """Return the background companion spectrum for the analysis demo shell."""
 
     counts = np.asarray(_demo_counts(), dtype=float) * 0.16
     channels = np.arange(len(counts), dtype=float)
@@ -187,7 +187,7 @@ def build_demo_background_spectrum() -> GammaSpectrum:
         detector_id="demo-hpge",
         gps={"latitude": 43.0736, "longitude": -89.4019},
         metadata={
-            "source": "phase2-demo-background",
+            "source": "analysis-demo-background",
             "gps": {"latitude": 43.0736, "longitude": -89.4019},
             "input_count_rate_cps": 13800.0,
         },
@@ -195,7 +195,7 @@ def build_demo_background_spectrum() -> GammaSpectrum:
 
 
 def build_demo_overlay_spectrum() -> GammaSpectrum:
-    """Return the secondary overlay companion spectrum for the Phase 2 demo shell."""
+    """Return the secondary overlay companion spectrum for the analysis demo shell."""
 
     counts = np.asarray(_demo_counts(), dtype=float) * 0.62
     counts[540:620] *= 1.18
@@ -212,7 +212,7 @@ def build_demo_overlay_spectrum() -> GammaSpectrum:
         detector_id="demo-hpge",
         gps={"latitude": 43.0742, "longitude": -89.4024},
         metadata={
-            "source": "phase2-demo-overlay",
+            "source": "analysis-demo-overlay",
             "gps": {"latitude": 43.0742, "longitude": -89.4024},
             "input_count_rate_cps": 29800.0,
         },
@@ -266,7 +266,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             *,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             library_manager: DataLibraryManager,
             undo_stack: QUndoStack | None = None,
             parent=None,
@@ -877,7 +877,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             *,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             library_manager: DataLibraryManager,
             parent=None,
         ) -> None:
@@ -1059,7 +1059,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def __init__(
             self,
             *,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -1109,7 +1109,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self,
             *,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             qa_monitor: QAMonitor,
             parent=None,
         ) -> None:
@@ -1329,7 +1329,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             qa_monitor: QAMonitor,
             parent=None,
         ) -> None:
@@ -1645,7 +1645,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             library_manager: DataLibraryManager | None = None,
             qa_monitor: QAMonitor | None = None,
             open_qa_history: Callable[[], None] | None = None,
@@ -2265,7 +2265,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def __init__(
             self,
             *,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -2411,7 +2411,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             library_manager: DataLibraryManager,
             undo_stack: QUndoStack | None = None,
             open_calibration_workspace: Callable[[], None] | None = None,
@@ -2511,7 +2511,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             body = QLabel(
                 (
-                    "Phase 2.1 now uses the dedicated Qt calibration workspace rather "
+                    "Calibration now uses the dedicated Qt workspace rather "
                     "than expanding the old bottom-tab editor."
                 ),
                 widget,
@@ -2598,7 +2598,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -2708,7 +2708,7 @@ else:
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             parent=None,
         ) -> None:
             self.mode_manager = mode_manager
@@ -2726,7 +2726,7 @@ else:
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             library_manager: DataLibraryManager | None = None,
             qa_monitor: QAMonitor | None = None,
             open_qa_history: Callable[[], None] | None = None,
@@ -2748,7 +2748,7 @@ else:
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             library_manager: DataLibraryManager,
             undo_stack=None,
             open_calibration_workspace: Callable[[], None] | None = None,
@@ -2774,7 +2774,7 @@ else:
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
-            workspace_controller: Phase2WorkspaceController,
+            workspace_controller: AnalysisWorkspaceController,
             parent=None,
         ) -> None:
             self.mode_manager = mode_manager

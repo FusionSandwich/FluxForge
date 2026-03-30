@@ -20,7 +20,7 @@ from fluxforge.unfolding.base import (
 
 @dataclass(frozen=True)
 class GravelUnfolder(UnfoldingMethod):
-    """GRAVEL wrapper aligned with the Phase 3 unfolding contract."""
+    """GRAVEL wrapper aligned with the shared unfolding contract."""
 
     max_iterations: int = 1000
     tolerance: float = 1e-4
@@ -173,14 +173,14 @@ def register_builtin_unfolders(
         definition.key,
         GravelUnfolder(),
         description=definition.summary,
-        tags=("phase3", "unfolding", definition.key),
+        tags=("unfolding", "native", definition.key),
     )
     maxed_definition = MaxedUnfolder.definition()
     registries.unfolders.register(
         maxed_definition.key,
         MaxedUnfolder(),
         description=maxed_definition.summary,
-        tags=("phase3", "unfolding", maxed_definition.key),
+        tags=("unfolding", "native", maxed_definition.key),
     )
     rmle_definition = RMLEUnfolder.definition()
     registries.unfolders.register(
@@ -188,7 +188,7 @@ def register_builtin_unfolders(
         RMLEUnfolder(),
         description=rmle_definition.summary,
         recommended=True,
-        tags=("phase3", "unfolding", rmle_definition.key),
+        tags=("unfolding", "native", rmle_definition.key),
         set_default=True,
     )
     ml_seed_definition = MLSeedUnfolder.definition()
@@ -196,7 +196,7 @@ def register_builtin_unfolders(
         ml_seed_definition.key,
         MLSeedUnfolder(),
         description=ml_seed_definition.summary,
-        tags=("phase3", "unfolding", ml_seed_definition.key),
+        tags=("unfolding", "native", ml_seed_definition.key),
     )
     return registries
 

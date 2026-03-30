@@ -92,7 +92,7 @@ def test_analysis_workspace_steps_are_complete_in_sequence():
         assert steps[step_id]["sequence_status"] == "complete"
 
 
-def test_phase3_module_completion_is_recorded_in_sequence():
+def test_advanced_analysis_module_completion_is_recorded_in_sequence():
     steps = {step["id"]: step for step in load_steps()["steps"]}
 
     for step_id in (
@@ -116,7 +116,7 @@ def test_phase3_module_completion_is_recorded_in_sequence():
         assert steps[step_id]["sequence_status"] == "complete"
 
 
-def test_phase4_next_step_is_explicit_after_module3_completion():
+def test_hal_step_is_explicit_after_advanced_analysis_completion():
     steps = {step["id"]: step for step in load_steps()["steps"]}
 
     assert steps["4.1"]["repo_status"] == "not-started"
@@ -125,7 +125,7 @@ def test_phase4_next_step_is_explicit_after_module3_completion():
         assert steps[step_id]["sequence_status"] == "pending"
 
 
-def test_predictive_phase4_plus_detour_is_recorded_as_complete():
+def test_predictive_detour_is_recorded_as_complete():
     steps = {step["id"]: step for step in load_steps()["steps"]}
 
     for step_id in ("4P.1", "4P.2", "4P.3"):

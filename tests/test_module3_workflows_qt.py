@@ -6,7 +6,7 @@ import pytest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
-from fluxforge.core.phase2_analysis import PeakCandidate  # noqa: E402
+from fluxforge.core.analysis_workspace import PeakCandidate  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import GUIMode, ModeManager  # noqa: E402
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QApplication  # noqa: E402
@@ -202,7 +202,7 @@ def test_peak_table_ml_button_updates_summary_and_sidebar_shows_qa_locks():
     bottom = window.bottom_dock.widget()
     peak_panel = bottom.peak_table_panel
 
-    window.phase2_workspace.replace_peaks(
+    window.analysis_workspace.replace_peaks(
         (
             PeakCandidate(
                 peak_id="peak-1",

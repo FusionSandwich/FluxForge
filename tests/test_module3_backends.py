@@ -4,6 +4,7 @@ from pathlib import Path
 import types
 
 import numpy as np
+import pytest
 
 from fluxforge.core.batch_analysis import (
     BatchAnalysisJob,
@@ -11,7 +12,7 @@ from fluxforge.core.batch_analysis import (
     run_batch_analysis_queue,
     write_batch_outputs,
 )
-from fluxforge.core.phase2_analysis import PeakCandidate, register_builtin_nuclide_id_engines
+from fluxforge.core.analysis_workspace import PeakCandidate, register_builtin_nuclide_id_engines
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.ml import MLPeakAnalysisEngine
 from fluxforge.plugins import PluginRegistries
@@ -271,3 +272,32 @@ def test_reporting_engine_reports_pdf_unavailable_without_weasyprint(monkeypatch
     engine = ReportingEngine()
 
     assert engine.can_export_pdf() is False
+
+
+def test_reporting_engine_imports_without_jinja2_backend(monkeypatch):
+    monkeypatch.setattr("fluxforge.reporting.engine._JINJA2_IMPORT_ERROR", ImportError("missing"))
+    monkeypatch.setattr("fluxforge.reporting.engine.Environment", None)
+    monkeypatch.setattr("fluxforge.reporting.engine.FileSystemLoader", None)
+    monkeypatch.setattr("fluxforge.reporting.engine.select_autoescape", None)
+
+    engine = ReportingEngine()
+
+    assert engine.template_backend_available() is False
+    with pytest.raises(RuntimeError, match="Jinja2"):
+        engine.render(
+            "standard_lab",
+            {
+                "title": "FluxForge Report",
+                "spectrum_image": "canvas",
+                "calibration_curve": "curve",
+                "calibration_residuals": "residuals",
+                "efficiency_curve": "eff curve",
+                "efficiency_residuals": "eff residuals",
+                "residuals_grid": "roi grid",
+                "peak_table": "<table></table>",
+                "activity_table": "<table></table>",
+                "astm_status_table": "<table></table>",
+                "qa_status_snapshot": "qa snapshot",
+                "provenance": "mode=expert",
+            },
+        )

@@ -7,7 +7,7 @@ import pytest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint  # noqa: E402
-from fluxforge.core.phase2_analysis import (  # noqa: E402
+from fluxforge.core.analysis_workspace import (  # noqa: E402
     bayesian_match_peak_candidates,
     calculate_peak_activity,
     compute_cascade_sum_lines,
@@ -27,9 +27,9 @@ from fluxforge.gui.panels.modern_shell import (  # noqa: E402
     build_demo_overlay_spectrum,
     build_demo_spectrum,
 )
-from fluxforge.gui.phase2_workspace import (  # noqa: E402
-    Phase2WorkspaceController,
-    Phase2WorkspaceState,
+from fluxforge.gui.analysis_workspace import (  # noqa: E402
+    AnalysisWorkspaceController,
+    AnalysisWorkspaceState,
     SpectrumSlot,
 )
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QApplication  # noqa: E402
@@ -163,8 +163,8 @@ def test_line_match_browser_and_gamma_phenomena_estimates_are_available():
 
 
 def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
-    controller = Phase2WorkspaceController(
-        Phase2WorkspaceState(
+    controller = AnalysisWorkspaceController(
+        AnalysisWorkspaceState(
             spectra=(
                 SpectrumSlot(
                     key="foreground",
@@ -230,7 +230,7 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
     QTest.mouseClick(peak_panel.auto_find_button, Qt.LeftButton)
     _qapp().processEvents()
     assert peak_panel.table.rowCount() == len(peaks)
-    assert window.phase2_workspace.describe()["peak_count"] == len(peaks)
+    assert window.analysis_workspace.describe()["peak_count"] == len(peaks)
 
     QTest.mouseClick(peak_panel.match_button, Qt.LeftButton)
     _qapp().processEvents()
@@ -243,7 +243,7 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
     peak_panel.table.selectRow(co60_row)
     _qapp().processEvents()
 
-    selected_peak = window.phase2_workspace.selected_peak()
+    selected_peak = window.analysis_workspace.selected_peak()
     assert selected_peak is not None
     assert window.selection_bus.state.peak_energy_keV == pytest.approx(
         selected_peak.energy_keV,
@@ -252,8 +252,8 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
 
     QTest.mouseClick(peak_panel.pin_button, Qt.LeftButton)
     _qapp().processEvents()
-    assert "Co60" in window.phase2_workspace.state.pinned_nuclides
-    assert len(window.phase2_workspace.state.cascade_sum_lines_keV) >= 1
+    assert "Co60" in window.analysis_workspace.state.pinned_nuclides
+    assert len(window.analysis_workspace.state.cascade_sum_lines_keV) >= 1
 
     monkeypatch.setattr(QInputDialog, "getText", lambda *args, **kwargs: ("qa-check", True))
     QTest.mouseClick(peak_panel.tag_button, Qt.LeftButton)
@@ -295,7 +295,7 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     peak_panel.table.selectRow(0)
     _qapp().processEvents()
 
-    original_peak = window.phase2_workspace.selected_peak()
+    original_peak = window.analysis_workspace.selected_peak()
     assert original_peak is not None
     assert peak_panel.peak_id_tolerance.value() == pytest.approx(2.0)
     assert peak_panel.peak_id_energy.value() == pytest.approx(original_peak.energy_keV, abs=1.0)
@@ -343,7 +343,7 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     QTest.mouseClick(peak_panel.assign_isotope_button, Qt.LeftButton)
     _qapp().processEvents()
 
-    updated_peak = window.phase2_workspace.selected_peak()
+    updated_peak = window.analysis_workspace.selected_peak()
     assert updated_peak is not None
     assert updated_peak.status == "manual"
     assert updated_peak.nuclide == reassigned.nuclide
@@ -353,16 +353,16 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
 
     QTest.mouseClick(peak_panel.clear_assignment_button, Qt.LeftButton)
     _qapp().processEvents()
-    cleared_peak = window.phase2_workspace.selected_peak()
+    cleared_peak = window.analysis_workspace.selected_peak()
     assert cleared_peak is not None
     assert cleared_peak.nuclide is None
 
     window.undo_stack.undo()
     _qapp().processEvents()
-    assert window.phase2_workspace.selected_peak().nuclide == reassigned.nuclide
+    assert window.analysis_workspace.selected_peak().nuclide == reassigned.nuclide
     window.undo_stack.redo()
     _qapp().processEvents()
-    assert window.phase2_workspace.selected_peak().nuclide is None
+    assert window.analysis_workspace.selected_peak().nuclide is None
     window.close()
 
 
@@ -452,7 +452,7 @@ def test_peak_id_browser_use_selected_peak_button_restores_peak_centroid(monkeyp
     )
     _qapp().processEvents()
 
-    selected_peak = window.phase2_workspace.selected_peak()
+    selected_peak = window.analysis_workspace.selected_peak()
     assert selected_peak is not None
     peak_panel.peak_id_energy.setValue(400.0)
     _qapp().processEvents()
@@ -498,7 +498,7 @@ def test_main_window_activity_background_and_survey_map_workflows(monkeypatch):
     _qapp().processEvents()
 
     fit = fit_efficiency_model(_make_efficiency_points(), model_key="log_poly_2")
-    window.phase2_workspace.set_efficiency_fit(fit)
+    window.analysis_workspace.set_efficiency_fit(fit)
     activity_panel = bottom.activity_results_panel
     activity_panel.background_mode_combo.setCurrentIndex(
         activity_panel.background_mode_combo.findData("statistical")
@@ -507,9 +507,9 @@ def test_main_window_activity_background_and_survey_map_workflows(monkeypatch):
     QTest.mouseClick(activity_panel.compute_activity_button, Qt.LeftButton)
     _qapp().processEvents()
 
-    assert len(window.phase2_workspace.state.activity_results) == 1
+    assert len(window.analysis_workspace.state.activity_results) == 1
     assert "Bateman correction" in activity_panel.results.toPlainText()
-    assert window.phase2_workspace.state.background_mode == "statistical"
+    assert window.analysis_workspace.state.background_mode == "statistical"
 
     survey_text = bottom.survey_map_panel.browser.toPlainText()
     assert "demo_hpge_workspace" in survey_text
@@ -519,7 +519,7 @@ def test_main_window_activity_background_and_survey_map_workflows(monkeypatch):
     assert spectrum_tabs.count() == 3
     spectrum_tabs.setCurrentIndex(1)
     _qapp().processEvents()
-    assert window.phase2_workspace.state.active_spectrum_key == "background"
+    assert window.analysis_workspace.state.active_spectrum_key == "background"
     window.close()
 
 
@@ -562,18 +562,18 @@ def test_main_window_background_selector_updates_subtracted_foreground_and_overl
     sidebar.overlay_spectrum_combo.setCurrentIndex(overlay_index)
     _qapp().processEvents()
 
-    state = window.phase2_workspace.state
+    state = window.analysis_workspace.state
     assert state.loaded_spectra[-3].label == "sample.csv"
     assert state.loaded_spectra[-2].label == "background.csv"
     assert state.loaded_spectra[-1].label == "overlay.csv"
-    assert window.phase2_workspace.slot("foreground").source_label == "sample.csv"
-    assert window.phase2_workspace.slot("background").source_label == "background.csv"
-    assert window.phase2_workspace.slot("overlay").source_label == "overlay.csv"
+    assert window.analysis_workspace.slot("foreground").source_label == "sample.csv"
+    assert window.analysis_workspace.slot("background").source_label == "background.csv"
+    assert window.analysis_workspace.slot("overlay").source_label == "overlay.csv"
 
     canvas = window.central_tabs.canvas
     expected = subtract_background_counts(
-        window.phase2_workspace.spectrum("foreground"),
-        window.phase2_workspace.spectrum("background"),
+        window.analysis_workspace.spectrum("foreground"),
+        window.analysis_workspace.spectrum("background"),
         mode=state.background_mode,
         scale=state.background_scale,
     )

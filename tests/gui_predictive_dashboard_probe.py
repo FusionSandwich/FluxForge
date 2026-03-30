@@ -14,7 +14,7 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 
-from fluxforge.core.phase2_analysis import PeakCandidate  # noqa: E402
+from fluxforge.core.analysis_workspace import PeakCandidate  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import ModeManager  # noqa: E402
 from fluxforge.gui.qt_compat import QApplication  # noqa: E402
@@ -106,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
     app = QApplication.instance() or QApplication([])
     selection_bus = SelectionBus()
     window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=selection_bus)
-    window.phase2_workspace.replace_peaks(
+    window.analysis_workspace.replace_peaks(
         (
             PeakCandidate(
                 peak_id="peak-1",
@@ -119,7 +119,7 @@ def main(argv: list[str] | None = None) -> int:
             ),
         )
     )
-    window.phase2_workspace.select_peak("peak-1")
+    window.analysis_workspace.select_peak("peak-1")
     selection_bus.publish_roi(655.0, 668.0)
     window.show()
     app.processEvents()

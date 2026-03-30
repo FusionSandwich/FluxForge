@@ -1,4 +1,4 @@
-"""Phase 2 peak-fitting registry and ROI fitting helpers."""
+"""Peak-fitting registry and ROI fitting helpers."""
 
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ class InteractivePeakFitResult:
 def register_builtin_peak_fitters(
     registries: PluginRegistries,
 ) -> PluginRegistries:
-    """Register the built-in Phase 2 Gaussian, skew, and Bayesian fitters."""
+    """Register the built-in Gaussian, skew, and Bayesian fitters."""
 
     registries.peak_fitters.clear()
     registries.peak_fitters.register(
@@ -69,7 +69,7 @@ def register_builtin_peak_fitters(
         description="Recommended Gaussian ROI fitter with live background diagnostics.",
         recommended=True,
         standards_locked=True,
-        tags=("phase2", "gaussian", "roi"),
+        tags=("analysis", "gaussian", "roi"),
         set_default=True,
     )
     registries.peak_fitters.register(
@@ -82,7 +82,7 @@ def register_builtin_peak_fitters(
             summary="Gaussian core with asymmetric exponential tails for distorted peaks.",
         ),
         description="Optional skewed Gaussian ROI fitter with asymmetric tail terms for tailed or charge-collection-distorted peaks.",
-        tags=("phase2", "skew", "roi"),
+        tags=("analysis", "skew", "roi"),
     )
     registries.peak_fitters.register(
         "bayesian_gaussian",
@@ -94,7 +94,7 @@ def register_builtin_peak_fitters(
             summary="Gaussian fit regularized by the local FWHM prior from the active calibration.",
         ),
         description="Bayesian Gaussian ROI fitter using the current FWHM calibration as a sigma prior.",
-        tags=("phase2", "bayesian", "roi"),
+        tags=("analysis", "bayesian", "roi"),
     )
     return registries
 

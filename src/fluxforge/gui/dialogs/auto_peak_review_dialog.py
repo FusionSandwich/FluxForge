@@ -1,10 +1,10 @@
-"""Auto peak review dialog for the modern Phase 2 workspace."""
+"""Auto peak review dialog for the modern analysis workspace."""
 
 from __future__ import annotations
 
 from collections.abc import Sequence
 
-from fluxforge.core.phase2_analysis import PeakCandidate
+from fluxforge.core.analysis_workspace import PeakCandidate
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch

@@ -9,10 +9,10 @@ from pathlib import Path
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
 from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
-from fluxforge.gui.phase2_workspace import (
+from fluxforge.gui.analysis_workspace import (
     LoadedSpectrumRecord,
-    Phase2WorkspaceController,
-    Phase2WorkspaceState,
+    AnalysisWorkspaceController,
+    AnalysisWorkspaceState,
     SpectrumSlot,
 )
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
@@ -143,7 +143,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.registries = bootstrap_builtin_registries()
             register_builtin_standards_modules(self.registries)
             self.undo_stack = QUndoStack(self)
-            self.phase2_workspace = Phase2WorkspaceController(
+            self.analysis_workspace = AnalysisWorkspaceController(
                 self._build_initial_workspace_state()
             )
             self._calibration_dialog = None
@@ -165,15 +165,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._build_docks()
             self._build_status_bar()
             self._restore_layout()
-            self._refresh_phase2_workspace_derivatives()
+            self._refresh_analysis_workspace_derivatives()
 
             self.mode_manager.subscribe(self._on_mode_state_changed)
             self.selection_bus.subscribe(self._on_selection_changed)
-            self.phase2_workspace.subscribe(self._on_workspace_state_changed)
+            self.analysis_workspace.subscribe(self._on_workspace_state_changed)
             self._on_mode_state_changed(self.mode_manager.state)
-            self._on_workspace_state_changed(self.phase2_workspace.state)
+            self._on_workspace_state_changed(self.analysis_workspace.state)
 
-        def _build_initial_workspace_state(self) -> Phase2WorkspaceState:
+        def _build_initial_workspace_state(self) -> AnalysisWorkspaceState:
             foreground = build_demo_spectrum()
             background = build_demo_background_spectrum()
             overlay = build_demo_overlay_spectrum()
@@ -217,7 +217,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     source_label="Demo Overlay",
                 ),
             )
-            return Phase2WorkspaceState(
+            return AnalysisWorkspaceState(
                 spectra=spectra,
                 loaded_spectra=loaded_spectra,
                 active_spectrum_key="foreground",
@@ -231,7 +231,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._report_export_action = self._action(
                 "Export Report...",
                 "Ctrl+E",
-                enabled=True,
+                enabled=self.reporting_engine.template_backend_available(),
                 handler=self._open_report_export,
             )
             file_menu.addAction(self._report_export_action)
@@ -340,7 +340,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.central_tabs = CentralWorkspaceTabs(
                 mode_manager=self.mode_manager,
                 selection_bus=self.selection_bus,
-                workspace_controller=self.phase2_workspace,
+                workspace_controller=self.analysis_workspace,
                 qa_monitor=self.qa_monitor,
                 parent=self,
             )
@@ -364,7 +364,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 SidebarPanel(
                     mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
-                    workspace_controller=self.phase2_workspace,
+                    workspace_controller=self.analysis_workspace,
                     library_manager=self.library_manager,
                     qa_monitor=self.qa_monitor,
                     open_qa_history=self._open_qa_history,
@@ -378,7 +378,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 BottomWorkspaceTabs(
                     mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
-                    workspace_controller=self.phase2_workspace,
+                    workspace_controller=self.analysis_workspace,
                     library_manager=self.library_manager,
                     undo_stack=self.undo_stack,
                     open_calibration_workspace=self._open_energy_fwhm_workspace,
@@ -394,7 +394,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 ToolContextPanel(
                     mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
-                    workspace_controller=self.phase2_workspace,
+                    workspace_controller=self.analysis_workspace,
                     parent=self,
                 ),
                 Qt.RightDockWidgetArea,
@@ -505,11 +505,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._update_predictive_status()
 
         def _update_predictive_status(self) -> None:
-            active = self.phase2_workspace.spectrum()
+            active = self.analysis_workspace.spectrum()
             if active is None:
                 self.predictive_label.setText("Predictive: --")
                 return
-            records = list(self.phase2_workspace.loaded_spectrum_records())
+            records = list(self.analysis_workspace.loaded_spectrum_records())
             records.sort(
                 key=lambda record: (
                     record.spectrum.start_time or datetime.max,
@@ -556,7 +556,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         else (spectrum.spectrum_id or f"{source.stem} spectrum {index + 1}")
                     )
                     loaded_keys.append(
-                        self.phase2_workspace.register_loaded_spectrum(
+                        self.analysis_workspace.register_loaded_spectrum(
                             spectrum,
                             label=label,
                             source_path=session_source,
@@ -568,15 +568,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         len(loaded_keys) - 1,
                     )
                     active_key = loaded_keys[active_index]
-                    slot_key = self.phase2_workspace.state.active_spectrum_key
-                    self.phase2_workspace.assign_loaded_spectrum_to_slot(
+                    slot_key = self.analysis_workspace.state.active_spectrum_key
+                    self.analysis_workspace.assign_loaded_spectrum_to_slot(
                         active_key,
                         slot_key,
                     )
                 self.recent_files.record_many(session.recent_files or [source])
             else:
                 spectrum = read_spectrum_any(source)
-                loaded_key = self.phase2_workspace.register_loaded_spectrum(
+                loaded_key = self.analysis_workspace.register_loaded_spectrum(
                     spectrum,
                     label=source.name,
                     source_path=str(source),
@@ -590,7 +590,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     )
                 self.recent_files.record(source)
             self.file_label.setText(f"File: {source.name}")
-            self._refresh_phase2_workspace_derivatives()
+            self._refresh_analysis_workspace_derivatives()
 
         def dragEnterEvent(self, event) -> None:
             mime_data = event.mimeData()
@@ -621,10 +621,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.open_path(path)
             event.acceptProposedAction()
 
-        def _open_energy_fwhm_workspace(self, phase2_tab: str | None = None) -> None:
+        def _open_energy_fwhm_workspace(self, advanced_tab: str | None = None) -> None:
             if self._calibration_dialog is not None and self._calibration_dialog.isVisible():
-                if phase2_tab is not None:
-                    self._calibration_dialog.set_active_phase2_tab(phase2_tab)
+                if advanced_tab is not None:
+                    self._calibration_dialog.set_active_advanced_tab(advanced_tab)
                 self._calibration_dialog.raise_()
                 self._calibration_dialog.activateWindow()
                 return
@@ -641,8 +641,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 on_apply=self._apply_calibration_workspace_result,
                 parent=self,
             )
-            if phase2_tab is not None:
-                self._calibration_dialog.set_active_phase2_tab(phase2_tab)
+            if advanced_tab is not None:
+                self._calibration_dialog.set_active_advanced_tab(advanced_tab)
             self._calibration_dialog.show()
 
         def _open_manual_calibration_workflow(self) -> None:
@@ -657,7 +657,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._open_energy_fwhm_workspace()
 
         def _open_quick_slider_calibration_mode(self) -> None:
-            self._open_energy_fwhm_workspace(phase2_tab="quick_slider")
+            self._open_energy_fwhm_workspace(advanced_tab="quick_slider")
 
         def _run_auto_peak_search(self) -> None:
             bottom_widget = self.bottom_dock.widget()
@@ -695,7 +695,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _build_report_context(self, template_name: str) -> dict[str, object]:
-            state = self.phase2_workspace.state
+            state = self.analysis_workspace.state
             peak_rows = "".join(
                 f"<tr><td>{peak.energy_keV:.3f}</td><td>{peak.nuclide or 'Unassigned'}</td><td>{peak.net_counts:.1f}</td></tr>"
                 for peak in state.peaks
@@ -776,6 +776,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             return tuple(evaluations)
 
         def _open_report_export(self) -> None:
+            if not self.reporting_engine.template_backend_available():
+                self.statusBar().showMessage(
+                    "Report export requires the optional reporting extra (`Jinja2`).",
+                    6000,
+                )
+                return
             if self._report_dialog is not None and self._report_dialog.isVisible():
                 self._report_dialog.raise_()
                 self._report_dialog.activateWindow()
@@ -822,7 +828,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._pu_isotopics_dialog.activateWindow()
                 return
             self._pu_isotopics_dialog = PuIsotopicsDialog(
-                peaks=self.phase2_workspace.state.peaks,
+                peaks=self.analysis_workspace.state.peaks,
                 parent=self,
             )
             self._pu_isotopics_dialog.show()
@@ -835,7 +841,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         ) -> None:
             if hasattr(self.central_tabs, "load_spectrum"):
                 self.central_tabs.load_spectrum(spectrum)
-            self._refresh_phase2_workspace_derivatives()
+            self._refresh_analysis_workspace_derivatives()
             self.file_label.setText(
                 f"File: {spectrum.spectrum_id or 'workspace spectrum'}"
             )
@@ -849,17 +855,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.progress.setValue(72)
             self.progress.setFormat("Calibration applied")
 
-        def _refresh_phase2_workspace_derivatives(self) -> None:
-            from fluxforge.core.phase2_analysis import compute_cascade_sum_lines, extract_survey_points
+        def _refresh_analysis_workspace_derivatives(self) -> None:
+            from fluxforge.core.analysis_workspace import compute_cascade_sum_lines, extract_survey_points
 
             spectra = [
                 (slot.key, slot.spectrum)
-                for slot in self.phase2_workspace.state.spectra
+                for slot in self.analysis_workspace.state.spectra
             ]
-            self.phase2_workspace.set_survey_points(extract_survey_points(spectra))
-            self.phase2_workspace.set_cascade_sum_lines(
+            self.analysis_workspace.set_survey_points(extract_survey_points(spectra))
+            self.analysis_workspace.set_cascade_sum_lines(
                 compute_cascade_sum_lines(
-                    self.phase2_workspace.state.pinned_nuclides,
+                    self.analysis_workspace.state.pinned_nuclides,
                     source_id=self.library_manager.state.gamma_identification_source_id,
                     custom_path=self.library_manager.state.custom_gamma_path,
                 )

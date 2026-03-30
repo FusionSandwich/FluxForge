@@ -6,7 +6,7 @@ from typing import Sequence
 
 import numpy as np
 
-from fluxforge.core.phase2_analysis import PeakCandidate
+from fluxforge.core.analysis_workspace import PeakCandidate
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import (

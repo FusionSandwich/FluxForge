@@ -1,4 +1,4 @@
-"""Generic CSV spectrum reader used by the Phase 1 reader factory."""
+"""Generic CSV spectrum reader used by the reader factory."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Efficiency calibration dialog for the modern Phase 2 workspace."""
+"""Efficiency calibration dialog for the modern analysis workspace."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import math
 from collections.abc import Sequence
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint
-from fluxforge.core.phase2_analysis import (
+from fluxforge.core.analysis_workspace import (
     EfficiencyCalibrationFitResult,
     register_builtin_efficiency_models,
     fit_efficiency_model,
@@ -33,7 +33,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
     class EfficiencyCalibrationDialog(QDialog):
-        """Fit and apply Phase 2 efficiency models from the modern Qt stack."""
+        """Fit and apply registered efficiency models from the modern Qt stack."""
 
         HEADERS = (
             "Energy keV",
@@ -67,7 +67,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             intro = QLabel(
                 (
                     "Fit one of the registered efficiency models. The resulting curve "
-                    "is used by the Phase 2 activity workflow."
+                    "is used by the activity workflow."
                 ),
                 self,
             )

@@ -1,4 +1,4 @@
-"""Phase 1 spectrum reader factory and file-type dispatch."""
+"""Spectrum reader factory and file-type dispatch."""
 
 from __future__ import annotations
 
@@ -65,7 +65,7 @@ class SpectrumReaderFactory:
 
 
 def create_reader_factory() -> SpectrumReaderFactory:
-    """Create the default Phase 1 reader factory."""
+    """Create the default reader factory."""
 
     factory = SpectrumReaderFactory()
     factory.register(".n42", _n42_to_gamma)

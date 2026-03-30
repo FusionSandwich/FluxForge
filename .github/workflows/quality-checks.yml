@@ -6,7 +6,6 @@ on:
     branches:
       - main
       - add_gui
-      - chore/repo-cleanup-phase1-safety-20260317
       - chore/folder-audit-native-gui-review-20260317
     paths:
       - 'src/fluxforge/**/*.py'
@@ -20,7 +19,7 @@ on:
       - '.github/workflows/quality-checks.yml'
 
 jobs:
-  phase2-core-analysis:
+  core-analysis:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -73,7 +72,7 @@ jobs:
             src/fluxforge/io/metadata.py \
             tests/test_io_metadata.py
 
-      - name: Stage 0 / Phase 1 scaffold checks
+      - name: Tracker and GUI scaffold checks
         env:
           PYTHONPATH: src
         run: |

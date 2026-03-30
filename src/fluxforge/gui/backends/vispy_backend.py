@@ -47,16 +47,16 @@ class VispySpectrumCanvas(SpectrumCanvas):
     def set_spectrum(self, counts: Sequence[float]) -> None:
         del counts
         raise RuntimeError(
-            "Vispy renderer is a Phase 1 stub and is not yet implemented in this workspace."
+            "Vispy renderer is an additive stub and is not yet implemented in this workspace."
         )
 
     def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
         del energies_keV
         raise RuntimeError(
-            "Vispy renderer is a Phase 1 stub and is not yet implemented in this workspace."
+            "Vispy renderer is an additive stub and is not yet implemented in this workspace."
         )
 
     def clear(self) -> None:
         raise RuntimeError(
-            "Vispy renderer is a Phase 1 stub and is not yet implemented in this workspace."
+            "Vispy renderer is an additive stub and is not yet implemented in this workspace."
         )

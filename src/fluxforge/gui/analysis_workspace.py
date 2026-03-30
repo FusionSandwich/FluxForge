@@ -1,4 +1,4 @@
-"""Shared state container for the modern Phase 2 GUI workflow."""
+"""Shared state container for the modern analysis GUI workflow."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass, replace
 from typing import Callable, Sequence
 
-from fluxforge.core.phase2_analysis import (
+from fluxforge.core.analysis_workspace import (
     ActivityCalculationResult,
     EfficiencyCalibrationFitResult,
     PeakCandidate,
@@ -43,8 +43,8 @@ class LoadedSpectrumRecord:
 
 
 @dataclass(frozen=True)
-class Phase2WorkspaceState:
-    """Serializable state for the remaining Phase 2 GUI surfaces."""
+class AnalysisWorkspaceState:
+    """Serializable state for the remaining analysis GUI surfaces."""
 
     spectra: tuple[SpectrumSlot, ...] = ()
     loaded_spectra: tuple[LoadedSpectrumRecord, ...] = ()
@@ -61,18 +61,18 @@ class Phase2WorkspaceState:
     cascade_sum_lines_keV: tuple[float, ...] = ()
 
 
-WorkspaceListener = Callable[[Phase2WorkspaceState], None]
+WorkspaceListener = Callable[[AnalysisWorkspaceState], None]
 
 
-class Phase2WorkspaceController:
-    """Observable state store for the modern Phase 2 shell."""
+class AnalysisWorkspaceController:
+    """Observable state store for the modern analysis shell."""
 
-    def __init__(self, initial_state: Phase2WorkspaceState | None = None) -> None:
-        self._state = initial_state or Phase2WorkspaceState()
+    def __init__(self, initial_state: AnalysisWorkspaceState | None = None) -> None:
+        self._state = initial_state or AnalysisWorkspaceState()
         self._listeners: list[WorkspaceListener] = []
 
     @property
-    def state(self) -> Phase2WorkspaceState:
+    def state(self) -> AnalysisWorkspaceState:
         return self._state
 
     def subscribe(self, listener: WorkspaceListener) -> None:
@@ -83,13 +83,13 @@ class Phase2WorkspaceController:
         if listener in self._listeners:
             self._listeners.remove(listener)
 
-    def set_state(self, state: Phase2WorkspaceState) -> Phase2WorkspaceState:
+    def set_state(self, state: AnalysisWorkspaceState) -> AnalysisWorkspaceState:
         self._state = state
         for listener in tuple(self._listeners):
             listener(state)
         return state
 
-    def update(self, **changes) -> Phase2WorkspaceState:
+    def update(self, **changes) -> AnalysisWorkspaceState:
         return self.set_state(replace(self._state, **changes))
 
     def spectrum(self, key: str | None = None) -> GammaSpectrum | None:
@@ -153,7 +153,7 @@ class Phase2WorkspaceController:
         source_key: str | None = None,
         source_label: str | None = None,
         source_path: str | None = None,
-    ) -> Phase2WorkspaceState:
+    ) -> AnalysisWorkspaceState:
         slots = []
         matched = False
         for slot in self._state.spectra:
@@ -190,7 +190,7 @@ class Phase2WorkspaceController:
         self,
         loaded_key: str,
         slot_key: str,
-    ) -> Phase2WorkspaceState:
+    ) -> AnalysisWorkspaceState:
         record = self.loaded_spectrum_record(loaded_key)
         if record is None:
             raise KeyError(f"Unknown loaded spectrum key: {loaded_key}")
@@ -202,16 +202,16 @@ class Phase2WorkspaceController:
             source_path=record.source_path,
         )
 
-    def select_spectrum(self, key: str) -> Phase2WorkspaceState:
+    def select_spectrum(self, key: str) -> AnalysisWorkspaceState:
         return self.update(active_spectrum_key=key)
 
-    def replace_peaks(self, peaks: Sequence[PeakCandidate]) -> Phase2WorkspaceState:
+    def replace_peaks(self, peaks: Sequence[PeakCandidate]) -> AnalysisWorkspaceState:
         selected = self._state.selected_peak_id
         if selected and all(peak.peak_id != selected for peak in peaks):
             selected = peaks[0].peak_id if peaks else None
         return self.update(peaks=tuple(peaks), selected_peak_id=selected)
 
-    def select_peak(self, peak_id: str | None) -> Phase2WorkspaceState:
+    def select_peak(self, peak_id: str | None) -> AnalysisWorkspaceState:
         return self.update(selected_peak_id=peak_id)
 
     def selected_peak(self) -> PeakCandidate | None:
@@ -222,21 +222,21 @@ class Phase2WorkspaceController:
                 return peak
         return None
 
-    def replace_peak(self, updated_peak: PeakCandidate) -> Phase2WorkspaceState:
+    def replace_peak(self, updated_peak: PeakCandidate) -> AnalysisWorkspaceState:
         peaks = [
             updated_peak if peak.peak_id == updated_peak.peak_id else peak
             for peak in self._state.peaks
         ]
         return self.update(peaks=tuple(peaks))
 
-    def set_pinned_nuclides(self, pinned_nuclides: Sequence[str]) -> Phase2WorkspaceState:
+    def set_pinned_nuclides(self, pinned_nuclides: Sequence[str]) -> AnalysisWorkspaceState:
         deduped: list[str] = []
         for nuclide in pinned_nuclides:
             if nuclide and nuclide not in deduped:
                 deduped.append(nuclide)
         return self.update(pinned_nuclides=tuple(deduped))
 
-    def toggle_pinned_nuclide(self, nuclide: str) -> Phase2WorkspaceState:
+    def toggle_pinned_nuclide(self, nuclide: str) -> AnalysisWorkspaceState:
         current = list(self._state.pinned_nuclides)
         if nuclide in current:
             current.remove(nuclide)
@@ -250,7 +250,7 @@ class Phase2WorkspaceController:
         mode: str | None = None,
         scale: float | None = None,
         visible: bool | None = None,
-    ) -> Phase2WorkspaceState:
+    ) -> AnalysisWorkspaceState:
         payload = {
             "background_mode": mode if mode is not None else self._state.background_mode,
             "background_scale": (
@@ -265,19 +265,19 @@ class Phase2WorkspaceController:
     def set_efficiency_fit(
         self,
         fit: EfficiencyCalibrationFitResult | None,
-    ) -> Phase2WorkspaceState:
+    ) -> AnalysisWorkspaceState:
         return self.update(efficiency_fit=fit)
 
     def set_activity_results(
         self,
         results: Sequence[ActivityCalculationResult],
-    ) -> Phase2WorkspaceState:
+    ) -> AnalysisWorkspaceState:
         return self.update(activity_results=tuple(results))
 
-    def set_survey_points(self, survey_points: Sequence[SurveyPoint]) -> Phase2WorkspaceState:
+    def set_survey_points(self, survey_points: Sequence[SurveyPoint]) -> AnalysisWorkspaceState:
         return self.update(survey_points=tuple(survey_points))
 
-    def set_cascade_sum_lines(self, energies_keV: Sequence[float]) -> Phase2WorkspaceState:
+    def set_cascade_sum_lines(self, energies_keV: Sequence[float]) -> AnalysisWorkspaceState:
         return self.update(
             cascade_sum_lines_keV=tuple(float(value) for value in energies_keV)
         )
@@ -315,15 +315,15 @@ class Phase2WorkspaceController:
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
     class WorkspaceStateCommand(QUndoCommand):
-        """Undoable replacement of the shared Phase 2 workspace state."""
+        """Undoable replacement of the shared analysis workspace state."""
 
         def __init__(
             self,
-            controller: Phase2WorkspaceController,
+            controller: AnalysisWorkspaceController,
             *,
             description: str,
-            before: Phase2WorkspaceState,
-            after: Phase2WorkspaceState,
+            before: AnalysisWorkspaceState,
+            after: AnalysisWorkspaceState,
         ) -> None:
             super().__init__(description)
             self.controller = controller
@@ -342,11 +342,11 @@ else:
     class WorkspaceStateCommand:  # pragma: no cover - import-safe placeholder
         def __init__(
             self,
-            controller: Phase2WorkspaceController,
+            controller: AnalysisWorkspaceController,
             *,
             description: str,
-            before: Phase2WorkspaceState,
-            after: Phase2WorkspaceState,
+            before: AnalysisWorkspaceState,
+            after: AnalysisWorkspaceState,
         ) -> None:
             self.controller = controller
             self.description = description

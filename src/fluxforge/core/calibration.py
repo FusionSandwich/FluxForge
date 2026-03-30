@@ -1,4 +1,4 @@
-"""Phase 2 calibration engines for the redesigned FluxForge GUI."""
+"""Calibration engines for the redesigned FluxForge GUI."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ class CalibrationOrderResolution:
 
 @dataclass(frozen=True)
 class EnergyCalibrationPoint:
-    """One energy-calibration point in the Phase 2 workspace."""
+    """One energy-calibration point in the calibration workspace."""
 
     channel: float
     reference_energy_keV: float
@@ -122,7 +122,7 @@ class QuickCalibrationResult:
 
 
 def standard_requires_astm_e181(standard: str | None) -> bool:
-    """Return True when the active standard should lock the Phase 2.1 workflow."""
+    """Return True when the active standard should lock the calibration workflow."""
 
     if not standard:
         return False
@@ -337,7 +337,7 @@ def fit_fwhm_calibration(
     default_relative_uncertainty: float = 0.05,
     minimum_uncertainty_keV: float = 0.03,
 ) -> FWHMCalibrationFit:
-    """Fit the detector resolution curve used by the Phase 2.1 workspace."""
+    """Fit the detector resolution curve used by the calibration workspace."""
 
     from fluxforge.analysis.detector_calibration import fit_resolution_curve
 

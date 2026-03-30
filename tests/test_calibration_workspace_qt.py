@@ -323,7 +323,7 @@ def test_main_window_exposes_manual_and_standards_workflows_and_library_selector
 
     QTest.mouseClick(quick_button, Qt.LeftButton)
     _qapp().processEvents()
-    assert window._calibration_dialog.phase2_tabs.currentWidget() is window._calibration_dialog.quick_slider_tab
+    assert window._calibration_dialog.advanced_tabs.currentWidget() is window._calibration_dialog.quick_slider_tab
 
     window._calibration_dialog.close()
     window.close()
@@ -333,7 +333,7 @@ def test_main_window_exposes_manual_and_standards_workflows_and_library_selector
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt calibration workspace dependencies are unavailable.",
 )
-def test_calibration_dialog_exposes_phase2_tools_and_roi_fitting():
+def test_calibration_dialog_exposes_advanced_tools_and_roi_fitting():
     _qapp()
     manager = ModeManager()
     dialog = CalibrationWorkspaceDialog(
@@ -345,7 +345,7 @@ def test_calibration_dialog_exposes_phase2_tools_and_roi_fitting():
     dialog.show()
     _qapp().processEvents()
 
-    dialog.phase2_tabs.setCurrentWidget(dialog.quick_slider_tab)
+    dialog.advanced_tabs.setCurrentWidget(dialog.quick_slider_tab)
     dialog.quick_anchor_a_combo.setCurrentIndex(0)
     dialog.quick_anchor_b_combo.setCurrentIndex(dialog.quick_anchor_b_combo.count() - 1)
     dialog.quick_anchor_a_slider.setValue(662)
@@ -363,7 +363,7 @@ def test_calibration_dialog_exposes_phase2_tools_and_roi_fitting():
     assert dialog.deviation_table.rowCount() >= 1
     assert len(dialog._energy_fit.deviation_pairs) >= 1
 
-    dialog.phase2_tabs.setCurrentWidget(dialog.roi_fit_tab)
+    dialog.advanced_tabs.setCurrentWidget(dialog.roi_fit_tab)
     dialog.roi_region.setRegion((1160.0, 1190.0))
     _qapp().processEvents()
     assert dialog._roi_fit is not None
@@ -395,7 +395,7 @@ def test_calibration_dialog_exposes_phase2_tools_and_roi_fitting():
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt calibration workspace dependencies are unavailable.",
 )
-def test_apply_workspace_results_persists_phase2_qt_state_to_spectrum():
+def test_apply_workspace_results_persists_calibration_workspace_state_to_spectrum():
     _qapp()
     spectrum = build_demo_spectrum()
     bus = SelectionBus()
@@ -408,7 +408,7 @@ def test_apply_workspace_results_persists_phase2_qt_state_to_spectrum():
     dialog.show()
     _qapp().processEvents()
 
-    dialog.phase2_tabs.setCurrentWidget(dialog.quick_slider_tab)
+    dialog.advanced_tabs.setCurrentWidget(dialog.quick_slider_tab)
     dialog.quick_anchor_a_slider.setValue(662)
     dialog.quick_anchor_b_slider.setValue(1332)
     dialog.quick_promote_button.click()
@@ -419,7 +419,7 @@ def test_apply_workspace_results_persists_phase2_qt_state_to_spectrum():
     dialog.seed_deviation_pairs_button.click()
     _qapp().processEvents()
 
-    dialog.phase2_tabs.setCurrentWidget(dialog.roi_fit_tab)
+    dialog.advanced_tabs.setCurrentWidget(dialog.roi_fit_tab)
     dialog.roi_region.setRegion((1160.0, 1190.0))
     _qapp().processEvents()
 

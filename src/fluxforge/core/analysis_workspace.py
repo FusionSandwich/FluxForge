@@ -1,4 +1,4 @@
-"""Phase 2 analysis helpers for the modern Qt workspace."""
+"""Analysis workspace helpers for the modern Qt shell."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ class EfficiencyModelDefinition:
 
 @dataclass(frozen=True)
 class EfficiencyCalibrationFitResult:
-    """Efficiency fit payload used by the Phase 2 activity surfaces."""
+    """Efficiency fit payload used by the activity surfaces."""
 
     model_key: str
     model_label: str
@@ -113,7 +113,7 @@ class BayesianNuclideMatchDefinition:
 def register_builtin_efficiency_models(
     registries: PluginRegistries,
 ) -> PluginRegistries:
-    """Register the built-in Phase 2 efficiency models."""
+    """Register the built-in efficiency models."""
 
     registries.calibration_models.clear()
     for key, label, degree, form, summary, recommended in (
@@ -161,7 +161,7 @@ def register_builtin_efficiency_models(
             ),
             description=summary,
             recommended=recommended,
-            tags=("phase2", "efficiency"),
+            tags=("analysis", "efficiency"),
             set_default=recommended,
         )
     return registries
@@ -188,14 +188,14 @@ def register_builtin_nuclide_id_engines(
             "and multi-line evidence accumulation."
         ),
         recommended=True,
-        tags=("phase2", "id", "bayesian"),
+        tags=("analysis", "id", "bayesian"),
         set_default=True,
     )
     registries.nuclide_id_engines.register(
         "ml_peak_onnx",
         MLPeakAnalysisEngine(),
         description=MLPeakAnalysisEngine.summary,
-        tags=("phase3", "id", "ml", "onnx"),
+        tags=("analysis", "id", "ml", "onnx"),
     )
     return registries
 
@@ -646,7 +646,7 @@ def subtract_background_counts(
     mode: str = "simple",
     scale: float = 1.0,
 ) -> np.ndarray:
-    """Subtract background counts using the requested Phase 2 mode."""
+    """Subtract background counts using the requested analysis mode."""
 
     foreground_counts = np.asarray(foreground.counts, dtype=float)
     if background is None:

@@ -86,20 +86,33 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             self.preview.setObjectName("ReportPreviewBrowser")
             root.addWidget(self.preview, 1)
 
+            self._sync_template_status()
             self._sync_pdf_status()
-            self.render_preview()
+            if self.engine.template_backend_available():
+                self.render_preview()
+            else:
+                self.preview.setPlainText(
+                    "HTML report rendering requires the optional reporting extra (`Jinja2`)."
+                )
 
         def current_template_name(self) -> str:
             data = self.template_combo.currentData()
             return str(data) if data is not None else str(self.template_combo.currentText())
 
         def render_preview(self) -> None:
+            if not self.engine.template_backend_available():
+                self.preview.setPlainText(
+                    "HTML report rendering requires the optional reporting extra (`Jinja2`)."
+                )
+                return
             template_name = self.current_template_name()
             context = self.context_factory(template_name)
             rendered = self.engine.render(template_name, context)
             self.preview.setHtml(rendered.html)
 
         def export_html(self) -> None:
+            if not self.engine.template_backend_available():
+                return
             template_name = self.current_template_name()
             context = self.context_factory(template_name)
             path = Path(self.path_input.text().strip())
@@ -109,6 +122,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             self.render_preview()
 
         def export_pdf(self) -> None:
+            if not self.engine.template_backend_available():
+                return
             template_name = self.current_template_name()
             context = self.context_factory(template_name)
             path = Path(self.path_input.text().strip())
@@ -121,10 +136,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             )
             self.render_preview()
 
+        def _sync_template_status(self) -> None:
+            available = self.engine.template_backend_available()
+            self.template_combo.setEnabled(available)
+            self.path_input.setEnabled(available)
+            self.render_button.setEnabled(available)
+            self.export_button.setEnabled(available)
+
         def _sync_pdf_status(self) -> None:
             available = self.engine.can_export_pdf()
             self.pdf_button.setEnabled(available)
-            if available:
+            if not self.engine.template_backend_available():
+                self.pdf_status.setText(
+                    "HTML/PDF report export requires the optional reporting extra (`Jinja2`)."
+                )
+            elif available:
                 self.pdf_status.setText(
                     "PDF export is available through the installed WeasyPrint backend."
                 )

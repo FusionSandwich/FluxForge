@@ -1,4 +1,4 @@
-"""Core abstractions for the Phase 3 unfolding package."""
+"""Core abstractions for the unfolding package."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Unified calibration workspace for the modern Phase 2 GUI stack."""
+"""Unified calibration workspace for the modern Qt GUI stack."""
 
 from __future__ import annotations
 
@@ -159,7 +159,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             header_layout.setContentsMargins(24, 20, 24, 20)
             header_layout.setSpacing(10)
 
-            eyebrow = QLabel("Phase 2.1", header)
+            eyebrow = QLabel("Calibration", header)
             eyebrow.setObjectName("HeroEyebrow")
             header_layout.addWidget(eyebrow)
 
@@ -506,19 +506,19 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             library_layout.addWidget(self.library_summary)
             controls_layout.addWidget(library_group, 2)
 
-            advanced_group = QGroupBox("Phase 2 calibration tools", controls_panel)
+            advanced_group = QGroupBox("Advanced calibration tools", controls_panel)
             advanced_group.setObjectName("CalibrationGroup")
             advanced_layout = QVBoxLayout(advanced_group)
             advanced_layout.setSpacing(10)
-            self.phase2_tabs = QTabWidget(advanced_group)
-            self.phase2_tabs.setObjectName("CalibrationPhase2Tabs")
-            self.quick_slider_tab = self._build_quick_slider_tab(self.phase2_tabs)
-            self.deviation_pairs_tab = self._build_deviation_pairs_tab(self.phase2_tabs)
-            self.roi_fit_tab = self._build_roi_fit_tab(self.phase2_tabs)
-            self.phase2_tabs.addTab(self.quick_slider_tab, "Quick Slider")
-            self.phase2_tabs.addTab(self.deviation_pairs_tab, "Fine Tuning")
-            self.phase2_tabs.addTab(self.roi_fit_tab, "ROI Fit")
-            advanced_layout.addWidget(self.phase2_tabs)
+            self.advanced_tabs = QTabWidget(advanced_group)
+            self.advanced_tabs.setObjectName("CalibrationAdvancedTabs")
+            self.quick_slider_tab = self._build_quick_slider_tab(self.advanced_tabs)
+            self.deviation_pairs_tab = self._build_deviation_pairs_tab(self.advanced_tabs)
+            self.roi_fit_tab = self._build_roi_fit_tab(self.advanced_tabs)
+            self.advanced_tabs.addTab(self.quick_slider_tab, "Quick Slider")
+            self.advanced_tabs.addTab(self.deviation_pairs_tab, "Fine Tuning")
+            self.advanced_tabs.addTab(self.roi_fit_tab, "ROI Fit")
+            advanced_layout.addWidget(self.advanced_tabs)
             controls_layout.addWidget(advanced_group, 3)
 
             provenance = QFrame(controls_panel)
@@ -823,7 +823,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 float(min(reference_channel + half_width, counts.size - 1)),
             )
 
-        def set_active_phase2_tab(self, key: str) -> None:
+        def set_active_advanced_tab(self, key: str) -> None:
             widget_map = {
                 "quick_slider": self.quick_slider_tab,
                 "deviation_pairs": self.deviation_pairs_tab,
@@ -831,7 +831,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             }
             widget = widget_map.get(key)
             if widget is not None:
-                self.phase2_tabs.setCurrentWidget(widget)
+                self.advanced_tabs.setCurrentWidget(widget)
 
         def _on_mode_state_changed(self, state) -> None:
             resolved = resolve_energy_calibration_order(
@@ -847,20 +847,20 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 self._format_provenance_summary(resolved.locked_by)
             )
             simple_mode = state.mode.value == "simple"
-            if hasattr(self.phase2_tabs, "setTabVisible"):
-                self.phase2_tabs.setTabVisible(
-                    self.phase2_tabs.indexOf(self.deviation_pairs_tab),
+            if hasattr(self.advanced_tabs, "setTabVisible"):
+                self.advanced_tabs.setTabVisible(
+                    self.advanced_tabs.indexOf(self.deviation_pairs_tab),
                     not simple_mode,
                 )
-                self.phase2_tabs.setTabVisible(
-                    self.phase2_tabs.indexOf(self.roi_fit_tab),
+                self.advanced_tabs.setTabVisible(
+                    self.advanced_tabs.indexOf(self.roi_fit_tab),
                     not simple_mode,
                 )
-            if simple_mode and self.phase2_tabs.currentWidget() in (
+            if simple_mode and self.advanced_tabs.currentWidget() in (
                 self.deviation_pairs_tab,
                 self.roi_fit_tab,
             ):
-                self.phase2_tabs.setCurrentWidget(self.quick_slider_tab)
+                self.advanced_tabs.setCurrentWidget(self.quick_slider_tab)
             self._apply_plot_palette()
             self._refresh_energy_fit()
             self._refresh_roi_background_models()
@@ -1901,5 +1901,5 @@ else:
 
         def __init__(self, *args, **kwargs) -> None:
             raise RuntimeError(
-                "The Phase 2.1 calibration workspace requires the native Qt GUI extras."
+                "The calibration workspace requires the native Qt GUI extras."
             )

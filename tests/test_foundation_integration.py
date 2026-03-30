@@ -69,7 +69,7 @@ def test_ffs_session_round_trip_preserves_hal_and_gps_fields(tmp_path):
     assert restored.device_snapshot[0]["device_id"] == "mock-mca"
 
 
-def test_reader_factory_supports_phase1_extensions():
+def test_reader_factory_supports_core_extensions():
     factory = create_reader_factory()
     assert factory.supported_extensions() == (
         ".chn",

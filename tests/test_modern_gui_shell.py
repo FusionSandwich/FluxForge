@@ -1,5 +1,9 @@
 import ast
+import os
 from pathlib import Path
+import subprocess
+import sys
+import textwrap
 
 from fluxforge.gui import (
     GUIMode,
@@ -94,6 +98,37 @@ def test_modern_gui_unavailable_message_mentions_legacy_fallback():
     message = modern_gui_unavailable_message()
 
     assert "fluxforge-gui-legacy" in message
+
+
+def test_gui_package_imports_without_reporting_extra():
+    script = textwrap.dedent(
+        """
+        import importlib.abc
+        import sys
+
+        class BlockJinja2(importlib.abc.MetaPathFinder):
+            def find_spec(self, fullname, path=None, target=None):
+                if fullname == "jinja2" or fullname.startswith("jinja2."):
+                    raise ModuleNotFoundError("blocked for test")
+                return None
+
+        sys.meta_path.insert(0, BlockJinja2())
+        import fluxforge.gui
+        print("ok")
+        """
+    )
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(ROOT / "src")
+    result = subprocess.run(
+        [sys.executable, "-c", script],
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip().splitlines()[-1] == "ok"
 
 
 def test_current_gui_regression_files_target_modern_qt_stack():

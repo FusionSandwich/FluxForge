@@ -1,4 +1,4 @@
-"""Modern unfolding workspace dialog for the Phase 3 Qt shell."""
+"""Modern unfolding workspace dialog for the Qt shell."""
 
 from __future__ import annotations
 
@@ -708,7 +708,7 @@ else:
 
         def __init__(self, *args, **kwargs) -> None:
             raise RuntimeError(
-                "The Phase 3 unfolding workspace requires the native Qt GUI extras."
+                "The unfolding workspace requires the native Qt GUI extras."
             )
 
 

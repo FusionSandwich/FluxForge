@@ -302,14 +302,14 @@ def main(argv: list[str] | None = None) -> int:
 
     dialog.energy_table.item(2, 3).setText("1515.0")
     app.processEvents()
-    dialog.phase2_tabs.setCurrentWidget(dialog.deviation_pairs_tab)
+    dialog.advanced_tabs.setCurrentWidget(dialog.deviation_pairs_tab)
     dialog.seed_deviation_pairs_button.click()
     app.processEvents()
     deviation_shot = output_dir / "07-deviation-pairs.png"
     dialog.grab().save(str(deviation_shot))
     screenshots.append(deviation_shot)
 
-    dialog.phase2_tabs.setCurrentWidget(dialog.roi_fit_tab)
+    dialog.advanced_tabs.setCurrentWidget(dialog.roi_fit_tab)
     dialog.roi_region.setRegion((1160.0, 1190.0))
     app.processEvents()
     roi_gaussian_shot = output_dir / "08-roi-gaussian-fit.png"

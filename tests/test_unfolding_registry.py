@@ -28,20 +28,20 @@ def test_register_builtin_unfolders_registers_rmle_as_default():
     assert registries.unfolders.default_key == "rmle"
     gravel_entry = registries.unfolders.get_entry("gravel")
     assert isinstance(gravel_entry.implementation, GravelUnfolder)
-    assert gravel_entry.metadata.tags == ("phase3", "unfolding", "gravel")
+    assert gravel_entry.metadata.tags == ("unfolding", "native", "gravel")
 
     maxed_entry = registries.unfolders.get_entry("maxed")
     assert isinstance(maxed_entry.implementation, MaxedUnfolder)
-    assert maxed_entry.metadata.tags == ("phase3", "unfolding", "maxed")
+    assert maxed_entry.metadata.tags == ("unfolding", "native", "maxed")
 
     rmle_entry = registries.unfolders.get_entry("rmle")
     assert isinstance(rmle_entry.implementation, RMLEUnfolder)
     assert rmle_entry.metadata.recommended is True
-    assert rmle_entry.metadata.tags == ("phase3", "unfolding", "rmle")
+    assert rmle_entry.metadata.tags == ("unfolding", "native", "rmle")
 
     ml_seed_entry = registries.unfolders.get_entry("ml_seed")
     assert isinstance(ml_seed_entry.implementation, MLSeedUnfolder)
-    assert ml_seed_entry.metadata.tags == ("phase3", "unfolding", "ml_seed")
+    assert ml_seed_entry.metadata.tags == ("unfolding", "native", "ml_seed")
     assert [registered.key for registered in unfolding_entries(registries)] == [
         "gravel",
         "maxed",

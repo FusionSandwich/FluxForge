@@ -7,7 +7,15 @@ from importlib import import_module
 from pathlib import Path
 from typing import Any
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+try:
+    from jinja2 import Environment, FileSystemLoader, select_autoescape
+except ImportError as exc:  # pragma: no cover - optional dependency branch
+    Environment = None
+    FileSystemLoader = None
+    select_autoescape = None
+    _JINJA2_IMPORT_ERROR = exc
+else:  # pragma: no cover - exercised when reporting extras are installed
+    _JINJA2_IMPORT_ERROR = None
 
 
 DEFAULT_TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
@@ -50,15 +58,30 @@ class ReportingEngine:
 
     templates: dict[str, ReportTemplateSpec] = field(default_factory=dict)
     template_dir: Path = field(default_factory=lambda: DEFAULT_TEMPLATE_DIR)
+    _environment: Any | None = field(init=False, default=None, repr=False)
 
     def __post_init__(self) -> None:
         self.template_dir = Path(self.template_dir)
+        if not self.templates:
+            self._register_bundled_templates()
+
+    def template_backend_available(self) -> bool:
+        """Return whether the HTML template backend is installed."""
+
+        return _JINJA2_IMPORT_ERROR is None
+
+    def _ensure_environment(self):
+        if self._environment is not None:
+            return self._environment
+        if _JINJA2_IMPORT_ERROR is not None:
+            raise RuntimeError(
+                "HTML report rendering requires the optional reporting extra (`Jinja2`)."
+            ) from _JINJA2_IMPORT_ERROR
         self._environment = Environment(
             loader=FileSystemLoader(str(self.template_dir)),
             autoescape=select_autoescape(["html", "xml"]),
         )
-        if not self.templates:
-            self._register_bundled_templates()
+        return self._environment
 
     def register(self, template: ReportTemplateSpec) -> None:
         self.templates[template.name] = template
@@ -116,6 +139,8 @@ class ReportingEngine:
     def can_export_pdf(self) -> bool:
         """Return whether PDF export support is available in the environment."""
 
+        if not self.template_backend_available():
+            return False
         try:
             _load_weasyprint_html()
         except RuntimeError:
@@ -134,7 +159,7 @@ class ReportingEngine:
                 f"Template {template_name!r} missing context keys: {', '.join(missing)}"
             )
         template_file = template.template_file or f"{template_name}.html.j2"
-        html = self._environment.get_template(template_file).render(**context)
+        html = self._ensure_environment().get_template(template_file).render(**context)
         return ReportRenderResult(template_name=template_name, html=html, context=dict(context))
 
     def export_html(

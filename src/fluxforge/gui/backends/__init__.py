@@ -37,14 +37,14 @@ def register_builtin_render_backends(
         PyQtGraphSpectrumCanvas,
         description="Primary production renderer for the native Qt shell.",
         recommended=True,
-        tags=("qt", "production", "phase1"),
+        tags=("qt", "production", "renderer"),
         set_default=True,
     )
     registries.render_backends.register(
         "vispy",
         VispySpectrumCanvas,
         description="Optional high-performance renderer stub for future expansion.",
-        tags=("qt", "optional", "phase1"),
+        tags=("qt", "optional", "renderer"),
     )
     return registries
 

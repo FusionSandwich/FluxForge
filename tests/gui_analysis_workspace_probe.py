@@ -18,7 +18,7 @@ if str(SRC_ROOT) not in sys.path:
 
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint  # noqa: E402
-from fluxforge.core.phase2_analysis import (  # noqa: E402
+from fluxforge.core.analysis_workspace import (  # noqa: E402
     detect_peak_candidates,
     fit_efficiency_model,
 )
@@ -264,10 +264,10 @@ def main(argv: list[str] | None = None) -> int:
         capture("03-pinned-tagged")
 
         fit = fit_efficiency_model(_efficiency_points(), model_key="log_poly_2")
-        window.phase2_workspace.set_efficiency_fit(fit)
+        window.analysis_workspace.set_efficiency_fit(fit)
         activity_panel = window.bottom_dock.widget().activity_results_panel
         peak_panel.table.selectRow(co60_row)
-        window.phase2_workspace.select_peak(window.phase2_workspace.state.peaks[co60_row].peak_id)
+        window.analysis_workspace.select_peak(window.analysis_workspace.state.peaks[co60_row].peak_id)
         app.processEvents()
         activity_panel.source_age_hours.setValue(24.0)
         activity_panel.background_mode_combo.setCurrentIndex(
@@ -342,18 +342,18 @@ def main(argv: list[str] | None = None) -> int:
 
     summary = {
         "screenshots": len(screenshots),
-        "peak_count": len(window.phase2_workspace.state.peaks),
-        "pinned": ", ".join(window.phase2_workspace.state.pinned_nuclides) or "none",
-        "activity_results": len(window.phase2_workspace.state.activity_results),
-        "survey_points": len(window.phase2_workspace.state.survey_points),
+        "peak_count": len(window.analysis_workspace.state.peaks),
+        "pinned": ", ".join(window.analysis_workspace.state.pinned_nuclides) or "none",
+        "activity_results": len(window.analysis_workspace.state.activity_results),
+        "survey_points": len(window.analysis_workspace.state.survey_points),
         "background_source": (
-            window.phase2_workspace.slot("background").source_label
-            if window.phase2_workspace.slot("background") is not None
+            window.analysis_workspace.slot("background").source_label
+            if window.analysis_workspace.slot("background") is not None
             else "none"
         ),
         "overlay_source": (
-            window.phase2_workspace.slot("overlay").source_label
-            if window.phase2_workspace.slot("overlay") is not None
+            window.analysis_workspace.slot("overlay").source_label
+            if window.analysis_workspace.slot("overlay") is not None
             else "none"
         ),
     }
