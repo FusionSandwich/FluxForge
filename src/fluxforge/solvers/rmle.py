@@ -30,6 +30,9 @@ from typing import Callable, Dict, List, Optional, Tuple, Union
 import numpy as np
 from scipy import linalg, optimize, sparse
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import require_nonnegative
+
 
 class RegularizationType(Enum):
     """Types of regularization."""
@@ -189,6 +192,9 @@ class UnfoldingResult:
     converged: bool = True
     diagnostics: Dict = field(default_factory=dict)
 
+    def __post_init__(self):
+        self.diagnostics = merge_flux_diagnostics(self.diagnostics, self.solution)
+
     @property
     def n_dof(self) -> int:
         """Degrees of freedom."""
@@ -252,6 +258,8 @@ class PoissonRMLEConfig:
     contaminant_mask : ndarray, optional
         Boolean mask identifying contaminant components.
         True = known contaminant with constrained prior.
+    initial_solution : ndarray, optional
+        Positive initial solution used to seed the Poisson optimization.
     """
 
     penalty: PoissonPenalty = PoissonPenalty.SOBLEV_2
@@ -270,6 +278,7 @@ class PoissonRMLEConfig:
     prior_uncertainties: Optional[np.ndarray] = None
     prior_weight: float = 1.0
     contaminant_mask: Optional[np.ndarray] = None
+    initial_solution: Optional[np.ndarray] = None
 
     def has_priors(self) -> bool:
         """Check if informative priors are specified."""
@@ -405,10 +414,16 @@ def poisson_rmle_unfolding(
     if config is None:
         config = PoissonRMLEConfig()
 
-    y = np.asarray(spectrum.counts, dtype=float)
-    R = np.asarray(response.matrix, dtype=float)
+    y = require_nonnegative("counts", spectrum.counts).reshape(-1)
+    R = require_nonnegative("response", response.matrix)
+    if R.ndim != 2:
+        raise ValueError("response matrix must be a 2-D array")
 
     n_channels, n_bins = R.shape
+    if n_channels != y.size:
+        raise ValueError(
+            f"response row count {n_channels} must match counts length {y.size}"
+        )
 
     # Background parameterization
     background_mode = (config.background_mode or "none").lower()
@@ -423,7 +438,18 @@ def poisson_rmle_unfolding(
         n_b = n_channels
 
     # Initial guess: small positive spectrum, background from low percentile
-    mu0 = np.maximum(np.full(n_bins, max(np.mean(y) / max(n_bins, 1), 1.0)), config.eps)
+    if config.initial_solution is not None:
+        seeded = require_nonnegative("initial_solution", config.initial_solution).reshape(-1)
+        if seeded.size != n_bins:
+            raise ValueError(
+                "initial_solution length must match the response column count"
+            )
+        mu0 = np.maximum(seeded, config.eps)
+    else:
+        mu0 = np.maximum(
+            np.full(n_bins, max(np.mean(y) / max(n_bins, 1), 1.0)),
+            config.eps,
+        )
     b0_val = float(np.percentile(y, 5)) if len(y) else 0.0
     if n_b == 0:
         x0 = mu0
@@ -570,6 +596,7 @@ def poisson_rmle_unfolding(
                     mc_samples=0,
                     random_seed=None,
                     response_sampler=None,
+                    initial_solution=None,
                 )
                 tmp = poisson_rmle_unfolding(tmp_spec, tmp_response, tmp_cfg)
                 samples.append(tmp.solution)
@@ -587,7 +614,16 @@ def poisson_rmle_unfolding(
             regularization_param=float(config.alpha),
             residuals=resid,
             converged=True,
-            diagnostics=diagnostics,
+            diagnostics=merge_flux_diagnostics(
+                diagnostics,
+                mu_hat,
+                negative_policy=(
+                    "enforced_nonnegative"
+                    if config.positivity
+                    else "preserved_for_review"
+                ),
+                nonnegativity_enforced=bool(config.positivity),
+            ),
         )
     except Exception as exc:
         fallback = rmle_unfolding(
@@ -743,11 +779,19 @@ def rmle_unfolding(
     Returns:
         UnfoldingResult with unfolded spectrum
     """
-    d = spectrum.counts
-    sigma = spectrum.uncertainty
-    R = response.matrix
+    d = require_nonnegative("counts", spectrum.counts).reshape(-1)
+    sigma = require_nonnegative("uncertainty", spectrum.uncertainty).reshape(-1)
+    R = require_nonnegative("response", response.matrix)
+    if R.ndim != 2:
+        raise ValueError("response matrix must be a 2-D array")
 
     n_channels, n_bins = R.shape
+    if sigma.size != d.size:
+        raise ValueError("uncertainty length must match counts length")
+    if n_channels != d.size:
+        raise ValueError(
+            f"response row count {n_channels} must match counts length {d.size}"
+        )
 
     # Build regularization matrix
     if regularization == RegularizationType.NONE:
@@ -818,12 +862,21 @@ def rmle_unfolding(
         regularization_param=reg_param,
         residuals=residuals,
         converged=converged,
-        diagnostics={
-            "regularization_type": regularization.value,
-            "param_selection": param_selection.value,
-            "n_channels": n_channels,
-            "n_bins": n_bins,
-        },
+        diagnostics=merge_flux_diagnostics(
+            {
+                "regularization_type": regularization.value,
+                "param_selection": param_selection.value,
+                "n_channels": n_channels,
+                "n_bins": n_bins,
+            },
+            solution,
+            negative_policy=(
+                "enforced_nonnegative"
+                if enforce_positivity
+                else "preserved_for_review"
+            ),
+            nonnegativity_enforced=bool(enforce_positivity),
+        ),
     )
 
 

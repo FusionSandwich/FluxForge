@@ -61,6 +61,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mode_manager.subscribe(self._sync_mode)
             self._sync_mode(self.mode_manager.state)
 
+        @staticmethod
+        def _entry_label(entry) -> str:
+            implementation = entry.implementation
+            if hasattr(implementation, "label"):
+                return str(implementation.label)
+            definition = getattr(type(implementation), "definition", None)
+            if callable(definition):
+                resolved = definition()
+                label = getattr(resolved, "label", None)
+                if label:
+                    return str(label)
+            return str(entry.key)
+
         def current_key(self) -> str | None:
             data = self.combo.currentData()
             return str(data) if data is not None else None
@@ -82,7 +95,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.combo.blockSignals(True)
             self.combo.clear()
             for entry in entries:
-                self.combo.addItem(entry.implementation.label, entry.key)
+                self.combo.addItem(self._entry_label(entry), entry.key)
             self.combo.blockSignals(False)
             if current_key is not None:
                 index = self.combo.findData(current_key)
@@ -106,7 +119,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.mode_manager.state.mode is GUIMode.STANDARDS
                 and entry.metadata.standards_locked
             ):
-                badge = "Standards Locked"
+                badge = "🔒 Standards Locked"
             elif entry.metadata.recommended:
                 badge = "Recommended"
             else:

@@ -115,6 +115,11 @@ class SpectrumCanvas:
         """Load reference-line overlays."""
         raise NotImplementedError
 
+    def set_annotation_lines(self, lines: Sequence[ReferenceLine]) -> None:
+        """Optional bulk update for labeled analytical overlays."""
+
+        del lines
+
     def clear(self) -> None:
         """Reset the canvas state."""
         raise NotImplementedError

@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
+from fluxforge.gui.spectrum_canvas import ReferenceLine
+
 
 @dataclass(frozen=True)
 class SelectionState:
@@ -14,6 +16,7 @@ class SelectionState:
     roi_bounds_keV: tuple[float, float] | None = None
     nuclide: str | None = None
     reference_lines_keV: tuple[float, ...] = ()
+    annotation_lines: tuple[ReferenceLine, ...] = ()
 
 
 SelectionListener = Callable[[SelectionState], None]
@@ -68,6 +71,7 @@ class SelectionBus:
                 roi_bounds_keV=self._state.roi_bounds_keV,
                 nuclide=nuclide or self._state.nuclide,
                 reference_lines_keV=self._state.reference_lines_keV,
+                annotation_lines=self._state.annotation_lines,
             )
         )
 
@@ -81,6 +85,7 @@ class SelectionBus:
                 roi_bounds_keV=(lower, upper),
                 nuclide=self._state.nuclide,
                 reference_lines_keV=self._state.reference_lines_keV,
+                annotation_lines=self._state.annotation_lines,
             )
         )
 
@@ -89,6 +94,7 @@ class SelectionBus:
         nuclide: str,
         *,
         reference_lines_keV: tuple[float, ...] = (),
+        annotation_lines: tuple[ReferenceLine, ...] = (),
     ) -> SelectionState:
         """Publish a nuclide-centric selection update."""
 
@@ -98,6 +104,7 @@ class SelectionBus:
                 roi_bounds_keV=self._state.roi_bounds_keV,
                 nuclide=nuclide,
                 reference_lines_keV=reference_lines_keV,
+                annotation_lines=annotation_lines,
             )
         )
 
@@ -114,5 +121,6 @@ class SelectionBus:
             "roi_bounds_keV": self._state.roi_bounds_keV,
             "nuclide": self._state.nuclide,
             "reference_lines_keV": self._state.reference_lines_keV,
+            "annotation_line_count": len(self._state.annotation_lines),
             "listener_count": len(self._listeners),
         }

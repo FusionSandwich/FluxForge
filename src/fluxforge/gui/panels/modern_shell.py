@@ -2,36 +2,52 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Callable
 
 import numpy as np
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint
+from fluxforge.core.batch_analysis import (
+    BatchAnalysisJob,
+    run_batch_analysis_queue,
+    write_batch_outputs,
+)
 from fluxforge.core.phase2_analysis import (
     PeakCandidate,
+    apply_ml_peak_predictions,
     bayesian_match_peak_candidates,
     calculate_peak_activity,
     compute_cascade_sum_lines,
     detect_peak_candidates,
+    estimate_spectral_phenomena,
     extract_survey_points,
+    register_builtin_nuclide_id_engines,
     subtract_background_counts,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
 from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.library_manager import DataLibraryManager
-from fluxforge.gui.nuclide_search import NuclideSearchController
+from fluxforge.gui.nuclide_search import GammaLineMatchResult, NuclideSearchController
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
 from fluxforge.gui.phase2_workspace import Phase2WorkspaceController, SpectrumSlot, WorkspaceStateCommand
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
-from fluxforge.gui.spectrum_canvas import SpectrumTrace
+from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
 from fluxforge.io.spe import GammaSpectrum
+from fluxforge.plugins import bootstrap_builtin_registries
+from fluxforge.standards import (
+    QAMonitor,
+    StandardsEvaluationContext,
+    register_builtin_standards_modules,
+)
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import PyQtGraphSpectrumCanvas
     from fluxforge.gui.qt_compat import (
         QAbstractItemView,
+        QApplication,
         QCheckBox,
         QComboBox,
         QDialog,
@@ -47,6 +63,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QListWidget,
         QListWidgetItem,
         QPlainTextEdit,
+        QProgressBar,
         QPushButton,
         QTabBar,
         QTabWidget,
@@ -85,6 +102,8 @@ def _selection_summary(state: SelectionState) -> str:
         )
     if state.reference_lines_keV:
         fragments.append(f"{len(state.reference_lines_keV)} ref lines")
+    if state.annotation_lines:
+        fragments.append(f"{len(state.annotation_lines)} guides")
     return " | ".join(fragments) if fragments else "No active selection"
 
 
@@ -180,6 +199,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     def _peak_status_dot(status: str) -> str:
         if status == "matched":
             return "●"
+        if status == "manual":
+            return "◆"
         if status == "review":
             return "◐"
         return "○"
@@ -206,6 +227,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager
             self.undo_stack = undo_stack
+            self.nuclide_controller = NuclideSearchController(
+                self.selection_bus,
+                library_manager=self.library_manager,
+            )
+            self.registries = bootstrap_builtin_registries()
+            register_builtin_nuclide_id_engines(self.registries)
+            self._current_match_results: tuple[GammaLineMatchResult, ...] = ()
 
             layout = QVBoxLayout(self)
             layout.setContentsMargins(16, 16, 16, 16)
@@ -233,6 +261,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.match_button.setObjectName("BayesianMatchPeaksButton")
             self.match_button.clicked.connect(self.run_bayesian_match)
             action_row.addWidget(self.match_button)
+
+            self.ml_button = QPushButton("ML Peak Analysis", self)
+            self.ml_button.setObjectName("MlPeakAnalysisButton")
+            self.ml_button.clicked.connect(self.run_ml_peak_analysis)
+            action_row.addWidget(self.ml_button)
 
             self.pin_button = QPushButton("Pin Selected Nuclide", self)
             self.pin_button.clicked.connect(self._pin_selected_nuclide)
@@ -267,8 +300,101 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.summary.setWordWrap(True)
             layout.addWidget(self.summary)
 
+            self.ml_summary = QLabel("ML proposals have not been generated yet.", self)
+            self.ml_summary.setObjectName("PanelBody")
+            self.ml_summary.setWordWrap(True)
+            layout.addWidget(self.ml_summary)
+
+            layout.addWidget(self._build_peak_id_panel())
+
             self.workspace_controller.subscribe(self._sync_state)
             self._sync_state(self.workspace_controller.state)
+
+        def _build_peak_id_panel(self) -> QWidget:
+            group = QGroupBox("Peak ID Browser", self)
+            group.setObjectName("PeakIdBrowserPanel")
+            layout = QVBoxLayout(group)
+            layout.setContentsMargins(12, 12, 12, 12)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "Start from the selected peak centroid or type an energy, browse isotope "
+                    "lines from the active library within a default ±2 keV window, and keep "
+                    "manual peak assignments editable after Bayesian matching."
+                ),
+                group,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            controls = QGridLayout()
+            controls.setHorizontalSpacing(8)
+            controls.setVerticalSpacing(8)
+
+            controls.addWidget(QLabel("Centroid (keV)", group), 0, 0)
+            self.peak_id_energy = QDoubleSpinBox(group)
+            self.peak_id_energy.setObjectName("PeakIdCentroidSpin")
+            self.peak_id_energy.setDecimals(3)
+            self.peak_id_energy.setRange(0.0, 10000.0)
+            self.peak_id_energy.setSingleStep(0.25)
+            controls.addWidget(self.peak_id_energy, 0, 1)
+
+            controls.addWidget(QLabel("Window (±keV)", group), 0, 2)
+            self.peak_id_tolerance = QDoubleSpinBox(group)
+            self.peak_id_tolerance.setObjectName("PeakIdToleranceSpin")
+            self.peak_id_tolerance.setDecimals(2)
+            self.peak_id_tolerance.setRange(0.1, 250.0)
+            self.peak_id_tolerance.setSingleStep(0.25)
+            self.peak_id_tolerance.setValue(2.0)
+            controls.addWidget(self.peak_id_tolerance, 0, 3)
+
+            controls.addWidget(QLabel("Element / isotope filter", group), 1, 0)
+            self.peak_id_filter = QLineEdit(group)
+            self.peak_id_filter.setObjectName("PeakIdFilterInput")
+            self.peak_id_filter.setPlaceholderText("Optional filter, e.g. Cs or Co-60")
+            controls.addWidget(self.peak_id_filter, 1, 1, 1, 3)
+            layout.addLayout(controls)
+
+            action_row = QHBoxLayout()
+            self.use_selected_peak_button = QPushButton("Use Selected Peak", group)
+            self.use_selected_peak_button.setObjectName("PeakIdUseSelectedPeakButton")
+            self.use_selected_peak_button.clicked.connect(self._use_selected_peak_centroid)
+            action_row.addWidget(self.use_selected_peak_button)
+
+            self.assign_isotope_button = QPushButton("Assign Selected Isotope", group)
+            self.assign_isotope_button.setObjectName("PeakIdAssignSelectedIsotopeButton")
+            self.assign_isotope_button.clicked.connect(self._assign_selected_isotope)
+            action_row.addWidget(self.assign_isotope_button)
+
+            self.clear_assignment_button = QPushButton("Clear Peak ID", group)
+            self.clear_assignment_button.setObjectName("PeakIdClearAssignmentButton")
+            self.clear_assignment_button.clicked.connect(self._clear_selected_peak_assignment)
+            action_row.addWidget(self.clear_assignment_button)
+            action_row.addStretch(1)
+            layout.addLayout(action_row)
+
+            layout.addWidget(QLabel("Library matches", group))
+            self.peak_id_matches = QListWidget(group)
+            self.peak_id_matches.setObjectName("PeakIdMatchesList")
+            layout.addWidget(self.peak_id_matches, 1)
+
+            layout.addWidget(QLabel("Estimated gamma-spectroscopy phenomena", group))
+            self.peak_id_phenomena = QListWidget(group)
+            self.peak_id_phenomena.setObjectName("PeakIdPhenomenaList")
+            layout.addWidget(self.peak_id_phenomena, 1)
+
+            self.peak_id_summary = QLabel("Select a peak or type a centroid to browse isotope lines.", group)
+            self.peak_id_summary.setObjectName("PanelBody")
+            self.peak_id_summary.setWordWrap(True)
+            layout.addWidget(self.peak_id_summary)
+
+            self.peak_id_energy.valueChanged.connect(self._refresh_peak_id_matches)
+            self.peak_id_tolerance.valueChanged.connect(self._refresh_peak_id_matches)
+            self.peak_id_filter.textChanged.connect(self._refresh_peak_id_matches)
+            self.peak_id_matches.itemSelectionChanged.connect(self._match_selection_changed)
+            return group
 
         def run_auto_peak_search(self) -> None:
             spectrum = self.workspace_controller.spectrum()
@@ -312,6 +438,45 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     }
                 ),
             )
+
+        def run_ml_peak_analysis(self) -> None:
+            state = self.workspace_controller.state
+            peaks = state.peaks
+            if not peaks:
+                self.run_auto_peak_search()
+                peaks = self.workspace_controller.state.peaks
+            if not peaks:
+                self.ml_summary.setText(
+                    "ML peak proposals require at least one detected peak."
+                )
+                return
+            engine = self.registries.nuclide_id_engines.get("ml_peak_onnx")
+            predictions = engine.analyze_peaks(
+                peaks,
+                source_id=self.library_manager.state.gamma_identification_source_id,
+                custom_path=self.library_manager.state.custom_gamma_path,
+            )
+            updated_peaks = apply_ml_peak_predictions(peaks, predictions)
+            self._commit_state_change(
+                "ML peak proposals",
+                self.workspace_controller.state,
+                self.workspace_controller.state.__class__(
+                    **{
+                        **self.workspace_controller.state.__dict__,
+                        "peaks": tuple(updated_peaks),
+                    }
+                ),
+            )
+            if predictions:
+                lead = predictions[0]
+                self.ml_summary.setText(
+                    f"ML lead: {lead.predicted_nuclide} at {lead.predicted_line_keV:.3f} keV "
+                    f"(confidence {lead.confidence:.2f}, uncertainty {lead.uncertainty_keV:.2f} keV, backend {lead.backend})."
+                )
+            else:
+                self.ml_summary.setText(
+                    "ML peak analysis finished without a confident library proposal."
+                )
 
         def _pin_selected_nuclide(self) -> None:
             peak = self.workspace_controller.selected_peak()
@@ -380,6 +545,188 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 state.__class__(**{**state.__dict__, "peaks": tuple(peaks)}),
             )
 
+        def _use_selected_peak_centroid(self) -> None:
+            peak = self.workspace_controller.selected_peak()
+            if peak is None:
+                return
+            self.peak_id_energy.blockSignals(True)
+            self.peak_id_energy.setValue(float(peak.energy_keV))
+            self.peak_id_energy.blockSignals(False)
+            self._refresh_peak_id_matches()
+
+        def _selected_match(self) -> GammaLineMatchResult | None:
+            row = self.peak_id_matches.currentRow()
+            if row < 0 or row >= len(self._current_match_results):
+                return None
+            return self._current_match_results[row]
+
+        def _peak_annotations_for_match(
+            self,
+            match: GammaLineMatchResult,
+        ) -> tuple[ReferenceLine, ...]:
+            annotations = [
+                ReferenceLine(
+                    energy_keV=float(match.line_energy_keV),
+                    label=f"{match.display_name} photopeak",
+                    color="#72d6ff",
+                )
+            ]
+            for phenomenon in estimate_spectral_phenomena(match.line_energy_keV):
+                annotations.append(
+                    ReferenceLine(
+                        energy_keV=float(phenomenon.energy_keV),
+                        label=phenomenon.label,
+                        color=phenomenon.color,
+                    )
+                )
+            return tuple(annotations)
+
+        def _refresh_peak_id_matches(self) -> None:
+            energy_keV = float(self.peak_id_energy.value())
+            tolerance_keV = float(self.peak_id_tolerance.value())
+            query = self.peak_id_filter.text().strip()
+            if energy_keV <= 0.0:
+                self._current_match_results = ()
+                self.peak_id_matches.clear()
+                self.peak_id_phenomena.clear()
+                self.peak_id_summary.setText(
+                    "Select a peak or type a centroid to browse isotope lines."
+                )
+                return
+
+            matches = tuple(
+                self.nuclide_controller.line_matches_for_energy(
+                    energy_keV,
+                    tolerance_keV=tolerance_keV,
+                    query=query,
+                )
+            )
+            self._current_match_results = matches
+            self.peak_id_matches.blockSignals(True)
+            self.peak_id_matches.clear()
+            for match in matches:
+                item = QListWidgetItem(
+                    (
+                        f"{match.display_name} · {match.line_energy_keV:.3f} keV "
+                        f"(Δ {match.delta_keV:+.3f} keV, I={match.intensity:.3f})"
+                    ),
+                    self.peak_id_matches,
+                )
+                item.setData(Qt.UserRole, match.nuclide)
+            self.peak_id_matches.blockSignals(False)
+            if matches:
+                self.peak_id_matches.setCurrentRow(0)
+                self.peak_id_summary.setText(
+                    (
+                        f"{len(matches)} isotope lines found within ±{tolerance_keV:.2f} keV "
+                        f"using {self.nuclide_controller.source_label()}."
+                    )
+                )
+                self._match_selection_changed()
+            else:
+                self.peak_id_phenomena.clear()
+                self.peak_id_summary.setText(
+                    (
+                        f"No isotope lines found within ±{tolerance_keV:.2f} keV using "
+                        f"{self.nuclide_controller.source_label()}."
+                    )
+                )
+                peak = self.workspace_controller.selected_peak()
+                self.selection_bus.publish(
+                    SelectionState(
+                        peak_energy_keV=peak.energy_keV if peak is not None else energy_keV,
+                        roi_bounds_keV=peak.roi_bounds_keV if peak is not None else None,
+                        nuclide=peak.nuclide if peak is not None else None,
+                        reference_lines_keV=peak.reference_lines_keV if peak is not None else (),
+                    )
+                )
+
+        def _match_selection_changed(self) -> None:
+            match = self._selected_match()
+            peak = self.workspace_controller.selected_peak()
+            self.peak_id_phenomena.clear()
+            if match is None:
+                return
+            for phenomenon in estimate_spectral_phenomena(match.line_energy_keV):
+                QListWidgetItem(
+                    f"{phenomenon.label} · {phenomenon.energy_keV:.3f} keV",
+                    self.peak_id_phenomena,
+                )
+            reference_lines = self.nuclide_controller.reference_lines_for_nuclide(match.nuclide)
+            self.selection_bus.publish(
+                SelectionState(
+                    peak_energy_keV=peak.energy_keV if peak is not None else float(self.peak_id_energy.value()),
+                    roi_bounds_keV=peak.roi_bounds_keV if peak is not None else None,
+                    nuclide=match.nuclide,
+                    reference_lines_keV=reference_lines,
+                    annotation_lines=self._peak_annotations_for_match(match),
+                )
+            )
+
+        def _assign_selected_isotope(self) -> None:
+            peak = self.workspace_controller.selected_peak()
+            match = self._selected_match()
+            if peak is None or match is None:
+                return
+            reference_lines = self.nuclide_controller.reference_lines_for_nuclide(match.nuclide)
+            updated_peak = replace(
+                peak,
+                status="manual",
+                nuclide=match.nuclide,
+                candidate_nuclides=tuple(
+                    dict.fromkeys((match.nuclide, *peak.candidate_nuclides))
+                ),
+                reference_lines_keV=reference_lines,
+            )
+            state = self.workspace_controller.state
+            peaks = [
+                updated_peak if item.peak_id == updated_peak.peak_id else item
+                for item in state.peaks
+            ]
+            self._commit_state_change(
+                "Assign peak isotope",
+                state,
+                state.__class__(**{**state.__dict__, "peaks": tuple(peaks)}),
+            )
+            self.selection_bus.publish(
+                SelectionState(
+                    peak_energy_keV=updated_peak.energy_keV,
+                    roi_bounds_keV=updated_peak.roi_bounds_keV,
+                    nuclide=updated_peak.nuclide,
+                    reference_lines_keV=updated_peak.reference_lines_keV,
+                    annotation_lines=self._peak_annotations_for_match(match),
+                )
+            )
+
+        def _clear_selected_peak_assignment(self) -> None:
+            peak = self.workspace_controller.selected_peak()
+            if peak is None:
+                return
+            updated_peak = replace(
+                peak,
+                status="candidate" if peak.candidate_nuclides else "review",
+                nuclide=None,
+                reference_lines_keV=(),
+            )
+            state = self.workspace_controller.state
+            peaks = [
+                updated_peak if item.peak_id == updated_peak.peak_id else item
+                for item in state.peaks
+            ]
+            self._commit_state_change(
+                "Clear peak isotope",
+                state,
+                state.__class__(**{**state.__dict__, "peaks": tuple(peaks)}),
+            )
+            self.selection_bus.publish(
+                SelectionState(
+                    peak_energy_keV=updated_peak.energy_keV,
+                    roi_bounds_keV=updated_peak.roi_bounds_keV,
+                    nuclide=None,
+                    reference_lines_keV=(),
+                )
+            )
+
         def _clear_peaks(self) -> None:
             state = self.workspace_controller.state
             self._commit_state_change(
@@ -426,12 +773,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             if state.peaks:
                 matched = sum(1 for peak in state.peaks if peak.status == "matched")
+                manual = sum(1 for peak in state.peaks if peak.status == "manual")
                 self.summary.setText(
-                    f"{len(state.peaks)} peaks tracked. {matched} currently matched. "
+                    f"{len(state.peaks)} peaks tracked. {matched} Bayesian matched, {manual} manually assigned. "
                     f"Pinned nuclides: {', '.join(state.pinned_nuclides) or 'none'}."
                 )
             else:
                 self.summary.setText("No peaks have been added yet.")
+
+            selected_peak = self.workspace_controller.selected_peak()
+            if selected_peak is not None:
+                self.peak_id_energy.blockSignals(True)
+                self.peak_id_energy.setValue(float(selected_peak.energy_keV))
+                self.peak_id_energy.blockSignals(False)
+            self.assign_isotope_button.setEnabled(selected_peak is not None)
+            self.clear_assignment_button.setEnabled(
+                selected_peak is not None and selected_peak.nuclide is not None
+            )
+            self.use_selected_peak_button.setEnabled(selected_peak is not None)
+            self._refresh_peak_id_matches()
 
         def _publish_selected_peak(self) -> None:
             row = self.table.currentRow()
@@ -439,12 +799,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             peak = self.workspace_controller.state.peaks[row]
             self.workspace_controller.select_peak(peak.peak_id)
+            annotation_lines = ()
+            if peak.nuclide and peak.reference_lines_keV:
+                annotation_lines = tuple(
+                    ReferenceLine(
+                        energy_keV=float(energy),
+                        label=f"{peak.nuclide} ref",
+                    )
+                    for energy in peak.reference_lines_keV[:4]
+                )
             self.selection_bus.publish(
                 SelectionState(
                     peak_energy_keV=peak.energy_keV,
                     roi_bounds_keV=peak.roi_bounds_keV,
                     nuclide=peak.nuclide,
                     reference_lines_keV=peak.reference_lines_keV,
+                    annotation_lines=annotation_lines,
                 )
             )
 
@@ -1005,15 +1375,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def __init__(
             self,
+            mode_manager: ModeManager,
             selection_bus: SelectionBus,
             workspace_controller: Phase2WorkspaceController,
             library_manager: DataLibraryManager | None = None,
+            qa_monitor: QAMonitor | None = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
+            self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager or DataLibraryManager()
+            self.qa_monitor = qa_monitor or QAMonitor()
+            self.qa_monitor.seed_demo_history()
+            self.registries = bootstrap_builtin_registries()
+            register_builtin_standards_modules(self.registries)
             self.nuclide_controller = NuclideSearchController(
                 selection_bus,
                 library_manager=self.library_manager,
@@ -1068,17 +1445,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             layout.addWidget(self.selection_note, 1)
 
-            qa = QTextEdit(self)
-            qa.setObjectName("SidebarNote")
-            qa.setReadOnly(True)
-            qa.setPlainText(
-                "QA & Standards\n\nASTM status dots, drift alerts, and standards locking details will be surfaced here."
-            )
-            layout.addWidget(qa, 1)
+            self.qa_note = QTextEdit(self)
+            self.qa_note.setObjectName("QaStandardsSummary")
+            self.qa_note.setReadOnly(True)
+            layout.addWidget(self.qa_note, 1)
 
             self.selection_bus.subscribe(self._sync_selection)
             self.library_manager.subscribe(self._sync_library_state)
             self.workspace_controller.subscribe(self._sync_workspace_state)
+            self.mode_manager.subscribe(lambda _state: self._sync_qa_summary())
             self.nuclide_query.textChanged.connect(self._refresh_nuclide_results)
             self.nuclides.itemSelectionChanged.connect(self._activate_selected_nuclide)
             self.custom_gamma_path.editingFinished.connect(self._apply_custom_gamma_path)
@@ -1105,6 +1480,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._populate_library_combos()
             self._sync_library_state(self.library_manager.state)
             self._sync_workspace_state(self.workspace_controller.state)
+            self._sync_qa_summary()
 
         def _build_spectrum_role_panel(self) -> QWidget:
             group = QGroupBox("Spectrum Roles", self)
@@ -1473,6 +1849,216 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.pinned_nuclides.clear()
             for nuclide in state.pinned_nuclides:
                 QListWidgetItem(nuclide, self.pinned_nuclides)
+            self._sync_qa_summary()
+
+        def _sync_qa_summary(self) -> None:
+            statuses = self.qa_monitor.status_snapshot()
+            latest_status = statuses[0] if statuses else None
+            context = StandardsEvaluationContext(
+                calibration_order=2,
+                max_residual_keV=0.18,
+                efficiency_uncertainty_pct=2.6,
+                fwhm_at_413_keV=1.08,
+                qa_centroid_drift_keV=(
+                    latest_status.centroid_drift_keV if latest_status else 0.0
+                ),
+                qa_fwhm_degradation_pct=(
+                    latest_status.fwhm_degradation_pct if latest_status else 0.0
+                ),
+                before_calibration=(
+                    latest_status.last_check if latest_status is not None else None
+                ),
+                measured_at=(
+                    latest_status.last_check if latest_status is not None else None
+                ),
+                after_calibration=(
+                    latest_status.last_check if latest_status is not None else None
+                ),
+                net_counts={"primary": 1200.0, "Pu-240 160.3": 1205.0},
+            )
+            summary_bits = []
+            for key in (
+                "ASTM E181",
+                "ASTM E1297",
+                "ASTM E1218",
+                "ASTM C1232",
+                "ASTM C1030",
+            ):
+                module = self.registries.standards_modules.get(key)
+                evaluation = module.evaluate(context)
+                dot = {"green": "●", "amber": "◐", "red": "◆"}.get(
+                    evaluation.overall_status,
+                    "○",
+                )
+                summary_bits.append(f"{module.display_name} [{dot}]")
+
+            lines = ["<h3>QA &amp; Standards</h3>"]
+            lines.append(
+                "<p><strong>ASTM Status:</strong> " + "  ".join(summary_bits) + "</p>"
+            )
+            if latest_status is not None:
+                lines.append(
+                    "<p><strong>QA Monitor:</strong> "
+                    f"FWHM @ {latest_status.energy_keV:.2f} keV: {latest_status.fwhm_degradation_pct:+.2f}% | "
+                    f"Drift: {latest_status.centroid_drift_keV:+.3f} keV<br/>"
+                    f"Last check: {latest_status.last_check.isoformat(sep=' ', timespec='minutes')}</p>"
+                )
+            active_standard = self.mode_manager.state.standard
+            if active_standard and active_standard in self.registries.standards_modules:
+                module = self.registries.standards_modules.get(active_standard)
+                locks = "<br/>".join(
+                    f"🔒 {setting.field_id}: {setting.value} ({setting.standard_section})"
+                    for setting in module.locked_settings()
+                ) or "No workflow locks."
+                lines.append(
+                    f"<p><strong>Active standard:</strong> {active_standard}<br/>{locks}</p>"
+                )
+            self.qa_note.setHtml("".join(lines))
+
+
+    class BatchQueuePanel(QWidget):
+        """Queued batch-analysis panel backed by ProcessPoolExecutor workers."""
+
+        def __init__(
+            self,
+            *,
+            workspace_controller: Phase2WorkspaceController,
+            parent=None,
+        ) -> None:
+            super().__init__(parent)
+            self.workspace_controller = workspace_controller
+            self.queued_jobs: tuple[BatchAnalysisJob, ...] = ()
+            self.results = ()
+            self.last_output_dir = None
+
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(16, 16, 16, 16)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "Run loaded spectra through the batch queue, then emit per-spectrum JSON "
+                    "artifacts plus one aggregate CSV."
+                ),
+                self,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            action_row = QHBoxLayout()
+            self.queue_button = QPushButton("Queue Loaded Spectra", self)
+            self.queue_button.setObjectName("QueueLoadedSpectraButton")
+            self.queue_button.clicked.connect(self.queue_loaded_spectra)
+            action_row.addWidget(self.queue_button)
+
+            self.run_button = QPushButton("Run Batch Queue", self)
+            self.run_button.setObjectName("RunBatchQueueButton")
+            self.run_button.clicked.connect(self.run_queue)
+            action_row.addWidget(self.run_button)
+
+            self.prefer_gpu_checkbox = QCheckBox("Prefer GPU backend", self)
+            self.prefer_gpu_checkbox.setObjectName("BatchPreferGpuCheck")
+            action_row.addWidget(self.prefer_gpu_checkbox)
+            action_row.addStretch(1)
+            layout.addLayout(action_row)
+
+            self.output_dir = QLineEdit(self)
+            self.output_dir.setObjectName("BatchOutputDirectoryInput")
+            self.output_dir.setText("artifacts/batch_analysis")
+            layout.addWidget(self.output_dir)
+
+            self.progress_bar = QProgressBar(self)
+            self.progress_bar.setObjectName("BatchQueueProgressBar")
+            self.progress_bar.setRange(0, 100)
+            self.progress_bar.setValue(0)
+            layout.addWidget(self.progress_bar)
+
+            self.table = QTableWidget(0, 6, self)
+            self.table.setObjectName("BatchQueueResultsTable")
+            self.table.setHorizontalHeaderLabels(
+                ("Label", "Counts", "σ Counts", "Peaks", "Dominant Nuclide", "Backend")
+            )
+            self.table.verticalHeader().setVisible(False)
+            layout.addWidget(self.table, 1)
+
+            self.summary = QLabel("No queued spectra.", self)
+            self.summary.setObjectName("PanelBody")
+            self.summary.setWordWrap(True)
+            layout.addWidget(self.summary)
+
+        def queue_loaded_spectra(self) -> None:
+            jobs: list[BatchAnalysisJob] = []
+            records = self.workspace_controller.loaded_spectrum_records()
+            if records:
+                for index, record in enumerate(records):
+                    jobs.append(
+                        BatchAnalysisJob(
+                            job_id=f"batch-{index + 1}",
+                            label=record.label,
+                            spectrum=record.spectrum,
+                        )
+                    )
+            else:
+                for index, slot in enumerate(self.workspace_controller.spectrum_slots()):
+                    jobs.append(
+                        BatchAnalysisJob(
+                            job_id=f"slot-{slot.key}",
+                            label=slot.source_label or slot.label,
+                            spectrum=slot.spectrum,
+                        )
+                    )
+            self.queued_jobs = tuple(jobs)
+            self.progress_bar.setValue(0)
+            self.summary.setText(f"Queued {len(self.queued_jobs)} spectra for batch analysis.")
+
+        def run_queue(self) -> None:
+            if not self.queued_jobs:
+                self.queue_loaded_spectra()
+            if not self.queued_jobs:
+                self.summary.setText("No spectra are available for the batch queue.")
+                return
+
+            def _progress_update(completed: int, total: int) -> None:
+                if total <= 0:
+                    self.progress_bar.setValue(0)
+                    return
+                percent = int(round(100.0 * float(completed) / float(total)))
+                self.progress_bar.setValue(max(0, min(percent, 100)))
+                self.summary.setText(
+                    f"Processed {completed} of {total} spectra in the batch queue."
+                )
+                QApplication.processEvents()
+
+            self.results = run_batch_analysis_queue(
+                self.queued_jobs,
+                max_workers=1,
+                prefer_gpu=self.prefer_gpu_checkbox.isChecked(),
+                progress_callback=_progress_update,
+            )
+            output_dir = self.output_dir.text().strip() or "artifacts/batch_analysis"
+            aggregate_path, _json_paths = write_batch_outputs(self.results, output_dir)
+            self.last_output_dir = aggregate_path.parent
+            self.table.setRowCount(len(self.results))
+            for row, result in enumerate(self.results):
+                values = (
+                    result.label,
+                    result.total_counts,
+                    result.total_uncertainty,
+                    result.peak_count,
+                    result.dominant_nuclide or "N/A",
+                    result.backend,
+                )
+                for column, value in enumerate(values):
+                    item = QTableWidgetItem(
+                        value if isinstance(value, str) else f"{float(value):.4f}".rstrip("0").rstrip(".")
+                    )
+                    item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    self.table.setItem(row, column, item)
+            self.progress_bar.setValue(100)
+            self.summary.setText(
+                f"Processed {len(self.results)} spectra. Aggregate CSV: {aggregate_path}"
+            )
 
 
     class BottomWorkspaceTabs(QTabWidget):
@@ -1524,13 +2110,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             self.addTab(self.activity_results_panel, "Activity Results")
-            self.addTab(
-                self._text_panel(
-                    "Batch Queue",
-                    "Queued spectra, progress, and aggregate reporting placeholder.",
-                ),
-                "Batch Queue",
+            self.batch_queue_panel = BatchQueuePanel(
+                workspace_controller=self.workspace_controller,
+                parent=self,
             )
+            self.addTab(self.batch_queue_panel, "Batch Queue")
             self.addTab(
                 self._text_panel(
                     "Spectrogram",
@@ -1797,14 +2381,18 @@ else:
     class SidebarPanel:  # pragma: no cover - placeholder without Qt
         def __init__(
             self,
+            mode_manager: ModeManager,
             selection_bus: SelectionBus,
             workspace_controller: Phase2WorkspaceController,
             library_manager: DataLibraryManager | None = None,
+            qa_monitor: QAMonitor | None = None,
             parent=None,
         ) -> None:
+            self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager
+            self.qa_monitor = qa_monitor
             self.parent = parent
 
 

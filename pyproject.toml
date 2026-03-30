@@ -40,6 +40,7 @@ bundle = [
 ]
 reporting = [
     "Jinja2>=3.1",
+    "WeasyPrint>=62.0",
 ]
 
 [project.scripts]
@@ -52,7 +53,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
-fluxforge = ["data/*.json", "gui/themes/*.qss", "resources/schemas/*.xsd"]
+fluxforge = [
+    "data/*.json",
+    "gui/themes/*.qss",
+    "reporting/templates/*.j2",
+    "resources/schemas/*.xsd",
+]
 
 [tool.black]
 line-length = 88

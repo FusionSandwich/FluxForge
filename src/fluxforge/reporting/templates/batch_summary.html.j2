@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ title }}</title>
+    <style>
+      body { font-family: "IBM Plex Sans", sans-serif; margin: 24px; color: #10253c; }
+      section { margin-bottom: 20px; padding: 16px; border: 1px solid #d8e3ec; border-radius: 14px; }
+      pre { white-space: pre-wrap; word-break: break-word; }
+    </style>
+  </head>
+  <body>
+    <h1>{{ title }}</h1>
+    <section>
+      <h2>Batch Rows</h2>
+      <div>{{ batch_rows }}</div>
+    </section>
+    <section>
+      <h2>Aggregate CSV</h2>
+      <pre>{{ aggregate_csv }}</pre>
+    </section>
+    <section>
+      <h2>Provenance</h2>
+      <pre>{{ provenance }}</pre>
+    </section>
+  </body>
+</html>

@@ -27,6 +27,9 @@ from typing import Dict, Optional, Tuple, Union
 
 import numpy as np
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import require_nonnegative
+
 # ---------------------------------------------------------------------------
 # Optional dependency guard
 # ---------------------------------------------------------------------------
@@ -87,6 +90,12 @@ class NeutronIBUResult:
     test_statistic: float = 0.0
     unfolding_matrix: Optional[np.ndarray] = None
     diagnostics: Dict = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.diagnostics = merge_flux_diagnostics(
+            self.diagnostics,
+            self.unfolded_flux,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -176,10 +185,10 @@ class NeutronUnfolderIBU:
             Unfolded flux, uncertainties, covariance, and diagnostics.
         """
         # --- Unpack inputs ---
-        data = np.asarray(reaction_rates.values, dtype=float)
-        data_err = np.asarray(reaction_rates.uncertainties, dtype=float)
+        data = require_nonnegative("data", reaction_rates.values).reshape(-1)
+        data_err = require_nonnegative("data_err", reaction_rates.uncertainties).reshape(-1)
 
-        R = np.asarray(response.matrix, dtype=float)
+        R = require_nonnegative("response", response.matrix)
         n_effects, n_causes = R.shape
 
         if data.shape[0] != n_effects:
@@ -190,24 +199,34 @@ class NeutronUnfolderIBU:
 
         # --- Response uncertainty ---
         if response_err is not None:
-            R_err = np.asarray(response_err, dtype=float)
+            R_err = require_nonnegative("response_err", response_err)
+            if R_err.shape != R.shape:
+                raise ValueError("response_err shape must match the response shape")
         else:
             R_err = np.abs(R) * 0.05  # default 5% relative
 
         # --- Efficiencies (detection efficiency per cause bin) ---
         if efficiencies is not None:
-            eff = np.asarray(efficiencies, dtype=float)
+            eff = require_nonnegative("efficiencies", efficiencies).reshape(-1)
         else:
             eff = np.ones(n_causes, dtype=float)
+        if eff.size != n_causes:
+            raise ValueError(
+                f"efficiencies size {eff.size} != response columns {n_causes}"
+            )
 
         if efficiencies_err is not None:
-            eff_err = np.asarray(efficiencies_err, dtype=float)
+            eff_err = require_nonnegative("efficiencies_err", efficiencies_err).reshape(-1)
         else:
             eff_err = eff * 0.01
+        if eff_err.size != n_causes:
+            raise ValueError(
+                f"efficiencies_err size {eff_err.size} != response columns {n_causes}"
+            )
 
         # --- Prior ---
         if prior_flux is not None:
-            prior = np.asarray(prior_flux, dtype=float)
+            prior = require_nonnegative("prior", prior_flux).reshape(-1)
             if prior.size != n_causes:
                 raise ValueError(
                     f"prior_flux size {prior.size} != response columns {n_causes}"
@@ -250,19 +269,24 @@ class NeutronUnfolderIBU:
             n_iterations=int(result.get("num_iterations", 0)),
             test_statistic=float(result.get("ts_iter", 0.0)),
             unfolding_matrix=result.get("unfolding_matrix"),
-            diagnostics={
-                k: v
-                for k, v in result.items()
-                if k
-                not in (
-                    "unfolded",
-                    "stat_err",
-                    "sys_err",
-                    "num_iterations",
-                    "ts_iter",
-                    "unfolding_matrix",
-                )
-            },
+            diagnostics=merge_flux_diagnostics(
+                {
+                    k: v
+                    for k, v in result.items()
+                    if k
+                    not in (
+                        "unfolded",
+                        "stat_err",
+                        "sys_err",
+                        "num_iterations",
+                        "ts_iter",
+                        "unfolding_matrix",
+                    )
+                },
+                unfolded,
+                negative_policy="bayesian_posterior_nonnegative",
+                nonnegativity_enforced=True,
+            ),
         )
 
     # ------------------------------------------------------------------

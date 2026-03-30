@@ -393,8 +393,8 @@
         "src/fluxforge/gui/dialogs/calibration_dialog.py",
         "src/fluxforge/gui/main_window.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_calibration_workspace.py",
-        "tests/gui_phase2_calibration_probe.py"
+        "tests/test_calibration_workspace_qt.py",
+        "tests/gui_calibration_workspace_probe.py"
       ],
       "notes": "The redesigned Qt shell now exposes the unified calibration workspace with embedded spectrum review, live energy/FWHM fits, ASTM E181 order locking, and residual-first diagnostics."
     },
@@ -411,8 +411,8 @@
         "src/fluxforge/gui/dialogs/calibration_dialog.py",
         "src/fluxforge/gui/main_window.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_calibration_workspace.py",
-        "tests/gui_phase2_calibration_probe.py"
+        "tests/test_calibration_workspace_qt.py",
+        "tests/gui_calibration_workspace_probe.py"
       ],
       "notes": "The modern Qt calibration workspace now includes additive quick-slider anchor controls, shell launch points, and native review coverage."
     },
@@ -428,7 +428,7 @@
         "src/fluxforge/core/calibration.py",
         "src/fluxforge/io/spe.py",
         "src/fluxforge/gui/dialogs/calibration_dialog.py",
-        "tests/test_phase2_calibration_workspace.py"
+        "tests/test_calibration_workspace_qt.py"
       ],
       "notes": "Deviation-pair fine tuning is now available in the calibration dialog and persists through the spectrum calibration path."
     },
@@ -443,8 +443,8 @@
       "evidence": [
         "src/fluxforge/core/peak_fitting.py",
         "src/fluxforge/gui/dialogs/calibration_dialog.py",
-        "tests/test_phase2_calibration_workspace.py",
-        "tests/gui_phase2_calibration_probe.py"
+        "tests/test_calibration_workspace_qt.py",
+        "tests/gui_calibration_workspace_probe.py"
       ],
       "notes": "The spectrum canvas now exposes a draggable ROI with live fit overlays, ROI residuals, and calibration-table application actions."
     },
@@ -459,8 +459,8 @@
       "evidence": [
         "src/fluxforge/core/peak_fitting.py",
         "src/fluxforge/plugins/registry.py",
-        "tests/test_phase2_calibration_workspace.py",
-        "tests/gui_phase2_calibration_probe.py"
+        "tests/test_calibration_workspace_qt.py",
+        "tests/gui_calibration_workspace_probe.py"
       ],
       "notes": "The shared peak fitter registry now includes the recommended Gaussian fitter and the additive skewed-Gaussian fitter."
     },
@@ -476,7 +476,7 @@
         "src/fluxforge/gui/widgets/method_selector.py",
         "src/fluxforge/gui/dialogs/calibration_dialog.py",
         "src/fluxforge/gui/__init__.py",
-        "tests/test_phase2_calibration_workspace.py"
+        "tests/test_calibration_workspace_qt.py"
       ],
       "notes": "The reusable method selector now drives the ROI fitter selection from the shared registry and respects Standards mode locking."
     },
@@ -492,7 +492,7 @@
         "src/fluxforge/gui/main_window.py",
         "src/fluxforge/gui/phase2_workspace.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "The modern Qt shell now routes peak-table mutations through a shared QUndoStack-backed workspace-state command path."
     },
@@ -507,7 +507,7 @@
       "evidence": [
         "src/fluxforge/gui/panels/modern_shell.py",
         "src/fluxforge/gui/selection_bus.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "The bottom peak table is now live in the Qt shell with status dots, candidate columns, selection synchronization, pinning, and tagging."
     },
@@ -523,7 +523,7 @@
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/gui/dialogs/auto_peak_review_dialog.py",
         "src/fluxforge/gui/main_window.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "Ctrl+A now opens an auto-peak review flow in the modern Qt stack before committing detected peaks to the shared table."
     },
@@ -539,7 +539,7 @@
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/plugins/registry.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "A Bayesian line-matching engine is now registered and wired into the peak workflow for multi-line nuclide ranking."
     },
@@ -555,7 +555,7 @@
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/gui/dialogs/efficiency_dialog.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "The redesigned Qt stack now ships a dedicated efficiency dialog with four registered model families and activity-panel integration."
     },
@@ -570,7 +570,7 @@
       "evidence": [
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "The Activity Results panel now computes activities from selected peaks using the active efficiency fit and propagated counting uncertainty."
     },
@@ -586,7 +586,7 @@
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/physics/decay_chain.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "The activity workflow now exposes source-age correction and Bateman-based decay-chain summaries in the modern Qt path."
     },
@@ -601,7 +601,7 @@
       "evidence": [
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "Foreground/background subtraction is now configurable from the Activity panel and reflected in the central spectrum canvas."
     },
@@ -616,7 +616,7 @@
       "evidence": [
         "src/fluxforge/gui/backends/pyqtgraph_backend.py",
         "src/fluxforge/core/phase2_analysis.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "The PyQtGraph canvas now shows a residual strip for the active peaks in Expert and Standards modes."
     },
@@ -632,7 +632,7 @@
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/io/n42.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "GPS metadata extraction is now surfaced through the dedicated Survey Map panel in the modern bottom workspace."
     },
@@ -647,7 +647,7 @@
       "evidence": [
         "src/fluxforge/gui/panels/modern_shell.py",
         "src/fluxforge/gui/main_window.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "Foreground, Background, and Secondary Overlay tabs now sit above the central canvas in the redesigned Qt shell."
     },
@@ -662,7 +662,7 @@
       "evidence": [
         "src/fluxforge/gui/panels/modern_shell.py",
         "src/fluxforge/gui/phase2_workspace.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "Pinned nuclides now persist in the shared workspace state and peaks can be tagged directly from the live Qt table."
     },
@@ -678,7 +678,7 @@
         "src/fluxforge/core/phase2_analysis.py",
         "src/fluxforge/gui/backends/pyqtgraph_backend.py",
         "src/fluxforge/gui/panels/modern_shell.py",
-        "tests/test_phase2_remaining_features.py"
+        "tests/test_analysis_workspace_qt.py"
       ],
       "notes": "Pinned nuclides now drive dotted cascade-sum overlays on the modern PyQtGraph canvas."
     },
@@ -693,23 +693,390 @@
       "evidence": [
         "src/fluxforge/core/peak_fitting.py",
         "src/fluxforge/gui/dialogs/calibration_dialog.py",
-        "tests/test_phase2_calibration_workspace.py"
+        "tests/test_calibration_workspace_qt.py"
       ],
       "notes": "The ROI fitter registry now includes a Bayesian Gaussian option regularized by the active FWHM calibration."
+    },
+    {
+      "id": "2.21",
+      "phase": "Phase 2",
+      "title": "Implement interactive peak isotope assignment and reassignment in the modern GUI",
+      "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 2-19",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/phase2_workspace.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "The Peak Table now exposes an undoable manual isotope assignment and clear/reassign path that remains available after Bayesian matching."
+    },
+    {
+      "id": "2.22",
+      "phase": "Phase 2",
+      "title": "Implement centroid-driven isotope browser with adjustable energy window and active-library filtering",
+      "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 2-20",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/nuclide_search.py",
+        "src/fluxforge/data/nuclide_library.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "The Peak ID Browser now starts from the selected centroid or a typed energy, defaults to ±2 keV, and filters candidate lines through the active gamma-identification source."
+    },
+    {
+      "id": "2.23",
+      "phase": "Phase 2",
+      "title": "Implement gamma-phenomena estimation overlays for continuum, Compton features, and escape peaks",
+      "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 2-21",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/backends/pyqtgraph_backend.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "The selected line now drives estimated Compton edge, backscatter, annihilation, and escape-peak guides that are listed in the panel and overlaid on the spectrum canvas."
+    },
+    {
+      "id": "2.24",
+      "phase": "Phase 2",
+      "title": "Keep peak IDs editable after automated workflows and wire the edit path through SelectionBus and undo/redo",
+      "primary_reference": "FluxForge_Final_Additions.md §11 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md §19 / 2-22",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/selection_bus.py",
+        "src/fluxforge/gui/backends/pyqtgraph_backend.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "Manual overrides, clear actions, SelectionBus guide overlays, and QUndoStack-backed reassignment all remain available after automated peak-ID workflows."
     },
     {
       "id": "3.1",
       "phase": "Phase 3",
       "title": "Implement GRAVEL in unfolding/gravel.py and register it",
       "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
-      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-1",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-8 (GRAVEL portion)",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/unfolding_inputs.py",
+        "src/fluxforge/unfolding/base.py",
+        "src/fluxforge/unfolding/gravel.py",
+        "src/fluxforge/unfolding/__init__.py",
+        "tests/test_unfolding_registry.py",
+        "tests/test_unfolding_workflows.py",
+        "tests/test_unfolding_diagnostics.py",
+        "tests/test_unfolding_reference_parity.py"
+      ],
+      "notes": "The dedicated Phase 3 unfolding package now exposes the GRAVEL method through a shared UnfoldingMethod contract, registers it in the plugin registry, carries shared pyunfold-style nonnegative input validation, and now includes external-reference parity regression coverage against the local Neutron-Unfolding and pyunfold repos on matched methods, datasets, and tolerance settings."
+    },
+    {
+      "id": "3.2",
+      "phase": "Phase 3",
+      "title": "Implement MAXED in unfolding/maxed.py and register it",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-9",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/unfolding/base.py",
+        "src/fluxforge/unfolding/maxed.py",
+        "src/fluxforge/unfolding/gravel.py",
+        "src/fluxforge/unfolding/__init__.py",
+        "tests/test_unfolding_registry.py",
+        "tests/test_unfolding_workflows.py"
+      ],
+      "notes": "MAXED is now implemented in the dedicated unfolding package, registered beside GRAVEL in the shared unfolder registry, and covered by the FluxForge pytest workflow and registry tests with uncertainty reporting."
+    },
+    {
+      "id": "3.3",
+      "phase": "Phase 3",
+      "title": "Implement RMLE in unfolding/rmle.py and register as default in unfold_registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-10",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/unfolding/rmle.py",
+        "src/fluxforge/unfolding/gravel.py",
+        "src/fluxforge/unfolding/__init__.py",
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py",
+        "src/fluxforge/cli/app.py",
+        "src/fluxforge/workflows/spectrum_unfolding.py",
+        "tests/test_unfolding_registry.py",
+        "tests/test_unfolding_workflows.py",
+        "tests/test_unfolding_workspace_qt.py"
+      ],
+      "notes": "RMLE is now implemented in the dedicated unfolding package, registered as the recommended default in the shared unfolder registry, exposed in the modern Qt unfolding workspace, and selectable through the public CLI and SpectrumUnfolder workflow."
+    },
+    {
+      "id": "3.4",
+      "phase": "Phase 3",
+      "title": "Implement ML seed in unfolding/ml_seed.py and register in unfold_registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-11",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/unfolding/ml_seed.py",
+        "src/fluxforge/unfolding/gravel.py",
+        "src/fluxforge/unfolding/rmle.py",
+        "src/fluxforge/workflows/spectrum_unfolding.py",
+        "src/fluxforge/cli/app.py",
+        "tests/test_unfolding_registry.py",
+        "tests/test_unfolding_workflows.py",
+        "tests/test_unfolding_workspace_qt.py"
+      ],
+      "notes": "ML Seed now exists as a registry-backed unfolder, is selectable in the CLI, SpectrumUnfolder, and Qt workspace, and can initialize both GRAVEL and RMLE through a confidence-threshold gate."
+    },
+    {
+      "id": "3.5",
+      "phase": "Phase 3",
+      "title": "Build unfolding dialog with algorithm comparison mode",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a712 / unfolding dialog additions + \u00a719 / 3-8",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py",
+        "src/fluxforge/gui/main_window.py",
+        "src/fluxforge/gui/widgets/method_selector.py",
+        "tests/test_unfolding_workspace_qt.py",
+        "tests/gui_unfolding_workspace_probe.py"
+      ],
+      "notes": "The redesigned Qt shell now includes an unfolding workspace with registry-backed method selectors, an RMLE lambda slider, response-matrix heatmap, convergence plot, uncertainty-aware flux table, ML Seed controls, and mouse-driven GRAVEL/MAXED/RMLE/ML Seed comparison mode."
+    },
+    {
+      "id": "3.6",
+      "phase": "Phase 3",
+      "title": "Implement ML peak analysis engine (PyTorch \u2192 ONNX)",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-13",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/ml/peak_analysis.py",
+        "src/fluxforge/core/phase2_analysis.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_module3_backends.py",
+        "tests/test_module3_workflows_qt.py"
+      ],
+      "notes": "The Qt shell now exposes an ONNX-oriented ML peak proposal engine with a CPU fallback backend, registry registration, and explicit peak-table GUI coverage."
+    },
+    {
+      "id": "3.7",
+      "phase": "Phase 3",
+      "title": "Implement ASTM E181 compliance module and register in standards_registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-2",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/standards/e181.py",
+        "src/fluxforge/standards/__init__.py",
+        "tests/test_module3_backends.py"
+      ],
+      "notes": "ASTM E181 is now registered in the standards registry with residual-band and locked-order checks."
+    },
+    {
+      "id": "3.8",
+      "phase": "Phase 3",
+      "title": "Implement ASTM E1297 MDA module and register in standards_registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-3",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/standards/e1297.py",
+        "src/fluxforge/standards/__init__.py",
+        "tests/test_module3_backends.py"
+      ],
+      "notes": "ASTM E1297 now uses a locked Currie MDA implementation and is covered in the backend tests."
+    },
+    {
+      "id": "3.9",
+      "phase": "Phase 3",
+      "title": "Implement ASTM E1218 + C1232 modules",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-4",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/standards/e1218.py",
+        "src/fluxforge/standards/c1232.py",
+        "src/fluxforge/standards/__init__.py",
+        "tests/test_module3_backends.py"
+      ],
+      "notes": "ASTM E1218 calibration bracketing and ASTM C1232 QA drift checks are now registered and covered."
+    },
+    {
+      "id": "3.10",
+      "phase": "Phase 3",
+      "title": "Implement ASTM C1030 Pu isotopics wizard",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-6",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/standards/c1030.py",
+        "src/fluxforge/gui/dialogs/pu_isotopics_dialog.py",
+        "src/fluxforge/gui/main_window.py",
+        "tests/test_module3_backends.py",
+        "tests/test_module3_workflows_qt.py"
+      ],
+      "notes": "The C1030 isotopics backend and four-step Expert/Standards wizard are now available in the modern Qt shell."
+    },
+    {
+      "id": "3.11",
+      "phase": "Phase 3",
+      "title": "Implement QA monitor and Tools \u2192 QA History view",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-5",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/standards/qa_monitor.py",
+        "src/fluxforge/gui/dialogs/qa_history_dialog.py",
+        "src/fluxforge/gui/main_window.py",
+        "tests/test_module3_backends.py",
+        "tests/test_module3_workflows_qt.py"
+      ],
+      "notes": "SQLite-backed QA history, drift summaries, CSV export, and the Tools \u2192 QA History dialog are now implemented."
+    },
+    {
+      "id": "3.12",
+      "phase": "Phase 3",
+      "title": "Implement Standards Mode workflow locking via registry",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-1 (locking portion)",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/standards/__init__.py",
+        "src/fluxforge/gui/widgets/method_selector.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/main_window.py",
+        "tests/test_module3_workflows_qt.py"
+      ],
+      "notes": "Standards registry entries now expose lock metadata, the shell surfaces padlock summaries, and Standards mode keeps the active lock set visible in the modern GUI."
+    },
+    {
+      "id": "3.13",
+      "phase": "Phase 3",
+      "title": "Implement Jinja2 report engine and 3 bundled templates",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-14 + 3-15",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/reporting/engine.py",
+        "src/fluxforge/reporting/templates/standard_lab.html.j2",
+        "src/fluxforge/reporting/templates/astm_compliance.html.j2",
+        "src/fluxforge/reporting/templates/batch_summary.html.j2",
+        "src/fluxforge/gui/dialogs/report_export_dialog.py",
+        "tests/test_module3_backends.py",
+        "tests/test_module3_workflows_qt.py"
+      ],
+      "notes": "The report engine now renders bundled standard-lab, ASTM-compliance, and batch-summary templates and is reachable through the Qt report dialog with both HTML and PDF export paths."
+    },
+    {
+      "id": "3.14",
+      "phase": "Phase 3",
+      "title": "Implement batch analysis queue and ProcessPoolExecutor workers",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 3-16",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/batch_analysis.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_module3_backends.py",
+        "tests/test_module3_workflows_qt.py",
+        "tests/gui_module3_workflows_probe.py"
+      ],
+      "notes": "The bottom-shell Batch Queue tab now runs ProcessPoolExecutor-backed analyses, exposes visible progress in the Qt shell, and writes per-spectrum JSON plus an aggregate CSV."
+    },
+    {
+      "id": "3.15",
+      "phase": "Phase 3",
+      "title": "Add GPU-accelerated batch inference via optional CuPy",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a712 / RMLE implementation notes + \u00a719 / 3-13 + 3-16",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/unfolding/gpu_backend.py",
+        "src/fluxforge/ml/peak_analysis.py",
+        "src/fluxforge/core/batch_analysis.py",
+        "tests/test_module3_backends.py"
+      ],
+      "notes": "Optional CuPy backend selection now exists for ML and batch workflows, with a clean NumPy fallback on CPU-only environments."
+    },
+    {
+      "id": "4.1",
+      "phase": "Phase 4",
+      "title": "Implement USB HID + Ethernet HAL drivers",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 4",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 4-3",
       "repo_status": "not-started",
       "sequence_status": "next",
       "evidence": [
         "docs/FluxForge_Final_Additions.md",
         "docs/FluxForge_Additions_v3_Final.md"
       ],
-      "notes": "Phase 2 is now complete, so the formal next implementation step is Phase 3.1: GRAVEL."
+      "notes": "Module 3 is now complete in sequence, so the next formal step is the first real HAL driver work."
+    },
+    {
+      "id": "4.2",
+      "phase": "Phase 4",
+      "title": "Implement device discovery + thumbnails",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 4",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 4-2",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "The Dashboard and Devices surfaces are still reserved placeholders waiting on real HAL discovery."
+    },
+    {
+      "id": "4.3",
+      "phase": "Phase 4",
+      "title": "Implement Digital Twin dashboard",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 4",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 4-1",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "The Dashboard tab is still reserved, but its live telemetry implementation remains a later Phase 4 item."
+    },
+    {
+      "id": "4.4",
+      "phase": "Phase 4",
+      "title": "Implement Spectrogram panel",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 4",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 4-4",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "The Spectrogram tab remains reserved until live acquisition and time-energy data streams land."
     }
   ]
 }

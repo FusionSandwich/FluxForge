@@ -10,6 +10,7 @@ from fluxforge.gui import (
     modern_gui_unavailable_message,
     register_builtin_render_backends,
 )
+from fluxforge.gui.spectrum_canvas import ReferenceLine
 from fluxforge.plugins import PluginRegistries
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -62,10 +63,14 @@ def test_selection_bus_helper_publishers_preserve_shared_context():
     bus.publish_peak(661.657, nuclide="Cs-137")
     bus.publish_roi(640.0, 680.0)
 
-    state = bus.publish_nuclide("Ba-137m")
+    state = bus.publish_nuclide(
+        "Ba-137m",
+        annotation_lines=(ReferenceLine(energy_keV=661.657, label="Photopeak"),),
+    )
     assert state.peak_energy_keV == 661.657
     assert state.roi_bounds_keV == (640.0, 680.0)
     assert bus.describe()["nuclide"] == "Ba-137m"
+    assert bus.describe()["annotation_line_count"] == 1
 
 
 def test_hierarchical_buffer_builds_multiple_levels():
@@ -94,10 +99,14 @@ def test_modern_gui_unavailable_message_mentions_legacy_fallback():
 def test_current_gui_regression_files_target_modern_qt_stack():
     modern_gui_files = (
         ROOT / "tests" / "test_modern_gui_shell.py",
-        ROOT / "tests" / "test_phase2_calibration_workspace.py",
-        ROOT / "tests" / "gui_phase2_calibration_probe.py",
-        ROOT / "tests" / "gui_phase2_completion_probe.py",
-        ROOT / "tests" / "test_phase2_remaining_features.py",
+        ROOT / "tests" / "test_calibration_workspace_qt.py",
+        ROOT / "tests" / "test_unfolding_workspace_qt.py",
+        ROOT / "tests" / "gui_calibration_workspace_probe.py",
+        ROOT / "tests" / "gui_analysis_workspace_probe.py",
+        ROOT / "tests" / "gui_unfolding_workspace_probe.py",
+        ROOT / "tests" / "gui_module3_workflows_probe.py",
+        ROOT / "tests" / "test_analysis_workspace_qt.py",
+        ROOT / "tests" / "test_module3_workflows_qt.py",
     )
 
     for path in modern_gui_files:

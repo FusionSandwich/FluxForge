@@ -16,6 +16,9 @@ import numpy as np
 from scipy import optimize
 from scipy.stats import chi2
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import require_nonnegative
+
 
 @dataclass
 class RegularizedSolution:
@@ -30,6 +33,9 @@ class RegularizedSolution:
     converged: bool
     loss_history: List[float] = field(default_factory=list)
     details: Dict = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.details = merge_flux_diagnostics(self.details, self.spectrum)
 
     @property
     def reduced_chi_squared(self) -> float:
@@ -341,11 +347,16 @@ def gradient_descent_regularized(
         n_iterations=epoch + 1,
         converged=converged,
         loss_history=loss_history,
-        details={
-            "scaling_factor": scaling_factor,
-            "final_loss": loss_history[-1] if loss_history else 0.0,
-            "loss_threshold": loss_threshold,
-        },
+        details=merge_flux_diagnostics(
+            {
+                "scaling_factor": scaling_factor,
+                "final_loss": loss_history[-1] if loss_history else 0.0,
+                "loss_threshold": loss_threshold,
+            },
+            x,
+            negative_policy="clipped_to_zero",
+            nonnegativity_enforced=True,
+        ),
     )
 
 
@@ -524,8 +535,29 @@ def regularized_unfold(
     RegularizedSolution
         Unfolded spectrum with uncertainties
     """
-    A = np.atleast_2d(response_matrix)
-    b = np.atleast_1d(measurements).flatten()
+    A = require_nonnegative("response_matrix", response_matrix)
+    if A.ndim != 2:
+        raise ValueError("response_matrix must be a 2-D array")
+    b = require_nonnegative("measurements", measurements).reshape(-1)
+    if A.shape[0] != b.size:
+        raise ValueError("response_matrix row count must match measurements length")
+
+    if measurement_errors is not None:
+        measurement_errors = require_nonnegative(
+            "measurement_errors",
+            measurement_errors,
+        ).reshape(-1)
+        if measurement_errors.size != b.size:
+            raise ValueError(
+                "measurement_errors length must match measurements length"
+            )
+
+    if prior_spectrum is not None:
+        prior_spectrum = require_nonnegative("prior_spectrum", prior_spectrum).reshape(-1)
+        if prior_spectrum.size != A.shape[1]:
+            raise ValueError(
+                "prior_spectrum length must match response_matrix column count"
+            )
 
     # Auto-select regularization parameter
     if reg_param is None:
@@ -561,6 +593,12 @@ def regularized_unfold(
             regularization_param=reg_param,
             n_iterations=1,
             converged=True,
+            details=merge_flux_diagnostics(
+                None,
+                x,
+                negative_policy="clipped_to_zero",
+                nonnegativity_enforced=True,
+            ),
         )
     else:
         raise ValueError(f"Unknown method: {method}")

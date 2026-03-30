@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ title }}</title>
+    <style>
+      body { font-family: "IBM Plex Sans", sans-serif; margin: 24px; color: #10253c; }
+      section { margin-bottom: 20px; padding: 16px; border: 1px solid #d8e3ec; border-radius: 14px; }
+      h1, h2 { margin: 0 0 12px; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      pre { white-space: pre-wrap; word-break: break-word; }
+    </style>
+  </head>
+  <body>
+    <h1>{{ title }}</h1>
+    <section><h2>Spectrum</h2><div>{{ spectrum_image }}</div></section>
+    <section class="grid">
+      <div><h2>Calibration Curve</h2><div>{{ calibration_curve }}</div></div>
+      <div><h2>Calibration Residuals</h2><div>{{ calibration_residuals }}</div></div>
+      <div><h2>Efficiency Curve</h2><div>{{ efficiency_curve }}</div></div>
+      <div><h2>Efficiency Residuals</h2><div>{{ efficiency_residuals }}</div></div>
+    </section>
+    <section><h2>Residuals Grid</h2><div>{{ residuals_grid }}</div></section>
+    <section><h2>Peak Table</h2><div>{{ peak_table }}</div></section>
+    <section><h2>Activity Table</h2><div>{{ activity_table }}</div></section>
+    <section><h2>ASTM Status</h2><div>{{ astm_status_table }}</div></section>
+    <section><h2>QA Snapshot</h2><div>{{ qa_status_snapshot }}</div></section>
+    <section><h2>Provenance</h2><pre>{{ provenance }}</pre></section>
+  </body>
+</html>

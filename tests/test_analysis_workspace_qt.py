@@ -12,6 +12,7 @@ from fluxforge.core.phase2_analysis import (  # noqa: E402
     calculate_peak_activity,
     compute_cascade_sum_lines,
     detect_peak_candidates,
+    estimate_spectral_phenomena,
     extract_survey_points,
     fit_efficiency_model,
     subtract_background_counts,
@@ -20,6 +21,7 @@ from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
 from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import ModeManager  # noqa: E402
+from fluxforge.gui.nuclide_search import NuclideSearchController  # noqa: E402
 from fluxforge.gui.panels.modern_shell import (  # noqa: E402
     build_demo_background_spectrum,
     build_demo_overlay_spectrum,
@@ -88,7 +90,7 @@ def _make_efficiency_points():
     )
 
 
-def test_phase2_core_helpers_cover_remaining_analysis_surfaces():
+def test_analysis_core_helpers_cover_workspace_surfaces():
     foreground = build_demo_spectrum()
     background = build_demo_background_spectrum()
     overlay = build_demo_overlay_spectrum()
@@ -121,7 +123,7 @@ def test_phase2_core_helpers_cover_remaining_analysis_surfaces():
     assert any(value == pytest.approx(2505.72, abs=1.0) for value in cascade)
 
 
-def test_phase2_efficiency_models_and_activity_results_are_available():
+def test_efficiency_models_and_activity_results_are_available():
     fits = {
         model_key: fit_efficiency_model(_make_efficiency_points(), model_key=model_key)
         for model_key in ("log_poly_2", "log_poly_3", "gray_functional", "semi_empirical_hpge")
@@ -146,7 +148,21 @@ def test_phase2_efficiency_models_and_activity_results_are_available():
     assert "Bateman correction" in result.chain_summary
 
 
-def test_phase2_workspace_tracks_loaded_spectra_and_role_assignments():
+def test_line_match_browser_and_gamma_phenomena_estimates_are_available():
+    controller = NuclideSearchController(SelectionBus())
+    hits = controller.line_matches_for_energy(661.657, tolerance_keV=2.0, query="cs")
+
+    assert hits
+    assert any("cs" in hit.nuclide.lower() for hit in hits)
+    assert all(abs(hit.delta_keV) <= 2.0 for hit in hits)
+
+    phenomena = estimate_spectral_phenomena(1332.492)
+    kinds = {item.kind for item in phenomena}
+    assert {"compton_edge", "backscatter", "single_escape", "double_escape", "annihilation"} <= kinds
+    assert all(item.energy_keV > 0.0 for item in phenomena)
+
+
+def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
     controller = Phase2WorkspaceController(
         Phase2WorkspaceState(
             spectra=(
@@ -195,9 +211,9 @@ def _write_spectrum_csv(path: Path, spectrum) -> None:
 
 @pytest.mark.skipif(
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
-    reason="Qt phase 2 workspace dependencies are unavailable.",
+    reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_main_window_phase2_peak_workflow_supports_undo_pin_tag_and_selection_sync(monkeypatch):
+def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monkeypatch):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -256,9 +272,206 @@ def test_main_window_phase2_peak_workflow_supports_undo_pin_tag_and_selection_sy
 
 @pytest.mark.skipif(
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
-    reason="Qt phase 2 workspace dependencies are unavailable.",
+    reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_main_window_phase2_activity_background_and_survey_map_workflows(monkeypatch):
+def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monkeypatch):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    monkeypatch.setattr(AutoPeakReviewDialog, "accepted_peaks", lambda self: peaks)
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    peak_panel.run_auto_peak_search()
+    peak_panel.run_bayesian_match()
+    _qapp().processEvents()
+
+    peak_panel.table.selectRow(0)
+    _qapp().processEvents()
+
+    original_peak = window.phase2_workspace.selected_peak()
+    assert original_peak is not None
+    assert peak_panel.peak_id_tolerance.value() == pytest.approx(2.0)
+    assert peak_panel.peak_id_energy.value() == pytest.approx(original_peak.energy_keV, abs=1.0)
+    assert peak_panel.peak_id_matches.count() >= 1
+
+    alternate_row = next(
+        (
+            index
+            for index, match in enumerate(peak_panel._current_match_results)
+            if match.nuclide != original_peak.nuclide
+        ),
+        None,
+    )
+    if alternate_row is None:
+        peak_panel.peak_id_tolerance.setValue(25.0)
+        peak_panel.peak_id_filter.setText("")
+        _qapp().processEvents()
+        alternate_row = next(
+            (
+                index
+                for index, match in enumerate(peak_panel._current_match_results)
+                if match.nuclide != original_peak.nuclide
+            ),
+            None,
+        )
+    if alternate_row is None:
+        peak_panel.peak_id_tolerance.setValue(250.0)
+        _qapp().processEvents()
+        alternate_row = next(
+            (
+                index
+                for index, match in enumerate(peak_panel._current_match_results)
+                if match.nuclide != original_peak.nuclide
+            ),
+            None,
+        )
+    assert alternate_row is not None
+
+    peak_panel.peak_id_matches.setCurrentRow(alternate_row)
+    _qapp().processEvents()
+    reassigned = peak_panel._current_match_results[alternate_row]
+    assert peak_panel.peak_id_phenomena.count() >= 2
+    assert len(window.selection_bus.state.annotation_lines) >= 3
+
+    QTest.mouseClick(peak_panel.assign_isotope_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    updated_peak = window.phase2_workspace.selected_peak()
+    assert updated_peak is not None
+    assert updated_peak.status == "manual"
+    assert updated_peak.nuclide == reassigned.nuclide
+    assert updated_peak.nuclide != original_peak.nuclide or peak_panel.peak_id_tolerance.value() > 2.0
+    assert window.selection_bus.state.nuclide == reassigned.nuclide
+    assert len(window.central_tabs.canvas._reference_lines) >= 1
+
+    QTest.mouseClick(peak_panel.clear_assignment_button, Qt.LeftButton)
+    _qapp().processEvents()
+    cleared_peak = window.phase2_workspace.selected_peak()
+    assert cleared_peak is not None
+    assert cleared_peak.nuclide is None
+
+    window.undo_stack.undo()
+    _qapp().processEvents()
+    assert window.phase2_workspace.selected_peak().nuclide == reassigned.nuclide
+    window.undo_stack.redo()
+    _qapp().processEvents()
+    assert window.phase2_workspace.selected_peak().nuclide is None
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_peak_id_browser_supports_typed_centroid_filtering_and_phenomena_guides():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    sidebar = window.left_dock.widget()
+    assert sidebar.gamma_source_combo.count() >= 4
+    assert sidebar.gamma_source_combo.currentData() == (
+        window.library_manager.state.gamma_identification_source_id
+    )
+    assert "Identification" in sidebar.library_summary.toPlainText()
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    peak_panel.peak_id_energy.setValue(661.657)
+    peak_panel.peak_id_tolerance.setValue(2.0)
+    peak_panel.peak_id_filter.setText("cs")
+    _qapp().processEvents()
+
+    assert peak_panel.peak_id_matches.count() >= 1
+    assert peak_panel._current_match_results
+    assert all(
+        "cs" in f"{match.nuclide} {match.display_name}".lower()
+        for match in peak_panel._current_match_results
+    )
+    first_match = peak_panel._current_match_results[0]
+    assert abs(first_match.line_energy_keV - 661.657) <= 2.0
+
+    match_item = peak_panel.peak_id_matches.item(0)
+    match_rect = peak_panel.peak_id_matches.visualItemRect(match_item)
+    QTest.mouseClick(
+        peak_panel.peak_id_matches.viewport(),
+        Qt.LeftButton,
+        Qt.NoModifier,
+        match_rect.center(),
+    )
+    _qapp().processEvents()
+
+    phenomena = [
+        peak_panel.peak_id_phenomena.item(index).text().lower()
+        for index in range(peak_panel.peak_id_phenomena.count())
+    ]
+    assert any("compton edge" in text for text in phenomena)
+    assert any("backscatter" in text for text in phenomena)
+    assert len(window.selection_bus.state.annotation_lines) >= 3
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_peak_id_browser_use_selected_peak_button_restores_peak_centroid(monkeypatch):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    monkeypatch.setattr(AutoPeakReviewDialog, "accepted_peaks", lambda self: peaks)
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    QTest.mouseClick(peak_panel.auto_find_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    index = peak_panel.table.model().index(0, 0)
+    rect = peak_panel.table.visualRect(index)
+    QTest.mouseClick(
+        peak_panel.table.viewport(),
+        Qt.LeftButton,
+        Qt.NoModifier,
+        rect.center(),
+    )
+    _qapp().processEvents()
+
+    selected_peak = window.phase2_workspace.selected_peak()
+    assert selected_peak is not None
+    peak_panel.peak_id_energy.setValue(400.0)
+    _qapp().processEvents()
+
+    QTest.mouseClick(peak_panel.use_selected_peak_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    assert peak_panel.peak_id_energy.value() == pytest.approx(
+        selected_peak.energy_keV,
+        abs=1.0,
+    )
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_main_window_activity_background_and_survey_map_workflows(monkeypatch):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -312,7 +525,7 @@ def test_main_window_phase2_activity_background_and_survey_map_workflows(monkeyp
 
 @pytest.mark.skipif(
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
-    reason="Qt phase 2 workspace dependencies are unavailable.",
+    reason="Qt analysis workspace dependencies are unavailable.",
 )
 def test_main_window_background_selector_updates_subtracted_foreground_and_overlay(tmp_path):
     _qapp()

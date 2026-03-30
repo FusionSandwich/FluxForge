@@ -13,6 +13,7 @@ import warnings
 
 import numpy as np
 
+from fluxforge.core.unfolding_inputs import require_nonnegative
 from fluxforge.analysis.segmented_detection import (
     SegmentedDetectionConfig,
     detect_peaks_segmented,
@@ -40,6 +41,7 @@ from fluxforge.core.response import (
     build_response_matrix,
 )
 from fluxforge.core.schemas import validate_or_raise
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
 from fluxforge.data.efficiency_models import EfficiencyModel
 from fluxforge.data.kayzero_k0 import (
     import_kayzero_k0_library,
@@ -90,6 +92,7 @@ from fluxforge.physics.activation import (
 )
 from fluxforge.solvers.gls import gls_adjust
 from fluxforge.solvers.iterative import gravel, mlem
+from fluxforge.unfolding import GravelUnfolder, MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
 from fluxforge.validation import spectrum_comparison_metrics
 
 
@@ -1274,7 +1277,7 @@ def _build_unfold_diagnostics(
     pulls = np.divide(residuals, sigma, out=np.zeros_like(residuals), where=sigma > 0.0)
     payload["rate_residuals"] = residuals.astype(float).tolist()
     payload["rate_pulls"] = pulls.astype(float).tolist()
-    return payload
+    return merge_flux_diagnostics(payload, flux)
 
 
 def _solve_unfold_method(
@@ -1299,6 +1302,7 @@ def _solve_unfold_method(
             enforce_nonnegativity=bool(getattr(args, "enforce_nonnegativity", True)),
         )
         diagnostics = {
+            **dict(getattr(solution, "diagnostics", {})),
             "reduced_chi2": float(getattr(solution, "reduced_chi2", 0.0)),
             "n_dof": int(getattr(solution, "n_dof", 0)),
         }
@@ -1317,29 +1321,33 @@ def _solve_unfold_method(
         )
 
     if method_key == "gravel":
-        solution = gravel(
-            response_matrix,
-            measured_rates,
-            initial_flux=prior_flux,
-            measurement_uncertainty=rate_uncertainties,
-            max_iters=int(getattr(args, "max_iters", 250)),
+        solution = GravelUnfolder(
+            max_iterations=int(getattr(args, "max_iters", 250)),
             tolerance=float(getattr(args, "tolerance", 1e-4)),
             chi2_tolerance=float(getattr(args, "chi2_tolerance", 0.01)),
             floor=float(getattr(args, "floor", 1e-20)),
             relaxation=float(getattr(args, "relaxation", 0.7)),
+        ).unfold(
+            np.asarray(measured_rates, dtype=float),
+            np.asarray(response_matrix, dtype=float),
+            initial_flux=np.asarray(prior_flux, dtype=float),
+            measurement_uncertainty=np.asarray(rate_uncertainties, dtype=float),
+            convergence_mode=str(getattr(args, "convergence_mode", "relative")),
+            seed_with_ml=bool(getattr(args, "use_ml_seed", False)),
+            confidence_threshold=float(getattr(args, "ml_seed_threshold", 0.6)),
             verbose=bool(getattr(args, "verbose_solver", False)),
         )
+        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
         diagnostics = {
+            **dict(solution.parameters_used),
             "iterations": int(solution.iterations),
             "converged": bool(solution.converged),
-            "chi2_history": [float(value) for value in solution.chi_squared_history],
-            "final_residuals": [
-                float(value) for value in solution.final_residuals or []
-            ],
+            "chi2_history": [float(value) for value in solution.convergence_history],
+            "final_residuals": [float(value) for value in solution.residuals],
         }
         return (
             [float(value) for value in solution.flux],
-            _zero_covariance(len(solution.flux)),
+            covariance.tolist(),
             float(solution.chi_squared),
             "gravel",
             diagnostics,
@@ -1360,6 +1368,7 @@ def _solve_unfold_method(
             verbose=bool(getattr(args, "verbose_solver", False)),
         )
         diagnostics = {
+            **dict(getattr(solution, "diagnostics", {})),
             "iterations": int(solution.iterations),
             "converged": bool(solution.converged),
             "chi2_history": [float(value) for value in solution.chi_squared_history],
@@ -1376,6 +1385,83 @@ def _solve_unfold_method(
             diagnostics,
         )
 
+    if method_key == "maxed":
+        solution = MaxedUnfolder(
+            max_iterations=int(getattr(args, "max_iters", 250)),
+        ).unfold(
+            np.asarray(measured_rates, dtype=float),
+            np.asarray(response_matrix, dtype=float),
+            initial_flux=np.asarray(prior_flux, dtype=float),
+            measurement_uncertainty=np.asarray(rate_uncertainties, dtype=float),
+        )
+        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
+        diagnostics = {
+            **dict(solution.parameters_used),
+            "iterations": int(solution.iterations),
+            "converged": bool(solution.converged),
+            "chi2_history": [float(value) for value in solution.convergence_history],
+            "final_residuals": [float(value) for value in solution.residuals],
+        }
+        return (
+            [float(value) for value in solution.flux],
+            covariance.tolist(),
+            float(solution.chi_squared),
+            "maxed",
+            diagnostics,
+        )
+
+    if method_key == "ml_seed":
+        solution = MLSeedUnfolder().unfold(
+            np.asarray(measured_rates, dtype=float),
+            np.asarray(response_matrix, dtype=float),
+            initial_flux=np.asarray(prior_flux, dtype=float),
+            measurement_uncertainty=np.asarray(rate_uncertainties, dtype=float),
+            confidence_threshold=float(getattr(args, "ml_seed_threshold", 0.6)),
+        )
+        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
+        diagnostics = {
+            **dict(solution.parameters_used),
+            "iterations": int(solution.iterations),
+            "converged": bool(solution.converged),
+            "chi2_history": [float(value) for value in solution.convergence_history],
+            "final_residuals": [float(value) for value in solution.residuals],
+        }
+        return (
+            [float(value) for value in solution.flux],
+            covariance.tolist(),
+            float(solution.chi_squared),
+            "ml_seed",
+            diagnostics,
+        )
+
+    if method_key == "rmle":
+        solution = RMLEUnfolder(
+            max_iterations=int(getattr(args, "max_iters", 250)),
+            tolerance=float(getattr(args, "tolerance", 1e-6)),
+        ).unfold(
+            np.asarray(measured_rates, dtype=float),
+            np.asarray(response_matrix, dtype=float),
+            initial_flux=np.asarray(prior_flux, dtype=float),
+            measurement_uncertainty=np.asarray(rate_uncertainties, dtype=float),
+            seed_with_ml=bool(getattr(args, "use_ml_seed", False)),
+            confidence_threshold=float(getattr(args, "ml_seed_threshold", 0.6)),
+        )
+        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
+        diagnostics = {
+            **dict(solution.parameters_used),
+            "iterations": int(solution.iterations),
+            "converged": bool(solution.converged),
+            "chi2_history": [float(value) for value in solution.convergence_history],
+            "final_residuals": [float(value) for value in solution.residuals],
+        }
+        return (
+            [float(value) for value in solution.flux],
+            covariance.tolist(),
+            float(solution.chi_squared),
+            "rmle",
+            diagnostics,
+        )
+
     raise ValueError(f"Unsupported unfold method: {method}")
 
 
@@ -1383,7 +1469,7 @@ def cmd_unfold(args: argparse.Namespace) -> None:
     response_data = read_response_bundle(args.response_file)
     if args.validate:
         validate_or_raise(response_data)
-    response_matrix = response_data["matrix"]
+    response_matrix = require_nonnegative("response", response_data["matrix"]).tolist()
     boundaries = response_data["boundaries_eV"]
     reactions = response_data["reactions"]
     groups = EnergyGroupStructure([float(b) for b in boundaries])
@@ -1391,19 +1477,31 @@ def cmd_unfold(args: argparse.Namespace) -> None:
     rates_payload = read_reaction_rates(args.rates_file)
     if args.validate:
         validate_or_raise(rates_payload)
-    measured_rates = [float(rx["rate"]) for rx in rates_payload["rates"]]
-    rate_uncertainties = [float(rx["uncertainty"]) for rx in rates_payload["rates"]]
+    measured_rates = require_nonnegative(
+        "measurements",
+        [float(rx["rate"]) for rx in rates_payload["rates"]],
+    ).astype(float).tolist()
+    rate_uncertainties = require_nonnegative(
+        "measurement_uncertainty",
+        [float(rx["uncertainty"]) for rx in rates_payload["rates"]],
+    ).astype(float).tolist()
 
     if args.prior_flux_file:
-        prior_flux = [float(v) for v in _load_json(args.prior_flux_file)]
+        prior_flux = require_nonnegative(
+            "prior_flux",
+            [float(v) for v in _load_json(args.prior_flux_file)],
+        ).astype(float).tolist()
     else:
         avg_response = sum(sum(row) for row in response_matrix) / max(
             len(response_matrix) * len(response_matrix[0]), 1
         )
-        prior_flux = [
-            sum(measured_rates) / max(avg_response, 1e-12)
-            for _ in range(groups.group_count)
-        ]
+        prior_flux = require_nonnegative(
+            "prior_flux",
+            [
+                sum(measured_rates) / max(avg_response, 1e-12)
+                for _ in range(groups.group_count)
+            ],
+        ).astype(float).tolist()
 
     # Prior covariance model (K8)
     cov_model = PriorCovarianceModel(
@@ -3191,7 +3289,7 @@ def build_parser() -> argparse.ArgumentParser:
     response.set_defaults(func=cmd_response)
 
     unfold = subparsers.add_parser(
-        "unfold", help="Infer spectrum using GLS, GRAVEL, or MLEM"
+        "unfold", help="Infer spectrum using GLS, GRAVEL, MLEM, MAXED, RMLE, or ML Seed"
     )
     unfold.add_argument("--rates-file", type=Path, required=True)
     unfold.add_argument("--response-file", type=Path, required=True)
@@ -3200,7 +3298,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--method",
         type=str,
         default="gls",
-        choices=["gls", "gravel", "mlem"],
+        choices=["gls", "gravel", "mlem", "maxed", "rmle", "ml_seed"],
         help="Unfolding method to use",
     )
     unfold.add_argument("--prior-uncertainty", type=float, default=0.25)
@@ -3255,6 +3353,17 @@ def build_parser() -> argparse.ArgumentParser:
         default="relative",
         choices=["relative", "ddJ"],
         help="MLEM convergence criterion",
+    )
+    unfold.add_argument(
+        "--use-ml-seed",
+        action="store_true",
+        help="Use the ML Seed approximation to initialize GRAVEL or RMLE",
+    )
+    unfold.add_argument(
+        "--ml-seed-threshold",
+        type=float,
+        default=0.6,
+        help="Confidence threshold used to accept an ML Seed solution",
     )
     unfold.add_argument(
         "--no-enforce-nonnegativity",

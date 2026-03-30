@@ -14,9 +14,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import require_nonnegative
 from fluxforge.core.linalg import Matrix, Vector, elementwise_maximum, matmul
+
+
+# Small enough to preserve reference-implementation parity without hitting zero.
+_ITERATIVE_POSITIVE_FLOOR = 1e-100
 
 
 @dataclass
@@ -30,10 +36,59 @@ class IterativeSolution:
     chi_squared: float = 0.0
     chi_squared_history: List[float] = field(default_factory=list)
     final_residuals: Optional[Vector] = None
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.diagnostics = merge_flux_diagnostics(self.diagnostics, self.flux)
 
 
 def _default_flux(n_groups: int, scale: float = 1.0) -> Vector:
     return [scale for _ in range(n_groups)]
+
+
+def _validate_iterative_inputs(
+    response: Matrix,
+    measurements: Vector,
+    initial_flux: Optional[Vector] = None,
+    measurement_uncertainty: Optional[Vector] = None,
+) -> tuple[Matrix, Vector, Optional[Vector], Optional[Vector]]:
+    """Normalize iterative unfolding inputs using shared nonnegative guards."""
+
+    response_array = require_nonnegative("response", response)
+    if response_array.ndim != 2:
+        raise ValueError("response must be a 2-D array")
+
+    measurements_array = require_nonnegative("measurements", measurements).reshape(-1)
+    if response_array.shape[0] != measurements_array.size:
+        raise ValueError("response row count must match the measurements length")
+
+    initial_array = None
+    if initial_flux is not None:
+        initial_array = require_nonnegative("initial_flux", initial_flux).reshape(-1)
+        if initial_array.size != response_array.shape[1]:
+            raise ValueError(
+                "initial_flux length must match the response column count"
+            )
+
+    uncertainty_array = None
+    if measurement_uncertainty is not None:
+        uncertainty_array = require_nonnegative(
+            "measurement_uncertainty",
+            measurement_uncertainty,
+        ).reshape(-1)
+        if uncertainty_array.size != measurements_array.size:
+            raise ValueError(
+                "measurement_uncertainty length must match the measurements length"
+            )
+
+    return (
+        response_array.astype(float).tolist(),
+        measurements_array.astype(float).tolist(),
+        None if initial_array is None else initial_array.astype(float).tolist(),
+        None
+        if uncertainty_array is None
+        else uncertainty_array.astype(float).tolist(),
+    )
 
 
 def _compute_chi_squared(
@@ -69,8 +124,9 @@ def gravel(
     max_iters: int = 1000,
     tolerance: float = 1e-4,
     chi2_tolerance: float = 0.01,
-    floor: float = 1e-20,
+    floor: float = _ITERATIVE_POSITIVE_FLOOR,
     relaxation: float = 0.7,
+    convergence_mode: str = "relative",  # "relative" or "ddJ" (Neutron-Unfolding style)
     verbose: bool = False,
 ) -> IterativeSolution:
     """GRAVEL algorithm (log-space SAND-II variant) for spectrum unfolding.
@@ -85,8 +141,19 @@ def gravel(
         chi2_tolerance: Chi-squared per DOF threshold for convergence.
         floor: Minimum flux/prediction value to avoid divide-by-zero.
         relaxation: Under-relaxation factor (0-1). Lower = more stable, slower.
+        convergence_mode: "relative" (default) uses max relative flux change,
+            "ddJ" uses the Neutron-Unfolding style second-derivative criterion.
         verbose: Print convergence progress.
     """
+
+    response, measurements, initial_flux, measurement_uncertainty = (
+        _validate_iterative_inputs(
+            response,
+            measurements,
+            initial_flux=initial_flux,
+            measurement_uncertainty=measurement_uncertainty,
+        )
+    )
 
     n_groups = len(response[0])
     n_meas = len(measurements)
@@ -111,6 +178,9 @@ def gravel(
     history: List[Vector] = [phi[:]]
     chi2_history: List[float] = []
     converged = False
+    ddj_indices = [idx for idx, value in enumerate(measurements) if value > 0.0]
+    J_prev = 0.0
+    dJ_prev = 1.0
 
     for it in range(1, max_iters + 1):
         predicted = matmul(response, phi)
@@ -125,6 +195,21 @@ def gravel(
 
         if verbose and it % 100 == 0:
             print(f"  GRAVEL iter {it}: chi2/dof = {chi2_per_dof:.4f}")
+
+        if convergence_mode == "ddJ":
+            ddj_predicted = [predicted[idx] for idx in ddj_indices]
+            ddj_measurements = [measurements[idx] for idx in ddj_indices]
+            if ddj_predicted:
+                J = sum(
+                    (p - m) * (p - m)
+                    for p, m in zip(ddj_predicted, ddj_measurements)
+                ) / max(sum(ddj_predicted), floor)
+            else:
+                J = 0.0
+            dJ = J_prev - J
+            ddJ = abs(dJ - dJ_prev)
+            J_prev = J
+            dJ_prev = dJ
 
         # Compute log ratios of measurements to predictions
         log_ratios = [
@@ -163,7 +248,15 @@ def gravel(
         history.append(phi[:])
 
         # Check convergence criteria
-        if max_rel_change < tolerance:
+        if convergence_mode == "ddJ" and ddJ < tolerance:
+            converged = True
+            if verbose:
+                print(
+                    f"  GRAVEL converged at iter {it}: ddJ = {ddJ:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                )
+            break
+
+        if convergence_mode == "relative" and max_rel_change < tolerance:
             converged = True
             if verbose:
                 print(
@@ -189,6 +282,12 @@ def gravel(
         chi_squared=final_chi2 / max(n_meas - 1, 1),
         chi_squared_history=chi2_history,
         final_residuals=final_residuals,
+        diagnostics=merge_flux_diagnostics(
+            None,
+            phi,
+            negative_policy="floor_clamped",
+            nonnegativity_enforced=True,
+        ),
     )
 
 
@@ -200,7 +299,7 @@ def mlem(
     max_iters: int = 1000,
     tolerance: float = 1e-4,
     chi2_tolerance: float = 0.01,
-    floor: float = 1e-20,
+    floor: float = _ITERATIVE_POSITIVE_FLOOR,
     relaxation: float = 0.8,
     convergence_mode: str = "relative",  # "relative" or "ddJ" (Neutron-Unfolding style)
     verbose: bool = False,
@@ -221,6 +320,15 @@ def mlem(
             "ddJ" uses Neutron-Unfolding style second derivative criterion.
         verbose: Print convergence progress.
     """
+
+    response, measurements, initial_flux, measurement_uncertainty = (
+        _validate_iterative_inputs(
+            response,
+            measurements,
+            initial_flux=initial_flux,
+            measurement_uncertainty=measurement_uncertainty,
+        )
+    )
 
     n_groups = len(response[0])
     n_meas = len(measurements)
@@ -325,6 +433,12 @@ def mlem(
         chi_squared=final_chi2 / max(n_meas - 1, 1),
         chi_squared_history=chi2_history,
         final_residuals=final_residuals,
+        diagnostics=merge_flux_diagnostics(
+            None,
+            phi,
+            negative_policy="floor_clamped",
+            nonnegativity_enforced=True,
+        ),
     )
 
 
@@ -363,6 +477,15 @@ def gradient_descent(
         auto_scale: Auto-scale flux to match measurement magnitude.
         verbose: Print convergence progress.
     """
+    response, measurements, initial_flux, measurement_uncertainty = (
+        _validate_iterative_inputs(
+            response,
+            measurements,
+            initial_flux=initial_flux,
+            measurement_uncertainty=measurement_uncertainty,
+        )
+    )
+
     n_groups = len(response[0])
     n_meas = len(measurements)
 
@@ -503,4 +626,10 @@ def gradient_descent(
         chi_squared=final_chi2 / max(n_meas - 1, 1),
         chi_squared_history=chi2_history,
         final_residuals=final_residuals,
+        diagnostics=merge_flux_diagnostics(
+            None,
+            phi,
+            negative_policy="floor_clamped",
+            nonnegativity_enforced=True,
+        ),
     )

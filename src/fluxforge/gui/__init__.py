@@ -16,7 +16,13 @@ from fluxforge.gui.main_window import (
     MainWindowScaffold,
     modern_gui_unavailable_message,
 )
-from fluxforge.gui.dialogs import CalibrationWorkspaceDialog
+from fluxforge.gui.dialogs import (
+    CalibrationWorkspaceDialog,
+    PuIsotopicsDialog,
+    QAHistoryDialog,
+    ReportExportDialog,
+    UnfoldingWorkspaceDialog,
+)
 from fluxforge.gui.library_manager import DataLibraryManager, DataLibraryState
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
@@ -45,6 +51,9 @@ __all__ = [
     "MethodSelectorWidget",
     "ModeManager",
     "ModeState",
+    "PuIsotopicsDialog",
+    "QAHistoryDialog",
+    "ReportExportDialog",
     "DataLibraryManager",
     "DataLibraryState",
     "PYQTGRAPH_AVAILABLE",
@@ -57,6 +66,7 @@ __all__ = [
     "SelectionState",
     "SpectrumCanvas",
     "SpectrumTrace",
+    "UnfoldingWorkspaceDialog",
     "VISPY_AVAILABLE",
     "VispySpectrumCanvas",
     "available_renderer_status",

@@ -40,6 +40,11 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Any
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import (
+    require_covariance_matrix,
+    require_nonnegative,
+)
 from fluxforge.core.linalg import (
     Matrix,
     Vector,
@@ -90,6 +95,9 @@ class GLSSolution:
     influence: Optional[Vector] = None
     prior_posterior_change: Optional[Vector] = None
     diagnostics: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.diagnostics = merge_flux_diagnostics(self.diagnostics, self.flux)
 
     @property
     def flux_uncertainty(self) -> Vector:
@@ -225,14 +233,40 @@ def gls_adjust(
     """
     import math
 
+    response_array = require_nonnegative("response", response)
+    if response_array.ndim != 2:
+        raise ValueError("response must be a 2-D array")
+    measurements_array = require_nonnegative("measurements", measurements).reshape(-1)
+    measurement_cov_array = require_covariance_matrix(
+        "measurement_cov",
+        measurement_cov,
+    )
+    prior_flux_array = require_nonnegative("prior_flux", prior_flux).reshape(-1)
+    prior_cov_array = require_covariance_matrix("prior_cov", prior_cov)
+
+    if response_array.shape != (measurements_array.size, prior_flux_array.size):
+        raise ValueError(
+            f"Response matrix shape ({response_array.shape[0]}×{response_array.shape[1]}) "
+            f"doesn't match measurements ({measurements_array.size}) and prior ({prior_flux_array.size})"
+        )
+    if measurement_cov_array.shape != (measurements_array.size, measurements_array.size):
+        raise ValueError("measurement_cov shape must match the measurements length")
+    if prior_cov_array.shape != (prior_flux_array.size, prior_flux_array.size):
+        raise ValueError("prior_cov shape must match the prior_flux length")
+
+    response = response_array.astype(float).tolist()
+    measurements = measurements_array.astype(float).tolist()
+    measurement_cov = measurement_cov_array.astype(float).tolist()
+    prior_flux = prior_flux_array.astype(float).tolist()
+    prior_cov = prior_cov_array.astype(float).tolist()
+    if response_cov is not None:
+        response_cov_array = require_nonnegative("response_cov", response_cov)
+        if response_cov_array.shape != response_array.shape:
+            raise ValueError("response_cov shape must match the response shape")
+        response_cov = response_cov_array.astype(float).tolist()
+
     n_reactions = len(measurements)
     n_groups = len(prior_flux)
-
-    if len(response) != n_reactions or len(response[0]) != n_groups:
-        raise ValueError(
-            f"Response matrix shape ({len(response)}×{len(response[0])}) "
-            f"doesn't match measurements ({n_reactions}) and prior ({n_groups})"
-        )
 
     # Handle response covariance if provided
     working_measurement_cov = measurement_cov
@@ -320,6 +354,15 @@ def gls_adjust(
             "response_cov_policy": response_cov_policy.value,
         }
 
+    diagnostics = merge_flux_diagnostics(
+        diagnostics,
+        phi_hat,
+        negative_policy=(
+            "clipped_to_zero" if enforce_nonnegativity else "preserved_for_review"
+        ),
+        nonnegativity_enforced=bool(enforce_nonnegativity),
+    )
+
     return GLSSolution(
         flux=phi_hat,
         covariance=posterior_cov,
@@ -389,6 +432,27 @@ def gls_adjust_with_response_cov(
     import random
     import math
 
+    response_array = require_nonnegative("response", response)
+    if response_array.ndim != 2:
+        raise ValueError("response must be a 2-D array")
+    response_cov_array = require_nonnegative("response_cov", response_cov)
+    if response_cov_array.shape != response_array.shape:
+        raise ValueError("response_cov shape must match the response shape")
+    measurements_array = require_nonnegative("measurements", measurements).reshape(-1)
+    measurement_cov_array = require_covariance_matrix(
+        "measurement_cov",
+        measurement_cov,
+    )
+    prior_flux_array = require_nonnegative("prior_flux", prior_flux).reshape(-1)
+    prior_cov_array = require_covariance_matrix("prior_cov", prior_cov)
+
+    response = response_array.astype(float).tolist()
+    response_cov = response_cov_array.astype(float).tolist()
+    measurements = measurements_array.astype(float).tolist()
+    measurement_cov = measurement_cov_array.astype(float).tolist()
+    prior_flux = prior_flux_array.astype(float).tolist()
+    prior_cov = prior_cov_array.astype(float).tolist()
+
     n_reactions = len(response)
     n_groups = len(response[0])
 
@@ -399,7 +463,7 @@ def gls_adjust_with_response_cov(
         # Perturb response matrix
         perturbed_R = [
             [
-                response[i][g] + random.gauss(0, response_cov[i][g])
+                max(response[i][g] + random.gauss(0, response_cov[i][g]), 0.0)
                 for g in range(n_groups)
             ]
             for i in range(n_reactions)

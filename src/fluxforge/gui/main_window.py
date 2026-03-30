@@ -17,10 +17,19 @@ from fluxforge.gui.phase2_workspace import (
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.io import read_ffs_session, read_spectrum_any
+from fluxforge.reporting.engine import ReportingEngine
+from fluxforge.standards import QAMonitor, StandardsEvaluationContext, register_builtin_standards_modules
+from fluxforge.plugins import bootstrap_builtin_registries
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import available_renderer_status
-    from fluxforge.gui.dialogs import CalibrationWorkspaceDialog
+    from fluxforge.gui.dialogs import (
+        CalibrationWorkspaceDialog,
+        PuIsotopicsDialog,
+        QAHistoryDialog,
+        ReportExportDialog,
+        UnfoldingWorkspaceDialog,
+    )
     from fluxforge.gui.panels import (
         BottomWorkspaceTabs,
         CentralWorkspaceTabs,
@@ -122,11 +131,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_bus = selection_bus or SelectionBus.shared()
             self.library_manager = DataLibraryManager(settings=self.settings)
             self.recent_files = RecentFilesManager(self.settings)
+            self.qa_monitor = QAMonitor()
+            self.qa_monitor.seed_demo_history()
+            self.reporting_engine = ReportingEngine()
+            self.registries = bootstrap_builtin_registries()
+            register_builtin_standards_modules(self.registries)
             self.undo_stack = QUndoStack(self)
             self.phase2_workspace = Phase2WorkspaceController(
                 self._build_initial_workspace_state()
             )
             self._calibration_dialog = None
+            self._unfolding_dialog = None
+            self._qa_history_dialog = None
+            self._report_dialog = None
+            self._pu_isotopics_dialog = None
             self.setDockOptions(
                 QMainWindow.AllowNestedDocks
                 | QMainWindow.AllowTabbedDocks
@@ -201,7 +219,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             file_menu.addAction(self._action("Open Spectrum...", "Ctrl+O"))
             file_menu.addAction(self._action("Open Session...", "Ctrl+Shift+O"))
             file_menu.addSeparator()
-            file_menu.addAction(self._action("Export Report...", "Ctrl+E"))
+            self._report_export_action = self._action(
+                "Export Report...",
+                "Ctrl+E",
+                enabled=True,
+                handler=self._open_report_export,
+            )
+            file_menu.addAction(self._report_export_action)
             file_menu.addAction(self._action("Export ANSI N42.42...", "Ctrl+Shift+E"))
 
             edit_menu = self.menuBar().addMenu("&Edit")
@@ -232,6 +256,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             )
             analysis_menu.addAction(self._action("Nuclide Search"))
+            analysis_menu.addAction(
+                self._action(
+                    "Spectrum Unfolding Workspace",
+                    enabled=True,
+                    handler=self._open_unfolding_workspace,
+                )
+            )
+            self._pu_isotopics_action = self._action(
+                "Pu Isotopics Wizard...",
+                enabled=True,
+                handler=self._open_pu_isotopics_wizard,
+            )
+            analysis_menu.addAction(self._pu_isotopics_action)
 
             calibration_menu = self.menuBar().addMenu("&Calibration")
             calibration_menu.addAction(
@@ -264,7 +301,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
             tools_menu = self.menuBar().addMenu("&Tools")
-            tools_menu.addAction(self._action("QA History"))
+            self._qa_history_action = self._action(
+                "QA History",
+                enabled=True,
+                handler=self._open_qa_history,
+            )
+            tools_menu.addAction(self._qa_history_action)
             tools_menu.addAction(self._action("Hardware Dashboard"))
 
             help_menu = self.menuBar().addMenu("&Help")
@@ -303,9 +345,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.left_dock = self._wrap_dock(
                 "Workspace",
                 SidebarPanel(
+                    mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
                     workspace_controller=self.phase2_workspace,
                     library_manager=self.library_manager,
+                    qa_monitor=self.qa_monitor,
                     parent=self,
                 ),
                 Qt.LeftDockWidgetArea,
@@ -404,6 +448,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mode_label.setText(label)
             self.progress.setFormat(f"{state.mode.value.title()} shell ready")
             self.renderer_label.setText("Renderer: PyQtGraph-first")
+            if hasattr(self, "_pu_isotopics_action"):
+                self._pu_isotopics_action.setEnabled(state.mode is not GUIMode.SIMPLE)
 
         def _on_selection_changed(self, state: SelectionState) -> None:
             cursor_parts = []
@@ -550,6 +596,142 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             bottom_widget = self.bottom_dock.widget()
             if hasattr(bottom_widget, "run_auto_peak_search"):
                 bottom_widget.run_auto_peak_search()
+
+        def _open_unfolding_workspace(self) -> None:
+            if self._unfolding_dialog is not None and self._unfolding_dialog.isVisible():
+                self._unfolding_dialog.raise_()
+                self._unfolding_dialog.activateWindow()
+                return
+
+            self._unfolding_dialog = UnfoldingWorkspaceDialog(
+                mode_manager=self.mode_manager,
+                parent=self,
+            )
+            self._unfolding_dialog.show()
+
+        def _build_standards_context(self) -> StandardsEvaluationContext:
+            latest = next(iter(self.qa_monitor.status_snapshot()), None)
+            return StandardsEvaluationContext(
+                calibration_order=2,
+                max_residual_keV=0.18,
+                efficiency_uncertainty_pct=2.6,
+                fwhm_at_413_keV=1.08,
+                qa_centroid_drift_keV=(latest.centroid_drift_keV if latest else 0.0),
+                qa_fwhm_degradation_pct=(
+                    latest.fwhm_degradation_pct if latest else 0.0
+                ),
+                before_calibration=(latest.last_check if latest else None),
+                measured_at=(latest.last_check if latest else None),
+                after_calibration=(latest.last_check if latest else None),
+                net_counts={"primary": 1200.0, "Pu-240 160.3": 1205.0},
+                line_observations={"c1030": ()},
+            )
+
+        def _build_report_context(self, template_name: str) -> dict[str, object]:
+            state = self.phase2_workspace.state
+            peak_rows = "".join(
+                f"<tr><td>{peak.energy_keV:.3f}</td><td>{peak.nuclide or 'Unassigned'}</td><td>{peak.net_counts:.1f}</td></tr>"
+                for peak in state.peaks
+            ) or "<tr><td colspan='3'>No peaks</td></tr>"
+            peak_table = (
+                "<table><tr><th>Energy</th><th>Nuclide</th><th>Net Counts</th></tr>"
+                + peak_rows
+                + "</table>"
+            )
+            activity_rows = "".join(
+                f"<tr><td>{result.nuclide}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
+                for result in state.activity_results
+            ) or "<tr><td colspan='4'>No activity results</td></tr>"
+            activity_table = (
+                "<table><tr><th>Nuclide</th><th>Line</th><th>Activity</th><th>σ</th></tr>"
+                + activity_rows
+                + "</table>"
+            )
+            standards_rows = []
+            context = self._build_standards_context()
+            for key in ("ASTM E181", "ASTM E1297", "ASTM E1218", "ASTM C1232", "ASTM C1030"):
+                module = self.registries.standards_modules.get(key)
+                evaluation = module.evaluate(context)
+                standards_rows.append(
+                    f"<tr><td>{module.display_name}</td><td>{evaluation.overall_status}</td><td>{evaluation.summary}</td></tr>"
+                )
+            astm_status_table = (
+                "<table><tr><th>Standard</th><th>Status</th><th>Summary</th></tr>"
+                + "".join(standards_rows)
+                + "</table>"
+            )
+            qa_status_snapshot = "<br/>".join(
+                f"{item.nuclide} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
+                for item in self.qa_monitor.status_snapshot()
+            ) or "No QA snapshot available."
+            provenance = (
+                f"mode={self.mode_manager.state.mode.value}\n"
+                f"standard={self.mode_manager.state.standard}\n"
+                f"gamma_library={self.library_manager.state.gamma_identification_source_id}\n"
+                f"peaks={len(state.peaks)}\n"
+                f"activity_results={len(state.activity_results)}"
+            )
+            batch_rows = "No batch results yet."
+            aggregate_csv = ""
+            bottom_widget = self.bottom_dock.widget()
+            if hasattr(bottom_widget, "batch_queue_panel"):
+                panel = bottom_widget.batch_queue_panel
+                if getattr(panel, "results", ()):
+                    batch_rows = "<br/>".join(
+                        f"{result.label}: {result.peak_count} peaks, {result.backend}"
+                        for result in panel.results
+                    )
+                    aggregate_csv = (panel.last_output_dir / "aggregate.csv").read_text(encoding="utf-8") if panel.last_output_dir and (panel.last_output_dir / "aggregate.csv").exists() else ""
+            payload = {
+                "title": "FluxForge Module 3 Report",
+                "spectrum_image": "Modern Qt spectrum canvas snapshot",
+                "calibration_curve": "Embedded calibration curve placeholder",
+                "calibration_residuals": "Embedded calibration residuals placeholder",
+                "efficiency_curve": "Embedded efficiency curve placeholder",
+                "efficiency_residuals": "Embedded efficiency residuals placeholder",
+                "residuals_grid": "Embedded residual thumbnails placeholder",
+                "peak_table": peak_table,
+                "activity_table": activity_table,
+                "astm_status_table": astm_status_table,
+                "qa_status_snapshot": qa_status_snapshot,
+                "provenance": provenance,
+                "batch_rows": batch_rows,
+                "aggregate_csv": aggregate_csv or "No batch CSV available.",
+            }
+            return payload
+
+        def _open_report_export(self) -> None:
+            if self._report_dialog is not None and self._report_dialog.isVisible():
+                self._report_dialog.raise_()
+                self._report_dialog.activateWindow()
+                return
+            self._report_dialog = ReportExportDialog(
+                engine=self.reporting_engine,
+                context_factory=self._build_report_context,
+                parent=self,
+            )
+            self._report_dialog.show()
+
+        def _open_qa_history(self) -> None:
+            if self._qa_history_dialog is not None and self._qa_history_dialog.isVisible():
+                self._qa_history_dialog.raise_()
+                self._qa_history_dialog.activateWindow()
+                return
+            self._qa_history_dialog = QAHistoryDialog(self.qa_monitor, parent=self)
+            self._qa_history_dialog.show()
+
+        def _open_pu_isotopics_wizard(self) -> None:
+            if self.mode_manager.state.mode is GUIMode.SIMPLE:
+                return
+            if self._pu_isotopics_dialog is not None and self._pu_isotopics_dialog.isVisible():
+                self._pu_isotopics_dialog.raise_()
+                self._pu_isotopics_dialog.activateWindow()
+                return
+            self._pu_isotopics_dialog = PuIsotopicsDialog(
+                peaks=self.phase2_workspace.state.peaks,
+                parent=self,
+            )
+            self._pu_isotopics_dialog.show()
 
         def _apply_calibration_workspace_result(
             self,

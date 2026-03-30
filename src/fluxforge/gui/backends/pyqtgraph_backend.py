@@ -11,6 +11,7 @@ from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import (
     HierarchicalSpectrumBuffer,
+    ReferenceLine,
     RendererCapabilities,
     SpectrumCanvas,
     SpectrumTrace,
@@ -195,15 +196,30 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
+            self.set_annotation_lines(
+                tuple(
+                    ReferenceLine(
+                        energy_keV=float(energy),
+                        color="#f59e0b",
+                    )
+                    for energy in energies_keV
+                )
+            )
+
+        def set_annotation_lines(self, lines: Sequence[ReferenceLine]) -> None:
             for line in self._reference_lines:
                 self.plot_item.removeItem(line)
             self._reference_lines.clear()
 
-            for energy in energies_keV:
+            for marker in lines:
                 line = pg.InfiniteLine(
-                    pos=float(energy),
+                    pos=float(marker.energy_keV),
                     angle=90,
-                    pen=pg.mkPen(color="#f59e0b", width=1, style=pg.QtCore.Qt.DashLine),
+                    pen=pg.mkPen(
+                        color=marker.color,
+                        width=1,
+                        style=pg.QtCore.Qt.DashLine,
+                    ),
                 )
                 self.plot_item.addItem(line)
                 self._reference_lines.append(line)
@@ -276,15 +292,23 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
         def clear(self) -> None:
             self.buffer = HierarchicalSpectrumBuffer.from_counts(())
             self.trace_item.setData([], [])
-            self.set_reference_lines(())
+            self.set_annotation_lines(())
             self.set_cascade_sum_lines(())
             self.set_peak_candidates(())
             self.set_peak_residuals((), visible=False)
             self.status_label.setText("No spectrum loaded")
 
         def _on_selection_changed(self, state: SelectionState) -> None:
-            if state.reference_lines_keV:
-                self.set_reference_lines(state.reference_lines_keV)
+            if state.reference_lines_keV or state.annotation_lines:
+                annotations = list(state.annotation_lines)
+                if not annotations:
+                    annotations = [
+                        ReferenceLine(energy_keV=float(energy))
+                        for energy in state.reference_lines_keV
+                    ]
+                self.set_annotation_lines(tuple(annotations))
+            else:
+                self.set_annotation_lines(())
             fragments = []
             if state.peak_energy_keV is not None:
                 fragments.append(f"{state.peak_energy_keV:.3f} keV")
@@ -294,6 +318,8 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 fragments.append(
                     f"ROI {state.roi_bounds_keV[0]:.1f}-{state.roi_bounds_keV[1]:.1f} keV"
                 )
+            if state.annotation_lines:
+                fragments.append(f"{len(state.annotation_lines)} guides")
             if fragments:
                 self.header_label.setText("Selection: " + " | ".join(fragments))
             else:
@@ -320,6 +346,12 @@ else:
 
         def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
             del energies_keV
+            raise RuntimeError(
+                "PyQtGraph renderer is unavailable. Install the `native-gui` extra."
+            )
+
+        def set_annotation_lines(self, lines: Sequence[ReferenceLine]) -> None:
+            del lines
             raise RuntimeError(
                 "PyQtGraph renderer is unavailable. Install the `native-gui` extra."
             )

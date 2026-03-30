@@ -18,6 +18,7 @@ from fluxforge.data.nuclear_data_sources import load_gamma_identification_source
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.physics.activation import GammaLineMeasurement
 from fluxforge.physics.decay_chain import DecayChain
+from fluxforge.ml import MLPeakAnalysisEngine
 from fluxforge.plugins import PluginRegistries, bootstrap_builtin_registries
 
 
@@ -39,6 +40,17 @@ class PeakCandidate:
     tags: tuple[str, ...] = ()
     normalized_residuals: tuple[float, ...] = ()
     residual_channels: tuple[float, ...] = ()
+
+
+@dataclass(frozen=True)
+class SpectralPhenomenonEstimate:
+    """Estimated location of a common gamma-spectroscopy feature."""
+
+    kind: str
+    label: str
+    energy_keV: float
+    summary: str
+    color: str = "#f59e0b"
 
 
 @dataclass(frozen=True)
@@ -179,7 +191,158 @@ def register_builtin_nuclide_id_engines(
         tags=("phase2", "id", "bayesian"),
         set_default=True,
     )
+    registries.nuclide_id_engines.register(
+        "ml_peak_onnx",
+        MLPeakAnalysisEngine(),
+        description=MLPeakAnalysisEngine.summary,
+        tags=("phase3", "id", "ml", "onnx"),
+    )
     return registries
+
+
+def apply_ml_peak_predictions(
+    peaks: Sequence[PeakCandidate],
+    predictions: Sequence[object],
+    *,
+    confidence_threshold: float = 0.45,
+) -> tuple[PeakCandidate, ...]:
+    """Overlay ML proposal metadata onto the peak table payload."""
+
+    by_peak = {
+        str(getattr(prediction, "peak_id")): prediction for prediction in predictions
+    }
+    updated: list[PeakCandidate] = []
+    for peak in peaks:
+        prediction = by_peak.get(peak.peak_id)
+        if prediction is None:
+            updated.append(peak)
+            continue
+        predicted_nuclide = str(getattr(prediction, "predicted_nuclide", "")).strip()
+        confidence = float(getattr(prediction, "confidence", 0.0))
+        uncertainty_keV = float(getattr(prediction, "uncertainty_keV", 0.0))
+        tags = list(peak.tags)
+        tags.append(f"ml:{confidence:.2f}")
+        updated.append(
+            PeakCandidate(
+                peak_id=peak.peak_id,
+                channel=peak.channel,
+                energy_keV=peak.energy_keV,
+                significance=peak.significance,
+                roi_bounds_keV=peak.roi_bounds_keV,
+                net_counts=peak.net_counts,
+                fit_quality=peak.fit_quality,
+                status=(
+                    "manual"
+                    if peak.status == "manual"
+                    else "review" if confidence < confidence_threshold else "matched"
+                ),
+                nuclide=predicted_nuclide or peak.nuclide,
+                candidate_nuclides=(
+                    (predicted_nuclide,) + tuple(item for item in peak.candidate_nuclides if item != predicted_nuclide)
+                    if predicted_nuclide
+                    else peak.candidate_nuclides
+                ),
+                reference_lines_keV=peak.reference_lines_keV,
+                tags=tuple(tags),
+                normalized_residuals=peak.normalized_residuals,
+                residual_channels=peak.residual_channels,
+            )
+        )
+    return tuple(updated)
+
+
+def estimate_spectral_phenomena(
+    photopeak_energy_keV: float,
+    *,
+    detector_material: str = "hpge",
+) -> tuple[SpectralPhenomenonEstimate, ...]:
+    """Estimate common gamma-spectroscopy artifacts near a selected line."""
+
+    energy = float(photopeak_energy_keV)
+    if energy <= 0.0:
+        return ()
+
+    electron_rest_keV = 511.0
+    phenomena: list[SpectralPhenomenonEstimate] = []
+
+    compton_edge = energy * (1.0 - 1.0 / (1.0 + (2.0 * energy / electron_rest_keV)))
+    backscatter_peak = energy / (1.0 + (2.0 * energy / electron_rest_keV))
+    phenomena.append(
+        SpectralPhenomenonEstimate(
+            kind="compton_edge",
+            label="Compton Edge",
+            energy_keV=compton_edge,
+            summary=(
+                "Upper bound of the single-scatter Compton continuum for the selected line."
+            ),
+            color="#f59e0b",
+        )
+    )
+    phenomena.append(
+        SpectralPhenomenonEstimate(
+            kind="backscatter",
+            label="Backscatter Peak",
+            energy_keV=backscatter_peak,
+            summary="Expected backscatter feature from 180° scattering before detector absorption.",
+            color="#f97316",
+        )
+    )
+
+    if detector_material.lower() == "hpge":
+        for label, escape_energy in (
+            ("Ge Kα Escape", energy - 9.87),
+            ("Ge Kβ Escape", energy - 10.98),
+        ):
+            if escape_energy > 0.0:
+                phenomena.append(
+                    SpectralPhenomenonEstimate(
+                        kind="detector_escape",
+                        label=label,
+                        energy_keV=escape_energy,
+                        summary="Detector escape feature estimated for an HPGe crystal.",
+                        color="#22c55e",
+                    )
+                )
+
+    if energy > 2.0 * electron_rest_keV:
+        single_escape = energy - electron_rest_keV
+        double_escape = energy - (2.0 * electron_rest_keV)
+        if single_escape > 0.0:
+            phenomena.append(
+                SpectralPhenomenonEstimate(
+                    kind="single_escape",
+                    label="Single Escape",
+                    energy_keV=single_escape,
+                    summary="Pair-production escape peak after one annihilation photon leaves the detector.",
+                    color="#10b981",
+                )
+            )
+        if double_escape > 0.0:
+            phenomena.append(
+                SpectralPhenomenonEstimate(
+                    kind="double_escape",
+                    label="Double Escape",
+                    energy_keV=double_escape,
+                    summary="Pair-production escape peak after both annihilation photons leave the detector.",
+                    color="#059669",
+                )
+            )
+        phenomena.append(
+            SpectralPhenomenonEstimate(
+                kind="annihilation",
+                label="Annihilation Line",
+                energy_keV=electron_rest_keV,
+                summary="511 keV annihilation feature expected when pair production contributes.",
+                color="#38bdf8",
+            )
+        )
+
+    return tuple(
+        sorted(
+            phenomena,
+            key=lambda item: (item.energy_keV, item.label),
+        )
+    )
 
 
 def detect_peak_candidates(
@@ -626,16 +789,19 @@ def _load_gamma_database(
 
 __all__ = [
     "ActivityCalculationResult",
+    "apply_ml_peak_predictions",
     "BayesianNuclideMatchDefinition",
     "EfficiencyCalibrationFitResult",
     "EfficiencyModelDefinition",
     "PeakCandidate",
+    "SpectralPhenomenonEstimate",
     "SurveyPoint",
     "bayesian_match_peak_candidates",
     "build_decay_chain_summary",
     "calculate_peak_activity",
     "compute_cascade_sum_lines",
     "detect_peak_candidates",
+    "estimate_spectral_phenomena",
     "extract_survey_points",
     "fit_efficiency_model",
     "register_builtin_efficiency_models",

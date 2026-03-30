@@ -68,7 +68,7 @@ def _write_review_gallery(
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>FluxForge Phase 2 Review</title>
+    <title>FluxForge Calibration Workspace Review</title>
     <style>
       :root {{
         --ink: #102036;
@@ -174,7 +174,7 @@ def _write_review_gallery(
   <body>
     <main>
       <header>
-        <h1>FluxForge Phase 2 Calibration Workspace</h1>
+        <h1>FluxForge Calibration Workspace Review</h1>
         <p>
           Native Qt screenshots captured from the redesigned GUI path. Use this page for browser-based review and Playwright inspection of the quick-slider, deviation-pair, and ROI fitting tools.
         </p>
@@ -214,7 +214,7 @@ def _write_review_gallery(
 def main(argv: list[str] | None = None) -> int:
     args = argv or sys.argv[1:]
     if len(args) != 1:
-        print("usage: gui_phase2_calibration_probe.py <output-dir>", file=sys.stderr)
+        print("usage: gui_calibration_workspace_probe.py <output-dir>", file=sys.stderr)
         return 2
 
     output_dir = Path(args[0]).resolve()

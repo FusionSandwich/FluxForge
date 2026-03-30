@@ -15,6 +15,11 @@ from typing import Optional, List, Tuple, Callable
 import math
 from enum import Enum
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import (
+    require_covariance_matrix,
+    require_nonnegative,
+)
 from fluxforge.core.linalg import Matrix, Vector, matmul
 
 
@@ -44,6 +49,10 @@ class AdvancedIterativeSolution:
     # Convergence diagnostics
     ddJ_history: List[float] = field(default_factory=list)
     smoothness_history: List[float] = field(default_factory=list)
+    diagnostics: dict = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.diagnostics = merge_flux_diagnostics(self.diagnostics, self.flux)
 
 
 def build_covariance_matrix(
@@ -454,6 +463,58 @@ def mlem_with_covariance(
     -------
     AdvancedIterativeSolution
     """
+    response_array = require_nonnegative("response", response)
+    if response_array.ndim != 2:
+        raise ValueError("response must be a 2-D array")
+    measurements_array = require_nonnegative("measurements", measurements).reshape(-1)
+    if response_array.shape[0] != measurements_array.size:
+        raise ValueError("response row count must match the measurements length")
+
+    initial_array = None
+    if initial_flux is not None:
+        initial_array = require_nonnegative("initial_flux", initial_flux).reshape(-1)
+        if initial_array.size != response_array.shape[1]:
+            raise ValueError(
+                "initial_flux length must match the response column count"
+            )
+
+    uncertainty_array = None
+    if measurement_uncertainty is not None:
+        uncertainty_array = require_nonnegative(
+            "measurement_uncertainty",
+            measurement_uncertainty,
+        ).reshape(-1)
+        if uncertainty_array.size != measurements_array.size:
+            raise ValueError(
+                "measurement_uncertainty length must match the measurements length"
+            )
+
+    measurement_cov_array = None
+    if measurement_cov is not None:
+        measurement_cov_array = require_covariance_matrix(
+            "measurement_cov",
+            measurement_cov,
+        )
+        if measurement_cov_array.shape != (
+            measurements_array.size,
+            measurements_array.size,
+        ):
+            raise ValueError(
+                "measurement_cov shape must match the measurements length"
+            )
+
+    response = response_array.astype(float).tolist()
+    measurements = measurements_array.astype(float).tolist()
+    initial_flux = None if initial_array is None else initial_array.astype(float).tolist()
+    measurement_uncertainty = (
+        None if uncertainty_array is None else uncertainty_array.astype(float).tolist()
+    )
+    measurement_cov = (
+        None
+        if measurement_cov_array is None
+        else measurement_cov_array.astype(float).tolist()
+    )
+
     n_groups = len(response[0])
     n_meas = len(measurements)
 
@@ -588,6 +649,16 @@ def mlem_with_covariance(
         final_residuals=residuals,
         ddJ_history=ddJ_history,
         smoothness_history=smoothness_history,
+        diagnostics=merge_flux_diagnostics(
+            {
+                "covariance_model": cov_model.value,
+                "error_method": error_method,
+                "convergence_mode": convergence_mode,
+            },
+            phi,
+            negative_policy="floor_clamped",
+            nonnegativity_enforced=True,
+        ),
     )
 
 

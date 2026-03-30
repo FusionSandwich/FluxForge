@@ -21,7 +21,7 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| 3.1 | `next` | `not-started` | Phase 2 is now complete, so the formal next step is Phase 3.1: the GRAVEL unfolding engine. |
+| 4.1 | `next` | `not-started` | Module 3 is now complete in sequence, so the formal next step is Phase 4.1: real HAL driver work. |
 
 ## Completed In Sequence
 
@@ -74,6 +74,25 @@ officially in progress.
 | 2.18 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/phase2_workspace.py` now provide pinned nuclides and peak tagging in the modern shell |
 | 2.19 | `complete` | `src/fluxforge/core/phase2_analysis.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` now render dotted cascade-sum overlays for pinned nuclides |
 | 2.20 | `complete` | `src/fluxforge/core/peak_fitting.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` now provide the Bayesian Gaussian ROI fitter registered beside the Gaussian and skew options |
+| 2.21 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/phase2_workspace.py` now provide manual isotope assignment, replacement, and clear actions for selected peaks |
+| 2.22 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/nuclide_search.py` + `src/fluxforge/data/nuclide_library.py` now provide a centroid-driven isotope browser with a default ±2 keV window and active-library filtering |
+| 2.23 | `complete` | `src/fluxforge/core/phase2_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` now render gamma-phenomena guidance for Compton edge, backscatter, annihilation, and escape features |
+| 2.24 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/selection_bus.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` now keep peak IDs editable after automated workflows with SelectionBus overlays and undo/redo |
+| 3.1 | `complete` | `src/fluxforge/core/unfolding_inputs.py` + `src/fluxforge/unfolding/base.py` + `src/fluxforge/unfolding/gravel.py` + `src/fluxforge/unfolding/__init__.py` now provide the registry-backed GRAVEL API, shared pyunfold-style nonnegative input validation, the built-in unfolder registration path, and local reference-parity coverage in `tests/test_unfolding_reference_parity.py` |
+| 3.2 | `complete` | `src/fluxforge/unfolding/maxed.py` + `src/fluxforge/unfolding/gravel.py` + `src/fluxforge/unfolding/__init__.py` now provide the registry-backed MAXED method with uncertainty estimates and shared pytest coverage in `tests/test_unfolding_registry.py` and `tests/test_unfolding_workflows.py` |
+| 3.3 | `complete` | `src/fluxforge/unfolding/rmle.py` + `src/fluxforge/unfolding/gravel.py` + `src/fluxforge/unfolding/__init__.py` now provide the registry-backed RMLE default, while `src/fluxforge/gui/dialogs/unfolding_dialog.py`, `src/fluxforge/cli/app.py`, and `src/fluxforge/workflows/spectrum_unfolding.py` expose it through the modern Qt workspace, CLI, and public workflow |
+| 3.4 | `complete` | `src/fluxforge/unfolding/ml_seed.py` + `src/fluxforge/unfolding/rmle.py` + `src/fluxforge/workflows/spectrum_unfolding.py` now provide ML Seed as both a standalone method and an RMLE/GRAVEL initializer |
+| 3.5 | `complete` | `src/fluxforge/gui/dialogs/unfolding_dialog.py` + `tests/test_unfolding_workspace_qt.py` + `tests/gui_unfolding_workspace_probe.py` now provide the comparison-mode unfolding dialog with response heatmap, uncertainty bands, and response-source loading |
+| 3.6 | `complete` | `src/fluxforge/ml/peak_analysis.py` + `src/fluxforge/core/phase2_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` now provide registry-backed ML peak proposals in the modern peak table |
+| 3.7 | `complete` | `src/fluxforge/standards/e181.py` + `src/fluxforge/standards/__init__.py` now provide ASTM E181 compliance checks and registry registration |
+| 3.8 | `complete` | `src/fluxforge/standards/e1297.py` now provides Currie-method MDA evaluation through the standards registry |
+| 3.9 | `complete` | `src/fluxforge/standards/e1218.py` + `src/fluxforge/standards/c1232.py` now provide calibration-bracketing and lab-QA checks |
+| 3.10 | `complete` | `src/fluxforge/standards/c1030.py` + `src/fluxforge/gui/dialogs/pu_isotopics_dialog.py` + `src/fluxforge/gui/main_window.py` now provide the ASTM C1030 Pu isotopics backend and Expert/Standards wizard |
+| 3.11 | `complete` | `src/fluxforge/standards/qa_monitor.py` + `src/fluxforge/gui/dialogs/qa_history_dialog.py` + `src/fluxforge/gui/main_window.py` now provide SQLite QA history, drift status, and `Tools → QA History` |
+| 3.12 | `complete` | `src/fluxforge/standards/__init__.py` + `src/fluxforge/gui/widgets/method_selector.py` + `src/fluxforge/gui/panels/modern_shell.py` now surface registry-driven standards locks and padlock summaries in the modern GUI |
+| 3.13 | `complete` | `src/fluxforge/reporting/engine.py` + `src/fluxforge/reporting/templates/` + `src/fluxforge/gui/dialogs/report_export_dialog.py` now provide the Jinja2 report engine with the three bundled templates and HTML/PDF export |
+| 3.14 | `complete` | `src/fluxforge/core/batch_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` now provide the ProcessPoolExecutor-backed batch queue, visible progress tracking, and JSON/CSV outputs |
+| 3.15 | `complete` | `src/fluxforge/unfolding/gpu_backend.py` + `src/fluxforge/ml/peak_analysis.py` + `src/fluxforge/core/batch_analysis.py` now provide optional CuPy backend selection with clean CPU fallback |
 
 ## GUI Direction
 
@@ -93,7 +112,7 @@ officially in progress.
   registries, GUI scaffolding, and mock HAL device.
 - `pytest` was upgraded in the user environment to `8.4.2`.
 - The TensorFlow-specific tests were run explicitly in this round, and the only remaining skips are the CUDA library checks that are correct for this CPU-only workspace.
-- The full suite now passes in this workspace: `1030 passed, 2 skipped`.
+- The full suite now passes in this workspace: `1124 passed, 2 skipped`.
 - The redesigned Qt GUI was verified beyond unit tests in this round:
   mouse-driven peak picking in the calibration canvas, governed data-library
   selectors in the sidebar, library-assisted calibration-line assignment, and
@@ -103,6 +122,49 @@ officially in progress.
   calculation, background subtraction, pinned nuclides, cascade lines, survey
   map rendering, and multi-spectrum tab switching all ran successfully in the
   modern GUI tests.
+- Additional Qt GUI identification coverage now exists for the reopened Phase 2
+  items as well: centroid-driven isotope browsing, adjustable energy windows,
+  manual isotope reassignment after Bayesian matching, and gamma-phenomena guide
+  overlays are now exercised in the modern GUI tests.
+- Phase 3.1 now has dedicated core coverage as well: the new unfolding contract,
+  GRAVEL adapter, and built-in unfolder registration path are exercised in
+  `tests/test_unfolding_registry.py`, including parity checks against the
+  existing iterative GRAVEL solver and a no-GUI-import boundary check.
+- Public unfolding workflow coverage is now broader as well: `tests/test_unfolding_workflows.py`
+  exercises the public neutron and gamma unfolding entrypoints, CLI methods,
+  registry-backed GRAVEL adapter, standards-style `SpectrumUnfolder`, `quick_unfold`,
+  and the optional IBU/RMLE wrappers on synthetic spectra, including uncertainty
+  payload checks and pyunfold-style negative-input rejection checks.
+- External-reference unfolding parity coverage now exists as well:
+  `tests/test_unfolding_reference_parity.py` compares FluxForge GRAVEL and MLEM
+  against the local Neutron-Unfolding repo on its bundled neutron dataset using
+  the same tolerance settings, and compares `NeutronUnfolderIBU` against the local
+  pyunfold repo on five published/example cases while checking unfolded values,
+  uncertainties, and iteration statistics.
+- Phase 3 GUI coverage now exists in the redesigned Qt shell as well:
+  `tests/test_unfolding_workspace_qt.py` exercises the unfolding workspace,
+  mouse-driven algorithm comparison, RMLE default selection, uncertainty-visible
+  results table, and main-window launch wiring for the native unfolding dialog.
+- A native unfolding review probe now exists at
+  `tests/gui_unfolding_workspace_probe.py` so the modern dialog can be captured
+  and inspected visually in the same artifact-gallery flow used for the Phase 2 shell.
+- Additional Module 3 backend coverage now exists in `tests/test_module3_backends.py`:
+  the standards registry, Currie MDA implementation, C1030 isotopics backend,
+  QA monitor, reporting engine, response-matrix loader, optional GPU selector,
+  ML peak engine, and batch-analysis writer are all exercised directly.
+- Additional Module 3 GUI coverage now exists in `tests/test_module3_workflows_qt.py`:
+  the QA History dialog, report export dialog, C1030 wizard, batch queue tab,
+  ML peak table action, and sidebar QA/lock summary are now exercised in the
+  redesigned Qt shell.
+- A native Module 3 review probe now exists at `tests/gui_module3_workflows_probe.py`
+  so the QA history, report export, Pu isotopics, and batch queue surfaces can
+  be inspected visually in the artifact-gallery flow as well.
+- Native Qt review artifacts for the peak-ID browser were generated at
+  `artifacts/gui_review/mouse_peak_id_review/`, and the resulting browser
+  gallery was inspected with Playwright against the `06-peak-id-browser` state
+  after a mouse-driven probe path through the peak table, `Use Selected Peak`,
+  and the candidate list to confirm centroid-driven isotope browsing, manual
+  reassignment readiness, and guide overlays in the rendered GUI.
 - Native review artifacts for the Phase 2 calibration tools were generated at
   `artifacts/gui_review/phase2_tools_review/`, including quick-slider,
   deviation-pair, Gaussian ROI, skew ROI, and standards-workflow states in a
@@ -119,4 +181,12 @@ officially in progress.
 - Phase 2.1 is complete in the repository and formally complete in sequence.
 - Phase 2.2 through 2.20 are complete in the repository and formally complete in sequence.
 - Phase 2 as a whole is now complete in the repository and formally complete in sequence.
-- The roadmap's current next step is Phase 3.1: GRAVEL.
+- Phase 2.21 through 2.24 are now complete in the repository and formally complete in sequence.
+- Phase 3.1 is now complete in the repository and formally complete in sequence.
+- Phase 3.2 is now complete in the repository and formally complete in sequence.
+- Phase 3.3 is now complete in the repository and formally complete in sequence.
+- Phase 3.4 is now complete in the repository and formally complete in sequence.
+- Phase 3.5 is now complete in the repository and formally complete in sequence.
+- Phase 3.6 through 3.15 are now complete in the repository and formally complete in sequence.
+- Module 3 as a whole is now complete in the repository and formally complete in sequence.
+- The roadmap's current next step is Phase 4.1: real HAL driver work.

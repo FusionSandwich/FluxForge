@@ -65,7 +65,7 @@ def _write_review_gallery(
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>FluxForge Phase 2 Complete</title>
+    <title>FluxForge Analysis Workspace Review</title>
     <style>
       :root {{
         --ink: #15263d;
@@ -165,8 +165,8 @@ def _write_review_gallery(
   <body>
     <main>
       <header>
-        <h1>FluxForge Phase 2 Completion Review</h1>
-        <p>Native Qt screenshots captured from the redesigned GUI after finishing the Phase 2 analysis workflows.</p>
+        <h1>FluxForge Analysis Workspace Review</h1>
+        <p>Native Qt screenshots captured from the redesigned GUI after completing the analysis workspace workflows.</p>
         <dl>{details}</dl>
       </header>
       <div class="filters">{''.join(filters)}</div>
@@ -214,7 +214,7 @@ def _write_spectrum_csv(path: Path, spectrum) -> None:
 def main(argv: list[str] | None = None) -> int:
     args = argv or sys.argv[1:]
     if len(args) != 1:
-        print("usage: gui_phase2_completion_probe.py <output-dir>", file=sys.stderr)
+        print("usage: gui_analysis_workspace_probe.py <output-dir>", file=sys.stderr)
         return 2
 
     output_dir = Path(args[0]).resolve()
@@ -283,6 +283,31 @@ def main(argv: list[str] | None = None) -> int:
         app.processEvents()
         capture("05-survey-map")
 
+        window.bottom_dock.widget().setCurrentWidget(peak_panel)
+        table_index = peak_panel.table.model().index(0, 0)
+        table_rect = peak_panel.table.visualRect(table_index)
+        QTest.mouseClick(
+            peak_panel.table.viewport(),
+            Qt.LeftButton,
+            Qt.NoModifier,
+            table_rect.center(),
+        )
+        QTest.mouseClick(peak_panel.use_selected_peak_button, Qt.LeftButton)
+        peak_panel.peak_id_tolerance.setValue(2.0)
+        peak_panel.peak_id_filter.setText("")
+        app.processEvents()
+        if peak_panel.peak_id_matches.count():
+            match_item = peak_panel.peak_id_matches.item(0)
+            match_rect = peak_panel.peak_id_matches.visualItemRect(match_item)
+            QTest.mouseClick(
+                peak_panel.peak_id_matches.viewport(),
+                Qt.LeftButton,
+                Qt.NoModifier,
+                match_rect.center(),
+            )
+            app.processEvents()
+        capture("06-peak-id-browser")
+
         review_input_dir = output_dir / "probe_inputs"
         review_input_dir.mkdir(exist_ok=True)
         sample_path = review_input_dir / "sample.csv"
@@ -305,11 +330,11 @@ def main(argv: list[str] | None = None) -> int:
             sidebar.overlay_spectrum_combo.findData("overlay-csv")
         )
         app.processEvents()
-        capture("06-background-selector-overlay")
+        capture("07-background-selector-overlay")
 
         window.central_tabs.spectrum_slot_tabs.setCurrentIndex(1)
         app.processEvents()
-        capture("07-background-slot")
+        capture("08-background-slot")
     finally:
         AutoPeakReviewDialog.exec = original_exec  # type: ignore[method-assign]
         AutoPeakReviewDialog.accepted_peaks = original_accepted  # type: ignore[method-assign]

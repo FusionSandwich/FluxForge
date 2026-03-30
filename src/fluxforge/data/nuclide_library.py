@@ -21,6 +21,19 @@ class NuclideSearchHit:
     strongest_lines_keV: tuple[float, ...]
 
 
+@dataclass(frozen=True)
+class GammaLineSearchHit:
+    """One gamma line match near a target energy."""
+
+    nuclide: str
+    display_name: str
+    element: str
+    line_energy_keV: float
+    delta_keV: float
+    intensity: float
+    half_life_s: float
+
+
 SCHEMA_STATEMENTS = (
     """
     CREATE TABLE IF NOT EXISTS nuclides (
@@ -268,10 +281,75 @@ def reference_lines_for_nuclide(
     return tuple(float(row[0]) for row in rows)
 
 
+def search_gamma_lines_by_energy(
+    path: str | Path,
+    energy_keV: float,
+    *,
+    tolerance_keV: float = 2.0,
+    query: str = "",
+    limit: int = 64,
+    min_intensity: float = 0.0,
+) -> list[GammaLineSearchHit]:
+    """Return library gamma lines within an energy window around a centroid."""
+
+    db_path = Path(path)
+    token = query.strip().lower()
+    with sqlite3.connect(db_path) as connection:
+        rows = connection.execute(
+            """
+            SELECT
+              n.name,
+              n.display_name,
+              n.element,
+              n.half_life_s,
+              g.energy_keV,
+              g.intensity,
+              g.norm
+            FROM gamma_lines g
+            JOIN nuclides n ON n.id = g.nuclide_id
+            WHERE ABS(g.energy_keV - ?) <= ?
+              AND g.intensity >= ?
+              AND (
+                ? = ''
+                OR lower(n.name) LIKE ?
+                OR lower(n.display_name) LIKE ?
+                OR lower(n.element) LIKE ?
+              )
+            ORDER BY ABS(g.energy_keV - ?) ASC, (g.intensity * g.norm) DESC, n.display_name ASC
+            LIMIT ?
+            """,
+            (
+                float(energy_keV),
+                float(tolerance_keV),
+                float(min_intensity),
+                token,
+                f"%{token}%",
+                f"%{token}%",
+                f"%{token}%",
+                float(energy_keV),
+                int(limit),
+            ),
+        ).fetchall()
+    return [
+        GammaLineSearchHit(
+            nuclide=str(name),
+            display_name=str(display_name),
+            element=str(element),
+            line_energy_keV=float(line_energy_keV),
+            delta_keV=float(line_energy_keV) - float(energy_keV),
+            intensity=float(intensity) * float(norm),
+            half_life_s=float(half_life_s or 0.0),
+        )
+        for name, display_name, element, half_life_s, line_energy_keV, intensity, norm in rows
+    ]
+
+
 __all__ = [
+    "GammaLineSearchHit",
     "NuclideSearchHit",
     "build_nuclide_library",
     "ensure_bundled_nuclide_database",
     "reference_lines_for_nuclide",
+    "search_gamma_lines_by_energy",
     "search_nuclides",
 ]

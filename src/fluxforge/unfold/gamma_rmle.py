@@ -26,6 +26,9 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import require_nonnegative
+
 # ---------------------------------------------------------------------------
 # Optional dependency guard
 # ---------------------------------------------------------------------------
@@ -73,6 +76,13 @@ class GammaUnfoldResult:
     cost_history: list = field(default_factory=list)
     n_iterations: int = 0
     converged: bool = True
+    diagnostics: dict = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.diagnostics = merge_flux_diagnostics(
+            self.diagnostics,
+            self.unfolded_spectrum,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -99,7 +109,7 @@ class GammaUnfolderRMLE:
     def __init__(self, response_matrix: np.ndarray) -> None:
         _require_pylops()
 
-        self._R = np.atleast_2d(np.asarray(response_matrix, dtype=float))
+        self._R = np.atleast_2d(require_nonnegative("response_matrix", response_matrix))
         if self._R.ndim != 2:
             raise ValueError("response_matrix must be 2-D")
 
@@ -148,7 +158,7 @@ class GammaUnfolderRMLE:
         residuals : np.ndarray
             y − R η, shape (N_channels,).
         """
-        y = np.asarray(measured_spectrum, dtype=float).ravel()
+        y = require_nonnegative("measured_spectrum", measured_spectrum).reshape(-1)
         if y.size != self._n_channels:
             raise ValueError(
                 f"measured_spectrum length {y.size} != response rows {self._n_channels}"
@@ -187,7 +197,7 @@ class GammaUnfolderRMLE:
         tol = kwargs.pop("tol", 1e-8)
         show = kwargs.pop("show", False)
 
-        y = np.asarray(measured_spectrum, dtype=float).ravel()
+        y = require_nonnegative("measured_spectrum", measured_spectrum).reshape(-1)
         if y.size != self._n_channels:
             raise ValueError(
                 f"measured_spectrum length {y.size} != response rows {self._n_channels}"
@@ -214,6 +224,15 @@ class GammaUnfolderRMLE:
             cost_history=cost_list,
             n_iterations=int(n_it),
             converged=True,
+            diagnostics=merge_flux_diagnostics(
+                {
+                    "solver": "gamma_rmle_fista",
+                    "lambda_reg": float(lambda_reg),
+                },
+                eta_hat,
+                negative_policy="clipped_to_zero",
+                nonnegativity_enforced=True,
+            ),
         )
 
     # ------------------------------------------------------------------

@@ -142,9 +142,63 @@ be completed before any Phase 1 code is committed on the branch.
   auto peak review, undo/redo, Bayesian matching, efficiency fitting, activity
   calculation, background subtraction, pinned nuclides, survey-map rendering,
   multi-spectrum switching, and Playwright-reviewed completion screenshots.
-- Phase 2 as a whole is now complete; roadmap items `2.1` through `2.20` are
-  complete and the next required implementation step is `3.1`.
-- The current roadmap next step is Phase 3.1, GRAVEL.
+- The follow-on Phase 2 GUI identification items are now implemented as well:
+  roadmap items `2.21` through `2.24` now cover manual isotope assignment,
+  centroid-driven isotope browsing, gamma-phenomena overlays, and post-workflow
+  peak-ID editing in the modern Qt shell.
+- Phase 3.1 is now implemented in-repo: the dedicated `fluxforge/unfolding/`
+  package now exposes a shared `UnfoldingMethod` contract plus the registry-backed
+  `GRAVEL` implementation.
+- Phase 3.1 also now carries shared pyunfold-style nonnegative input validation
+  and end-to-end workflow regression coverage across the public unfolding APIs,
+  wrappers, and CLI paths.
+- Phase 3.1 unfolding validation now also includes local external-reference parity
+  tests: GRAVEL and MLEM are checked against the bundled Neutron-Unfolding repo on
+  its sample neutron dataset using matched tolerance settings, and `NeutronUnfolderIBU`
+  is checked against the local pyunfold repo on five published/example cases while
+  comparing unfolded values, uncertainties, and iteration statistics.
+- Phase 3.2 is now implemented in-repo as well: the dedicated `MAXED`
+  implementation is registered beside GRAVEL in `fluxforge/unfolding/` and
+  is covered by the FluxForge pytest suite.
+- Phase 3.3 is now implemented in-repo too: the dedicated `RMLE`
+  implementation is registered as the recommended default in
+  `fluxforge/unfolding/`, and the public CLI, `SpectrumUnfolder`, and the
+  modern Qt unfolding workspace now all expose RMLE as a selectable method.
+- Phase 3.4 is now implemented in-repo as well: `fluxforge/unfolding/ml_seed.py`
+  is registered beside GRAVEL, MAXED, and RMLE, and ML Seed can now run as a
+  standalone method or initialize GRAVEL/RMLE through a confidence-threshold gate
+  in the CLI, `SpectrumUnfolder`, and the modern Qt unfolding workspace.
+- The redesigned Qt shell now also has a repo-complete unfolding workspace:
+  registry-backed method selectors, GRAVEL/MAXED/RMLE/ML Seed comparison mode,
+  visible flux uncertainties, convergence plotting, an RMLE lambda slider,
+  ML Seed threshold controls, and a response-matrix heatmap are now implemented under
+  `src/fluxforge/gui/dialogs/unfolding_dialog.py`.
+- Phase 3.6 is now implemented in-repo as well: `src/fluxforge/ml/peak_analysis.py`
+  now provides an ONNX-oriented ML peak proposal engine with CPU fallback, it is
+  registered through `src/fluxforge/core/phase2_analysis.py`, and it is exposed
+  in the modern Peak Table workflow under `src/fluxforge/gui/panels/modern_shell.py`.
+- Phase 3.7 through 3.9 are now implemented in-repo too:
+  `src/fluxforge/standards/e181.py`, `src/fluxforge/standards/e1297.py`,
+  `src/fluxforge/standards/e1218.py`, and `src/fluxforge/standards/c1232.py`
+  now register the ASTM compliance and QA modules through `src/fluxforge/standards/__init__.py`.
+- Phase 3.10 and 3.11 are now implemented in-repo as well:
+  `src/fluxforge/standards/c1030.py`, `src/fluxforge/gui/dialogs/pu_isotopics_dialog.py`,
+  `src/fluxforge/standards/qa_monitor.py`, and
+  `src/fluxforge/gui/dialogs/qa_history_dialog.py` now provide the Pu isotopics
+  wizard, SQLite QA history, drift alerts, and the `Tools → QA History` surface.
+- Phase 3.12 and 3.13 are now implemented in-repo too:
+  registry-driven standards locks now surface through the modern Qt shell, and
+  `src/fluxforge/reporting/engine.py` plus the bundled templates under
+  `src/fluxforge/reporting/templates/` now provide the Jinja2 report engine, the
+  native report-export dialog, and HTML/PDF export support.
+- Phase 3.14 and 3.15 are now implemented in-repo as well:
+  `src/fluxforge/core/batch_analysis.py`, `src/fluxforge/unfolding/gpu_backend.py`,
+  and `src/fluxforge/gui/panels/modern_shell.py` now provide the ProcessPoolExecutor-backed
+  batch queue, visible progress tracking, per-spectrum JSON and aggregate CSV
+  outputs, and optional CuPy-backed batch/ML backend selection with a clean CPU
+  fallback.
+- Module 3 is now complete in sequence and in-repo.
+- The current roadmap next step is Phase 4.1, real HAL driver work.
 - GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
   repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide search, and overlay wiring, while
@@ -1044,6 +1098,10 @@ by dependency and impact. All Stage 0 items must complete before Stage 1 begins.
 | 2.18 | Implement pinned nuclides + nuclide tagging (bGamma-style) | area/gui | Right-click → Pin in nuclide browser |
 | 2.19 | Implement cascade sum line display (InterSpec-style) | area/gui | Dotted lines at sum energies |
 | 2.20 | Implement Bayesian peak fitting; register in `fitter_registry` | area/core | Prior from FWHM calibration |
+| 2.21 | Implement manual isotope assignment and reassignment for selected peaks in the Qt GUI | area/gui | Must remain available after Bayesian ID or any future automated workflow |
+| 2.22 | Implement centroid-driven isotope browser with adjustable ±keV window and active-library filtering | area/gui | Default window is ±2 keV; analysts may override it |
+| 2.23 | Implement gamma-phenomena guidance overlays for Compton edge, backscatter, escape peaks, and continuum estimates | area/gui | Visible on the canvas and tied to the selected peak or chosen line |
+| 2.24 | Keep peak IDs editable after automated workflows and route edits through `SelectionBus` + `QUndoStack` | area/gui | Analysts must be able to replace or clear a peak assignment from the GUI |
 
 ### Phase 3 — Advanced Analysis (Sprints 9–14)
 

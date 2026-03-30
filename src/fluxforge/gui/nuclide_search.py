@@ -14,6 +14,7 @@ from fluxforge.data.nuclide_library import (
     NuclideSearchHit,
     ensure_bundled_nuclide_database,
     reference_lines_for_nuclide,
+    search_gamma_lines_by_energy,
     search_nuclides,
 )
 from fluxforge.gui.library_manager import DataLibraryManager
@@ -27,6 +28,19 @@ class NuclideSearchResult:
     nuclide: str
     display_name: str
     strongest_lines_keV: tuple[float, ...] = ()
+    source_id: str = "fluxforge_bundled_gamma"
+
+
+@dataclass(frozen=True)
+class GammaLineMatchResult:
+    """One isotope-line candidate near a selected or typed centroid."""
+
+    nuclide: str
+    display_name: str
+    line_energy_keV: float
+    delta_keV: float
+    intensity: float
+    half_life_s: float
     source_id: str = "fluxforge_bundled_gamma"
 
 
@@ -151,8 +165,69 @@ class NuclideSearchController:
             reference_lines_keV=lines,
         )
 
+    def line_matches_for_energy(
+        self,
+        energy_keV: float,
+        *,
+        tolerance_keV: float = 2.0,
+        query: str = "",
+        limit: int = 48,
+        min_intensity: float = 0.0,
+    ) -> list[GammaLineMatchResult]:
+        if self._source_id == "fluxforge_bundled_gamma":
+            return [
+                GammaLineMatchResult(
+                    nuclide=hit.nuclide,
+                    display_name=hit.display_name,
+                    line_energy_keV=hit.line_energy_keV,
+                    delta_keV=hit.delta_keV,
+                    intensity=hit.intensity,
+                    half_life_s=hit.half_life_s,
+                    source_id=self._source_id,
+                )
+                for hit in search_gamma_lines_by_energy(
+                    self.database_path,
+                    energy_keV,
+                    tolerance_keV=tolerance_keV,
+                    query=query,
+                    limit=limit,
+                    min_intensity=min_intensity,
+                )
+            ]
+
+        token = self._normalize_query(query)
+        database = self._gamma_database or GammaDatabase()
+        matches: list[GammaLineMatchResult] = []
+        for nuclide, line in database.find_matches(
+            energy_keV,
+            tolerance_keV=tolerance_keV,
+            min_intensity=min_intensity,
+        ):
+            normalized = self._normalize_query(nuclide)
+            if token and token not in normalized:
+                continue
+            matches.append(
+                GammaLineMatchResult(
+                    nuclide=nuclide,
+                    display_name=nuclide,
+                    line_energy_keV=round(line.energy_keV, 3),
+                    delta_keV=round(line.energy_keV - float(energy_keV), 3),
+                    intensity=float(line.intensity * line.norm),
+                    half_life_s=float(
+                        database.get(nuclide).halflife
+                        if database.get(nuclide) is not None
+                        else 0.0
+                    ),
+                    source_id=self._source_id,
+                )
+            )
+        matches.sort(
+            key=lambda item: (abs(item.delta_keV), -item.intensity, item.display_name.lower())
+        )
+        return matches[:limit]
+
     def _normalize_query(self, query: str) -> str:
         return "".join(character for character in query.lower() if character.isalnum())
 
 
-__all__ = ["NuclideSearchController", "NuclideSearchResult"]
+__all__ = ["GammaLineMatchResult", "NuclideSearchController", "NuclideSearchResult"]

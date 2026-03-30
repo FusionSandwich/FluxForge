@@ -15,8 +15,10 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple, Callable
+from typing import Any, List, Optional, Tuple, Callable
 
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import require_nonnegative
 from fluxforge.core.linalg import Matrix, Vector, matmul
 
 
@@ -54,6 +56,10 @@ class MCMCSolution:
     chi_squared: float = 0.0
     n_samples: int = 0
     n_accepted: int = 0
+    diagnostics: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.diagnostics = merge_flux_diagnostics(self.diagnostics, self.flux)
 
 
 def _log_likelihood(
@@ -212,6 +218,39 @@ def mcmc_unfold(
     >>> print(f"Mean flux: {result.flux}")
     >>> print(f"Acceptance rate: {result.acceptance_rate:.2%}")
     """
+    response_array = require_nonnegative("response", response)
+    if response_array.ndim != 2:
+        raise ValueError("response must be a 2-D array")
+    measurements_array = require_nonnegative("measurements", measurements).reshape(-1)
+    if response_array.shape[0] != measurements_array.size:
+        raise ValueError("response row count must match the measurements length")
+
+    initial_array = None
+    if initial_flux is not None:
+        initial_array = require_nonnegative("initial_flux", initial_flux).reshape(-1)
+        if initial_array.size != response_array.shape[1]:
+            raise ValueError(
+                "initial_flux length must match the response column count"
+            )
+
+    uncertainty_array = None
+    if measurement_uncertainty is not None:
+        uncertainty_array = require_nonnegative(
+            "measurement_uncertainty",
+            measurement_uncertainty,
+        ).reshape(-1)
+        if uncertainty_array.size != measurements_array.size:
+            raise ValueError(
+                "measurement_uncertainty length must match the measurements length"
+            )
+
+    response = response_array.astype(float).tolist()
+    measurements = measurements_array.astype(float).tolist()
+    initial_flux = None if initial_array is None else initial_array.astype(float).tolist()
+    measurement_uncertainty = (
+        None if uncertainty_array is None else uncertainty_array.astype(float).tolist()
+    )
+
     if seed is not None:
         random.seed(seed)
 
@@ -348,6 +387,16 @@ def mcmc_unfold(
         chi_squared=chi2_per_dof,
         n_samples=n_samples_kept,
         n_accepted=n_accepted,
+        diagnostics=merge_flux_diagnostics(
+            {
+                "prior": prior,
+                "adaptive_step": bool(adaptive_step),
+                "target_acceptance": float(target_acceptance),
+            },
+            posterior_mean,
+            negative_policy="proposal_preserves_positivity",
+            nonnegativity_enforced=True,
+        ),
     )
 
 

@@ -111,7 +111,7 @@ def test_energy_calibration_accepts_deviation_pairs():
     assert np.max(np.abs(fit.correction_keV)) >= 0.25 - 1e-6
 
 
-def test_peak_fitter_registry_contains_phase2_gaussian_and_skew_entries():
+def test_peak_fitter_registry_contains_gaussian_skew_and_bayesian_entries():
     entries = {entry.key: entry for entry in peak_fitter_entries()}
 
     assert "gaussian" in entries
@@ -148,7 +148,7 @@ def test_method_selector_widget_tracks_modern_peak_fitter_registry():
     _qapp().processEvents()
     assert widget.combo.count() == 1
     assert widget.current_key() == "gaussian"
-    assert widget.badge_label.text() == "Standards Locked"
+    assert widget.badge_label.text() == "🔒 Standards Locked"
     assert widget.combo.isEnabled() is False
     widget.close()
 
@@ -200,7 +200,7 @@ def test_calibration_dialog_locks_astm_order_and_applies_to_workspace_spectrum()
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt calibration workspace dependencies are unavailable.",
 )
-def test_main_window_opens_phase2_calibration_workspace():
+def test_main_window_opens_calibration_workspace_dialog():
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),

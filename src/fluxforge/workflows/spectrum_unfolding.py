@@ -25,6 +25,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 
 # FluxForge imports
+from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
+from fluxforge.core.unfolding_inputs import require_nonnegative
 from fluxforge.data.irdff import (
     IRDFFDatabase,
     IRDFFCrossSection,
@@ -34,6 +36,7 @@ from fluxforge.data.irdff import (
     IRDFF_REACTIONS,
 )
 from fluxforge.solvers.iterative import gravel, mlem, IterativeSolution
+from fluxforge.unfolding import MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
 
 
 # =============================================================================
@@ -437,7 +440,7 @@ class SpectrumUnfolder:
         if len(flux) != self.n_groups:
             raise ValueError(f"Flux length {len(flux)} != n_groups {self.n_groups}")
 
-        self.initial_flux = np.array(flux)
+        self.initial_flux = require_nonnegative("initial_flux", flux).reshape(-1)
         self.initial_guess_source = source
 
     def _build_response_matrix(self) -> Tuple[np.ndarray, List[str], np.ndarray]:
@@ -469,6 +472,8 @@ class SpectrumUnfolder:
         tolerance: float = 1e-4,
         chi2_tolerance: float = 0.01,
         relaxation: float = 0.7,
+        use_ml_seed: bool = False,
+        ml_seed_threshold: float = 0.6,
     ) -> UnfoldingResult:
         """
         Perform spectrum unfolding.
@@ -485,6 +490,10 @@ class SpectrumUnfolder:
             Chi-squared per DOF threshold
         relaxation : float
             Under-relaxation factor (0-1)
+        use_ml_seed : bool
+            Use the ML Seed approximation to initialize GRAVEL or RMLE
+        ml_seed_threshold : float
+            Confidence threshold for accepting the ML seed initializer
 
         Returns
         -------
@@ -496,6 +505,7 @@ class SpectrumUnfolder:
 
         # Build response matrix
         response_matrix, valid_reactions, response_unc = self._build_response_matrix()
+        response_matrix = require_nonnegative("response_matrix", response_matrix)
 
         if len(valid_reactions) == 0:
             raise ValueError("No valid reactions found with cross section data.")
@@ -512,8 +522,11 @@ class SpectrumUnfolder:
                     else m.reaction_rate_per_atom * 0.1
                 )
 
-        measured_rates = np.array(measured_rates)
-        rate_uncertainties = np.array(rate_uncertainties)
+        measured_rates = require_nonnegative("measured_rates", measured_rates).reshape(-1)
+        rate_uncertainties = require_nonnegative(
+            "rate_uncertainties",
+            rate_uncertainties,
+        ).reshape(-1)
 
         # Prepare initial guess
         if self.initial_flux is not None:
@@ -533,7 +546,30 @@ class SpectrumUnfolder:
             print(f"  Initial guess: {self.initial_guess_source}")
 
         # Run unfolding
+        seed_metadata: Dict[str, Any] = {}
         if method.upper() == "GRAVEL":
+            if use_ml_seed:
+                seed_result = MLSeedUnfolder().unfold(
+                    measured_rates,
+                    response_matrix,
+                    initial_flux=np.asarray(initial, dtype=float),
+                    measurement_uncertainty=rate_uncertainties,
+                    confidence_threshold=ml_seed_threshold,
+                )
+                seed_metadata = {
+                    "seed_with_ml": True,
+                    "seed_accepted": bool(
+                        seed_result.parameters_used.get("accepted", False)
+                    ),
+                    "seed_confidence_score": float(
+                        seed_result.parameters_used.get("confidence_score", 0.0)
+                    ),
+                    "seed_backend": str(
+                        seed_result.parameters_used.get("backend", "")
+                    ),
+                }
+                if bool(seed_result.parameters_used.get("accepted", False)):
+                    initial = np.asarray(seed_result.flux, dtype=float).tolist()
             result = gravel(
                 response=response_matrix.tolist(),
                 measurements=measured_rates.tolist(),
@@ -557,17 +593,52 @@ class SpectrumUnfolder:
                 relaxation=relaxation,
                 verbose=self.verbose,
             )
+        elif method.upper() == "MAXED":
+            result = MaxedUnfolder(
+                max_iterations=max_iterations,
+            ).unfold(
+                measured_rates,
+                response_matrix,
+                initial_flux=np.asarray(initial, dtype=float),
+                measurement_uncertainty=rate_uncertainties,
+            )
+        elif method.upper() == "ML_SEED":
+            result = MLSeedUnfolder().unfold(
+                measured_rates,
+                response_matrix,
+                initial_flux=np.asarray(initial, dtype=float),
+                measurement_uncertainty=rate_uncertainties,
+                confidence_threshold=ml_seed_threshold,
+            )
+        elif method.upper() == "RMLE":
+            result = RMLEUnfolder(
+                max_iterations=max_iterations,
+                tolerance=tolerance,
+            ).unfold(
+                measured_rates,
+                response_matrix,
+                initial_flux=np.asarray(initial, dtype=float),
+                measurement_uncertainty=rate_uncertainties,
+                seed_with_ml=use_ml_seed,
+                confidence_threshold=ml_seed_threshold,
+            )
         else:
-            raise ValueError(f"Unknown method: {method}. Use 'GRAVEL' or 'MLEM'.")
+            raise ValueError(
+                f"Unknown method: {method}. Use 'GRAVEL', 'MLEM', 'MAXED', 'RMLE', or 'ML_SEED'."
+            )
 
         # Calculate predicted rates
         flux_array = np.array(result.flux)
         predicted_rates = response_matrix @ flux_array
 
         # Estimate flux uncertainties (simplified - from response matrix propagation)
-        flux_uncertainty = self._estimate_flux_uncertainty(
-            flux_array, response_matrix, rate_uncertainties
-        )
+        result_uncertainty = getattr(result, "uncertainties", None)
+        if result_uncertainty is not None:
+            flux_uncertainty = np.asarray(result_uncertainty, dtype=float)
+        else:
+            flux_uncertainty = self._estimate_flux_uncertainty(
+                flux_array, response_matrix, rate_uncertainties
+            )
 
         if self.verbose:
             print(f"\nUnfolding complete:")
@@ -588,12 +659,20 @@ class SpectrumUnfolder:
             converged=result.converged,
             method=method.upper(),
             initial_guess_source=self.initial_guess_source,
-            metadata={
-                "chi2_history": result.chi_squared_history,
-                "final_residuals": result.final_residuals,
-                "tolerance": tolerance,
-                "relaxation": relaxation,
-            },
+            metadata=merge_flux_diagnostics(
+                {
+                    **dict(getattr(result, "parameters_used", {})),
+                    **dict(getattr(result, "diagnostics", {})),
+                    **seed_metadata,
+                    "chi2_history": list(getattr(result, "chi_squared_history", []))
+                    or list(getattr(result, "convergence_history", [])),
+                    "final_residuals": getattr(result, "final_residuals", [])
+                    or list(getattr(result, "residuals", [])),
+                    "tolerance": tolerance,
+                    "relaxation": relaxation,
+                },
+                flux_array,
+            ),
         )
 
     def _estimate_flux_uncertainty(
@@ -688,6 +767,8 @@ def quick_unfold(
     method: str = "GRAVEL",
     energy_structure: str = "flux_wire",
     verbose: bool = True,
+    use_ml_seed: bool = False,
+    ml_seed_threshold: float = 0.6,
 ) -> UnfoldingResult:
     """
     Quick spectrum unfolding from dictionary of reactions.
@@ -706,6 +787,10 @@ def quick_unfold(
         Energy group structure
     verbose : bool
         Print status
+    use_ml_seed : bool
+        Use the ML Seed approximation to initialize GRAVEL or RMLE
+    ml_seed_threshold : float
+        Confidence threshold for accepting the ML seed initializer
 
     Returns
     -------
@@ -738,7 +823,11 @@ def quick_unfold(
     if initial_spectrum is not None:
         unfolder.set_initial_guess(initial_spectrum, source="user")
 
-    return unfolder.unfold(method=method)
+    return unfolder.unfold(
+        method=method,
+        use_ml_seed=use_ml_seed,
+        ml_seed_threshold=ml_seed_threshold,
+    )
 
 
 def build_flux_wire_response_matrix(

@@ -21,7 +21,7 @@ without pulling archived Tk widgets back into the redesign.
 - **Nuclear Data Integrations**: Bundled access to ENDF/B-VIII.0, IRDFF-II test schemas, and custom user dosimetry libraries.
 - **Modern calibration workspace**: The Phase 2.1 Qt shell now includes a unified energy + FWHM calibration dialog with embedded spectrum review, residual-first plots, and ASTM E181 order locking.
 - **Interactive plot review**: Spectrum inspection defaults to log counts with isotope-colored peak markers, and Activity/Rates now include live zoomable plot panels alongside the existing unfold diagnostics.
-- **Rigorous Test Suite**: Backed by 960+ unit and integration tests spanning MCNP workflows, ASTM paths, GUI logic, and transport/IO integrations.
+- **Rigorous Test Suite**: Backed by 1124 passing unit and integration tests in this workspace, spanning MCNP workflows, ASTM paths, unfolding parity, GUI logic, and transport/IO integrations.
 
 ## Getting started
 The project maintains low external dependency overhead to ensure seamless offline, air-gapped lab execution. Install in editable mode and run the CLI or GUI:
@@ -37,6 +37,9 @@ pip install -e '.[dev]'
 
 # Optional: install the modern native GUI stack
 pip install -e '.[native-gui]'
+
+# Optional: enable Jinja2 + WeasyPrint report export support
+pip install -e '.[reporting]'
 
 # Optional: legacy Tk desktop automation coverage
 pip install -e '.[gui-test]'
@@ -86,7 +89,7 @@ For the redesigned Qt calibration workspace, generate the native Phase 2.1 revie
 
 ```bash
 QT_QPA_PLATFORM=offscreen PYTHONPATH=src \
-  python tests/gui_phase2_calibration_probe.py \
+  python tests/gui_calibration_workspace_probe.py \
   artifacts/gui_review/phase2_calibration_workspace
 ```
 

@@ -111,9 +111,63 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   auto peak review, undo/redo, Bayesian matching, efficiency fitting, activity
   calculation, background subtraction, pinned nuclides, survey-map rendering,
   multi-spectrum switching, and Playwright-reviewed completion screenshots.
-- Phase 2 as a whole is now complete; roadmap items `2.1` through `2.20` are now
-  complete and the next required implementation step is `3.1`.
-- The current roadmap next step is Phase 3.1, GRAVEL.
+- The follow-on Phase 2 GUI identification items are now implemented as well:
+  roadmap items `2.21` through `2.24` now cover manual isotope assignment,
+  centroid-driven isotope browsing, gamma-phenomena overlays, and post-workflow
+  peak-ID editing in the redesigned Qt shell.
+- The controlling roadmap's Phase 3.1 GRAVEL core is now implemented in-repo in
+  `fluxforge/unfolding/`; in this document's local numbering that corresponds to
+  the GRAVEL/registry portion of row `3-8`, while the unfolding dialog portion
+  remains pending.
+- That same repo state now also includes shared pyunfold-style nonnegative input
+  validation and workflow-level regression coverage across the public unfolding
+  solvers, wrappers, `quick_unfold`, `SpectrumUnfolder`, and CLI methods.
+- That same validation layer now also includes local external-reference parity tests:
+  GRAVEL and MLEM are checked against the bundled Neutron-Unfolding repo on its
+  sample neutron dataset using matched tolerance settings, and `NeutronUnfolderIBU`
+  is checked against the local pyunfold repo on five published/example cases while
+  comparing unfolded values, uncertainties, and iteration statistics.
+- The controlling roadmap's Phase 3.2 MAXED core is now implemented in-repo as well:
+  `fluxforge/unfolding/maxed.py` is registered in the shared unfolder registry and
+  covered by FluxForge pytest coverage.
+- The controlling roadmap's Phase 3.3 RMLE core is now implemented in-repo as well:
+  `fluxforge/unfolding/rmle.py` is registered as the default unfolder, and RMLE is
+  now selectable in the Qt unfolding workspace, the public CLI, and the public
+  `SpectrumUnfolder` workflow.
+- The controlling roadmap's Phase 3.4 ML Seed core is now implemented in-repo as
+  well: `fluxforge/unfolding/ml_seed.py` is registered in the shared unfolder
+  registry, exposed in the Qt unfolding workspace, CLI, and public
+  `SpectrumUnfolder`, and can initialize both GRAVEL and RMLE behind a
+  confidence-threshold gate.
+- The Qt GUI now also has a repo-complete unfolding workspace for the local
+  dialog/comparison portion of row `3-8`: registry-backed selectors,
+  GRAVEL/MAXED/RMLE/ML Seed comparison mode, visible uncertainty values,
+  convergence plotting, a real RMLE lambda slider, ML Seed threshold controls,
+  and the response-matrix
+  heatmap all exist in the modern shell.
+- The controlling roadmap's Phase 3.6 ML peak-analysis engine is now implemented
+  in-repo too: `src/fluxforge/ml/peak_analysis.py` provides an ONNX-oriented
+  CPU-fallback engine, `src/fluxforge/core/phase2_analysis.py` registers it, and
+  the modern Peak Table now exposes it through `src/fluxforge/gui/panels/modern_shell.py`.
+- The controlling roadmap's Phase 3.7 through 3.9 standards framework is now
+  implemented in-repo as well: `src/fluxforge/standards/e181.py`,
+  `src/fluxforge/standards/e1297.py`, `src/fluxforge/standards/e1218.py`, and
+  `src/fluxforge/standards/c1232.py` are registered through
+  `src/fluxforge/standards/__init__.py`.
+- The controlling roadmap's Phase 3.10 and 3.11 are now implemented in-repo too:
+  `src/fluxforge/standards/c1030.py`, `src/fluxforge/gui/dialogs/pu_isotopics_dialog.py`,
+  `src/fluxforge/standards/qa_monitor.py`, and
+  `src/fluxforge/gui/dialogs/qa_history_dialog.py` now provide the Pu isotopics
+  wizard, QA history, and drift monitoring.
+- The controlling roadmap's Phase 3.12 through 3.15 are now implemented in-repo
+  as well: standards-lock summaries surface in the modern Qt shell, the Jinja2
+  report engine and bundled templates exist under `src/fluxforge/reporting/`,
+  the report dialog now supports HTML/PDF export, the batch queue is live in
+  `src/fluxforge/gui/panels/modern_shell.py` with visible progress, and optional
+  CuPy backend selection now exists in `src/fluxforge/unfolding/gpu_backend.py`.
+- Module 3 is now complete in sequence and in-repo.
+- The current controlling-roadmap next step is Phase 4.1, real HAL driver work
+  (local Phase 4 work in this document).
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for
   roadmap items `1.3` through `1.18`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide database, and instant overlay search;
@@ -1536,6 +1590,10 @@ The following replaces and supersedes the base plan's 23-item list. Items are gr
 | 2-16 | Implement mini residuals sub-plot beneath every ROI on canvas (Expert/Standards mode). | area/gui | p1 |
 | 2-17 | Implement Survey Map panel using folium + offline tile bundle. GPS extraction wired in. | area/gui | p2 |
 | 2-18 | Implement three-tier method badge display in all method selectors. Provenance in `.ffs` and reports. | area/gui | p1 |
+| 2-19 | Implement manual isotope assignment, replacement, and clearing for selected peaks in the Qt peak workflow. Analysts must be able to override automated IDs from the GUI. | area/gui | p0 |
+| 2-20 | Implement a centroid-driven isotope browser that starts from the selected peak or a typed centroid, defaults to a ±2 keV photopeak window, allows tolerance edits, and filters against the active identification library. | area/gui | p0 |
+| 2-21 | Implement gamma-phenomena guidance overlays for Compton edge, backscatter, escape peaks, annihilation line, and continuum-adjacent guide locations tied to the selected line. | area/gui | p1 |
+| 2-22 | Keep peak IDs editable after Bayesian or future automated workflows. Route assign/reassign/clear actions through `SelectionBus` and `QUndoStack` so manual overrides remain available. | area/gui | p0 |
 
 ### Phase 3 — Advanced Analysis and Standards
 
