@@ -33,6 +33,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         PuIsotopicsDialog,
         QAHistoryDialog,
         ReportExportDialog,
+        StandardsReviewDialog,
         UnfoldingWorkspaceDialog,
     )
     from fluxforge.gui.panels import (
@@ -150,6 +151,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._qa_history_dialog = None
             self._report_dialog = None
             self._pu_isotopics_dialog = None
+            self._standards_review_dialog = None
             self.setDockOptions(
                 QMainWindow.AllowNestedDocks
                 | QMainWindow.AllowTabbedDocks
@@ -265,6 +267,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             analysis_menu.addAction(self._action("Nuclide Search"))
             analysis_menu.addAction(
                 self._action(
+                    "Run ASTM Check",
+                    enabled=True,
+                    handler=self._open_standards_review,
+                )
+            )
+            analysis_menu.addAction(
+                self._action(
                     "Spectrum Unfolding Workspace",
                     enabled=True,
                     handler=self._open_unfolding_workspace,
@@ -358,6 +367,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     workspace_controller=self.phase2_workspace,
                     library_manager=self.library_manager,
                     qa_monitor=self.qa_monitor,
+                    open_qa_history=self._open_qa_history,
+                    open_standards_review=self._open_standards_review,
                     parent=self,
                 ),
                 Qt.LeftDockWidgetArea,
@@ -417,6 +428,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.addPermanentWidget(self.progress)
             status.addPermanentWidget(self.hardware_led)
             self.hardware_led.set_status("offline", "NO DEVICE")
+            self.hardware_led.set_click_handler(self._open_dashboard_tab)
             self.library_manager.subscribe(self._on_library_state_changed)
             self._on_library_state_changed(self.library_manager.state)
             self._update_predictive_status()
@@ -755,6 +767,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             }
             return payload
 
+        def _build_standards_evaluations(self):
+            context = self._build_standards_context()
+            evaluations = []
+            for key in ("ASTM E181", "ASTM E1297", "ASTM E1218", "ASTM C1232", "ASTM C1030"):
+                module = self.registries.standards_modules.get(key)
+                evaluations.append(module.evaluate(context))
+            return tuple(evaluations)
+
         def _open_report_export(self) -> None:
             if self._report_dialog is not None and self._report_dialog.isVisible():
                 self._report_dialog.raise_()
@@ -767,6 +787,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._report_dialog.show()
 
+        def _open_standards_review(self) -> None:
+            if (
+                self._standards_review_dialog is not None
+                and self._standards_review_dialog.isVisible()
+            ):
+                self._standards_review_dialog.refresh()
+                self._standards_review_dialog.raise_()
+                self._standards_review_dialog.activateWindow()
+                return
+            self._standards_review_dialog = StandardsReviewDialog(
+                evaluation_factory=self._build_standards_evaluations,
+                parent=self,
+            )
+            self._standards_review_dialog.show()
+
         def _open_qa_history(self) -> None:
             if self._qa_history_dialog is not None and self._qa_history_dialog.isVisible():
                 self._qa_history_dialog.raise_()
@@ -774,6 +809,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             self._qa_history_dialog = QAHistoryDialog(self.qa_monitor, parent=self)
             self._qa_history_dialog.show()
+
+        def _open_dashboard_tab(self) -> None:
+            if hasattr(self, "central_tabs"):
+                self.central_tabs.setCurrentIndex(1)
 
         def _open_pu_isotopics_wizard(self) -> None:
             if self.mode_manager.state.mode is GUIMode.SIMPLE:

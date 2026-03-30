@@ -37,6 +37,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(self.dot)
             layout.addWidget(self.label)
 
+            self._click_handler = None
             self.set_status("offline")
 
         def set_status(self, status: str, message: str | None = None) -> None:
@@ -47,6 +48,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "border: 1px solid rgba(255,255,255,0.12); }"
             )
             self.label.setText(message or tone)
+
+        def set_click_handler(self, handler) -> None:
+            self._click_handler = handler
+
+        def mousePressEvent(self, event) -> None:
+            if callable(self._click_handler):
+                self._click_handler()
+            super().mousePressEvent(event)
 
 else:
 

@@ -342,9 +342,10 @@
       "sequence_status": "complete",
       "evidence": [
         "src/fluxforge/gui/widgets/hardware_led.py",
-        "src/fluxforge/gui/main_window.py"
+        "src/fluxforge/gui/main_window.py",
+        "tests/test_module3_workflows_qt.py"
       ],
-      "notes": "The main window now carries a dedicated hardware LED widget in the status bar."
+      "notes": "The main window now carries a dedicated hardware LED widget in the status bar, and clicking it opens the Dashboard tab for direct access."
     },
     {
       "id": "1.18",
@@ -947,11 +948,13 @@
       "evidence": [
         "src/fluxforge/standards/qa_monitor.py",
         "src/fluxforge/gui/dialogs/qa_history_dialog.py",
+        "src/fluxforge/gui/dialogs/standards_review_dialog.py",
         "src/fluxforge/gui/main_window.py",
         "tests/test_module3_backends.py",
-        "tests/test_module3_workflows_qt.py"
+        "tests/test_module3_workflows_qt.py",
+        "tests/gui_module3_workflows_probe.py"
       ],
-      "notes": "SQLite-backed QA history, drift summaries, CSV export, and the Tools \u2192 QA History dialog are now implemented."
+      "notes": "SQLite-backed QA history, drift summaries, CSV export, the Tools \u2192 QA History dialog, and the direct Run ASTM Check review surface are now implemented in the modern shell."
     },
     {
       "id": "3.12",

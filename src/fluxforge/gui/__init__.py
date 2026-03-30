@@ -21,6 +21,7 @@ from fluxforge.gui.dialogs import (
     PuIsotopicsDialog,
     QAHistoryDialog,
     ReportExportDialog,
+    StandardsReviewDialog,
     UnfoldingWorkspaceDialog,
 )
 from fluxforge.gui.library_manager import DataLibraryManager, DataLibraryState
@@ -54,6 +55,7 @@ __all__ = [
     "PuIsotopicsDialog",
     "QAHistoryDialog",
     "ReportExportDialog",
+    "StandardsReviewDialog",
     "DataLibraryManager",
     "DataLibraryState",
     "PYQTGRAPH_AVAILABLE",

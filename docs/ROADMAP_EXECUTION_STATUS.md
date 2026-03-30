@@ -88,7 +88,7 @@ officially in progress.
 | 3.8 | `complete` | `src/fluxforge/standards/e1297.py` now provides Currie-method MDA evaluation through the standards registry |
 | 3.9 | `complete` | `src/fluxforge/standards/e1218.py` + `src/fluxforge/standards/c1232.py` now provide calibration-bracketing and lab-QA checks |
 | 3.10 | `complete` | `src/fluxforge/standards/c1030.py` + `src/fluxforge/gui/dialogs/pu_isotopics_dialog.py` + `src/fluxforge/gui/main_window.py` now provide the ASTM C1030 Pu isotopics backend and Expert/Standards wizard |
-| 3.11 | `complete` | `src/fluxforge/standards/qa_monitor.py` + `src/fluxforge/gui/dialogs/qa_history_dialog.py` + `src/fluxforge/gui/main_window.py` now provide SQLite QA history, drift status, and `Tools → QA History` |
+| 3.11 | `complete` | `src/fluxforge/standards/qa_monitor.py` + `src/fluxforge/gui/dialogs/qa_history_dialog.py` + `src/fluxforge/gui/dialogs/standards_review_dialog.py` + `src/fluxforge/gui/main_window.py` now provide SQLite QA history, drift status, `Tools → QA History`, and a direct `Run ASTM Check` review surface from the modern sidebar |
 | 3.12 | `complete` | `src/fluxforge/standards/__init__.py` + `src/fluxforge/gui/widgets/method_selector.py` + `src/fluxforge/gui/panels/modern_shell.py` now surface registry-driven standards locks and padlock summaries in the modern GUI |
 | 3.13 | `complete` | `src/fluxforge/reporting/engine.py` + `src/fluxforge/reporting/templates/` + `src/fluxforge/gui/dialogs/report_export_dialog.py` now provide the Jinja2 report engine with the three bundled templates and HTML/PDF export |
 | 3.14 | `complete` | `src/fluxforge/core/batch_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` now provide the ProcessPoolExecutor-backed batch queue, visible progress tracking, and JSON/CSV outputs |
@@ -115,7 +115,7 @@ officially in progress.
   registries, GUI scaffolding, and mock HAL device.
 - `pytest` was upgraded in the user environment to `8.4.2`.
 - The TensorFlow-specific tests were run explicitly in this round, and the only remaining skips are the CUDA library checks that are correct for this CPU-only workspace.
-- The full suite now passes in this workspace: `1129 passed, 2 skipped`.
+- The full suite now passes in this workspace: `1131 passed, 2 skipped`.
 - The redesigned Qt GUI was verified beyond unit tests in this round:
   mouse-driven peak picking in the calibration canvas, governed data-library
   selectors in the sidebar, library-assisted calibration-line assignment, and
@@ -156,12 +156,18 @@ officially in progress.
   QA monitor, reporting engine, response-matrix loader, optional GPU selector,
   ML peak engine, and batch-analysis writer are all exercised directly.
 - Additional Module 3 GUI coverage now exists in `tests/test_module3_workflows_qt.py`:
-  the QA History dialog, report export dialog, C1030 wizard, batch queue tab,
-  ML peak table action, and sidebar QA/lock summary are now exercised in the
-  redesigned Qt shell.
+  the QA History dialog, direct `Run ASTM Check` sidebar action, clickable
+  hardware LED dashboard shortcut, report export dialog, C1030 wizard, batch
+  queue tab, ML peak table action, and sidebar QA/lock summary are now exercised
+  in the redesigned Qt shell.
 - A native Module 3 review probe now exists at `tests/gui_module3_workflows_probe.py`
-  so the QA history, report export, Pu isotopics, and batch queue surfaces can
-  be inspected visually in the artifact-gallery flow as well.
+  so the QA history, ASTM standards review, report export, Pu isotopics, and
+  batch queue surfaces can be inspected visually in the artifact-gallery flow as
+  well.
+- The refreshed Module 3 artifact gallery now lives at
+  `artifacts/gui_review/module3_workflows_review/`, and the `03-standards-review`
+  state was re-checked in Playwright after the sidebar `Run ASTM Check` path was
+  added to the modern shell.
 - Additional predictive backend coverage now exists in `tests/test_predictive_features.py`:
   ROI count-target ETA, dead-time saturation forecasting, and QA-history
   recalibration prediction are exercised directly from deterministic spectra and
@@ -203,4 +209,6 @@ officially in progress.
 - Phase 3.5 is now complete in the repository and formally complete in sequence.
 - Phase 3.6 through 3.15 are now complete in the repository and formally complete in sequence.
 - Module 3 as a whole is now complete in the repository and formally complete in sequence.
+- All final-plan GUI features except the deferred live MCA / HAL transport work in
+  Phase 4.1 through 4.4 are now implemented in the modern Qt shell.
 - The roadmap's current next step is Phase 4.1: real HAL driver work.

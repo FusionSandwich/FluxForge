@@ -1648,6 +1648,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             workspace_controller: Phase2WorkspaceController,
             library_manager: DataLibraryManager | None = None,
             qa_monitor: QAMonitor | None = None,
+            open_qa_history: Callable[[], None] | None = None,
+            open_standards_review: Callable[[], None] | None = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -1656,6 +1658,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager or DataLibraryManager()
             self.qa_monitor = qa_monitor or QAMonitor()
+            self._open_qa_history = open_qa_history
+            self._open_standards_review = open_standards_review
             self.qa_monitor.seed_demo_history()
             self.registries = bootstrap_builtin_registries()
             register_builtin_standards_modules(self.registries)
@@ -1717,6 +1721,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.qa_note.setObjectName("QaStandardsSummary")
             self.qa_note.setReadOnly(True)
             layout.addWidget(self.qa_note, 1)
+
+            qa_actions = QHBoxLayout()
+            self.qa_history_button = QPushButton("View QA History", self)
+            self.qa_history_button.setObjectName("QaHistoryShortcutButton")
+            self.qa_history_button.clicked.connect(self._open_qa_history_clicked)
+            qa_actions.addWidget(self.qa_history_button)
+            self.astm_check_button = QPushButton("Run ASTM Check", self)
+            self.astm_check_button.setObjectName("RunAstmCheckButton")
+            self.astm_check_button.clicked.connect(self._open_standards_review_clicked)
+            qa_actions.addWidget(self.astm_check_button)
+            layout.addLayout(qa_actions)
 
             self.selection_bus.subscribe(self._sync_selection)
             self.library_manager.subscribe(self._sync_library_state)
@@ -1994,6 +2009,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_note.setPlainText(
                 "Selection sync\n\n" + _selection_summary(state)
             )
+            self._sync_qa_summary()
 
         def _refresh_nuclide_results(self, query: str) -> None:
             self.nuclides.clear()
@@ -2226,13 +2242,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if active_standard and active_standard in self.registries.standards_modules:
                 module = self.registries.standards_modules.get(active_standard)
                 locks = "<br/>".join(
-                    f"🔒 {setting.field_id}: {setting.value} ({setting.standard_section})"
+                    f"[locked] {setting.field_id}: {setting.value} ({setting.standard_section})"
                     for setting in module.locked_settings()
                 ) or "No workflow locks."
                 lines.append(
                     f"<p><strong>Active standard:</strong> {active_standard}<br/>{locks}</p>"
                 )
             self.qa_note.setHtml("".join(lines))
+
+        def _open_qa_history_clicked(self) -> None:
+            if callable(self._open_qa_history):
+                self._open_qa_history()
+
+        def _open_standards_review_clicked(self) -> None:
+            if callable(self._open_standards_review):
+                self._open_standards_review()
 
 
     class BatchQueuePanel(QWidget):
@@ -2705,6 +2729,8 @@ else:
             workspace_controller: Phase2WorkspaceController,
             library_manager: DataLibraryManager | None = None,
             qa_monitor: QAMonitor | None = None,
+            open_qa_history: Callable[[], None] | None = None,
+            open_standards_review: Callable[[], None] | None = None,
             parent=None,
         ) -> None:
             self.mode_manager = mode_manager
@@ -2712,6 +2738,8 @@ else:
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager
             self.qa_monitor = qa_monitor
+            self._open_qa_history = open_qa_history
+            self._open_standards_review = open_standards_review
             self.parent = parent
 
 

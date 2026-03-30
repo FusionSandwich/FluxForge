@@ -10,9 +10,11 @@ FluxForge's primary redesign path is now a native `PySide6 + PyQtGraph` desktop 
 
 The Stage 0 roadmap governance layer now lives in the repository under
 `.github/project-management/`, `docs/adr/`, and `CONTRIBUTING.md`. The
-next-generation `PySide6 + PyQtGraph` shell is now the primary GUI target, and
-Phase 2.1 lands the unified energy + FWHM calibration workspace in that new path
-without pulling archived Tk widgets back into the redesign.
+next-generation `PySide6 + PyQtGraph` shell is now the primary GUI target. That
+modern path now carries the completed Phase 1 through Phase 3 GUI roadmap plus
+the user-directed predictive dashboard slice, including calibration, analysis,
+unfolding, standards/QA, reporting, batch workflows, and direct sidebar ASTM
+review actions, without pulling archived Tk widgets back into the redesign.
 
 ## Key Capabilities
 - **Full Workflow Parity**: Implements raw ASCII/IEC spectral processing, deterministic Peak Identification, Activity/Reaction rate generation matching Quantum Gold and PeakEasy.
@@ -21,7 +23,7 @@ without pulling archived Tk widgets back into the redesign.
 - **Nuclear Data Integrations**: Bundled access to ENDF/B-VIII.0, IRDFF-II test schemas, and custom user dosimetry libraries.
 - **Modern calibration workspace**: The Phase 2.1 Qt shell now includes a unified energy + FWHM calibration dialog with embedded spectrum review, residual-first plots, and ASTM E181 order locking.
 - **Interactive plot review**: Spectrum inspection defaults to log counts with isotope-colored peak markers, and Activity/Rates now include live zoomable plot panels alongside the existing unfold diagnostics.
-- **Rigorous Test Suite**: Backed by 1129 passing unit and integration tests in this workspace, spanning MCNP workflows, ASTM paths, unfolding parity, GUI logic, transport/IO integrations, and predictive Qt workflows.
+- **Rigorous Test Suite**: Backed by 1131 passing unit and integration tests in this workspace, spanning MCNP workflows, ASTM paths, unfolding parity, GUI logic, transport/IO integrations, and predictive Qt workflows.
 
 ## Getting started
 The project maintains low external dependency overhead to ensure seamless offline, air-gapped lab execution. Install in editable mode and run the CLI or GUI:

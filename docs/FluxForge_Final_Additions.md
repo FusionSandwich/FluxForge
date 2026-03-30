@@ -202,6 +202,11 @@ be completed before any Phase 1 code is committed on the branch.
   implemented in-repo too: the modern Qt dashboard, QA sidebar, and status bar
   now forecast ROI time-to-target counts, dead-time saturation risk, and QA-based
   recalibration timing using offline spectra plus `QAMonitor` history.
+- A follow-on GUI audit against the final plan is now closed as well: excluding the
+  deferred live MCA / HAL transport work in Phase 4.1 through 4.4, the planned GUI
+  surfaces are now implemented in the modern Qt shell, the QA sidebar exposes direct
+  `View QA History` and `Run ASTM Check` buttons, and the status-bar hardware LED now
+  opens the Dashboard tab for one-click access.
 - The current roadmap next step is Phase 4.1, real HAL driver work.
 - GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
   repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader

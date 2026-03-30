@@ -170,6 +170,11 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   implemented in-repo as well: the modern Qt dashboard, QA sidebar, and status
   bar now forecast ROI target-count timing, dead-time saturation, and
   recalibration timing using offline spectra plus QA history.
+- A final GUI audit against this plan is now also closed: excluding the deferred
+  live MCA / HAL work from local Phase 4, the planned GUI surfaces are implemented
+  in the modern Qt shell, the QA & Standards sidebar exposes direct `View QA History`
+  and `Run ASTM Check` buttons, and clicking the status-bar hardware LED now opens
+  the Dashboard tab as specified in Section 16.
 - The current controlling-roadmap next step is Phase 4.1, real HAL driver work
   (local Phase 4 work in this document).
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for

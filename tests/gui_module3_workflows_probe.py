@@ -110,6 +110,8 @@ def main(argv: list[str] | None = None) -> int:
 
     output_dir = Path(args[0]).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
+    for stale_png in output_dir.glob("*.png"):
+        stale_png.unlink()
 
     app = QApplication.instance() or QApplication([])
     window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
@@ -125,24 +127,29 @@ def main(argv: list[str] | None = None) -> int:
 
     capture(window, "01-main-shell-qa")
 
-    window._open_qa_history()
+    sidebar = window.left_dock.widget()
+    QTest.mouseClick(sidebar.qa_history_button, Qt.LeftButton)
     app.processEvents()
     capture(window._qa_history_dialog, "02-qa-history")
 
+    QTest.mouseClick(sidebar.astm_check_button, Qt.LeftButton)
+    app.processEvents()
+    capture(window._standards_review_dialog, "03-standards-review")
+
     window._open_report_export()
     app.processEvents()
-    capture(window._report_dialog, "03-report-export")
+    capture(window._report_dialog, "04-report-export")
 
     window._open_pu_isotopics_wizard()
     app.processEvents()
-    capture(window._pu_isotopics_dialog, "04-pu-isotopics")
+    capture(window._pu_isotopics_dialog, "05-pu-isotopics")
 
     batch_panel = window.bottom_dock.widget().batch_queue_panel
     QTest.mouseClick(batch_panel.queue_button, Qt.LeftButton)
     app.processEvents()
     QTest.mouseClick(batch_panel.run_button, Qt.LeftButton)
     app.processEvents()
-    capture(batch_panel, "05-batch-queue")
+    capture(batch_panel, "06-batch-queue")
 
     review_path = _write_review_gallery(output_dir, screenshots)
     window.close()

@@ -100,6 +100,34 @@ def test_main_window_report_export_dialog_writes_pdf(tmp_path, monkeypatch):
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt module-3 workspace dependencies are unavailable.",
 )
+def test_sidebar_buttons_open_qa_history_and_astm_review():
+    _qapp()
+    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window.show()
+    _qapp().processEvents()
+    sidebar = window.left_dock.widget()
+
+    QTest.mouseClick(sidebar.qa_history_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window._qa_history_dialog is not None
+    assert window._qa_history_dialog.isVisible()
+
+    QTest.mouseClick(sidebar.astm_check_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window._standards_review_dialog is not None
+    assert window._standards_review_dialog.isVisible()
+    assert window._standards_review_dialog.table.rowCount() >= 5
+    assert "ASTM E181" in window._standards_review_dialog.detail.toPlainText()
+
+    window._qa_history_dialog.close()
+    window._standards_review_dialog.close()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt module-3 workspace dependencies are unavailable.",
+)
 def test_main_window_opens_pu_isotopics_wizard_outside_simple_mode():
     _qapp()
     manager = ModeManager()
@@ -142,6 +170,24 @@ def test_batch_queue_panel_runs_and_writes_outputs(tmp_path):
     assert panel.last_output_dir is not None
     assert (panel.last_output_dir / "aggregate.csv").exists()
     assert panel.progress_bar.value() == 100
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt module-3 workspace dependencies are unavailable.",
+)
+def test_hardware_led_click_opens_dashboard_tab():
+    _qapp()
+    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window.show()
+    _qapp().processEvents()
+
+    assert window.central_tabs.currentIndex() == 0
+    QTest.mouseClick(window.hardware_led, Qt.LeftButton)
+    _qapp().processEvents()
+
+    assert window.central_tabs.currentIndex() == 1
     window.close()
 
 
