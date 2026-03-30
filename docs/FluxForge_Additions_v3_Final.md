@@ -91,7 +91,10 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
 - Canonical status tracker: `docs/ROADMAP_EXECUTION_STATUS.md`.
 - Stage 0 live tracker application was verified complete on GitHub on 2026-03-30.
 - Phase 1 implementation is repo-complete and formally complete in sequence.
-- The current roadmap next step is Phase 2.1, the unified energy + FWHM calibration workspace.
+- Phase 2.1 is now implemented in the redesigned Qt path, including the unified
+  calibration dialog, residual-first plots, ASTM E181 order locking, and the native
+  review probe used for Playwright inspection.
+- The current roadmap next step is Phase 2.2, the additive quick slider calibration mode.
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for
   roadmap items `1.3` through `1.18`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide database, and instant overlay search;
@@ -1496,7 +1499,7 @@ The following replaces and supersedes the base plan's 23-item list. Items are gr
 
 | # | Action | Area | Priority |
 |---|---|---|---|
-| 2-1 | Implement unified calibration dialog: live embedded canvas + energy/FWHM calibration + residuals + Chi-squared. | area/gui | p0 |
+| 2-1 | Implement unified calibration dialog: live embedded canvas + energy/FWHM calibration + residuals + Chi-squared. | area/gui | p0 - complete in repo |
 | 2-2 | Implement slider-bar quick calibration mode (PeakEasy-inspired) alongside full calibration. | area/gui | p1 |
 | 2-3 | Implement non-linear deviation pairs in calibration fine-tuning sub-tab. | area/core | p1 |
 | 2-4 | Implement ROI drag + real-time Gaussian peak fitting (Levenberg-Marquardt). Register in `PluginRegistries.peak_fitters`. | area/core | p0 |

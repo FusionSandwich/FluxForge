@@ -21,7 +21,7 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| 2.1 | `next` | `not-started` | Stage 0 and Phase 1 are complete, so the formal next step is the unified energy + FWHM calibration workspace. |
+| 2.2 | `next` | `not-started` | Phase 2.1 is complete, so the formal next step is the additive quick slider calibration mode. |
 
 ## Completed In Sequence
 
@@ -54,6 +54,7 @@ officially in progress.
 | 1.17 | `complete` | `src/fluxforge/gui/widgets/hardware_led.py` + `src/fluxforge/gui/main_window.py` add the status-bar hardware LED |
 | 1.18 | `complete` | `src/fluxforge/gui/theme_manager.py` + `src/fluxforge/gui/themes/` provide dark/light/system theme handling |
 | 1.19 | `complete` | `tests/spectra/`, `tests/test_n42.py`, `tests/test_cnf_io.py`, `tests/test_csv_readers.py`, and CI provide the current Phase 1 test harness baseline |
+| 2.1 | `complete` | `src/fluxforge/core/calibration.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` + `src/fluxforge/gui/main_window.py` now provide the live Qt calibration workspace with embedded spectrum review, energy/FWHM fits, ASTM E181 order locking, and residual-first diagnostics |
 
 ## GUI Direction
 
@@ -80,4 +81,5 @@ officially in progress.
 
 - Stage 0 is complete both in-repo and on the live GitHub repository.
 - Phase 1 is complete in the repository and formally complete in sequence.
-- The roadmap's current next step is Phase 2.1: the unified energy + FWHM calibration dialog.
+- Phase 2.1 is complete in the repository and formally complete in sequence.
+- The roadmap's current next step is Phase 2.2: the quick slider calibration mode.

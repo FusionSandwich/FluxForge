@@ -16,7 +16,7 @@ def test_ordered_tracker_has_single_next_step():
     next_steps = [step for step in steps if step["sequence_status"] == "next"]
 
     assert len(next_steps) == 1
-    assert next_steps[0]["id"] == "2.1"
+    assert next_steps[0]["id"] == "2.2"
 
 
 def test_stage0_gate_is_closed_live():
@@ -56,3 +56,11 @@ def test_phase1_foundation_repo_completion_is_explicitly_tracked():
 
     assert steps["1.15"]["repo_status"] == "complete"
     assert steps["1.19"]["repo_status"] == "complete"
+
+
+def test_phase2_calibration_workspace_is_complete_in_sequence():
+    steps = {step["id"]: step for step in load_steps()["steps"]}
+
+    assert steps["2.1"]["repo_status"] == "complete"
+    assert steps["2.1"]["sequence_status"] == "complete"
+    assert steps["2.2"]["sequence_status"] == "next"

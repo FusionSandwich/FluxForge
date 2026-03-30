@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Sequence
 
@@ -100,23 +99,23 @@ class HierarchicalSpectrumBuffer:
         }
 
 
-class SpectrumCanvas(ABC):
+class SpectrumCanvas:
     """Abstract rendering surface used by the planned GUI."""
 
     backend_key: str
     capabilities: RendererCapabilities
 
-    @abstractmethod
     def set_spectrum(self, counts: Sequence[float]) -> None:
         """Load the primary spectrum."""
+        raise NotImplementedError
 
-    @abstractmethod
     def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
         """Load reference-line overlays."""
+        raise NotImplementedError
 
-    @abstractmethod
     def clear(self) -> None:
         """Reset the canvas state."""
+        raise NotImplementedError
 
     def set_traces(self, traces: Sequence[SpectrumTrace]) -> None:
         """Optional bulk update for primary and overlay traces."""

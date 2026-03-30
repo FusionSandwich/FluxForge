@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+from typing import Callable
+
+import numpy as np
+
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
 from fluxforge.gui.nuclide_search import NuclideSearchController
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
+from fluxforge.io.spe import GammaSpectrum
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import PyQtGraphSpectrumCanvas
@@ -19,6 +24,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QListWidget,
         QListWidgetItem,
         QPlainTextEdit,
+        QPushButton,
         QTabWidget,
         QTextEdit,
         QTreeWidget,
@@ -66,8 +72,22 @@ def _demo_counts() -> tuple[float, ...]:
     return tuple(counts)
 
 
-if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
+def build_demo_spectrum() -> GammaSpectrum:
+    """Return the native demo spectrum used by the redesigned shell."""
 
+    counts = _demo_counts()
+    channels = tuple(float(index) for index in range(len(counts)))
+    return GammaSpectrum(
+        counts=np.asarray(counts, dtype=float),
+        channels=np.asarray(channels, dtype=float),
+        calibration={"energy": [0.0, 1.0]},
+        spectrum_id="demo_hpge_workspace",
+        detector_id="demo-hpge",
+        metadata={"source": "phase2-demo"},
+    )
+
+
+if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     def _card(title: str, body: str, accent: str | None = None) -> QFrame:
         frame = QFrame()
         frame.setObjectName("HeroCard")
@@ -106,6 +126,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             super().__init__(parent)
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
+            self._current_spectrum = build_demo_spectrum()
             self.setObjectName("CentralWorkspaceTabs")
             self.addTab(self._build_spectrum_tab(), "Spectrum")
             self.addTab(self._build_dashboard_tab(), "Dashboard")
@@ -158,7 +179,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     selection_bus=self.selection_bus,
                     parent=widget,
                 )
-                self.canvas.set_spectrum(_demo_counts())
+                self.canvas.set_spectrum(self._current_spectrum.counts)
                 self.canvas.set_reference_lines((661.657, 1173.228, 1332.492))
                 body.addWidget(self.canvas, 3)
             else:
@@ -206,6 +227,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def load_spectrum(self, spectrum) -> None:
             """Load a GammaSpectrum-like object into the primary canvas."""
 
+            self._current_spectrum = spectrum
             if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
                 return
             self.canvas.set_spectrum(tuple(float(value) for value in spectrum.counts))
@@ -218,6 +240,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         reference_lines_keV=self.selection_bus.state.reference_lines_keV,
                     )
                 )
+
+        def current_spectrum(self):
+            """Return the current spectrum object shown in the central workspace."""
+
+            return self._current_spectrum
 
         def _build_dashboard_tab(self) -> QWidget:
             widget = QWidget(self)
@@ -362,11 +389,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self,
             mode_manager: ModeManager,
             selection_bus: SelectionBus,
+            open_calibration_workspace: Callable[[], None] | None = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
+            self._open_calibration_workspace = open_calibration_workspace
             self.addTab(
                 self._text_panel(
                     "Peak Table",
@@ -375,10 +404,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Peak Table",
             )
             self.addTab(
-                self._text_panel(
-                    "Calibration",
-                    "Unified energy + FWHM calibration workspace placeholder with live canvas embedding planned.",
-                ),
+                self._build_calibration_panel(),
                 "Calibration",
             )
             self.addTab(
@@ -431,6 +457,43 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mode_manager.subscribe(self._append_mode_event)
             return widget
 
+        def _build_calibration_panel(self) -> QWidget:
+            widget = QWidget(self)
+            layout = QVBoxLayout(widget)
+            layout.setContentsMargins(16, 16, 16, 16)
+            layout.setSpacing(12)
+
+            title = QLabel("Calibration", widget)
+            title.setObjectName("PanelHeading")
+            layout.addWidget(title)
+
+            body = QLabel(
+                (
+                    "Phase 2.1 now uses the dedicated Qt calibration workspace rather "
+                    "than expanding the old bottom-tab editor."
+                ),
+                widget,
+            )
+            body.setObjectName("PanelBody")
+            body.setWordWrap(True)
+            layout.addWidget(body)
+
+            self.calibration_mode_note = QLabel(widget)
+            self.calibration_mode_note.setObjectName("HeroCardAccent")
+            self.calibration_mode_note.setWordWrap(True)
+            layout.addWidget(self.calibration_mode_note)
+
+            launch_button = QPushButton("Open Energy + FWHM Workspace", widget)
+            launch_button.setEnabled(self._open_calibration_workspace is not None)
+            if self._open_calibration_workspace is not None:
+                launch_button.clicked.connect(self._open_calibration_workspace)
+            layout.addWidget(launch_button)
+            layout.addStretch(1)
+
+            self.mode_manager.subscribe(self._sync_calibration_note)
+            self._sync_calibration_note(self.mode_manager.state)
+            return widget
+
         def _append_selection_event(self, state: SelectionState) -> None:
             self.log.appendPlainText("Selection → " + _selection_summary(state))
 
@@ -439,6 +502,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if state.standard:
                 summary += f" / {state.standard}"
             self.log.appendPlainText("Mode → " + summary)
+
+        def _sync_calibration_note(self, state) -> None:
+            if state.mode is GUIMode.STANDARDS and state.standard:
+                self.calibration_mode_note.setText(
+                    f"Standards lock active: {state.standard} forces the energy fit to order 2."
+                )
+                return
+            self.calibration_mode_note.setText(
+                "Expert mode keeps the order selection editable while the ASTM acceptance band remains visible."
+            )
 
 
     class ToolContextPanel(QWidget):
@@ -511,6 +584,10 @@ else:
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.parent = parent
+            self._current_spectrum = build_demo_spectrum()
+
+        def current_spectrum(self):
+            return self._current_spectrum
 
 
     class SidebarPanel:  # pragma: no cover - placeholder without Qt
@@ -520,9 +597,16 @@ else:
 
 
     class BottomWorkspaceTabs:  # pragma: no cover - placeholder without Qt
-        def __init__(self, mode_manager: ModeManager, selection_bus: SelectionBus, parent=None) -> None:
+        def __init__(
+            self,
+            mode_manager: ModeManager,
+            selection_bus: SelectionBus,
+            open_calibration_workspace: Callable[[], None] | None = None,
+            parent=None,
+        ) -> None:
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
+            self.open_calibration_workspace = open_calibration_workspace
             self.parent = parent
 
 

@@ -16,6 +16,7 @@ from fluxforge.gui.main_window import (
     MainWindowScaffold,
     modern_gui_unavailable_message,
 )
+from fluxforge.gui.dialogs import CalibrationWorkspaceDialog
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
 from fluxforge.gui.nuclide_search import NuclideSearchController
@@ -32,6 +33,7 @@ from fluxforge.gui.spectrum_canvas import (
 
 __all__ = [
     "DEFAULT_DOCK_ZONES",
+    "CalibrationWorkspaceDialog",
     "DockZone",
     "FluxForgeMainWindow",
     "HierarchicalSpectrumBuffer",

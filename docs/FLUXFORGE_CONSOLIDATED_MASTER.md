@@ -1192,7 +1192,7 @@ Current implementation snapshot for this release branch:
 |----|------------|--------|-------|
 | C1 | Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit) | Partial | Viewer, overlays, isotope-colored peak markers, log-count default, ROI editing, PNG export, CLI plot export, and a scrollable analysis-controls rail are working in the current Tk/ttk prototype |
 | C2 | ROI/peak workflows with multiplet deconvolution | Partial | Peak tables, auto-finding, counting-method selection, ROI plot selection, plotted diagnostics, constrained-fit widgets, free-form constraint-matrix editing, and ASTM/INL preset-driven IEC-tiered counting defaults are wired; richer tied-parameter UX still remains |
-| C3 | Energy/efficiency calibration UI | Partial | Polynomial coefficient editor, calibration-point picking, residual plots, efficiency-point capture, fitted-curve JSON export, and native desktop calibration acceptance are implemented; detector-profile import/wizards remain |
+| C3 | Energy/efficiency calibration UI | Partial | The redesigned Qt path now includes the unified Phase 2.1 energy + FWHM calibration workspace with embedded spectrum review, residual-first plots, ASTM E181 order locking, and native review artifacts; efficiency/source import wizards remain |
 | C4 | Batch operations (sum/append/convert, ROI integration) | Partial | Multi-buffer management, buffer arithmetic, and GUI `ingest-batch` orchestration are implemented; broader workspace/session orchestration remains |
 | C5 | GUI-to-CLI macro recorder + project file | Planned | Reproducible workflows |
 | C6 | Interactive CLI shell (HDTV-style) | Planned | Batch scripts + keybindings |
@@ -1208,7 +1208,7 @@ Current implementation snapshot for this release branch:
 | C16 | ANN-based NAA workflow | Planned | From `testing/NAA-ANN-1` |
 | C17 | Additional unfolding libraries | Planned | From `testing/pyunfold` |
 | C18 | Guided instructional NAA workflow | Planned | End-to-end educational NAA path from calibration to analysis report |
-| C19 | Calibration wizard for standard sources | Partial | Annotated manual point picking, residual fit review, and efficiency-source point capture are working; covariance/geometry assistants remain |
+| C19 | Calibration wizard for standard sources | Partial | Annotated manual point picking, residual fit review, the new Qt calibration workspace, and efficiency-source point capture are working; covariance/geometry assistants remain |
 | C20 | Reference-assisted isotope ID workspace | Partial | GUI now supports selectable line-match, nuclide-consensus, and hybrid-ranked identification methods with source/tolerance/intensity controls |
 | C21 | Comparator-standard mass worksheet | Planned | Reference-driven mass/concentration estimation with uncertainty propagation |
 | C22 | Irradiation / decay / count-time planner | Planned | Short-lived vs long-lived isotope timing studies |

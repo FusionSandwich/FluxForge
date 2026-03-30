@@ -122,7 +122,10 @@ be completed before any Phase 1 code is committed on the branch.
 - Canonical status tracker: `docs/ROADMAP_EXECUTION_STATUS.md`.
 - Stage 0 live tracker application was verified complete on GitHub on 2026-03-30.
 - Phase 1 implementation is repo-complete and formally complete in sequence.
-- The current roadmap next step is Phase 2.1, the unified energy + FWHM calibration workspace.
+- Phase 2.1 is now implemented in the redesigned Qt path under `src/fluxforge/core/`
+  and `src/fluxforge/gui/`, including the unified calibration dialog, residual-first
+  plots, ASTM E181 order locking, and the native review probe.
+- The current roadmap next step is Phase 2.2, the additive quick slider calibration mode.
 - GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
   repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide search, and overlay wiring, while
@@ -1002,7 +1005,7 @@ by dependency and impact. All Stage 0 items must complete before Stage 1 begins.
 
 | # | Action | Area | Notes |
 |---|---|---|---|
-| 2.1 | Implement unified energy + FWHM calibration dialog (bGamma-style) | area/calibration | Canvas embedded in dialog; live updates |
+| 2.1 | Implement unified energy + FWHM calibration dialog (bGamma-style) | area/calibration | Complete in repo: `src/fluxforge/gui/dialogs/calibration_dialog.py`; canvas embedded in dialog; live updates |
 | 2.2 | Add quick slider calibration mode (PeakEasy-inspired) | area/calibration | Additive — does not replace full workflow |
 | 2.3 | Add non-linear deviation pairs (InterSpec-style) | area/calibration | Fine calibration sub-tab |
 | 2.4 | Implement ROI drag + real-time Gaussian peak fitting | area/core | LM algorithm; < 5ms per ROI |

@@ -163,3 +163,99 @@ QTreeWidget::item,
 QListWidget::item {
   padding: 8px;
 }
+
+QDialog#CalibrationWorkspaceDialog {
+  background: qlineargradient(
+    x1: 0, y1: 0, x2: 1, y2: 1,
+    stop: 0 #f7fafc,
+    stop: 0.6 #eef3f8,
+    stop: 1 #dde7f1
+  );
+}
+
+QFrame#CalibrationHeaderCard,
+QFrame#CalibrationKpiCard {
+  background-color: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(91, 101, 118, 0.16);
+  border-radius: 20px;
+}
+
+QLabel#CalibrationKpiLabel {
+  color: #5b6576;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+QLabel#CalibrationKpiValue {
+  color: #14293f;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+QLabel#CalibrationLockLabel {
+  color: #1a6cc0;
+  font-weight: 700;
+}
+
+QGroupBox#CalibrationGroup {
+  border: 1px solid rgba(91, 101, 118, 0.16);
+  border-radius: 18px;
+  margin-top: 12px;
+  padding-top: 16px;
+  background-color: rgba(255, 255, 255, 0.94);
+  font-weight: 700;
+}
+
+QGroupBox#CalibrationGroup::title {
+  subcontrol-origin: margin;
+  left: 12px;
+  padding: 0 6px;
+}
+
+QTableWidget#CalibrationTable {
+  background-color: #ffffff;
+  border: 1px solid rgba(91, 101, 118, 0.16);
+  border-radius: 14px;
+  gridline-color: rgba(91, 101, 118, 0.12);
+}
+
+QTableWidget#CalibrationTable::item:selected {
+  background-color: rgba(26, 108, 192, 0.12);
+}
+
+QHeaderView::section {
+  background-color: rgba(255, 255, 255, 0.98);
+  border: none;
+  border-right: 1px solid rgba(91, 101, 118, 0.12);
+  padding: 8px;
+  font-weight: 700;
+}
+
+QPushButton {
+  background-color: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(91, 101, 118, 0.16);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+QPushButton:hover {
+  border-color: rgba(26, 108, 192, 0.42);
+}
+
+QPushButton#PrimaryAction {
+  background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #1a6cc0, stop: 1 #b7791f);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+QSpinBox {
+  background-color: #ffffff;
+  border: 1px solid rgba(91, 101, 118, 0.16);
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+
+QSplitter::handle {
+  background-color: rgba(91, 101, 118, 0.1);
+}

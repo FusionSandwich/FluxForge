@@ -9,16 +9,17 @@ FluxForge is intentionally self-contained. It must install, package, and run wit
 FluxForge's primary redesign path is now a native `PySide6 + PyQtGraph` desktop shell under `src/fluxforge/gui/`. It does **not** require a browser, an embedded web runtime, or any internet connection for supported offline workflows.
 
 The Stage 0 roadmap governance layer now lives in the repository under
-`.github/project-management/`, `docs/adr/`, and `CONTRIBUTING.md`. The planned
-next-generation PySide6 shell is now the primary GUI target, while the prior
-`src/fluxforge_gui/` Tk application is retained as a legacy/archive fallback.
+`.github/project-management/`, `docs/adr/`, and `CONTRIBUTING.md`. The
+next-generation `PySide6 + PyQtGraph` shell is now the primary GUI target, and
+Phase 2.1 lands the unified energy + FWHM calibration workspace in that new path
+without pulling archived Tk widgets back into the redesign.
 
 ## Key Capabilities
 - **Full Workflow Parity**: Implements raw ASCII/IEC spectral processing, deterministic Peak Identification, Activity/Reaction rate generation matching Quantum Gold and PeakEasy.
 - **Standards Compliant**: Direct integration with ASTM E3376 two-stream analysis, FWHM-scaled Covell continuum subtraction, and ASTM E261 reactor dosimetry schemas.
 - **Spectrum Unfolding**: Multi-algorithm backend featuring Iterative GRAVEL, MLEM, and GLS with optional non-negativity enforcement and robust Monte Carlo uncertainty propagation.
 - **Nuclear Data Integrations**: Bundled access to ENDF/B-VIII.0, IRDFF-II test schemas, and custom user dosimetry libraries.
-- **GUI redesign in progress**: A modern PySide6 shell is now the primary desktop path, with the older Tk UI preserved as a legacy fallback during migration.
+- **Modern calibration workspace**: The Phase 2.1 Qt shell now includes a unified energy + FWHM calibration dialog with embedded spectrum review, residual-first plots, and ASTM E181 order locking.
 - **Interactive plot review**: Spectrum inspection defaults to log counts with isotope-colored peak markers, and Activity/Rates now include live zoomable plot panels alongside the existing unfold diagnostics.
 - **Rigorous Test Suite**: Backed by 960+ unit and integration tests spanning MCNP workflows, ASTM paths, GUI logic, and transport/IO integrations.
 
@@ -80,6 +81,14 @@ PYTHONPATH=src FLUXFORGE_OFFLINE=1 xvfb-run -a \
 ```
 
 The latest local native-review run writes screenshots such as `01-launch.png`, `03-roi-calibration.png`, and `06-report-plots.png` under `artifacts/gui_review/current_linux/` for manual inspection. The committed Linux screenshot baselines live under `tests/data/gui_review_baselines/linux/`.
+
+For the redesigned Qt calibration workspace, generate the native Phase 2.1 review gallery with:
+
+```bash
+QT_QPA_PLATFORM=offscreen PYTHONPATH=src \
+  python tests/gui_phase2_calibration_probe.py \
+  artifacts/gui_review/phase2_calibration_workspace
+```
 
 To apply the roadmap tracker on GitHub after pushing planning changes, use the
 `Sync Project Planning` workflow. The repository stores the milestone, label, board,

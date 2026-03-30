@@ -13,6 +13,7 @@ from fluxforge.io import read_ffs_session, read_spectrum_any
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import available_renderer_status
+    from fluxforge.gui.dialogs import CalibrationWorkspaceDialog
     from fluxforge.gui.panels import (
         BottomWorkspaceTabs,
         CentralWorkspaceTabs,
@@ -107,6 +108,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mode_manager = mode_manager or ModeManager(settings=self.settings)
             self.selection_bus = selection_bus or SelectionBus.shared()
             self.recent_files = RecentFilesManager(self.settings)
+            self._calibration_dialog = None
             self.setDockOptions(
                 QMainWindow.AllowNestedDocks
                 | QMainWindow.AllowTabbedDocks
@@ -152,7 +154,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             analysis_menu.addAction(self._action("Nuclide Search"))
 
             calibration_menu = self.menuBar().addMenu("&Calibration")
-            calibration_menu.addAction(self._action("Energy + FWHM Workspace"))
+            calibration_menu.addAction(
+                self._action(
+                    "Energy + FWHM Workspace",
+                    enabled=True,
+                    handler=self._open_energy_fwhm_workspace,
+                )
+            )
             calibration_menu.addAction(self._action("Quick Slider Mode"))
 
             tools_menu = self.menuBar().addMenu("&Tools")
@@ -201,6 +209,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 BottomWorkspaceTabs(
                     mode_manager=self.mode_manager,
                     selection_bus=self.selection_bus,
+                    open_calibration_workspace=self._open_energy_fwhm_workspace,
                     parent=self,
                 ),
                 Qt.BottomDockWidgetArea,
@@ -240,11 +249,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.addPermanentWidget(self.hardware_led)
             self.hardware_led.set_status("offline", "NO DEVICE")
 
-        def _action(self, text: str, shortcut: str | None = None) -> QAction:
+        def _action(
+            self,
+            text: str,
+            shortcut: str | None = None,
+            *,
+            enabled: bool = False,
+            handler=None,
+        ) -> QAction:
             action = QAction(text, self)
             if shortcut:
                 action.setShortcut(QKeySequence(shortcut))
-            action.setEnabled(False)
+            action.setEnabled(enabled)
+            if handler is not None:
+                action.triggered.connect(handler)
             return action
 
         def _restore_layout(self) -> None:
@@ -328,6 +346,46 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             for path in normalized:
                 self.open_path(path)
             event.acceptProposedAction()
+
+        def _open_energy_fwhm_workspace(self) -> None:
+            if self._calibration_dialog is not None and self._calibration_dialog.isVisible():
+                self._calibration_dialog.raise_()
+                self._calibration_dialog.activateWindow()
+                return
+
+            current_spectrum = None
+            if hasattr(self.central_tabs, "current_spectrum"):
+                current_spectrum = self.central_tabs.current_spectrum()
+
+            self._calibration_dialog = CalibrationWorkspaceDialog(
+                spectrum=current_spectrum,
+                mode_manager=self.mode_manager,
+                selection_bus=self.selection_bus,
+                on_apply=self._apply_calibration_workspace_result,
+                parent=self,
+            )
+            self._calibration_dialog.show()
+
+        def _apply_calibration_workspace_result(
+            self,
+            spectrum,
+            energy_fit,
+            fwhm_fit,
+        ) -> None:
+            if hasattr(self.central_tabs, "load_spectrum"):
+                self.central_tabs.load_spectrum(spectrum)
+            self.file_label.setText(
+                f"File: {spectrum.spectrum_id or 'workspace spectrum'}"
+            )
+            message = (
+                f"Applied calibration order {energy_fit.order} "
+                f"(RMS {energy_fit.rms_keV:.4f} keV)"
+            )
+            if fwhm_fit is not None:
+                message += f" | FWHM RMS {fwhm_fit.rms_keV:.4f} keV"
+            self.statusBar().showMessage(message, 6000)
+            self.progress.setValue(72)
+            self.progress.setFormat("Calibration applied")
 
         def closeEvent(self, event) -> None:
             self._save_layout()

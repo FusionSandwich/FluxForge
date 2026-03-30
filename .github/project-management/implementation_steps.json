@@ -386,13 +386,31 @@
       "title": "Implement unified energy + FWHM calibration dialog (bGamma-style)",
       "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
       "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-1",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/calibration.py",
+        "src/fluxforge/gui/dialogs/calibration_dialog.py",
+        "src/fluxforge/gui/main_window.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_phase2_calibration_workspace.py",
+        "tests/gui_phase2_calibration_probe.py"
+      ],
+      "notes": "The redesigned Qt shell now exposes the unified calibration workspace with embedded spectrum review, live energy/FWHM fits, ASTM E181 order locking, and residual-first diagnostics."
+    },
+    {
+      "id": "2.2",
+      "phase": "Phase 2",
+      "title": "Add quick slider calibration mode (PeakEasy-inspired)",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 2",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 2-2",
       "repo_status": "not-started",
       "sequence_status": "next",
       "evidence": [
         "docs/FluxForge_Final_Additions.md",
         "docs/FluxForge_Additions_v3_Final.md"
       ],
-      "notes": "Stage 0 and Phase 1 are now complete, so the roadmap formal next step is the unified calibration workspace."
+      "notes": "Phase 2.1 is complete, so the formal next step is the additive quick-calibration slider mode."
     }
   ]
 }
