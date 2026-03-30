@@ -240,7 +240,9 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
         if "co60" in peak_panel.table.item(row, 4).text().lower():
             co60_row = row
             break
+    peak_panel.table.setCurrentCell(co60_row, 0)
     peak_panel.table.selectRow(co60_row)
+    peak_panel._publish_selected_peak()
     _qapp().processEvents()
 
     selected_peak = window.analysis_workspace.selected_peak()
@@ -292,7 +294,9 @@ def test_peak_id_browser_supports_manual_assignment_reassignment_and_guides(monk
     peak_panel.run_bayesian_match()
     _qapp().processEvents()
 
+    peak_panel.table.setCurrentCell(0, 0)
     peak_panel.table.selectRow(0)
+    peak_panel._publish_selected_peak()
     _qapp().processEvents()
 
     original_peak = window.analysis_workspace.selected_peak()
