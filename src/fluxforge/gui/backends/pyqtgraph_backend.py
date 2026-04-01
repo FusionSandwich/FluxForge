@@ -60,11 +60,16 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             super().__init__(parent)
             self.selection_bus = selection_bus
             self.buffer = HierarchicalSpectrumBuffer.from_counts(())
+            self._current_traces: tuple[SpectrumTrace, ...] = ()
+            self._annotation_specs: tuple[ReferenceLine, ...] = ()
             self._reference_lines: list[object] = []
+            self._annotation_label_items: list[object] = []
             self._cascade_sum_lines: list[object] = []
             self._overlay_traces: list[object] = []
             self._peak_scatter = None
             self._residual_visible = False
+            self._log_scale = False
+            self._peak_labels_visible = True
 
             shell = QVBoxLayout(self)
             shell.setContentsMargins(0, 0, 0, 0)
@@ -94,6 +99,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.plot.setLabel("bottom", "Channel")
             self.plot.setLabel("left", "Counts")
             self.plot_item = self.plot.getPlotItem()
+            self.plot_item.setLogMode(x=False, y=False)
             self.trace_item = self.plot_item.plot(
                 pen=pg.mkPen(color="#72d6ff", width=2),
                 fillLevel=0,
@@ -159,6 +165,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.clear()
                 return
 
+            self._current_traces = tuple(traces)
             for item in self._overlay_traces:
                 self.plot_item.removeItem(item)
             self._overlay_traces.clear()
@@ -177,7 +184,8 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             ]
             if len(channels) < len(level.counts):
                 channels = [index * level.stride for index in range(len(level.counts))]
-            self.trace_item.setData(channels, level.counts)
+            display_primary = [self._display_value(value) for value in level.counts]
+            self.trace_item.setData(channels, display_primary)
             self.trace_item.setPen(pg.mkPen(color=primary.color, width=2))
 
             for overlay in traces[1:]:
@@ -185,7 +193,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                     continue
                 item = self.plot_item.plot(
                     tuple(float(value) for value in overlay.channels),
-                    tuple(float(value) for value in overlay.counts),
+                    tuple(self._display_value(value) for value in overlay.counts),
                     pen=pg.mkPen(color=overlay.color, width=1.35),
                 )
                 self._overlay_traces.append(item)
@@ -194,6 +202,8 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.status_label.setText(
                 f"{len(values):,} channels · {len(self.buffer.levels)} LOD levels · {visible_labels}"
             )
+            if self._annotation_specs:
+                self.set_annotation_lines(self._annotation_specs)
 
         def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
             self.set_annotation_lines(
@@ -207,9 +217,13 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def set_annotation_lines(self, lines: Sequence[ReferenceLine]) -> None:
+            self._annotation_specs = tuple(lines)
             for line in self._reference_lines:
                 self.plot_item.removeItem(line)
             self._reference_lines.clear()
+            for label_item in self._annotation_label_items:
+                self.plot_item.removeItem(label_item)
+            self._annotation_label_items.clear()
 
             for marker in lines:
                 line = pg.InfiniteLine(
@@ -223,6 +237,22 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 self.plot_item.addItem(line)
                 self._reference_lines.append(line)
+                if self._peak_labels_visible and marker.label:
+                    label_item = pg.TextItem(
+                        html=(
+                            "<div style='font-size:10px; color:#e2e8f0; "
+                            "background:rgba(15,23,42,0.72); padding:2px 4px; border-radius:4px;'>"
+                            f"{marker.label}"
+                            "</div>"
+                        ),
+                        anchor=(0.0, 1.0),
+                    )
+                    label_item.setPos(
+                        float(marker.energy_keV),
+                        float(self._annotation_label_height()),
+                    )
+                    self.plot_item.addItem(label_item)
+                    self._annotation_label_items.append(label_item)
 
         def set_cascade_sum_lines(self, energies_keV: Sequence[float]) -> None:
             for line in self._cascade_sum_lines:
@@ -246,7 +276,13 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             x_values = [float(peak.channel) for peak in peaks]
             y_values = [
-                float(self.buffer.full_resolution[min(int(round(peak.channel)), len(self.buffer.full_resolution) - 1)])
+                self._display_value(
+                    float(
+                        self.buffer.full_resolution[
+                            min(int(round(peak.channel)), len(self.buffer.full_resolution) - 1)
+                        ]
+                    )
+                )
                 if self.buffer.full_resolution
                 else 0.0
                 for peak in peaks
@@ -291,12 +327,24 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def clear(self) -> None:
             self.buffer = HierarchicalSpectrumBuffer.from_counts(())
+            self._current_traces = ()
+            self._annotation_specs = ()
             self.trace_item.setData([], [])
             self.set_annotation_lines(())
             self.set_cascade_sum_lines(())
             self.set_peak_candidates(())
             self.set_peak_residuals((), visible=False)
             self.status_label.setText("No spectrum loaded")
+
+        def set_log_scale(self, enabled: bool) -> None:
+            self._log_scale = bool(enabled)
+            self.plot_item.setLogMode(x=False, y=self._log_scale)
+            if self._current_traces:
+                self.set_traces(self._current_traces)
+
+        def set_peak_labels_visible(self, visible: bool) -> None:
+            self._peak_labels_visible = bool(visible)
+            self.set_annotation_lines(self._annotation_specs)
 
         def _on_selection_changed(self, state: SelectionState) -> None:
             if state.reference_lines_keV or state.annotation_lines:
@@ -324,6 +372,23 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.header_label.setText("Selection: " + " | ".join(fragments))
             else:
                 self.header_label.setText("Live spectrum canvas")
+
+        def _display_value(self, value: float) -> float:
+            if not self._log_scale:
+                return float(value)
+            return max(float(value), 1.0e-3)
+
+        def _annotation_label_height(self) -> float:
+            if not self._current_traces:
+                return 1.0
+            max_value = 0.0
+            for trace in self._current_traces:
+                if not trace.visible or not trace.counts:
+                    continue
+                max_value = max(max_value, max(float(value) for value in trace.counts))
+            if self._log_scale:
+                return max(max_value, 1.0e-3)
+            return max_value if max_value > 0.0 else 1.0
 
 
 else:

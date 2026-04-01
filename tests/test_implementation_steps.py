@@ -128,6 +128,6 @@ def test_hal_step_is_explicit_after_advanced_analysis_completion():
 def test_predictive_detour_is_recorded_as_complete():
     steps = {step["id"]: step for step in load_steps()["steps"]}
 
-    for step_id in ("4P.1", "4P.2", "4P.3"):
+    for step_id in ("4P.1", "4P.2", "4P.3", "4P.4", "4P.5", "4P.6", "4P.7"):
         assert steps[step_id]["repo_status"] == "complete"
         assert steps[step_id]["sequence_status"] == "complete"

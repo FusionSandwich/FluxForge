@@ -96,6 +96,10 @@ officially in progress.
 | 4P.1 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast ROI time-to-target counts from offline spectra |
 | 4P.2 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now project dead-time trend and saturation warnings without live MCA transport |
 | 4P.3 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/main_window.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast recalibration timing from `QAMonitor` history and surface it in the dashboard, sidebar, and status bar |
+| 4P.4 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/nuclide_search.py` now provide a saved-list nuclide workbench in the modern sidebar |
+| 4P.5 | `complete` | `src/fluxforge/gui/nuclide_search.py` + `src/fluxforge/gui/panels/modern_shell.py` now surface parent/daughter relationships, age-aware line tables, specific activity, and dose context from the active library |
+| 4P.6 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` now provides an editable nuclide-mixture builder with normalization and combined overlay publishing |
+| 4P.7 | `complete` | `src/fluxforge/gui/main_window.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` + `src/fluxforge/gui/panels/modern_shell.py` now expose direct `Log Scale` and `Peak Labels` toggles on the primary canvas |
 
 ## GUI Direction
 
@@ -179,6 +183,11 @@ officially in progress.
 - A native predictive review probe now exists at `tests/gui_predictive_dashboard_probe.py`
   so the offline predictive dashboard and QA sidebar can be inspected visually in
   the artifact-gallery flow as well.
+- Additional PeakEasy-parity GUI coverage now exists too:
+  `tests/test_foundation_integration.py` now validates nuclide detail snapshots
+  and decay relatives, while `tests/test_analysis_workspace_qt.py` now exercises
+  saved user lists, mixtures, and the primary-canvas display toggles with native
+  Qt interaction.
 - Native Qt review artifacts for the peak-ID browser were generated at
   `artifacts/gui_review/mouse_peak_id_review/`, and the resulting browser
   gallery was inspected with Playwright against the `06-peak-id-browser` state

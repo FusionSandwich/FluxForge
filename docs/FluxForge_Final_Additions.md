@@ -1152,6 +1152,10 @@ HAL work at explicit user direction. They do not mark Phase 4 HAL as complete.
 | 4P.1 | Implement ROI count-rate ETA forecasting in the modern Qt shell | area/gui | Uses current ROI counts, live time, and loaded-spectrum history |
 | 4P.2 | Implement dead-time saturation forecasting in the modern Qt shell | area/gui | Uses loaded-spectrum dead-time trend; no live MCA dependency |
 | 4P.3 | Implement QA-history recalibration forecasting in the dashboard, sidebar, and status bar | area/gui | Uses `QAMonitor` slope analysis from ASTM-style QA history |
+| 4P.4 | Implement a PeakEasy-style nuclide workbench with saved analyst lists | area/gui | Search, save, clear, and re-apply user-defined nuclide overlays from the modern sidebar |
+| 4P.5 | Implement parent/daughter, age-aware line, specific-activity, and dose context in the GUI library workflow | area/gui | Uses the active identification source and exposes chain/dose context beside the search list |
+| 4P.6 | Implement editable nuclide mixtures in the modern Qt shell | area/gui | Mixture rows can be normalized and published as one combined reference overlay |
+| 4P.7 | Implement direct canvas display toggles for Log Scale and Peak Labels | area/gui | Toolbar + View menu actions drive the primary PyQtGraph canvas without touching the legacy Tk path |
 
 ### Packaging (Continuous — Target M6)
 

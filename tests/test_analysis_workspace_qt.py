@@ -21,7 +21,7 @@ from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
 from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import ModeManager  # noqa: E402
-from fluxforge.gui.nuclide_search import NuclideSearchController  # noqa: E402
+from fluxforge.gui.nuclide_search import GammaLineMatchResult, NuclideSearchController  # noqa: E402
 from fluxforge.gui.panels.modern_shell import (  # noqa: E402
     build_demo_background_spectrum,
     build_demo_overlay_spectrum,
@@ -295,43 +295,81 @@ def _prepare_reassignable_peak_assignment(monkeypatch):
         peak_panel.table.setCurrentCell(row, 0)
         peak_panel.table.selectRow(row)
         peak_panel._publish_selected_peak()
-        peak_panel.peak_id_tolerance.setValue(2.0)
         _qapp().processEvents()
 
         original_peak = window.analysis_workspace.selected_peak()
         if original_peak is None:
             continue
 
+        primary_nuclide = original_peak.nuclide or "Cs-137"
+        alternate_nuclide = "Co-60" if primary_nuclide.lower() != "co-60" else "Ba-133"
+        alternate_energy = float(original_peak.energy_keV) + 0.5
+
+        def _fake_line_matches_for_energy(
+            energy_keV: float,
+            *,
+            tolerance_keV: float = 2.0,
+            query: str = "",
+            limit: int = 48,
+            min_intensity: float = 0.0,
+        ):
+            del tolerance_keV, min_intensity
+            token = "".join(character for character in query.lower() if character.isalnum())
+            matches = [
+                GammaLineMatchResult(
+                    nuclide=primary_nuclide,
+                    display_name=primary_nuclide,
+                    line_energy_keV=float(original_peak.energy_keV),
+                    delta_keV=round(float(original_peak.energy_keV) - float(energy_keV), 3),
+                    intensity=0.9,
+                    half_life_s=1.0,
+                ),
+                GammaLineMatchResult(
+                    nuclide=alternate_nuclide,
+                    display_name=alternate_nuclide,
+                    line_energy_keV=alternate_energy,
+                    delta_keV=round(alternate_energy - float(energy_keV), 3),
+                    intensity=0.7,
+                    half_life_s=1.0,
+                ),
+            ]
+            if token:
+                matches = [
+                    match
+                    for match in matches
+                    if token in "".join(character for character in f"{match.nuclide} {match.display_name}".lower() if character.isalnum())
+                ]
+            return matches[:limit]
+
+        def _fake_reference_lines_for_nuclide(nuclide: str, *, limit=None):
+            anchor = float(original_peak.energy_keV) if nuclide == primary_nuclide else alternate_energy
+            lines = (round(anchor, 3), round(anchor + 31.0, 3), round(anchor + 63.0, 3))
+            if limit is None:
+                return lines
+            return lines[:limit]
+
+        monkeypatch.setattr(
+            peak_panel.nuclide_controller,
+            "line_matches_for_energy",
+            _fake_line_matches_for_energy,
+        )
+        monkeypatch.setattr(
+            peak_panel.nuclide_controller,
+            "reference_lines_for_nuclide",
+            _fake_reference_lines_for_nuclide,
+        )
+        peak_panel.peak_id_tolerance.setValue(2.0)
+        peak_panel._refresh_peak_id_matches()
+        _qapp().processEvents()
+
         alternate_row = next(
             (
                 index
                 for index, match in enumerate(peak_panel._current_match_results)
-                if match.nuclide != original_peak.nuclide
+                if match.nuclide != primary_nuclide
             ),
             None,
         )
-        if alternate_row is None:
-            peak_panel.peak_id_tolerance.setValue(25.0)
-            _qapp().processEvents()
-            alternate_row = next(
-                (
-                    index
-                    for index, match in enumerate(peak_panel._current_match_results)
-                    if match.nuclide != original_peak.nuclide
-                ),
-                None,
-            )
-        if alternate_row is None:
-            peak_panel.peak_id_tolerance.setValue(250.0)
-            _qapp().processEvents()
-            alternate_row = next(
-                (
-                    index
-                    for index, match in enumerate(peak_panel._current_match_results)
-                    if match.nuclide != original_peak.nuclide
-                ),
-                None,
-            )
         if alternate_row is not None:
             peak_panel.peak_id_matches.setCurrentRow(alternate_row)
             peak_panel._match_selection_changed()
@@ -470,6 +508,120 @@ def test_peak_id_browser_use_selected_peak_button_restores_peak_centroid(monkeyp
         selected_peak.energy_keV,
         abs=1.0,
     )
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_sidebar_nuclide_workbench_supports_saved_lists_mixtures_and_details():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    sidebar = window.left_dock.widget()
+    offline_index = sidebar.gamma_source_combo.findData("nndc_offline_activation")
+    if offline_index >= 0:
+        sidebar.gamma_source_combo.setCurrentIndex(offline_index)
+        _qapp().processEvents()
+
+    sidebar.nuclide_query.setText("co")
+    _qapp().processEvents()
+    assert sidebar.nuclides.count() >= 1
+    sidebar.nuclides.setCurrentRow(0)
+    _qapp().processEvents()
+
+    assert "Specific activity" in sidebar.nuclide_details_browser.toPlainText()
+    assert sidebar.nuclide_line_table.rowCount() >= 1
+
+    QTest.mouseClick(sidebar.save_selected_nuclide_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert sidebar.saved_nuclides.count() == 1
+    assert "User Define List" in sidebar.saved_nuclide_summary.toPlainText()
+
+    QTest.mouseClick(sidebar.apply_saved_overlay_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window.selection_bus.state.nuclide is not None
+    assert window.selection_bus.state.nuclide.startswith("Saved:")
+    assert len(window.selection_bus.state.annotation_lines) >= 1
+
+    QTest.mouseClick(sidebar.add_selected_mixture_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    sidebar.nuclide_query.setText("cs")
+    _qapp().processEvents()
+    assert sidebar.nuclides.count() >= 1
+    sidebar.nuclides.setCurrentRow(0)
+    _qapp().processEvents()
+    QTest.mouseClick(sidebar.add_selected_mixture_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    assert sidebar.mixture_table.rowCount() >= 2
+    sidebar.mixture_table.item(0, 1).setText("2.0")
+    sidebar.mixture_table.item(1, 1).setText("1.0")
+    _qapp().processEvents()
+
+    QTest.mouseClick(sidebar.normalize_mixture_button, Qt.LeftButton)
+    _qapp().processEvents()
+    weights = [
+        float(sidebar.mixture_table.item(row, 1).text())
+        for row in range(sidebar.mixture_table.rowCount())
+    ]
+    assert sum(weights) == pytest.approx(1.0, abs=1.0e-6)
+    assert "Mixture" in sidebar.mixture_summary.toPlainText()
+
+    QTest.mouseClick(sidebar.apply_mixture_overlay_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window.selection_bus.state.nuclide is not None
+    assert window.selection_bus.state.nuclide.startswith("Mixture:")
+    assert len(window.selection_bus.state.annotation_lines) >= 2
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_main_window_exposes_log_scale_and_peak_label_toggles():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    sidebar = window.left_dock.widget()
+    sidebar.nuclides.setCurrentRow(0)
+    _qapp().processEvents()
+    QTest.mouseClick(sidebar.save_selected_nuclide_button, Qt.LeftButton)
+    _qapp().processEvents()
+    QTest.mouseClick(sidebar.apply_saved_overlay_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    canvas = window.central_tabs.canvas
+    assert canvas._log_scale is False
+    assert canvas._peak_labels_visible is True
+    assert len(canvas._annotation_label_items) >= 1
+
+    window._log_scale_action.trigger()
+    _qapp().processEvents()
+    assert canvas._log_scale is True
+
+    window._peak_labels_action.trigger()
+    _qapp().processEvents()
+    assert canvas._peak_labels_visible is False
+    assert len(canvas._annotation_label_items) == 0
+
+    window._peak_labels_action.trigger()
+    _qapp().processEvents()
+    assert canvas._peak_labels_visible is True
+    assert len(canvas._annotation_label_items) >= 1
     window.close()
 
 

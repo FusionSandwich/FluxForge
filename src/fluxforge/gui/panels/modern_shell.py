@@ -1468,6 +1468,18 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             return self.workspace_controller.spectrum() or self._current_spectrum
 
+        def set_log_scale(self, enabled: bool) -> None:
+            if PYQTGRAPH_AVAILABLE and hasattr(self, "canvas") and hasattr(self.canvas, "set_log_scale"):
+                self.canvas.set_log_scale(bool(enabled))
+
+        def set_peak_labels_visible(self, visible: bool) -> None:
+            if (
+                PYQTGRAPH_AVAILABLE
+                and hasattr(self, "canvas")
+                and hasattr(self.canvas, "set_peak_labels_visible")
+            ):
+                self.canvas.set_peak_labels_visible(bool(visible))
+
         def _slot_tab_changed(self, index: int) -> None:
             if index < 0 or index >= len(self.workspace_controller.state.spectra):
                 return
@@ -1688,26 +1700,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 QListWidgetItem(text, devices)
             layout.addWidget(devices, 1)
 
-            self.nuclide_query = QLineEdit(self)
-            self.nuclide_query.setObjectName("NuclideSearchInput")
-            self.nuclide_query.setPlaceholderText("Nuclide search...")
-            layout.addWidget(self.nuclide_query)
-
-            self.nuclides = QListWidget(self)
-            self.nuclides.setObjectName("SidebarList")
-            layout.addWidget(self.nuclides, 1)
+            layout.addWidget(self._build_reference_workbench_panel(), 3)
             self._refresh_nuclide_results("cs")
-
-            pin_row = QHBoxLayout()
-            self.pin_selected_nuclide_button = QPushButton("Pin Selected Nuclide", self)
-            self.pin_selected_nuclide_button.clicked.connect(self._pin_selected_nuclide)
-            pin_row.addWidget(self.pin_selected_nuclide_button)
-            pin_row.addStretch(1)
-            layout.addLayout(pin_row)
-
-            self.pinned_nuclides = QListWidget(self)
-            self.pinned_nuclides.setObjectName("PinnedNuclidesList")
-            layout.addWidget(self.pinned_nuclides, 1)
 
             self.selection_note = QTextEdit(self)
             self.selection_note.setObjectName("SidebarNote")
@@ -1739,6 +1733,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mode_manager.subscribe(lambda _state: self._sync_qa_summary())
             self.nuclide_query.textChanged.connect(self._refresh_nuclide_results)
             self.nuclides.itemSelectionChanged.connect(self._activate_selected_nuclide)
+            self.nuclide_age_days.valueChanged.connect(self._refresh_nuclide_details)
+            self.save_selected_nuclide_button.clicked.connect(self._save_selected_nuclide)
+            self.remove_saved_nuclide_button.clicked.connect(self._remove_saved_nuclide)
+            self.clear_saved_nuclide_button.clicked.connect(self._clear_saved_nuclides)
+            self.apply_saved_overlay_button.clicked.connect(self._apply_saved_list_overlay)
+            self.add_selected_mixture_button.clicked.connect(self._add_selected_to_mixture)
+            self.remove_mixture_row_button.clicked.connect(self._remove_selected_mixture_row)
+            self.clear_mixture_button.clicked.connect(self._clear_mixture)
+            self.normalize_mixture_button.clicked.connect(self._normalize_mixture_weights)
+            self.apply_mixture_overlay_button.clicked.connect(self._apply_mixture_overlay)
+            self.mixture_table.itemChanged.connect(self._update_mixture_summary)
             self.custom_gamma_path.editingFinished.connect(self._apply_custom_gamma_path)
             self.gamma_source_combo.currentIndexChanged.connect(self._gamma_source_changed)
             self.calibration_source_combo.currentIndexChanged.connect(
@@ -1861,6 +1866,150 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(self.library_summary)
             return group
 
+        def _build_reference_workbench_panel(self) -> QWidget:
+            group = QGroupBox("Nuclide Workbench", self)
+            group.setObjectName("NuclideWorkbenchPanel")
+            layout = QVBoxLayout(group)
+            layout.setContentsMargins(12, 12, 12, 12)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "PeakEasy-style reference workbench: search isotopes, review half-life and "
+                    "line details, save analyst lists, build mixtures, and publish overlays "
+                    "without leaving the modern Qt shell."
+                ),
+                group,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            self.nuclide_query = QLineEdit(group)
+            self.nuclide_query.setObjectName("NuclideSearchInput")
+            self.nuclide_query.setPlaceholderText("Nuclide search...")
+            layout.addWidget(self.nuclide_query)
+
+            self.nuclides = QListWidget(group)
+            self.nuclides.setObjectName("SidebarList")
+            layout.addWidget(self.nuclides, 1)
+
+            action_row = QHBoxLayout()
+            self.pin_selected_nuclide_button = QPushButton("Pin Selected Nuclide", group)
+            self.pin_selected_nuclide_button.clicked.connect(self._pin_selected_nuclide)
+            action_row.addWidget(self.pin_selected_nuclide_button)
+            self.save_selected_nuclide_button = QPushButton("Save To List", group)
+            self.save_selected_nuclide_button.setObjectName("SaveNuclideToUserListButton")
+            action_row.addWidget(self.save_selected_nuclide_button)
+            self.add_selected_mixture_button = QPushButton("Add To Mixture", group)
+            self.add_selected_mixture_button.setObjectName("AddNuclideToMixtureButton")
+            action_row.addWidget(self.add_selected_mixture_button)
+            action_row.addStretch(1)
+            layout.addLayout(action_row)
+
+            self.reference_tabs = QTabWidget(group)
+            self.reference_tabs.setObjectName("NuclideWorkbenchTabs")
+            layout.addWidget(self.reference_tabs, 2)
+
+            details_tab = QWidget(self.reference_tabs)
+            details_layout = QVBoxLayout(details_tab)
+            details_layout.setContentsMargins(8, 8, 8, 8)
+            details_layout.setSpacing(8)
+
+            age_row = QHBoxLayout()
+            age_row.addWidget(QLabel("Nuclide age (days)", details_tab))
+            self.nuclide_age_days = QDoubleSpinBox(details_tab)
+            self.nuclide_age_days.setObjectName("NuclideAgeDaysSpin")
+            self.nuclide_age_days.setRange(0.0, 36500.0)
+            self.nuclide_age_days.setDecimals(2)
+            self.nuclide_age_days.setValue(0.0)
+            age_row.addWidget(self.nuclide_age_days)
+            age_row.addStretch(1)
+            details_layout.addLayout(age_row)
+
+            self.nuclide_details_browser = QTextBrowser(details_tab)
+            self.nuclide_details_browser.setObjectName("NuclideDetailsBrowser")
+            details_layout.addWidget(self.nuclide_details_browser, 1)
+
+            self.nuclide_line_table = QTableWidget(0, 3, details_tab)
+            self.nuclide_line_table.setObjectName("NuclideLineTable")
+            self.nuclide_line_table.setHorizontalHeaderLabels(("Energy (keV)", "Yield", "Age Adj."))
+            self.nuclide_line_table.verticalHeader().setVisible(False)
+            self.nuclide_line_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.nuclide_line_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            details_layout.addWidget(self.nuclide_line_table, 1)
+
+            details_layout.addWidget(QLabel("Pinned nuclides", details_tab))
+            self.pinned_nuclides = QListWidget(details_tab)
+            self.pinned_nuclides.setObjectName("PinnedNuclidesList")
+            details_layout.addWidget(self.pinned_nuclides, 1)
+
+            self.reference_tabs.addTab(details_tab, "Details")
+
+            saved_tab = QWidget(self.reference_tabs)
+            saved_layout = QVBoxLayout(saved_tab)
+            saved_layout.setContentsMargins(8, 8, 8, 8)
+            saved_layout.setSpacing(8)
+
+            self.saved_nuclides = QListWidget(saved_tab)
+            self.saved_nuclides.setObjectName("SavedNuclideList")
+            saved_layout.addWidget(self.saved_nuclides, 1)
+
+            saved_actions = QHBoxLayout()
+            self.remove_saved_nuclide_button = QPushButton("Remove", saved_tab)
+            self.remove_saved_nuclide_button.setObjectName("RemoveSavedNuclideButton")
+            saved_actions.addWidget(self.remove_saved_nuclide_button)
+            self.clear_saved_nuclide_button = QPushButton("Clear List", saved_tab)
+            self.clear_saved_nuclide_button.setObjectName("ClearSavedNuclideButton")
+            saved_actions.addWidget(self.clear_saved_nuclide_button)
+            self.apply_saved_overlay_button = QPushButton("Apply Overlay", saved_tab)
+            self.apply_saved_overlay_button.setObjectName("ApplySavedNuclideOverlayButton")
+            saved_actions.addWidget(self.apply_saved_overlay_button)
+            saved_actions.addStretch(1)
+            saved_layout.addLayout(saved_actions)
+
+            self.saved_nuclide_summary = QTextBrowser(saved_tab)
+            self.saved_nuclide_summary.setObjectName("SavedNuclideSummary")
+            saved_layout.addWidget(self.saved_nuclide_summary, 1)
+
+            self.reference_tabs.addTab(saved_tab, "User List")
+
+            mixture_tab = QWidget(self.reference_tabs)
+            mixture_layout = QVBoxLayout(mixture_tab)
+            mixture_layout.setContentsMargins(8, 8, 8, 8)
+            mixture_layout.setSpacing(8)
+
+            self.mixture_table = QTableWidget(0, 2, mixture_tab)
+            self.mixture_table.setObjectName("NuclideMixtureTable")
+            self.mixture_table.setHorizontalHeaderLabels(("Nuclide", "Weight"))
+            self.mixture_table.verticalHeader().setVisible(False)
+            self.mixture_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+            self.mixture_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+            mixture_layout.addWidget(self.mixture_table, 1)
+
+            mixture_actions = QHBoxLayout()
+            self.remove_mixture_row_button = QPushButton("Remove", mixture_tab)
+            self.remove_mixture_row_button.setObjectName("RemoveMixtureRowButton")
+            mixture_actions.addWidget(self.remove_mixture_row_button)
+            self.clear_mixture_button = QPushButton("Clear Mixture", mixture_tab)
+            self.clear_mixture_button.setObjectName("ClearMixtureButton")
+            mixture_actions.addWidget(self.clear_mixture_button)
+            self.normalize_mixture_button = QPushButton("Normalize", mixture_tab)
+            self.normalize_mixture_button.setObjectName("NormalizeMixtureButton")
+            mixture_actions.addWidget(self.normalize_mixture_button)
+            self.apply_mixture_overlay_button = QPushButton("Apply Mixture Overlay", mixture_tab)
+            self.apply_mixture_overlay_button.setObjectName("ApplyMixtureOverlayButton")
+            mixture_actions.addWidget(self.apply_mixture_overlay_button)
+            mixture_actions.addStretch(1)
+            mixture_layout.addLayout(mixture_actions)
+
+            self.mixture_summary = QTextBrowser(mixture_tab)
+            self.mixture_summary.setObjectName("NuclideMixtureSummary")
+            mixture_layout.addWidget(self.mixture_summary, 1)
+
+            self.reference_tabs.addTab(mixture_tab, "Mixtures")
+            return group
+
         def _populate_library_combos(self) -> None:
             self._populate_combo(
                 self.gamma_source_combo,
@@ -1928,6 +2077,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             )
             self._refresh_nuclide_results(self.nuclide_query.text())
+            self._refresh_nuclide_details()
+            self._update_saved_summary()
+            self._update_mixture_summary()
 
         def _set_combo_value(self, combo: QComboBox, source_id: str) -> None:
             index = combo.findData(source_id)
@@ -2012,6 +2164,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._sync_qa_summary()
 
         def _refresh_nuclide_results(self, query: str) -> None:
+            previous = self._selected_nuclide_name()
             self.nuclides.clear()
             for hit in self.nuclide_controller.search(query or "c"):
                 label = hit.display_name
@@ -2023,20 +2176,26 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     )
                 item = QListWidgetItem(label, self.nuclides)
                 item.setData(0x0100, hit.nuclide)
+            if self.nuclides.count():
+                selected_index = 0
+                if previous:
+                    for index in range(self.nuclides.count()):
+                        item = self.nuclides.item(index)
+                        if item is not None and item.data(0x0100) == previous:
+                            selected_index = index
+                            break
+                self.nuclides.setCurrentRow(selected_index)
+            else:
+                self._refresh_nuclide_details()
 
         def _activate_selected_nuclide(self) -> None:
-            item = self.nuclides.currentItem()
-            if item is None:
-                return
-            nuclide = item.data(0x0100)
+            nuclide = self._selected_nuclide_name()
             if nuclide:
                 self.nuclide_controller.activate(str(nuclide))
+            self._refresh_nuclide_details()
 
         def _pin_selected_nuclide(self) -> None:
-            item = self.nuclides.currentItem()
-            if item is None:
-                return
-            nuclide = item.data(0x0100)
+            nuclide = self._selected_nuclide_name()
             if nuclide:
                 pinned = list(self.workspace_controller.state.pinned_nuclides)
                 if str(nuclide) in pinned:
@@ -2056,6 +2215,261 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         }
                     )
                 )
+            self._update_saved_summary()
+
+        def _selected_nuclide_name(self) -> str | None:
+            item = self.nuclides.currentItem()
+            if item is None:
+                return None
+            value = item.data(0x0100)
+            return str(value) if value else None
+
+        def _refresh_nuclide_details(self) -> None:
+            nuclide = self._selected_nuclide_name()
+            if not nuclide:
+                self.nuclide_details_browser.setHtml("<p>No nuclide selected.</p>")
+                self.nuclide_line_table.setRowCount(0)
+                return
+            details = self.nuclide_controller.nuclide_details(
+                nuclide,
+                age_s=float(self.nuclide_age_days.value()) * 86400.0,
+                limit=8,
+            )
+            parents = (
+                ", ".join(
+                    f"{item.display_name} ({item.decay_mode or 'decay'})"
+                    for item in details.parents
+                )
+                or "No parent-chain data in this source."
+            )
+            daughters = (
+                ", ".join(
+                    f"{item.display_name} ({item.decay_mode or 'decay'})"
+                    for item in details.daughters
+                )
+                or "No daughter-chain data in this source."
+            )
+            gamma_lines = (
+                ", ".join(f"{line.energy_keV:.3f}" for line in details.gamma_lines[:4])
+                or "None"
+            )
+            xray_lines = (
+                ", ".join(f"{line.energy_keV:.3f}" for line in details.xray_lines[:4])
+                or "None"
+            )
+            age_note = (
+                f"{self.nuclide_age_days.value():.2f} d"
+                if self.nuclide_age_days.value() > 0.0
+                else "fresh reference"
+            )
+            self.nuclide_details_browser.setHtml(
+                (
+                    f"<h3>{details.display_name}</h3>"
+                    f"<p><strong>Source:</strong> {self.nuclide_controller.source_label()}<br/>"
+                    f"<strong>Half-life:</strong> {details.half_life_s:.3e} s<br/>"
+                    f"<strong>Specific activity:</strong> {details.specific_activity_bq_g:.3e} Bq/g<br/>"
+                    f"<strong>Dose @ 1 µCi / 1 m:</strong> {details.dose_rate_uSv_h_per_uCi_at_1m:.4f} µSv/h<br/>"
+                    f"<strong>Age context:</strong> {age_note}</p>"
+                    f"<p><strong>Strongest gamma lines:</strong> {gamma_lines}<br/>"
+                    f"<strong>Strongest X-rays:</strong> {xray_lines}</p>"
+                    f"<p><strong>Parents:</strong> {parents}<br/>"
+                    f"<strong>Daughters:</strong> {daughters}</p>"
+                )
+            )
+            lines = details.gamma_lines or details.xray_lines
+            self.nuclide_line_table.setRowCount(len(lines))
+            for row, line in enumerate(lines):
+                values = (
+                    f"{line.energy_keV:.3f}",
+                    f"{line.intensity:.6f}",
+                    f"{line.age_adjusted_intensity:.6f}",
+                )
+                for column, value in enumerate(values):
+                    item = QTableWidgetItem(value)
+                    item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                    self.nuclide_line_table.setItem(row, column, item)
+
+        def _save_selected_nuclide(self) -> None:
+            nuclide = self._selected_nuclide_name()
+            if not nuclide:
+                return
+            existing = {
+                self.saved_nuclides.item(index).data(0x0100)
+                for index in range(self.saved_nuclides.count())
+            }
+            if nuclide in existing:
+                return
+            details = self.nuclide_controller.nuclide_details(nuclide, limit=4)
+            item = QListWidgetItem(details.display_name, self.saved_nuclides)
+            item.setData(0x0100, details.nuclide)
+            self._update_saved_summary()
+            self.reference_tabs.setCurrentWidget(self.saved_nuclides.parentWidget())
+
+        def _remove_saved_nuclide(self) -> None:
+            row = self.saved_nuclides.currentRow()
+            if row >= 0:
+                self.saved_nuclides.takeItem(row)
+            self._update_saved_summary()
+
+        def _clear_saved_nuclides(self) -> None:
+            self.saved_nuclides.clear()
+            self._update_saved_summary()
+
+        def _apply_saved_list_overlay(self) -> None:
+            nuclides = self._saved_nuclide_names()
+            if nuclides:
+                self._publish_reference_overlay(nuclides, label_prefix="Saved")
+
+        def _saved_nuclide_names(self) -> tuple[str, ...]:
+            names = []
+            for index in range(self.saved_nuclides.count()):
+                item = self.saved_nuclides.item(index)
+                if item is None:
+                    continue
+                value = item.data(0x0100)
+                if value:
+                    names.append(str(value))
+            return tuple(names)
+
+        def _update_saved_summary(self) -> None:
+            saved = self._saved_nuclide_names()
+            if not saved:
+                self.saved_nuclide_summary.setHtml(
+                    "<p>No user-defined nuclide list yet.</p>"
+                )
+                return
+            items = []
+            for nuclide in saved:
+                details = self.nuclide_controller.nuclide_details(nuclide, limit=3)
+                lines = ", ".join(f"{line.energy_keV:.3f}" for line in details.gamma_lines[:3]) or "None"
+                items.append(f"<li><strong>{details.display_name}</strong>: {lines} keV</li>")
+            self.saved_nuclide_summary.setHtml(
+                "<h3>User Define List</h3><ul>" + "".join(items) + "</ul>"
+            )
+
+        def _add_selected_to_mixture(self) -> None:
+            nuclide = self._selected_nuclide_name()
+            if not nuclide:
+                return
+            for row in range(self.mixture_table.rowCount()):
+                item = self.mixture_table.item(row, 0)
+                if item is not None and item.data(0x0100) == nuclide:
+                    self.mixture_table.setCurrentCell(row, 0)
+                    return
+            self.mixture_table.blockSignals(True)
+            row = self.mixture_table.rowCount()
+            self.mixture_table.insertRow(row)
+            details = self.nuclide_controller.nuclide_details(nuclide, limit=3)
+            name_item = QTableWidgetItem(details.display_name)
+            name_item.setData(0x0100, details.nuclide)
+            self.mixture_table.setItem(row, 0, name_item)
+            weight_item = QTableWidgetItem("1.0")
+            self.mixture_table.setItem(row, 1, weight_item)
+            self.mixture_table.blockSignals(False)
+            self._update_mixture_summary()
+
+        def _remove_selected_mixture_row(self) -> None:
+            row = self.mixture_table.currentRow()
+            if row >= 0:
+                self.mixture_table.removeRow(row)
+            self._update_mixture_summary()
+
+        def _clear_mixture(self) -> None:
+            self.mixture_table.setRowCount(0)
+            self._update_mixture_summary()
+
+        def _normalize_mixture_weights(self) -> None:
+            entries = self._mixture_entries()
+            total = sum(weight for _nuclide, weight in entries)
+            if total <= 0.0:
+                return
+            self.mixture_table.blockSignals(True)
+            for row, (_nuclide, weight) in enumerate(entries):
+                normalized = weight / total
+                self.mixture_table.setItem(row, 1, QTableWidgetItem(f"{normalized:.6f}"))
+            self.mixture_table.blockSignals(False)
+            self._update_mixture_summary()
+
+        def _apply_mixture_overlay(self) -> None:
+            entries = self._mixture_entries()
+            if entries:
+                self._publish_reference_overlay(
+                    tuple(nuclide for nuclide, _weight in entries),
+                    label_prefix="Mixture",
+                )
+
+        def _mixture_entries(self) -> tuple[tuple[str, float], ...]:
+            entries: list[tuple[str, float]] = []
+            for row in range(self.mixture_table.rowCount()):
+                name_item = self.mixture_table.item(row, 0)
+                weight_item = self.mixture_table.item(row, 1)
+                if name_item is None:
+                    continue
+                nuclide = name_item.data(0x0100)
+                if not nuclide:
+                    continue
+                try:
+                    weight = float(weight_item.text()) if weight_item is not None else 0.0
+                except (TypeError, ValueError):
+                    weight = 0.0
+                entries.append((str(nuclide), float(weight)))
+            return tuple(entries)
+
+        def _update_mixture_summary(self) -> None:
+            entries = self._mixture_entries()
+            if not entries:
+                self.mixture_summary.setHtml("<p>No nuclide mixture defined.</p>")
+                return
+            total = sum(weight for _nuclide, weight in entries) or 1.0
+            items = []
+            for nuclide, weight in entries:
+                details = self.nuclide_controller.nuclide_details(nuclide, limit=3)
+                items.append(
+                    f"<li><strong>{details.display_name}</strong>: {weight:.4f} "
+                    f"({(weight / total) * 100.0:.1f}%)</li>"
+                )
+            self.mixture_summary.setHtml(
+                "<h3>Mixture</h3><ul>" + "".join(items) + "</ul>"
+            )
+
+        def _publish_reference_overlay(
+            self,
+            nuclides: tuple[str, ...],
+            *,
+            label_prefix: str,
+        ) -> None:
+            annotation_lines: list[ReferenceLine] = []
+            reference_lines: list[float] = []
+            for nuclide in nuclides:
+                details = self.nuclide_controller.nuclide_details(
+                    nuclide,
+                    age_s=float(self.nuclide_age_days.value()) * 86400.0,
+                    limit=self.nuclide_controller.overlay_limit,
+                )
+                for line in details.gamma_lines[: self.nuclide_controller.overlay_limit]:
+                    reference_lines.append(float(line.energy_keV))
+                    annotation_lines.append(
+                        ReferenceLine(
+                            energy_keV=float(line.energy_keV),
+                            label=f"{details.display_name} ref",
+                            color="#f59e0b",
+                        )
+                    )
+            if not reference_lines:
+                return
+            summary = ", ".join(
+                self.nuclide_controller.nuclide_details(nuclide, limit=1).display_name
+                for nuclide in nuclides[:4]
+            )
+            if len(nuclides) > 4:
+                summary += f" +{len(nuclides) - 4}"
+            self.selection_bus.publish(
+                SelectionState(
+                    nuclide=f"{label_prefix}: {summary}",
+                    reference_lines_keV=tuple(reference_lines),
+                    annotation_lines=tuple(annotation_lines),
+                )
+            )
 
         def _sync_workspace_state(self, state) -> None:
             self.files.clear()

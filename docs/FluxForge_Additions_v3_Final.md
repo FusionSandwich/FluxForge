@@ -170,6 +170,11 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   implemented in-repo as well: the modern Qt dashboard, QA sidebar, and status
   bar now forecast ROI target-count timing, dead-time saturation, and
   recalibration timing using offline spectra plus QA history.
+- The same user-directed Phase 4+ detour now also closes the missing PeakEasy-style
+  reference-workbench surfaces in the modern Qt GUI: the sidebar supports saved
+  user-defined nuclide lists, parent/daughter and age-aware line details, editable
+  mixtures with combined overlays, and direct `Log Scale` / `Peak Labels` controls
+  on the primary spectrum canvas.
 - A final GUI audit against this plan is now also closed: excluding the deferred
   live MCA / HAL work from local Phase 4, the planned GUI surfaces are implemented
   in the modern Qt shell, the QA & Standards sidebar exposes direct `View QA History`
@@ -1417,6 +1422,12 @@ Status: implemented ahead of live MCA work at user direction. The modern Qt
 dashboard, QA sidebar, and status bar now surface these predictive forecasts
 using offline spectra plus `QAMonitor` history, while HAL-driven telemetry
 remains deferred.
+
+Additional GUI parity work implemented in the same detour:
+  ● saved user-defined nuclide lists in the sidebar workbench
+  ● parent/daughter, specific-activity, dose, and age-aware line details
+  ● editable nuclide mixtures with normalized combined overlays
+  ● direct `Log Scale` and `Peak Labels` controls on the main canvas
 
 ---
 

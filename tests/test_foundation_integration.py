@@ -167,6 +167,26 @@ def test_nuclide_search_controller_publishes_reference_lines(tmp_path):
     assert bus.describe()["reference_lines_keV"] == state.reference_lines_keV
 
 
+def test_nuclide_search_controller_exposes_detail_snapshots_and_decay_relatives(tmp_path):
+    db_path = tmp_path / "nuclides.db"
+    build_nuclide_library(
+        db_path,
+        gamma_database=GammaDatabase(),
+        decay_chain_rows=[("Co60", "Cs137", 1.0, "beta-")],
+    )
+
+    controller = NuclideSearchController(SelectionBus(), database_path=db_path)
+    details = controller.nuclide_details("Cs-137", age_s=86400.0)
+
+    assert details.display_name == "Cs-137"
+    assert details.half_life_s > 0.0
+    assert details.gamma_lines
+    assert details.gamma_lines[0].age_adjusted_intensity <= details.gamma_lines[0].intensity
+    assert details.parents
+    assert details.parents[0].display_name == "Co-60"
+    assert details.specific_activity_bq_g > 0.0
+
+
 def test_recent_files_manager_and_drop_normalization():
     settings = FakeSettings()
     manager = RecentFilesManager(settings, limit=3)

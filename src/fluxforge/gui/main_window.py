@@ -248,6 +248,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             view_menu = self.menuBar().addMenu("&View")
             view_menu.addAction(self._action("Toggle Full Canvas", "F11"))
             view_menu.addAction(self._action("Restore Default Layout"))
+            self._log_scale_action = self._action(
+                "Log Scale",
+                "Ctrl+L",
+                enabled=True,
+                handler=self._toggle_log_scale,
+                checkable=True,
+                checked=False,
+                object_name="ToggleLogScaleAction",
+            )
+            view_menu.addAction(self._log_scale_action)
+            self._peak_labels_action = self._action(
+                "Peak Labels",
+                enabled=True,
+                handler=self._toggle_peak_labels,
+                checkable=True,
+                checked=True,
+                object_name="TogglePeakLabelsAction",
+            )
+            view_menu.addAction(self._peak_labels_action)
             renderer_menu = view_menu.addMenu("Renderer")
             for backend in available_renderer_status():
                 label = backend["display_name"]
@@ -334,6 +353,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             toolbar.setObjectName("PrimaryToolbar")
             toolbar.setMovable(False)
             toolbar.addWidget(ModeSwitcherWidget(self.mode_manager, toolbar))
+            toolbar.addSeparator()
+            toolbar.addAction(self._log_scale_action)
+            toolbar.addAction(self._peak_labels_action)
             self.addToolBar(Qt.TopToolBarArea, toolbar)
 
         def _build_central_workspace(self) -> None:
@@ -345,6 +367,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             self.setCentralWidget(self.central_tabs)
+            self._toggle_log_scale(self._log_scale_action.isChecked())
+            self._toggle_peak_labels(self._peak_labels_action.isChecked())
 
         def _wrap_dock(self, title: str, widget, area) -> QDockWidget:
             dock = QDockWidget(title, self)
@@ -440,14 +464,38 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             *,
             enabled: bool = False,
             handler=None,
+            checkable: bool = False,
+            checked: bool = False,
+            object_name: str | None = None,
         ) -> QAction:
             action = QAction(text, self)
+            if object_name:
+                action.setObjectName(object_name)
             if shortcut:
                 action.setShortcut(QKeySequence(shortcut))
             action.setEnabled(enabled)
+            action.setCheckable(checkable)
+            if checkable:
+                action.setChecked(checked)
             if handler is not None:
                 action.triggered.connect(handler)
             return action
+
+        def _toggle_log_scale(self, enabled: bool) -> None:
+            if hasattr(self, "central_tabs") and hasattr(self.central_tabs, "set_log_scale"):
+                self.central_tabs.set_log_scale(bool(enabled))
+            self.statusBar().showMessage(
+                f"Canvas scale: {'log' if enabled else 'linear'}",
+                3000,
+            )
+
+        def _toggle_peak_labels(self, visible: bool) -> None:
+            if hasattr(self, "central_tabs") and hasattr(self.central_tabs, "set_peak_labels_visible"):
+                self.central_tabs.set_peak_labels_visible(bool(visible))
+            self.statusBar().showMessage(
+                f"Peak labels {'enabled' if visible else 'hidden'}",
+                3000,
+            )
 
         def _restore_layout(self) -> None:
             geometry = self.settings.value("main_window/geometry")

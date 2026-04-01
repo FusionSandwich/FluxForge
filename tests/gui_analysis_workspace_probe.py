@@ -308,6 +308,21 @@ def main(argv: list[str] | None = None) -> int:
             app.processEvents()
         capture("06-peak-id-browser")
 
+        sidebar = window.left_dock.widget()
+        QTest.mouseClick(sidebar.save_selected_nuclide_button, Qt.LeftButton)
+        QTest.mouseClick(sidebar.add_selected_mixture_button, Qt.LeftButton)
+        sidebar.nuclide_query.setText("cs")
+        app.processEvents()
+        if sidebar.nuclides.count():
+            sidebar.nuclides.setCurrentRow(0)
+            app.processEvents()
+            QTest.mouseClick(sidebar.add_selected_mixture_button, Qt.LeftButton)
+            app.processEvents()
+        QTest.mouseClick(sidebar.normalize_mixture_button, Qt.LeftButton)
+        QTest.mouseClick(sidebar.apply_mixture_overlay_button, Qt.LeftButton)
+        app.processEvents()
+        capture("07-reference-workbench")
+
         review_input_dir = output_dir / "probe_inputs"
         review_input_dir.mkdir(exist_ok=True)
         sample_path = review_input_dir / "sample.csv"
@@ -319,7 +334,6 @@ def main(argv: list[str] | None = None) -> int:
         window.open_path(sample_path)
         window.open_path(background_path)
         window.open_path(overlay_path)
-        sidebar = window.left_dock.widget()
         sidebar.foreground_spectrum_combo.setCurrentIndex(
             sidebar.foreground_spectrum_combo.findData("sample-csv")
         )
@@ -330,11 +344,11 @@ def main(argv: list[str] | None = None) -> int:
             sidebar.overlay_spectrum_combo.findData("overlay-csv")
         )
         app.processEvents()
-        capture("07-background-selector-overlay")
+        capture("08-background-selector-overlay")
 
         window.central_tabs.spectrum_slot_tabs.setCurrentIndex(1)
         app.processEvents()
-        capture("08-background-slot")
+        capture("09-background-slot")
     finally:
         AutoPeakReviewDialog.exec = original_exec  # type: ignore[method-assign]
         AutoPeakReviewDialog.accepted_peaks = original_accepted  # type: ignore[method-assign]
@@ -346,6 +360,8 @@ def main(argv: list[str] | None = None) -> int:
         "pinned": ", ".join(window.analysis_workspace.state.pinned_nuclides) or "none",
         "activity_results": len(window.analysis_workspace.state.activity_results),
         "survey_points": len(window.analysis_workspace.state.survey_points),
+        "saved_nuclides": sidebar.saved_nuclides.count(),
+        "mixture_rows": sidebar.mixture_table.rowCount(),
         "background_source": (
             window.analysis_workspace.slot("background").source_label
             if window.analysis_workspace.slot("background") is not None

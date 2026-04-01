@@ -1130,6 +1130,67 @@
         "tests/gui_predictive_dashboard_probe.py"
       ],
       "notes": "QA slope analysis now predicts the next recalibration trigger date and surfaces it in the predictive dashboard, QA sidebar, and status bar."
+    },
+    {
+      "id": "4P.4",
+      "phase": "Phase 4+",
+      "title": "Implement a saved-list nuclide workbench in the modern sidebar",
+      "primary_reference": "FluxForge_Final_Additions.md user-directed predictive detour note",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md predictive detour status note",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/nuclide_search.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "The modern sidebar now lets analysts save and clear user-defined nuclide lists and re-apply them as one combined overlay without leaving the Qt shell."
+    },
+    {
+      "id": "4P.5",
+      "phase": "Phase 4+",
+      "title": "Implement parent/daughter, age-aware line, specific-activity, and dose context in the GUI reference workflow",
+      "primary_reference": "FluxForge_Final_Additions.md user-directed predictive detour note",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md predictive detour status note",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/nuclide_search.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_foundation_integration.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "Nuclide detail snapshots now expose half-life, age-adjusted line intensities, available parent/daughter relationships, specific activity, and one-meter dose context from the active identification source."
+    },
+    {
+      "id": "4P.6",
+      "phase": "Phase 4+",
+      "title": "Implement editable nuclide mixtures in the modern Qt shell",
+      "primary_reference": "FluxForge_Final_Additions.md user-directed predictive detour note",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md predictive detour status note",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "The reference workbench now lets analysts build, normalize, clear, and publish nuclide mixtures as one combined overlay in the modern canvas."
+    },
+    {
+      "id": "4P.7",
+      "phase": "Phase 4+",
+      "title": "Implement direct Log Scale and Peak Labels toggles on the primary canvas",
+      "primary_reference": "FluxForge_Final_Additions.md user-directed predictive detour note",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md predictive detour status note",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/gui/main_window.py",
+        "src/fluxforge/gui/backends/pyqtgraph_backend.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "The primary toolbar and View menu now drive log/linear display mode and labeled reference-line visibility directly on the PyQtGraph canvas."
     }
   ]
 }

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import math
+import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 
 from fluxforge.data.gamma_database import GammaDatabase
+from fluxforge.data.isotope_names import format_isotope_name, parse_gamma_nuclide_name
 from fluxforge.data.nuclear_data_sources import (
     get_nuclear_data_source,
     load_gamma_identification_source,
@@ -19,6 +22,9 @@ from fluxforge.data.nuclide_library import (
 )
 from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
+from fluxforge.physics.activation import radioisotope_specific_activity_bq_g
+from fluxforge.physics.dose import GammaLine as DoseGammaLine
+from fluxforge.physics.dose import isotope_dose_rate
 
 
 @dataclass(frozen=True)
@@ -42,6 +48,42 @@ class GammaLineMatchResult:
     intensity: float
     half_life_s: float
     source_id: str = "fluxforge_bundled_gamma"
+
+
+@dataclass(frozen=True)
+class NuclideRelative:
+    """One parent or daughter nuclide relationship surfaced in the GUI."""
+
+    nuclide: str
+    display_name: str
+    decay_mode: str = ""
+    branching_ratio: float = 0.0
+
+
+@dataclass(frozen=True)
+class NuclideLineDetail:
+    """Detailed line row shown in the modern reference workbench."""
+
+    energy_keV: float
+    intensity: float
+    age_adjusted_intensity: float
+    line_type: str = "gamma"
+
+
+@dataclass(frozen=True)
+class NuclideDetailResult:
+    """Resolved nuclide details for the PeakEasy-style reference workflow."""
+
+    nuclide: str
+    display_name: str
+    source_id: str
+    half_life_s: float
+    gamma_lines: tuple[NuclideLineDetail, ...] = ()
+    xray_lines: tuple[NuclideLineDetail, ...] = ()
+    parents: tuple[NuclideRelative, ...] = ()
+    daughters: tuple[NuclideRelative, ...] = ()
+    specific_activity_bq_g: float = 0.0
+    dose_rate_uSv_h_per_uCi_at_1m: float = 0.0
 
 
 @dataclass
@@ -226,8 +268,268 @@ class NuclideSearchController:
         )
         return matches[:limit]
 
+    def line_details_for_nuclide(
+        self,
+        nuclide: str,
+        *,
+        limit: int = 8,
+        age_s: float = 0.0,
+    ) -> tuple[NuclideLineDetail, ...]:
+        if self._source_id == "fluxforge_bundled_gamma":
+            return self._sqlite_line_details_for_nuclide(
+                nuclide,
+                limit=limit,
+                age_s=age_s,
+            )
+        return self._database_line_details_for_nuclide(
+            nuclide,
+            line_type="gamma",
+            limit=limit,
+            age_s=age_s,
+        )
+
+    def nuclide_details(
+        self,
+        nuclide: str,
+        *,
+        age_s: float = 0.0,
+        limit: int = 8,
+    ) -> NuclideDetailResult:
+        if self._source_id == "fluxforge_bundled_gamma":
+            resolved_nuclide, display_name, half_life_s = self._sqlite_nuclide_identity(nuclide)
+            gamma_lines = self._sqlite_line_details_for_nuclide(
+                resolved_nuclide,
+                limit=limit,
+                age_s=age_s,
+            )
+            xray_lines: tuple[NuclideLineDetail, ...] = ()
+            parents, daughters = self._sqlite_decay_relatives(resolved_nuclide)
+        else:
+            decay = self._database_decay_data(nuclide)
+            if decay is None:
+                resolved_nuclide = nuclide
+                try:
+                    element, mass_number, metastable = parse_gamma_nuclide_name(nuclide)
+                    display_name = format_isotope_name(element, mass_number, metastable)
+                except ValueError:
+                    display_name = nuclide
+                half_life_s = 0.0
+                gamma_lines = ()
+                xray_lines = ()
+            else:
+                resolved_nuclide = decay.nuclide
+                try:
+                    element, mass_number, metastable = parse_gamma_nuclide_name(decay.nuclide)
+                    display_name = format_isotope_name(element, mass_number, metastable)
+                except ValueError:
+                    display_name = decay.nuclide
+                half_life_s = float(decay.halflife or 0.0)
+                gamma_lines = self._database_line_details_for_nuclide(
+                    resolved_nuclide,
+                    line_type="gamma",
+                    limit=limit,
+                    age_s=age_s,
+                )
+                xray_lines = self._database_line_details_for_nuclide(
+                    resolved_nuclide,
+                    line_type="xray",
+                    limit=limit,
+                    age_s=age_s,
+                )
+            parents = ()
+            daughters = ()
+        return NuclideDetailResult(
+            nuclide=resolved_nuclide,
+            display_name=display_name,
+            source_id=self._source_id,
+            half_life_s=float(half_life_s or 0.0),
+            gamma_lines=tuple(gamma_lines),
+            xray_lines=tuple(xray_lines),
+            parents=tuple(parents),
+            daughters=tuple(daughters),
+            specific_activity_bq_g=float(
+                radioisotope_specific_activity_bq_g(
+                    float(half_life_s or 0.0),
+                    isotope=display_name,
+                )
+            ),
+            dose_rate_uSv_h_per_uCi_at_1m=float(
+                self._estimate_dose_rate_uSv_h_per_uCi_at_1m(
+                    tuple(gamma_lines),
+                    half_life_s=float(half_life_s or 0.0),
+                )
+            ),
+        )
+
     def _normalize_query(self, query: str) -> str:
         return "".join(character for character in query.lower() if character.isalnum())
 
+    def _database_decay_data(self, nuclide: str):
+        database = self._gamma_database or GammaDatabase()
+        direct = database.get(nuclide)
+        if direct is not None:
+            return direct
+        normalized = self._normalize_query(nuclide)
+        for key in database.nuclides:
+            if self._normalize_query(key) == normalized:
+                return database.get(key)
+        return None
 
-__all__ = ["GammaLineMatchResult", "NuclideSearchController", "NuclideSearchResult"]
+    def _database_line_details_for_nuclide(
+        self,
+        nuclide: str,
+        *,
+        line_type: str,
+        limit: int,
+        age_s: float,
+    ) -> tuple[NuclideLineDetail, ...]:
+        decay = self._database_decay_data(nuclide)
+        if decay is None:
+            return ()
+        lines = list(decay.get_lines(line_type))
+        lines.sort(key=lambda item: item.intensity * item.norm, reverse=True)
+        age_factor = self._age_factor(float(decay.halflife or 0.0), age_s)
+        return tuple(
+            NuclideLineDetail(
+                energy_keV=round(line.energy_keV, 3),
+                intensity=float(line.intensity * line.norm),
+                age_adjusted_intensity=float(line.intensity * line.norm * age_factor),
+                line_type=line_type,
+            )
+            for line in lines[:limit]
+        )
+
+    def _sqlite_nuclide_identity(self, nuclide: str) -> tuple[str, str, float]:
+        normalized = self._normalize_query(nuclide)
+        with sqlite3.connect(Path(self.database_path)) as connection:
+            row = connection.execute(
+                """
+                SELECT name, display_name, half_life_s
+                FROM nuclides
+                WHERE lower(replace(replace(name, '-', ''), ' ', '')) = ?
+                   OR lower(replace(replace(display_name, '-', ''), ' ', '')) = ?
+                LIMIT 1
+                """,
+                (normalized, normalized),
+            ).fetchone()
+        if row is None:
+            return nuclide, nuclide, 0.0
+        return str(row[0]), str(row[1]), float(row[2] or 0.0)
+
+    def _sqlite_line_details_for_nuclide(
+        self,
+        nuclide: str,
+        *,
+        limit: int,
+        age_s: float,
+    ) -> tuple[NuclideLineDetail, ...]:
+        resolved_nuclide, _display_name, half_life_s = self._sqlite_nuclide_identity(nuclide)
+        age_factor = self._age_factor(half_life_s, age_s)
+        with sqlite3.connect(Path(self.database_path)) as connection:
+            rows = connection.execute(
+                """
+                SELECT g.energy_keV, g.intensity * g.norm, g.line_type
+                FROM gamma_lines g
+                JOIN nuclides n ON n.id = g.nuclide_id
+                WHERE n.name = ?
+                ORDER BY g.intensity * g.norm DESC, g.energy_keV ASC
+                LIMIT ?
+                """,
+                (resolved_nuclide, int(limit)),
+            ).fetchall()
+        return tuple(
+            NuclideLineDetail(
+                energy_keV=round(float(energy_keV), 3),
+                intensity=float(intensity or 0.0),
+                age_adjusted_intensity=float(float(intensity or 0.0) * age_factor),
+                line_type=str(line_type or "gamma"),
+            )
+            for energy_keV, intensity, line_type in rows
+        )
+
+    def _sqlite_decay_relatives(
+        self,
+        nuclide: str,
+    ) -> tuple[tuple[NuclideRelative, ...], tuple[NuclideRelative, ...]]:
+        resolved_nuclide, _display_name, _half_life_s = self._sqlite_nuclide_identity(nuclide)
+        with sqlite3.connect(Path(self.database_path)) as connection:
+            parents = connection.execute(
+                """
+                SELECT parent.name, parent.display_name, dc.decay_mode, dc.branching_ratio
+                FROM decay_chains dc
+                JOIN nuclides child ON child.id = dc.daughter_id
+                JOIN nuclides parent ON parent.id = dc.parent_id
+                WHERE child.name = ?
+                ORDER BY COALESCE(dc.branching_ratio, 0.0) DESC, parent.display_name ASC
+                """,
+                (resolved_nuclide,),
+            ).fetchall()
+            daughters = connection.execute(
+                """
+                SELECT daughter.name, daughter.display_name, dc.decay_mode, dc.branching_ratio
+                FROM decay_chains dc
+                JOIN nuclides parent ON parent.id = dc.parent_id
+                JOIN nuclides daughter ON daughter.id = dc.daughter_id
+                WHERE parent.name = ?
+                ORDER BY COALESCE(dc.branching_ratio, 0.0) DESC, daughter.display_name ASC
+                """,
+                (resolved_nuclide,),
+            ).fetchall()
+        return (
+            tuple(
+                NuclideRelative(
+                    nuclide=str(name),
+                    display_name=str(display_name),
+                    decay_mode=str(decay_mode or ""),
+                    branching_ratio=float(branching_ratio or 0.0),
+                )
+                for name, display_name, decay_mode, branching_ratio in parents
+            ),
+            tuple(
+                NuclideRelative(
+                    nuclide=str(name),
+                    display_name=str(display_name),
+                    decay_mode=str(decay_mode or ""),
+                    branching_ratio=float(branching_ratio or 0.0),
+                )
+                for name, display_name, decay_mode, branching_ratio in daughters
+            ),
+        )
+
+    def _estimate_dose_rate_uSv_h_per_uCi_at_1m(
+        self,
+        gamma_lines: tuple[NuclideLineDetail, ...],
+        *,
+        half_life_s: float,
+    ) -> float:
+        del half_life_s
+        if not gamma_lines:
+            return 0.0
+        dose_lines = [
+            DoseGammaLine(
+                energy_keV=float(line.energy_keV),
+                intensity=float(line.intensity),
+            )
+            for line in gamma_lines[:8]
+        ]
+        result = isotope_dose_rate(
+            dose_lines,
+            activity_Bq=3.7e4,
+            distance_cm=100.0,
+        )
+        return float(result.dose_rate_uSv_h)
+
+    def _age_factor(self, half_life_s: float, age_s: float) -> float:
+        if half_life_s <= 0.0 or age_s <= 0.0:
+            return 1.0
+        return math.exp(-(math.log(2.0) / float(half_life_s)) * float(age_s))
+
+
+__all__ = [
+    "GammaLineMatchResult",
+    "NuclideDetailResult",
+    "NuclideLineDetail",
+    "NuclideRelative",
+    "NuclideSearchController",
+    "NuclideSearchResult",
+]
