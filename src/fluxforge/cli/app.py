@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import json
 import sys
@@ -192,6 +193,170 @@ def _parse_csv_floats(raw: Optional[str]) -> Optional[List[float]]:
     if not values:
         return None
     return [float(value) for value in values]
+
+
+def _parse_csv_strings(raw: Optional[str]) -> tuple[str, ...]:
+    if raw is None:
+        return ()
+    values = [token.strip() for token in str(raw).split(",") if token.strip()]
+    return tuple(values)
+
+
+def _normalize_nuclide_label(label: str) -> str:
+    return (
+        str(label)
+        .strip()
+        .lower()
+        .replace("-", "")
+        .replace("_", "")
+        .replace(" ", "")
+    )
+
+
+def _extract_line_nuclide(item: Any) -> str:
+    if not isinstance(item, dict):
+        return ""
+    return str(item.get("nuclide") or item.get("isotope") or "").strip()
+
+
+def _count_candidate_lines(candidate: Any) -> int:
+    if not isinstance(candidate, dict):
+        return 0
+    total = 0
+    lines = candidate.get("lines")
+    if isinstance(lines, list):
+        total += len(lines)
+    windows = candidate.get("windows")
+    if isinstance(windows, list):
+        for window in windows:
+            if not isinstance(window, dict):
+                continue
+            window_lines = window.get("lines")
+            if isinstance(window_lines, list):
+                total += len(window_lines)
+    actions = candidate.get("actions")
+    if isinstance(actions, list):
+        for action in actions:
+            if not isinstance(action, dict):
+                continue
+            action_lines = action.get("lines")
+            if isinstance(action_lines, list):
+                total += len(action_lines)
+    return total
+
+
+def _candidate_has_line_data(candidate: Any) -> bool:
+    if not isinstance(candidate, dict):
+        return False
+    lines = candidate.get("lines")
+    if isinstance(lines, list) and len(lines) > 0:
+        return True
+    windows = candidate.get("windows")
+    if isinstance(windows, list) and len(windows) > 0:
+        return True
+    actions = candidate.get("actions")
+    if isinstance(actions, list) and len(actions) > 0:
+        return True
+    return False
+
+
+def _filter_optimization_payload_by_isotopes(
+    payload: Any,
+    isotopes_of_interest: tuple[str, ...],
+) -> tuple[Dict[str, Any], Dict[str, Any]]:
+    if not isinstance(payload, dict):
+        raise ValueError("Optimization payload must be a JSON object.")
+
+    filtered_payload = copy.deepcopy(payload)
+    candidates_raw = filtered_payload.get("candidates")
+    if not isinstance(candidates_raw, list):
+        raise ValueError("Optimization payload requires a non-empty 'candidates' list.")
+
+    before_candidates = len(candidates_raw)
+    before_lines = sum(_count_candidate_lines(item) for item in candidates_raw)
+
+    requested = tuple(dict.fromkeys(str(item).strip() for item in isotopes_of_interest if str(item).strip()))
+    if len(requested) == 0:
+        return filtered_payload, {
+            "requested_isotopes": [],
+            "candidates_before": before_candidates,
+            "candidates_after": before_candidates,
+            "line_terms_before": before_lines,
+            "line_terms_after": before_lines,
+        }
+
+    allowed = {_normalize_nuclide_label(item) for item in requested}
+
+    filtered_candidates: list[Any] = []
+    for candidate in candidates_raw:
+        if not isinstance(candidate, dict):
+            continue
+        candidate_copy = dict(candidate)
+
+        base_lines = candidate_copy.get("lines")
+        if isinstance(base_lines, list):
+            candidate_copy["lines"] = [
+                line
+                for line in base_lines
+                if _normalize_nuclide_label(_extract_line_nuclide(line)) in allowed
+            ]
+
+        windows = candidate_copy.get("windows")
+        if isinstance(windows, list):
+            filtered_windows: list[Dict[str, Any]] = []
+            for window in windows:
+                if not isinstance(window, dict):
+                    continue
+                window_copy = dict(window)
+                window_lines = window_copy.get("lines")
+                if isinstance(window_lines, list):
+                    window_copy["lines"] = [
+                        line
+                        for line in window_lines
+                        if _normalize_nuclide_label(_extract_line_nuclide(line)) in allowed
+                    ]
+                if isinstance(window_copy.get("lines"), list) and len(window_copy["lines"]) > 0:
+                    filtered_windows.append(window_copy)
+            candidate_copy["windows"] = filtered_windows
+
+        actions = candidate_copy.get("actions")
+        if isinstance(actions, list):
+            filtered_actions: list[Dict[str, Any]] = []
+            for action in actions:
+                if not isinstance(action, dict):
+                    continue
+                action_copy = dict(action)
+                action_lines = action_copy.get("lines")
+                if isinstance(action_lines, list):
+                    action_copy["lines"] = [
+                        line
+                        for line in action_lines
+                        if _normalize_nuclide_label(_extract_line_nuclide(line)) in allowed
+                    ]
+                if isinstance(action_copy.get("lines"), list) and len(action_copy["lines"]) > 0:
+                    filtered_actions.append(action_copy)
+            candidate_copy["actions"] = filtered_actions
+
+        if _candidate_has_line_data(candidate_copy):
+            filtered_candidates.append(candidate_copy)
+
+    filtered_payload["candidates"] = filtered_candidates
+    weights_raw = filtered_payload.get("isotope_weights")
+    if isinstance(weights_raw, dict):
+        filtered_payload["isotope_weights"] = {
+            key: value
+            for key, value in weights_raw.items()
+            if _normalize_nuclide_label(str(key)) in allowed
+        }
+
+    after_lines = sum(_count_candidate_lines(item) for item in filtered_candidates)
+    return filtered_payload, {
+        "requested_isotopes": list(requested),
+        "candidates_before": before_candidates,
+        "candidates_after": len(filtered_candidates),
+        "line_terms_before": before_lines,
+        "line_terms_after": after_lines,
+    }
 
 
 def _parse_efficiency_override(raw: Optional[str]) -> Optional[Dict[str, float]]:
@@ -1669,6 +1834,17 @@ def cmd_inventory_review(args: argparse.Namespace) -> None:
 def cmd_optimization_sweep(args: argparse.Namespace) -> None:
     objective = str(getattr(args, "objective", "di-fom")).lower()
     payload = _load_json(args.input)
+    isotopes_of_interest = _parse_csv_strings(
+        getattr(args, "isotopes_of_interest", None)
+    )
+    payload, isotope_filter_summary = _filter_optimization_payload_by_isotopes(
+        payload,
+        isotopes_of_interest,
+    )
+    if int(isotope_filter_summary.get("candidates_after", 0)) <= 0:
+        raise ValueError(
+            "No schedule candidates remain after applying --isotopes-of-interest."
+        )
     isotope_weights: Dict[str, float] = {}
 
     if objective == "di-fom":
@@ -1800,6 +1976,8 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
 
     output_payload["input"] = str(args.input)
     output_payload["isotope_weights"] = isotope_weights
+    output_payload["isotopes_of_interest"] = list(isotopes_of_interest)
+    output_payload["isotope_filter_summary"] = isotope_filter_summary
     output_payload["generated_at"] = datetime.utcnow().isoformat(timespec="seconds") + "Z"
 
     output_path = Path(args.output)
@@ -4241,6 +4419,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="di-fom",
         choices=("di-fom", "fim-d", "fim-a", "fim-c", "mwdcs", "bass-d", "stbd-mr"),
         help="Optimization objective",
+    )
+    optimization_sweep.add_argument(
+        "--isotopes-of-interest",
+        type=str,
+        default=None,
+        help="Comma-separated isotopes used to filter candidate line terms before scoring",
     )
     optimization_sweep.add_argument(
         "--enable-advanced-objectives",

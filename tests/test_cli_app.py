@@ -230,10 +230,13 @@ def test_build_parser_optimization_sweep_command(tmp_path):
             str(tmp_path / "optimization_candidates.json"),
             "--objective",
             "di-fom",
+            "--isotopes-of-interest",
+            "Mo-99,Tc-99m",
         ]
     )
     assert args.command == "optimization-sweep"
     assert args.output.name == "optimization_sweep.json"
+    assert args.isotopes_of_interest == "Mo-99,Tc-99m"
 
 
 def test_build_parser_optimization_sweep_supports_fim_options(tmp_path):
@@ -660,6 +663,75 @@ def test_cmd_optimization_sweep_writes_json_and_csv_outputs(tmp_path):
     assert payload["ranked_candidates"][0]["difom_score"] >= payload["ranked_candidates"][1]["difom_score"]
     assert csv_path.exists()
     assert "difom_score" in csv_path.read_text(encoding="utf-8")
+
+
+def test_cmd_optimization_sweep_filters_isotopes_of_interest(tmp_path):
+    input_payload = {
+        "isotope_weights": {"Mo-99": 2.0, "Co-60": 1.0},
+        "candidates": [
+            {
+                "label": "mixed",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 7200.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 90.0,
+                        "background_counts": 10.0,
+                    },
+                    {
+                        "nuclide": "Co-60",
+                        "line_energy_keV": 1332.5,
+                        "signal_counts": 80.0,
+                        "background_counts": 10.0,
+                    },
+                ],
+            },
+            {
+                "label": "co60_only",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 7200.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Co-60",
+                        "line_energy_keV": 1332.5,
+                        "signal_counts": 150.0,
+                        "background_counts": 10.0,
+                    }
+                ],
+            },
+        ],
+    }
+    input_path = tmp_path / "optimization_candidates_filtered.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    output_path = tmp_path / "optimization_sweep_filtered.json"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=output_path,
+            objective="di-fom",
+            csv_output=None,
+            isotopes_of_interest="Mo-99",
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["objective"] == "di-fom"
+    assert payload["isotopes_of_interest"] == ["Mo-99"]
+    assert payload["isotope_weights"] == {"Mo-99": 2.0}
+    summary = payload["isotope_filter_summary"]
+    assert summary["candidates_before"] == 2
+    assert summary["candidates_after"] == 1
+    assert summary["line_terms_before"] == 3
+    assert summary["line_terms_after"] == 1
+    assert [item["label"] for item in payload["ranked_candidates"]] == ["mixed"]
 
 
 def test_cmd_optimization_sweep_writes_fim_outputs(tmp_path):

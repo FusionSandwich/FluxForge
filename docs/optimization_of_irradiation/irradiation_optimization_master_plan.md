@@ -516,6 +516,12 @@ Method progression is strictly sequential:
 - `method_comparison_<method>.md` interpretation memo.
 - Overlay plot pack comparing all currently available methods.
 
+### CMP-D User-Selected Isotope Focus (Baseline 2026-04-06)
+- Cross-objective isotope filtering is available through `optimization-sweep --isotopes-of-interest`.
+- Filter behavior is applied before objective scoring and reports before/after candidate and line-term counts.
+- Baseline workflow note: `docs/optimization_of_irradiation/isotopes_of_interest_filter_workflow.md`.
+- Verification coverage in `tests/test_cli_app.py` includes parser and scoring-path filtering assertions.
+
 ## RAFM Campaign Analysis Track for Second-Irradiation Conditions
 
 Baseline campaign timing audit: `docs/optimization_of_irradiation/rafm_second_irradiation_baseline.md`.

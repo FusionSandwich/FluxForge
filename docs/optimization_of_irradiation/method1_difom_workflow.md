@@ -56,9 +56,12 @@ Example:
 fluxforge optimization-sweep \
   --input optimization_candidates.json \
   --objective di-fom \
+  --isotopes-of-interest Mo-99,Tc-99m \
   --output optimization_sweep.json \
   --csv-output optimization_sweep.csv
 ```
+
+`--isotopes-of-interest` filters candidate line terms before scoring, so users can run a focused optimization pass for specific isotopes.
 
 JSON output schema:
 
