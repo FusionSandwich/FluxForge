@@ -74,13 +74,16 @@ The summary reports STBD-MR score, graph density, and masking penalty.
 Run:
 
 ```bash
-PYTHONPATH=src python examples/RAFM_irradiation/compare_m1_m2_m3_n1_legacy_schedule_objectives.py
+PYTHONPATH=src python examples/RAFM_irradiation/compare_m1_m2_m3_n1_n2_legacy_schedule_objectives.py
+PYTHONPATH=src python examples/RAFM_irradiation/compare_method_rankings_pairwise.py
 ```
 
 Outputs:
 
 - `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.csv`
 - `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.md`
+- `examples/RAFM_irradiation/results/method_benchmark/method_pairwise_similarity.csv`
+- `examples/RAFM_irradiation/results/method_benchmark/method_pairwise_similarity.md`
 
 ## Verification pointers
 

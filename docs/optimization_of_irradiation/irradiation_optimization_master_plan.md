@@ -484,10 +484,12 @@ Status update (2026-04-06): Baseline BASS-D implementation is now present in cor
 - CLI objective routing and advanced guard implemented in `src/fluxforge/cli/app.py` (`stbd-mr` + `--enable-advanced-objectives`).
 - GUI integration implemented in `src/fluxforge/gui/panels/modern_shell.py` (InventoryTimelinePanel STBD-MR preview and differentiable-graph toggle).
 - Baseline documentation added in `docs/optimization_of_irradiation/method_n2_stbdmr_workflow.md`.
-- Cross-method benchmark script updated to include N2 in `examples/RAFM_irradiation/compare_m1_m2_m3_n1_legacy_schedule_objectives.py`.
+- Cross-method benchmark script updated to include N2 in `examples/RAFM_irradiation/compare_m1_m2_m3_n1_n2_legacy_schedule_objectives.py`.
 - Generated benchmark artifacts:
   - `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.csv`
   - `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.md`
+  - `examples/RAFM_irradiation/results/method_benchmark/method_pairwise_similarity.csv`
+  - `examples/RAFM_irradiation/results/method_benchmark/method_pairwise_similarity.md`
 - Tests run and passing:
   - `pytest -q tests/test_optimization_stbdmr.py tests/test_cli_app.py tests/test_analysis_workspace_qt.py -k "stbdmr or optimization_sweep"`
 
@@ -528,6 +530,12 @@ Method progression is strictly sequential:
 - Optional isotope subsetting is supported through `--isotopes-of-interest`.
 - Baseline workflow note: `docs/optimization_of_irradiation/isotope_priority_workflow.md`.
 - Verification coverage in `tests/test_isotope_priority.py` and `tests/test_cli_app.py`.
+
+### CMP-F Method Audit Outcome (2026-04-06)
+- Reviewed planning docs in `docs/optimization_of_irradiation/` for high-value missing methods.
+- The practical method set required by this plan is fully implemented and integrated (M1, M2, M3, N1, N2).
+- Joint multi-window spectral inference intent from `openmc_deep.md` is covered by the STBD-MR baseline path.
+- Next high-value future candidate (not required for current gate): explicit multi-objective Pareto schedule search for time, uncertainty, and dose tradeoffs.
 
 ## RAFM Campaign Analysis Track for Second-Irradiation Conditions
 

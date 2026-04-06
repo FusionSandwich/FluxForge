@@ -148,6 +148,14 @@ from fluxforge.analysis.isotope_priority import (
     serialize_isotope_priority_ranking,
 )
 
+from fluxforge.analysis.method_comparison import (
+    MethodPairMetric,
+    compute_pairwise_method_metrics,
+    serialize_pairwise_method_metrics,
+    spearman_rank_correlation,
+    top_k_overlap,
+)
+
 from fluxforge.analysis.segmented_detection import (
     RegionParams,
     SegmentedDetectionConfig,
@@ -438,6 +446,12 @@ __all__ = [
     "IsotopePriorityScore",
     "rank_isotopes_from_activity_review_payload",
     "serialize_isotope_priority_ranking",
+    # Method-comparison utilities
+    "MethodPairMetric",
+    "compute_pairwise_method_metrics",
+    "serialize_pairwise_method_metrics",
+    "spearman_rank_correlation",
+    "top_k_overlap",
     # Advanced peak finders
     "PeakInfo",
     "snip_background",
