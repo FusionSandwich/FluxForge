@@ -142,10 +142,18 @@ def test_build_parser_spectrum_plot(tmp_path):
             "--output",
             str(tmp_path / "sample.png"),
             "--background-subtracted",
+            "--feature-isotope",
+            "Co-60",
+            "--feature-line-keV",
+            "1332.5",
+            "--save-feature-report",
+            str(tmp_path / "features.json"),
         ]
     )
     assert args.command == "spectrum-plot"
     assert args.background_subtracted is True
+    assert args.feature_isotope == "Co-60"
+    assert args.feature_line_keV == pytest.approx(1332.5)
 
 
 def test_build_parser_roi_commands(tmp_path):
@@ -199,6 +207,26 @@ def test_build_parser_activity_review_command(tmp_path):
     assert args.command == "activity-review"
     assert args.source_id == "custom_gamma_file"
     assert args.cooling_time_s == pytest.approx(3600.0)
+
+
+def test_build_parser_activity_review_supports_reaction_export_options(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "activity-review",
+            "--peaks-file",
+            str(tmp_path / "peaks.json"),
+            "--eoi-export",
+            "reaction-rates",
+            "--irradiation-time-s",
+            "7200",
+            "--reaction-rate-csv-output",
+            str(tmp_path / "reaction_rates.csv"),
+        ]
+    )
+    assert args.command == "activity-review"
+    assert args.eoi_export == "reaction-rates"
+    assert args.irradiation_time_s == pytest.approx(7200.0)
 
 
 def test_build_parser_inventory_review_command(tmp_path):
@@ -258,6 +286,31 @@ def test_build_parser_optimization_sweep_command(tmp_path):
     assert args.command == "optimization-sweep"
     assert args.output.name == "optimization_sweep.json"
     assert args.isotopes_of_interest == "Mo-99,Tc-99m"
+
+
+def test_build_parser_optimization_sweep_supports_activity_review_generation(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "optimization-sweep",
+            "--activity-review-file",
+            str(tmp_path / "activity_review.json"),
+            "--objective",
+            "di-fom",
+            "--neutron-spectrum-file",
+            str(tmp_path / "neutron_flux.csv"),
+            "--irradiation-grid-s",
+            "1800,3600",
+            "--cooldown-grid-s",
+            "0,3600",
+            "--count-grid-s",
+            "300,900",
+        ]
+    )
+    assert args.command == "optimization-sweep"
+    assert args.input is None
+    assert args.activity_review_file.name == "activity_review.json"
+    assert args.neutron_spectrum_file.name == "neutron_flux.csv"
 
 
 def test_build_parser_optimization_sweep_supports_fim_options(tmp_path):
@@ -539,6 +592,85 @@ def test_cmd_activity_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp
     )
 
 
+def test_cmd_activity_review_can_export_reaction_rate_csv(monkeypatch, tmp_path):
+    gamma_path = tmp_path / "gamma.json"
+    gamma_path.write_text(
+        json.dumps(
+            [
+                {
+                    "nuclide": "Co60",
+                    "energy_keV": 1173.228,
+                    "intensity": 0.999,
+                    "half_life_s": 5.2714 * 365.25 * 24.0 * 3600.0,
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    peaks_path = tmp_path / "peaks.json"
+    peaks_path.write_text(
+        json.dumps(
+            {
+                "spectrum_id": "demo-activation",
+                "live_time_s": 120.0,
+                "peaks": [
+                    {
+                        "peak_id": "peak-1",
+                        "channel": 100,
+                        "energy_keV": 1173.23,
+                        "area": 12000.0,
+                        "report_isotope": "Co60",
+                    }
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    def fake_plot_decay_curves(*_args, save_path=None, **_kwargs):
+        Path(save_path).write_text("plot", encoding="utf-8")
+        return object(), object()
+
+    monkeypatch.setattr(app, "plot_decay_curves", fake_plot_decay_curves)
+
+    output = tmp_path / "activity_review.json"
+    app.cmd_activity_review(
+        Namespace(
+            peaks_file=peaks_path,
+            output=output,
+            live_time_s=None,
+            cooling_time_s=3600.0,
+            dead_time_fraction=0.0,
+            energy_tolerance_keV=1.0,
+            source_id="custom_gamma_file",
+            custom_gamma_path=gamma_path,
+            efficiency=0.2,
+            efficiency_polynomial=None,
+            efficiency_uncertainty=0.04,
+            sample_mass_g=2.5,
+            eoi_export="reaction-rates",
+            irradiation_time_s=3600.0,
+            irradiation_segments_file=None,
+            isotope_csv_output=None,
+            line_csv_output=None,
+            reaction_rate_csv_output=None,
+            reaction_rates_output=None,
+            decay_plot=None,
+            bateman_plot=None,
+            validate=False,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["eoi_export_mode"] == "reaction-rates"
+    assert "reaction_rate_rows" in payload
+    assert payload["reaction_rate_rows"]
+    reaction_csv = tmp_path / "activity_review_reaction_rates.csv"
+    assert reaction_csv.exists()
+    assert "reaction_rate_s" in reaction_csv.read_text(encoding="utf-8")
+
+
 def test_cmd_inventory_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp_path):
     activity_review_path = tmp_path / "activity_review.json"
     activity_review_path.write_text(
@@ -751,6 +883,94 @@ def test_cmd_optimization_sweep_writes_json_and_csv_outputs(tmp_path):
     assert payload["ranked_candidates"][0]["difom_score"] >= payload["ranked_candidates"][1]["difom_score"]
     assert csv_path.exists()
     assert "difom_score" in csv_path.read_text(encoding="utf-8")
+
+
+def test_cmd_optimization_sweep_builds_candidates_from_activity_review(tmp_path):
+    activity_review = {
+        "schema": "fluxforge.activity_review.v1",
+        "live_time_s": 300.0,
+        "cooling_time_s": 3600.0,
+        "line_results": [
+            {"nuclide": "Mo-99", "matched_line_energy_keV": 140.5},
+            {"nuclide": "Sc-46", "matched_line_energy_keV": 889.3},
+        ],
+        "isotope_summaries": [
+            {
+                "nuclide": "Mo-99",
+                "line_count": 2,
+                "total_net_counts": 9000.0,
+                "half_life_s": 65.94 * 3600.0,
+                "cooling_time_s": 3600.0,
+                "irradiation_time_activity_Bq": 850.0,
+                "irradiation_time_activity_unc_Bq": 42.0,
+            },
+            {
+                "nuclide": "Sc-46",
+                "line_count": 1,
+                "total_net_counts": 5000.0,
+                "half_life_s": 83.79 * 24.0 * 3600.0,
+                "cooling_time_s": 3600.0,
+                "irradiation_time_activity_Bq": 450.0,
+                "irradiation_time_activity_unc_Bq": 30.0,
+            },
+        ],
+    }
+    activity_review_path = tmp_path / "activity_review.json"
+    activity_review_path.write_text(json.dumps(activity_review, indent=2), encoding="utf-8")
+
+    neutron_csv = tmp_path / "neutron_flux.csv"
+    neutron_csv.write_text(
+        "energy_eV,flux\n"
+        "1.0e2,1.0\n"
+        "1.0e4,2.0\n"
+        "2.0e5,3.0\n",
+        encoding="utf-8",
+    )
+
+    output_path = tmp_path / "optimization_sweep.json"
+    generated_path = tmp_path / "generated_candidates.json"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=None,
+            activity_review_file=activity_review_path,
+            output=output_path,
+            objective="di-fom",
+            csv_output=None,
+            isotopes_of_interest="Mo-99,Sc-46",
+            irradiation_grid_s="1800,3600",
+            cooldown_grid_s="0,3600",
+            count_grid_s="300,900",
+            reference_irradiation_time_s=3600.0,
+            unfold_file=None,
+            neutron_spectrum_file=neutron_csv,
+            flux_scale=1.0,
+            reference_flux_integral=0.0,
+            generated_candidates_output=generated_path,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,7200,86400",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=False,
+            mwdcs_overlap_penalty=0.0,
+            enable_advanced_objectives=False,
+            bassd_dose_weight=0.02,
+            bassd_exploration_temperature=0.0,
+            bassd_seed=17,
+            stbdmr_window_offsets_s="0,7200,86400",
+            stbdmr_window_count_time_s=900.0,
+            stbdmr_masking_regularization=0.1,
+            stbdmr_differentiable_graph=False,
+            stbdmr_graph_temperature=2.0,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["candidate_source"] == "activity-review"
+    assert payload["objective"] == "di-fom"
+    assert payload["ranked_candidates"]
+    assert payload["neutron_source"]["source"] == "csv"
+    assert generated_path.exists()
 
 
 def test_cmd_optimization_sweep_filters_isotopes_of_interest(tmp_path):
@@ -1812,6 +2032,14 @@ def test_cmd_spectrum_plot_writes_plot_and_manual_peak_report(
             background_subtracted=True,
             manual_peaks_file=manual_file,
             save_peak_report=peak_report,
+            feature_photopeak_keV=None,
+            feature_line_keV=None,
+            feature_isotope=None,
+            auto_feature_driver=False,
+            feature_detector_material="hpge",
+            feature_tolerance_keV=2.0,
+            feature_min_intensity=0.02,
+            save_feature_report=None,
             title=None,
             x_min_keV=None,
             x_max_keV=None,
@@ -1830,6 +2058,72 @@ def test_cmd_spectrum_plot_writes_plot_and_manual_peak_report(
     assert "Wrote spectrum plot to" in out
     assert "Wrote manual peak report to" in out
     assert "Warnings:" in out
+
+
+def test_cmd_spectrum_plot_writes_spectral_feature_report(
+    monkeypatch, tmp_path, capsys
+):
+    sample = GammaSpectrum(
+        counts=np.array([2.0, 5.0, 25.0, 60.0, 24.0, 6.0, 2.0], dtype=float),
+        channels=np.arange(7, dtype=float),
+        energies=np.arange(100.0, 107.0, 1.0),
+        live_time=10.0,
+        real_time=10.0,
+        calibration={"energy": [100.0, 1.0, 0.0]},
+        spectrum_id="sample",
+    )
+
+    monkeypatch.setattr(
+        app,
+        "read_genie_spectrum",
+        lambda path, **kwargs: GammaSpectrum.from_dict(sample.to_dict()),
+    )
+
+    input_file = tmp_path / "sample.ASC"
+    plot_file = tmp_path / "plots" / "sample_features.png"
+    feature_report = tmp_path / "feature_report.json"
+    input_file.write_text("dummy", encoding="utf-8")
+
+    app.cmd_spectrum_plot(
+        Namespace(
+            input=input_file,
+            output=plot_file,
+            validate=False,
+            profile=None,
+            background_file=None,
+            background_scale_mode="live",
+            background_scale_factor=None,
+            energy_calibration=None,
+            efficiency_coefficients=None,
+            background_subtracted=False,
+            manual_peaks_file=None,
+            save_peak_report=None,
+            feature_photopeak_keV=104.0,
+            feature_line_keV=None,
+            feature_isotope=None,
+            auto_feature_driver=False,
+            feature_detector_material="hpge",
+            feature_tolerance_keV=2.0,
+            feature_min_intensity=0.02,
+            save_feature_report=feature_report,
+            title=None,
+            x_min_keV=None,
+            x_max_keV=None,
+            y_log=False,
+        )
+    )
+
+    payload = json.loads(feature_report.read_text(encoding="utf-8"))
+    out = capsys.readouterr().out
+
+    assert plot_file.exists()
+    assert feature_report.exists()
+    assert payload["photopeak_energy_keV"] == pytest.approx(104.0)
+    assert any(item["kind"] == "compton_edge" for item in payload["features"])
+    assert any(
+        item["estimated_height_counts"] is not None for item in payload["features"]
+    )
+    assert "Wrote spectral feature report to" in out
 
 
 def test_cmd_peaks_manual_roi_mode(monkeypatch, tmp_path, capsys):
@@ -2405,6 +2699,100 @@ def test_cmd_report_summarizes_activation_metrics(monkeypatch, tmp_path):
     assert "FluxForge Standard Activation Report" in report_text
     assert "Isotope Activity Summary" in report_text
     assert "Reaction Rate Summary" in report_text
+
+
+def test_cmd_report_includes_optimization_recommendation(monkeypatch, tmp_path):
+    report_written = {}
+
+    candidate_input_path = tmp_path / "optimization_candidates.json"
+    candidate_input_path.write_text(
+        json.dumps(
+            {
+                "candidates": [
+                    {
+                        "label": "candidate_a",
+                        "lines": [
+                            {
+                                "nuclide": "Mo-99",
+                                "line_energy_keV": 140.5,
+                                "signal_counts": 120.0,
+                                "background_counts": 20.0,
+                                "interference_counts": 30.0,
+                            },
+                            {
+                                "nuclide": "Sc-46",
+                                "line_energy_keV": 140.6,
+                                "signal_counts": 90.0,
+                                "background_counts": 15.0,
+                                "interference_counts": 60.0,
+                            },
+                        ],
+                    }
+                ]
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    optimization_path = tmp_path / "optimization_sweep.json"
+    optimization_path.write_text(
+        json.dumps(
+            {
+                "schema": "fluxforge.optimization_sweep.difom.v1",
+                "objective": "di-fom",
+                "input": str(candidate_input_path),
+                "isotopes_of_interest": ["Mo-99"],
+                "ranked_candidates": [
+                    {
+                        "rank": 1,
+                        "label": "candidate_a",
+                        "irradiation_time_s": 3600.0,
+                        "cooldown_time_s": 7200.0,
+                        "count_time_s": 900.0,
+                        "difom_score": 123.4,
+                    }
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        app,
+        "write_report_bundle",
+        lambda output, **kwargs: report_written.update(
+            {"output": output, "payload": kwargs}
+        ),
+    )
+
+    report_out = tmp_path / "report.json"
+    app.cmd_report(
+        Namespace(
+            spectrum_file=None,
+            peaks_file=None,
+            lines_file=None,
+            rates_file=None,
+            optimization_file=optimization_path,
+            unfold_file=None,
+            validation_file=None,
+            validation_results_root=None,
+            output=report_out,
+            validate=False,
+        )
+    )
+
+    summary = report_written["payload"]["summary"]
+    assert summary["optimization_objective"] == "di-fom"
+    assert summary["recommended_schedule_label"] == "candidate_a"
+    assert summary["recommended_mask_isotope"] == "Sc-46"
+    assert summary["recommended_isotope_of_interest"] == "Mo-99"
+    assert "optimization_recommendation" in report_written["payload"]["tables"]["items"]
+    assert "optimization_top_candidates" in report_written["payload"]["tables"]["items"]
+
+    report_text = (tmp_path / "report.txt").read_text(encoding="utf-8")
+    assert "Optimization Recommendation" in report_text
+    assert "Top Optimization Schedules" in report_text
 
 
 def test_cmd_report_accepts_validation_results_root(monkeypatch, tmp_path):

@@ -59,6 +59,10 @@ from fluxforge.analysis.optimization_stbdmr import (
     rank_stbdmr_schedules,
     serialize_stbdmr_ranking,
 )
+from fluxforge.analysis.optimization_schedule_builder import (
+    build_difom_payload_from_activity_review,
+    summarize_neutron_spectrum_source,
+)
 from fluxforge.analysis.isotope_priority import (
     IsotopePriorityWeights,
     rank_isotopes_from_activity_review_payload,
@@ -73,12 +77,16 @@ from fluxforge.core.response import (
 from fluxforge.core.schemas import validate_or_raise
 from fluxforge.core.activity_review import review_spectrum_activation
 from fluxforge.core.analysis_workspace import (
+    ContinuumDriverEstimate,
     PeakCandidate,
     analyze_roi_region,
     compute_roi_statistics,
     detect_peak_candidates,
+    estimate_dominant_continuum_driver,
+    estimate_spectral_phenomena,
     register_builtin_peak_search_methods,
 )
+from fluxforge.analysis.line_search import list_nuclide_lines
 from fluxforge.core.inventory_timeline import (
     DEFAULT_DECAY_SOURCE_ID,
     TIME_ORIGINS,
@@ -141,6 +149,7 @@ from fluxforge.plots.activation import plot_decay_curves
 from fluxforge.physics.activation import (
     IrradiationSegment,
     activation_study_metrics,
+    irradiation_buildup_factor,
     reaction_rate_from_activity,
 )
 from fluxforge.solvers.gls import gls_adjust
@@ -205,6 +214,268 @@ def _parse_csv_strings(raw: Optional[str]) -> tuple[str, ...]:
         return ()
     values = [token.strip() for token in str(raw).split(",") if token.strip()]
     return tuple(values)
+
+
+def _coerce_irradiation_segments(
+    *,
+    irradiation_time_s: float,
+    segments_payload: Any | None,
+) -> list[IrradiationSegment]:
+    if isinstance(segments_payload, list) and segments_payload:
+        segments: list[IrradiationSegment] = []
+        for index, item in enumerate(segments_payload, start=1):
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"Irradiation segment #{index} must be an object with duration_s and optional relative_power."
+                )
+            duration_s = _safe_float(item.get("duration_s"), default=0.0)
+            relative_power = _safe_float(item.get("relative_power"), default=1.0)
+            if duration_s <= 0.0:
+                continue
+            segments.append(
+                IrradiationSegment(
+                    duration_s=float(duration_s),
+                    relative_power=float(relative_power),
+                )
+            )
+        if segments:
+            return segments
+
+    duration_s = max(float(irradiation_time_s), 0.0)
+    if duration_s <= 0.0:
+        return []
+    return [IrradiationSegment(duration_s=duration_s, relative_power=1.0)]
+
+
+def _build_reaction_rate_rows_from_activity_review(
+    *,
+    isotope_rows: Sequence[dict[str, Any]],
+    segments: Sequence[IrradiationSegment],
+) -> list[dict[str, Any]]:
+    if not segments:
+        raise ValueError(
+            "Reaction-rate export requires a positive irradiation duration or segment file."
+        )
+
+    rows: list[dict[str, Any]] = []
+    segment_factor_cache: dict[float, float] = {}
+
+    for row in isotope_rows:
+        nuclide = str(row.get("nuclide") or "").strip()
+        if not nuclide:
+            continue
+        activity_eoi = _safe_float(row.get("irradiation_time_activity_Bq"), default=0.0)
+        activity_unc = _safe_float(
+            row.get("irradiation_time_activity_unc_Bq"),
+            default=0.0,
+        )
+        half_life_s = max(_safe_float(row.get("half_life_s"), default=0.0), 0.0)
+        if activity_eoi <= 0.0 or half_life_s <= 0.0:
+            continue
+
+        if half_life_s not in segment_factor_cache:
+            buildup = irradiation_buildup_factor(segments, half_life_s)
+            segment_factor_cache[half_life_s] = max(float(buildup), 1.0e-12)
+        factor = segment_factor_cache[half_life_s]
+
+        rate = activity_eoi / factor
+        rate_unc = activity_unc / factor
+        rows.append(
+            {
+                "reaction_id": nuclide,
+                "nuclide": nuclide,
+                "line_count": int(_safe_float(row.get("line_count"), default=0.0)),
+                "half_life_s": float(half_life_s),
+                "cooling_time_s": float(
+                    _safe_float(row.get("cooling_time_s"), default=0.0)
+                ),
+                "activity_eoi_Bq": float(activity_eoi),
+                "activity_eoi_unc_Bq": float(activity_unc),
+                "reaction_rate_s": float(rate),
+                "reaction_rate_unc_s": float(rate_unc),
+                "relative_uncertainty": float(rate_unc / max(rate, 1.0e-12)),
+            }
+        )
+
+    rows.sort(
+        key=lambda item: (
+            -_safe_float(item.get("reaction_rate_s")),
+            str(item.get("nuclide")),
+        )
+    )
+    return rows
+
+
+def _candidate_lines_for_recommendation(candidate: Any) -> list[dict[str, Any]]:
+    if not isinstance(candidate, dict):
+        return []
+    lines: list[dict[str, Any]] = []
+    base_lines = candidate.get("lines")
+    if isinstance(base_lines, list):
+        lines.extend(item for item in base_lines if isinstance(item, dict))
+    windows = candidate.get("windows")
+    if isinstance(windows, list):
+        for window in windows:
+            if not isinstance(window, dict):
+                continue
+            window_lines = window.get("lines")
+            if isinstance(window_lines, list):
+                lines.extend(item for item in window_lines if isinstance(item, dict))
+    actions = candidate.get("actions")
+    if isinstance(actions, list):
+        for action in actions:
+            if not isinstance(action, dict):
+                continue
+            action_lines = action.get("lines")
+            if isinstance(action_lines, list):
+                lines.extend(item for item in action_lines if isinstance(item, dict))
+    return lines
+
+
+def _recommendation_from_optimization_payload(
+    optimization_payload: dict[str, Any],
+    *,
+    optimization_file: Path,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    ranked = optimization_payload.get("ranked_candidates") or []
+    if not isinstance(ranked, list):
+        ranked = []
+
+    recommendation: dict[str, Any] = {
+        "objective": str(optimization_payload.get("objective") or "unknown"),
+        "isotopes_of_interest": list(
+            optimization_payload.get("isotopes_of_interest") or []
+        ),
+    }
+    if not ranked:
+        return recommendation, []
+
+    top = ranked[0] if isinstance(ranked[0], dict) else {}
+    recommendation.update(
+        {
+            "recommended_label": top.get("label"),
+            "recommended_rank": int(_safe_float(top.get("rank"), default=1.0)),
+            "recommended_irradiation_time_s": _safe_float(
+                top.get("irradiation_time_s")
+            ),
+            "recommended_cooldown_time_s": _safe_float(
+                top.get("cooldown_time_s"),
+                default=_safe_float(
+                    ((top.get("window_scores") or [{}])[0]).get("cooldown_time_s")
+                ),
+            ),
+            "recommended_count_time_s": _safe_float(
+                top.get("count_time_s"),
+                default=_safe_float(
+                    ((top.get("window_scores") or [{}])[0]).get("count_time_s")
+                ),
+            ),
+            "recommended_objective_score": _safe_float(
+                top.get("difom_score"),
+                default=_safe_float(
+                    top.get("objective_score"),
+                    default=_safe_float(
+                        top.get("total_score"),
+                        default=_safe_float(top.get("total_utility")),
+                    ),
+                ),
+            ),
+        }
+    )
+
+    if isinstance(top.get("action_scores"), list) and top["action_scores"]:
+        recommendation["recommended_expected_dose_uSv"] = float(
+            sum(
+                _safe_float(item.get("expected_dose_uSv"))
+                for item in top["action_scores"]
+                if isinstance(item, dict)
+            )
+        )
+
+    input_payload: dict[str, Any] | None = None
+    input_path_raw = optimization_payload.get("input")
+    if isinstance(input_path_raw, str) and input_path_raw.strip():
+        input_path = Path(input_path_raw)
+        if not input_path.is_absolute():
+            input_path = optimization_file.parent / input_path
+        if input_path.exists():
+            try:
+                input_payload = _load_json(input_path)
+            except Exception:
+                input_payload = None
+
+    candidate_lines: list[dict[str, Any]] = []
+    if isinstance(input_payload, dict):
+        candidates_raw = input_payload.get("candidates") or []
+        if isinstance(candidates_raw, list):
+            for item in candidates_raw:
+                if not isinstance(item, dict):
+                    continue
+                if str(item.get("label")) != str(top.get("label")):
+                    continue
+                candidate_lines = _candidate_lines_for_recommendation(item)
+                break
+
+    if candidate_lines:
+        mask_scores: dict[str, float] = {}
+        for line in candidate_lines:
+            nuclide = str(line.get("nuclide") or line.get("isotope") or "").strip()
+            if not nuclide:
+                continue
+            interference = _safe_float(line.get("interference_counts"))
+            interference += _safe_float(line.get("continuum_counts"))
+            background = _safe_float(line.get("background_counts"))
+            mask_scores[nuclide] = mask_scores.get(nuclide, 0.0) + max(
+                interference + 0.25 * background,
+                0.0,
+            )
+        if mask_scores:
+            recommendation["recommended_mask_isotope"] = max(
+                mask_scores.items(), key=lambda item: item[1]
+            )[0]
+
+    if recommendation.get("isotopes_of_interest"):
+        recommendation["recommended_isotope_of_interest"] = recommendation[
+            "isotopes_of_interest"
+        ][0]
+
+    top_rows: list[dict[str, Any]] = []
+    for item in ranked[:10]:
+        if not isinstance(item, dict):
+            continue
+        top_rows.append(
+            {
+                "rank": int(_safe_float(item.get("rank"), default=0.0)),
+                "label": item.get("label"),
+                "irradiation_time_s": _safe_float(item.get("irradiation_time_s")),
+                "cooldown_time_s": _safe_float(
+                    item.get("cooldown_time_s"),
+                    default=_safe_float(
+                        ((item.get("window_scores") or [{}])[0]).get(
+                            "cooldown_time_s"
+                        )
+                    ),
+                ),
+                "count_time_s": _safe_float(
+                    item.get("count_time_s"),
+                    default=_safe_float(
+                        ((item.get("window_scores") or [{}])[0]).get("count_time_s")
+                    ),
+                ),
+                "objective_score": _safe_float(
+                    item.get("difom_score"),
+                    default=_safe_float(
+                        item.get("objective_score"),
+                        default=_safe_float(
+                            item.get("total_score"),
+                            default=_safe_float(item.get("total_utility")),
+                        ),
+                    ),
+                ),
+            }
+        )
+
+    return recommendation, top_rows
 
 
 def _normalize_nuclide_label(label: str) -> str:
@@ -884,6 +1155,108 @@ def _manual_peak_rows(
     return rows
 
 
+def _resolve_spectral_feature_photopeak(
+    args: argparse.Namespace,
+    spectrum: GammaSpectrum,
+) -> tuple[float, str, ContinuumDriverEstimate | None] | None:
+    manual_photopeak = getattr(args, "feature_photopeak_keV", None)
+    if manual_photopeak is not None:
+        return float(manual_photopeak), "manual photopeak", None
+
+    isotope = str(getattr(args, "feature_isotope", "") or "").strip()
+    if isotope:
+        target_line = getattr(args, "feature_line_keV", None)
+        min_intensity = max(float(getattr(args, "feature_min_intensity", 0.02)), 0.0)
+        lines = list_nuclide_lines(isotope, line_type="gamma", min_intensity=min_intensity)
+        if not lines:
+            raise ValueError(
+                f"No gamma lines found for isotope '{isotope}' at min intensity {min_intensity:.3f}."
+            )
+        if target_line is None:
+            selected = lines[0]
+        else:
+            selected = min(lines, key=lambda line: abs(line.energy_keV - float(target_line)))
+        return float(selected.energy_keV), f"{selected.nuclide} library line", None
+
+    manual_line = getattr(args, "feature_line_keV", None)
+    if manual_line is not None:
+        return float(manual_line), "manual line", None
+
+    if bool(getattr(args, "auto_feature_driver", False)):
+        estimate = estimate_dominant_continuum_driver(
+            spectrum,
+            tolerance_keV=max(float(getattr(args, "feature_tolerance_keV", 2.0)), 0.1),
+            min_intensity=max(float(getattr(args, "feature_min_intensity", 0.02)), 0.0),
+        )
+        if estimate is None:
+            raise ValueError(
+                "Auto continuum-driver detection did not find a confident line match."
+            )
+        return float(estimate.line_energy_keV), f"auto {estimate.nuclide}", estimate
+
+    return None
+
+
+def _build_spectral_feature_payload(
+    spectrum: GammaSpectrum,
+    *,
+    photopeak_energy_keV: float,
+    source_label: str,
+    detector_material: str,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    feature_items = estimate_spectral_phenomena(
+        photopeak_energy_keV,
+        detector_material=detector_material,
+        spectrum=spectrum,
+    )
+
+    annotations: list[dict[str, Any]] = [
+        {
+            "kind": "photopeak",
+            "label": f"{source_label} photopeak",
+            "energy_keV": float(photopeak_energy_keV),
+            "color": "#72d6ff",
+            "line_style": "-",
+            "estimated_height_counts": None,
+        }
+    ]
+    report_features: list[dict[str, Any]] = []
+    for item in feature_items:
+        annotations.append(
+            {
+                "kind": item.kind,
+                "label": (
+                    f"{item.label} ({item.relative_height * 100.0:.0f}%)"
+                    if item.relative_height is not None
+                    else item.label
+                ),
+                "energy_keV": float(item.energy_keV),
+                "color": item.color,
+                "line_style": "--",
+                "estimated_height_counts": item.estimated_height_counts,
+            }
+        )
+        report_features.append(
+            {
+                "kind": item.kind,
+                "label": item.label,
+                "energy_keV": float(item.energy_keV),
+                "relative_height": item.relative_height,
+                "estimated_height_counts": item.estimated_height_counts,
+                "summary": item.summary,
+                "color": item.color,
+            }
+        )
+
+    report = {
+        "photopeak_energy_keV": float(photopeak_energy_keV),
+        "source_label": source_label,
+        "detector_material": detector_material,
+        "features": report_features,
+    }
+    return annotations, report
+
+
 def _load_plot_and_analysis_spectra(
     input_path: Path,
     *,
@@ -1255,6 +1628,37 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
             analysis_spectrum if args.background_subtracted else raw_spectrum
         )
 
+        feature_annotations: list[dict[str, Any]] = []
+        feature_report_payload: dict[str, Any] | None = None
+        feature_line = _resolve_spectral_feature_photopeak(args, spectrum_for_plot)
+        if feature_line is not None:
+            line_energy_keV, source_label, auto_estimate = feature_line
+            detector_material = str(
+                getattr(args, "feature_detector_material", "hpge") or "hpge"
+            )
+            feature_annotations, feature_report_payload = _build_spectral_feature_payload(
+                spectrum_for_plot,
+                photopeak_energy_keV=line_energy_keV,
+                source_label=source_label,
+                detector_material=detector_material,
+            )
+            if auto_estimate is not None:
+                feature_report_payload["auto_driver"] = {
+                    "nuclide": auto_estimate.nuclide,
+                    "line_energy_keV": float(auto_estimate.line_energy_keV),
+                    "score": float(auto_estimate.score),
+                    "summary": auto_estimate.summary,
+                }
+                print(
+                    "Auto continuum driver: "
+                    f"{auto_estimate.nuclide} at {auto_estimate.line_energy_keV:.3f} keV "
+                    f"(score {auto_estimate.score:.4g})"
+                )
+            print(
+                "Spectral feature overlays enabled for "
+                f"{source_label} at {line_energy_keV:.3f} keV"
+            )
+
         import matplotlib
 
         matplotlib.use("Agg", force=True)
@@ -1265,6 +1669,7 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
             spectrum_for_plot,
             title=args.title or spectrum_for_plot.spectrum_id,
             manual_regions=manual_regions,
+            feature_annotations=feature_annotations,
             x_min_keV=getattr(args, "x_min_keV", None),
             x_max_keV=getattr(args, "x_max_keV", None),
             y_log=bool(getattr(args, "y_log", False)),
@@ -1276,6 +1681,20 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
         fig.savefig(args.output, bbox_inches="tight", dpi=200)
         plt.close(fig)
         print(f"Wrote spectrum plot to {args.output}")
+
+        feature_report_output: Optional[Path] = getattr(args, "save_feature_report", None)
+        if feature_report_output is not None:
+            if feature_report_payload is None:
+                raise ValueError(
+                    "--save-feature-report requires a selected feature line "
+                    "(--feature-photopeak-keV, --feature-line-keV, --feature-isotope, or --auto-feature-driver)."
+                )
+            _ensure_parent_dir(feature_report_output)
+            feature_report_output.write_text(
+                json.dumps(feature_report_payload, indent=2),
+                encoding="utf-8",
+            )
+            print(f"Wrote spectral feature report to {feature_report_output}")
 
         peak_report_output: Optional[Path] = getattr(args, "save_peak_report", None)
         if peak_report_output is not None:
@@ -1655,6 +2074,12 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
     )
 
     output_path = Path(args.output)
+    export_mode = str(getattr(args, "eoi_export", "activities") or "activities").strip().lower()
+    if export_mode not in {"activities", "reaction-rates", "both"}:
+        raise ValueError(
+            "--eoi-export must be one of: activities, reaction-rates, both"
+        )
+
     isotope_csv = Path(
         getattr(args, "isotope_csv_output", None)
         or _activity_review_artifact_path(output_path, "_isotopes.csv")
@@ -1671,12 +2096,64 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
         getattr(args, "bateman_plot", None)
         or _activity_review_artifact_path(output_path, "_bateman.png")
     )
+    reaction_rate_csv = Path(
+        getattr(args, "reaction_rate_csv_output", None)
+        or _activity_review_artifact_path(output_path, "_reaction_rates.csv")
+    )
 
     isotope_rows = review.isotope_rows(sample_mass_g=getattr(args, "sample_mass_g", None))
     line_rows = review.line_rows(sample_mass_g=getattr(args, "sample_mass_g", None))
 
-    isotope_artifact = _write_csv_table(isotope_csv, isotope_rows)
-    line_artifact = _write_csv_table(line_csv, line_rows)
+    isotope_artifact = None
+    line_artifact = None
+    reaction_artifact = None
+    reaction_rate_rows: list[dict[str, Any]] = []
+    if export_mode in {"activities", "both"}:
+        isotope_artifact = _write_csv_table(isotope_csv, isotope_rows)
+        line_artifact = _write_csv_table(line_csv, line_rows)
+
+    if export_mode in {"reaction-rates", "both"}:
+        raw_segments = None
+        segments_file = getattr(args, "irradiation_segments_file", None)
+        if segments_file is not None:
+            raw_segments = _load_structured_rows(Path(segments_file))
+            if isinstance(raw_segments, dict):
+                raw_segments = raw_segments.get("segments")
+        segments = _coerce_irradiation_segments(
+            irradiation_time_s=float(
+                getattr(args, "irradiation_time_s", 0.0) or 0.0
+            ),
+            segments_payload=raw_segments,
+        )
+        reaction_rate_rows = _build_reaction_rate_rows_from_activity_review(
+            isotope_rows=isotope_rows,
+            segments=segments,
+        )
+        reaction_artifact = _write_csv_table(reaction_rate_csv, reaction_rate_rows)
+
+        reaction_rates_output = getattr(args, "reaction_rates_output", None)
+        if reaction_rates_output is not None:
+            segment_rows = [
+                {
+                    "duration_s": float(segment.duration_s),
+                    "relative_power": float(segment.relative_power),
+                }
+                for segment in segments
+            ]
+            write_reaction_rates(
+                Path(reaction_rates_output),
+                rates=[
+                    {
+                        "reaction_id": row["reaction_id"],
+                        "rate": row["reaction_rate_s"],
+                        "uncertainty": row["reaction_rate_unc_s"],
+                        "half_life_s": row["half_life_s"],
+                    }
+                    for row in reaction_rate_rows
+                ],
+                segments=segment_rows,
+                source_path=args.peaks_file,
+            )
 
     decay_plot.parent.mkdir(parents=True, exist_ok=True)
     fig, _ax = plot_decay_curves(
@@ -1705,12 +2182,27 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
 
     payload = review.to_payload(sample_mass_g=getattr(args, "sample_mass_g", None))
     payload["spectrum_id"] = peak_report.get("spectrum_id", "")
-    payload["artifacts"] = {
-        "isotope_csv": isotope_artifact or {"path": isotope_csv.name, "format": "csv"},
-        "line_csv": line_artifact or {"path": line_csv.name, "format": "csv"},
+    artifacts: dict[str, Any] = {
         "decay_plot": {"path": decay_plot.name, "format": "png"},
         "bateman_plot": {"path": bateman_plot.name, "format": "png"},
     }
+    if export_mode in {"activities", "both"}:
+        artifacts["isotope_csv"] = isotope_artifact or {
+            "path": isotope_csv.name,
+            "format": "csv",
+        }
+        artifacts["line_csv"] = line_artifact or {
+            "path": line_csv.name,
+            "format": "csv",
+        }
+    if export_mode in {"reaction-rates", "both"}:
+        artifacts["reaction_rates_csv"] = reaction_artifact or {
+            "path": reaction_rate_csv.name,
+            "format": "csv",
+        }
+        payload["reaction_rate_rows"] = reaction_rate_rows
+    payload["artifacts"] = artifacts
+    payload["eoi_export_mode"] = export_mode
     _ensure_parent_dir(output_path)
     output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"Wrote activity review bundle to {output_path}")
@@ -1885,7 +2377,66 @@ def cmd_isotope_priority(args: argparse.Namespace) -> None:
 
 def cmd_optimization_sweep(args: argparse.Namespace) -> None:
     objective = str(getattr(args, "objective", "di-fom")).lower()
-    payload = _load_json(args.input)
+    payload_source = "input"
+    input_path = getattr(args, "input", None)
+    neutron_source_summary: dict[str, Any] | None = None
+
+    if input_path is not None:
+        payload = _load_json(Path(input_path))
+    else:
+        activity_review_file = getattr(args, "activity_review_file", None)
+        if activity_review_file is None:
+            raise ValueError(
+                "optimization-sweep requires --input or --activity-review-file."
+            )
+
+        activity_review_payload = _load_json(Path(activity_review_file))
+        irradiation_grid_s = _parse_csv_floats(
+            getattr(args, "irradiation_grid_s", None)
+        ) or [1800.0, 3600.0, 7200.0, 14400.0]
+        cooldown_grid_s = _parse_csv_floats(
+            getattr(args, "cooldown_grid_s", None)
+        ) or [0.0, 1800.0, 7200.0, 21600.0]
+        count_grid_s = _parse_csv_floats(
+            getattr(args, "count_grid_s", None)
+        ) or [300.0, 600.0, 900.0, 1800.0]
+
+        unfold_payload = None
+        unfold_file = getattr(args, "unfold_file", None)
+        if unfold_file is not None:
+            unfold_payload = read_unfold_result(Path(unfold_file))
+
+        neutron_spectrum_file = getattr(args, "neutron_spectrum_file", None)
+        neutron_source_summary = summarize_neutron_spectrum_source(
+            unfold_payload=unfold_payload,
+            neutron_spectrum_csv=(
+                None if neutron_spectrum_file is None else Path(neutron_spectrum_file)
+            ),
+            base_scale=max(float(getattr(args, "flux_scale", 1.0) or 1.0), 0.0),
+            reference_integral_flux=max(
+                float(getattr(args, "reference_flux_integral", 0.0) or 0.0),
+                0.0,
+            ),
+        )
+        payload = build_difom_payload_from_activity_review(
+            activity_review_payload,
+            irradiation_grid_s=tuple(float(item) for item in irradiation_grid_s),
+            cooldown_grid_s=tuple(float(item) for item in cooldown_grid_s),
+            count_grid_s=tuple(float(item) for item in count_grid_s),
+            reference_irradiation_time_s=max(
+                float(getattr(args, "reference_irradiation_time_s", 3600.0) or 3600.0),
+                1.0,
+            ),
+            flux_scale=float(neutron_source_summary.get("applied_flux_scale", 1.0)),
+        )
+        payload_source = "activity-review"
+
+        generated_candidates_output = getattr(args, "generated_candidates_output", None)
+        if generated_candidates_output is not None:
+            generated_output = Path(generated_candidates_output)
+            _ensure_parent_dir(generated_output)
+            generated_output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
     isotopes_of_interest = _parse_csv_strings(
         getattr(args, "isotopes_of_interest", None)
     )
@@ -2026,7 +2577,25 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
             "Unsupported objective. Use one of: di-fom, fim-d, fim-a, fim-c, mwdcs, bass-d, stbd-mr."
         )
 
-    output_payload["input"] = str(args.input)
+    output_payload["input"] = None if input_path is None else str(input_path)
+    output_payload["candidate_source"] = payload_source
+    if payload_source == "activity-review":
+        output_payload["activity_review_file"] = str(getattr(args, "activity_review_file"))
+        output_payload["candidate_generation"] = {
+            "irradiation_grid_s": _parse_csv_floats(
+                getattr(args, "irradiation_grid_s", None)
+            )
+            or [1800.0, 3600.0, 7200.0, 14400.0],
+            "cooldown_grid_s": _parse_csv_floats(getattr(args, "cooldown_grid_s", None))
+            or [0.0, 1800.0, 7200.0, 21600.0],
+            "count_grid_s": _parse_csv_floats(getattr(args, "count_grid_s", None))
+            or [300.0, 600.0, 900.0, 1800.0],
+            "reference_irradiation_time_s": float(
+                getattr(args, "reference_irradiation_time_s", 3600.0) or 3600.0
+            ),
+        }
+    if neutron_source_summary is not None:
+        output_payload["neutron_source"] = neutron_source_summary
     output_payload["isotope_weights"] = isotope_weights
     output_payload["isotopes_of_interest"] = list(isotopes_of_interest)
     output_payload["isotope_filter_summary"] = isotope_filter_summary
@@ -2919,6 +3488,9 @@ def _build_standard_report_text(
     line_payload: Optional[Dict[str, Any]],
     isotope_rows: List[Dict[str, Any]],
     rates_payload: Optional[Dict[str, Any]],
+    optimization_payload: Optional[Dict[str, Any]],
+    optimization_recommendation: Optional[Dict[str, Any]],
+    optimization_top_rows: List[Dict[str, Any]],
     unfold_payload: Optional[Dict[str, Any]],
     validation_payload: Optional[Dict[str, Any]],
     validation_results_summary: Optional[Dict[str, Any]],
@@ -3096,6 +3668,70 @@ def _build_standard_report_text(
             )
         )
 
+    if optimization_payload is not None:
+        recommendation = optimization_recommendation or {}
+        sections.append(
+            _format_key_value_section(
+                "Optimization Recommendation",
+                [
+                    ("Objective", recommendation.get("objective")),
+                    ("Best candidate", recommendation.get("recommended_label")),
+                    (
+                        "Irradiation time (s)",
+                        recommendation.get("recommended_irradiation_time_s"),
+                    ),
+                    (
+                        "Cooldown time (s)",
+                        recommendation.get("recommended_cooldown_time_s"),
+                    ),
+                    (
+                        "Count time (s)",
+                        recommendation.get("recommended_count_time_s"),
+                    ),
+                    (
+                        "Objective score",
+                        recommendation.get("recommended_objective_score"),
+                    ),
+                    (
+                        "Mask isotope",
+                        recommendation.get("recommended_mask_isotope"),
+                    ),
+                    (
+                        "Isotope of interest",
+                        recommendation.get("recommended_isotope_of_interest"),
+                    ),
+                    (
+                        "Expected dose (uSv)",
+                        recommendation.get("recommended_expected_dose_uSv"),
+                    ),
+                ],
+            )
+        )
+        sections.append(
+            _format_table_section(
+                "Top Optimization Schedules",
+                [
+                    "Rank",
+                    "Label",
+                    "Irradiation (s)",
+                    "Cooldown (s)",
+                    "Count (s)",
+                    "Score",
+                ],
+                [
+                    [
+                        row.get("rank"),
+                        row.get("label"),
+                        row.get("irradiation_time_s"),
+                        row.get("cooldown_time_s"),
+                        row.get("count_time_s"),
+                        row.get("objective_score"),
+                    ]
+                    for row in optimization_top_rows
+                ],
+            )
+        )
+
     if unfold_payload is not None:
         diagnostics = unfold_payload.get("diagnostics", {}) or {}
         energy_edges = (
@@ -3251,6 +3887,9 @@ def cmd_report(args: argparse.Namespace) -> None:
     peak_report: Optional[Dict[str, Any]] = None
     line_payload: Optional[Dict[str, Any]] = None
     rates_payload: Optional[Dict[str, Any]] = None
+    optimization_payload: Optional[Dict[str, Any]] = None
+    optimization_recommendation: Optional[Dict[str, Any]] = None
+    optimization_top_rows: List[Dict[str, Any]] = []
     unfold_payload: Optional[Dict[str, Any]] = None
     validation_payload: Optional[Dict[str, Any]] = None
     isotope_rows: List[Dict[str, Any]] = []
@@ -3414,6 +4053,42 @@ def cmd_report(args: argparse.Namespace) -> None:
             summary["total_rate_reactions_s"] = float(
                 sum(float(item.get("rate", 0.0) or 0.0) for item in rates)
             )
+    optimization_file = getattr(args, "optimization_file", None)
+    if optimization_file:
+        optimization_file_path = Path(optimization_file)
+        inputs["optimization_file"] = str(optimization_file_path)
+        optimization_payload = _load_json(optimization_file_path)
+        optimization_recommendation, optimization_top_rows = (
+            _recommendation_from_optimization_payload(
+                optimization_payload,
+                optimization_file=optimization_file_path,
+            )
+        )
+        summary["optimization_objective"] = optimization_recommendation.get(
+            "objective"
+        )
+        summary["recommended_schedule_label"] = optimization_recommendation.get(
+            "recommended_label"
+        )
+        summary["recommended_irradiation_time_s"] = optimization_recommendation.get(
+            "recommended_irradiation_time_s"
+        )
+        summary["recommended_cooldown_time_s"] = optimization_recommendation.get(
+            "recommended_cooldown_time_s"
+        )
+        summary["recommended_count_time_s"] = optimization_recommendation.get(
+            "recommended_count_time_s"
+        )
+        summary["recommended_mask_isotope"] = optimization_recommendation.get(
+            "recommended_mask_isotope"
+        )
+        summary["recommended_isotope_of_interest"] = (
+            optimization_recommendation.get("recommended_isotope_of_interest")
+        )
+        if "recommended_expected_dose_uSv" in optimization_recommendation:
+            summary["recommended_expected_dose_uSv"] = optimization_recommendation.get(
+                "recommended_expected_dose_uSv"
+            )
     if args.unfold_file:
         inputs["unfold_file"] = str(args.unfold_file)
         unfold_payload = read_unfold_result(args.unfold_file)
@@ -3476,6 +4151,22 @@ def cmd_report(args: argparse.Namespace) -> None:
         )
         if rate_table is not None:
             table_items["reaction_rates_summary"] = rate_table
+    if optimization_payload is not None:
+        recommendation_rows = []
+        if optimization_recommendation:
+            recommendation_rows = [optimization_recommendation]
+        recommendation_table = _write_csv_table(
+            tables_dir / "optimization_recommendation.csv",
+            recommendation_rows,
+        )
+        top_table = _write_csv_table(
+            tables_dir / "optimization_top_candidates.csv",
+            optimization_top_rows,
+        )
+        if recommendation_table is not None:
+            table_items["optimization_recommendation"] = recommendation_table
+        if top_table is not None:
+            table_items["optimization_top_candidates"] = top_table
     if unfold_payload is not None:
         flux_rows = []
         boundaries = list(
@@ -3519,6 +4210,9 @@ def cmd_report(args: argparse.Namespace) -> None:
         line_payload=line_payload,
         isotope_rows=isotope_rows,
         rates_payload=rates_payload,
+        optimization_payload=optimization_payload,
+        optimization_recommendation=optimization_recommendation,
+        optimization_top_rows=optimization_top_rows,
         unfold_payload=unfold_payload,
         validation_payload=validation_payload,
         validation_results_summary=validation_results_summary,
@@ -4155,6 +4849,53 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional peak-report artifact generated from the manual ROI definitions",
     )
     spectrum_plot.add_argument(
+        "--feature-photopeak-keV",
+        type=float,
+        default=None,
+        help="Manual photopeak energy used to compute Compton/escape/backscatter guides",
+    )
+    spectrum_plot.add_argument(
+        "--feature-line-keV",
+        type=float,
+        default=None,
+        help="Manual library-line energy used for spectral-feature overlays",
+    )
+    spectrum_plot.add_argument(
+        "--feature-isotope",
+        type=str,
+        default=None,
+        help="Nuclide name for selecting a library gamma line before feature calculations",
+    )
+    spectrum_plot.add_argument(
+        "--auto-feature-driver",
+        action="store_true",
+        help="Automatically detect the dominant continuum-driving line from matched peaks",
+    )
+    spectrum_plot.add_argument(
+        "--feature-detector-material",
+        choices=["hpge", "nai"],
+        default="hpge",
+        help="Detector material assumptions used for spectral-feature estimation",
+    )
+    spectrum_plot.add_argument(
+        "--feature-tolerance-keV",
+        type=float,
+        default=2.0,
+        help="Matching tolerance used for automatic continuum-driver detection",
+    )
+    spectrum_plot.add_argument(
+        "--feature-min-intensity",
+        type=float,
+        default=0.02,
+        help="Minimum gamma-line intensity for isotope/auto feature selection",
+    )
+    spectrum_plot.add_argument(
+        "--save-feature-report",
+        type=Path,
+        default=None,
+        help="Optional JSON report containing calculated spectral-feature energies and estimated heights",
+    )
+    spectrum_plot.add_argument(
         "--title", type=str, default=None, help="Optional plot title override"
     )
     spectrum_plot.add_argument("--x-min-keV", type=float, default=None)
@@ -4396,8 +5137,34 @@ def build_parser() -> argparse.ArgumentParser:
         help="Relative efficiency uncertainty applied to the activity review.",
     )
     activity_review.add_argument("--sample-mass-g", type=float)
+    activity_review.add_argument(
+        "--eoi-export",
+        type=str,
+        default="activities",
+        choices=("activities", "reaction-rates", "both"),
+        help="Choose whether to export EOI activities CSVs, reaction-rate CSVs, or both.",
+    )
+    activity_review.add_argument(
+        "--irradiation-time-s",
+        type=float,
+        default=0.0,
+        help="Single-segment irradiation duration used for reaction-rate export when no segment file is supplied.",
+    )
+    activity_review.add_argument(
+        "--irradiation-segments-file",
+        type=Path,
+        default=None,
+        help="Optional JSON/CSV segment definition file with duration_s and relative_power columns.",
+    )
     activity_review.add_argument("--isotope-csv-output", type=Path, default=None)
     activity_review.add_argument("--line-csv-output", type=Path, default=None)
+    activity_review.add_argument("--reaction-rate-csv-output", type=Path, default=None)
+    activity_review.add_argument(
+        "--reaction-rates-output",
+        type=Path,
+        default=None,
+        help="Optional JSON/YAML reaction-rates artifact output path in addition to CSV export.",
+    )
     activity_review.add_argument("--decay-plot", type=Path, default=None)
     activity_review.add_argument("--bateman-plot", type=Path, default=None)
     _add_validate_option(activity_review)
@@ -4517,8 +5284,14 @@ def build_parser() -> argparse.ArgumentParser:
     optimization_sweep.add_argument(
         "--input",
         type=Path,
-        required=True,
+        default=None,
         help="JSON payload with schedule candidates and optional isotope weights",
+    )
+    optimization_sweep.add_argument(
+        "--activity-review-file",
+        type=Path,
+        default=None,
+        help="Optional activity-review bundle used to auto-generate schedule candidates when --input is omitted.",
     )
     optimization_sweep.add_argument(
         "--output",
@@ -4538,6 +5311,60 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="Comma-separated isotopes used to filter candidate line terms before scoring",
+    )
+    optimization_sweep.add_argument(
+        "--irradiation-grid-s",
+        type=str,
+        default="1800,3600,7200,14400",
+        help="Irradiation-duration grid (s) used when candidates are auto-generated from activity-review data.",
+    )
+    optimization_sweep.add_argument(
+        "--cooldown-grid-s",
+        type=str,
+        default="0,1800,7200,21600",
+        help="Cooldown-time grid (s) used when candidates are auto-generated from activity-review data.",
+    )
+    optimization_sweep.add_argument(
+        "--count-grid-s",
+        type=str,
+        default="300,600,900,1800",
+        help="Count-time grid (s) used when candidates are auto-generated from activity-review data.",
+    )
+    optimization_sweep.add_argument(
+        "--reference-irradiation-time-s",
+        type=float,
+        default=3600.0,
+        help="Reference irradiation duration used to scale activity-review EOI activities during candidate generation.",
+    )
+    optimization_sweep.add_argument(
+        "--unfold-file",
+        type=Path,
+        default=None,
+        help="Optional unfolded neutron spectrum bundle used to derive spectrum-aware candidate scaling.",
+    )
+    optimization_sweep.add_argument(
+        "--neutron-spectrum-file",
+        type=Path,
+        default=None,
+        help="Optional neutron source spectrum CSV (energy, flux) used to derive spectrum-aware candidate scaling.",
+    )
+    optimization_sweep.add_argument(
+        "--flux-scale",
+        type=float,
+        default=1.0,
+        help="Base multiplicative flux scale before spectrum-derived hardness/integral adjustments.",
+    )
+    optimization_sweep.add_argument(
+        "--reference-flux-integral",
+        type=float,
+        default=0.0,
+        help="Optional reference integral flux; when >0, scales candidates by integral_flux/reference_flux_integral.",
+    )
+    optimization_sweep.add_argument(
+        "--generated-candidates-output",
+        type=Path,
+        default=None,
+        help="Optional path to write the auto-generated candidate payload before optimization scoring.",
     )
     optimization_sweep.add_argument(
         "--enable-advanced-objectives",
@@ -4846,6 +5673,7 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--peaks-file", type=Path)
     report.add_argument("--lines-file", type=Path)
     report.add_argument("--rates-file", type=Path)
+    report.add_argument("--optimization-file", type=Path)
     report.add_argument("--unfold-file", type=Path)
     report.add_argument("--validation-file", type=Path)
     report.add_argument("--validation-results-root", type=Path)

@@ -52,6 +52,10 @@ following overlays were adopted additively and do not replace that map.
   libraries, GUI and CLI registration of external library locations, reserved
   bundled IDs, and collision-safe aliasing so user libraries cannot silently
   overwrite built-in sources.
+- InterSpec compatibility planning now explicitly includes a SandiaDecay
+  bridge track (decay XML + reaction-gamma XML + reference-line overlays) as
+  a governed adapter layer under Step `3.18`, with validation gates before any
+  imported value is surfaced as a recommended display value.
 - A de-hardcoding cleanup pass is now planned across the parity work: move
   removable hardcoded workflows and values behind registries or explicit config,
   while keeping the intentional carve-outs for QuantumGold parity, PeakEasy
@@ -111,7 +115,7 @@ following overlays were adopted additively and do not replace that map.
 | 2.20 | `complete` | `src/fluxforge/core/peak_fitting.py` + `src/fluxforge/gui/dialogs/calibration_dialog.py` now provide the Bayesian Gaussian ROI fitter registered beside the Gaussian and skew options |
 | 2.21 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/phase2_workspace.py` now provide manual isotope assignment, replacement, and clear actions for selected peaks |
 | 2.22 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/nuclide_search.py` + `src/fluxforge/data/nuclide_library.py` now provide a centroid-driven isotope browser with a default ±2 keV window and active-library filtering |
-| 2.23 | `complete` | `src/fluxforge/core/phase2_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` now render gamma-phenomena guidance for Compton edge, backscatter, annihilation, and escape features |
+| 2.23 | `complete` | `src/fluxforge/core/analysis_workspace.py` + `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` + `src/fluxforge/plots/spectrum_inspection.py` + `src/fluxforge/cli/app.py` now render gamma-phenomena guidance for Compton edge/backscatter/annihilation/escape with estimated feature heights, auto continuum-driver selection, and saved spectrum-plot overlays/reports |
 | 2.24 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/selection_bus.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` now keep peak IDs editable after automated workflows with SelectionBus overlays and undo/redo |
 | 3.1 | `complete` | `src/fluxforge/core/unfolding_inputs.py` + `src/fluxforge/unfolding/base.py` + `src/fluxforge/unfolding/gravel.py` + `src/fluxforge/unfolding/__init__.py` now provide the registry-backed GRAVEL API, shared pyunfold-style nonnegative input validation, the built-in unfolder registration path, and local reference-parity coverage in `tests/test_unfolding_reference_parity.py` |
 | 3.2 | `complete` | `src/fluxforge/unfolding/maxed.py` + `src/fluxforge/unfolding/gravel.py` + `src/fluxforge/unfolding/__init__.py` now provide the registry-backed MAXED method with uncertainty estimates and shared pytest coverage in `tests/test_unfolding_registry.py` and `tests/test_unfolding_workflows.py` |

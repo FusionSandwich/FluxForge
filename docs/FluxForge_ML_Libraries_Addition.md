@@ -574,3 +574,67 @@ Because the FluxForge repository is not mounted in this workspace, the items abo
 - add builder/import code under `src/fluxforge/data/` and `scripts/`
 - wire the new GUI workspaces into the existing Qt shell under the pending 3.18–3.25 slice
 
+---
+
+## 10. InterSpec compatibility checkpoint (2026-04-06)
+
+This section records the compatibility decision after source-level review of the
+InterSpec data stack and current FluxForge implementation status.
+
+### 10.1 What InterSpec actually uses
+
+InterSpec does not rely on a single flat line list. It uses layered files and
+loaders:
+
+1. `sandia.decay.xml` for decay-chain and radiation backbone.
+2. `sandia.reactiongamma.xml` for capture and reaction-gamma signatures.
+3. `PhotoPeak.lis` for fast line lookup and isotope ID paths.
+4. `add_ref_line.xml` and `dynamic_ref_lines.xml` for reference-line overlays.
+5. `more_nuclide_info.xml` for curated nuclide annotations and analyst context.
+
+### 10.2 FluxForge implementation decision
+
+FluxForge should not replace its current stacked architecture with direct
+InterSpec file dependence. FluxForge should:
+
+1. Continue using authoritative third-party nuclear data sources as the primary
+   value authority.
+2. Add optional InterSpec-compatible import adapters for Sandia-style XML and
+   reference overlays.
+3. Keep FluxForge as the normalization and provenance authority so all displayed
+   values remain explainable and reproducible.
+
+In short: adopt third-party data where possible, but keep a FluxForge-governed
+schema and conflict policy instead of a one-off opaque custom library.
+
+### 10.3 New 3.18 sub-steps for InterSpec parity
+
+Add these sub-items under Step `3.18`:
+
+- **3.18I** - SandiaDecay adapter: import `sandia.decay.xml` into normalized
+  decay tables with parent/daughter links and uncertainty fields.
+- **3.18J** - Reaction-gamma adapter: import
+  `sandia.reactiongamma.xml` into a dedicated reaction-gamma table with
+  explicit reaction type tags.
+- **3.18K** - Reference overlay adapter: ingest `PhotoPeak.lis`,
+  `add_ref_line.xml`, and `dynamic_ref_lines.xml` as non-authoritative overlay
+  layers.
+- **3.18L** - Value-governance rule engine: enforce priority and provenance
+  display (`display_value`, `display_uncertainty`, `source_name`,
+  `source_version`, `alternate_values`).
+- **3.18M** - Cross-library validation harness: compare selected nuclides and
+  lines across FluxForge base sources, Sandia imports, and metrology overrides.
+
+### 10.4 Required quality gates
+
+Before enabling any InterSpec-compatible source by default, all of the following
+must pass:
+
+1. Schema validation for XML and tabular overlays, with explicit parse errors.
+2. Golden-nuclide comparison tests for half-life, gamma energy, and intensity.
+3. Reaction-gamma sanity checks (units, yield normalization, reaction labels).
+4. Provenance-completeness checks: every surfaced value must carry source and
+   version metadata.
+5. Regression tests proving no degradation of existing peak-identification and
+   activity workflows when the adapters are enabled.
+
