@@ -55,6 +55,16 @@ class KayzeroImportResult:
 
 
 @dataclass(frozen=True)
+class KayzeroHalfLifeValue:
+    """Resolved half-life value parsed from a Kayzero ``uT12`` table."""
+
+    nuclide: str
+    half_life_s: float
+    half_life_uncertainty_s: float | None
+    source_name: str
+
+
+@dataclass(frozen=True)
 class _KayzeroGammaLine:
     nuclide: str
     energy_keV: float
@@ -558,6 +568,47 @@ def _detect_half_life_scale(
     if minute_votes >= max(second_votes, 1):
         return 60.0, "minutes_to_seconds"
     return 1.0, "seconds"
+
+
+def load_kayzero_half_life_table(
+    source_path: str | Path,
+    *,
+    preferred_version: str | None = None,
+) -> dict[str, KayzeroHalfLifeValue]:
+    """Load and scale half-life rows from a Kayzero ``uT12`` table or bundle."""
+
+    path = Path(source_path)
+    if path.is_file() and path.suffix.lower() == ".ut12":
+        source_name = path.name
+        rows = _parse_half_life_rows(path.read_text(encoding="utf-8", errors="ignore"))
+    else:
+        source = _KayzeroSource(path)
+        try:
+            names = list(source.iter_names())
+            member = _find_versioned_member(names, ".uT12", preferred_version)
+            if member is None:
+                raise FileNotFoundError(
+                    "Kayzero half-life loading requires a uT12 table."
+                )
+            source_name = member
+            rows = _parse_half_life_rows(source.read_text(member))
+        finally:
+            source.close()
+
+    scale, _ = _detect_half_life_scale(rows)
+    return {
+        nuclide: KayzeroHalfLifeValue(
+            nuclide=nuclide,
+            half_life_s=float(row.raw_value) * scale,
+            half_life_uncertainty_s=(
+                float(row.raw_uncertainty) * scale
+                if row.raw_uncertainty is not None
+                else None
+            ),
+            source_name=source_name,
+        )
+        for nuclide, row in rows.items()
+    }
 
 
 def _product_and_target_isotopes(product_isotope: str) -> tuple[str, str, list[str]]:

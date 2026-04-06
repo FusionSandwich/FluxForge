@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable
 
-from fluxforge.data.nuclear_data_sources import list_nuclear_data_sources
+from fluxforge.data.nuclear_data_sources import list_nuclear_data_sources_by_capability
 from fluxforge.data.rafm_profile import list_rafm_profiles
 from fluxforge_gui.models import StandardsGuiPreset
 
@@ -21,7 +21,12 @@ def get_gui_data_source_choices(
 ) -> tuple[str, ...]:
     """Return selectable nuclear data source identifiers for the GUI."""
 
-    return tuple(record.source_id for record in list_nuclear_data_sources(custom_paths))
+    return tuple(
+        record.source_id
+        for record in list_nuclear_data_sources_by_capability(
+            "peak-identification", custom_paths
+        )
+    )
 
 
 def get_standards_gui_presets() -> dict[str, StandardsGuiPreset]:

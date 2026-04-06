@@ -1,9 +1,9 @@
 # FluxForge Roadmap Execution Status
 
 **Date:** 2026-04-06  
-**Controlling roadmap document:** `docs/FluxForge_Final_Additions.md`  
-**Secondary detail source:** `docs/FluxForge_Additions_v3_Final.md` when it does not
-conflict with the controlling document.  
+**Controlling roadmap document:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md`  
+**Companion GUI document:** `docs/GUI_PLAN.md`  
+**Companion testing document:** `docs/FluxForge_Testing_Master.md`  
 **Machine-readable tracker:** `.github/project-management/implementation_steps.json`
 
 ## Stepwise Execution Rule
@@ -21,8 +21,42 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| 3.17 | `next` | `not-started` | The formal next step is now calibration / efficiency parity after the new ROI/background groundwork landed in 3.16. |
+| 3.18 | `next` | `in-progress` | Identification / activity / reference parity is now in progress. The repo now includes bundled GSA-v4 edited plus natural libraries; NASA-gamma common-lab, natural, CapGam, IAEA capture, delayed-activation, Baghdad inelastic, and TALYS 14 MeV reference libraries; ENDF/B-VIII supplement; ICRP-107 plus Kayzero registrations; GUI/CLI user-library registration with reserved bundled names; and activity-review plus inventory views with uncertainty-bearing decay/Bateman outputs and GUI activity-unit selectors. |
 | 4.1 | `pending` | `not-started` | HAL driver work remains on the roadmap, but it is formally deferred until the new Phase 3B offline-parity module closes. |
+
+## Additive Roadmap Overlays
+
+The numbered sequence gate above remains the controlling roadmap map. The
+following overlays were adopted additively and do not replace that map.
+
+### Activation / FISPACT-Style `3N` Overlay
+
+- `3N.1` through `3N.4` extend the active `3.18` through planned `3.25` work with
+  explicit irradiation schedules, inventory states, arbitrary-time solvers,
+  Bateman/half-life plots, and time-evolution workspaces.
+- `3N.5` through `3N.14` extend `3.19`, `3.20`, and `3.25` with FISPACT-style
+  observables, dominant-contributor plots, masking analysis, NAA mass and
+  concentration inference, optimization sweeps, second-irradiation planners,
+  and shutdown-through-100-year dose studies.
+- `3N.15` extends the reporting/export track with a benchmark experimental bundle
+  contract centered on `.ffexp`.
+- `3N.16` extends `3.21` through `3.23` with activation-inventory fixtures,
+  plot smoke tests, and workflow-level validation.
+- The additive issue-seed set `3N.1` through `3N.16` is adopted for future
+  tracker synchronization and should be kept distinct from the controlling
+  `3.18` through `3.27` sequence.
+
+### Library Governance and De-Hardcoding Overlay
+
+- Library-management planning now explicitly includes opt-in downloadable
+  libraries, GUI and CLI registration of external library locations, reserved
+  bundled IDs, and collision-safe aliasing so user libraries cannot silently
+  overwrite built-in sources.
+- A de-hardcoding cleanup pass is now planned across the parity work: move
+  removable hardcoded workflows and values behind registries or explicit config,
+  while keeping the intentional carve-outs for QuantumGold parity, PeakEasy
+  parity, governed standards workflows such as ASTM and k0-NAA, and RAFM
+  irradiation-analysis paths.
 
 ## Completed In Sequence
 
@@ -95,6 +129,7 @@ officially in progress.
 | 3.14 | `complete` | `src/fluxforge/core/batch_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` now provide the ProcessPoolExecutor-backed batch queue, visible progress tracking, and JSON/CSV outputs |
 | 3.15 | `complete` | `src/fluxforge/unfolding/gpu_backend.py` + `src/fluxforge/ml/peak_analysis.py` + `src/fluxforge/core/batch_analysis.py` now provide optional CuPy backend selection with clean CPU fallback |
 | 3.16 | `complete` | `src/fluxforge/core/analysis_workspace.py` + `src/fluxforge/gui/analysis_workspace.py` + `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/cli/app.py` now provide registry-backed peak-search selection, explicit ROI/background workflows, overlap decomposition, ROI statistics, the Qt ROI Tools panel, and matching CLI commands covered by `tests/test_roi_analysis_core.py`, `tests/test_cli_app.py`, and `tests/test_analysis_workspace_qt.py` |
+| 3.17 | `complete` | `src/fluxforge/gui/dialogs/calibration_dialog.py` + `src/fluxforge/gui/dialogs/efficiency_dialog.py` + `src/fluxforge/gui/library_manager.py` + `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/gui/main_window.py` now provide detector-slot recall, preserved/fine-tuned calibration flows, NASA smart seeding, all four registered efficiency models, and standards-aware calibration/identification source locking covered by `tests/test_calibration_workspace_qt.py`, `tests/test_analysis_workspace_qt.py`, and `tests/test_cli_app.py` |
 | 4P.1 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast ROI time-to-target counts from offline spectra |
 | 4P.2 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now project dead-time trend and saturation warnings without live MCA transport |
 | 4P.3 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/main_window.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast recalibration timing from `QAMonitor` history and surface it in the dashboard, sidebar, and status bar |
@@ -107,8 +142,7 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| 3.17 | `next` | `not-started` | Implement calibration/efficiency parity, detector-slot workflows, and NASA-style preserve/fine-tune helpers. |
-| 3.18 | `pending` | `not-started` | Implement identification/activity/reference parity, richer libraries, relative activity, and source-age overlays. |
+| 3.18 | `next` | `in-progress` | Implement the remaining identification/activity/reference parity work on top of the now-bundled GSA-v4 edited/natural, NASA-gamma common-lab/natural/capture/delayed-activation/inelastic families, ENDF/B-VIII supplement, ICRP-107 plus Kayzero source registrations, collision-safe GUI/CLI user-library registration, and GUI activity-unit selectors, then finish relative activity, source-age overlays, deeper decay-dataset consumption, and the remaining parity surfaces. |
 | 3.19 | `pending` | `not-started` | Implement detection-limit, dose, shielding, attenuation/material, and units-conversion workspaces. |
 | 3.20 | `pending` | `not-started` | Implement file-query, batch-compare, ROI-statistics review, and KayWin-style k0 workflows without hardware control. |
 | 3.21 | `pending` | `not-started` | Curate repo-backed parity fixtures and manifests under `tests/spectra/reference_parity/`. |
@@ -128,9 +162,8 @@ officially in progress.
 - The Qt redesign under `src/fluxforge/gui/` is now the primary GUI implementation path.
 - The prior Tk application under `src/fluxforge_gui/` is intentionally retained as a
   legacy/archive fallback while the redesign reaches feature parity.
-- Older GUI planning references are now explicitly archived in `docs/GUI_PLAN_old.md`
-  and `docs/GUI_CAPABILITY_PROGRAM_old.md`; the top-level files at those old paths are
-  redirect notes only.
+- Older planning references are archived under
+  `docs/archive/planning_snapshot_2026-04-06/`.
 - CI keeps lightweight modern-shell checks in the regular push path and limits the
   old desktop automation flow to manual dispatch.
 
@@ -244,7 +277,8 @@ officially in progress.
 - A new formal follow-on module now sits between Module 3 and Phase 4:
   Phase 3B — Offline Spectroscopy Parity.
 - Phase 3.16 is now complete in the repository and formally complete in sequence.
+- Phase 3.17 is now complete in the repository and formally complete in sequence.
 - All final-plan GUI features except the deferred live MCA / HAL transport work in
   Phase 4.1 through 4.4 are now implemented in the modern Qt shell.
-- The roadmap's current next step is Phase 3.17: calibration / efficiency
-  parity for the offline spectroscopy module.
+- The roadmap's current next step is Phase 3.18: identification / activity /
+  reference parity for the offline spectroscopy module.

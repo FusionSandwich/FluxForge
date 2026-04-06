@@ -214,6 +214,15 @@ be completed before any Phase 1 code is committed on the branch.
   now provide registry-backed Mariscotti / second-difference / NASA peak search,
   explicit ROI sideband/SNIP workflows, overlap decomposition, multi-spectrum ROI
   statistics, the Qt ROI Tools panel, and matching CLI commands.
+- Phase 3.17 is now implemented in-repo:
+  `src/fluxforge/gui/dialogs/calibration_dialog.py`,
+  `src/fluxforge/gui/dialogs/efficiency_dialog.py`,
+  `src/fluxforge/gui/library_manager.py`,
+  `src/fluxforge/gui/panels/modern_shell.py`, and
+  `src/fluxforge/gui/main_window.py` now provide detector-slot workflows,
+  preserve/fine-tune calibration flows, NASA-style smart seeding, all four
+  first-class efficiency models in the Qt dialog, and standards-aware source
+  locking for calibration and identification surfaces.
 - The user-directed Phase 4+ predictive slice from the secondary GUI plan is now
   implemented in-repo too: the modern Qt dashboard, QA sidebar, and status bar
   now forecast ROI time-to-target counts, dead-time saturation risk, and QA-based
@@ -223,8 +232,8 @@ be completed before any Phase 1 code is committed on the branch.
   surfaces are now implemented in the modern Qt shell, the QA sidebar exposes direct
   `View QA History` and `Run ASTM Check` buttons, and the status-bar hardware LED now
   opens the Dashboard tab for one-click access.
-- The current roadmap next step is Phase `3.17`, calibration/efficiency parity
-  for the offline spectroscopy module.
+- The current roadmap next step is Phase `3.18`,
+  identification/activity/reference parity for the offline spectroscopy module.
 - The newly added Phase 3B milestone, epic, and issue seeds now exist in the
   in-repo planning manifests and require the next `Sync Project Planning` run to
   materialize on GitHub.

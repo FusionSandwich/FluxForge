@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import csv
 from dataclasses import replace
 from datetime import datetime
+from pathlib import Path
 from typing import Callable
 
 import numpy as np
@@ -20,11 +22,11 @@ from fluxforge.core.predictive import (
     estimate_recalibration_forecast,
 )
 from fluxforge.core.analysis_workspace import (
+    ActivityCalculationResult,
     PeakCandidate,
     analyze_roi_region,
     apply_ml_peak_predictions,
     bayesian_match_peak_candidates,
-    calculate_peak_activity,
     compute_roi_statistics,
     compute_cascade_sum_lines,
     detect_peak_candidates,
@@ -36,6 +38,17 @@ from fluxforge.core.analysis_workspace import (
     background_adjusted_spectrum,
     subtract_background_counts,
 )
+from fluxforge.core.activity_review import (
+    ActivityReviewResult,
+    review_spectrum_activation,
+)
+from fluxforge.core.inventory_timeline import (
+    DEFAULT_DECAY_SOURCE_ID,
+    build_inventory_state_from_activity_results,
+    build_time_grid,
+    compute_inventory_time_evolution,
+)
+from fluxforge.data.nuclear_data_sources import list_nuclear_data_sources_by_capability
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
 from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
@@ -48,6 +61,7 @@ from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
 from fluxforge.gui.widgets.method_selector import MethodSelectorWidget
 from fluxforge.io.spe import GammaSpectrum
+from fluxforge.plots.activation import plot_decay_curves
 from fluxforge.plugins import bootstrap_builtin_registries
 from fluxforge.standards import (
     QAMonitor,
@@ -67,6 +81,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QComboBox,
         QDialog,
         QDoubleSpinBox,
+        QFileDialog,
         QFrame,
         QGridLayout,
         QGroupBox,
@@ -102,6 +117,41 @@ MODERN_LOG_LINES = (
     "Mode-aware workflow locking ready",
     "Tk GUI demoted to explicit legacy fallback",
 )
+
+_ACTIVITY_UNIT_FACTORS = {
+    "Bq": 1.0,
+    "kBq": 1.0e3,
+    "MBq": 1.0e6,
+    "GBq": 1.0e9,
+    "uCi": 3.7e4,
+    "mCi": 3.7e7,
+    "Ci": 3.7e10,
+}
+
+
+def _activity_unit_factor(unit: str) -> float:
+    return float(_ACTIVITY_UNIT_FACTORS.get(str(unit), 1.0))
+
+
+def _scale_activity_points(
+    points: tuple[tuple[float, float, float], ...],
+    unit: str,
+) -> tuple[tuple[float, float, float], ...]:
+    factor = _activity_unit_factor(unit)
+    return tuple(
+        (float(time_s), float(value) / factor, float(uncertainty) / factor)
+        for time_s, value, uncertainty in points
+    )
+
+
+def _format_activity_value(
+    value_bq: float,
+    unit: str,
+    *,
+    precision: str = ".6g",
+) -> str:
+    scaled_value = float(value_bq) / _activity_unit_factor(unit)
+    return f"{scaled_value:{precision}} {unit}"
 
 
 def _selection_summary(state: SelectionState) -> str:
@@ -378,10 +428,123 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.ml_summary.setWordWrap(True)
             layout.addWidget(self.ml_summary)
 
+            layout.addWidget(self._build_identification_sources_panel())
             layout.addWidget(self._build_peak_id_panel())
 
             self.workspace_controller.subscribe(self._sync_state)
+            self.library_manager.subscribe(lambda _state: self._sync_identification_sources())
+            self.mode_manager.subscribe(lambda _state: self._sync_identification_sources())
+            self._sync_identification_sources()
             self._sync_state(self.workspace_controller.state)
+
+        def _analysis_standard(self) -> str | None:
+            state = self.mode_manager.state
+            if state.mode is GUIMode.STANDARDS:
+                return state.standard
+            return None
+
+        def _build_identification_sources_panel(self) -> QWidget:
+            group = QGroupBox("Identification Databases", self)
+            group.setObjectName("PeakIdentificationSourcesPanel")
+            layout = QGridLayout(group)
+            layout.setContentsMargins(12, 12, 12, 12)
+            layout.setHorizontalSpacing(8)
+            layout.setVerticalSpacing(8)
+
+            layout.addWidget(QLabel("Bayesian matcher", group), 0, 0)
+            self.bayesian_source_combo = QComboBox(group)
+            self.bayesian_source_combo.setObjectName("BayesianLibraryCombo")
+            self.bayesian_source_combo.currentIndexChanged.connect(
+                self._bayesian_source_changed
+            )
+            layout.addWidget(self.bayesian_source_combo, 0, 1)
+
+            layout.addWidget(QLabel("ML proposals", group), 1, 0)
+            self.ml_source_combo = QComboBox(group)
+            self.ml_source_combo.setObjectName("MlPeakLibraryCombo")
+            self.ml_source_combo.currentIndexChanged.connect(self._ml_source_changed)
+            layout.addWidget(self.ml_source_combo, 1, 1)
+
+            self.id_source_summary = QLabel("", group)
+            self.id_source_summary.setObjectName("PanelBody")
+            self.id_source_summary.setWordWrap(True)
+            layout.addWidget(self.id_source_summary, 2, 0, 1, 2)
+            return group
+
+        def _sync_identification_sources(self) -> None:
+            standard = self._analysis_standard()
+            resolved_state = self.library_manager.resolved_state(standard=standard)
+            self.nuclide_controller.set_source(
+                resolved_state.gamma_identification_source_id,
+                custom_path=resolved_state.custom_gamma_path,
+            )
+            records = self.library_manager.available_sources(
+                "gamma_identification",
+                standard=standard,
+            )
+            locked = self.library_manager.locked_source_for_category(
+                "gamma_identification",
+                standard=standard,
+            )
+            self._populate_identification_source_combo(
+                self.bayesian_source_combo,
+                records,
+                self.workspace_controller.state.bayesian_source_id,
+            )
+            self._populate_identification_source_combo(
+                self.ml_source_combo,
+                records,
+                self.workspace_controller.state.ml_source_id,
+            )
+            combo_enabled = locked is None and len(records) > 1
+            self.bayesian_source_combo.setEnabled(combo_enabled)
+            self.ml_source_combo.setEnabled(combo_enabled)
+            if locked is not None:
+                locked_record = self.library_manager.record_for_category(
+                    "gamma_identification",
+                    standard=standard,
+                )
+                self.id_source_summary.setText(
+                    f"Standards mode locks Bayesian and ML identification to {locked_record.label}."
+                )
+            else:
+                bayesian_label = self.bayesian_source_combo.currentText() or "Unselected"
+                ml_label = self.ml_source_combo.currentText() or "Unselected"
+                self.id_source_summary.setText(
+                    f"Bayesian DB: {bayesian_label} | ML DB: {ml_label}"
+                )
+
+        def _populate_identification_source_combo(
+            self,
+            combo: QComboBox,
+            records,
+            preferred_source_id: str,
+        ) -> None:
+            combo.blockSignals(True)
+            current = combo.currentData()
+            combo.clear()
+            for record in records:
+                combo.addItem(record.label, record.source_id)
+            target = preferred_source_id or current
+            if target is not None:
+                index = combo.findData(target)
+                if index >= 0:
+                    combo.setCurrentIndex(index)
+            if combo.currentIndex() < 0 and combo.count() > 0:
+                combo.setCurrentIndex(0)
+            combo.blockSignals(False)
+
+        def _bayesian_source_changed(self) -> None:
+            source_id = self.bayesian_source_combo.currentData()
+            if source_id:
+                self.workspace_controller.set_bayesian_source_id(str(source_id))
+                self._sync_identification_sources()
+
+        def _ml_source_changed(self) -> None:
+            source_id = self.ml_source_combo.currentData()
+            if source_id:
+                self.workspace_controller.set_ml_source_id(str(source_id))
+                self._sync_identification_sources()
 
         def _build_peak_id_panel(self) -> QWidget:
             group = QGroupBox("Peak ID Browser", self)
@@ -503,9 +666,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if not state.peaks:
                 self.summary.setText("Run peak search before Bayesian matching.")
                 return
+            source_id = str(
+                self.bayesian_source_combo.currentData() or state.bayesian_source_id
+            )
             matched = bayesian_match_peak_candidates(
                 state.peaks,
-                source_id=self.library_manager.state.gamma_identification_source_id,
+                source_id=source_id,
                 custom_path=self.library_manager.state.custom_gamma_path,
             )
             self._commit_state_change(
@@ -531,9 +697,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 return
             engine = self.registries.nuclide_id_engines.get("ml_peak_onnx")
+            source_id = str(self.ml_source_combo.currentData() or state.ml_source_id)
             predictions = engine.analyze_peaks(
                 peaks,
-                source_id=self.library_manager.state.gamma_identification_source_id,
+                source_id=source_id,
                 custom_path=self.library_manager.state.custom_gamma_path,
             )
             updated_peaks = apply_ml_peak_predictions(peaks, predictions)
@@ -557,6 +724,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.ml_summary.setText(
                     "ML peak analysis finished without a confident library proposal."
                 )
+            self._sync_identification_sources()
 
         def _pin_selected_nuclide(self) -> None:
             peak = self.workspace_controller.selected_peak()
@@ -566,10 +734,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             pinned = list(state.pinned_nuclides)
             if peak.nuclide not in pinned:
                 pinned.append(peak.nuclide)
+            standard = self._analysis_standard()
+            resolved_state = self.library_manager.resolved_state(standard=standard)
             cascade_sum_lines_keV = compute_cascade_sum_lines(
                 pinned,
-                source_id=self.library_manager.state.gamma_identification_source_id,
-                custom_path=self.library_manager.state.custom_gamma_path,
+                source_id=resolved_state.gamma_identification_source_id,
+                custom_path=resolved_state.custom_gamma_path,
             )
             self._commit_state_change(
                 "Pin nuclide",
@@ -834,6 +1004,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.peak_search_selector.set_current_key(state.peak_search_method)
                 self.peak_search_selector.combo.blockSignals(False)
                 self.peak_search_selector._sync_badge()
+            if self.bayesian_source_combo.currentData() != state.bayesian_source_id:
+                index = self.bayesian_source_combo.findData(state.bayesian_source_id)
+                if index >= 0:
+                    self.bayesian_source_combo.blockSignals(True)
+                    self.bayesian_source_combo.setCurrentIndex(index)
+                    self.bayesian_source_combo.blockSignals(False)
+            if self.ml_source_combo.currentData() != state.ml_source_id:
+                index = self.ml_source_combo.findData(state.ml_source_id)
+                if index >= 0:
+                    self.ml_source_combo.blockSignals(True)
+                    self.ml_source_combo.setCurrentIndex(index)
+                    self.ml_source_combo.blockSignals(False)
+            self._sync_identification_sources()
 
             self.table.blockSignals(True)
             self.table.setRowCount(0)
@@ -922,6 +1105,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager
+            self._last_activity_review: ActivityReviewResult | None = None
 
             layout = QVBoxLayout(self)
             layout.setContentsMargins(16, 16, 16, 16)
@@ -929,8 +1113,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             intro = QLabel(
                 (
-                    "Activity calculations consume the selected peak, the active efficiency "
-                    "fit, the chosen data library, and the current background mode."
+                    "Activity review consumes the active efficiency fit, matched peaks, the "
+                    "chosen gamma library, and the time since end of irradiation (EOI) to "
+                    "produce count-time and irradiation-time isotope activities."
                 ),
                 self,
             )
@@ -946,6 +1131,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.compute_activity_button = QPushButton("Compute Activity", self)
             self.compute_activity_button.clicked.connect(self._compute_activity)
             control_row.addWidget(self.compute_activity_button)
+
+            self.analyze_spectrum_button = QPushButton("Analyze Spectrum", self)
+            self.analyze_spectrum_button.clicked.connect(self._analyze_spectrum)
+            control_row.addWidget(self.analyze_spectrum_button)
+
+            self.export_csv_button = QPushButton("Export CSV", self)
+            self.export_csv_button.clicked.connect(self._export_activity_csv_dialog)
+            control_row.addWidget(self.export_csv_button)
+
+            self.export_decay_button = QPushButton("Save Decay Plot", self)
+            self.export_decay_button.clicked.connect(self._export_decay_plot_dialog)
+            control_row.addWidget(self.export_decay_button)
+
+            self.export_bateman_button = QPushButton("Save Bateman Plot", self)
+            self.export_bateman_button.clicked.connect(self._export_bateman_plot_dialog)
+            control_row.addWidget(self.export_bateman_button)
 
             self.background_mode_combo = QComboBox(self)
             self.background_mode_combo.addItem("Simple", "simple")
@@ -972,8 +1173,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.source_age_hours.setObjectName("SourceAgeHoursSpin")
             self.source_age_hours.setRange(0.0, 87600.0)
             self.source_age_hours.setDecimals(2)
-            self.source_age_hours.setSuffix(" h age")
+            self.source_age_hours.setSuffix(" h since EOI")
             control_row.addWidget(self.source_age_hours)
+
+            control_row.addWidget(QLabel("Activity units", self))
+            self.activity_unit_combo = QComboBox(self)
+            self.activity_unit_combo.setObjectName("ActivityResultsUnitCombo")
+            for unit in _ACTIVITY_UNIT_FACTORS:
+                self.activity_unit_combo.addItem(unit, unit)
+            control_row.addWidget(self.activity_unit_combo)
             control_row.addStretch(1)
             layout.addLayout(control_row)
 
@@ -987,6 +1195,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(self.results, 1)
 
             self.workspace_controller.subscribe(self._sync_state)
+            self.activity_unit_combo.currentIndexChanged.connect(
+                self._refresh_activity_display
+            )
             self._sync_state(self.workspace_controller.state)
 
         def _fit_efficiency(self) -> None:
@@ -1000,6 +1211,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             fit = dialog.accepted_fit()
             if fit is None:
                 return
+            self._last_activity_review = None
             self.workspace_controller.set_efficiency_fit(fit)
 
         def _seed_efficiency_points(self) -> tuple[EfficiencyPoint, ...]:
@@ -1020,24 +1232,239 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             return tuple(points)
 
-        def _compute_activity(self) -> None:
-            peak = self.workspace_controller.selected_peak()
+        def _current_activity_source(self) -> tuple[str, str | None]:
+            standard = (
+                self.mode_manager.state.standard
+                if self.mode_manager.state.mode is GUIMode.STANDARDS
+                else None
+            )
+            resolved = self.library_manager.resolved_state(standard=standard)
+            return (
+                resolved.gamma_identification_source_id,
+                resolved.custom_gamma_path,
+            )
+
+        def _current_activity_unit(self) -> str:
+            return str(self.activity_unit_combo.currentData() or "Bq")
+
+        def _refresh_activity_display(self) -> None:
+            self._sync_state(self.workspace_controller.state)
+
+        def _scaled_activity_plot_data(
+            self,
+            plot_data: dict[str, tuple[tuple[float, float, float], ...]],
+        ) -> dict[str, tuple[tuple[float, float, float], ...]]:
+            unit = self._current_activity_unit()
+            return {
+                label: _scale_activity_points(points, unit)
+                for label, points in plot_data.items()
+            }
+
+        def _review_peaks(self, *, selected_only: bool) -> tuple[PeakCandidate, ...]:
+            if selected_only:
+                peak = self.workspace_controller.selected_peak()
+                return (peak,) if peak is not None else ()
+            return tuple(
+                peak for peak in self.workspace_controller.state.peaks if peak.nuclide
+            )
+
+        def _review_to_activity_results(
+            self,
+            review: ActivityReviewResult,
+        ) -> tuple[ActivityCalculationResult, ...]:
+            return tuple(
+                ActivityCalculationResult(
+                    nuclide=item.nuclide,
+                    line_energy_keV=(
+                        item.matched_line_energies_keV[0]
+                        if item.matched_line_energies_keV
+                        else (item.peak_energies_keV[0] if item.peak_energies_keV else 0.0)
+                    ),
+                    activity_bq=item.count_time_activity_bq,
+                    uncertainty_bq=item.count_time_uncertainty_bq,
+                    age_corrected_activity_bq=item.irradiation_time_activity_bq,
+                    mda_bq=0.0,
+                    half_life_s=item.half_life_s,
+                    source_age_s=item.cooling_time_s,
+                    chain_summary=item.chain_summary,
+                    age_corrected_uncertainty_bq=item.irradiation_time_uncertainty_bq,
+                )
+                for item in review.isotope_summaries
+            )
+
+        def _run_activity_review(
+            self,
+            *,
+            selected_only: bool,
+        ) -> ActivityReviewResult | None:
+            peaks = self._review_peaks(selected_only=selected_only)
             fit = self.workspace_controller.state.efficiency_fit
             spectrum = self.workspace_controller.spectrum()
-            if peak is None or fit is None or spectrum is None:
+            if fit is None or spectrum is None:
                 self.summary.setText(
-                    "Select a peak and fit an efficiency curve before computing activity."
+                    "Fit an efficiency curve before running activity review."
                 )
-                return
-            result = calculate_peak_activity(
-                peak,
-                spectrum,
-                efficiency_curve=fit.curve,
-                gamma_intensity=1.0,
-                half_life_s=5.27 * 365.25 * 24.0 * 3600.0 if peak.nuclide and "co60" in peak.nuclide.lower() else 30.17 * 365.25 * 24.0 * 3600.0,
-                source_age_s=float(self.source_age_hours.value()) * 3600.0,
+                return None
+            if not peaks:
+                self.summary.setText(
+                    "No matched peaks are available for activity review."
+                )
+                return None
+            if any(peak.nuclide is None for peak in peaks):
+                self.summary.setText(
+                    "Assign nuclides to peaks before running activity review."
+                )
+                return None
+
+            source_id, custom_gamma_path = self._current_activity_source()
+            try:
+                review = review_spectrum_activation(
+                    peaks,
+                    live_time_s=max(float(spectrum.live_time or 1.0), 1.0),
+                    efficiency_curve=fit.curve,
+                    cooling_time_s=float(self.source_age_hours.value()) * 3600.0,
+                    source_id=source_id,
+                    custom_gamma_path=custom_gamma_path,
+                    dead_time_fraction=float(
+                        getattr(spectrum, "dead_time_fraction", 0.0) or 0.0
+                    ),
+                )
+            except Exception as exc:
+                self.summary.setText(str(exc))
+                return None
+
+            self._last_activity_review = review
+            self.workspace_controller.set_activity_results(
+                self._review_to_activity_results(review)
             )
-            self.workspace_controller.set_activity_results((result,))
+            return review
+
+        def _compute_activity(self) -> None:
+            review = self._run_activity_review(selected_only=True)
+            if review is None:
+                return
+            self.summary.setText(
+                f"{self.workspace_controller.state.efficiency_fit.model_label} active. "
+                f"Selected-peak review resolved {len(review.line_results)} line(s) to "
+                f"{len(review.isotope_summaries)} isotope(s)."
+            )
+
+        def _analyze_spectrum(self) -> None:
+            review = self._run_activity_review(selected_only=False)
+            if review is None:
+                return
+            self.summary.setText(
+                f"{self.workspace_controller.state.efficiency_fit.model_label} active. "
+                f"Spectrum review resolved {len(review.line_results)} line(s) across "
+                f"{len(review.isotope_summaries)} isotope(s)."
+            )
+
+        def analyze_spectrum_activities(self) -> ActivityReviewResult | None:
+            """Test-friendly wrapper for full-spectrum activity review."""
+
+            return self._run_activity_review(selected_only=False)
+
+        def _activity_review_for_export(self) -> ActivityReviewResult | None:
+            if self._last_activity_review is not None:
+                return self._last_activity_review
+            return self._run_activity_review(selected_only=False)
+
+        def _prompt_save_path(self, default_name: str, file_filter: str) -> Path | None:
+            filename, _selected = QFileDialog.getSaveFileName(
+                self,
+                "Save Activity Review Output",
+                str(Path.cwd() / default_name),
+                file_filter,
+            )
+            return Path(filename) if filename else None
+
+        def _write_csv_rows(self, path: Path, rows: list[dict[str, object]]) -> None:
+            if not rows:
+                raise ValueError("No activity rows are available to export.")
+            fieldnames: list[str] = []
+            for row in rows:
+                for key in row.keys():
+                    if key not in fieldnames:
+                        fieldnames.append(str(key))
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fieldnames)
+                writer.writeheader()
+                for row in rows:
+                    writer.writerow(row)
+
+        def export_activity_csv(self, path: str | Path) -> Path:
+            review = self._activity_review_for_export()
+            if review is None:
+                raise ValueError("Activity review is not available.")
+            resolved = Path(path)
+            self._write_csv_rows(resolved, review.isotope_rows())
+            return resolved
+
+        def export_decay_plot(self, path: str | Path) -> Path:
+            review = self._activity_review_for_export()
+            if review is None:
+                raise ValueError("Activity review is not available.")
+            resolved = Path(path)
+            resolved.parent.mkdir(parents=True, exist_ok=True)
+            unit = self._current_activity_unit()
+            plot_decay_curves(
+                self._scaled_activity_plot_data(review.decay_plot_data),
+                title="Spectrum Half-Life Decay Review",
+                xlabel="Time Since EOI (s)",
+                ylabel=f"Activity ({unit})",
+                log_y=True,
+                log_x=False,
+                half_lives=review.half_lives_s,
+                save_path=resolved,
+            )
+            return resolved
+
+        def export_bateman_plot(self, path: str | Path) -> Path:
+            review = self._activity_review_for_export()
+            if review is None:
+                raise ValueError("Activity review is not available.")
+            resolved = Path(path)
+            resolved.parent.mkdir(parents=True, exist_ok=True)
+            unit = self._current_activity_unit()
+            plot_decay_curves(
+                self._scaled_activity_plot_data(review.bateman_plot_data),
+                title="Spectrum Bateman Parent/Daughter Review",
+                xlabel="Time Since EOI (s)",
+                ylabel=f"EOI-Equivalent Inventory ({unit})",
+                log_y=False,
+                log_x=False,
+                half_lives=review.bateman_half_lives_s,
+                save_path=resolved,
+            )
+            return resolved
+
+        def _export_activity_csv_dialog(self) -> None:
+            path = self._prompt_save_path(
+                "activity_review_isotopes.csv",
+                "CSV Files (*.csv)",
+            )
+            if path is None:
+                return
+            self.export_activity_csv(path)
+
+        def _export_decay_plot_dialog(self) -> None:
+            path = self._prompt_save_path(
+                "activity_review_decay.png",
+                "PNG Files (*.png)",
+            )
+            if path is None:
+                return
+            self.export_decay_plot(path)
+
+        def _export_bateman_plot_dialog(self) -> None:
+            path = self._prompt_save_path(
+                "activity_review_bateman.png",
+                "PNG Files (*.png)",
+            )
+            if path is None:
+                return
+            self.export_bateman_plot(path)
 
         def _background_mode_changed(self) -> None:
             self.workspace_controller.set_background_config(
@@ -1068,25 +1495,556 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if state.efficiency_fit is None:
                 self.summary.setText("No efficiency fit has been applied yet.")
             else:
-                self.summary.setText(
-                    f"{state.efficiency_fit.model_label} active. RMSE {state.efficiency_fit.rmse:.6f}."
+                summary = (
+                    f"{state.efficiency_fit.model_label} active. "
+                    f"RMSE {state.efficiency_fit.rmse:.6f}."
                 )
-            if state.activity_results:
-                result = state.activity_results[0]
-                self.results.setPlainText(
-                    "\n".join(
-                        [
-                            f"Nuclide: {result.nuclide}",
-                            f"Line: {result.line_energy_keV:.3f} keV",
-                            f"Activity: {result.activity_bq:.6g} Bq ± {result.uncertainty_bq:.3g}",
-                            f"Age corrected: {result.age_corrected_activity_bq:.6g} Bq",
-                            f"MDA: {result.mda_bq:.6g} Bq",
-                            result.chain_summary,
-                        ]
+                if self._last_activity_review is not None:
+                    summary += (
+                        f" Reviewed {len(self._last_activity_review.line_results)} line(s) "
+                        f"across {len(self._last_activity_review.isotope_summaries)} isotope(s)."
                     )
+                self.summary.setText(summary)
+            exports_enabled = bool(state.activity_results)
+            self.export_csv_button.setEnabled(exports_enabled)
+            self.export_decay_button.setEnabled(exports_enabled)
+            self.export_bateman_button.setEnabled(exports_enabled)
+            if state.activity_results:
+                unit = self._current_activity_unit()
+                blocks = []
+                for result in state.activity_results:
+                    irradiation_uncertainty_bq = float(
+                        result.age_corrected_uncertainty_bq or 0.0
+                    )
+                    lines = [
+                        f"Nuclide: {result.nuclide}",
+                        f"Representative line: {result.line_energy_keV:.3f} keV",
+                        (
+                            "Count-time activity: "
+                            f"{_format_activity_value(result.activity_bq, unit)} "
+                            f"± {_format_activity_value(result.uncertainty_bq, unit, precision='.3g')}"
+                        ),
+                        (
+                            "Irradiation-time activity: "
+                            f"{_format_activity_value(result.age_corrected_activity_bq, unit)}"
+                        ),
+                    ]
+                    if irradiation_uncertainty_bq > 0.0:
+                        lines.append(
+                            "Irradiation-time sigma: "
+                            + _format_activity_value(
+                                irradiation_uncertainty_bq,
+                                unit,
+                                precision=".3g",
+                            )
+                        )
+                    if result.mda_bq > 0.0:
+                        lines.append(
+                            "MDA: " + _format_activity_value(result.mda_bq, unit)
+                        )
+                    lines.append(result.chain_summary)
+                    blocks.append("\n".join(lines))
+                self.results.setPlainText(
+                    "\n\n".join(blocks)
                 )
             else:
+                self._last_activity_review = None
                 self.results.setPlainText("No activity result has been calculated yet.")
+
+
+    class InventoryTimelinePanel(QWidget):
+        """Inventory/time-evolution surface fed by the current activity review."""
+
+        def __init__(
+            self,
+            *,
+            mode_manager: ModeManager,
+            workspace_controller: AnalysisWorkspaceController,
+            library_manager: DataLibraryManager,
+            parent=None,
+        ) -> None:
+            super().__init__(parent)
+            self.mode_manager = mode_manager
+            self.workspace_controller = workspace_controller
+            self.library_manager = library_manager
+            self._last_result = None
+
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(16, 16, 16, 16)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "Inventory / Time Evolution reconstructs the irradiation-time inventory "
+                    "from the current spectrum activity review, then propagates activity, "
+                    "atoms, mass, and dose to arbitrary times."
+                ),
+                self,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            controls = QGridLayout()
+            controls.setHorizontalSpacing(10)
+            controls.setVerticalSpacing(8)
+
+            controls.addWidget(QLabel("Decay library", self), 0, 0)
+            self.decay_source_combo = QComboBox(self)
+            self.decay_source_combo.setObjectName("InventoryDecaySourceCombo")
+            for record in list_nuclear_data_sources_by_capability("inventory-decay"):
+                self.decay_source_combo.addItem(record.label, record.source_id)
+            default_index = self.decay_source_combo.findData(DEFAULT_DECAY_SOURCE_ID)
+            if default_index >= 0:
+                self.decay_source_combo.setCurrentIndex(default_index)
+            controls.addWidget(self.decay_source_combo, 0, 1)
+
+            controls.addWidget(QLabel("Reference nuclide", self), 0, 2)
+            self.nuclide_focus_combo = QComboBox(self)
+            self.nuclide_focus_combo.setObjectName("InventoryNuclideFocusCombo")
+            self.nuclide_focus_combo.addItem("Top contributors", "__top__")
+            self.nuclide_focus_combo.addItem("All nuclides", "__all__")
+            controls.addWidget(self.nuclide_focus_combo, 0, 3)
+
+            controls.addWidget(QLabel("Time origin", self), 1, 0)
+            self.time_origin_combo = QComboBox(self)
+            self.time_origin_combo.setObjectName("InventoryTimeOriginCombo")
+            self.time_origin_combo.addItem("EOI", "eoi")
+            self.time_origin_combo.addItem("Count Start", "count_start")
+            self.time_origin_combo.addItem("Count End", "count_end")
+            controls.addWidget(self.time_origin_combo, 1, 1)
+
+            controls.addWidget(QLabel("Observable", self), 1, 2)
+            self.observable_combo = QComboBox(self)
+            self.observable_combo.setObjectName("InventoryObservableCombo")
+            self.observable_combo.addItem("Activity", "activity")
+            self.observable_combo.addItem("Atoms", "atoms")
+            self.observable_combo.addItem("Mass", "mass")
+            self.observable_combo.addItem("Dose", "dose")
+            controls.addWidget(self.observable_combo, 1, 3)
+
+            controls.addWidget(QLabel("Start (h)", self), 2, 0)
+            self.time_start_hours = QDoubleSpinBox(self)
+            self.time_start_hours.setObjectName("InventoryTimeStartHoursSpin")
+            self.time_start_hours.setRange(-1.0e5, 1.0e5)
+            self.time_start_hours.setDecimals(3)
+            self.time_start_hours.setValue(0.0)
+            controls.addWidget(self.time_start_hours, 2, 1)
+
+            controls.addWidget(QLabel("Stop (h)", self), 2, 2)
+            self.time_stop_hours = QDoubleSpinBox(self)
+            self.time_stop_hours.setObjectName("InventoryTimeStopHoursSpin")
+            self.time_stop_hours.setRange(-1.0e5, 1.0e5)
+            self.time_stop_hours.setDecimals(3)
+            self.time_stop_hours.setValue(48.0)
+            controls.addWidget(self.time_stop_hours, 2, 3)
+
+            controls.addWidget(QLabel("Points", self), 3, 0)
+            self.time_point_count = QSpinBox(self)
+            self.time_point_count.setObjectName("InventoryTimePointCountSpin")
+            self.time_point_count.setRange(2, 200)
+            self.time_point_count.setValue(25)
+            controls.addWidget(self.time_point_count, 3, 1)
+
+            controls.addWidget(QLabel("Distance (cm)", self), 3, 2)
+            self.distance_cm = QDoubleSpinBox(self)
+            self.distance_cm.setObjectName("InventoryDoseDistanceSpin")
+            self.distance_cm.setRange(0.1, 1.0e5)
+            self.distance_cm.setDecimals(2)
+            self.distance_cm.setValue(30.0)
+            controls.addWidget(self.distance_cm, 3, 3)
+
+            controls.addWidget(QLabel("Top N", self), 4, 0)
+            self.top_n_spin = QSpinBox(self)
+            self.top_n_spin.setObjectName("InventoryTopContributorCountSpin")
+            self.top_n_spin.setRange(1, 20)
+            self.top_n_spin.setValue(8)
+            controls.addWidget(self.top_n_spin, 4, 1)
+
+            controls.addWidget(QLabel("Activity units", self), 4, 2)
+            self.activity_unit_combo = QComboBox(self)
+            self.activity_unit_combo.setObjectName("InventoryActivityUnitCombo")
+            for unit in _ACTIVITY_UNIT_FACTORS:
+                self.activity_unit_combo.addItem(unit, unit)
+            controls.addWidget(self.activity_unit_combo, 4, 3)
+
+            button_row = QHBoxLayout()
+            self.refresh_button = QPushButton("Refresh Timeline", self)
+            self.refresh_button.clicked.connect(self._refresh_inventory)
+            button_row.addWidget(self.refresh_button)
+
+            self.export_csv_button = QPushButton("Export CSV", self)
+            self.export_csv_button.clicked.connect(self._export_csv_dialog)
+            button_row.addWidget(self.export_csv_button)
+
+            self.export_plot_button = QPushButton("Save Plot", self)
+            self.export_plot_button.clicked.connect(self._export_plot_dialog)
+            button_row.addWidget(self.export_plot_button)
+            button_row.addStretch(1)
+
+            layout.addLayout(controls)
+            layout.addLayout(button_row)
+
+            self.summary = QLabel(
+                "Run an activity review first to seed the irradiation-time inventory.",
+                self,
+            )
+            self.summary.setObjectName("PanelBody")
+            self.summary.setWordWrap(True)
+            layout.addWidget(self.summary)
+
+            self.family_browser = QTextBrowser(self)
+            self.family_browser.setObjectName("InventoryFamilyBrowser")
+            layout.addWidget(self.family_browser, 1)
+
+            self.table = QTableWidget(0, 8, self)
+            self.table.setObjectName("InventoryTimelineTable")
+            self.table.setHorizontalHeaderLabels(
+                (
+                    "Nuclide",
+                    "Rel. Time (h)",
+                    "Activity (Bq)",
+                    "Atoms",
+                    "Mass (g)",
+                    "Dose (uSv/h)",
+                    "Act. Sigma",
+                    "Dose Sigma",
+                )
+            )
+            self.table.verticalHeader().setVisible(False)
+            self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            layout.addWidget(self.table, 2)
+
+            self.workspace_controller.subscribe(self._sync_workspace_state)
+            self.nuclide_focus_combo.currentIndexChanged.connect(self._render_last_result)
+            self.observable_combo.currentIndexChanged.connect(self._render_last_result)
+            self.activity_unit_combo.currentIndexChanged.connect(self._render_last_result)
+            self._sync_workspace_state(self.workspace_controller.state)
+
+        def build_inventory_timeline(self):
+            return self._compute_inventory_timeline()
+
+        def _current_focus(self) -> str:
+            data = self.nuclide_focus_combo.currentData()
+            return str(data) if data else "__top__"
+
+        def _current_observable(self) -> str:
+            data = self.observable_combo.currentData()
+            return str(data) if data else "activity"
+
+        def _current_activity_unit(self) -> str:
+            return str(self.activity_unit_combo.currentData() or "Bq")
+
+        def _scale_activity_value(self, value_bq: float) -> float:
+            return float(value_bq) / _activity_unit_factor(self._current_activity_unit())
+
+        def _scale_activity_plot_data(
+            self,
+            plot_data: dict[str, tuple[tuple[float, float, float], ...]],
+        ) -> dict[str, tuple[tuple[float, float, float], ...]]:
+            unit = self._current_activity_unit()
+            return {
+                label: _scale_activity_points(points, unit)
+                for label, points in plot_data.items()
+            }
+
+        def _current_time_grid_s(self) -> tuple[float, ...]:
+            return build_time_grid(
+                start_s=float(self.time_start_hours.value()) * 3600.0,
+                stop_s=float(self.time_stop_hours.value()) * 3600.0,
+                count=int(self.time_point_count.value()),
+            )
+
+        def _inventory_state(self):
+            spectrum = self.workspace_controller.spectrum()
+            if spectrum is None:
+                self.summary.setText("No active spectrum is available for inventory evolution.")
+                return None
+            activity_results = self.workspace_controller.state.activity_results
+            if not activity_results:
+                self.summary.setText(
+                    "Run an activity review first to seed the irradiation-time inventory."
+                )
+                return None
+            standard = (
+                self.mode_manager.state.standard
+                if self.mode_manager.state.mode is GUIMode.STANDARDS
+                else None
+            )
+            resolved = self.library_manager.resolved_state(standard=standard)
+            return build_inventory_state_from_activity_results(
+                activity_results,
+                live_time_s=max(float(spectrum.live_time or 0.0), 0.0),
+                gamma_source_id=resolved.gamma_identification_source_id,
+                custom_gamma_path=resolved.custom_gamma_path,
+                sample_id=str(spectrum.spectrum_id or ""),
+                decay_source_id=str(
+                    self.decay_source_combo.currentData() or DEFAULT_DECAY_SOURCE_ID
+                ),
+            )
+
+        def _compute_inventory_timeline(self):
+            inventory_state = self._inventory_state()
+            if inventory_state is None:
+                return None
+            try:
+                result = compute_inventory_time_evolution(
+                    inventory_state,
+                    relative_times_s=self._current_time_grid_s(),
+                    time_origin=str(self.time_origin_combo.currentData() or "eoi"),
+                    decay_source_id=str(
+                        self.decay_source_combo.currentData() or DEFAULT_DECAY_SOURCE_ID
+                    ),
+                    distance_cm=float(self.distance_cm.value()),
+                )
+            except Exception as exc:
+                self.summary.setText(str(exc))
+                return None
+            self._last_result = result
+            return result
+
+        def _refresh_inventory(self) -> None:
+            result = self._compute_inventory_timeline()
+            if result is None:
+                return
+            total_activity_points = result.activity_series.get("Total")
+            total_dose_points = result.dose_series.get("Total")
+            final_activity = (
+                total_activity_points.points[-1][1]
+                if total_activity_points is not None and total_activity_points.points
+                else 0.0
+            )
+            final_dose = (
+                total_dose_points.points[-1][1]
+                if total_dose_points is not None and total_dose_points.points
+                else 0.0
+            )
+            self.summary.setText(
+                (
+                    f"Evolved {len(result.inventory_state.seeds)} seed isotope(s) across "
+                    f"{len(result.relative_times_s)} time points. "
+                    f"Final total activity {_format_activity_value(final_activity, self._current_activity_unit())}; "
+                    f"final total dose {final_dose:.6g} uSv/h."
+                )
+            )
+            self._render_result(result)
+
+        def _selected_plot_data(self, result) -> dict[str, tuple[tuple[float, float, float], ...]]:
+            observable = self._current_observable()
+            focus = self._current_focus()
+            if focus == "__all__":
+                return {
+                    label: series.points
+                    for label, series in result.series_for(observable).items()
+                }
+            if focus not in {"__top__", "__all__"}:
+                series = result.series_for(observable)
+                selected: dict[str, tuple[tuple[float, float, float], ...]] = {}
+                if "Total" in series:
+                    selected["Total"] = series["Total"].points
+                if focus in series:
+                    selected[focus] = series[focus].points
+                return selected
+            return result.plot_data(
+                observable,
+                top_n=int(self.top_n_spin.value()),
+                include_total=True,
+            )
+
+        def _render_last_result(self) -> None:
+            if self._last_result is not None:
+                self._render_result(self._last_result)
+
+        def _render_result(self, result) -> None:
+            focus = self._current_focus()
+            if focus in {"__top__", "__all__"}:
+                candidate_labels = [
+                    label
+                    for label in result.parents_by_nuclide.keys()
+                    if label in result.activity_series and label != "Total"
+                ]
+                focus = candidate_labels[0] if candidate_labels else "Total"
+            self.family_browser.setPlainText(self._family_summary(result, focus))
+            rows = [
+                row
+                for row in result.time_series_rows()
+                if self._row_visible(row)
+            ]
+            activity_unit = self._current_activity_unit()
+            self.table.setHorizontalHeaderLabels(
+                (
+                    "Nuclide",
+                    "Rel. Time (h)",
+                    f"Activity ({activity_unit})",
+                    "Atoms",
+                    "Mass (g)",
+                    "Dose (uSv/h)",
+                    f"Act. Sigma ({activity_unit})",
+                    "Dose Sigma (uSv/h)",
+                )
+            )
+            self.table.setRowCount(len(rows))
+            for row_index, row in enumerate(rows):
+                values = (
+                    row["nuclide"],
+                    f"{float(row['relative_time_s']) / 3600.0:.3f}",
+                    f"{self._scale_activity_value(float(row['activity_bq'])):.6g}",
+                    f"{float(row['atoms']):.6g}",
+                    f"{float(row['mass_g']):.6g}",
+                    f"{float(row['dose_rate_uSv_h']):.6g}",
+                    f"{self._scale_activity_value(float(row['activity_uncertainty_bq'])):.3g}",
+                    f"{float(row['dose_rate_uncertainty_uSv_h']):.3g}",
+                )
+                for column, value in enumerate(values):
+                    item = QTableWidgetItem(str(value))
+                    self.table.setItem(row_index, column, item)
+
+        def _row_visible(self, row: dict[str, object]) -> bool:
+            focus = self._current_focus()
+            nuclide = str(row.get("nuclide", ""))
+            if focus == "__all__":
+                return True
+            if focus == "__top__":
+                if self._last_result is None:
+                    return nuclide == "Total"
+                selected = set(self._selected_plot_data(self._last_result).keys())
+                return nuclide in selected
+            return nuclide in {"Total", focus}
+
+        def _family_summary(self, result, nuclide: str) -> str:
+            reference_rows = result.reference_rows("eoi")
+            half_life_s = None
+            for row in reference_rows:
+                if str(row.get("nuclide")) == nuclide:
+                    half_life_s = row.get("half_life_s")
+                    break
+            parents = ", ".join(result.parents_by_nuclide.get(nuclide, ())) or "none"
+            daughters = ", ".join(result.daughters_by_nuclide.get(nuclide, ())) or "none"
+            lines = [
+                f"Reference nuclide: {nuclide}",
+                f"Immediate parents: {parents}",
+                f"Immediate daughters: {daughters}",
+                f"EOI to count start: {_format_duration(result.inventory_state.schedule.count_start_time_s)}",
+                f"Count live time: {_format_duration(result.inventory_state.schedule.count_live_time_s)}",
+            ]
+            if half_life_s:
+                lines.append(f"Half-life: {_format_duration(float(half_life_s))}")
+            lines.append("")
+            lines.extend(result.notes)
+            return "\n".join(lines)
+
+        def _prompt_save_path(self, default_name: str, file_filter: str) -> Path | None:
+            filename, _selected = QFileDialog.getSaveFileName(
+                self,
+                "Save Inventory Output",
+                str(Path.cwd() / default_name),
+                file_filter,
+            )
+            return Path(filename) if filename else None
+
+        def _write_csv_rows(self, path: Path, rows: list[dict[str, object]]) -> None:
+            if not rows:
+                raise ValueError("No inventory rows are available to export.")
+            fieldnames: list[str] = []
+            for row in rows:
+                for key in row.keys():
+                    if key not in fieldnames:
+                        fieldnames.append(str(key))
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fieldnames)
+                writer.writeheader()
+                for row in rows:
+                    writer.writerow(row)
+
+        def export_time_series_csv(self, path: str | Path) -> Path:
+            result = self._last_result or self._compute_inventory_timeline()
+            if result is None:
+                raise ValueError("Inventory timeline is not available.")
+            resolved = Path(path)
+            self._write_csv_rows(resolved, result.time_series_rows())
+            return resolved
+
+        def export_plot(self, path: str | Path) -> Path:
+            result = self._last_result or self._compute_inventory_timeline()
+            if result is None:
+                raise ValueError("Inventory timeline is not available.")
+            observable = self._current_observable()
+            plot_data = self._selected_plot_data(result)
+            ylabel = {
+                "activity": f"Activity ({self._current_activity_unit()})",
+                "atoms": "Atoms",
+                "mass": "Mass (g)",
+                "dose": "Dose Rate (uSv/h)",
+            }[observable]
+            if observable == "activity":
+                plot_data = self._scale_activity_plot_data(plot_data)
+            resolved = Path(path)
+            resolved.parent.mkdir(parents=True, exist_ok=True)
+            half_lives = {
+                str(row["nuclide"]): float(row["half_life_s"])
+                for row in result.reference_rows("eoi")
+                if row.get("half_life_s") is not None
+            }
+            plot_decay_curves(
+                plot_data,
+                title=f"Inventory Time Evolution ({observable.title()})",
+                xlabel=(
+                    f"Time Since "
+                    f"{str(self.time_origin_combo.currentData() or 'eoi').replace('_', ' ').title()} (s)"
+                ),
+                ylabel=ylabel,
+                log_y=observable in {"activity", "atoms", "dose"},
+                log_x=False,
+                half_lives=half_lives,
+                save_path=resolved,
+            )
+            return resolved
+
+        def _export_csv_dialog(self) -> None:
+            path = self._prompt_save_path(
+                "inventory_timeseries.csv",
+                "CSV Files (*.csv)",
+            )
+            if path is None:
+                return
+            self.export_time_series_csv(path)
+
+        def _export_plot_dialog(self) -> None:
+            path = self._prompt_save_path(
+                f"inventory_{self._current_observable()}.png",
+                "PNG Files (*.png)",
+            )
+            if path is None:
+                return
+            self.export_plot(path)
+
+        def _sync_workspace_state(self, state) -> None:
+            current_focus = self._current_focus()
+            self.nuclide_focus_combo.blockSignals(True)
+            self.nuclide_focus_combo.clear()
+            self.nuclide_focus_combo.addItem("Top contributors", "__top__")
+            self.nuclide_focus_combo.addItem("All nuclides", "__all__")
+            for result in state.activity_results:
+                self.nuclide_focus_combo.addItem(result.nuclide, result.nuclide)
+            index = self.nuclide_focus_combo.findData(current_focus)
+            if index < 0:
+                index = 0
+            self.nuclide_focus_combo.setCurrentIndex(index)
+            self.nuclide_focus_combo.blockSignals(False)
+
+            enabled = bool(state.activity_results)
+            self.refresh_button.setEnabled(enabled)
+            self.export_csv_button.setEnabled(enabled)
+            self.export_plot_button.setEnabled(enabled)
+            self.nuclide_focus_combo.setEnabled(enabled)
+            if not enabled:
+                self._last_result = None
+                self.family_browser.setPlainText(
+                    "Run an activity review first to seed the irradiation-time inventory."
+                )
+                self.table.setRowCount(0)
 
 
     class RoiToolsPanel(QWidget):
@@ -2085,6 +3043,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.library_manager.subscribe(self._sync_library_state)
             self.workspace_controller.subscribe(self._sync_workspace_state)
             self.mode_manager.subscribe(lambda _state: self._sync_qa_summary())
+            self.mode_manager.subscribe(lambda _state: self._sync_library_state(self.library_manager.state))
             self.nuclide_query.textChanged.connect(self._refresh_nuclide_results)
             self.nuclides.itemSelectionChanged.connect(self._activate_selected_nuclide)
             self.nuclide_age_days.valueChanged.connect(self._refresh_nuclide_details)
@@ -2099,6 +3058,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.apply_mixture_overlay_button.clicked.connect(self._apply_mixture_overlay)
             self.mixture_table.itemChanged.connect(self._update_mixture_summary)
             self.custom_gamma_path.editingFinished.connect(self._apply_custom_gamma_path)
+            self.register_custom_gamma_button.clicked.connect(
+                self._register_user_gamma_source
+            )
+            self.remove_registered_gamma_button.clicked.connect(
+                self._remove_registered_gamma_source
+            )
             self.gamma_source_combo.currentIndexChanged.connect(self._gamma_source_changed)
             self.calibration_source_combo.currentIndexChanged.connect(
                 self._calibration_source_changed
@@ -2193,6 +3158,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Optional custom gamma locator (JSON/CSV/YAML/sqlite://.../python://...)"
             )
             layout.addWidget(self.custom_gamma_path)
+
+            self.custom_gamma_alias = QLineEdit(group)
+            self.custom_gamma_alias.setObjectName("CustomGammaAliasInput")
+            self.custom_gamma_alias.setPlaceholderText(
+                "Registered alias for the library above"
+            )
+            layout.addWidget(self.custom_gamma_alias)
+
+            custom_actions = QHBoxLayout()
+            self.register_custom_gamma_button = QPushButton("Register Library", group)
+            self.register_custom_gamma_button.setObjectName("RegisterCustomGammaButton")
+            custom_actions.addWidget(self.register_custom_gamma_button)
+            self.remove_registered_gamma_button = QPushButton("Remove Selected", group)
+            self.remove_registered_gamma_button.setObjectName(
+                "RemoveRegisteredGammaButton"
+            )
+            custom_actions.addWidget(self.remove_registered_gamma_button)
+            custom_actions.addStretch(1)
+            layout.addLayout(custom_actions)
 
             layout.addWidget(QLabel("Calibration sources", group))
             self.calibration_source_combo = QComboBox(group)
@@ -2365,25 +3349,33 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             return group
 
         def _populate_library_combos(self) -> None:
+            standard = (
+                self.mode_manager.state.standard
+                if self.mode_manager.state.mode is GUIMode.STANDARDS
+                else None
+            )
             self._populate_combo(
                 self.gamma_source_combo,
-                self.library_manager.available_sources("gamma_identification"),
+                self.library_manager.available_sources(
+                    "gamma_identification",
+                    standard=standard,
+                ),
             )
             self._populate_combo(
                 self.calibration_source_combo,
-                self.library_manager.available_sources("calibration"),
+                self.library_manager.available_sources("calibration", standard=standard),
             )
             self._populate_combo(
                 self.naa_source_combo,
-                self.library_manager.available_sources("naa_monitor"),
+                self.library_manager.available_sources("naa_monitor", standard=standard),
             )
             self._populate_combo(
                 self.dosimetry_source_combo,
-                self.library_manager.available_sources("dosimetry"),
+                self.library_manager.available_sources("dosimetry", standard=standard),
             )
             self._populate_combo(
                 self.activation_source_combo,
-                self.library_manager.available_sources("activation"),
+                self.library_manager.available_sources("activation", standard=standard),
             )
 
         def _populate_combo(self, combo: QComboBox, records) -> None:
@@ -2394,42 +3386,121 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             combo.blockSignals(False)
 
         def _sync_library_state(self, state) -> None:
+            standard = (
+                self.mode_manager.state.standard
+                if self.mode_manager.state.mode is GUIMode.STANDARDS
+                else None
+            )
+            resolved_state = self.library_manager.resolved_state(standard=standard)
+            self.nuclide_controller.set_source(
+                resolved_state.gamma_identification_source_id,
+                custom_path=resolved_state.custom_gamma_path,
+            )
+            self._populate_library_combos()
             self._set_combo_value(
                 self.gamma_source_combo,
-                state.gamma_identification_source_id,
+                resolved_state.gamma_identification_source_id,
             )
             self._set_combo_value(
                 self.calibration_source_combo,
-                state.calibration_source_id,
+                resolved_state.calibration_source_id,
             )
-            self._set_combo_value(self.naa_source_combo, state.naa_monitor_source_id)
-            self._set_combo_value(self.dosimetry_source_combo, state.dosimetry_source_id)
+            self._set_combo_value(self.naa_source_combo, resolved_state.naa_monitor_source_id)
+            self._set_combo_value(self.dosimetry_source_combo, resolved_state.dosimetry_source_id)
             self._set_combo_value(
                 self.activation_source_combo,
-                state.activation_catalog_source_id,
+                resolved_state.activation_catalog_source_id,
             )
             self.custom_gamma_path.blockSignals(True)
             self.custom_gamma_path.setText(state.custom_gamma_path or "")
             self.custom_gamma_path.setEnabled(
-                state.gamma_identification_source_id == "custom_gamma_file"
+                standard is None
+                and state.gamma_identification_source_id == "custom_gamma_file"
             )
             self.custom_gamma_path.blockSignals(False)
-            self.library_summary.setPlainText(
-                "\n\n".join(
-                    [
-                        "Identification\n"
-                        + self.library_manager.summary_for_category("gamma_identification"),
-                        "Calibration\n"
-                        + self.library_manager.summary_for_category("calibration"),
-                        "Standards / monitors\n"
-                        + self.library_manager.summary_for_category("naa_monitor"),
-                        "Dosimetry\n"
-                        + self.library_manager.summary_for_category("dosimetry"),
-                        "Activation\n"
-                        + self.library_manager.summary_for_category("activation"),
-                    ]
-                )
+            self.custom_gamma_alias.setEnabled(standard is None)
+            self.register_custom_gamma_button.setEnabled(standard is None)
+            self.remove_registered_gamma_button.setEnabled(
+                standard is None
+                and str(state.gamma_identification_source_id).startswith("user_gamma_")
             )
+            self.gamma_source_combo.setEnabled(
+                self.library_manager.locked_source_for_category(
+                    "gamma_identification",
+                    standard=standard,
+                )
+                is None
+                and self.gamma_source_combo.count() > 1
+            )
+            self.calibration_source_combo.setEnabled(
+                self.library_manager.locked_source_for_category(
+                    "calibration",
+                    standard=standard,
+                )
+                is None
+                and self.calibration_source_combo.count() > 1
+            )
+            self.naa_source_combo.setEnabled(
+                self.library_manager.locked_source_for_category(
+                    "naa_monitor",
+                    standard=standard,
+                )
+                is None
+                and self.naa_source_combo.count() > 1
+            )
+            self.dosimetry_source_combo.setEnabled(
+                self.library_manager.locked_source_for_category(
+                    "dosimetry",
+                    standard=standard,
+                )
+                is None
+                and self.dosimetry_source_combo.count() > 1
+            )
+            self.activation_source_combo.setEnabled(
+                self.library_manager.locked_source_for_category(
+                    "activation",
+                    standard=standard,
+                )
+                is None
+                and self.activation_source_combo.count() > 1
+            )
+            sections = [
+                "Identification\n"
+                + self.library_manager.summary_for_category(
+                    "gamma_identification",
+                    standard=standard,
+                ),
+                "Calibration\n"
+                + self.library_manager.summary_for_category(
+                    "calibration",
+                    standard=standard,
+                ),
+                "Standards / monitors\n"
+                + self.library_manager.summary_for_category(
+                    "naa_monitor",
+                    standard=standard,
+                ),
+                "Dosimetry\n"
+                + self.library_manager.summary_for_category(
+                    "dosimetry",
+                    standard=standard,
+                ),
+                "Activation\n"
+                + self.library_manager.summary_for_category(
+                    "activation",
+                    standard=standard,
+                ),
+            ]
+            registered = self.library_manager.registered_user_gamma_sources()
+            if registered:
+                sections.append(
+                    "Registered User Libraries\n"
+                    + "\n".join(
+                        f"{record.source_id} -> {record.path_hint}"
+                        for record in registered
+                    )
+                )
+            self.library_summary.setPlainText("\n\n".join(sections))
             self._refresh_nuclide_results(self.nuclide_query.text())
             self._refresh_nuclide_details()
             self._update_saved_summary()
@@ -2511,6 +3582,34 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 custom_gamma_path=self.custom_gamma_path.text().strip() or None,
             )
 
+        def _register_user_gamma_source(self) -> None:
+            alias = self.custom_gamma_alias.text().strip()
+            locator = self.custom_gamma_path.text().strip()
+            if not alias or not locator:
+                self.library_summary.setPlainText(
+                    "Provide both a library alias and locator to register a user library."
+                )
+                return
+            try:
+                record = self.library_manager.register_user_gamma_source(alias, locator)
+            except Exception as exc:
+                self.library_summary.setPlainText(str(exc))
+                return
+            self.custom_gamma_alias.clear()
+            self._set_combo_value(self.gamma_source_combo, record.source_id)
+
+        def _remove_registered_gamma_source(self) -> None:
+            source_id = str(self.gamma_source_combo.currentData() or "")
+            if not source_id.startswith("user_gamma_"):
+                self.library_summary.setPlainText(
+                    "Select a registered user library before attempting removal."
+                )
+                return
+            if not self.library_manager.remove_user_gamma_source(source_id):
+                self.library_summary.setPlainText(
+                    f"Registered library not found: {source_id}"
+                )
+
         def _sync_selection(self, state: SelectionState) -> None:
             self.selection_note.setPlainText(
                 "Selection sync\n\n" + _selection_summary(state)
@@ -2556,6 +3655,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     pinned.remove(str(nuclide))
                 else:
                     pinned.append(str(nuclide))
+                standard = (
+                    self.mode_manager.state.standard
+                    if self.mode_manager.state.mode is GUIMode.STANDARDS
+                    else None
+                )
+                resolved_state = self.library_manager.resolved_state(standard=standard)
                 self.workspace_controller.set_state(
                     self.workspace_controller.state.__class__(
                         **{
@@ -2563,8 +3668,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                             "pinned_nuclides": tuple(pinned),
                             "cascade_sum_lines_keV": compute_cascade_sum_lines(
                                 pinned,
-                                source_id=self.library_manager.state.gamma_identification_source_id,
-                                custom_path=self.library_manager.state.custom_gamma_path,
+                                source_id=resolved_state.gamma_identification_source_id,
+                                custom_path=resolved_state.custom_gamma_path,
                             ),
                         }
                     )
@@ -3228,6 +4333,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             self.addTab(self.activity_results_panel, "Activity Results")
+            self.inventory_timeline_panel = InventoryTimelinePanel(
+                mode_manager=self.mode_manager,
+                workspace_controller=self.workspace_controller,
+                library_manager=self.library_manager,
+                parent=self,
+            )
+            self.addTab(self.inventory_timeline_panel, "Inventory / Time Evolution")
             self.batch_queue_panel = BatchQueuePanel(
                 workspace_controller=self.workspace_controller,
                 parent=self,

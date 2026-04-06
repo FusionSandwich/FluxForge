@@ -292,16 +292,41 @@ class TestFluxWireMeasurement(unittest.TestCase):
         from fluxforge.workflows.spectrum_unfolding import FluxWireMeasurement
 
         meas = FluxWireMeasurement(
-            reaction="Ti-46(n,p)Sc-46",
+            reaction="Sc-45(n,g)Sc-46",
             activity_Bq=1e5,
             saturation_factor=0.5,
             decay_factor=0.8,
+            sample_mass_g=1.0e-3,
+            isotope_abundance=1.0,
         )
 
         rate = meas.reaction_rate_per_atom
-        expected = 1e5 / (0.5 * 0.8)
+        n_atoms = (1.0e-3 / 44.955908) * 6.02214076e23
+        expected = 1e5 / (n_atoms * 0.5 * 0.8)
 
         self.assertTrue(np.isclose(rate, expected))
+
+    def test_reaction_rate_uses_timing_metadata(self):
+        """Test saturation and decay corrections derived from irradiation metadata."""
+        from fluxforge.workflows.spectrum_unfolding import FluxWireMeasurement
+
+        meas = FluxWireMeasurement(
+            reaction="Cu-63(n,g)Cu-64",
+            activity_Bq=2.5e4,
+            sample_mass_g=1.3748e-3,
+            irradiation_time=7200.0,
+            cooling_time=357.0,
+        )
+
+        lam = np.log(2.0) / 45720.0
+        saturation = 1.0 - np.exp(-lam * 7200.0)
+        decay = np.exp(-lam * 357.0)
+        n_atoms = (1.3748e-3 / 63.546) * 6.02214076e23 * 0.6917
+        expected = 2.5e4 / (n_atoms * saturation * decay)
+
+        self.assertTrue(np.isclose(meas.effective_saturation_factor, saturation))
+        self.assertTrue(np.isclose(meas.effective_decay_factor, decay))
+        self.assertTrue(np.isclose(meas.reaction_rate_per_atom, expected))
 
 
 class TestUnfoldingResult(unittest.TestCase):

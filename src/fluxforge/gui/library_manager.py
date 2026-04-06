@@ -9,6 +9,9 @@ from fluxforge.data.nuclear_data_sources import (
     NuclearDataSourceRecord,
     get_nuclear_data_source,
     list_nuclear_data_sources,
+    list_registered_user_gamma_sources,
+    register_user_gamma_source,
+    remove_user_gamma_source,
     summarize_nuclear_data_source,
 )
 
@@ -26,6 +29,36 @@ class DataLibraryState:
 
 
 LibraryListener = Callable[[DataLibraryState], None]
+
+
+STANDARD_LIBRARY_LOCKS: dict[str, dict[str, str]] = {
+    "ASTM E181": {
+        "gamma_identification": "decay_2012",
+        "calibration": "calibration_standard_sources",
+    },
+    "ASTM E1218": {
+        "gamma_identification": "decay_2012",
+        "calibration": "calibration_standard_sources",
+    },
+    "ASTM E1297": {
+        "gamma_identification": "decay_2012",
+        "calibration": "calibration_standard_sources",
+    },
+    "ASTM C1232": {
+        "gamma_identification": "decay_2012",
+        "calibration": "calibration_standard_sources",
+    },
+    "ASTM C1030": {
+        "gamma_identification": "decay_2012",
+        "calibration": "calibration_standard_sources",
+    },
+    "ASTM E261": {
+        "gamma_identification": "decay_2012",
+        "calibration": "calibration_standard_sources",
+        "dosimetry": "irdff_ii_dosimetry",
+        "activation": "flux_wire_catalog",
+    },
+}
 
 
 class DataLibraryManager:
@@ -223,35 +256,125 @@ class DataLibraryManager:
             )
         )
 
-    def available_sources(self, category: str) -> tuple[NuclearDataSourceRecord, ...]:
+    def locked_source_for_category(
+        self,
+        category: str,
+        *,
+        standard: str | None = None,
+    ) -> str | None:
+        if not standard:
+            return None
+        return STANDARD_LIBRARY_LOCKS.get(str(standard), {}).get(category)
+
+    def resolved_state(
+        self,
+        *,
+        standard: str | None = None,
+    ) -> DataLibraryState:
+        state = self._state
+        return DataLibraryState(
+            gamma_identification_source_id=(
+                self.locked_source_for_category(
+                    "gamma_identification",
+                    standard=standard,
+                )
+                or state.gamma_identification_source_id
+            ),
+            calibration_source_id=(
+                self.locked_source_for_category("calibration", standard=standard)
+                or state.calibration_source_id
+            ),
+            naa_monitor_source_id=(
+                self.locked_source_for_category("naa_monitor", standard=standard)
+                or state.naa_monitor_source_id
+            ),
+            dosimetry_source_id=(
+                self.locked_source_for_category("dosimetry", standard=standard)
+                or state.dosimetry_source_id
+            ),
+            activation_catalog_source_id=(
+                self.locked_source_for_category("activation", standard=standard)
+                or state.activation_catalog_source_id
+            ),
+            custom_gamma_path=state.custom_gamma_path,
+        )
+
+    def available_sources(
+        self,
+        category: str,
+        *,
+        standard: str | None = None,
+    ) -> tuple[NuclearDataSourceRecord, ...]:
         records = list_nuclear_data_sources(self._custom_paths())
+        locked_source_id = self.locked_source_for_category(category, standard=standard)
         if category == "gamma_identification":
-            return tuple(
+            resolved = tuple(
                 record
                 for record in records
                 if "peak-identification" in record.capabilities
                 or record.source_id.startswith("custom_gamma_")
                 or record.source_id == "custom_gamma_file"
             )
+            if locked_source_id:
+                return tuple(
+                    record for record in resolved if record.source_id == locked_source_id
+                )
+            return resolved
         if category == "calibration":
-            return tuple(
+            resolved = tuple(
                 record for record in records if "efficiency-calibration" in record.capabilities
             )
+            if locked_source_id:
+                return tuple(
+                    record for record in resolved if record.source_id == locked_source_id
+                )
+            return resolved
         if category == "naa_monitor":
-            return tuple(record for record in records if "k0-naa" in record.capabilities)
+            resolved = tuple(record for record in records if "k0-naa" in record.capabilities)
+            if locked_source_id:
+                return tuple(
+                    record for record in resolved if record.source_id == locked_source_id
+                )
+            return resolved
         if category == "dosimetry":
-            return tuple(record for record in records if "dosimetry" in record.capabilities)
+            resolved = tuple(
+                record for record in records if "dosimetry" in record.capabilities
+            )
+            if locked_source_id:
+                return tuple(
+                    record for record in resolved if record.source_id == locked_source_id
+                )
+            return resolved
         if category == "activation":
-            return tuple(
+            resolved = tuple(
                 record
                 for record in records
                 if "activation-reference" in record.capabilities
                 and record.source_id != "nndc_offline_activation"
             )
+            resolved = tuple(
+                sorted(
+                    resolved,
+                    key=lambda record: (
+                        0 if record.source_id == "flux_wire_catalog" else 1,
+                        record.label.lower(),
+                    ),
+                )
+            )
+            if locked_source_id:
+                return tuple(
+                    record for record in resolved if record.source_id == locked_source_id
+                )
+            return resolved
         raise KeyError(f"Unknown data-library category: {category}")
 
-    def record_for_category(self, category: str) -> NuclearDataSourceRecord:
-        state = self._state
+    def record_for_category(
+        self,
+        category: str,
+        *,
+        standard: str | None = None,
+    ) -> NuclearDataSourceRecord:
+        state = self.resolved_state(standard=standard)
         selected_id = {
             "gamma_identification": state.gamma_identification_source_id,
             "calibration": state.calibration_source_id,
@@ -261,8 +384,13 @@ class DataLibraryManager:
         }[category]
         return get_nuclear_data_source(selected_id, custom_paths=self._custom_paths())
 
-    def summary_for_category(self, category: str) -> str:
-        record = self.record_for_category(category)
+    def summary_for_category(
+        self,
+        category: str,
+        *,
+        standard: str | None = None,
+    ) -> str:
+        record = self.record_for_category(category, standard=standard)
         custom_path = (
             self._state.custom_gamma_path if record.source_id == "custom_gamma_file" else None
         )
@@ -278,8 +406,34 @@ class DataLibraryManager:
             "custom_gamma_path": self._state.custom_gamma_path,
         }
 
+    def registered_user_gamma_sources(self) -> tuple[NuclearDataSourceRecord, ...]:
+        return list_registered_user_gamma_sources()
+
+    def register_user_gamma_source(
+        self,
+        alias: str,
+        locator: str,
+        *,
+        description: str | None = None,
+    ) -> NuclearDataSourceRecord:
+        record = register_user_gamma_source(alias, locator, description=description)
+        self.set_gamma_identification_source(record.source_id)
+        return record
+
+    def remove_user_gamma_source(self, source_id: str) -> bool:
+        removed = remove_user_gamma_source(source_id)
+        if not removed:
+            return False
+        if self._state.gamma_identification_source_id == source_id:
+            self.set_gamma_identification_source(
+                DataLibraryState.gamma_identification_source_id
+            )
+        else:
+            self._publish(self._state)
+        return True
+
     def _custom_paths(self) -> tuple[str, ...]:
         return (self._state.custom_gamma_path,) if self._state.custom_gamma_path else ()
 
 
-__all__ = ["DataLibraryManager", "DataLibraryState"]
+__all__ = ["DataLibraryManager", "DataLibraryState", "STANDARD_LIBRARY_LOCKS"]

@@ -4,7 +4,7 @@ Decay data library loader for offline workflows.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -59,12 +59,16 @@ class DecayDataset:
     progeny: Dict[str, List[str]]
     branching: Dict[str, List[float]]
     modes: Dict[str, List[str]]
+    half_life_uncertainties_s: Dict[str, float] = field(default_factory=dict)
 
     def half_life_s(self, nuclide: str) -> Optional[float]:
         return self.half_lives_s.get(normalize_nuclide_label(nuclide))
 
     def atomic_mass(self, nuclide: str) -> Optional[float]:
         return self.atomic_masses_g_mol.get(normalize_nuclide_label(nuclide))
+
+    def half_life_uncertainty_s(self, nuclide: str) -> Optional[float]:
+        return self.half_life_uncertainties_s.get(normalize_nuclide_label(nuclide))
 
     def decay_products(self, nuclide: str) -> List[str]:
         return list(self.progeny.get(normalize_nuclide_label(nuclide), []))
@@ -76,7 +80,13 @@ class DecayDataset:
         return list(self.modes.get(normalize_nuclide_label(nuclide), []))
 
     @classmethod
-    def from_radioactivedecay_npz(cls, path: Union[str, Path]) -> "DecayDataset":
+    def from_radioactivedecay_npz(
+        cls,
+        path: Union[str, Path],
+        *,
+        half_life_overrides_s: Optional[Dict[str, float]] = None,
+        half_life_uncertainties_s: Optional[Dict[str, float]] = None,
+    ) -> "DecayDataset":
         """
         Load decay data from radioactivedecay npz bundle.
         """
@@ -96,6 +106,15 @@ class DecayDataset:
         progeny_map: Dict[str, List[str]] = {}
         branching_map: Dict[str, List[float]] = {}
         modes_map: Dict[str, List[str]] = {}
+        half_life_override_map = {
+            normalize_nuclide_label(key): float(value)
+            for key, value in (half_life_overrides_s or {}).items()
+        }
+        half_life_uncertainty_map = {
+            normalize_nuclide_label(key): float(value)
+            for key, value in (half_life_uncertainties_s or {}).items()
+            if value is not None
+        }
 
         for idx, nuclide in enumerate(nuclides):
             atomic_masses_g_mol[nuclide] = float(masses[idx])
@@ -106,6 +125,7 @@ class DecayDataset:
                 half_life = float(h_val) * year_conv * 86400.0
             else:
                 half_life = float(h_val) * _UNIT_TO_SECONDS.get(unit, 1.0)
+            half_life = half_life_override_map.get(nuclide, half_life)
             half_lives_s[nuclide] = half_life
 
             progeny_list = [normalize_nuclide_label(p) for p in progeny[idx]]
@@ -119,4 +139,5 @@ class DecayDataset:
             progeny=progeny_map,
             branching=branching_map,
             modes=modes_map,
+            half_life_uncertainties_s=half_life_uncertainty_map,
         )

@@ -55,6 +55,10 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.package-data]
 fluxforge = [
     "data/*.json",
+    "data/*.csv",
+    "data/*.dat",
+    "data/*.npz",
+    "data/*.uT12",
     "gui/themes/*.qss",
     "reporting/templates/*.j2",
     "resources/schemas/*.xsd",

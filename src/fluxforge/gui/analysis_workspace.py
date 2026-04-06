@@ -55,6 +55,8 @@ class AnalysisWorkspaceState:
     selected_peak_id: str | None = None
     pinned_nuclides: tuple[str, ...] = ()
     peak_search_method: str = "mariscotti"
+    bayesian_source_id: str = "fluxforge_bundled_gamma"
+    ml_source_id: str = "fluxforge_bundled_gamma"
     roi_background_method: str = "roi_sideband"
     background_mode: str = "simple"
     background_scale: float = 1.0
@@ -271,6 +273,12 @@ class AnalysisWorkspaceController:
     def set_peak_search_method(self, method: str) -> AnalysisWorkspaceState:
         return self.update(peak_search_method=str(method))
 
+    def set_bayesian_source_id(self, source_id: str) -> AnalysisWorkspaceState:
+        return self.update(bayesian_source_id=str(source_id))
+
+    def set_ml_source_id(self, source_id: str) -> AnalysisWorkspaceState:
+        return self.update(ml_source_id=str(source_id))
+
     def set_roi_background_method(self, method: str) -> AnalysisWorkspaceState:
         return self.update(roi_background_method=str(method))
 
@@ -318,6 +326,8 @@ class AnalysisWorkspaceController:
             "selected_peak_id": self._state.selected_peak_id,
             "pinned_nuclides": list(self._state.pinned_nuclides),
             "peak_search_method": self._state.peak_search_method,
+            "bayesian_source_id": self._state.bayesian_source_id,
+            "ml_source_id": self._state.ml_source_id,
             "roi_background_method": self._state.roi_background_method,
             "background_mode": self._state.background_mode,
             "background_visible": self._state.background_visible,

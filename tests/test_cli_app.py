@@ -180,6 +180,318 @@ def test_build_parser_roi_commands(tmp_path):
     assert len(stats_args.inputs) == 2
 
 
+def test_build_parser_activity_review_command(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "activity-review",
+            "--peaks-file",
+            str(tmp_path / "peaks.json"),
+            "--cooling-time-s",
+            "3600",
+            "--source-id",
+            "custom_gamma_file",
+            "--custom-gamma-path",
+            str(tmp_path / "gamma.json"),
+            "--efficiency-polynomial=-2.0,-0.1",
+        ]
+    )
+    assert args.command == "activity-review"
+    assert args.source_id == "custom_gamma_file"
+    assert args.cooling_time_s == pytest.approx(3600.0)
+
+
+def test_build_parser_inventory_review_command(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "inventory-review",
+            "--activity-review-file",
+            str(tmp_path / "activity_review.json"),
+            "--time-origin",
+            "count_start",
+            "--observable",
+            "dose",
+            "--time-points-s",
+            "0,3600,7200",
+        ]
+    )
+    assert args.command == "inventory-review"
+    assert args.time_origin == "count_start"
+    assert args.observable == "dose"
+
+
+def test_build_parser_library_registry_commands(tmp_path):
+    parser = app.build_parser()
+    list_args = parser.parse_args(["library-list", "--json"])
+    assert list_args.command == "library-list"
+
+    register_args = parser.parse_args(
+        [
+            "library-register",
+            "--alias",
+            "Lab Ref",
+            "--locator",
+            str(tmp_path / "gamma.csv"),
+        ]
+    )
+    assert register_args.command == "library-register"
+
+    remove_args = parser.parse_args(
+        [
+            "library-remove",
+            "--source-id",
+            "user_gamma_lab_ref",
+        ]
+    )
+    assert remove_args.command == "library-remove"
+
+
+def test_activity_review_source_choices_only_include_gamma_libraries():
+    source_ids = set(app._activity_review_source_choices())
+
+    assert "nasa_common_lab_sources" in source_ids
+    assert "nasa_capture_capgam" not in source_ids
+    assert "nasa_capture_iaea" not in source_ids
+    assert "radioactivedecay_icrp107_kayzero_2023" not in source_ids
+
+
+def test_build_parser_peak_search_supports_all_modern_methods(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "peaks",
+            "--spectrum-file",
+            str(tmp_path / "sample.json"),
+            "--method",
+            "consensus",
+        ]
+    )
+    assert args.method == "consensus"
+
+    roi_args = parser.parse_args(
+        [
+            "roi-analyze",
+            "--input",
+            str(tmp_path / "sample.json"),
+            "--left-keV",
+            "100.0",
+            "--right-keV",
+            "200.0",
+            "--peak-search-method",
+            "wavelet",
+        ]
+    )
+    assert roi_args.peak_search_method == "wavelet"
+
+
+def test_cmd_activity_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp_path):
+    gamma_path = tmp_path / "gamma.json"
+    gamma_path.write_text(
+        json.dumps(
+            [
+                {
+                    "nuclide": "Co60",
+                    "energy_keV": 1173.228,
+                    "intensity": 0.999,
+                    "intensity_unc": 0.004,
+                    "half_life_s": 5.2714 * 365.25 * 24.0 * 3600.0,
+                },
+                {
+                    "nuclide": "Co60",
+                    "energy_keV": 1332.492,
+                    "intensity": 0.998,
+                    "intensity_unc": 0.004,
+                    "half_life_s": 5.2714 * 365.25 * 24.0 * 3600.0,
+                },
+                {
+                    "nuclide": "Sc46",
+                    "energy_keV": 889.277,
+                    "intensity": 0.999,
+                    "intensity_unc": 0.006,
+                    "half_life_s": 83.79 * 24.0 * 3600.0,
+                },
+            ],
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    peaks_path = tmp_path / "peaks.json"
+    peaks_path.write_text(
+        json.dumps(
+            {
+                "spectrum_id": "demo-activation",
+                "live_time_s": 120.0,
+                "peaks": [
+                    {
+                        "peak_id": "peak-1",
+                        "channel": 100,
+                        "energy_keV": 1173.23,
+                        "area": 12000.0,
+                        "report_isotope": "Co60",
+                    },
+                    {
+                        "peak_id": "peak-2",
+                        "channel": 120,
+                        "energy_keV": 1332.49,
+                        "area": 10000.0,
+                        "report_isotope": "Co60",
+                    },
+                    {
+                        "peak_id": "peak-3",
+                        "channel": 80,
+                        "energy_keV": 889.28,
+                        "area": 7000.0,
+                        "report_isotope": "Sc46",
+                    },
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    def fake_plot_decay_curves(*_args, save_path=None, **_kwargs):
+        Path(save_path).write_text("plot", encoding="utf-8")
+        return object(), object()
+
+    monkeypatch.setattr(app, "plot_decay_curves", fake_plot_decay_curves)
+
+    output = tmp_path / "activity_review.json"
+    app.cmd_activity_review(
+        Namespace(
+            peaks_file=peaks_path,
+            output=output,
+            live_time_s=None,
+            cooling_time_s=7200.0,
+            dead_time_fraction=0.0,
+            energy_tolerance_keV=1.0,
+            source_id="custom_gamma_file",
+            custom_gamma_path=gamma_path,
+            efficiency=0.2,
+            efficiency_polynomial=None,
+            efficiency_uncertainty=0.04,
+            sample_mass_g=2.5,
+            isotope_csv_output=None,
+            line_csv_output=None,
+            decay_plot=None,
+            bateman_plot=None,
+            validate=False,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.activity_review.v1"
+    assert payload["spectrum_id"] == "demo-activation"
+    assert len(payload["isotope_summaries"]) == 2
+    assert (tmp_path / "activity_review_isotopes.csv").exists()
+    assert (tmp_path / "activity_review_lines.csv").exists()
+    assert (tmp_path / "activity_review_decay.png").exists()
+    assert (tmp_path / "activity_review_bateman.png").exists()
+    assert "irradiation_time_activity_Bq" in (tmp_path / "activity_review_isotopes.csv").read_text(
+        encoding="utf-8"
+    )
+
+
+def test_cmd_inventory_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp_path):
+    activity_review_path = tmp_path / "activity_review.json"
+    activity_review_path.write_text(
+        json.dumps(
+            {
+                "schema": "fluxforge.activity_review.v1",
+                "spectrum_id": "mo99-demo",
+                "source_id": "nasa_common_lab_sources",
+                "custom_gamma_path": None,
+                "live_time_s": 300.0,
+                "cooling_time_s": 7200.0,
+                "isotope_summaries": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_count": 2,
+                        "half_life_s": 65.94 * 3600.0,
+                        "count_time_activity_Bq": 850.0,
+                        "count_time_activity_unc_Bq": 40.0,
+                        "irradiation_time_activity_Bq": 900.0,
+                        "irradiation_time_activity_unc_Bq": 50.0,
+                    }
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    def fake_plot_decay_curves(*_args, save_path=None, **_kwargs):
+        Path(save_path).write_text("plot", encoding="utf-8")
+        return object(), object()
+
+    monkeypatch.setattr(app, "plot_decay_curves", fake_plot_decay_curves)
+
+    output = tmp_path / "inventory_review.json"
+    app.cmd_inventory_review(
+        Namespace(
+            activity_review_file=activity_review_path,
+            output=output,
+            decay_source_id="radioactivedecay_icrp107_kayzero_2023",
+            time_origin="count_start",
+            time_points_s="0,3600,7200",
+            time_start_s=0.0,
+            time_stop_s=86400.0,
+            time_count=25,
+            observable="activity",
+            distance_cm=25.0,
+            top_n=5,
+            timeseries_csv_output=None,
+            eoi_csv_output=None,
+            count_start_csv_output=None,
+            count_end_csv_output=None,
+            plot_output=None,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.inventory_time_evolution.v1"
+    assert payload["sample_id"] == "mo99-demo"
+    assert payload["time_origin"] == "count_start"
+    assert len(payload["time_series_rows"]) >= 3
+    assert (tmp_path / "inventory_review_timeseries.csv").exists()
+    assert (tmp_path / "inventory_review_activities_at_irradiation.csv").exists()
+    assert (tmp_path / "inventory_review_activities_at_count_start.csv").exists()
+    assert (tmp_path / "inventory_review_activities_at_count_end.csv").exists()
+    assert (tmp_path / "inventory_review_activity.png").exists()
+    assert "dose_rate_uSv_h" in (tmp_path / "inventory_review_timeseries.csv").read_text(
+        encoding="utf-8"
+    )
+
+
+def test_cmd_library_register_list_and_remove(monkeypatch, tmp_path, capsys):
+    registry_path = tmp_path / "library_registry.json"
+    gamma_path = tmp_path / "gamma.csv"
+    gamma_path.write_text(
+        "nuclide,energy_keV,intensity,half_life_s\nCo60,1332.5,1.0,166344192.0\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("FLUXFORGE_LIBRARY_REGISTRY", str(registry_path))
+
+    app.cmd_library_register(
+        Namespace(
+            alias="Lab Ref",
+            locator=str(gamma_path),
+            description=None,
+        )
+    )
+    register_out = capsys.readouterr().out
+    assert "user_gamma_lab_ref" in register_out
+
+    app.cmd_library_list(Namespace(capability="peak-identification", kind=None, json=True))
+    payload = json.loads(capsys.readouterr().out)
+    assert any(item["source_id"] == "user_gamma_lab_ref" for item in payload)
+
+    app.cmd_library_remove(Namespace(source_id="user_gamma_lab_ref"))
+    remove_out = capsys.readouterr().out
+    assert "Removed user_gamma_lab_ref" in remove_out
+
+
 def test_cmd_plots_uses_master_suite(monkeypatch, tmp_path):
     called = {}
 

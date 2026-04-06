@@ -1,0 +1,170 @@
+library_stack:
+  version: 1
+  description: >-
+    Proposed stacked nuclear-data sources for FluxForge to solve daughter-chain,
+    half-life-uncertainty, metrology-grade decay data, coincidence, and
+    reaction-gamma gaps.
+  sources:
+    - id: endf_b_viii_0_decay
+      role: base_decay_library
+      priority: 10
+      purpose:
+        - broad shipped offline decay library
+        - PeakEasy parity baseline
+      source:
+        name: NNDC ENDF/B-VIII.0 Decay Reaction Sublibrary
+        url: https://www.nndc.bnl.gov/endf-b8.0/download.html
+      target_path: src/fluxforge/resources/nuclear_data/endf_b_viii_0_decay/
+      gui_surfaces:
+        - Nuclide Decay Info 2.0
+        - Reference/Library Workbench
+        - Activity Results
+      ingest_notes:
+        - preserve parent/daughter links
+        - preserve metastable states
+
+    - id: ensdf_archive
+      role: evaluated_decay_backbone
+      priority: 20
+      purpose:
+        - complete evaluated decay structure
+        - full daughter-chain reconstruction
+        - level and gamma metadata
+      source:
+        name: ENSDF Archivals
+        url: https://www.nndc.bnl.gov/ensdfarchivals/
+      target_path: src/fluxforge/resources/nuclear_data/ensdf/
+      gui_surfaces:
+        - Nuclide Decay Info 2.0
+        - Coincidence/Masking Explorer
+      ingest_notes:
+        - parse half-life uncertainty fields
+        - materialize daughter and reverse-parent graphs
+
+    - id: iaea_livechart_api
+      role: machine_readable_sync
+      priority: 30
+      purpose:
+        - selective refresh
+        - CSV-backed cache updates
+      source:
+        name: IAEA LiveChart API
+        url: https://www-nds.iaea.org/relnsd/vcharthtml/api_v0_guide.html
+      target_path: src/fluxforge/resources/nuclear_data/livechart_cache/
+      gui_surfaces:
+        - Library Source Manager
+      ingest_notes:
+        - cache responses with version and timestamp
+        - allow per-nuclide refresh
+
+    - id: nubase2020
+      role: half_life_isomer_overlay
+      priority: 40
+      purpose:
+        - half-life uncertainties
+        - canonical isomer identity
+        - decay mode intensity overlay
+      source:
+        name: NUBASE2020
+        url: https://www-nds.iaea.org/amdc/ame2020/NUBASE2020.pdf
+      target_path: src/fluxforge/resources/nuclear_data/nubase2020/
+      gui_surfaces:
+        - Nuclide Decay Info 2.0
+        - Library conflict inspector
+      ingest_notes:
+        - normalize state identifiers
+        - preserve published uncertainties
+
+    - id: ddep_lnhb
+      role: recommended_decay_override
+      priority: 50
+      purpose:
+        - metrology-grade recommended decay data
+        - calibration/reference radionuclide overrides
+      source:
+        name: LNHB / DDEP / LaraWeb
+        url: https://www.lnhb.fr/home/nuclear-data/
+      target_path: src/fluxforge/resources/nuclear_data/ddep_lnhb/
+      gui_surfaces:
+        - Calibration Standards Browser
+        - Nuclide Decay Info 2.0
+      ingest_notes:
+        - annotate limited coverage explicitly
+        - prefer for recommended calibration nuclides only
+
+    - id: iaea_xgamma_standards
+      role: standards_subset
+      priority: 60
+      purpose:
+        - standards-backed half-lives and emission probabilities
+      source:
+        name: IAEA X and Gamma Ray Decay Data Standards
+        url: https://nds.iaea.org/xgamma_standards/
+      target_path: src/fluxforge/resources/nuclear_data/iaea_xgamma_standards/
+      gui_surfaces:
+        - Calibration Standards Browser
+      ingest_notes:
+        - show standards badge in GUI
+
+    - id: sandiadecay_xml
+      role: interoperability_decay_engine
+      priority: 70
+      purpose:
+        - InterSpec-compatible decay calculations
+        - alternate editable XML-backed source
+      source:
+        name: SandiaDecay
+        url: https://github.com/sandialabs/SandiaDecay
+      target_path: src/fluxforge/resources/nuclear_data/sandiadecay/
+      gui_surfaces:
+        - Library Source Manager
+        - Nuclide Decay Info 2.0
+      ingest_notes:
+        - optional import/export bridge
+
+    - id: coincidence_json
+      role: coincidence_and_cascade_extension
+      priority: 80
+      purpose:
+        - gamma-gamma and gamma-X coincidence reasoning
+        - masking/cascade analysis
+      source:
+        name: ENSDF-derived coincidence JSON / paceENSDF class source
+        url: https://nucleardata.berkeley.edu/databases/
+      target_path: src/fluxforge/resources/nuclear_data/coincidence/
+      gui_surfaces:
+        - Coincidence/Masking Explorer
+      ingest_notes:
+        - store coincidence intensities and uncertainties
+        - link to singles gamma lines and level scheme
+
+    - id: capgam_egaf
+      role: prompt_capture_gamma_extension
+      priority: 90
+      purpose:
+        - thermal capture gamma overlays
+        - prompt/reaction gamma analysis support
+      source:
+        name: NNDC CapGam / EGAF / pyEGAF-class source
+        url: https://www.nndc.bnl.gov/ensdf/
+      target_path: src/fluxforge/resources/nuclear_data/capgam_egaf/
+      gui_surfaces:
+        - Reference/Library Workbench
+        - Prompt / reaction gamma views
+      ingest_notes:
+        - keep distinct from decay-radiation lines
+
+    - id: fast_reaction_gamma
+      role: fast_reaction_gamma_extension
+      priority: 100
+      purpose:
+        - n,n'gamma and related fast-neutron gamma signatures
+      source:
+        name: Berkeley nuclear data databases / Baghdad Atlas class sources
+        url: https://nucleardata.berkeley.edu/databases/
+      target_path: src/fluxforge/resources/nuclear_data/fast_reaction_gamma/
+      gui_surfaces:
+        - Reference/Library Workbench
+        - Reaction Gamma Explorer
+      ingest_notes:
+        - flag as specialized and optional

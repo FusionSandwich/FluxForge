@@ -409,6 +409,7 @@ def plot_decay_curves(
     xlabel: str = "Cooling Time (s)",
     ylabel: str = "Specific Activity (Bq/g)",
     log_y: bool = True,
+    log_x: bool = True,
     show_half_life: bool = True,
     half_lives: Optional[Dict[str, float]] = None,
     figsize: Tuple[float, float] = (10, 7),
@@ -427,6 +428,8 @@ def plot_decay_curves(
         Axis labels
     log_y : bool
         Use log y-axis
+    log_x : bool
+        Use log x-axis
     show_half_life : bool
         Annotate half-lives
     half_lives : Dict[str, float], optional
@@ -487,7 +490,8 @@ def plot_decay_curves(
 
     if log_y:
         ax.set_yscale("log")
-    ax.set_xscale("log")
+    if log_x:
+        ax.set_xscale("log")
 
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)

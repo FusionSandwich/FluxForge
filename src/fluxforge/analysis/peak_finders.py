@@ -978,6 +978,9 @@ PEAK_FINDER_METHODS = {
     "window": WindowPeakFinder,
     "chunked": ChunkedPeakFinder,
     "scipy": ScipyPeakFinder,
+    "direct_scipy": DirectScipyPeakFinder,
+    "wavelet": WaveletPeakFinder,
+    "relative_extrema": RelativeExtremaPeakFinder,
     "segmented": SegmentedPeakFinder,
     "derivative": DerivativePeakFinder,
     "second_difference": SecondDifferencePeakFinder,
@@ -991,8 +994,9 @@ def get_peak_finder(method: str = "simple", **kwargs):
     Parameters
     ----------
     method : str
-        One of: 'simple', 'window', 'chunked', 'scipy', 'segmented',
-        'derivative', 'second_difference'
+        One of: 'simple', 'window', 'chunked', 'scipy', 'direct_scipy',
+        'wavelet', 'relative_extrema', 'segmented', 'derivative',
+        'second_difference'
     **kwargs
         Arguments passed to the peak finder constructor
 

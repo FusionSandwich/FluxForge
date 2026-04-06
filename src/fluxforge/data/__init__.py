@@ -85,7 +85,9 @@ from fluxforge.data.nuclear_data import (
 )
 from fluxforge.data.kayzero_k0 import (
     KayzeroImportResult,
+    KayzeroHalfLifeValue,
     import_kayzero_k0_library,
+    load_kayzero_half_life_table,
     write_governed_library_json,
     write_import_report_json,
 )
@@ -118,7 +120,12 @@ from fluxforge.data.nuclear_data_sources import (
     NuclearDataSourceRecord,
     get_nuclear_data_source,
     list_nuclear_data_sources,
+    list_nuclear_data_sources_by_capability,
+    list_registered_user_gamma_sources,
+    load_decay_dataset_source,
     load_gamma_identification_source,
+    register_user_gamma_source,
+    remove_user_gamma_source,
     summarize_nuclear_data_source,
 )
 from fluxforge.data.nuclide_library import (
@@ -200,7 +207,9 @@ __all__ = [
     "create_multigroup_data",
     # Kayzero k0 importer
     "KayzeroImportResult",
+    "KayzeroHalfLifeValue",
     "import_kayzero_k0_library",
+    "load_kayzero_half_life_table",
     "write_governed_library_json",
     "write_import_report_json",
     # RAFM decay subset
@@ -229,7 +238,12 @@ __all__ = [
     "NuclearDataSourceRecord",
     "get_nuclear_data_source",
     "list_nuclear_data_sources",
+    "list_nuclear_data_sources_by_capability",
+    "list_registered_user_gamma_sources",
+    "load_decay_dataset_source",
     "load_gamma_identification_source",
+    "register_user_gamma_source",
+    "remove_user_gamma_source",
     "summarize_nuclear_data_source",
     # SQLite-backed nuclide search
     "NuclideSearchHit",

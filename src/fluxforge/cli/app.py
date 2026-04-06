@@ -41,17 +41,34 @@ from fluxforge.core.response import (
     build_response_matrix,
 )
 from fluxforge.core.schemas import validate_or_raise
+from fluxforge.core.activity_review import review_spectrum_activation
 from fluxforge.core.analysis_workspace import (
+    PeakCandidate,
     analyze_roi_region,
     compute_roi_statistics,
     detect_peak_candidates,
+    register_builtin_peak_search_methods,
+)
+from fluxforge.core.inventory_timeline import (
+    DEFAULT_DECAY_SOURCE_ID,
+    TIME_ORIGINS,
+    build_inventory_state_from_payload,
+    build_time_grid,
+    compute_inventory_time_evolution,
 )
 from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
 from fluxforge.data.efficiency_models import EfficiencyModel
+from fluxforge.data.efficiency import EfficiencyCurve
 from fluxforge.data.kayzero_k0 import (
     import_kayzero_k0_library,
     write_governed_library_json,
     write_import_report_json,
+)
+from fluxforge.data.nuclear_data_sources import (
+    list_nuclear_data_sources,
+    list_nuclear_data_sources_by_capability,
+    register_user_gamma_source,
+    remove_user_gamma_source,
 )
 from fluxforge.data.rafm_profile import list_rafm_profiles, load_rafm_profile
 from fluxforge.examples.rafm_workflow import (
@@ -90,6 +107,7 @@ from fluxforge.io.artifacts import (
 )
 from fluxforge.io.genie import read_genie_spectrum
 from fluxforge.io.spe import GammaSpectrum, read_spe_file
+from fluxforge.plots.activation import plot_decay_curves
 from fluxforge.physics.activation import (
     IrradiationSegment,
     activation_study_metrics,
@@ -99,6 +117,7 @@ from fluxforge.solvers.gls import gls_adjust
 from fluxforge.solvers.iterative import gravel, mlem
 from fluxforge.unfolding import GravelUnfolder, MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
 from fluxforge.validation import spectrum_comparison_metrics
+from fluxforge.plugins import PluginRegistries
 
 
 def _load_json(path: Path):
@@ -119,6 +138,14 @@ def _load_structured_rows(path: Path) -> Any:
 
 def _ensure_parent_dir(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+
+
+def _peak_search_cli_choices() -> tuple[str, ...]:
+    registries = register_builtin_peak_search_methods(PluginRegistries())
+    keys = tuple(registries.peak_search_methods.keys())
+    if "segmented" in keys:
+        return keys
+    return ("segmented", *keys)
 
 
 def _write_dict_rows(path: Path, rows: List[Dict[str, Any]]) -> None:
@@ -161,6 +188,80 @@ def _parse_efficiency_override(raw: Optional[str]) -> Optional[Dict[str, float]]
     if len(values) == 5:
         override["DetModel"] = values[4]
     return override
+
+
+def _activity_review_source_choices() -> tuple[str, ...]:
+    return tuple(
+        record.source_id
+        for record in list_nuclear_data_sources_by_capability("peak-identification")
+    )
+
+
+def _inventory_decay_source_choices() -> tuple[str, ...]:
+    return tuple(
+        record.source_id
+        for record in list_nuclear_data_sources_by_capability("inventory-decay")
+    )
+
+
+def _serialize_nuclear_data_source(record) -> dict[str, Any]:
+    return {
+        "source_id": record.source_id,
+        "label": record.label,
+        "kind": record.kind,
+        "builtin": bool(record.builtin),
+        "path_hint": record.path_hint,
+        "description": record.description,
+        "capabilities": list(record.capabilities),
+        "metadata": dict(record.metadata),
+    }
+
+
+def _build_activity_review_efficiency_curve(args: argparse.Namespace) -> EfficiencyCurve:
+    rel_uncertainty = max(float(getattr(args, "efficiency_uncertainty", 0.05)), 0.0)
+    polynomial = _parse_csv_floats(getattr(args, "efficiency_polynomial", None))
+    if polynomial:
+        return EfficiencyCurve.from_polynomial(
+            coefficients=polynomial,
+            energy_range=(1.0, 10000.0),
+            uncertainty_model={"type": "constant", "value": rel_uncertainty},
+        )
+
+    constant_efficiency = max(float(getattr(args, "efficiency", 1.0)), 1e-12)
+    return EfficiencyCurve(
+        model_type="empirical",
+        parameters={
+            "energies": [1.0, 10000.0],
+            "efficiencies": [constant_efficiency, constant_efficiency],
+            "interpolation": "linear",
+        },
+        energy_range=(1.0, 10000.0),
+        uncertainty_model={"type": "constant", "value": rel_uncertainty},
+    )
+
+
+def _activity_review_artifact_path(output: Path, suffix: str) -> Path:
+    return output.with_name(f"{output.stem}{suffix}")
+
+
+def _inventory_review_artifact_path(output: Path, suffix: str) -> Path:
+    return output.with_name(f"{output.stem}{suffix}")
+
+
+def _parse_relative_time_points(raw: Optional[str]) -> tuple[float, ...]:
+    values = _parse_csv_floats(raw)
+    if values is None:
+        return ()
+    return tuple(float(value) for value in values)
+
+
+def _close_figure(fig: Any) -> None:
+    try:
+        import matplotlib.pyplot as plt
+
+        plt.close(fig)
+    except Exception:
+        pass
 
 
 def _apply_overrides_to_spectrum(
@@ -1303,6 +1404,281 @@ def cmd_activity(args: argparse.Namespace) -> None:
         source_path=args.peaks_file,
     )
     print(f"Wrote line activities to {args.output}")
+
+
+def cmd_activity_review(args: argparse.Namespace) -> None:
+    peak_report = read_peak_report(args.peaks_file)
+    if args.validate:
+        validate_or_raise(peak_report)
+
+    live_time_s = peak_report.get("live_time_s") or args.live_time_s
+    if live_time_s is None:
+        raise ValueError("Live time is required to review activities.")
+
+    peaks: list[PeakCandidate] = []
+    tolerance_keV = max(float(args.energy_tolerance_keV), 0.1)
+    for index, peak in enumerate(peak_report.get("peaks", []) or []):
+        if not isinstance(peak, dict):
+            continue
+        energy_keV = float(peak.get("energy_keV", 0.0) or 0.0)
+        net_counts = float(
+            peak.get("area") or peak.get("raw_counts") or peak.get("amplitude") or 0.0
+        )
+        isotope = str(peak.get("report_isotope") or peak.get("isotope") or "").strip() or None
+        peaks.append(
+            PeakCandidate(
+                peak_id=str(peak.get("peak_id") or f"peak-{index + 1}"),
+                channel=float(peak.get("channel", index) or index),
+                energy_keV=energy_keV,
+                significance=float(peak.get("significance", 0.0) or 0.0),
+                roi_bounds_keV=(
+                    float(peak.get("left_keV", energy_keV - tolerance_keV)),
+                    float(peak.get("right_keV", energy_keV + tolerance_keV)),
+                ),
+                net_counts=net_counts,
+                fit_quality=float(
+                    peak.get("reduced_chi_squared")
+                    or peak.get("fit_quality")
+                    or 1.0
+                ),
+                status="matched" if isotope else "candidate",
+                nuclide=isotope,
+            )
+        )
+
+    review = review_spectrum_activation(
+        peaks,
+        live_time_s=float(live_time_s),
+        efficiency_curve=_build_activity_review_efficiency_curve(args),
+        cooling_time_s=float(args.cooling_time_s),
+        source_id=str(args.source_id),
+        custom_gamma_path=(
+            str(args.custom_gamma_path) if getattr(args, "custom_gamma_path", None) else None
+        ),
+        energy_tolerance_keV=float(args.energy_tolerance_keV),
+        dead_time_fraction=float(getattr(args, "dead_time_fraction", 0.0) or 0.0),
+        sample_mass_g=getattr(args, "sample_mass_g", None),
+    )
+
+    output_path = Path(args.output)
+    isotope_csv = Path(
+        getattr(args, "isotope_csv_output", None)
+        or _activity_review_artifact_path(output_path, "_isotopes.csv")
+    )
+    line_csv = Path(
+        getattr(args, "line_csv_output", None)
+        or _activity_review_artifact_path(output_path, "_lines.csv")
+    )
+    decay_plot = Path(
+        getattr(args, "decay_plot", None)
+        or _activity_review_artifact_path(output_path, "_decay.png")
+    )
+    bateman_plot = Path(
+        getattr(args, "bateman_plot", None)
+        or _activity_review_artifact_path(output_path, "_bateman.png")
+    )
+
+    isotope_rows = review.isotope_rows(sample_mass_g=getattr(args, "sample_mass_g", None))
+    line_rows = review.line_rows(sample_mass_g=getattr(args, "sample_mass_g", None))
+
+    isotope_artifact = _write_csv_table(isotope_csv, isotope_rows)
+    line_artifact = _write_csv_table(line_csv, line_rows)
+
+    decay_plot.parent.mkdir(parents=True, exist_ok=True)
+    fig, _ax = plot_decay_curves(
+        review.decay_plot_data,
+        title="CLI Spectrum Half-Life Decay Review",
+        xlabel="Time Since EOI (s)",
+        ylabel="Activity (Bq)",
+        log_y=True,
+        log_x=False,
+        half_lives=review.half_lives_s,
+        save_path=decay_plot,
+    )
+    _close_figure(fig)
+    bateman_plot.parent.mkdir(parents=True, exist_ok=True)
+    fig, _ax = plot_decay_curves(
+        review.bateman_plot_data,
+        title="CLI Spectrum Bateman Parent/Daughter Review",
+        xlabel="Time Since EOI (s)",
+        ylabel="EOI-Equivalent Inventory (Bq)",
+        log_y=False,
+        log_x=False,
+        half_lives=review.bateman_half_lives_s,
+        save_path=bateman_plot,
+    )
+    _close_figure(fig)
+
+    payload = review.to_payload(sample_mass_g=getattr(args, "sample_mass_g", None))
+    payload["spectrum_id"] = peak_report.get("spectrum_id", "")
+    payload["artifacts"] = {
+        "isotope_csv": isotope_artifact or {"path": isotope_csv.name, "format": "csv"},
+        "line_csv": line_artifact or {"path": line_csv.name, "format": "csv"},
+        "decay_plot": {"path": decay_plot.name, "format": "png"},
+        "bateman_plot": {"path": bateman_plot.name, "format": "png"},
+    }
+    _ensure_parent_dir(output_path)
+    output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Wrote activity review bundle to {output_path}")
+
+
+def cmd_inventory_review(args: argparse.Namespace) -> None:
+    payload = _load_json(args.activity_review_file)
+    inventory_state = build_inventory_state_from_payload(
+        payload,
+        decay_source_id=str(args.decay_source_id),
+    )
+
+    relative_times_s = _parse_relative_time_points(
+        getattr(args, "time_points_s", None)
+    )
+    if not relative_times_s:
+        relative_times_s = build_time_grid(
+            start_s=float(args.time_start_s),
+            stop_s=float(args.time_stop_s),
+            count=int(args.time_count),
+        )
+
+    result = compute_inventory_time_evolution(
+        inventory_state,
+        relative_times_s=relative_times_s,
+        time_origin=str(args.time_origin),
+        decay_source_id=str(args.decay_source_id),
+        distance_cm=float(args.distance_cm),
+    )
+
+    output_path = Path(args.output)
+    time_series_csv = Path(
+        getattr(args, "timeseries_csv_output", None)
+        or _inventory_review_artifact_path(output_path, "_timeseries.csv")
+    )
+    eoi_csv = Path(
+        getattr(args, "eoi_csv_output", None)
+        or _inventory_review_artifact_path(output_path, "_activities_at_irradiation.csv")
+    )
+    count_start_csv = Path(
+        getattr(args, "count_start_csv_output", None)
+        or _inventory_review_artifact_path(output_path, "_activities_at_count_start.csv")
+    )
+    count_end_csv = Path(
+        getattr(args, "count_end_csv_output", None)
+        or _inventory_review_artifact_path(output_path, "_activities_at_count_end.csv")
+    )
+    plot_output = Path(
+        getattr(args, "plot_output", None)
+        or _inventory_review_artifact_path(
+            output_path,
+            f"_{args.observable}.png",
+        )
+    )
+
+    time_series_artifact = _write_csv_table(time_series_csv, result.time_series_rows())
+    eoi_artifact = _write_csv_table(eoi_csv, list(result.reference_rows("eoi")))
+    count_start_artifact = _write_csv_table(
+        count_start_csv,
+        list(result.reference_rows("count_start")),
+    )
+    count_end_artifact = _write_csv_table(
+        count_end_csv,
+        list(result.reference_rows("count_end")),
+    )
+
+    plot_output.parent.mkdir(parents=True, exist_ok=True)
+    ylabel = {
+        "activity": "Activity (Bq)",
+        "atoms": "Atoms",
+        "mass": "Mass (g)",
+        "dose": "Dose Rate (uSv/h)",
+    }[str(args.observable)]
+    fig, _ax = plot_decay_curves(
+        result.plot_data(str(args.observable), top_n=int(args.top_n), include_total=True),
+        title=f"Inventory Time Evolution ({str(args.observable).title()})",
+        xlabel=f"Time Since {str(args.time_origin).replace('_', ' ').title()} (s)",
+        ylabel=ylabel,
+        log_y=str(args.observable) in {"activity", "atoms", "dose"},
+        log_x=False,
+        half_lives=None,
+        save_path=plot_output,
+    )
+    _close_figure(fig)
+
+    output_payload = {
+        "schema": "fluxforge.inventory_time_evolution.v1",
+        "sample_id": inventory_state.sample_id,
+        "activity_review_file": str(args.activity_review_file),
+        "gamma_source_id": inventory_state.gamma_source_id,
+        "custom_gamma_path": inventory_state.custom_gamma_path,
+        "decay_source_id": result.decay_source_id,
+        "time_origin": result.time_origin,
+        "relative_times_s": list(result.relative_times_s),
+        "absolute_times_s": list(result.absolute_times_s),
+        "observable": str(args.observable),
+        "distance_cm": float(args.distance_cm),
+        "notes": list(result.notes),
+        "reference_states": {
+            name: list(rows)
+            for name, rows in result.reference_rows_by_name.items()
+        },
+        "time_series_rows": result.time_series_rows(),
+        "artifacts": {
+            "timeseries_csv": (
+                time_series_artifact
+                or {"path": time_series_csv.name, "format": "csv"}
+            ),
+            "eoi_csv": eoi_artifact or {"path": eoi_csv.name, "format": "csv"},
+            "count_start_csv": (
+                count_start_artifact
+                or {"path": count_start_csv.name, "format": "csv"}
+            ),
+            "count_end_csv": (
+                count_end_artifact
+                or {"path": count_end_csv.name, "format": "csv"}
+            ),
+            "plot": {"path": plot_output.name, "format": "png"},
+        },
+    }
+    _ensure_parent_dir(output_path)
+    output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
+    print(f"Wrote inventory review bundle to {output_path}")
+
+
+def cmd_library_list(args: argparse.Namespace) -> None:
+    records = list_nuclear_data_sources()
+    capability = str(getattr(args, "capability", "") or "").strip()
+    kind = str(getattr(args, "kind", "") or "").strip()
+    if capability:
+        records = tuple(
+            record for record in records if capability in record.capabilities
+        )
+    if kind:
+        records = tuple(record for record in records if record.kind == kind)
+    payload = [_serialize_nuclear_data_source(record) for record in records]
+    if getattr(args, "json", False):
+        print(json.dumps(payload, indent=2))
+        return
+    for item in payload:
+        capabilities = ",".join(item["capabilities"])
+        path_hint = item["path_hint"] or "-"
+        print(
+            f"{item['source_id']}\t{item['label']}\t{item['kind']}\t"
+            f"builtin={item['builtin']}\tcapabilities={capabilities}\tpath={path_hint}"
+        )
+
+
+def cmd_library_register(args: argparse.Namespace) -> None:
+    record = register_user_gamma_source(
+        args.alias,
+        args.locator,
+        description=getattr(args, "description", None),
+    )
+    print(f"Registered {record.source_id} -> {record.path_hint}")
+
+
+def cmd_library_remove(args: argparse.Namespace) -> None:
+    removed = remove_user_gamma_source(str(args.source_id))
+    if not removed:
+        raise ValueError(f"User library not found: {args.source_id}")
+    print(f"Removed {args.source_id}")
 
 
 def cmd_rates(args: argparse.Namespace) -> None:
@@ -3410,7 +3786,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     peaks.add_argument(
         "--method",
-        choices=["segmented", "mariscotti", "second_difference", "nasa_peaksearch"],
+        choices=list(_peak_search_cli_choices()),
         default="segmented",
         help="Peak-search method for automatic detection from a spectrum artifact",
     )
@@ -3441,7 +3817,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     roi_analyze.add_argument(
         "--peak-search-method",
-        choices=["mariscotti", "second_difference", "nasa_peaksearch"],
+        choices=list(_peak_search_cli_choices()),
         default="mariscotti",
     )
     roi_analyze.add_argument("--sideband-width-keV", type=float, default=4.0)
@@ -3488,7 +3864,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     roi_statistics.add_argument(
         "--peak-search-method",
-        choices=["mariscotti", "second_difference", "nasa_peaksearch"],
+        choices=list(_peak_search_cli_choices()),
         default="mariscotti",
     )
     roi_statistics.add_argument("--sideband-width-keV", type=float, default=4.0)
@@ -3504,6 +3880,31 @@ def build_parser() -> argparse.ArgumentParser:
     _add_validate_option(roi_statistics)
     roi_statistics.set_defaults(func=cmd_roi_statistics)
 
+    library_list = subparsers.add_parser(
+        "library-list",
+        help="List bundled and user-registered nuclear-data sources",
+    )
+    library_list.add_argument("--capability", type=str, default=None)
+    library_list.add_argument("--kind", type=str, default=None)
+    library_list.add_argument("--json", action="store_true", dest="json")
+    library_list.set_defaults(func=cmd_library_list)
+
+    library_register = subparsers.add_parser(
+        "library-register",
+        help="Register a user gamma-line library by alias and locator",
+    )
+    library_register.add_argument("--alias", type=str, required=True)
+    library_register.add_argument("--locator", type=str, required=True)
+    library_register.add_argument("--description", type=str, default=None)
+    library_register.set_defaults(func=cmd_library_register)
+
+    library_remove = subparsers.add_parser(
+        "library-remove",
+        help="Remove a registered user gamma-line library",
+    )
+    library_remove.add_argument("--source-id", type=str, required=True)
+    library_remove.set_defaults(func=cmd_library_remove)
+
     activity = subparsers.add_parser(
         "activity", help="Compute line activities from peak report"
     )
@@ -3518,6 +3919,99 @@ def build_parser() -> argparse.ArgumentParser:
     activity.add_argument("--reaction-id", type=str)
     _add_validate_option(activity)
     activity.set_defaults(func=cmd_activity)
+
+    activity_review = subparsers.add_parser(
+        "activity-review",
+        help="Review all matched isotope activities for one spectrum and export EOI tables/plots",
+    )
+    activity_review.add_argument("--peaks-file", type=Path, required=True)
+    activity_review.add_argument(
+        "--output",
+        type=Path,
+        default=Path("activity_review.json"),
+    )
+    activity_review.add_argument("--live-time-s", type=float)
+    activity_review.add_argument("--cooling-time-s", type=float, default=0.0)
+    activity_review.add_argument("--dead-time-fraction", type=float, default=0.0)
+    activity_review.add_argument("--energy-tolerance-keV", type=float, default=2.0)
+    activity_review.add_argument(
+        "--source-id",
+        type=str,
+        default="fluxforge_bundled_gamma",
+        choices=list(_activity_review_source_choices()),
+    )
+    activity_review.add_argument("--custom-gamma-path", type=Path, default=None)
+    activity_review.add_argument(
+        "--efficiency",
+        type=float,
+        default=1.0,
+        help="Constant full-energy peak efficiency to use when no polynomial is supplied.",
+    )
+    activity_review.add_argument(
+        "--efficiency-polynomial",
+        type=str,
+        default=None,
+        help="Comma-separated log-polynomial coefficients a0,a1,... for ln(eff)=sum ai*(ln E)^i.",
+    )
+    activity_review.add_argument(
+        "--efficiency-uncertainty",
+        type=float,
+        default=0.05,
+        help="Relative efficiency uncertainty applied to the activity review.",
+    )
+    activity_review.add_argument("--sample-mass-g", type=float)
+    activity_review.add_argument("--isotope-csv-output", type=Path, default=None)
+    activity_review.add_argument("--line-csv-output", type=Path, default=None)
+    activity_review.add_argument("--decay-plot", type=Path, default=None)
+    activity_review.add_argument("--bateman-plot", type=Path, default=None)
+    _add_validate_option(activity_review)
+    activity_review.set_defaults(func=cmd_activity_review)
+
+    inventory_review = subparsers.add_parser(
+        "inventory-review",
+        help="Propagate an activity-review inventory to arbitrary times and export time-series tables/plots",
+    )
+    inventory_review.add_argument("--activity-review-file", type=Path, required=True)
+    inventory_review.add_argument(
+        "--output",
+        type=Path,
+        default=Path("inventory_review.json"),
+    )
+    inventory_review.add_argument(
+        "--decay-source-id",
+        type=str,
+        default=DEFAULT_DECAY_SOURCE_ID,
+        choices=list(_inventory_decay_source_choices()),
+    )
+    inventory_review.add_argument(
+        "--time-origin",
+        type=str,
+        default="eoi",
+        choices=list(TIME_ORIGINS),
+    )
+    inventory_review.add_argument(
+        "--time-points-s",
+        type=str,
+        default=None,
+        help="Comma-separated relative times in seconds. Overrides the range arguments when provided.",
+    )
+    inventory_review.add_argument("--time-start-s", type=float, default=0.0)
+    inventory_review.add_argument("--time-stop-s", type=float, default=86400.0)
+    inventory_review.add_argument("--time-count", type=int, default=25)
+    inventory_review.add_argument(
+        "--observable",
+        type=str,
+        default="activity",
+        choices=("activity", "atoms", "mass", "dose"),
+    )
+    inventory_review.add_argument("--distance-cm", type=float, default=30.0)
+    inventory_review.add_argument("--top-n", type=int, default=8)
+    inventory_review.add_argument("--timeseries-csv-output", type=Path, default=None)
+    inventory_review.add_argument("--eoi-csv-output", type=Path, default=None)
+    inventory_review.add_argument("--count-start-csv-output", type=Path, default=None)
+    inventory_review.add_argument("--count-end-csv-output", type=Path, default=None)
+    inventory_review.add_argument("--plot-output", type=Path, default=None)
+    inventory_review.set_defaults(func=cmd_inventory_review)
 
     rates = subparsers.add_parser(
         "rates", help="Compute reaction rates from line activities"

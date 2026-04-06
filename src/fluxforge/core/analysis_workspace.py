@@ -11,7 +11,11 @@ import numpy as np
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
 from fluxforge.analysis.efficiency_models import semi_empirical_efficiency
-from fluxforge.analysis.peak_finders import get_peak_finder
+from fluxforge.analysis.peak_finders import (
+    PEAK_FINDER_METHODS,
+    find_peaks_multi_method,
+    get_peak_finder,
+)
 from fluxforge.analysis.peakfit import auto_find_peaks, estimate_background, fit_multiple_peaks
 from fluxforge.data.efficiency import EfficiencyCurve
 from fluxforge.data.gamma_database import FLUXFORGE_GAMMA_DATA, GammaDatabase
@@ -109,6 +113,7 @@ class ActivityCalculationResult:
     half_life_s: float
     source_age_s: float
     chain_summary: str
+    age_corrected_uncertainty_bq: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -285,7 +290,7 @@ def register_builtin_nuclide_id_engines(
 def register_builtin_peak_search_methods(
     registries: PluginRegistries,
 ) -> PluginRegistries:
-    """Register the built-in peak-search methods used by 3.16."""
+    """Register the built-in peak-search methods used by the modern GUI."""
 
     registries.peak_search_methods.clear()
     for key, label, finder_key, summary, recommended in (
@@ -297,6 +302,34 @@ def register_builtin_peak_search_methods(
             True,
         ),
         (
+            "segmented",
+            "Segmented",
+            "segmented",
+            "Region-aware peak search with optional Gaussian refinement inspired by workstation-style review flows.",
+            False,
+        ),
+        (
+            "window",
+            "Window Statistics",
+            "window",
+            "Local-window thresholding for reference-style peak search against changing continua.",
+            False,
+        ),
+        (
+            "simple",
+            "Simple Threshold",
+            "simple",
+            "SNIP-backed threshold search for quick first-pass peak discovery.",
+            False,
+        ),
+        (
+            "chunked",
+            "Chunked",
+            "chunked",
+            "Chunk-wise adaptive threshold search for spectra with region-varying backgrounds.",
+            False,
+        ),
+        (
             "second_difference",
             "Second Difference",
             "second_difference",
@@ -304,10 +337,52 @@ def register_builtin_peak_search_methods(
             False,
         ),
         (
+            "derivative",
+            "Derivative",
+            "derivative",
+            "First- and second-derivative zero-crossing search for narrow local maxima.",
+            False,
+        ),
+        (
+            "scipy",
+            "SciPy Smoothed",
+            "scipy",
+            "Savitzky-Golay plus `scipy.signal.find_peaks` for stable interactive searching.",
+            False,
+        ),
+        (
             "nasa_peaksearch",
             "NASA Peak Search",
             "scipy",
             "Smoothed SciPy peak search inspired by modular NASA-gamma analysis flows.",
+            False,
+        ),
+        (
+            "direct_scipy",
+            "Direct SciPy",
+            "direct_scipy",
+            "Direct `scipy.signal.find_peaks` wrapper for analysts who want raw control.",
+            False,
+        ),
+        (
+            "wavelet",
+            "Wavelet",
+            "wavelet",
+            "Continuous-wavelet peak search for broad and narrow peaks in one pass.",
+            False,
+        ),
+        (
+            "relative_extrema",
+            "Relative Extrema",
+            "relative_extrema",
+            "Argrelextrema-based local-maxima finder for exploratory review.",
+            False,
+        ),
+        (
+            "consensus",
+            "Consensus",
+            "consensus",
+            "Multi-method consensus search requiring agreement between multiple finders.",
             False,
         ),
     ):
@@ -600,11 +675,12 @@ def _detect_peak_method_results(
     registries: PluginRegistries | None = None,
 ) -> list[tuple[float, float]]:
     definition = _peak_search_definition(method, registries=registries)
-    finder_kwargs: dict[str, float | int | None] = {
+    count_array = np.asarray(counts, dtype=float)
+    finder_kwargs: dict[str, object] = {
         "threshold_sigma": max(float(threshold), 0.5),
         "min_distance": max(int(min_distance), 1),
     }
-    if definition.key == "nasa_peaksearch":
+    if definition.key in {"nasa_peaksearch", "scipy"}:
         finder_kwargs = {
             "threshold_factor": max(float(threshold) / 3.0, 1.0),
             "smooth_window": min(max(int(min_distance) * 5, 11), 101),
@@ -613,9 +689,46 @@ def _detect_peak_method_results(
         }
     elif definition.key == "mariscotti":
         finder_kwargs["threshold_sigma"] = max(float(threshold) * 0.9, 3.0)
+    elif definition.key == "window":
+        finder_kwargs = {
+            "threshold_sigma": max(float(threshold), 0.5),
+            "window_size": max(int(min_distance) * 4, 32),
+            "min_distance": max(int(min_distance), 1),
+        }
+    elif definition.key == "chunked":
+        finder_kwargs = {
+            "threshold": max(float(threshold), 0.5),
+            "n_chunks": max(min(int(len(count_array) / 512), 16), 4),
+        }
+    elif definition.key == "segmented":
+        finder_kwargs = {"gaussian_refine": True}
+    elif definition.key == "direct_scipy":
+        finder_kwargs = {
+            "distance": max(int(min_distance), 1),
+            "height": max(float(np.median(count_array) + np.std(count_array)), 1.0),
+        }
+    elif definition.key == "wavelet":
+        width_max = max(int(min_distance // 2), 4)
+        finder_kwargs = {
+            "widths": np.arange(1, width_max + 1, dtype=int),
+            "min_snr": max(float(threshold) / 3.0, 1.0),
+        }
+    elif definition.key == "relative_extrema":
+        finder_kwargs = {"order": max(int(min_distance // 2), 2)}
 
-    finder = get_peak_finder(definition.finder_key, **finder_kwargs)
-    found = finder.find_peaks(np.asarray(counts, dtype=float))
+    if definition.key == "consensus":
+        found = find_peaks_multi_method(
+            count_array,
+            methods=[
+                method_name
+                for method_name in ("window", "scipy", "second_difference", "segmented")
+                if method_name in PEAK_FINDER_METHODS
+            ],
+            consensus_threshold=2,
+        )
+    else:
+        finder = get_peak_finder(definition.finder_key, **finder_kwargs)
+        found = finder.find_peaks(count_array)
     resolved: list[tuple[float, float]] = []
     for peak in found:
         if getattr(peak, "centroid", None) is not None:
@@ -839,6 +952,10 @@ def calculate_peak_activity(
         activity_bq=float(activity_bq),
         uncertainty_bq=float(uncertainty_bq),
         age_corrected_activity_bq=float(age_corrected_activity),
+        age_corrected_uncertainty_bq=float(
+            uncertainty_bq
+            * math.exp(math.log(2.0) * source_age_s / max(half_life_s, 1e-6))
+        ),
         mda_bq=float(mda_bq),
         half_life_s=float(half_life_s),
         source_age_s=float(source_age_s),
@@ -854,19 +971,20 @@ def build_decay_chain_summary(
 ) -> str:
     """Return a short Bateman-based decay summary for the activity panel."""
 
+    daughter = f"{nuclide} daughter"
     chain = DecayChain(
         nuclide,
         nuclide_data={
-            nuclide: {"half_life_s": float(half_life_s), "decay_products": {"stable": 1.0}},
-            "stable": {"half_life_s": float("inf"), "decay_products": {}},
+            nuclide: {"half_life_s": float(half_life_s), "decay_products": {daughter: 1.0}},
+            daughter: {"half_life_s": float("inf"), "decay_products": {}},
         },
     )
-    result = chain.decay(initial_activity={nuclide: 1.0}, times=[0.0, float(source_age_s)])
-    remaining = float(result.get_activity(nuclide, time=float(source_age_s)))
-    daughter = float(result.get_activity("stable", time=float(source_age_s)))
+    result = chain.decay(initial_atoms={nuclide: 1.0}, times=[0.0, float(source_age_s)])
+    remaining = float(result.atoms[nuclide][-1])
+    daughter_fraction = float(result.atoms[daughter][-1])
     return (
         f"Bateman correction over {source_age_s / 3600.0:.2f} h: "
-        f"{nuclide} retains {remaining:.4f} of unit activity and transfers {daughter:.4f} to daughter."
+        f"{nuclide} retains {remaining:.4f} of its EOI inventory and transfers {daughter_fraction:.4f} to the daughter path."
     )
 
 

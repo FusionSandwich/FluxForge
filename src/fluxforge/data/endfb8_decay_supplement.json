@@ -1,0 +1,37 @@
+[
+  {
+    "nuclide": "Ag109m",
+    "energy_keV": 88.0336,
+    "intensity": 0.037
+  },
+  {
+    "nuclide": "Ge77m",
+    "energy_keV": 159.7,
+    "intensity": 0.1033296
+  },
+  {
+    "nuclide": "Hf179m",
+    "energy_keV": 214.335,
+    "intensity": 0.953
+  },
+  {
+    "nuclide": "Lu176m",
+    "energy_keV": 88.361,
+    "intensity": 0.08893943
+  },
+  {
+    "nuclide": "Re188m",
+    "energy_keV": 105.96,
+    "intensity": 0.10815
+  },
+  {
+    "nuclide": "Tm170",
+    "energy_keV": 84.25473,
+    "intensity": 0.02510443
+  },
+  {
+    "nuclide": "U239",
+    "energy_keV": 74.664,
+    "intensity": 0.492
+  }
+]

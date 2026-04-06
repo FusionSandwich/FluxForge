@@ -538,7 +538,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._update_predictive_status()
 
         def _on_library_state_changed(self, _state) -> None:
-            label = self.library_manager.record_for_category("gamma_identification").label
+            standard = (
+                self.mode_manager.state.standard
+                if self.mode_manager.state.mode is GUIMode.STANDARDS
+                else None
+            )
+            label = self.library_manager.record_for_category(
+                "gamma_identification",
+                standard=standard,
+            ).label
             self.library_label.setText(f"Library: {label}")
 
         def _on_workspace_state_changed(self, state) -> None:
@@ -782,7 +790,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             provenance = (
                 f"mode={self.mode_manager.state.mode.value}\n"
                 f"standard={self.mode_manager.state.standard}\n"
-                f"gamma_library={self.library_manager.state.gamma_identification_source_id}\n"
+                f"gamma_library={self.library_manager.resolved_state(standard=self.mode_manager.state.standard if self.mode_manager.state.mode is GUIMode.STANDARDS else None).gamma_identification_source_id}\n"
                 f"peaks={len(state.peaks)}\n"
                 f"activity_results={len(state.activity_results)}"
             )
@@ -914,7 +922,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.analysis_workspace.set_cascade_sum_lines(
                 compute_cascade_sum_lines(
                     self.analysis_workspace.state.pinned_nuclides,
-                    source_id=self.library_manager.state.gamma_identification_source_id,
+                    source_id=self.library_manager.resolved_state(
+                        standard=(
+                            self.mode_manager.state.standard
+                            if self.mode_manager.state.mode is GUIMode.STANDARDS
+                            else None
+                        )
+                    ).gamma_identification_source_id,
                     custom_path=self.library_manager.state.custom_gamma_path,
                 )
             )

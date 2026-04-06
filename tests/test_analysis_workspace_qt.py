@@ -8,6 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint  # noqa: E402
 from fluxforge.core.analysis_workspace import (  # noqa: E402
+    ActivityCalculationResult,
     bayesian_match_peak_candidates,
     calculate_peak_activity,
     compute_cascade_sum_lines,
@@ -20,7 +21,7 @@ from fluxforge.core.analysis_workspace import (  # noqa: E402
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
 from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
-from fluxforge.gui.mode_manager import ModeManager  # noqa: E402
+from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState  # noqa: E402
 from fluxforge.gui.nuclide_search import GammaLineMatchResult, NuclideSearchController  # noqa: E402
 from fluxforge.gui.panels.modern_shell import (  # noqa: E402
     build_demo_background_spectrum,
@@ -200,6 +201,8 @@ def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
     assert controller.slot("background").source_path == "/tmp/background.spe"
     assert controller.describe()["loaded_spectrum_count"] == 2
     assert controller.describe()["slot_sources"]["background"] == "sample.spe"
+    assert controller.describe()["bayesian_source_id"] == "fluxforge_bundled_gamma"
+    assert controller.describe()["ml_source_id"] == "fluxforge_bundled_gamma"
 
 
 def _write_spectrum_csv(path: Path, spectrum) -> None:
@@ -269,6 +272,268 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
     window.undo_stack.redo()
     _qapp().processEvents()
     assert "qa-check" in peak_panel.table.item(co60_row, 5).text()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_peak_panel_exposes_full_search_surface_and_method_specific_databases(monkeypatch):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    search_keys = {
+        peak_panel.peak_search_selector.combo.itemData(index)
+        for index in range(peak_panel.peak_search_selector.combo.count())
+    }
+    assert {
+        "mariscotti",
+        "simple",
+        "window",
+        "chunked",
+        "scipy",
+        "segmented",
+        "derivative",
+        "second_difference",
+        "direct_scipy",
+        "wavelet",
+        "relative_extrema",
+        "consensus",
+        "nasa_peaksearch",
+    }.issubset(search_keys)
+
+    assert peak_panel.bayesian_source_combo.count() >= 4
+    assert peak_panel.ml_source_combo.count() >= 4
+
+    peak_panel.bayesian_source_combo.setCurrentIndex(
+        max(peak_panel.bayesian_source_combo.findData("nndc_offline_activation"), 0)
+    )
+    peak_panel.ml_source_combo.setCurrentIndex(
+        max(peak_panel.ml_source_combo.findData("fluxforge_bundled_gamma"), 0)
+    )
+    peak_panel.peak_search_selector.set_current_key("window")
+    _qapp().processEvents()
+
+    assert window.analysis_workspace.state.bayesian_source_id == str(
+        peak_panel.bayesian_source_combo.currentData()
+    )
+    assert window.analysis_workspace.state.ml_source_id == str(
+        peak_panel.ml_source_combo.currentData()
+    )
+
+    peaks = detect_peak_candidates(build_demo_spectrum(), method="window")
+    monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    monkeypatch.setattr(AutoPeakReviewDialog, "accepted_peaks", lambda self: peaks)
+    QTest.mouseClick(peak_panel.auto_find_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert window.analysis_workspace.state.peak_search_method == "window"
+    assert peak_panel.table.rowCount() == len(peaks)
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_inventory_timeline_panel_builds_and_exports_timeseries(tmp_path):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
+    window.analysis_workspace.set_activity_results(
+        (
+            ActivityCalculationResult(
+                nuclide="Mo-99",
+                line_energy_keV=140.5,
+                activity_bq=850.0,
+                uncertainty_bq=30.0,
+                age_corrected_activity_bq=900.0,
+                mda_bq=0.0,
+                half_life_s=65.94 * 3600.0,
+                source_age_s=7200.0,
+                chain_summary="Mo-99 feed",
+                age_corrected_uncertainty_bq=45.0,
+            ),
+        )
+    )
+    window.show()
+    _qapp().processEvents()
+
+    panel = window.bottom_dock.widget().inventory_timeline_panel
+    panel.observable_combo.setCurrentIndex(
+        max(panel.observable_combo.findData("activity"), 0)
+    )
+    panel.nuclide_focus_combo.setCurrentIndex(
+        max(panel.nuclide_focus_combo.findData("Mo-99"), 0)
+    )
+    result = panel.build_inventory_timeline()
+    assert result is not None
+    assert "Mo-99" in result.activity_series
+    assert "Tc-99m" in result.activity_series
+
+    csv_path = tmp_path / "inventory_timeseries.csv"
+    plot_path = tmp_path / "inventory_activity.png"
+    panel.export_time_series_csv(csv_path)
+    panel.export_plot(plot_path)
+
+    assert csv_path.exists()
+    assert plot_path.exists()
+    assert "dose_rate_uSv_h" in csv_path.read_text(encoding="utf-8")
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_astm_mode_locks_peak_identification_databases_to_standard_sources():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(
+            initial_state=ModeState(
+                mode=GUIMode.STANDARDS,
+                standard="ASTM E181",
+                theme="dark",
+            )
+        ),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    sidebar = window.left_dock.widget()
+
+    assert peak_panel.bayesian_source_combo.count() == 1
+    assert peak_panel.bayesian_source_combo.currentData() == "decay_2012"
+    assert peak_panel.bayesian_source_combo.isEnabled() is False
+    assert peak_panel.ml_source_combo.count() == 1
+    assert peak_panel.ml_source_combo.currentData() == "decay_2012"
+    assert peak_panel.ml_source_combo.isEnabled() is False
+
+    assert sidebar.gamma_source_combo.count() == 1
+    assert sidebar.gamma_source_combo.currentData() == "decay_2012"
+    assert sidebar.gamma_source_combo.isEnabled() is False
+    assert sidebar.calibration_source_combo.count() == 1
+    assert sidebar.calibration_source_combo.currentData() == "calibration_standard_sources"
+    assert sidebar.calibration_source_combo.isEnabled() is False
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_astm_mode_peak_matching_workflows_use_locked_gamma_source(monkeypatch):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(
+            initial_state=ModeState(
+                mode=GUIMode.STANDARDS,
+                standard="ASTM E181",
+                theme="dark",
+            )
+        ),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    window.library_manager.set_gamma_identification_source("nndc_offline_activation")
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    window.analysis_workspace.replace_peaks(peaks)
+    window.analysis_workspace.select_peak(peaks[0].peak_id)
+    _qapp().processEvents()
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    captured: dict[str, str] = {}
+
+    def _fake_bayesian_match(peaks_arg, *, source_id="fluxforge_bundled_gamma", custom_path=None):
+        del custom_path
+        captured["bayesian_source_id"] = str(source_id)
+        return tuple(peaks_arg)
+
+    monkeypatch.setattr(
+        "fluxforge.gui.panels.modern_shell.bayesian_match_peak_candidates",
+        _fake_bayesian_match,
+    )
+
+    engine = window.registries.nuclide_id_engines.get("ml_peak_onnx")
+
+    def _fake_analyze_peaks(
+        peaks_arg,
+        *,
+        source_id="fluxforge_bundled_gamma",
+        custom_path=None,
+        prefer_gpu=False,
+    ):
+        del peaks_arg, custom_path, prefer_gpu
+        captured["ml_source_id"] = str(source_id)
+        return ()
+
+    monkeypatch.setattr(engine, "analyze_peaks", _fake_analyze_peaks)
+
+    peak_panel.run_bayesian_match()
+    peak_panel.run_ml_peak_analysis()
+    _qapp().processEvents()
+
+    assert captured["bayesian_source_id"] == "decay_2012"
+    assert captured["ml_source_id"] == "decay_2012"
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_astm_mode_reference_overlays_use_locked_gamma_source(monkeypatch):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(
+            initial_state=ModeState(
+                mode=GUIMode.STANDARDS,
+                standard="ASTM E181",
+                theme="dark",
+            )
+        ),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    window.library_manager.set_gamma_identification_source("nndc_offline_activation")
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    assigned = bayesian_match_peak_candidates(peaks)
+    window.analysis_workspace.replace_peaks(assigned)
+    window.analysis_workspace.select_peak(assigned[0].peak_id)
+    _qapp().processEvents()
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    captured: dict[str, str] = {}
+
+    def _fake_cascade_lines(pinned, *, source_id="fluxforge_bundled_gamma", custom_path=None):
+        del pinned, custom_path
+        captured["source_id"] = str(source_id)
+        return (2505.72,)
+
+    monkeypatch.setattr(
+        "fluxforge.gui.panels.modern_shell.compute_cascade_sum_lines",
+        _fake_cascade_lines,
+    )
+
+    peak_panel._pin_selected_nuclide()
+    _qapp().processEvents()
+
+    assert captured["source_id"] == "decay_2012"
     window.close()
 
 
@@ -678,6 +943,204 @@ def test_main_window_activity_background_and_survey_map_workflows(monkeypatch):
     spectrum_tabs.setCurrentIndex(1)
     _qapp().processEvents()
     assert window.analysis_workspace.state.active_spectrum_key == "background"
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_main_window_activity_review_exports_csv_and_plots(monkeypatch, tmp_path):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    monkeypatch.setattr(AutoPeakReviewDialog, "accepted_peaks", lambda self: peaks)
+
+    bottom = window.bottom_dock.widget()
+    bottom.peak_table_panel.run_auto_peak_search()
+    bottom.peak_table_panel.run_bayesian_match()
+    _qapp().processEvents()
+
+    fit = fit_efficiency_model(_make_efficiency_points(), model_key="log_poly_2")
+    window.analysis_workspace.set_efficiency_fit(fit)
+
+    activity_panel = bottom.activity_results_panel
+    activity_panel.source_age_hours.setValue(24.0)
+    review = activity_panel.analyze_spectrum_activities()
+    assert review is not None
+    assert len(review.isotope_summaries) >= 1
+
+    csv_path = tmp_path / "activity_review.csv"
+    decay_path = tmp_path / "activity_decay.png"
+    bateman_path = tmp_path / "activity_bateman.png"
+    activity_panel.export_activity_csv(csv_path)
+    activity_panel.export_decay_plot(decay_path)
+    activity_panel.export_bateman_plot(bateman_path)
+
+    assert csv_path.exists()
+    assert decay_path.exists()
+    assert bateman_path.exists()
+    assert "irradiation_time_activity_Bq" in csv_path.read_text(encoding="utf-8")
+    assert "Irradiation-time activity" in activity_panel.results.toPlainText()
+    assert len(window.analysis_workspace.state.activity_results) >= 1
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_main_window_activity_unit_selector_rescales_activity_review_plot(monkeypatch, tmp_path):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    monkeypatch.setattr(AutoPeakReviewDialog, "accepted_peaks", lambda self: peaks)
+
+    bottom = window.bottom_dock.widget()
+    bottom.peak_table_panel.run_auto_peak_search()
+    bottom.peak_table_panel.run_bayesian_match()
+    _qapp().processEvents()
+
+    fit = fit_efficiency_model(_make_efficiency_points(), model_key="log_poly_2")
+    window.analysis_workspace.set_efficiency_fit(fit)
+
+    activity_panel = bottom.activity_results_panel
+    review = activity_panel.analyze_spectrum_activities()
+    assert review is not None
+
+    activity_panel.activity_unit_combo.setCurrentIndex(
+        max(activity_panel.activity_unit_combo.findData("kBq"), 0)
+    )
+    _qapp().processEvents()
+
+    captured = {}
+
+    def fake_plot_decay_curves(data, *, ylabel=None, save_path=None, **kwargs):
+        captured["data"] = data
+        captured["ylabel"] = ylabel
+        Path(save_path).write_text("plot", encoding="utf-8")
+        return object(), object()
+
+    monkeypatch.setattr(
+        "fluxforge.gui.panels.modern_shell.plot_decay_curves",
+        fake_plot_decay_curves,
+    )
+
+    plot_path = tmp_path / "activity_decay_kbq.png"
+    activity_panel.export_decay_plot(plot_path)
+
+    assert plot_path.exists()
+    assert captured["ylabel"] == "Activity (kBq)"
+    raw_first_value = next(iter(review.decay_plot_data.values()))[0][1]
+    scaled_first_value = next(iter(captured["data"].values()))[0][1]
+    assert scaled_first_value == pytest.approx(raw_first_value / 1000.0)
+    assert "kBq" in activity_panel.results.toPlainText()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_main_window_inventory_panel_activity_unit_selector_updates_headers_and_values():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
+    window.analysis_workspace.set_activity_results(
+        (
+            ActivityCalculationResult(
+                nuclide="Mo-99",
+                line_energy_keV=140.5,
+                activity_bq=850.0,
+                uncertainty_bq=30.0,
+                age_corrected_activity_bq=900.0,
+                mda_bq=0.0,
+                half_life_s=65.94 * 3600.0,
+                source_age_s=7200.0,
+                chain_summary="Mo-99 feed",
+                age_corrected_uncertainty_bq=45.0,
+            ),
+        )
+    )
+    window.show()
+    _qapp().processEvents()
+
+    panel = window.bottom_dock.widget().inventory_timeline_panel
+    panel.observable_combo.setCurrentIndex(
+        max(panel.observable_combo.findData("activity"), 0)
+    )
+    panel.nuclide_focus_combo.setCurrentIndex(
+        max(panel.nuclide_focus_combo.findData("Mo-99"), 0)
+    )
+    result = panel.build_inventory_timeline()
+    assert result is not None
+
+    panel.activity_unit_combo.setCurrentIndex(
+        max(panel.activity_unit_combo.findData("kBq"), 0)
+    )
+    panel._render_result(result)
+    _qapp().processEvents()
+
+    assert panel.table.horizontalHeaderItem(2).text() == "Activity (kBq)"
+    assert panel.table.horizontalHeaderItem(6).text() == "Act. Sigma (kBq)"
+    assert float(panel.table.item(0, 2).text()) < 1.0
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_main_window_sidebar_registers_and_removes_user_library(monkeypatch, tmp_path):
+    registry_path = tmp_path / "library_registry.json"
+    gamma_path = tmp_path / "gamma.csv"
+    gamma_path.write_text(
+        "nuclide,energy_keV,intensity,half_life_s\nCo60,1332.5,1.0,166344192.0\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("FLUXFORGE_LIBRARY_REGISTRY", str(registry_path))
+
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    sidebar = window.left_dock.widget()
+    sidebar.gamma_source_combo.setCurrentIndex(
+        max(sidebar.gamma_source_combo.findData("custom_gamma_file"), 0)
+    )
+    sidebar.custom_gamma_path.setText(str(gamma_path))
+    sidebar.custom_gamma_alias.setText("Lab Ref")
+    QTest.mouseClick(sidebar.register_custom_gamma_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    assert sidebar.gamma_source_combo.findData("user_gamma_lab_ref") >= 0
+    assert window.library_manager.state.gamma_identification_source_id == "user_gamma_lab_ref"
+
+    QTest.mouseClick(sidebar.remove_registered_gamma_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    assert window.library_manager.state.gamma_identification_source_id == "fluxforge_bundled_gamma"
     window.close()
 
 

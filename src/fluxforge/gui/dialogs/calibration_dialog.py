@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Callable
 
 import numpy as np
 
+from fluxforge.core.analysis_workspace import detect_peak_candidates
 from fluxforge.core.calibration import (
     ASTM_E181_ENERGY_LIMIT_KEV,
     EnergyCalibrationFit,
@@ -73,6 +75,23 @@ REFERENCE_LINES_KEV = (
     ("Co-60 (1332)", 1332.492),
 )
 
+DETECTOR_SLOT_NAMES = (
+    "Primary HPGe",
+    "Field HPGe",
+    "Low-Energy HPGe",
+    "Well Detector",
+)
+
+
+@dataclass(frozen=True)
+class CalibrationSnapshot:
+    """Preserved calibration state used for fine-tuning and detector-slot recall."""
+
+    label: str
+    energy_points: tuple[EnergyCalibrationPoint, ...]
+    fwhm_points: tuple[FWHMCalibrationPoint, ...]
+    deviation_pairs: tuple[EnergyDeviationPair, ...]
+
 
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
 
@@ -133,6 +152,8 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self._quick_fit = None
             self._roi_fit: InteractivePeakFitResult | None = None
             self._peak_fitter_registry = bootstrap_builtin_registries().peak_fitters
+            self._preserved_snapshot: CalibrationSnapshot | None = None
+            self._detector_slots: dict[str, CalibrationSnapshot] = {}
 
             self._build_ui()
             self.mode_manager.subscribe(self._on_mode_state_changed)
@@ -514,9 +535,11 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.advanced_tabs.setObjectName("CalibrationAdvancedTabs")
             self.quick_slider_tab = self._build_quick_slider_tab(self.advanced_tabs)
             self.deviation_pairs_tab = self._build_deviation_pairs_tab(self.advanced_tabs)
+            self.preserve_slots_tab = self._build_preserve_slots_tab(self.advanced_tabs)
             self.roi_fit_tab = self._build_roi_fit_tab(self.advanced_tabs)
             self.advanced_tabs.addTab(self.quick_slider_tab, "Quick Slider")
             self.advanced_tabs.addTab(self.deviation_pairs_tab, "Fine Tuning")
+            self.advanced_tabs.addTab(self.preserve_slots_tab, "Preserve && Slots")
             self.advanced_tabs.addTab(self.roi_fit_tab, "ROI Fit")
             advanced_layout.addWidget(self.advanced_tabs)
             controls_layout.addWidget(advanced_group, 3)
@@ -695,6 +718,77 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             layout.addWidget(self.deviation_summary)
             return widget
 
+        def _build_preserve_slots_tab(self, parent: QWidget) -> QWidget:
+            widget = QWidget(parent)
+            layout = QVBoxLayout(widget)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "Preserve the current calibration, recall named detector slots, and "
+                    "fine-tune a prior solution against the current spectrum without "
+                    "rebuilding every row by hand."
+                ),
+                widget,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            form = QFormLayout()
+            form.setContentsMargins(0, 0, 0, 0)
+            form.setSpacing(8)
+
+            self.detector_slot_combo = QComboBox(widget)
+            self.detector_slot_combo.setObjectName("CalibrationDetectorSlotCombo")
+            for slot_name in DETECTOR_SLOT_NAMES:
+                self.detector_slot_combo.addItem(slot_name, slot_name)
+            self.detector_slot_combo.currentIndexChanged.connect(
+                self._refresh_snapshot_summary
+            )
+            form.addRow("Detector slot", self.detector_slot_combo)
+            layout.addLayout(form)
+
+            button_row = QHBoxLayout()
+            button_row.setSpacing(8)
+
+            self.preserve_current_button = QPushButton("Preserve current", widget)
+            self.preserve_current_button.setObjectName("PreserveCalibrationButton")
+            self.preserve_current_button.clicked.connect(self._preserve_current_calibration)
+            button_row.addWidget(self.preserve_current_button)
+
+            self.fine_tune_preserved_button = QPushButton("Fine-tune preserved", widget)
+            self.fine_tune_preserved_button.setObjectName("FineTunePreservedButton")
+            self.fine_tune_preserved_button.clicked.connect(self._fine_tune_from_preserved)
+            button_row.addWidget(self.fine_tune_preserved_button)
+
+            self.save_slot_button = QPushButton("Save to slot", widget)
+            self.save_slot_button.setObjectName("SaveDetectorSlotButton")
+            self.save_slot_button.clicked.connect(self._save_current_to_detector_slot)
+            button_row.addWidget(self.save_slot_button)
+
+            self.load_slot_button = QPushButton("Load slot", widget)
+            self.load_slot_button.setObjectName("LoadDetectorSlotButton")
+            self.load_slot_button.clicked.connect(self._load_detector_slot)
+            button_row.addWidget(self.load_slot_button)
+
+            self.nasa_smart_seed_button = QPushButton("NASA smart seed", widget)
+            self.nasa_smart_seed_button.setObjectName("NasaSmartSeedButton")
+            self.nasa_smart_seed_button.clicked.connect(self._apply_nasa_smart_seed)
+            button_row.addWidget(self.nasa_smart_seed_button)
+
+            button_row.addStretch(1)
+            layout.addLayout(button_row)
+
+            self.snapshot_summary = QLabel("", widget)
+            self.snapshot_summary.setObjectName("CalibrationSnapshotSummary")
+            self.snapshot_summary.setWordWrap(True)
+            layout.addWidget(self.snapshot_summary)
+
+            self._refresh_snapshot_summary()
+            return widget
+
         def _build_roi_fit_tab(self, parent: QWidget) -> QWidget:
             widget = QWidget(parent)
             layout = QVBoxLayout(widget)
@@ -827,6 +921,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             widget_map = {
                 "quick_slider": self.quick_slider_tab,
                 "deviation_pairs": self.deviation_pairs_tab,
+                "preserve_slots": self.preserve_slots_tab,
                 "roi_fit": self.roi_fit_tab,
             }
             widget = widget_map.get(key)
@@ -853,26 +948,39 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     not simple_mode,
                 )
                 self.advanced_tabs.setTabVisible(
+                    self.advanced_tabs.indexOf(self.preserve_slots_tab),
+                    not simple_mode,
+                )
+                self.advanced_tabs.setTabVisible(
                     self.advanced_tabs.indexOf(self.roi_fit_tab),
                     not simple_mode,
                 )
             if simple_mode and self.advanced_tabs.currentWidget() in (
                 self.deviation_pairs_tab,
+                self.preserve_slots_tab,
                 self.roi_fit_tab,
             ):
                 self.advanced_tabs.setCurrentWidget(self.quick_slider_tab)
             self._apply_plot_palette()
+            self._populate_library_sources()
+            self._sync_library_state(self.library_manager.state)
             self._refresh_energy_fit()
             self._refresh_roi_background_models()
             self._refresh_quick_slider_preview()
+            self._refresh_snapshot_summary()
             self._refresh_roi_fit()
 
         def _format_provenance_summary(self, locked_by: str | None) -> str:
             spectrum_name = self._spectrum.spectrum_id or "Untitled spectrum"
             mode_state = self.mode_manager.state
-            calibration_library = self.library_manager.record_for_category("calibration").label
+            standard = mode_state.standard if mode_state.mode.value == "standards" else None
+            calibration_library = self.library_manager.record_for_category(
+                "calibration",
+                standard=standard,
+            ).label
             identification_library = self.library_manager.record_for_category(
-                "gamma_identification"
+                "gamma_identification",
+                standard=standard,
             ).label
             lines = [
                 f"Spectrum: {spectrum_name}",
@@ -897,7 +1005,15 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
         def _populate_library_sources(self) -> None:
             self.library_source_combo.blockSignals(True)
             self.library_source_combo.clear()
-            for record in self.library_manager.available_sources("gamma_identification"):
+            standard = (
+                self.mode_manager.state.standard
+                if self.mode_manager.state.mode.value == "standards"
+                else None
+            )
+            for record in self.library_manager.available_sources(
+                "gamma_identification",
+                standard=standard,
+            ):
                 self.library_source_combo.addItem(record.label, record.source_id)
             self.library_source_combo.blockSignals(False)
 
@@ -941,13 +1057,36 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     combo.setCurrentIndex(index)
 
         def _sync_library_state(self, state) -> None:
-            index = self.library_source_combo.findData(state.gamma_identification_source_id)
+            standard = (
+                self.mode_manager.state.standard
+                if self.mode_manager.state.mode.value == "standards"
+                else None
+            )
+            resolved_state = self.library_manager.resolved_state(standard=standard)
+            self.nuclide_controller.set_source(
+                resolved_state.gamma_identification_source_id,
+                custom_path=resolved_state.custom_gamma_path,
+            )
+            index = self.library_source_combo.findData(
+                resolved_state.gamma_identification_source_id
+            )
             if index >= 0:
                 self.library_source_combo.blockSignals(True)
                 self.library_source_combo.setCurrentIndex(index)
                 self.library_source_combo.blockSignals(False)
+            self.library_source_combo.setEnabled(
+                self.library_manager.locked_source_for_category(
+                    "gamma_identification",
+                    standard=standard,
+                )
+                is None
+                and self.library_source_combo.count() > 1
+            )
             self.library_summary.setText(
-                self.library_manager.summary_for_category("gamma_identification")
+                self.library_manager.summary_for_category(
+                    "gamma_identification",
+                    standard=standard,
+                )
             )
             self._refresh_library_results(self.library_search.text())
             self._populate_quick_reference_options()
@@ -1168,6 +1307,269 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     self._set_energy_cell(row, 4, 0.12, editable=True)
             self.energy_table.selectRow(0)
             self._refresh_energy_fit()
+
+        def _selected_detector_slot_name(self) -> str:
+            return str(
+                self.detector_slot_combo.currentData()
+                or self.detector_slot_combo.currentText()
+            )
+
+        def _capture_current_snapshot(self, label: str) -> CalibrationSnapshot:
+            return CalibrationSnapshot(
+                label=label,
+                energy_points=self._read_energy_points(),
+                fwhm_points=self._read_fwhm_points(),
+                deviation_pairs=self._read_deviation_pairs(),
+            )
+
+        def _seed_energy_table_from_points(
+            self,
+            points: tuple[EnergyCalibrationPoint, ...],
+        ) -> None:
+            self._syncing_energy_table = True
+            self.energy_table.setRowCount(0)
+            for point in points:
+                self._append_energy_row(point)
+            self._syncing_energy_table = False
+
+        def _seed_fwhm_table_from_points(
+            self,
+            points: tuple[FWHMCalibrationPoint, ...],
+        ) -> None:
+            self._syncing_fwhm_table = True
+            self.fwhm_table.setRowCount(0)
+            for point in points:
+                self._append_fwhm_row(point)
+            self._syncing_fwhm_table = False
+
+        def _seed_deviation_table_from_pairs(
+            self,
+            pairs: tuple[EnergyDeviationPair, ...],
+        ) -> None:
+            self._syncing_deviation_table = True
+            self.deviation_table.setRowCount(0)
+            for pair in pairs:
+                row = self.deviation_table.rowCount()
+                self.deviation_table.insertRow(row)
+                self._set_deviation_cell(row, 0, pair.energy_keV)
+                self._set_deviation_cell(row, 1, pair.correction_keV)
+                self._set_deviation_cell(row, 2, pair.label)
+            self._syncing_deviation_table = False
+
+        def _restore_snapshot(
+            self,
+            snapshot: CalibrationSnapshot,
+            *,
+            message: str,
+        ) -> None:
+            self._seed_energy_table_from_points(snapshot.energy_points)
+            self._seed_fwhm_table_from_points(snapshot.fwhm_points)
+            self._seed_deviation_table_from_pairs(snapshot.deviation_pairs)
+            if self.energy_table.rowCount():
+                self.energy_table.selectRow(0)
+            if self.fwhm_table.rowCount():
+                self.fwhm_table.selectRow(0)
+            self._reset_quick_slider_anchors()
+            self._refresh_energy_fit()
+            self._refresh_fwhm_fit()
+            self._refresh_snapshot_summary(message=message)
+
+        def _refresh_snapshot_summary(
+            self,
+            *_args,
+            message: str | None = None,
+        ) -> None:
+            slot_name = self._selected_detector_slot_name()
+            slot_snapshot = self._detector_slots.get(slot_name)
+            preserved_label = (
+                self._preserved_snapshot.label
+                if self._preserved_snapshot is not None
+                else "none"
+            )
+            if slot_snapshot is None:
+                slot_text = f"{slot_name}: empty"
+            else:
+                slot_text = (
+                    f"{slot_name}: {len(slot_snapshot.energy_points)} energy points, "
+                    f"{len(slot_snapshot.fwhm_points)} resolution points, "
+                    f"{len(slot_snapshot.deviation_pairs)} deviation pairs"
+                )
+            lines = [
+                f"Preserved calibration: {preserved_label}",
+                f"Detector slot status: {slot_text}",
+                "NASA smart seed reassigns the seeded references using nasa_peaksearch.",
+            ]
+            if message:
+                lines.append(message)
+            self.snapshot_summary.setText("\n".join(lines))
+            self.fine_tune_preserved_button.setEnabled(self._preserved_snapshot is not None)
+            self.load_slot_button.setEnabled(slot_snapshot is not None)
+
+        def _preserve_current_calibration(self) -> None:
+            self._preserved_snapshot = self._capture_current_snapshot("Current workspace")
+            self._refresh_snapshot_summary(
+                message="Current calibration preserved for later fine-tuning."
+            )
+
+        def _save_current_to_detector_slot(self) -> None:
+            slot_name = self._selected_detector_slot_name()
+            self._detector_slots[slot_name] = self._capture_current_snapshot(slot_name)
+            self._refresh_snapshot_summary(
+                message=f"Stored the current calibration in detector slot '{slot_name}'."
+            )
+
+        def _load_detector_slot(self) -> None:
+            slot_name = self._selected_detector_slot_name()
+            snapshot = self._detector_slots.get(slot_name)
+            if snapshot is None:
+                self._refresh_snapshot_summary(
+                    message=f"Detector slot '{slot_name}' is empty."
+                )
+                return
+            self._restore_snapshot(
+                snapshot,
+                message=f"Loaded detector slot '{slot_name}' into the workspace tables.",
+            )
+
+        def _best_channel_guess(
+            self,
+            reference_energy_keV: float,
+            *,
+            fallback_channel: float,
+        ) -> float:
+            max_channel = max(len(self._spectrum.counts) - 1, 0)
+            predicted_channel = float(fallback_channel)
+            try:
+                guessed = float(self._spectrum.energy_to_channel(reference_energy_keV))
+                if np.isfinite(guessed) and abs(guessed - fallback_channel) <= 256.0:
+                    predicted_channel = guessed
+            except Exception:
+                pass
+            return float(np.clip(predicted_channel, 0.0, max_channel))
+
+        def _fine_tune_from_preserved(self) -> None:
+            if self._preserved_snapshot is None:
+                self._refresh_snapshot_summary(
+                    message="Preserve a calibration before requesting a fine-tune pass."
+                )
+                return
+            tuned_energy_points: list[EnergyCalibrationPoint] = []
+            for point in self._preserved_snapshot.energy_points:
+                channel_guess = self._best_channel_guess(
+                    float(point.reference_energy_keV),
+                    fallback_channel=float(point.channel),
+                )
+                snapped_channel = self._snap_channel_to_peak(channel_guess)
+                tuned_energy_points.append(
+                    EnergyCalibrationPoint(
+                        label=point.label,
+                        channel=snapped_channel,
+                        observed_energy_keV=float(
+                            self._spectrum.channel_to_energy(snapped_channel)
+                        ),
+                        reference_energy_keV=float(point.reference_energy_keV),
+                        uncertainty_keV=point.uncertainty_keV,
+                    )
+                )
+
+            tuned_fwhm_points: list[FWHMCalibrationPoint] = []
+            for point in self._preserved_snapshot.fwhm_points:
+                channel_guess = self._best_channel_guess(
+                    float(point.energy_keV),
+                    fallback_channel=float(point.energy_keV),
+                )
+                snapped_channel = self._snap_channel_to_peak(channel_guess)
+                local_fwhm_channels = estimate_local_fwhm_channels(
+                    self._spectrum.counts,
+                    int(round(snapped_channel)),
+                )
+                tuned_fwhm_points.append(
+                    FWHMCalibrationPoint(
+                        label=point.label,
+                        energy_keV=float(point.energy_keV),
+                        fwhm_keV=max(
+                            local_fwhm_channels * self._energy_scale_at_channel(snapped_channel),
+                            0.05,
+                        ),
+                        uncertainty_keV=point.uncertainty_keV,
+                    )
+                )
+
+            self._restore_snapshot(
+                CalibrationSnapshot(
+                    label=f"{self._preserved_snapshot.label} (fine-tuned)",
+                    energy_points=tuple(tuned_energy_points),
+                    fwhm_points=tuple(tuned_fwhm_points),
+                    deviation_pairs=self._preserved_snapshot.deviation_pairs,
+                ),
+                message="Fine-tuned the preserved calibration against peaks in the current spectrum.",
+            )
+
+        def _apply_nasa_smart_seed(self) -> None:
+            detected_peaks = list(
+                detect_peak_candidates(self._spectrum, method="nasa_peaksearch")
+            )
+            assigned_peak_ids: set[str] = set()
+            smart_points: list[EnergyCalibrationPoint] = []
+            for index, (label, reference_energy) in enumerate(REFERENCE_LINES_KEV):
+                selected_peak = None
+                selected_delta = float("inf")
+                for peak in detected_peaks:
+                    if peak.peak_id in assigned_peak_ids:
+                        continue
+                    delta = abs(float(peak.energy_keV) - float(reference_energy))
+                    if delta < selected_delta:
+                        selected_peak = peak
+                        selected_delta = delta
+                if selected_peak is not None and selected_delta <= 80.0:
+                    assigned_peak_ids.add(selected_peak.peak_id)
+                    snapped_channel = float(selected_peak.channel)
+                else:
+                    snapped_channel = self._snap_channel_to_peak(
+                        self._best_channel_guess(
+                            float(reference_energy),
+                            fallback_channel=float(reference_energy),
+                        )
+                    )
+                smart_points.append(
+                    EnergyCalibrationPoint(
+                        label=label,
+                        channel=snapped_channel,
+                        observed_energy_keV=float(
+                            self._spectrum.channel_to_energy(snapped_channel)
+                        ),
+                        reference_energy_keV=float(reference_energy),
+                        uncertainty_keV=0.15 if index == 0 else 0.12,
+                    )
+                )
+
+            smart_fwhm_points: list[FWHMCalibrationPoint] = []
+            for point in smart_points:
+                local_fwhm_channels = estimate_local_fwhm_channels(
+                    self._spectrum.counts,
+                    int(round(point.channel)),
+                )
+                smart_fwhm_points.append(
+                    FWHMCalibrationPoint(
+                        label=point.label,
+                        energy_keV=float(point.reference_energy_keV),
+                        fwhm_keV=max(
+                            local_fwhm_channels * self._energy_scale_at_channel(point.channel),
+                            0.05,
+                        ),
+                        uncertainty_keV=0.05,
+                    )
+                )
+
+            self._restore_snapshot(
+                CalibrationSnapshot(
+                    label="NASA smart seed",
+                    energy_points=tuple(smart_points),
+                    fwhm_points=tuple(smart_fwhm_points),
+                    deviation_pairs=self._read_deviation_pairs(),
+                ),
+                message="NASA smart seed refreshed the calibration anchors from detected peaks.",
+            )
 
         def _read_deviation_pairs(self) -> tuple[EnergyDeviationPair, ...]:
             pairs: list[EnergyDeviationPair] = []

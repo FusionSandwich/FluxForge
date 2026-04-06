@@ -19,7 +19,9 @@ References for IRDFF-II:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from math import exp, log
 from pathlib import Path
+import re
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -35,6 +37,11 @@ from fluxforge.data.irdff import (
     build_response_matrix,
     IRDFF_REACTIONS,
 )
+from fluxforge.data.flux_wire_unfolding import (
+    get_flux_wire_isotope_fraction,
+    load_flux_wire_sample_defaults,
+)
+from fluxforge.data.nndc import Isotope
 from fluxforge.solvers.iterative import gravel, mlem, IterativeSolution
 from fluxforge.unfolding import MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
 
@@ -42,6 +49,41 @@ from fluxforge.unfolding import MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
 # =============================================================================
 # Data Classes
 # =============================================================================
+
+
+_AVOGADRO = 6.02214076e23
+_BARN_TO_CM2 = 1.0e-24
+_FLUX_WIRE_SAMPLE_DEFAULTS = load_flux_wire_sample_defaults()
+
+
+def _get_reaction_metadata(reaction: str) -> Dict[str, Any]:
+    """Return IRDFF metadata for one reaction when available."""
+    for category in IRDFF_REACTIONS.values():
+        if reaction in category:
+            return dict(category[reaction])
+    return {}
+
+
+def _canonical_isotope_or_none(name: str) -> Optional[str]:
+    """Return a canonical isotope string when parsing succeeds."""
+    try:
+        return Isotope.from_string(name).name
+    except Exception:
+        return None
+
+
+def _reaction_target_and_product(reaction: str) -> Tuple[Optional[str], Optional[str]]:
+    """Extract target and product isotopes from one reaction identifier."""
+    metadata = _get_reaction_metadata(reaction)
+    target = metadata.get("target")
+    product = metadata.get("product")
+    if target and product:
+        return str(target), str(product)
+
+    match = re.match(r"^\s*([A-Za-z]+-\d+m?)\([^)]*\)([A-Za-z]+-\d+m?)\s*$", reaction)
+    if match:
+        return match.group(1), match.group(2)
+    return None, None
 
 
 @dataclass
@@ -82,11 +124,123 @@ class FluxWireMeasurement:
     isotope_abundance: float = 1.0
 
     @property
+    def target_isotope(self) -> Optional[str]:
+        """Target isotope parsed from the reaction identifier."""
+        target, _ = _reaction_target_and_product(self.reaction)
+        return target
+
+    @property
+    def product_isotope(self) -> Optional[str]:
+        """Activation product isotope parsed from the reaction identifier."""
+        _, product = _reaction_target_and_product(self.reaction)
+        return product
+
+    @property
+    def effective_isotope_abundance(self) -> float:
+        """Resolved target-isotope abundance fraction."""
+        if self.isotope_abundance > 0.0 and not np.isclose(self.isotope_abundance, 1.0):
+            return float(self.isotope_abundance)
+
+        target = self.target_isotope
+        if target:
+            try:
+                element = target.split("-", 1)[0]
+                default_fraction = get_flux_wire_isotope_fraction(self.reaction, element)
+                if default_fraction > 0.0 and not np.isclose(default_fraction, 1.0):
+                    return float(default_fraction)
+            except Exception:
+                pass
+
+            canonical_target = _canonical_isotope_or_none(target)
+            if canonical_target is not None:
+                isotope = Isotope.from_string(canonical_target)
+                if isotope.abundance is not None and isotope.abundance > 0.0:
+                    return float(isotope.abundance)
+
+        return float(self.isotope_abundance)
+
+    @property
+    def target_atom_count(self) -> float:
+        """Number of target atoms in the measured wire."""
+        if self.sample_mass_g <= 0.0:
+            return 0.0
+
+        target = self.target_isotope
+        if target is None:
+            return 0.0
+
+        element = target.split("-", 1)[0]
+        atomic_mass = None
+        defaults = _FLUX_WIRE_SAMPLE_DEFAULTS.get(element, {})
+        if defaults:
+            atomic_mass = defaults.get("atomic_mass")
+
+        if atomic_mass is None:
+            canonical_target = _canonical_isotope_or_none(target)
+            if canonical_target is not None:
+                atomic_mass = Isotope.from_string(canonical_target).atomic_mass
+
+        if atomic_mass is None or atomic_mass <= 0.0:
+            return 0.0
+
+        abundance = self.effective_isotope_abundance
+        if abundance <= 0.0:
+            return 0.0
+
+        return float((self.sample_mass_g / atomic_mass) * _AVOGADRO * abundance)
+
+    @property
+    def effective_saturation_factor(self) -> float:
+        """Saturation factor, derived from timing metadata when available."""
+        if self.saturation_factor > 0.0 and not np.isclose(self.saturation_factor, 1.0):
+            return float(self.saturation_factor)
+
+        product = self.product_isotope
+        if product is None or self.irradiation_time <= 0.0:
+            return float(self.saturation_factor)
+
+        canonical_product = _canonical_isotope_or_none(product)
+        if canonical_product is None:
+            return float(self.saturation_factor)
+
+        half_life_s = Isotope.from_string(canonical_product).half_life_s
+        if half_life_s is None or half_life_s <= 0.0 or half_life_s == float("inf"):
+            return float(self.saturation_factor)
+
+        decay_constant = log(2.0) / half_life_s
+        return float(1.0 - exp(-decay_constant * self.irradiation_time))
+
+    @property
+    def effective_decay_factor(self) -> float:
+        """Decay factor, derived from timing metadata when available."""
+        if self.decay_factor > 0.0 and not np.isclose(self.decay_factor, 1.0):
+            return float(self.decay_factor)
+
+        product = self.product_isotope
+        if product is None or self.cooling_time <= 0.0:
+            return float(self.decay_factor)
+
+        canonical_product = _canonical_isotope_or_none(product)
+        if canonical_product is None:
+            return float(self.decay_factor)
+
+        half_life_s = Isotope.from_string(canonical_product).half_life_s
+        if half_life_s is None or half_life_s <= 0.0 or half_life_s == float("inf"):
+            return float(self.decay_factor)
+
+        decay_constant = log(2.0) / half_life_s
+        return float(exp(-decay_constant * self.cooling_time))
+
+    @property
     def reaction_rate_per_atom(self) -> float:
         """Calculate reaction rate per target atom per second."""
-        # R = A / (N * S * D)
-        # where A = activity, N = number of atoms, S = saturation factor, D = decay factor
-        return self.activity_Bq / (self.saturation_factor * self.decay_factor)
+        n_target_atoms = self.target_atom_count
+        saturation = self.effective_saturation_factor
+        decay = self.effective_decay_factor
+        denominator = n_target_atoms * saturation * decay
+        if denominator <= 0.0:
+            return 0.0
+        return self.activity_Bq / denominator
 
     @property
     def relative_uncertainty(self) -> float:
@@ -458,6 +612,10 @@ class SpectrumUnfolder:
             db=self.irdff_db,
             verbose=self.verbose,
         )
+
+        group_widths = np.diff(self.energy_edges).reshape(1, -1)
+        response = response * group_widths * _BARN_TO_CM2
+        uncertainties = uncertainties * group_widths * _BARN_TO_CM2
 
         self._response_matrix = response
         self._reaction_list = valid_reactions

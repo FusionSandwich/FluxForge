@@ -191,8 +191,11 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   in the modern Qt shell, the QA & Standards sidebar exposes direct `View QA History`
   and `Run ASTM Check` buttons, and clicking the status-bar hardware LED now opens
   the Dashboard tab as specified in Section 16.
-- The current controlling-roadmap next step is Phase `3.17`,
-  calibration/efficiency parity for the new offline spectroscopy module.
+- Phase `3.17` is now implemented in-repo via the Qt calibration workspace,
+  efficiency dialog, standards-aware library locking, and the modern-shell
+  identification source selectors.
+- The current controlling-roadmap next step is Phase `3.18`,
+  identification/activity/reference parity for the new offline spectroscopy module.
 - The newly added Phase 3B milestone, epic, and issue seeds now exist in the
   in-repo planning manifests and require the next planning-sync run to
   materialize on GitHub.

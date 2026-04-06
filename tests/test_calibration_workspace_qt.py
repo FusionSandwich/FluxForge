@@ -21,6 +21,7 @@ from fluxforge.core.peak_fitting import (  # noqa: E402
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
 from fluxforge.gui.dialogs import CalibrationWorkspaceDialog  # noqa: E402
+from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog  # noqa: E402
 from fluxforge.gui.library_manager import DataLibraryManager  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState  # noqa: E402
@@ -151,6 +152,38 @@ def test_method_selector_widget_tracks_modern_peak_fitter_registry():
     assert widget.badge_label.text() == "🔒 Standards Locked"
     assert widget.combo.isEnabled() is False
     widget.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
+def test_efficiency_dialog_exposes_all_four_registered_models():
+    _qapp()
+    dialog = EfficiencyCalibrationDialog(
+        mode_manager=ModeManager(),
+    )
+    dialog.show()
+    _qapp().processEvents()
+
+    keys = {
+        dialog.method_selector.combo.itemData(index)
+        for index in range(dialog.method_selector.combo.count())
+    }
+    assert {
+        "log_poly_2",
+        "log_poly_3",
+        "gray_functional",
+        "semi_empirical_hpge",
+    }.issubset(keys)
+
+    dialog.method_selector.set_current_key("semi_empirical_hpge")
+    dialog._fit_model()
+    _qapp().processEvents()
+
+    assert dialog.accepted_fit() is not None
+    assert dialog.accepted_fit().model_key == "semi_empirical_hpge"
+    dialog.close()
 
 
 @pytest.mark.skipif(
@@ -395,6 +428,68 @@ def test_calibration_dialog_exposes_advanced_tools_and_roi_fitting():
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt calibration workspace dependencies are unavailable.",
 )
+def test_calibration_dialog_supports_preserve_slots_fine_tune_and_nasa_seed():
+    _qapp()
+    dialog = CalibrationWorkspaceDialog(
+        spectrum=build_demo_spectrum(),
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+        library_manager=DataLibraryManager(),
+    )
+    dialog.show()
+    _qapp().processEvents()
+
+    original_channel = float(dialog.energy_table.item(0, 1).text())
+    dialog.energy_table.item(2, 3).setText("1515.0")
+    _qapp().processEvents()
+    dialog.seed_deviation_pairs_button.click()
+    _qapp().processEvents()
+    preserved_pair_count = dialog.deviation_table.rowCount()
+    assert preserved_pair_count >= 1
+
+    dialog.preserve_current_button.click()
+    _qapp().processEvents()
+    assert dialog.fine_tune_preserved_button.isEnabled() is True
+    assert "Preserved calibration: Current workspace" in dialog.snapshot_summary.text()
+
+    dialog.save_slot_button.click()
+    _qapp().processEvents()
+    assert "Stored the current calibration in detector slot" in dialog.snapshot_summary.text()
+    assert dialog.load_slot_button.isEnabled() is True
+
+    dialog.energy_table.item(0, 1).setText("25.0")
+    dialog.clear_deviation_pairs_button.click()
+    _qapp().processEvents()
+    assert dialog.deviation_table.rowCount() == 0
+
+    dialog.load_slot_button.click()
+    _qapp().processEvents()
+    assert float(dialog.energy_table.item(0, 1).text()) == pytest.approx(
+        original_channel,
+        abs=1.0,
+    )
+    assert dialog.deviation_table.rowCount() == preserved_pair_count
+
+    dialog.energy_table.item(0, 1).setText("40.0")
+    _qapp().processEvents()
+    dialog.fine_tune_preserved_button.click()
+    _qapp().processEvents()
+    fine_tuned_channel = float(dialog.energy_table.item(0, 1).text())
+    assert abs(fine_tuned_channel - 40.0) >= 1.0
+    assert abs(fine_tuned_channel - original_channel) <= 48.0
+
+    dialog.nasa_smart_seed_button.click()
+    _qapp().processEvents()
+    assert "NASA smart seed refreshed the calibration anchors" in dialog.snapshot_summary.text()
+    assert dialog.energy_table.rowCount() >= 3
+    assert "Cs-137" in dialog.energy_table.item(0, 0).text()
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
 def test_apply_workspace_results_persists_calibration_workspace_state_to_spectrum():
     _qapp()
     spectrum = build_demo_spectrum()
@@ -436,7 +531,10 @@ def test_data_library_manager_tracks_gui_library_categories():
     manager = DataLibraryManager()
 
     gamma_ids = {record.source_id for record in manager.available_sources("gamma_identification")}
+    activation_ids = {record.source_id for record in manager.available_sources("activation")}
+    assert len(gamma_ids) >= 4
     assert {
+        "decay_2012",
         "fluxforge_bundled_gamma",
         "actigamma_2012",
         "nndc_offline_activation",
@@ -445,4 +543,82 @@ def test_data_library_manager_tracks_gui_library_categories():
     assert manager.available_sources("calibration")[0].source_id == "calibration_standard_sources"
     assert manager.available_sources("naa_monitor")[0].source_id == "k0_naa_monitors"
     assert manager.available_sources("dosimetry")[0].source_id == "irdff_ii_dosimetry"
-    assert manager.available_sources("activation")[0].source_id == "flux_wire_catalog"
+    assert "flux_wire_catalog" in activation_ids
+    assert "nasa_capture_iaea" in activation_ids
+
+
+def test_data_library_manager_registers_and_removes_user_sources(monkeypatch, tmp_path):
+    registry_path = tmp_path / "library_registry.json"
+    gamma_path = tmp_path / "gamma.csv"
+    gamma_path.write_text(
+        "nuclide,energy_keV,intensity,half_life_s\nCo60,1332.5,1.0,166344192.0\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("FLUXFORGE_LIBRARY_REGISTRY", str(registry_path))
+
+    manager = DataLibraryManager()
+    record = manager.register_user_gamma_source("Lab Ref", str(gamma_path))
+
+    gamma_ids = {
+        source.source_id for source in manager.available_sources("gamma_identification")
+    }
+    assert record.source_id == "user_gamma_lab_ref"
+    assert record.source_id in gamma_ids
+    assert manager.state.gamma_identification_source_id == "user_gamma_lab_ref"
+
+    assert manager.remove_user_gamma_source("user_gamma_lab_ref") is True
+    assert manager.state.gamma_identification_source_id == "fluxforge_bundled_gamma"
+
+
+def test_data_library_manager_resolves_astm_locked_sources():
+    manager = DataLibraryManager()
+
+    standards_gamma = manager.available_sources(
+        "gamma_identification",
+        standard="ASTM E181",
+    )
+    standards_calibration = manager.available_sources(
+        "calibration",
+        standard="ASTM E181",
+    )
+    e261_dosimetry = manager.available_sources("dosimetry", standard="ASTM E261")
+
+    assert [record.source_id for record in standards_gamma] == ["decay_2012"]
+    assert [record.source_id for record in standards_calibration] == [
+        "calibration_standard_sources"
+    ]
+    assert [record.source_id for record in e261_dosimetry] == ["irdff_ii_dosimetry"]
+    assert (
+        manager.resolved_state(standard="ASTM C1030").gamma_identification_source_id
+        == "decay_2012"
+    )
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
+def test_calibration_dialog_locks_gamma_library_to_astm_sources():
+    _qapp()
+    manager = ModeManager(
+        initial_state=ModeState(
+            mode=GUIMode.STANDARDS,
+            standard="ASTM E181",
+            theme="dark",
+        )
+    )
+    dialog = CalibrationWorkspaceDialog(
+        spectrum=build_demo_spectrum(),
+        mode_manager=manager,
+        selection_bus=SelectionBus(),
+        library_manager=DataLibraryManager(),
+    )
+    dialog.show()
+    _qapp().processEvents()
+
+    assert dialog.library_source_combo.count() == 1
+    assert dialog.library_source_combo.currentData() == "decay_2012"
+    assert dialog.library_source_combo.isEnabled() is False
+    assert dialog.nuclide_controller.source_id == "decay_2012"
+    assert "actigamma" in dialog.library_summary.text().lower()
+    dialog.close()
