@@ -59,6 +59,11 @@ from fluxforge.analysis.optimization_stbdmr import (
     rank_stbdmr_schedules,
     serialize_stbdmr_ranking,
 )
+from fluxforge.analysis.isotope_priority import (
+    IsotopePriorityWeights,
+    rank_isotopes_from_activity_review_payload,
+    serialize_isotope_priority_ranking,
+)
 from fluxforge.core.prior_covariance import PriorCovarianceConfig, PriorCovarianceModel
 from fluxforge.core.response import (
     EnergyGroupStructure,
@@ -1829,6 +1834,53 @@ def cmd_inventory_review(args: argparse.Namespace) -> None:
     _ensure_parent_dir(output_path)
     output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
     print(f"Wrote inventory review bundle to {output_path}")
+
+
+def cmd_isotope_priority(args: argparse.Namespace) -> None:
+    payload = _load_json(args.activity_review_file)
+    isotopes_of_interest = _parse_csv_strings(
+        getattr(args, "isotopes_of_interest", None)
+    )
+    weights = IsotopePriorityWeights(
+        activity=max(float(getattr(args, "weight_activity", 0.35) or 0.35), 0.0),
+        detectability=max(
+            float(getattr(args, "weight_detectability", 0.25) or 0.25),
+            0.0,
+        ),
+        confidence=max(float(getattr(args, "weight_confidence", 0.20) or 0.20), 0.0),
+        line_support=max(
+            float(getattr(args, "weight_line_support", 0.10) or 0.10),
+            0.0,
+        ),
+        dose=max(float(getattr(args, "weight_dose", 0.10) or 0.10), 0.0),
+    )
+    top_n = int(getattr(args, "top_n", 0) or 0)
+    ranked = rank_isotopes_from_activity_review_payload(
+        payload,
+        weights=weights,
+        isotopes_of_interest=isotopes_of_interest,
+        top_n=top_n if top_n > 0 else None,
+    )
+
+    output_payload = serialize_isotope_priority_ranking(
+        ranked,
+        source_path=str(args.activity_review_file),
+        isotopes_of_interest=isotopes_of_interest,
+        weights=weights,
+    )
+    output_payload["generated_at"] = (
+        datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    )
+
+    output_path = Path(args.output)
+    _ensure_parent_dir(output_path)
+    output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
+
+    csv_output = getattr(args, "csv_output", None)
+    if csv_output is not None:
+        _write_dict_rows(Path(csv_output), list(output_payload.get("ranked_isotopes") or []))
+
+    print(f"Wrote isotope-priority ranking to {output_path}")
 
 
 def cmd_optimization_sweep(args: argparse.Namespace) -> None:
@@ -4396,6 +4448,67 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_review.add_argument("--count-end-csv-output", type=Path, default=None)
     inventory_review.add_argument("--plot-output", type=Path, default=None)
     inventory_review.set_defaults(func=cmd_inventory_review)
+
+    isotope_priority = subparsers.add_parser(
+        "isotope-priority",
+        help="Rank important isotopes from activity-review gamma-spectrum outputs",
+    )
+    isotope_priority.add_argument("--activity-review-file", type=Path, required=True)
+    isotope_priority.add_argument(
+        "--output",
+        type=Path,
+        default=Path("isotope_priority.json"),
+        help="Output JSON ranking bundle path",
+    )
+    isotope_priority.add_argument(
+        "--csv-output",
+        type=Path,
+        default=None,
+        help="Optional CSV export with ranked isotope rows",
+    )
+    isotope_priority.add_argument(
+        "--isotopes-of-interest",
+        type=str,
+        default=None,
+        help="Optional comma-separated isotope subset for focused ranking",
+    )
+    isotope_priority.add_argument(
+        "--top-n",
+        type=int,
+        default=0,
+        help="Optional limit on ranked isotopes (0 means include all)",
+    )
+    isotope_priority.add_argument(
+        "--weight-activity",
+        type=float,
+        default=0.35,
+        help="Weight for activity magnitude in priority score",
+    )
+    isotope_priority.add_argument(
+        "--weight-detectability",
+        type=float,
+        default=0.25,
+        help="Weight for net-count detectability in priority score",
+    )
+    isotope_priority.add_argument(
+        "--weight-confidence",
+        type=float,
+        default=0.20,
+        help="Weight for measurement-confidence term in priority score",
+    )
+    isotope_priority.add_argument(
+        "--weight-line-support",
+        type=float,
+        default=0.10,
+        help="Weight for multi-line support in priority score",
+    )
+    isotope_priority.add_argument(
+        "--weight-dose",
+        type=float,
+        default=0.10,
+        help="Weight for dose-rate relevance in priority score",
+    )
+    isotope_priority.set_defaults(func=cmd_isotope_priority)
 
     optimization_sweep = subparsers.add_parser(
         "optimization-sweep",

@@ -141,6 +141,13 @@ from fluxforge.analysis.optimization_stbdmr import (
     serialize_stbdmr_ranking,
 )
 
+from fluxforge.analysis.isotope_priority import (
+    IsotopePriorityWeights,
+    IsotopePriorityScore,
+    rank_isotopes_from_activity_review_payload,
+    serialize_isotope_priority_ranking,
+)
+
 from fluxforge.analysis.segmented_detection import (
     RegionParams,
     SegmentedDetectionConfig,
@@ -426,6 +433,11 @@ __all__ = [
     "parse_stbdmr_sweep_payload",
     "rank_stbdmr_schedules",
     "serialize_stbdmr_ranking",
+    # Isotope-priority ranking workflow
+    "IsotopePriorityWeights",
+    "IsotopePriorityScore",
+    "rank_isotopes_from_activity_review_payload",
+    "serialize_isotope_priority_ranking",
     # Advanced peak finders
     "PeakInfo",
     "snip_background",

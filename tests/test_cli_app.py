@@ -221,6 +221,27 @@ def test_build_parser_inventory_review_command(tmp_path):
     assert args.observable == "dose"
 
 
+def test_build_parser_isotope_priority_command(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "isotope-priority",
+            "--activity-review-file",
+            str(tmp_path / "activity_review.json"),
+            "--isotopes-of-interest",
+            "Mo-99,Sc-46",
+            "--top-n",
+            "5",
+            "--weight-dose",
+            "0.2",
+        ]
+    )
+    assert args.command == "isotope-priority"
+    assert args.isotopes_of_interest == "Mo-99,Sc-46"
+    assert args.top_n == 5
+    assert args.weight_dose == pytest.approx(0.2)
+
+
 def test_build_parser_optimization_sweep_command(tmp_path):
     parser = app.build_parser()
     args = parser.parse_args(
@@ -587,6 +608,73 @@ def test_cmd_inventory_review_writes_json_csv_and_plot_artifacts(monkeypatch, tm
     assert "dose_rate_uSv_h" in (tmp_path / "inventory_review_timeseries.csv").read_text(
         encoding="utf-8"
     )
+
+
+def test_cmd_isotope_priority_writes_json_and_csv_outputs(tmp_path):
+    activity_review_path = tmp_path / "activity_review.json"
+    activity_review_path.write_text(
+        json.dumps(
+            {
+                "schema": "fluxforge.activity_review.v1",
+                "spectrum_id": "priority-demo",
+                "isotope_summaries": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_count": 2,
+                        "total_net_counts": 8200.0,
+                        "irradiation_time_activity_Bq": 1200.0,
+                        "irradiation_time_activity_unc_Bq": 80.0,
+                        "dose_rate_uSv_h": 30.0,
+                    },
+                    {
+                        "nuclide": "Co-60",
+                        "line_count": 1,
+                        "total_net_counts": 10000.0,
+                        "irradiation_time_activity_Bq": 800.0,
+                        "irradiation_time_activity_unc_Bq": 200.0,
+                        "dose_rate_uSv_h": 40.0,
+                    },
+                    {
+                        "nuclide": "Sc-46",
+                        "line_count": 3,
+                        "total_net_counts": 6000.0,
+                        "irradiation_time_activity_Bq": 600.0,
+                        "irradiation_time_activity_unc_Bq": 50.0,
+                        "dose_rate_uSv_h": 20.0,
+                    },
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    output_path = tmp_path / "isotope_priority.json"
+    csv_path = tmp_path / "isotope_priority.csv"
+    app.cmd_isotope_priority(
+        Namespace(
+            activity_review_file=activity_review_path,
+            output=output_path,
+            csv_output=csv_path,
+            isotopes_of_interest="Mo-99,Sc-46",
+            top_n=1,
+            weight_activity=0.5,
+            weight_detectability=0.2,
+            weight_confidence=0.2,
+            weight_line_support=0.1,
+            weight_dose=0.0,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.isotope_priority.v1"
+    assert payload["isotopes_of_interest"] == ["Mo-99", "Sc-46"]
+    assert len(payload["ranked_isotopes"]) == 1
+    assert payload["ranked_isotopes"][0]["nuclide"] == "Mo-99"
+    assert csv_path.exists()
+    csv_text = csv_path.read_text(encoding="utf-8")
+    assert "priority_score" in csv_text
+    assert "nuclide" in csv_text
 
 
 def test_cmd_optimization_sweep_writes_json_and_csv_outputs(tmp_path):

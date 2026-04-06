@@ -522,6 +522,13 @@ Method progression is strictly sequential:
 - Baseline workflow note: `docs/optimization_of_irradiation/isotopes_of_interest_filter_workflow.md`.
 - Verification coverage in `tests/test_cli_app.py` includes parser and scoring-path filtering assertions.
 
+### CMP-E Spectrum-Driven Isotope Importance Workflow (Baseline 2026-04-06)
+- `isotope-priority` ranks important isotopes from `activity-review` artifacts.
+- Ranking includes activity, detectability, confidence, line-support, and dose component diagnostics.
+- Optional isotope subsetting is supported through `--isotopes-of-interest`.
+- Baseline workflow note: `docs/optimization_of_irradiation/isotope_priority_workflow.md`.
+- Verification coverage in `tests/test_isotope_priority.py` and `tests/test_cli_app.py`.
+
 ## RAFM Campaign Analysis Track for Second-Irradiation Conditions
 
 Baseline campaign timing audit: `docs/optimization_of_irradiation/rafm_second_irradiation_baseline.md`.
