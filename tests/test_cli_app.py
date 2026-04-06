@@ -312,6 +312,37 @@ def test_build_parser_optimization_sweep_supports_bassd_options(tmp_path):
     assert args.bassd_seed == 19
 
 
+def test_build_parser_optimization_sweep_supports_stbdmr_options(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "optimization-sweep",
+            "--input",
+            str(tmp_path / "optimization_candidates.json"),
+            "--objective",
+            "stbd-mr",
+            "--enable-advanced-objectives",
+            "--stbdmr-window-offsets-s",
+            "0,1800,7200",
+            "--stbdmr-window-count-time-s",
+            "1200",
+            "--stbdmr-masking-regularization",
+            "0.2",
+            "--stbdmr-differentiable-graph",
+            "--stbdmr-graph-temperature",
+            "1.5",
+        ]
+    )
+    assert args.command == "optimization-sweep"
+    assert args.objective == "stbd-mr"
+    assert args.enable_advanced_objectives is True
+    assert args.stbdmr_window_offsets_s == "0,1800,7200"
+    assert args.stbdmr_window_count_time_s == pytest.approx(1200.0)
+    assert args.stbdmr_masking_regularization == pytest.approx(0.2)
+    assert args.stbdmr_differentiable_graph is True
+    assert args.stbdmr_graph_temperature == pytest.approx(1.5)
+
+
 def test_build_parser_library_registry_commands(tmp_path):
     parser = app.build_parser()
     list_args = parser.parse_args(["library-list", "--json"])
@@ -905,6 +936,141 @@ def test_cmd_optimization_sweep_writes_bassd_outputs(tmp_path):
     assert "action_count" in csv_text
 
 
+def test_cmd_optimization_sweep_stbdmr_requires_advanced_guard(tmp_path):
+    input_payload = {
+        "candidates": [
+            {
+                "label": "candidate_a",
+                "irradiation_time_s": 3600.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 80.0,
+                        "background_counts": 10.0,
+                    }
+                ],
+            }
+        ]
+    }
+    input_path = tmp_path / "optimization_candidates_stbdmr_guard.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="enable-advanced-objectives"):
+        app.cmd_optimization_sweep(
+            Namespace(
+                input=input_path,
+                output=tmp_path / "stbdmr_guard.json",
+                objective="stbd-mr",
+                csv_output=None,
+                enable_advanced_objectives=False,
+                stbdmr_window_offsets_s="0,7200,86400",
+                stbdmr_window_count_time_s=900.0,
+                stbdmr_masking_regularization=0.1,
+                stbdmr_differentiable_graph=False,
+                stbdmr_graph_temperature=2.0,
+                target_nuclide=None,
+                nuisance_variance_fraction=0.0,
+                fim_regularization=1.0e-6,
+                mwdcs_window_offsets_s="0,7200,86400",
+                mwdcs_window_count_time_s=900.0,
+                mwdcs_full_spectrum_mode=False,
+                mwdcs_overlap_penalty=0.0,
+                bassd_dose_weight=0.02,
+                bassd_exploration_temperature=0.0,
+                bassd_seed=17,
+            )
+        )
+
+
+def test_cmd_optimization_sweep_writes_stbdmr_outputs(tmp_path):
+    input_payload = {
+        "isotope_weights": {"Mo-99": 1.2},
+        "candidates": [
+            {
+                "label": "candidate_a",
+                "irradiation_time_s": 3600.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 100.0,
+                        "background_counts": 10.0,
+                        "continuum_counts": 4.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.7,
+                        "signal_counts": 60.0,
+                        "background_counts": 10.0,
+                        "continuum_counts": 4.0,
+                    },
+                ],
+            },
+            {
+                "label": "candidate_b",
+                "irradiation_time_s": 3600.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 70.0,
+                        "background_counts": 10.0,
+                        "continuum_counts": 4.0,
+                    },
+                    {
+                        "nuclide": "Co-60",
+                        "line_energy_keV": 1332.5,
+                        "signal_counts": 60.0,
+                        "background_counts": 10.0,
+                        "continuum_counts": 4.0,
+                    },
+                ],
+            },
+        ],
+    }
+    input_path = tmp_path / "optimization_candidates_stbdmr.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    output_path = tmp_path / "optimization_sweep_stbdmr.json"
+    csv_path = tmp_path / "optimization_sweep_stbdmr.csv"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=output_path,
+            objective="stbd-mr",
+            csv_output=csv_path,
+            enable_advanced_objectives=True,
+            stbdmr_window_offsets_s="0,3600,21600",
+            stbdmr_window_count_time_s=900.0,
+            stbdmr_masking_regularization=0.2,
+            stbdmr_differentiable_graph=True,
+            stbdmr_graph_temperature=2.0,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,7200,86400",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=False,
+            mwdcs_overlap_penalty=0.0,
+            bassd_dose_weight=0.02,
+            bassd_exploration_temperature=0.0,
+            bassd_seed=17,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.optimization_sweep.stbdmr.v1"
+    assert payload["objective"] == "stbd-mr"
+    assert payload["advanced_objective"] is True
+    assert len(payload["ranked_candidates"]) == 2
+    assert "diagnostics" in payload["ranked_candidates"][0]
+    assert csv_path.exists()
+    csv_text = csv_path.read_text(encoding="utf-8")
+    assert "objective_score" in csv_text
+    assert "graph_density" in csv_text
+
+
 def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_path):
     payload = {
         "isotope_weights": {"Mo-99": 2.0, "Tc-99m": 0.2},
@@ -958,6 +1124,7 @@ def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_pat
     fim_output = tmp_path / "fim.json"
     mwdcs_output = tmp_path / "mwdcs.json"
     bassd_output = tmp_path / "bassd.json"
+    stbdmr_output = tmp_path / "stbdmr.json"
     app.cmd_optimization_sweep(
         Namespace(
             input=input_path,
@@ -1014,21 +1181,49 @@ def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_pat
             mwdcs_overlap_penalty=0.0,
         )
     )
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=stbdmr_output,
+            objective="stbd-mr",
+            csv_output=None,
+            enable_advanced_objectives=True,
+            stbdmr_window_offsets_s="0,3600,21600",
+            stbdmr_window_count_time_s=900.0,
+            stbdmr_masking_regularization=0.2,
+            stbdmr_differentiable_graph=True,
+            stbdmr_graph_temperature=2.0,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,7200,86400",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=False,
+            mwdcs_overlap_penalty=0.0,
+            bassd_dose_weight=0.03,
+            bassd_exploration_temperature=0.0,
+            bassd_seed=17,
+        )
+    )
 
     difom_payload = json.loads(difom_output.read_text(encoding="utf-8"))
     fim_payload = json.loads(fim_output.read_text(encoding="utf-8"))
     mwdcs_payload = json.loads(mwdcs_output.read_text(encoding="utf-8"))
     bassd_payload = json.loads(bassd_output.read_text(encoding="utf-8"))
+    stbdmr_payload = json.loads(stbdmr_output.read_text(encoding="utf-8"))
 
     assert difom_payload["schema"] == "fluxforge.optimization_sweep.difom.v1"
     assert fim_payload["schema"] == "fluxforge.optimization_sweep.fim.v1"
     assert mwdcs_payload["schema"] == "fluxforge.optimization_sweep.mwdcs.v1"
     assert bassd_payload["schema"] == "fluxforge.optimization_sweep.bassd.v1"
+    assert stbdmr_payload["schema"] == "fluxforge.optimization_sweep.stbdmr.v1"
     assert difom_payload["ranked_candidates"][0]["label"] != fim_payload["ranked_candidates"][0]["label"]
     assert len(mwdcs_payload["ranked_candidates"]) == 2
     assert "window_scores" in mwdcs_payload["ranked_candidates"][0]
     assert len(bassd_payload["ranked_candidates"]) == 2
     assert "action_scores" in bassd_payload["ranked_candidates"][0]
+    assert len(stbdmr_payload["ranked_candidates"]) == 2
+    assert "diagnostics" in stbdmr_payload["ranked_candidates"][0]
 
 
 def test_cmd_library_register_list_and_remove(monkeypatch, tmp_path, capsys):

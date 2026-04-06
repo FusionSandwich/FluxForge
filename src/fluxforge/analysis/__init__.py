@@ -124,6 +124,23 @@ from fluxforge.analysis.optimization_bassd import (
     serialize_bassd_ranking,
 )
 
+from fluxforge.analysis.optimization_stbdmr import (
+    STBDMRLineTerm,
+    STBDMRWindow,
+    STBDMRWindowScore,
+    STBDMRDiagnostics,
+    STBDMREvaluation,
+    STBDMRScheduleCandidate,
+    STBDMRScheduleScore,
+    build_interference_graph,
+    build_stbdmr_candidate_from_activity_results,
+    candidate_from_difom_candidate as stbdmr_candidate_from_difom_candidate,
+    evaluate_stbdmr,
+    parse_stbdmr_sweep_payload,
+    rank_stbdmr_schedules,
+    serialize_stbdmr_ranking,
+)
+
 from fluxforge.analysis.segmented_detection import (
     RegionParams,
     SegmentedDetectionConfig,
@@ -394,6 +411,21 @@ __all__ = [
     "posterior_variance_update",
     "rank_bassd_schedules",
     "serialize_bassd_ranking",
+    # Irradiation optimization (Method N2 STBD-MR)
+    "STBDMRLineTerm",
+    "STBDMRWindow",
+    "STBDMRWindowScore",
+    "STBDMRDiagnostics",
+    "STBDMREvaluation",
+    "STBDMRScheduleCandidate",
+    "STBDMRScheduleScore",
+    "build_interference_graph",
+    "build_stbdmr_candidate_from_activity_results",
+    "stbdmr_candidate_from_difom_candidate",
+    "evaluate_stbdmr",
+    "parse_stbdmr_sweep_payload",
+    "rank_stbdmr_schedules",
+    "serialize_stbdmr_ranking",
     # Advanced peak finders
     "PeakInfo",
     "snip_background",

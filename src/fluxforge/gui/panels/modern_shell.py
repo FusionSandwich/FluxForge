@@ -23,6 +23,10 @@ from fluxforge.analysis.optimization_bassd import (
     build_bassd_candidate_from_activity_results,
     evaluate_bassd,
 )
+from fluxforge.analysis.optimization_stbdmr import (
+    build_stbdmr_candidate_from_activity_results,
+    evaluate_stbdmr,
+)
 from fluxforge.analysis.detector_calibration import EfficiencyPoint
 from fluxforge.core.batch_analysis import (
     BatchAnalysisJob,
@@ -1704,6 +1708,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.advanced_objective_checkbox.setObjectName("InventoryAdvancedObjectiveCheck")
             controls.addWidget(self.advanced_objective_checkbox, 6, 2, 1, 2)
 
+            self.stbdmr_differentiable_checkbox = QCheckBox(
+                "STBD-MR differentiable graph mode",
+                self,
+            )
+            self.stbdmr_differentiable_checkbox.setObjectName("InventorySTBDMRDifferentiableCheck")
+            controls.addWidget(self.stbdmr_differentiable_checkbox, 7, 0, 1, 2)
+
             button_row = QHBoxLayout()
             self.refresh_button = QPushButton("Refresh Timeline", self)
             self.refresh_button.clicked.connect(self._refresh_inventory)
@@ -1732,6 +1743,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.preview_bassd_button = QPushButton("Preview BASS-D", self)
             self.preview_bassd_button.clicked.connect(self._preview_bassd_score)
             button_row.addWidget(self.preview_bassd_button)
+
+            self.preview_stbdmr_button = QPushButton("Preview STBD-MR", self)
+            self.preview_stbdmr_button.clicked.connect(self._preview_stbdmr_score)
+            button_row.addWidget(self.preview_stbdmr_button)
             button_row.addStretch(1)
 
             layout.addLayout(controls)
@@ -1777,6 +1792,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.bassd_summary.setWordWrap(True)
             layout.addWidget(self.bassd_summary)
 
+            self.stbdmr_summary = QLabel(
+                "STBD-MR preview is unavailable until advanced objectives are enabled.",
+                self,
+            )
+            self.stbdmr_summary.setObjectName("PanelBody")
+            self.stbdmr_summary.setWordWrap(True)
+            layout.addWidget(self.stbdmr_summary)
+
             self.family_browser = QTextBrowser(self)
             self.family_browser.setObjectName("InventoryFamilyBrowser")
             layout.addWidget(self.family_browser, 1)
@@ -1808,6 +1831,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mwdcs_window_count_spin.valueChanged.connect(self._preview_mwdcs_score)
             self.mwdcs_full_spectrum_checkbox.toggled.connect(self._preview_mwdcs_score)
             self.advanced_objective_checkbox.toggled.connect(self._preview_bassd_score)
+            self.advanced_objective_checkbox.toggled.connect(self._preview_stbdmr_score)
+            self.stbdmr_differentiable_checkbox.toggled.connect(self._preview_stbdmr_score)
             self._sync_workspace_state(self.workspace_controller.state)
 
         def build_inventory_timeline(self):
@@ -1921,6 +1946,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._preview_fim_score()
             self._preview_mwdcs_score()
             self._preview_bassd_score()
+            self._preview_stbdmr_score()
 
         def preview_difom_score(self) -> float | None:
             """Return a proxy DI-FOM score from current activity-review line estimates."""
@@ -2093,6 +2119,64 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _preview_bassd_score(self) -> None:
             self.preview_bassd_score()
+
+        def preview_stbdmr_score(self) -> float | None:
+            """Return a proxy STBD-MR score from activity-review results."""
+
+            if not bool(self.advanced_objective_checkbox.isChecked()):
+                self.stbdmr_summary.setText(
+                    "STBD-MR preview is disabled. Enable advanced objectives to continue."
+                )
+                return None
+
+            activity_results = tuple(self.workspace_controller.state.activity_results)
+            if not activity_results:
+                self.stbdmr_summary.setText(
+                    "STBD-MR preview is unavailable until activity-review results are loaded."
+                )
+                return None
+
+            window_count = max(int(self.mwdcs_window_count_spin.value()), 1)
+            stop_time_s = max(float(self.time_stop_hours.value()) * 3600.0, 0.0)
+            if window_count == 1:
+                offsets = (0.0,)
+            elif stop_time_s <= 0.0:
+                offsets = tuple(np.linspace(0.0, 86400.0, window_count))
+            else:
+                offsets = tuple(np.linspace(0.0, stop_time_s, window_count))
+
+            candidate = build_stbdmr_candidate_from_activity_results(
+                activity_results,
+                label="gui_preview",
+                window_offsets_s=offsets,
+                window_count_time_s=900.0,
+            )
+            if len(candidate.windows) == 0:
+                self.stbdmr_summary.setText(
+                    "STBD-MR preview is unavailable because no positive line terms were found."
+                )
+                return None
+
+            differentiable_mode = bool(self.stbdmr_differentiable_checkbox.isChecked())
+            evaluation = evaluate_stbdmr(
+                candidate.windows,
+                masking_regularization=0.1,
+                differentiable_graph_mode=differentiable_mode,
+                graph_temperature=2.0,
+            )
+            diagnostics = evaluation.diagnostics
+            self.stbdmr_summary.setText(
+                (
+                    f"STBD-MR preview score: {evaluation.total_score:.6g} across "
+                    f"{len(evaluation.window_scores)} window(s). "
+                    f"graph density {diagnostics.graph_density:.4g}, "
+                    f"masking penalty {diagnostics.masking_penalty:.6g}."
+                )
+            )
+            return float(evaluation.total_score)
+
+        def _preview_stbdmr_score(self) -> None:
+            self.preview_stbdmr_score()
 
         def _selected_plot_data(self, result) -> dict[str, tuple[tuple[float, float, float], ...]]:
             observable = self._current_observable()
@@ -2306,10 +2390,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.preview_fim_button.setEnabled(enabled)
             self.preview_mwdcs_button.setEnabled(enabled)
             self.preview_bassd_button.setEnabled(enabled)
+            self.preview_stbdmr_button.setEnabled(enabled)
             self.fim_objective_combo.setEnabled(enabled)
             self.mwdcs_window_count_spin.setEnabled(enabled)
             self.mwdcs_full_spectrum_checkbox.setEnabled(enabled)
             self.advanced_objective_checkbox.setEnabled(enabled)
+            self.stbdmr_differentiable_checkbox.setEnabled(enabled)
             self.nuclide_focus_combo.setEnabled(enabled)
             if not enabled:
                 self._last_result = None
@@ -2328,6 +2414,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 self.bassd_summary.setText(
                     "BASS-D preview is unavailable until advanced objectives are enabled."
+                )
+                self.stbdmr_summary.setText(
+                    "STBD-MR preview is unavailable until advanced objectives are enabled."
                 )
 
 

@@ -78,8 +78,8 @@ PYTHONPATH=src python examples/RAFM_irradiation/compare_m1_m2_m3_n1_legacy_sched
 
 Outputs:
 
-- `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_legacy_schedule_comparison.csv`
-- `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_legacy_schedule_comparison.md`
+- `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.csv`
+- `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.md`
 
 ## Known limits
 

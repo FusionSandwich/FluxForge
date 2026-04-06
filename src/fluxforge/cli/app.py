@@ -53,6 +53,11 @@ from fluxforge.analysis.optimization_bassd import (
     rank_bassd_schedules,
     serialize_bassd_ranking,
 )
+from fluxforge.analysis.optimization_stbdmr import (
+    parse_stbdmr_sweep_payload,
+    rank_stbdmr_schedules,
+    serialize_stbdmr_ranking,
+)
 from fluxforge.core.prior_covariance import PriorCovarianceConfig, PriorCovarianceModel
 from fluxforge.core.response import (
     EnergyGroupStructure,
@@ -1747,9 +1752,50 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
         output_payload["dose_weight"] = dose_weight
         output_payload["exploration_temperature"] = exploration_temperature
         output_payload["seed"] = seed
+    elif objective == "stbd-mr":
+        if not bool(getattr(args, "enable_advanced_objectives", False)):
+            raise ValueError(
+                "Objective 'stbd-mr' is advanced. Re-run with --enable-advanced-objectives."
+            )
+        raw_offsets = _parse_csv_floats(getattr(args, "stbdmr_window_offsets_s", None))
+        window_offsets_s = tuple(raw_offsets) if raw_offsets else (0.0, 7200.0, 86400.0)
+        window_count_time_s = max(
+            float(getattr(args, "stbdmr_window_count_time_s", 900.0) or 900.0),
+            1.0,
+        )
+        masking_regularization = max(
+            float(getattr(args, "stbdmr_masking_regularization", 0.1) or 0.1),
+            0.0,
+        )
+        differentiable_graph_mode = bool(
+            getattr(args, "stbdmr_differentiable_graph", False)
+        )
+        graph_temperature = max(
+            float(getattr(args, "stbdmr_graph_temperature", 2.0) or 2.0),
+            1.0e-6,
+        )
+        candidates, isotope_weights = parse_stbdmr_sweep_payload(
+            payload,
+            default_window_offsets_s=window_offsets_s,
+            default_window_count_time_s=window_count_time_s,
+        )
+        ranked = rank_stbdmr_schedules(
+            candidates,
+            isotope_weights=isotope_weights,
+            masking_regularization=masking_regularization,
+            differentiable_graph_mode=differentiable_graph_mode,
+            graph_temperature=graph_temperature,
+        )
+        output_payload = serialize_stbdmr_ranking(ranked)
+        output_payload["advanced_objective"] = True
+        output_payload["window_offsets_s"] = list(window_offsets_s)
+        output_payload["window_count_time_s"] = window_count_time_s
+        output_payload["masking_regularization"] = masking_regularization
+        output_payload["differentiable_graph_mode"] = differentiable_graph_mode
+        output_payload["graph_temperature"] = graph_temperature
     else:
         raise ValueError(
-            "Unsupported objective. Use one of: di-fom, fim-d, fim-a, fim-c, mwdcs, bass-d."
+            "Unsupported objective. Use one of: di-fom, fim-d, fim-a, fim-c, mwdcs, bass-d, stbd-mr."
         )
 
     output_payload["input"] = str(args.input)
@@ -1785,6 +1831,12 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
             elif objective == "bass-d":
                 row["objective_score"] = item["total_utility"]
                 row["action_count"] = len(item.get("action_scores") or [])
+            elif objective == "stbd-mr":
+                row["objective_score"] = item["total_score"]
+                diagnostics = item.get("diagnostics") or {}
+                row["graph_density"] = diagnostics.get("graph_density")
+                row["masking_penalty"] = diagnostics.get("masking_penalty")
+                row["gradient_norm"] = diagnostics.get("gradient_norm")
             else:
                 row["objective_score"] = item["objective_score"]
                 diagnostics = item.get("matrix_diagnostics") or {}
@@ -4169,7 +4221,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     optimization_sweep = subparsers.add_parser(
         "optimization-sweep",
-        help="Rank schedule candidates using DI-FOM, FIM, MWDCS, or advanced BASS-D objectives",
+        help="Rank schedule candidates using DI-FOM, FIM, MWDCS, or advanced N1/N2 objectives",
     )
     optimization_sweep.add_argument(
         "--input",
@@ -4187,13 +4239,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--objective",
         type=str,
         default="di-fom",
-        choices=("di-fom", "fim-d", "fim-a", "fim-c", "mwdcs", "bass-d"),
+        choices=("di-fom", "fim-d", "fim-a", "fim-c", "mwdcs", "bass-d", "stbd-mr"),
         help="Optimization objective",
     )
     optimization_sweep.add_argument(
         "--enable-advanced-objectives",
         action="store_true",
-        help="Required guard flag for advanced objectives such as bass-d",
+        help="Required guard flag for advanced objectives such as bass-d and stbd-mr",
     )
     optimization_sweep.add_argument(
         "--target-nuclide",
@@ -4253,6 +4305,35 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=17,
         help="Random seed used by bass-d exploration noise",
+    )
+    optimization_sweep.add_argument(
+        "--stbdmr-window-offsets-s",
+        type=str,
+        default="0,7200,86400",
+        help="Comma-separated cooldown offsets (s) for generated STBD-MR windows",
+    )
+    optimization_sweep.add_argument(
+        "--stbdmr-window-count-time-s",
+        type=float,
+        default=900.0,
+        help="Default count duration (s) per generated STBD-MR window",
+    )
+    optimization_sweep.add_argument(
+        "--stbdmr-masking-regularization",
+        type=float,
+        default=0.1,
+        help="Masking regularization weight for STBD-MR objective",
+    )
+    optimization_sweep.add_argument(
+        "--stbdmr-differentiable-graph",
+        action="store_true",
+        help="Enable differentiable interference-graph bonus in STBD-MR objective",
+    )
+    optimization_sweep.add_argument(
+        "--stbdmr-graph-temperature",
+        type=float,
+        default=2.0,
+        help="Energy temperature (keV) for differentiable STBD-MR graph affinities",
     )
     optimization_sweep.add_argument(
         "--csv-output",

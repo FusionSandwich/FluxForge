@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare M1/M2/M3/N1 objective rankings against the legacy scheduler objective."""
+"""Compare M1/M2/M3/N1/N2 objective rankings against the legacy scheduler objective."""
 
 from __future__ import annotations
 
@@ -24,6 +24,10 @@ from fluxforge.analysis.optimization_fim import rank_fim_schedules
 from fluxforge.analysis.optimization_mwdcs import (
     candidate_from_difom_candidate as mwdcs_candidate_from_difom_candidate,
     rank_mwdcs_schedules,
+)
+from fluxforge.analysis.optimization_stbdmr import (
+    candidate_from_difom_candidate as stbdmr_candidate_from_difom_candidate,
+    rank_stbdmr_schedules,
 )
 
 
@@ -199,20 +203,28 @@ def main() -> int:
         exploration_temperature=0.0,
         seed=17,
     )
+    ranked_stbdmr = rank_stbdmr_schedules(
+        tuple(stbdmr_candidate_from_difom_candidate(candidate) for candidate in candidates),
+        masking_regularization=0.2,
+        differentiable_graph_mode=True,
+        graph_temperature=2.0,
+    )
 
     difom_rank = {item.label: idx for idx, item in enumerate(ranked_difom, start=1)}
     fim_rank = {item.label: idx for idx, item in enumerate(ranked_fim, start=1)}
     mwdcs_rank = {item.label: idx for idx, item in enumerate(ranked_mwdcs, start=1)}
     bassd_rank = {item.label: idx for idx, item in enumerate(ranked_bassd, start=1)}
+    stbdmr_rank = {item.label: idx for idx, item in enumerate(ranked_stbdmr, start=1)}
 
     difom_score = {item.label: float(item.total_score) for item in ranked_difom}
     fim_score = {item.label: float(item.objective_score) for item in ranked_fim}
     mwdcs_score = {item.label: float(item.total_score) for item in ranked_mwdcs}
     bassd_score = {item.label: float(item.total_utility) for item in ranked_bassd}
+    stbdmr_score = {item.label: float(item.total_score) for item in ranked_stbdmr}
     legacy_score = {candidate.label: _legacy_score(candidate, legacy_module) for candidate in candidates}
     legacy_rank = _rank_from_scores(legacy_score)
 
-    csv_path = benchmark_root / "m1_m2_m3_n1_legacy_schedule_comparison.csv"
+    csv_path = benchmark_root / "m1_m2_m3_n1_n2_legacy_schedule_comparison.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
             handle,
@@ -230,6 +242,8 @@ def main() -> int:
                 "mwdcs_score",
                 "bassd_rank",
                 "bassd_score",
+                "stbdmr_rank",
+                "stbdmr_score",
                 "legacy_rank",
                 "legacy_score",
             ],
@@ -252,6 +266,8 @@ def main() -> int:
                     "mwdcs_score": mwdcs_score.get(label),
                     "bassd_rank": bassd_rank.get(label),
                     "bassd_score": bassd_score.get(label),
+                    "stbdmr_rank": stbdmr_rank.get(label),
+                    "stbdmr_score": stbdmr_score.get(label),
                     "legacy_rank": legacy_rank.get(label),
                     "legacy_score": legacy_score.get(label),
                 }
@@ -263,10 +279,11 @@ def main() -> int:
     top_fim = [item.label for item in ranked_fim[:top_k]]
     top_mwdcs = [item.label for item in ranked_mwdcs[:top_k]]
     top_bassd = [item.label for item in ranked_bassd[:top_k]]
+    top_stbdmr = [item.label for item in ranked_stbdmr[:top_k]]
 
-    md_path = benchmark_root / "m1_m2_m3_n1_legacy_schedule_comparison.md"
+    md_path = benchmark_root / "m1_m2_m3_n1_n2_legacy_schedule_comparison.md"
     lines = [
-        "# M1 vs M2 vs M3 vs N1 vs Legacy Schedule Comparison",
+        "# M1 vs M2 vs M3 vs N1 vs N2 vs Legacy Schedule Comparison",
         "",
         "Comparison scope: RAFM analysis artifacts in `results/analysis_json/*.json`.",
         "",
@@ -275,11 +292,16 @@ def main() -> int:
         f"- Spearman rank correlation (M2 vs Legacy): {_spearman_rank_correlation(fim_rank, legacy_rank):.4f}",
         f"- Spearman rank correlation (M3 vs Legacy): {_spearman_rank_correlation(mwdcs_rank, legacy_rank):.4f}",
         f"- Spearman rank correlation (N1 BASS-D vs Legacy): {_spearman_rank_correlation(bassd_rank, legacy_rank):.4f}",
+        f"- Spearman rank correlation (N2 STBD-MR vs Legacy): {_spearman_rank_correlation(stbdmr_rank, legacy_rank):.4f}",
         f"- Top-{top_k} overlap (N1 vs Legacy): {len(set(top_bassd).intersection(top_legacy))}",
+        f"- Top-{top_k} overlap (N2 vs Legacy): {len(set(top_stbdmr).intersection(top_legacy))}",
         "",
         "## Top N1 BASS-D schedules",
     ]
     lines.extend(f"- {label}" for label in top_bassd)
+    lines.append("")
+    lines.append("## Top N2 STBD-MR schedules")
+    lines.extend(f"- {label}" for label in top_stbdmr)
     lines.append("")
     lines.append("## Top Legacy schedules")
     lines.extend(f"- {label}" for label in top_legacy)
@@ -296,8 +318,8 @@ def main() -> int:
     lines.append(f"CSV output: `{csv_path}`")
     md_path.write_text("\n".join(lines), encoding="utf-8")
 
-    print(f"Wrote M1/M2/M3/N1/legacy comparison CSV: {csv_path}")
-    print(f"Wrote M1/M2/M3/N1/legacy comparison summary: {md_path}")
+    print(f"Wrote M1/M2/M3/N1/N2/legacy comparison CSV: {csv_path}")
+    print(f"Wrote M1/M2/M3/N1/N2/legacy comparison summary: {md_path}")
     return 0
 
 

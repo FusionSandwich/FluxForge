@@ -478,6 +478,19 @@ Status update (2026-04-06): Baseline BASS-D implementation is now present in cor
 - Advanced docs and example are updated.
 - Full cross-method comparison report (M1, M2, M3, N1, N2) is generated.
 
+### N2 Verification Evidence (Baseline 2026-04-06)
+- Core implemented in `src/fluxforge/analysis/optimization_stbdmr.py`.
+- Analysis exports wired in `src/fluxforge/analysis/__init__.py`.
+- CLI objective routing and advanced guard implemented in `src/fluxforge/cli/app.py` (`stbd-mr` + `--enable-advanced-objectives`).
+- GUI integration implemented in `src/fluxforge/gui/panels/modern_shell.py` (InventoryTimelinePanel STBD-MR preview and differentiable-graph toggle).
+- Baseline documentation added in `docs/optimization_of_irradiation/method_n2_stbdmr_workflow.md`.
+- Cross-method benchmark script updated to include N2 in `examples/RAFM_irradiation/compare_m1_m2_m3_n1_legacy_schedule_objectives.py`.
+- Generated benchmark artifacts:
+  - `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.csv`
+  - `examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.md`
+- Tests run and passing:
+  - `pytest -q tests/test_optimization_stbdmr.py tests/test_cli_app.py tests/test_analysis_workspace_qt.py -k "stbdmr or optimization_sweep"`
+
 ## Cross-Method Rule
 
 Method progression is strictly sequential:
