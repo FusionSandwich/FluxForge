@@ -519,6 +519,49 @@ def test_inventory_timeline_panel_mwdcs_preview_reports_score_and_window_count()
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
+def test_inventory_timeline_panel_bassd_preview_requires_advanced_guard_and_reports_score():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
+    window.analysis_workspace.set_activity_results(
+        (
+            ActivityCalculationResult(
+                nuclide="Mo-99",
+                line_energy_keV=140.5,
+                activity_bq=850.0,
+                uncertainty_bq=30.0,
+                age_corrected_activity_bq=900.0,
+                mda_bq=0.0,
+                half_life_s=65.94 * 3600.0,
+                source_age_s=7200.0,
+                chain_summary="Mo-99 feed",
+                age_corrected_uncertainty_bq=45.0,
+            ),
+        )
+    )
+    window.show()
+    _qapp().processEvents()
+
+    panel = window.bottom_dock.widget().inventory_timeline_panel
+    disabled_score = panel.preview_bassd_score()
+    assert disabled_score is None
+    assert "Enable advanced objectives" in panel.bassd_summary.text()
+
+    panel.advanced_objective_checkbox.setChecked(True)
+    score = panel.preview_bassd_score()
+    assert score is not None
+    assert score == pytest.approx(score)
+    assert "BASS-D preview utility" in panel.bassd_summary.text()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
 def test_astm_mode_locks_peak_identification_databases_to_standard_sources():
     _qapp()
     window = FluxForgeMainWindow(

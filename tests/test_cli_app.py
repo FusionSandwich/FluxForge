@@ -286,6 +286,32 @@ def test_build_parser_optimization_sweep_supports_mwdcs_options(tmp_path):
     assert args.mwdcs_overlap_penalty == pytest.approx(0.2)
 
 
+def test_build_parser_optimization_sweep_supports_bassd_options(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "optimization-sweep",
+            "--input",
+            str(tmp_path / "optimization_candidates.json"),
+            "--objective",
+            "bass-d",
+            "--enable-advanced-objectives",
+            "--bassd-dose-weight",
+            "0.03",
+            "--bassd-exploration-temperature",
+            "0.2",
+            "--bassd-seed",
+            "19",
+        ]
+    )
+    assert args.command == "optimization-sweep"
+    assert args.objective == "bass-d"
+    assert args.enable_advanced_objectives is True
+    assert args.bassd_dose_weight == pytest.approx(0.03)
+    assert args.bassd_exploration_temperature == pytest.approx(0.2)
+    assert args.bassd_seed == 19
+
+
 def test_build_parser_library_registry_commands(tmp_path):
     parser = app.build_parser()
     list_args = parser.parse_args(["library-list", "--json"])
@@ -752,6 +778,133 @@ def test_cmd_optimization_sweep_writes_mwdcs_outputs(tmp_path):
     assert "window_count" in csv_text
 
 
+def test_cmd_optimization_sweep_bassd_requires_advanced_guard(tmp_path):
+    input_payload = {
+        "candidates": [
+            {
+                "label": "candidate_a",
+                "irradiation_time_s": 3600.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 80.0,
+                        "background_counts": 10.0,
+                    }
+                ],
+            }
+        ]
+    }
+    input_path = tmp_path / "optimization_candidates_bassd_guard.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="enable-advanced-objectives"):
+        app.cmd_optimization_sweep(
+            Namespace(
+                input=input_path,
+                output=tmp_path / "bassd_guard.json",
+                objective="bass-d",
+                csv_output=None,
+                enable_advanced_objectives=False,
+                bassd_dose_weight=0.02,
+                bassd_exploration_temperature=0.0,
+                bassd_seed=17,
+                target_nuclide=None,
+                nuisance_variance_fraction=0.0,
+                fim_regularization=1.0e-6,
+                mwdcs_window_offsets_s="0,7200,86400",
+                mwdcs_window_count_time_s=900.0,
+                mwdcs_full_spectrum_mode=False,
+                mwdcs_overlap_penalty=0.0,
+            )
+        )
+
+
+def test_cmd_optimization_sweep_writes_bassd_outputs(tmp_path):
+    input_payload = {
+        "isotope_weights": {"Mo-99": 1.2},
+        "candidates": [
+            {
+                "label": "candidate_a",
+                "irradiation_time_s": 3600.0,
+                "actions": [
+                    {
+                        "label": "a1",
+                        "cooldown_time_s": 0.0,
+                        "count_time_s": 900.0,
+                        "lines": [
+                            {
+                                "nuclide": "Mo-99",
+                                "line_energy_keV": 140.5,
+                                "signal_counts": 100.0,
+                                "background_counts": 10.0,
+                                "dose_rate_uSv_h": 3.0,
+                                "prior_variance_counts2": 120.0,
+                            }
+                        ],
+                    }
+                ],
+            },
+            {
+                "label": "candidate_b",
+                "irradiation_time_s": 3600.0,
+                "actions": [
+                    {
+                        "label": "a1",
+                        "cooldown_time_s": 0.0,
+                        "count_time_s": 900.0,
+                        "lines": [
+                            {
+                                "nuclide": "Mo-99",
+                                "line_energy_keV": 140.5,
+                                "signal_counts": 60.0,
+                                "background_counts": 12.0,
+                                "dose_rate_uSv_h": 12.0,
+                                "prior_variance_counts2": 120.0,
+                            }
+                        ],
+                    }
+                ],
+            },
+        ],
+    }
+    input_path = tmp_path / "optimization_candidates_bassd.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    output_path = tmp_path / "optimization_sweep_bassd.json"
+    csv_path = tmp_path / "optimization_sweep_bassd.csv"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=output_path,
+            objective="bass-d",
+            csv_output=csv_path,
+            enable_advanced_objectives=True,
+            bassd_dose_weight=0.03,
+            bassd_exploration_temperature=0.0,
+            bassd_seed=17,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,7200,86400",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=False,
+            mwdcs_overlap_penalty=0.0,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.optimization_sweep.bassd.v1"
+    assert payload["objective"] == "bass-d"
+    assert payload["advanced_objective"] is True
+    assert len(payload["ranked_candidates"]) == 2
+    assert "action_scores" in payload["ranked_candidates"][0]
+    assert csv_path.exists()
+    csv_text = csv_path.read_text(encoding="utf-8")
+    assert "objective_score" in csv_text
+    assert "action_count" in csv_text
+
+
 def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_path):
     payload = {
         "isotope_weights": {"Mo-99": 2.0, "Tc-99m": 0.2},
@@ -804,6 +957,7 @@ def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_pat
     difom_output = tmp_path / "difom.json"
     fim_output = tmp_path / "fim.json"
     mwdcs_output = tmp_path / "mwdcs.json"
+    bassd_output = tmp_path / "bassd.json"
     app.cmd_optimization_sweep(
         Namespace(
             input=input_path,
@@ -841,17 +995,40 @@ def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_pat
             mwdcs_overlap_penalty=0.0,
         )
     )
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=bassd_output,
+            objective="bass-d",
+            csv_output=None,
+            enable_advanced_objectives=True,
+            bassd_dose_weight=0.03,
+            bassd_exploration_temperature=0.0,
+            bassd_seed=17,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,7200,86400",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=False,
+            mwdcs_overlap_penalty=0.0,
+        )
+    )
 
     difom_payload = json.loads(difom_output.read_text(encoding="utf-8"))
     fim_payload = json.loads(fim_output.read_text(encoding="utf-8"))
     mwdcs_payload = json.loads(mwdcs_output.read_text(encoding="utf-8"))
+    bassd_payload = json.loads(bassd_output.read_text(encoding="utf-8"))
 
     assert difom_payload["schema"] == "fluxforge.optimization_sweep.difom.v1"
     assert fim_payload["schema"] == "fluxforge.optimization_sweep.fim.v1"
     assert mwdcs_payload["schema"] == "fluxforge.optimization_sweep.mwdcs.v1"
+    assert bassd_payload["schema"] == "fluxforge.optimization_sweep.bassd.v1"
     assert difom_payload["ranked_candidates"][0]["label"] != fim_payload["ranked_candidates"][0]["label"]
     assert len(mwdcs_payload["ranked_candidates"]) == 2
     assert "window_scores" in mwdcs_payload["ranked_candidates"][0]
+    assert len(bassd_payload["ranked_candidates"]) == 2
+    assert "action_scores" in bassd_payload["ranked_candidates"][0]
 
 
 def test_cmd_library_register_list_and_remove(monkeypatch, tmp_path, capsys):

@@ -19,6 +19,10 @@ from fluxforge.analysis.optimization_mwdcs import (
     build_mwdcs_candidate_from_activity_results,
     evaluate_mwdcs,
 )
+from fluxforge.analysis.optimization_bassd import (
+    build_bassd_candidate_from_activity_results,
+    evaluate_bassd,
+)
 from fluxforge.analysis.detector_calibration import EfficiencyPoint
 from fluxforge.core.batch_analysis import (
     BatchAnalysisJob,
@@ -1696,6 +1700,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mwdcs_full_spectrum_checkbox.setObjectName("InventoryMWDCSFullSpectrumCheck")
             controls.addWidget(self.mwdcs_full_spectrum_checkbox, 6, 0, 1, 2)
 
+            self.advanced_objective_checkbox = QCheckBox("Enable advanced objectives", self)
+            self.advanced_objective_checkbox.setObjectName("InventoryAdvancedObjectiveCheck")
+            controls.addWidget(self.advanced_objective_checkbox, 6, 2, 1, 2)
+
             button_row = QHBoxLayout()
             self.refresh_button = QPushButton("Refresh Timeline", self)
             self.refresh_button.clicked.connect(self._refresh_inventory)
@@ -1720,6 +1728,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.preview_mwdcs_button = QPushButton("Preview MWDCS", self)
             self.preview_mwdcs_button.clicked.connect(self._preview_mwdcs_score)
             button_row.addWidget(self.preview_mwdcs_button)
+
+            self.preview_bassd_button = QPushButton("Preview BASS-D", self)
+            self.preview_bassd_button.clicked.connect(self._preview_bassd_score)
+            button_row.addWidget(self.preview_bassd_button)
             button_row.addStretch(1)
 
             layout.addLayout(controls)
@@ -1757,6 +1769,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mwdcs_summary.setWordWrap(True)
             layout.addWidget(self.mwdcs_summary)
 
+            self.bassd_summary = QLabel(
+                "BASS-D preview is unavailable until advanced objectives are enabled.",
+                self,
+            )
+            self.bassd_summary.setObjectName("PanelBody")
+            self.bassd_summary.setWordWrap(True)
+            layout.addWidget(self.bassd_summary)
+
             self.family_browser = QTextBrowser(self)
             self.family_browser.setObjectName("InventoryFamilyBrowser")
             layout.addWidget(self.family_browser, 1)
@@ -1787,6 +1807,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.fim_objective_combo.currentIndexChanged.connect(self._preview_fim_score)
             self.mwdcs_window_count_spin.valueChanged.connect(self._preview_mwdcs_score)
             self.mwdcs_full_spectrum_checkbox.toggled.connect(self._preview_mwdcs_score)
+            self.advanced_objective_checkbox.toggled.connect(self._preview_bassd_score)
             self._sync_workspace_state(self.workspace_controller.state)
 
         def build_inventory_timeline(self):
@@ -1899,6 +1920,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._preview_difom_score()
             self._preview_fim_score()
             self._preview_mwdcs_score()
+            self._preview_bassd_score()
 
         def preview_difom_score(self) -> float | None:
             """Return a proxy DI-FOM score from current activity-review line estimates."""
@@ -2025,6 +2047,52 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _preview_mwdcs_score(self) -> None:
             self.preview_mwdcs_score()
+
+        def preview_bassd_score(self) -> float | None:
+            """Return a proxy BASS-D utility score from activity-review results."""
+
+            if not bool(self.advanced_objective_checkbox.isChecked()):
+                self.bassd_summary.setText(
+                    "BASS-D preview is disabled. Enable advanced objectives to continue."
+                )
+                return None
+
+            activity_results = tuple(self.workspace_controller.state.activity_results)
+            if not activity_results:
+                self.bassd_summary.setText(
+                    "BASS-D preview is unavailable until activity-review results are loaded."
+                )
+                return None
+
+            candidate = build_bassd_candidate_from_activity_results(
+                activity_results,
+                label="gui_preview",
+                cooldown_time_s=max(float(self.time_start_hours.value()) * 3600.0, 0.0),
+                count_time_s=900.0,
+            )
+            if len(candidate.actions) == 0 or len(candidate.actions[0].lines) == 0:
+                self.bassd_summary.setText(
+                    "BASS-D preview is unavailable because no positive line terms were found."
+                )
+                return None
+
+            evaluation = evaluate_bassd(
+                candidate.actions,
+                dose_weight=0.02,
+                exploration_temperature=0.0,
+                seed=17,
+            )
+            self.bassd_summary.setText(
+                (
+                    f"BASS-D preview utility: {evaluation.total_utility:.6g} across "
+                    f"{len(evaluation.action_scores)} action(s). "
+                    "Advanced guard: enabled."
+                )
+            )
+            return float(evaluation.total_utility)
+
+        def _preview_bassd_score(self) -> None:
+            self.preview_bassd_score()
 
         def _selected_plot_data(self, result) -> dict[str, tuple[tuple[float, float, float], ...]]:
             observable = self._current_observable()
@@ -2237,9 +2305,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.preview_difom_button.setEnabled(enabled)
             self.preview_fim_button.setEnabled(enabled)
             self.preview_mwdcs_button.setEnabled(enabled)
+            self.preview_bassd_button.setEnabled(enabled)
             self.fim_objective_combo.setEnabled(enabled)
             self.mwdcs_window_count_spin.setEnabled(enabled)
             self.mwdcs_full_spectrum_checkbox.setEnabled(enabled)
+            self.advanced_objective_checkbox.setEnabled(enabled)
             self.nuclide_focus_combo.setEnabled(enabled)
             if not enabled:
                 self._last_result = None
@@ -2255,6 +2325,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 self.mwdcs_summary.setText(
                     "MWDCS preview is unavailable until activity-review results are loaded."
+                )
+                self.bassd_summary.setText(
+                    "BASS-D preview is unavailable until advanced objectives are enabled."
                 )
 
 

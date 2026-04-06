@@ -401,6 +401,8 @@ Status update (2026-04-06): Baseline MWDCS implementation is now present in core
 
 ## Method N1 Delivery Track: BASS-D (Novel)
 
+Status update (2026-04-06): Baseline BASS-D implementation is now present in core analysis, CLI advanced-objective routing, GUI preview, tests, and docs on branch `optimization-workflows`.
+
 ### N1-A Core Implementation
 - N1-A1: Create `src/fluxforge/analysis/optimization_bassd.py` adaptive scheduler core.
 - N1-A2: Implement expected-utility function with dose-weighted value-of-information terms.
@@ -432,6 +434,15 @@ Status update (2026-04-06): Baseline MWDCS implementation is now present in core
 - BASS-D GUI path is functional.
 - BASS-D docs and example are updated.
 - Comparative report includes M1, M2, M3, and N1 on shared fixtures.
+
+### N1 Verification Evidence (Baseline 2026-04-06)
+- Core implemented in `src/fluxforge/analysis/optimization_bassd.py`.
+- CLI objective routing and advanced guard implemented in `src/fluxforge/cli/app.py` (`bass-d` + `--enable-advanced-objectives`).
+- GUI integration implemented in `src/fluxforge/gui/panels/modern_shell.py` (InventoryTimelinePanel BASS-D preview and advanced guard checkbox).
+- Baseline documentation added in `docs/optimization_of_irradiation/method_n1_bassd_workflow.md`.
+- Tests run and passing:
+  - `pytest -q tests/test_optimization_bassd.py tests/test_cli_app.py -k "optimization_sweep or bassd"`
+  - `pytest -q tests/test_analysis_workspace_qt.py -k "bassd_preview or mwdcs_preview or fim_preview or difom_preview"`
 
 ## Method N2 Delivery Track: STBD-MR and Differentiable Interference Graph (Novel)
 

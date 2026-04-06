@@ -48,6 +48,11 @@ from fluxforge.analysis.optimization_mwdcs import (
     rank_mwdcs_schedules,
     serialize_mwdcs_ranking,
 )
+from fluxforge.analysis.optimization_bassd import (
+    parse_bassd_sweep_payload,
+    rank_bassd_schedules,
+    serialize_bassd_ranking,
+)
 from fluxforge.core.prior_covariance import PriorCovarianceConfig, PriorCovarianceModel
 from fluxforge.core.response import (
     EnergyGroupStructure,
@@ -1715,9 +1720,36 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
         output_payload["window_count_time_s"] = window_count_time_s
         output_payload["full_spectrum_mode"] = full_spectrum_mode
         output_payload["overlap_penalty"] = overlap_penalty
+    elif objective == "bass-d":
+        if not bool(getattr(args, "enable_advanced_objectives", False)):
+            raise ValueError(
+                "Objective 'bass-d' is advanced. Re-run with --enable-advanced-objectives."
+            )
+        dose_weight = max(
+            float(getattr(args, "bassd_dose_weight", 0.02) or 0.02),
+            0.0,
+        )
+        exploration_temperature = max(
+            float(getattr(args, "bassd_exploration_temperature", 0.0) or 0.0),
+            0.0,
+        )
+        seed = int(getattr(args, "bassd_seed", 17) or 17)
+        candidates, isotope_weights = parse_bassd_sweep_payload(payload)
+        ranked = rank_bassd_schedules(
+            candidates,
+            isotope_weights=isotope_weights,
+            dose_weight=dose_weight,
+            exploration_temperature=exploration_temperature,
+            seed=seed,
+        )
+        output_payload = serialize_bassd_ranking(ranked)
+        output_payload["advanced_objective"] = True
+        output_payload["dose_weight"] = dose_weight
+        output_payload["exploration_temperature"] = exploration_temperature
+        output_payload["seed"] = seed
     else:
         raise ValueError(
-            "Unsupported objective. Use one of: di-fom, fim-d, fim-a, fim-c, mwdcs."
+            "Unsupported objective. Use one of: di-fom, fim-d, fim-a, fim-c, mwdcs, bass-d."
         )
 
     output_payload["input"] = str(args.input)
@@ -1750,6 +1782,9 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
             elif objective == "mwdcs":
                 row["objective_score"] = item["total_score"]
                 row["window_count"] = len(item.get("window_scores") or [])
+            elif objective == "bass-d":
+                row["objective_score"] = item["total_utility"]
+                row["action_count"] = len(item.get("action_scores") or [])
             else:
                 row["objective_score"] = item["objective_score"]
                 diagnostics = item.get("matrix_diagnostics") or {}
@@ -4134,7 +4169,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     optimization_sweep = subparsers.add_parser(
         "optimization-sweep",
-        help="Rank irradiation/cooldown/count schedule candidates using DI-FOM or FIM objectives",
+        help="Rank schedule candidates using DI-FOM, FIM, MWDCS, or advanced BASS-D objectives",
     )
     optimization_sweep.add_argument(
         "--input",
@@ -4152,8 +4187,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--objective",
         type=str,
         default="di-fom",
-        choices=("di-fom", "fim-d", "fim-a", "fim-c", "mwdcs"),
+        choices=("di-fom", "fim-d", "fim-a", "fim-c", "mwdcs", "bass-d"),
         help="Optimization objective",
+    )
+    optimization_sweep.add_argument(
+        "--enable-advanced-objectives",
+        action="store_true",
+        help="Required guard flag for advanced objectives such as bass-d",
     )
     optimization_sweep.add_argument(
         "--target-nuclide",
@@ -4195,6 +4235,24 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=0.0,
         help="Penalty weight for near-energy overlaps in MWDCS full-spectrum mode",
+    )
+    optimization_sweep.add_argument(
+        "--bassd-dose-weight",
+        type=float,
+        default=0.02,
+        help="Dose penalty weight for advanced bass-d objective",
+    )
+    optimization_sweep.add_argument(
+        "--bassd-exploration-temperature",
+        type=float,
+        default=0.0,
+        help="Stochastic exploration temperature for bass-d action utility",
+    )
+    optimization_sweep.add_argument(
+        "--bassd-seed",
+        type=int,
+        default=17,
+        help="Random seed used by bass-d exploration noise",
     )
     optimization_sweep.add_argument(
         "--csv-output",

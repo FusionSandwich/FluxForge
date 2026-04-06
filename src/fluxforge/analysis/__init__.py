@@ -108,6 +108,22 @@ from fluxforge.analysis.optimization_mwdcs import (
     serialize_mwdcs_ranking,
 )
 
+from fluxforge.analysis.optimization_bassd import (
+    BASSDAction,
+    BASSDActionScore,
+    BASSDLineState,
+    BASSDEvaluation,
+    BASSDScheduleCandidate,
+    BASSDScheduleScore,
+    build_bassd_candidate_from_activity_results,
+    candidate_from_difom_candidate as bassd_candidate_from_difom_candidate,
+    evaluate_bassd,
+    parse_bassd_sweep_payload,
+    posterior_variance_update,
+    rank_bassd_schedules,
+    serialize_bassd_ranking,
+)
+
 from fluxforge.analysis.segmented_detection import (
     RegionParams,
     SegmentedDetectionConfig,
@@ -364,6 +380,20 @@ __all__ = [
     "parse_mwdcs_sweep_payload",
     "rank_mwdcs_schedules",
     "serialize_mwdcs_ranking",
+    # Irradiation optimization (Method N1 BASS-D)
+    "BASSDAction",
+    "BASSDActionScore",
+    "BASSDLineState",
+    "BASSDEvaluation",
+    "BASSDScheduleCandidate",
+    "BASSDScheduleScore",
+    "build_bassd_candidate_from_activity_results",
+    "bassd_candidate_from_difom_candidate",
+    "evaluate_bassd",
+    "parse_bassd_sweep_payload",
+    "posterior_variance_update",
+    "rank_bassd_schedules",
+    "serialize_bassd_ranking",
     # Advanced peak finders
     "PeakInfo",
     "snip_background",
