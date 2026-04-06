@@ -36,7 +36,7 @@
     {
       "id": "S0.2",
       "phase": "Stage 0",
-      "title": "Open all 10 epics",
+      "title": "Open tracked epics as the roadmap grows",
       "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Stage 0",
       "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / S0-8",
       "repo_status": "complete",
@@ -44,7 +44,7 @@
       "evidence": [
         ".github/project-management/issues.json"
       ],
-      "notes": "All 10 epic issue seeds from the tracker manifest are now present on GitHub."
+      "notes": "The original Stage 0 epic seed set is live on GitHub; newly added Phase 3B epic seeds are now present in the in-repo manifest and require the next planning-sync run."
     },
     {
       "id": "S0.3",
@@ -57,7 +57,7 @@
       "evidence": [
         ".github/project-management/issues.json"
       ],
-      "notes": "The initial seed issue set from the tracker manifest is now present on GitHub."
+      "notes": "The original Stage 0 issue seed set is live on GitHub; newly added Phase 3B issue seeds are now present in the in-repo manifest and require the next planning-sync run."
     },
     {
       "id": "S0.4",
@@ -1026,18 +1026,202 @@
       "notes": "Optional CuPy backend selection now exists for ML and batch workflows, with a clean NumPy fallback on CPU-only environments."
     },
     {
+      "id": "3.16",
+      "phase": "Phase 3B",
+      "title": "Implement peak-search, background, and ROI parity",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "complete",
+      "sequence_status": "complete",
+      "evidence": [
+        "src/fluxforge/core/analysis_workspace.py",
+        "src/fluxforge/gui/analysis_workspace.py",
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/cli/app.py",
+        "tests/test_roi_analysis_core.py",
+        "tests/test_cli_app.py",
+        "tests/test_analysis_workspace_qt.py"
+      ],
+      "notes": "Registry-backed Mariscotti/second-difference/NASA peak-search selection, explicit ROI sideband/SNIP background workflows, overlap decomposition, ROI statistics, modern Qt ROI Tools workspace, and matching CLI commands are now implemented and tested."
+    },
+    {
+      "id": "3.17",
+      "phase": "Phase 3B",
+      "title": "Implement calibration and efficiency parity workflows",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "next",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Extends detector-slot workflows, preserves all four GSA efficiency models as first-class methods, and adds NASA/InterSpec-style calibration preserve, multi-file, and fine-tune flows."
+    },
+    {
+      "id": "3.18",
+      "phase": "Phase 3B",
+      "title": "Implement identification, activity, and reference parity",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Adds editable text libraries, richer energy-window search, reference overlays, relative activity, source-age/decay-chain context, pinned mixtures, and expanded line-family libraries."
+    },
+    {
+      "id": "3.19",
+      "phase": "Phase 3B",
+      "title": "Implement operational calculator parity",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Adds detection-limit, dose, shielding/source-fit, attenuation/material, units-conversion, and offline reporting calculators using registry-backed method selection."
+    },
+    {
+      "id": "3.20",
+      "phase": "Phase 3B",
+      "title": "Implement archive, batch, and k0 parity workflows",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Adds InterSpec-style file query and batch compare, GSA ROI-statistics review workflows, and KayWin-derived k0/NAA session/report flows without entering hardware-control scope."
+    },
+    {
+      "id": "3.21",
+      "phase": "Phase 3B",
+      "title": "Curate repo-backed parity fixtures and manifests",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Defines the `tests/spectra/reference_parity/` fixture families and per-case manifests with source repo, source case, workflow, expected outputs, tolerances, and provenance notes."
+    },
+    {
+      "id": "3.22",
+      "phase": "Phase 3B",
+      "title": "Add algorithm-level parity tests",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Adds parser, calibration, peak-search, fit, activity, detection-limit, dose/shielding, and k0 parity checks against curated fixtures."
+    },
+    {
+      "id": "3.23",
+      "phase": "Phase 3B",
+      "title": "Add workflow-level parity tests",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Adds end-to-end same-input, same-workflow, nearly-same-result validation suites for each source family with golden outputs and declared tolerances."
+    },
+    {
+      "id": "3.24",
+      "phase": "Phase 3B",
+      "title": "Implement direct-manipulation canvas parity",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Copies the GSA-v4 and InterSpec interaction model: right-click peak add/delete/move, ROI edge dragging, background handles, peak-label toggles, and explicit overlay-role actions."
+    },
+    {
+      "id": "3.25",
+      "phase": "Phase 3B",
+      "title": "Implement new parity workspaces in the modern Qt shell",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Adds ROI Statistics, Detection Limit, Dose/Shielding, Relative Activity, File Query/Batch Compare, Reference/Library Workbench, and k0 characterization/report workspaces in the modern Qt shell only."
+    },
+    {
+      "id": "3.26",
+      "phase": "Phase 3B",
+      "title": "Implement GUI polish parity, first-class dark mode, and saved themes",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Adds InterSpec-style role-aware overlay polish, a shipped dark theme, saved theme profiles, clearer launch points, and tighter graph-table synchronization."
+    },
+    {
+      "id": "3.27",
+      "phase": "Phase 3B",
+      "title": "Add GUI verification, artifact review, and release checklist",
+      "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 3B",
+      "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / Phase 3B + Appendix \u2014 Offline Spectroscopy Parity Crosswalk",
+      "repo_status": "not-started",
+      "sequence_status": "pending",
+      "evidence": [
+        "testing/writeup.md",
+        "docs/FluxForge_Final_Additions.md",
+        "docs/FluxForge_Additions_v3_Final.md"
+      ],
+      "notes": "Extends the Qt workflow-test, native-probe, artifact-gallery, and acceptance-checklist pattern across every new offline-parity GUI surface."
+    },
+    {
       "id": "4.1",
       "phase": "Phase 4",
       "title": "Implement USB HID + Ethernet HAL drivers",
       "primary_reference": "FluxForge_Final_Additions.md \u00a711 / Phase 4",
       "secondary_reference": "FluxForge_Additions_v3_Final.md \u00a719 / 4-3",
       "repo_status": "not-started",
-      "sequence_status": "next",
+      "sequence_status": "pending",
       "evidence": [
         "docs/FluxForge_Final_Additions.md",
         "docs/FluxForge_Additions_v3_Final.md"
       ],
-      "notes": "The formal next roadmap step is still the first real HAL driver work, but the user-directed Phase 4+ predictive slice from the secondary GUI plan has now been implemented ahead of this step."
+      "notes": "HAL driver work remains on the roadmap, but it is formally deferred until the new Phase 3B offline spectroscopy parity module closes."
     },
     {
       "id": "4.2",

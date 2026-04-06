@@ -21,14 +21,19 @@ from fluxforge.core.predictive import (
 )
 from fluxforge.core.analysis_workspace import (
     PeakCandidate,
+    analyze_roi_region,
     apply_ml_peak_predictions,
     bayesian_match_peak_candidates,
     calculate_peak_activity,
+    compute_roi_statistics,
     compute_cascade_sum_lines,
     detect_peak_candidates,
     estimate_spectral_phenomena,
     extract_survey_points,
+    register_builtin_peak_search_methods,
+    register_builtin_roi_background_methods,
     register_builtin_nuclide_id_engines,
+    background_adjusted_spectrum,
     subtract_background_counts,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
@@ -41,6 +46,7 @@ from fluxforge.gui.analysis_workspace import AnalysisWorkspaceController, Spectr
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
+from fluxforge.gui.widgets.method_selector import MethodSelectorWidget
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.plugins import bootstrap_builtin_registries
 from fluxforge.standards import (
@@ -74,6 +80,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QPlainTextEdit,
         QProgressBar,
         QPushButton,
+        QSpinBox,
         QTabBar,
         QTabWidget,
         QTableWidget,
@@ -282,6 +289,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 library_manager=self.library_manager,
             )
             self.registries = bootstrap_builtin_registries()
+            register_builtin_peak_search_methods(self.registries)
             register_builtin_nuclide_id_engines(self.registries)
             self._current_match_results: tuple[GammaLineMatchResult, ...] = ()
 
@@ -306,6 +314,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.auto_find_button.setObjectName("AutoFindPeaksButton")
             self.auto_find_button.clicked.connect(self.run_auto_peak_search)
             action_row.addWidget(self.auto_find_button)
+
+            self.peak_search_selector = MethodSelectorWidget(
+                self.registries.peak_search_methods,
+                self.mode_manager,
+                title="Peak Search",
+                parent=self,
+            )
+            self.peak_search_selector.setObjectName("PeakSearchMethodSelector")
+            current_search_method = self.workspace_controller.state.peak_search_method
+            if current_search_method in self.registries.peak_search_methods.keys():
+                self.peak_search_selector.set_current_key(current_search_method)
+            self.peak_search_selector.combo.currentIndexChanged.connect(
+                self._peak_search_method_changed
+            )
+            action_row.addWidget(self.peak_search_selector, 1)
 
             self.match_button = QPushButton("Bayesian Match", self)
             self.match_button.setObjectName("BayesianMatchPeaksButton")
@@ -451,7 +474,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if spectrum is None:
                 self.summary.setText("No active spectrum is available for peak search.")
                 return
-            peaks = detect_peak_candidates(spectrum)
+            method = self.peak_search_selector.current_key() or self.workspace_controller.state.peak_search_method
+            peaks = detect_peak_candidates(spectrum, method=method)
             dialog = AutoPeakReviewDialog(peaks, parent=self)
             if dialog.exec() != QDialog.Accepted:
                 return
@@ -464,9 +488,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         **self.workspace_controller.state.__dict__,
                         "peaks": tuple(accepted),
                         "selected_peak_id": accepted[0].peak_id if accepted else None,
+                        "peak_search_method": method,
                     }
                 ),
             )
+
+        def _peak_search_method_changed(self) -> None:
+            method = self.peak_search_selector.current_key()
+            if method:
+                self.workspace_controller.set_peak_search_method(str(method))
 
         def run_bayesian_match(self) -> None:
             state = self.workspace_controller.state
@@ -799,6 +829,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.workspace_controller.set_state(after)
 
         def _sync_state(self, state) -> None:
+            if self.peak_search_selector.current_key() != state.peak_search_method:
+                self.peak_search_selector.combo.blockSignals(True)
+                self.peak_search_selector.set_current_key(state.peak_search_method)
+                self.peak_search_selector.combo.blockSignals(False)
+                self.peak_search_selector._sync_badge()
+
             self.table.blockSignals(True)
             self.table.setRowCount(0)
             for row, peak in enumerate(state.peaks):
@@ -1051,6 +1087,324 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             else:
                 self.results.setPlainText("No activity result has been calculated yet.")
+
+
+    class RoiToolsPanel(QWidget):
+        """Explicit ROI/background workflow surface for offline parity work."""
+
+        def __init__(
+            self,
+            *,
+            mode_manager: ModeManager,
+            selection_bus: SelectionBus,
+            workspace_controller: AnalysisWorkspaceController,
+            parent=None,
+        ) -> None:
+            super().__init__(parent)
+            self.mode_manager = mode_manager
+            self.selection_bus = selection_bus
+            self.workspace_controller = workspace_controller
+            self.registries = bootstrap_builtin_registries()
+            if len(self.registries.peak_search_methods) == 0:
+                register_builtin_peak_search_methods(self.registries)
+            if len(self.registries.roi_background_models) == 0:
+                register_builtin_roi_background_methods(self.registries)
+
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(16, 16, 16, 16)
+            layout.setSpacing(10)
+
+            intro = QLabel(
+                (
+                    "Explicit ROI/background workspace for offline parity: choose a peak-search "
+                    "method, estimate continuum with sidebands or SNIP, decompose overlaps, and "
+                    "review the same ROI across many loaded spectra."
+                ),
+                self,
+            )
+            intro.setObjectName("PanelBody")
+            intro.setWordWrap(True)
+            layout.addWidget(intro)
+
+            bounds_row = QHBoxLayout()
+            bounds_row.addWidget(QLabel("ROI left (keV)", self))
+            self.roi_left = QDoubleSpinBox(self)
+            self.roi_left.setObjectName("RoiLeftBoundSpin")
+            self.roi_left.setRange(0.0, 10000.0)
+            self.roi_left.setDecimals(3)
+            self.roi_left.setSingleStep(0.25)
+            bounds_row.addWidget(self.roi_left)
+            bounds_row.addWidget(QLabel("ROI right (keV)", self))
+            self.roi_right = QDoubleSpinBox(self)
+            self.roi_right.setObjectName("RoiRightBoundSpin")
+            self.roi_right.setRange(0.0, 10000.0)
+            self.roi_right.setDecimals(3)
+            self.roi_right.setSingleStep(0.25)
+            bounds_row.addWidget(self.roi_right)
+            self.use_selected_peak_button = QPushButton("Use Selected Peak ROI", self)
+            self.use_selected_peak_button.setObjectName("RoiUseSelectedPeakButton")
+            self.use_selected_peak_button.clicked.connect(self._use_selected_peak_roi)
+            bounds_row.addWidget(self.use_selected_peak_button)
+            bounds_row.addStretch(1)
+            layout.addLayout(bounds_row)
+
+            selector_row = QHBoxLayout()
+            self.peak_search_selector = MethodSelectorWidget(
+                self.registries.peak_search_methods,
+                self.mode_manager,
+                title="Peak Search",
+                parent=self,
+            )
+            self.peak_search_selector.setObjectName("RoiPeakSearchMethodSelector")
+            selector_row.addWidget(self.peak_search_selector, 1)
+            self.background_selector = MethodSelectorWidget(
+                self.registries.roi_background_models,
+                self.mode_manager,
+                title="ROI Background",
+                parent=self,
+            )
+            self.background_selector.setObjectName("RoiBackgroundMethodSelector")
+            selector_row.addWidget(self.background_selector, 1)
+            layout.addLayout(selector_row)
+
+            options_row = QHBoxLayout()
+            options_row.addWidget(QLabel("Sideband width (keV)", self))
+            self.sideband_width = QDoubleSpinBox(self)
+            self.sideband_width.setObjectName("RoiSidebandWidthSpin")
+            self.sideband_width.setRange(0.5, 250.0)
+            self.sideband_width.setDecimals(2)
+            self.sideband_width.setSingleStep(0.5)
+            self.sideband_width.setValue(4.0)
+            options_row.addWidget(self.sideband_width)
+            self.overlap_checkbox = QCheckBox("Decompose overlaps", self)
+            self.overlap_checkbox.setObjectName("RoiDecomposeOverlapsCheck")
+            self.overlap_checkbox.setChecked(True)
+            options_row.addWidget(self.overlap_checkbox)
+            options_row.addWidget(QLabel("Max comps", self))
+            self.max_components = QSpinBox(self)
+            self.max_components.setObjectName("RoiMaxComponentsSpin")
+            self.max_components.setRange(1, 6)
+            self.max_components.setValue(3)
+            options_row.addWidget(self.max_components)
+            options_row.addStretch(1)
+            layout.addLayout(options_row)
+
+            action_row = QHBoxLayout()
+            self.analyze_button = QPushButton("Analyze ROI", self)
+            self.analyze_button.setObjectName("AnalyzeRoiButton")
+            self.analyze_button.clicked.connect(self._analyze_roi)
+            action_row.addWidget(self.analyze_button)
+            self.statistics_button = QPushButton("ROI Statistics", self)
+            self.statistics_button.setObjectName("AnalyzeRoiStatisticsButton")
+            self.statistics_button.clicked.connect(self._analyze_roi_statistics)
+            action_row.addWidget(self.statistics_button)
+            action_row.addStretch(1)
+            layout.addLayout(action_row)
+
+            self.summary = QTextBrowser(self)
+            self.summary.setObjectName("RoiAnalysisSummaryBrowser")
+            layout.addWidget(self.summary)
+
+            layout.addWidget(QLabel("Overlap components", self))
+            self.component_table = QTableWidget(0, 5, self)
+            self.component_table.setObjectName("RoiOverlapTable")
+            self.component_table.setHorizontalHeaderLabels(
+                ("Centroid (keV)", "Net Counts", "σ Net", "FWHM (ch)", "χ²/dof")
+            )
+            self.component_table.verticalHeader().setVisible(False)
+            self.component_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.component_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            layout.addWidget(self.component_table, 1)
+
+            layout.addWidget(QLabel("ROI statistics across loaded spectra", self))
+            self.statistics_table = QTableWidget(0, 4, self)
+            self.statistics_table.setObjectName("RoiStatisticsTable")
+            self.statistics_table.setHorizontalHeaderLabels(
+                ("Spectrum", "Net Counts", "σ Net", "Centroid (keV)")
+            )
+            self.statistics_table.verticalHeader().setVisible(False)
+            self.statistics_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.statistics_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            layout.addWidget(self.statistics_table, 1)
+
+            self.peak_search_selector.combo.currentIndexChanged.connect(
+                self._peak_search_method_changed
+            )
+            self.background_selector.combo.currentIndexChanged.connect(
+                self._background_method_changed
+            )
+            self.workspace_controller.subscribe(self._sync_state)
+            self._sync_state(self.workspace_controller.state)
+
+        def _use_selected_peak_roi(self) -> None:
+            peak = self.workspace_controller.selected_peak()
+            if peak is None:
+                return
+            self.roi_left.setValue(float(peak.roi_bounds_keV[0]))
+            self.roi_right.setValue(float(peak.roi_bounds_keV[1]))
+            self.selection_bus.publish(
+                SelectionState(
+                    peak_energy_keV=peak.energy_keV,
+                    roi_bounds_keV=peak.roi_bounds_keV,
+                    nuclide=peak.nuclide,
+                    reference_lines_keV=peak.reference_lines_keV,
+                )
+            )
+
+        def _peak_search_method_changed(self) -> None:
+            method = self.peak_search_selector.current_key()
+            if method:
+                self.workspace_controller.set_peak_search_method(str(method))
+
+        def _background_method_changed(self) -> None:
+            method = self.background_selector.current_key()
+            if method:
+                self.workspace_controller.set_roi_background_method(str(method))
+
+        def _active_foreground_with_background(self) -> tuple[GammaSpectrum | None, GammaSpectrum | None]:
+            foreground = self.workspace_controller.spectrum()
+            background = None
+            if self.workspace_controller.state.active_spectrum_key != "background":
+                background_slot = self.workspace_controller.slot("background")
+                if background_slot is not None:
+                    background = background_slot.spectrum
+            return foreground, background
+
+        def _roi_bounds(self) -> tuple[float, float]:
+            return tuple(sorted((float(self.roi_left.value()), float(self.roi_right.value()))))
+
+        def _analyze_roi(self) -> None:
+            foreground, background = self._active_foreground_with_background()
+            if foreground is None:
+                self.summary.setHtml("<p>No active spectrum available for ROI analysis.</p>")
+                return
+            result = analyze_roi_region(
+                foreground,
+                roi_bounds_keV=self._roi_bounds(),
+                label=(foreground.spectrum_id or "ROI"),
+                background_method=self.background_selector.current_key()
+                or self.workspace_controller.state.roi_background_method,
+                peak_search_method=self.peak_search_selector.current_key()
+                or self.workspace_controller.state.peak_search_method,
+                sideband_width_keV=float(self.sideband_width.value()),
+                background_spectrum=background,
+                background_mode=self.workspace_controller.state.background_mode,
+                background_scale=self.workspace_controller.state.background_scale,
+                decompose_overlaps=bool(self.overlap_checkbox.isChecked()),
+                max_components=int(self.max_components.value()),
+                registries=self.registries,
+            )
+            self.workspace_controller.set_roi_analysis(result)
+            self.selection_bus.publish(
+                SelectionState(
+                    roi_bounds_keV=result.roi_bounds_keV,
+                    peak_energy_keV=result.centroid_keV,
+                )
+            )
+
+        def _statistics_inputs(self) -> tuple[tuple[str, GammaSpectrum], ...]:
+            background_source = None
+            background_slot = self.workspace_controller.slot("background")
+            if background_slot is not None:
+                background_source = background_slot.source_key
+            records = []
+            for record in self.workspace_controller.loaded_spectrum_records():
+                if background_source is not None and record.key == background_source:
+                    continue
+                records.append((record.label, record.spectrum))
+            if not records:
+                for slot in self.workspace_controller.spectrum_slots():
+                    if slot.key == "background":
+                        continue
+                    records.append((slot.source_label or slot.label, slot.spectrum))
+            return tuple(records)
+
+        def _analyze_roi_statistics(self) -> None:
+            inputs = self._statistics_inputs()
+            if not inputs:
+                self.summary.setHtml("<p>No loaded spectra available for ROI statistics.</p>")
+                return
+            result = compute_roi_statistics(
+                inputs,
+                roi_bounds_keV=self._roi_bounds(),
+                label="ROI Statistics",
+                background_method=self.background_selector.current_key()
+                or self.workspace_controller.state.roi_background_method,
+                peak_search_method=self.peak_search_selector.current_key()
+                or self.workspace_controller.state.peak_search_method,
+                sideband_width_keV=float(self.sideband_width.value()),
+                registries=self.registries,
+            )
+            self.workspace_controller.set_roi_statistics(result)
+
+        def _sync_state(self, state) -> None:
+            if self.peak_search_selector.current_key() != state.peak_search_method:
+                self.peak_search_selector.combo.blockSignals(True)
+                self.peak_search_selector.set_current_key(state.peak_search_method)
+                self.peak_search_selector.combo.blockSignals(False)
+                self.peak_search_selector._sync_badge()
+            if self.background_selector.current_key() != state.roi_background_method:
+                self.background_selector.combo.blockSignals(True)
+                self.background_selector.set_current_key(state.roi_background_method)
+                self.background_selector.combo.blockSignals(False)
+                self.background_selector._sync_badge()
+
+            if state.roi_analysis is None:
+                self.summary.setHtml("<p>No ROI analysis has been run yet.</p>")
+                self.component_table.setRowCount(0)
+            else:
+                analysis = state.roi_analysis
+                self.summary.setHtml(
+                    (
+                        f"<h3>{analysis.label}</h3>"
+                        f"<p><strong>ROI:</strong> {analysis.roi_bounds_keV[0]:.3f}-{analysis.roi_bounds_keV[1]:.3f} keV<br/>"
+                        f"<strong>Gross:</strong> {analysis.gross_counts:.3f} ± {analysis.gross_counts_uncertainty:.3f}<br/>"
+                        f"<strong>Background:</strong> {analysis.background_counts:.3f} ± {analysis.background_counts_uncertainty:.3f} ({analysis.background_method})<br/>"
+                        f"<strong>Net:</strong> {analysis.net_counts:.3f} ± {analysis.net_counts_uncertainty:.3f}<br/>"
+                        f"<strong>Centroid:</strong> {analysis.centroid_keV:.3f} ± {analysis.centroid_uncertainty_keV:.3f} keV<br/>"
+                        f"<strong>Significance:</strong> {analysis.significance:.2f}σ<br/>"
+                        f"<strong>Peak search:</strong> {analysis.peak_search_method}<br/>"
+                        f"<strong>Notes:</strong> {' '.join(analysis.notes)}</p>"
+                    )
+                )
+                self.component_table.setRowCount(len(analysis.overlap_components))
+                for row, component in enumerate(analysis.overlap_components):
+                    values = (
+                        f"{component.centroid_keV:.3f}",
+                        f"{component.net_counts:.3f}",
+                        f"{component.net_counts_uncertainty:.3f}",
+                        f"{component.fwhm_channels:.3f}",
+                        f"{component.reduced_chi_squared:.3f}",
+                    )
+                    for column, value in enumerate(values):
+                        item = QTableWidgetItem(value)
+                        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                        self.component_table.setItem(row, column, item)
+
+            stats = state.roi_statistics
+            if stats is None:
+                self.statistics_table.setRowCount(0)
+                return
+            self.statistics_table.setRowCount(len(stats.samples))
+            for row, sample in enumerate(stats.samples):
+                values = (
+                    sample.label,
+                    f"{sample.net_counts:.3f}",
+                    f"{sample.net_counts_uncertainty:.3f}",
+                    f"{sample.centroid_keV:.3f}",
+                )
+                for column, value in enumerate(values):
+                    item = QTableWidgetItem(value)
+                    item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                    self.statistics_table.setItem(row, column, item)
+            self.summary.append(
+                (
+                    f"<p><strong>ROI stats:</strong> n={stats.sample_count} | "
+                    f"mean net {stats.mean_net_counts:.3f} | "
+                    f"σ {stats.stdev_net_counts:.3f} | "
+                    f"RSD {stats.relative_std * 100.0:.2f}%</p>"
+                )
+            )
 
 
     class SurveyMapPanel(QWidget):
@@ -2819,7 +3173,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
 
     class BottomWorkspaceTabs(QTabWidget):
-        """Bottom-zone tab set for tables, calibration, activity, batch, and logs."""
+        """Bottom-zone tab set for tables, ROI tools, calibration, activity, batch, and logs."""
 
         def __init__(
             self,
@@ -2855,6 +3209,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             self.addTab(self.peak_table_panel, "Peak Table")
+            self.roi_tools_panel = RoiToolsPanel(
+                mode_manager=self.mode_manager,
+                selection_bus=self.selection_bus,
+                workspace_controller=self.workspace_controller,
+                parent=self,
+            )
+            self.addTab(self.roi_tools_panel, "ROI Tools")
             self.addTab(
                 self._build_calibration_panel(),
                 "Calibration",

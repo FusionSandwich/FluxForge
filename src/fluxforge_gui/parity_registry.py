@@ -35,6 +35,18 @@ GUI_PARITY_REGISTRY: tuple[GuiParityRecord, ...] = (
         "tests/test_gui_app.py::test_gui_profile_choices_include_standards_profiles",
     ),
     GuiParityRecord(
+        "roi-analyze",
+        "3B. ROI Tools / Analyze ROI",
+        "tests/test_analysis_workspace_qt.py::"
+        "test_roi_tools_panel_supports_mouse_driven_roi_analysis_and_statistics",
+    ),
+    GuiParityRecord(
+        "roi-statistics",
+        "3B. ROI Tools / ROI Statistics",
+        "tests/test_analysis_workspace_qt.py::"
+        "test_roi_tools_panel_supports_mouse_driven_roi_analysis_and_statistics",
+    ),
+    GuiParityRecord(
         "activity",
         "4. Activity / Run Activity",
         "tests/test_gui_app.py::"

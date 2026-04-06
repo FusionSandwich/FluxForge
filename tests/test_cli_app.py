@@ -148,6 +148,38 @@ def test_build_parser_spectrum_plot(tmp_path):
     assert args.background_subtracted is True
 
 
+def test_build_parser_roi_commands(tmp_path):
+    parser = app.build_parser()
+    roi_args = parser.parse_args(
+        [
+            "roi-analyze",
+            "--input",
+            str(tmp_path / "sample.ASC"),
+            "--left-keV",
+            "200.0",
+            "--right-keV",
+            "220.0",
+        ]
+    )
+    assert roi_args.command == "roi-analyze"
+    assert roi_args.peak_search_method == "mariscotti"
+
+    stats_args = parser.parse_args(
+        [
+            "roi-statistics",
+            "--inputs",
+            str(tmp_path / "a.ASC"),
+            str(tmp_path / "b.ASC"),
+            "--left-channel",
+            "10",
+            "--right-channel",
+            "20",
+        ]
+    )
+    assert stats_args.command == "roi-statistics"
+    assert len(stats_args.inputs) == 2
+
+
 def test_cmd_plots_uses_master_suite(monkeypatch, tmp_path):
     called = {}
 
@@ -786,6 +818,175 @@ def test_cmd_peaks_passes_fit_window_through_config(monkeypatch, tmp_path):
     )
 
     assert captured["fit_window"] == 9
+
+
+def test_cmd_peaks_parity_method_uses_core_detection(monkeypatch, tmp_path):
+    spectrum_payload = {
+        "schema_version": "1.0",
+        "type": "spectrum",
+        "spectrum": _dummy_spectrum().to_dict(),
+    }
+    written = {}
+
+    fake_peak = SimpleNamespace(
+        channel=1.2,
+        energy_keV=1.2,
+        net_counts=42.0,
+        roi_bounds_keV=(0.8, 1.6),
+        nuclide="Co-60",
+        peak_id="peak-1",
+        significance=5.1,
+        fit_quality=1.2,
+    )
+
+    monkeypatch.setattr(app, "read_spectrum_file", lambda _: spectrum_payload)
+    monkeypatch.setattr(app, "detect_peak_candidates", lambda *a, **k: [fake_peak])
+    monkeypatch.setattr(
+        app,
+        "write_peak_report",
+        lambda output, **kwargs: written.update({"output": output, "payload": kwargs}),
+    )
+
+    output = tmp_path / "peaks.json"
+    app.cmd_peaks(
+        Namespace(
+            spectrum_file=tmp_path / "spectrum.json",
+            output=output,
+            sensitivity="default",
+            fit_window=6,
+            validate=False,
+            manual_peaks_file=None,
+            method="mariscotti",
+            max_peaks=8,
+        )
+    )
+
+    assert written["output"] == output
+    assert written["payload"]["peaks"][0]["peak_search_method"] == "mariscotti"
+    assert written["payload"]["peaks"][0]["report_isotope"] == "Co-60"
+
+
+def test_cmd_roi_analyze_writes_background_and_overlap_payload(monkeypatch, tmp_path):
+    channels = np.arange(256, dtype=float)
+    sample = GammaSpectrum(
+        counts=(
+            12.0
+            + 0.03 * channels
+            + 220.0 * np.exp(-0.5 * ((channels - 90.0) / 4.0) ** 2)
+            + 180.0 * np.exp(-0.5 * ((channels - 98.0) / 4.5) ** 2)
+        ),
+        channels=channels,
+        live_time=60.0,
+        real_time=63.0,
+        calibration={"energy": [0.0, 1.0]},
+        spectrum_id="sample",
+    )
+    background = GammaSpectrum(
+        counts=np.full_like(channels, 3.0, dtype=float),
+        channels=channels,
+        live_time=60.0,
+        real_time=60.0,
+        calibration={"energy": [0.0, 1.0]},
+        spectrum_id="background",
+    )
+
+    def fake_read_genie(path, **kwargs):
+        return background if "background" in str(path) else sample
+
+    monkeypatch.setattr(app, "read_genie_spectrum", fake_read_genie)
+
+    input_file = tmp_path / "sample.ASC"
+    background_file = tmp_path / "background.ASC"
+    output_file = tmp_path / "roi_analysis.json"
+    input_file.write_text("dummy", encoding="utf-8")
+    background_file.write_text("dummy", encoding="utf-8")
+
+    app.cmd_roi_analyze(
+        Namespace(
+            input=input_file,
+            output=output_file,
+            label="doublet",
+            left_keV=84.0,
+            right_keV=104.0,
+            left_channel=None,
+            right_channel=None,
+            background_method="roi_sideband",
+            peak_search_method="mariscotti",
+            sideband_width_keV=5.0,
+            decompose_overlaps=True,
+            max_components=3,
+            profile=None,
+            background_file=background_file,
+            background_scale_mode="live",
+            background_scale_factor=None,
+            energy_calibration=None,
+            efficiency_coefficients=None,
+            validate=False,
+        )
+    )
+
+    payload = json.loads(output_file.read_text(encoding="utf-8"))
+    assert payload["analysis"]["background_method"] == "roi_sideband"
+    assert payload["analysis"]["peak_search_method"] == "mariscotti"
+    assert payload["analysis"]["net_counts"] > 0.0
+    assert len(payload["analysis"]["overlap_components"]) >= 1
+
+
+def test_cmd_roi_statistics_writes_summary_payload(monkeypatch, tmp_path):
+    def _make(scale: float) -> GammaSpectrum:
+        channels = np.arange(128, dtype=float)
+        counts = (
+            8.0
+            + 0.02 * channels
+            + scale * 120.0 * np.exp(-0.5 * ((channels - 44.0) / 3.0) ** 2)
+        )
+        return GammaSpectrum(
+            counts=counts,
+            channels=channels,
+            live_time=30.0,
+            real_time=30.0,
+            calibration={"energy": [0.0, 1.0]},
+            spectrum_id=f"sample-{scale:.2f}",
+        )
+
+    def fake_read_genie(path, **kwargs):
+        name = Path(path).name
+        if name.startswith("a"):
+            return _make(1.0)
+        if name.startswith("b"):
+            return _make(1.1)
+        return _make(0.9)
+
+    monkeypatch.setattr(app, "read_genie_spectrum", fake_read_genie)
+
+    files = [tmp_path / "a.ASC", tmp_path / "b.ASC", tmp_path / "c.ASC"]
+    for path in files:
+        path.write_text("dummy", encoding="utf-8")
+    output_file = tmp_path / "roi_stats.json"
+
+    app.cmd_roi_statistics(
+        Namespace(
+            inputs=files,
+            output=output_file,
+            label="roi-batch",
+            left_keV=40.0,
+            right_keV=48.0,
+            left_channel=None,
+            right_channel=None,
+            background_method="snip",
+            peak_search_method="nasa_peaksearch",
+            sideband_width_keV=4.0,
+            profile=None,
+            energy_calibration=None,
+            efficiency_coefficients=None,
+            validate=False,
+        )
+    )
+
+    payload = json.loads(output_file.read_text(encoding="utf-8"))
+    assert payload["statistics"]["sample_count"] == 3
+    assert payload["statistics"]["mean_net_counts"] > 0.0
+    assert len(payload["statistics"]["samples"]) == 3
 
 
 def test_cmd_unfold_compare_and_report(monkeypatch, tmp_path):

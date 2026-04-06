@@ -113,7 +113,7 @@ This is the single largest structural gap in the prior documents. The uploaded v
 correct that issue creation must be a formal first stage, not an afterthought. Stage 0 must
 be completed before any Phase 1 code is committed on the branch.
 
-### Repository Status — 2026-03-30
+### Repository Status — 2026-04-01
 
 - Completed in-repo: `CONTRIBUTING.md`, `docs/adr/ADR-001` through `ADR-007`,
   `.github/ISSUE_TEMPLATE/`, `.github/project-management/`, the sync workflow, and the
@@ -197,7 +197,23 @@ be completed before any Phase 1 code is committed on the branch.
   batch queue, visible progress tracking, per-spectrum JSON and aggregate CSV
   outputs, and optional CuPy-backed batch/ML backend selection with a clean CPU
   fallback.
-- Module 3 is now complete in sequence and in-repo.
+- Module 3 remains complete in sequence and in-repo.
+- A new formal follow-on module now sits between `3.15` and `4.1`:
+  **Phase 3B — Offline Spectroscopy Parity**.
+- Phase 3B uses `testing/writeup.md` sections `19` through `24`
+  (`GSA-v4`, `InterSpec`, `KayWinV410`, `NASA-gamma`,
+  `prospect_trial_installation`, and `GSA-v2`) as the source-of-truth feature
+  inventory.
+- Phase 3B scope is **offline analysis + GUI parity only**. MCA/live
+  acquisition, detector discovery, and device control remain in the existing HAL
+  roadmap under Phase 4.
+- Phase 3.16 is now implemented in-repo:
+  `src/fluxforge/core/analysis_workspace.py`,
+  `src/fluxforge/gui/analysis_workspace.py`,
+  `src/fluxforge/gui/panels/modern_shell.py`, and `src/fluxforge/cli/app.py`
+  now provide registry-backed Mariscotti / second-difference / NASA peak search,
+  explicit ROI sideband/SNIP workflows, overlap decomposition, multi-spectrum ROI
+  statistics, the Qt ROI Tools panel, and matching CLI commands.
 - The user-directed Phase 4+ predictive slice from the secondary GUI plan is now
   implemented in-repo too: the modern Qt dashboard, QA sidebar, and status bar
   now forecast ROI time-to-target counts, dead-time saturation risk, and QA-based
@@ -207,7 +223,11 @@ be completed before any Phase 1 code is committed on the branch.
   surfaces are now implemented in the modern Qt shell, the QA sidebar exposes direct
   `View QA History` and `Run ASTM Check` buttons, and the status-bar hardware LED now
   opens the Dashboard tab for one-click access.
-- The current roadmap next step is Phase 4.1, real HAL driver work.
+- The current roadmap next step is Phase `3.17`, calibration/efficiency parity
+  for the offline spectroscopy module.
+- The newly added Phase 3B milestone, epic, and issue seeds now exist in the
+  in-repo planning manifests and require the next `Sync Project Planning` run to
+  materialize on GitHub.
 - GUI redesign status in-repo: Phase 1 items `1.3` through `1.18` now exist in the
   repository under `src/fluxforge/gui/`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide search, and overlay wiring, while
@@ -229,6 +249,7 @@ milestone.
 | `M2 — Core Analysis Parity` | Phase 2: calibration, peak fitting, nuclide ID, activity calculation |
 | `M3 — Advanced Analysis` | Phase 3: unfolding, ML engine, batch mode, reporting |
 | `M4 — Standards & QA` | Phase 3 continuation: ASTM modules, QA monitor, C1030 |
+| `M3B — Offline Spectroscopy Parity` | Phase 3B: offline analysis parity, parity fixtures, and GUI parity against the new `testing/` source repos |
 | `M5 — MCA Foundations` | Phase 4: HAL drivers, live acquisition, spectrogram |
 | `M6 — Packaging & Release` | Distribution: AppImage, Windows .exe, CI/CD, documentation |
 
@@ -339,7 +360,7 @@ Configure automation:
 
 ### 2.5 Create Initial Epics
 
-Open these eight issues immediately as epics (`type/epic`):
+Open these eleven issues immediately as epics (`type/epic`):
 
 | # | Epic Title | Milestone | Priority |
 |---|---|---|---|
@@ -353,6 +374,7 @@ Open these eight issues immediately as epics (`type/epic`):
 | E8 | HAL, live acquisition, and dashboard foundation | M5 | P2 |
 | E9 | Reporting engine and packaging | M6 | P1 |
 | E10 | Plugin/registry architecture | M1 | P0 |
+| E11 | Offline spectroscopy parity module | M3B | P1 |
 
 ### 2.6 First Issue Set — Open Immediately
 
@@ -386,6 +408,31 @@ Each issue references its parent epic in brackets.
 | 23 | Scaffold unfolding workspace with algorithm registry | E7 | area/unfolding | P1 |
 | 24 | Add test harness: sample spectra, regression snapshots, CI baseline | — | area/testing | P0 |
 | 25 | Add dark/light theme QSS files and ModeManager theme hook | E1 | area/gui | P1 |
+
+### 2.7 Follow-On Epic and Issue Set — Offline Spectroscopy Parity
+
+Add this epic and issue set so the issue-first workflow stays aligned with the
+new Phase 3B module.
+
+| # | Epic Title | Milestone | Priority |
+|---|---|---|---|
+| E11 | Offline spectroscopy parity module | M3B | P1 |
+
+| # | Issue Title | Epic | Area | Priority |
+|---|---|---|---|---|
+| 26 | Build repo-to-feature crosswalk and parity tracker matrix | E11 | area/docs | P0 |
+| 27 | Implement peak-search / background / ROI parity | E11 | area/core | P1 |
+| 28 | Implement calibration / efficiency parity | E11 | area/calibration | P1 |
+| 29 | Implement identification / activity / reference parity | E11 | area/core | P1 |
+| 30 | Implement operational calculator parity | E11 | area/core | P1 |
+| 31 | Implement archive / batch / k0 parity workflows | E11 | area/core | P1 |
+| 32 | Curate repo-backed parity fixtures and manifests | E11 | area/testing | P0 |
+| 33 | Add algorithm-level parity tests | E11 | area/testing | P1 |
+| 34 | Add workflow-level parity tests | E11 | area/testing | P1 |
+| 35 | Implement direct-manipulation canvas parity | E11 | area/gui | P1 |
+| 36 | Implement new parity workspaces in the modern Qt shell | E11 | area/gui | P1 |
+| 37 | Implement GUI polish parity and saved themes | E11 | area/gui | P2 |
+| 38 | Add GUI verification, artifact review, and release checklist | E11 | area/testing | P1 |
 
 ---
 
@@ -541,7 +588,7 @@ Standards Mode is active, the method selector widget calls `list_available(stand
 and the dropdown automatically shows only the permitted methods. No changes needed to the
 individual method implementations.
 
-### Six Registry Instances — What Each Covers
+### Registry Instances — What Each Covers
 
 ```
 fitter_registry:    gaussian | gaussian_skew | bayesian | ml_assisted
@@ -565,6 +612,22 @@ standards_registry: astm_e181 | astm_e261 | astm_e1297 | astm_e1218 |
 
 render_registry:    pyqtgraph | vispy
                     default: pyqtgraph
+```
+
+**Phase 3B extends this same additively-registered architecture.** Do not add
+new method branches through scattered `if/elif` trees. Add the following
+registries wherever FluxForge exposes analyst-selectable workflows:
+
+```
+peak_search_registry:  second_difference | mariscotti | nasa_peaksearch
+background_registry:   simple_line | scaled | statistical | snip | roi_sideband
+detection_limit_registry:
+                       currie_e1297 | roi_simple | interspec_workspace
+calculator_registry:   dose_distance | shielding_fit | attenuation_material |
+                       units_converter | gamma_count
+reference_overlay_registry:
+                       decay_lines | cascade_sum | natural_background |
+                       capture | inelastic | common_lab
 ```
 
 ### GUI Integration — Method Selector Widget
@@ -700,6 +763,13 @@ Every `.ffs` session file and every generated report must record, per analytical
   "method": "quadratic",
   "method_category": "recommended_default",
   "standards_mode": null,
+  "reference_library_id": "endf_b8_nudat",
+  "peak_search_method": "second_difference",
+  "background_method": "statistical",
+  "fitter_method": "gaussian",
+  "efficiency_model": "log_polynomial",
+  "overlay_role": "foreground",
+  "parity_case_id": null,
   "coefficients": [0.045, 0.2981, -0.00000312],
   "polynomial_order": 2,
   "polynomial_order_locked_by": null
@@ -712,6 +782,13 @@ Every `.ffs` session file and every generated report must record, per analytical
   "method": "quadratic",
   "method_category": "standards_mandated",
   "standards_mode": "ASTM_E181_2023",
+  "reference_library_id": "endf_b8_nudat",
+  "peak_search_method": "mariscotti",
+  "background_method": "snip",
+  "fitter_method": "gaussian",
+  "efficiency_model": "log_polynomial",
+  "overlay_role": "foreground",
+  "parity_case_id": "gsa_v4_roi_stats_case_001",
   "coefficients": [0.045, 0.2981, -0.00000312],
   "polynomial_order": 2,
   "polynomial_order_locked_by": "ASTM E181-23 §5.4.2"
@@ -1001,6 +1078,11 @@ fluxforge/
 │   ├── unfold_registry.py
 │   ├── cal_registry.py
 │   ├── id_registry.py
+│   ├── peak_search_registry.py
+│   ├── background_registry.py
+│   ├── detection_limit_registry.py
+│   ├── calculator_registry.py
+│   ├── reference_overlay_registry.py
 │   ├── standards_registry.py
 │   └── render_registry.py
 │
@@ -1030,7 +1112,15 @@ resources/
 └── map_tiles/                      # Offline OSM tile bundle (~50 MB)
 
 tests/
-├── spectra/                        # Test spectrum files (N42, CHN, SPC, ...)
+├── spectra/
+│   ├── reference_parity/
+│   │   ├── manifest.schema.json    # Parity-fixture manifest schema
+│   │   ├── gsa/
+│   │   ├── interspec/
+│   │   ├── nasa_gamma/
+│   │   ├── kaywin_k0/
+│   │   └── prospect_offline/
+│   └── ...                         # Test spectrum files (N42, CHN, SPC, ...)
 ├── regression/                     # Regression snapshots
 └── ...
 
@@ -1054,8 +1144,8 @@ by dependency and impact. All Stage 0 items must complete before Stage 1 begins.
 | # | Action | Area | Phase |
 |---|---|---|---|
 | S0.1 | Create milestones, labels, issue templates, project board (§2.1–2.4) | area/docs | M0 |
-| S0.2 | Open all 10 epics (§2.5) | area/docs | M0 |
-| S0.3 | Open first 25 issues (§2.6) | area/docs | M0 |
+| S0.2 | Open tracked epics (§2.5 and §2.7 as the roadmap grows) | area/docs | M0 |
+| S0.3 | Open seed issues (§2.6 and approved follow-on issue sets such as §2.7) | area/docs | M0 |
 | S0.4 | Write and merge ADR-001 through ADR-007 (§5) | area/adr | M0 |
 | S0.5 | Scaffold `docs/adr/`, `tests/spectra/`, `.github/ISSUE_TEMPLATE/` | area/docs | M0 |
 
@@ -1132,7 +1222,50 @@ by dependency and impact. All Stage 0 items must complete before Stage 1 begins.
 | 3.14 | Implement batch analysis queue + ProcessPoolExecutor workers | area/gui | Per-spectrum JSON + aggregate CSV |
 | 3.15 | Add GPU-accelerated batch inference via optional CuPy (§7 unfolding/gpu_backend.py) | area/performance | Falls back to CPU if CuPy unavailable |
 
-### Phase 4 — MCA / Live Acquisition (Future)
+### Phase 3B — Offline Spectroscopy Parity (Current Module)
+
+This module is driven by `testing/writeup.md` sections `19` through `24`.
+Already-complete rows stay complete; only parity gaps and hardening work reopen.
+Scope is limited to offline analysis, reference-data workflows, and GUI/UX parity.
+MCA/live acquisition/device control remains deferred to Phase 4.
+
+All user-selectable methods added in this module must be registry-backed rather
+than introduced through new `if/elif` branches. Session files and exported
+reports must extend provenance to record `overlay_role`,
+`reference_library_id`, `peak_search_method`, `background_method`,
+`fitter_method`, `efficiency_model`, and `parity_case_id`.
+
+#### Phase 3B Source Crosswalk
+
+| Source repo | Source feature | FluxForge status | Existing evidence | New parity step | Fixture source | GUI source |
+|---|---|---|---|---|---|---|
+| `GSA-v2` / `GSA-v4` | Mariscotti-style peak search, explicit ROI/background workflow, overlap decomposition | `complete` | `2.4`, `2.9`, `2.14`, `3.16` | `3.16` | `testing/GSA-v2/example/`, `testing/GSA-v4/Spectrum/`, `testing/GSA-v4/Parameters/Parameters.txt` | `GSA-v4` |
+| `GSA-v2` / `GSA-v4` | Efficiency families, detector slots, activity parity, transparent coefficient files | `partial` | `2.11`, `2.12`, `2.13` | `3.17`, `3.18` | `testing/GSA-v2/Detectors/`, `testing/GSA-v4/Calibration/` | `GSA-v4` |
+| `GSA-v4` | Multi-spectrum ROI statistics and detector-consistency study | `partial` | `3.14`, `3.16` | `3.16`, `3.20`, `3.25` | `testing/GSA-v4/ROI_Statistic/` | `GSA-v4` |
+| `InterSpec` | Role-aware foreground/background/secondary overlays and direct chart manipulation | `partial` | `2.17`, `4P.7` | `3.24`, `3.26` | `testing/InterSpec/` | `InterSpec` |
+| `InterSpec` | Detection limit, relative activity, dose/shielding/material calculators | `missing` | `2.12` and `3.8` cover only activity + MDA basics | `3.18`, `3.19`, `3.25` | `testing/InterSpec/src/DetectionLimitSimple.cpp`, `src/RelAct*.cpp`, `src/DoseCalc*.cpp` | `InterSpec` |
+| `InterSpec` | File query, compact file management, batch compare, calibration preserve/multifile | `partial` | `1.11`, `3.14` | `3.17`, `3.20`, `3.25` | `testing/InterSpec/src/SpecFileQueryWidget.cpp`, `src/EnergyCalMultiFile.cpp` | `InterSpec` |
+| `NASA-gamma` | Modular analysis pipeline, peak-search variants, advanced fit, repeated-run diagnostics | `partial` | `1.11`, `2.4`, `2.9`, `3.16` | `3.16`, `3.17`, `3.20`, `3.22` | `testing/NASA-gamma/nasagamma/`, `testing/NASA-gamma/examples/` | `NASA-gamma` |
+| `NASA-gamma` | Expanded reference-data families: common lab, natural, capture, inelastic, delayed activation | `missing` | `1.13`, `2.22` only cover the current bundled library path | `3.18`, `3.21` | `testing/NASA-gamma/nasagamma/data/` | `NASA-gamma` |
+| `KayWinV410` | k0-NAA detector/facility characterization and governed irradiation/report workflows | `missing` | no current roadmap step covers this family | `3.20`, `3.22`, `3.25` | `testing/KayWinV410/` workspace bundle | `KayWinV410` |
+| `prospect_trial_installation` | Offline ROI/report/export/spectrogram workstation behaviors, excluding hardware control | `partial` | `3.13`; `4.4` reserved only | `3.24`, `3.25`, `3.27` | `testing/prospect_trial_installation/ProSpect User's Manual.pdf` | `ProSpect` |
+
+| # | Action | Area | Notes |
+|---|---|---|---|
+| 3.16 | Implement peak-search / background / ROI parity | area/core + area/gui | Mariscotti/second-derivative search, explicit GSA-style ROI/background workflows, overlapping-peak decomposition, manual sideband net-area tool, ROI-statistics workflow for many spectra |
+| 3.17 | Implement calibration / efficiency parity | area/calibration | Finish detector-slot workflows, keep all four GSA efficiency models first-class, add NASA-style smart calibration helpers, add preserve/fine-tune flows |
+| 3.18 | Implement identification / activity / reference parity | area/core + area/nuclide-db | Editable text libraries, richer energy-window search, reference-line overlays, relative activity, source-age/decay-chain views, pinned mixtures, natural/capture/inelastic/common-lab libraries |
+| 3.19 | Implement operational calculator parity | area/core | Detection-limit workspace, dose + shielding + attenuation/material tools, units conversion, source/shield fit surfaces, offline report calculators |
+| 3.20 | Implement archive / batch / k0 parity | area/core + area/gui | InterSpec-style file query + batch compare, GSA multi-spectrum review, KayWin-derived detector/facility characterization and governed k0 session/report flows, but no hardware control |
+| 3.21 | Curate repo-backed parity fixtures | area/testing | Ingest fixtures into `tests/spectra/reference_parity/` with per-case manifests containing `source_repo`, `source_case`, `input_files`, `workflow`, `expected_outputs`, `tolerances`, and `provenance_notes` |
+| 3.22 | Add algorithm-level parity tests | area/testing | Parser, calibration, peak search, fit, activity, detection-limit, dose/shielding, and k0 parity tests against curated fixtures |
+| 3.23 | Add workflow-level parity tests | area/testing | End-to-end "same input -> same workflow -> nearly same result" suites for each source family with source-linked golden outputs |
+| 3.24 | Implement direct-manipulation canvas parity | area/gui | Right-click peak add/delete/move, ROI edge dragging, background handles, peak-label toggles, sum-line overlays, and explicit foreground/background/secondary role actions |
+| 3.25 | Implement new parity workspaces in the modern Qt shell | area/gui | ROI Statistics, Detection Limit, Dose/Shielding, Relative Activity, File Query/Batch Compare, Reference/Library Workbench, and k0 characterization/report views |
+| 3.26 | Implement GUI polish parity, first-class dark mode, and saved themes | area/gui | InterSpec-style role-aware overlays, a shipped dark theme plus saved theme profiles, better calculator/report launch points, and GSA-style graph-plus-table synchronization |
+| 3.27 | Add GUI verification, artifact review, and release checklist | area/testing | Qt workflow tests, native probe scripts, artifact-gallery review states, and a release-blocking acceptance checklist for all new offline parity surfaces |
+
+### Phase 4 — MCA / Live Acquisition (Deferred Until Phase 3B Closes)
 
 | # | Action | Area | Notes |
 |---|---|---|---|

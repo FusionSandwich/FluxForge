@@ -149,6 +149,21 @@
         "Built-in bootstrap path exists without locking the project to a single implementation."
       ],
       "children": ["I08"]
+    },
+    {
+      "id": "E11",
+      "title": "Offline spectroscopy parity module",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/core",
+      "type": "type/epic",
+      "priority": "priority/p1-critical",
+      "summary": "Implement offline analysis and GUI parity against the newly added `testing/` repos without reopening already-complete work except where parity hardening is still missing.",
+      "definition_of_done": [
+        "Repo-to-feature crosswalk exists and is tied to step ownership.",
+        "Parity fixtures and tolerance manifests exist for each source family.",
+        "Modern Qt workflows can reproduce the required offline analysis and GUI behaviors."
+      ],
+      "children": ["I26", "I27", "I28", "I29", "I30", "I31", "I32", "I33", "I34", "I35", "I36", "I37", "I38"]
     }
   ],
   "issues": [
@@ -495,6 +510,188 @@
       "acceptance_criteria": [
         "Theme asset files exist in the new GUI package.",
         "Theme switching remains tracked alongside ModeManager."
+      ]
+    },
+    {
+      "id": "I26",
+      "title": "Build repo-to-feature crosswalk and parity tracker matrix",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/docs",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Translate `testing/writeup.md` sections 19 through 24 into a governed FluxForge parity matrix with step ownership, fixture provenance, and GUI-source mapping.",
+      "acceptance_criteria": [
+        "A crosswalk table exists with source repo, feature, FluxForge status, evidence, parity step, fixture source, and GUI source.",
+        "No already-complete roadmap row is reopened unless parity hardening is explicitly called out."
+      ]
+    },
+    {
+      "id": "I27",
+      "title": "Implement peak-search, background, and ROI parity",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/core",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Add GSA and NASA-inspired peak-search, explicit ROI/background workflows, overlap decomposition, and ROI-statistics groundwork.",
+      "acceptance_criteria": [
+        "Registry-backed peak-search and background methods cover the planned parity methods.",
+        "The modern Qt shell can support manual ROI/background edits and overlapping-peak workflows."
+      ]
+    },
+    {
+      "id": "I28",
+      "title": "Implement calibration and efficiency parity workflows",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/calibration",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Extend calibration and efficiency tooling with detector-slot handling, GSA efficiency families, and preserve/fine-tune style workflows.",
+      "acceptance_criteria": [
+        "All four GSA efficiency models remain first-class selectable methods.",
+        "Detector-slot, calibration-preserve, and calibration-fine-tune flows are tracked in the modern Qt shell."
+      ]
+    },
+    {
+      "id": "I29",
+      "title": "Implement identification, activity, and reference-data parity",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/core",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Add editable line libraries, richer energy-window search, reference overlays, relative activity, and expanded decay/reference workflows.",
+      "acceptance_criteria": [
+        "Reference-library handling covers the new source families called out in the writeup.",
+        "Session/report provenance records the selected library and relevant analysis-method metadata."
+      ]
+    },
+    {
+      "id": "I30",
+      "title": "Implement operational calculator parity",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/core",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Add detection-limit, dose, shielding, attenuation/material, gamma-count, and units-conversion tools inspired by InterSpec and ProSpect.",
+      "acceptance_criteria": [
+        "Calculator methods are registry-backed where multiple defensible methods exist.",
+        "The planned offline calculator outputs can be covered by parity fixtures and exported reports."
+      ]
+    },
+    {
+      "id": "I31",
+      "title": "Implement archive, batch, and k0 parity workflows",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/core",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Add InterSpec-style file query and batch-compare flows, GSA ROI statistics review, and KayWin-derived k0/NAA workflows without adding hardware control.",
+      "acceptance_criteria": [
+        "Offline archive/batch flows cover file query, comparison, and governed report/session output.",
+        "k0 workflows remain explicitly offline and separate from HAL/device-control work."
+      ]
+    },
+    {
+      "id": "I32",
+      "title": "Curate repo-backed parity fixtures and manifests",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/testing",
+      "type": "type/feature",
+      "priority": "priority/p0-blocking",
+      "summary": "Build the parity fixture inventory from the new source repos with reproducible provenance metadata and declared tolerances.",
+      "acceptance_criteria": [
+        "Fixture families exist for GSA, InterSpec, NASA-gamma, KayWin, and ProSpect offline cases.",
+        "Each curated case records source repo, source case, workflow, expected outputs, tolerances, and provenance notes."
+      ]
+    },
+    {
+      "id": "I33",
+      "title": "Add algorithm-level parity tests",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/testing",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Add deterministic parity tests for parsing, calibration, peak search, fit, activity, calculators, and k0 workflows against curated fixtures.",
+      "acceptance_criteria": [
+        "Deterministic algorithms have explicit tolerance targets and fixture-backed assertions.",
+        "Parity tests distinguish exact/near-exact cases from fit-driven tolerance bands."
+      ]
+    },
+    {
+      "id": "I34",
+      "title": "Add workflow-level parity tests",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/testing",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Exercise end-to-end offline workflows so FluxForge reproduces nearly the same outputs as the source applications when given the same data.",
+      "acceptance_criteria": [
+        "Each source family has at least one end-to-end parity workflow with source-linked golden outputs.",
+        "Workflow tests record tolerated differences instead of hiding them in undocumented approximations."
+      ]
+    },
+    {
+      "id": "I35",
+      "title": "Implement direct-manipulation canvas parity",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Bring the main chart interaction model closer to GSA-v4 and InterSpec with right-click edits, drag handles, and role-aware overlay controls.",
+      "acceptance_criteria": [
+        "Peaks, ROI bounds, and backgrounds can be manipulated directly on the chart.",
+        "Foreground/background/secondary actions are first-class interactions in the modern Qt shell."
+      ]
+    },
+    {
+      "id": "I36",
+      "title": "Implement new parity workspaces in the modern Qt shell",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Add dedicated Qt workspaces for ROI statistics, detection limit, dose/shielding, relative activity, file query/batch compare, reference libraries, and k0 reports.",
+      "acceptance_criteria": [
+        "Each major parity workflow has a dedicated modern Qt surface instead of relying on the legacy Tk path.",
+        "Graph/table synchronization remains intact across the new workspaces."
+      ]
+    },
+    {
+      "id": "I37",
+      "title": "Implement GUI polish parity and saved themes",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/gui",
+      "type": "type/feature",
+      "priority": "priority/p2-normal",
+      "summary": "Add role-aware overlays, saved theme profiles, improved launch points, and higher-fidelity graph/table synchronization polish.",
+      "acceptance_criteria": [
+        "Theme handling supports saved profiles and central color-token governance.",
+        "Parity surfaces match the intended interaction polish without creating a second GUI shell."
+      ]
+    },
+    {
+      "id": "I38",
+      "title": "Add GUI verification and artifact review for parity surfaces",
+      "epic": "E11",
+      "milestone": "M3B \u2014 Offline Spectroscopy Parity",
+      "area": "area/testing",
+      "type": "type/feature",
+      "priority": "priority/p1-critical",
+      "summary": "Extend the native Qt verification strategy to the new parity workspaces with artifact galleries and release-blocking acceptance checks.",
+      "acceptance_criteria": [
+        "Qt workflow tests and native probes cover the new parity surfaces.",
+        "Release gating includes an explicit acceptance checklist for the offline-parity GUI module."
       ]
     }
   ]

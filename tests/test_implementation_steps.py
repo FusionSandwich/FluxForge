@@ -16,7 +16,7 @@ def test_ordered_tracker_has_single_next_step():
     next_steps = [step for step in steps if step["sequence_status"] == "next"]
 
     assert len(next_steps) == 1
-    assert next_steps[0]["id"] == "4.1"
+    assert next_steps[0]["id"] == "3.17"
 
 
 def test_stage0_gate_is_closed_live():
@@ -116,11 +116,18 @@ def test_advanced_analysis_module_completion_is_recorded_in_sequence():
         assert steps[step_id]["sequence_status"] == "complete"
 
 
-def test_hal_step_is_explicit_after_advanced_analysis_completion():
+def test_offline_parity_block_is_explicit_before_hal_work():
     steps = {step["id"]: step for step in load_steps()["steps"]}
 
+    assert steps["3.16"]["repo_status"] == "complete"
+    assert steps["3.16"]["sequence_status"] == "complete"
+    assert steps["3.17"]["repo_status"] == "not-started"
+    assert steps["3.17"]["sequence_status"] == "next"
+    for step_id in ("3.18", "3.19", "3.20", "3.21", "3.22", "3.23", "3.24", "3.25", "3.26", "3.27"):
+        assert steps[step_id]["sequence_status"] == "pending"
+
     assert steps["4.1"]["repo_status"] == "not-started"
-    assert steps["4.1"]["sequence_status"] == "next"
+    assert steps["4.1"]["sequence_status"] == "pending"
     for step_id in ("4.2", "4.3", "4.4"):
         assert steps[step_id]["sequence_status"] == "pending"
 

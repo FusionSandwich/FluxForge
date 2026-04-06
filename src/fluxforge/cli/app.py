@@ -41,6 +41,11 @@ from fluxforge.core.response import (
     build_response_matrix,
 )
 from fluxforge.core.schemas import validate_or_raise
+from fluxforge.core.analysis_workspace import (
+    analyze_roi_region,
+    compute_roi_statistics,
+    detect_peak_candidates,
+)
 from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
 from fluxforge.data.efficiency_models import EfficiencyModel
 from fluxforge.data.kayzero_k0 import (
@@ -640,6 +645,87 @@ def _ingest_spectrum(
     )
 
 
+def _resolve_cli_roi_bounds(
+    args: argparse.Namespace,
+    spectrum: GammaSpectrum,
+) -> tuple[float, float]:
+    left_keV = getattr(args, "left_keV", None)
+    right_keV = getattr(args, "right_keV", None)
+    if left_keV is not None and right_keV is not None:
+        return tuple(sorted((float(left_keV), float(right_keV))))
+
+    left_channel = getattr(args, "left_channel", None)
+    right_channel = getattr(args, "right_channel", None)
+    if left_channel is not None and right_channel is not None:
+        return tuple(
+            sorted(
+                (
+                    float(spectrum.channel_to_energy(int(left_channel))),
+                    float(spectrum.channel_to_energy(int(right_channel))),
+                )
+            )
+        )
+    raise ValueError(
+        "ROI bounds require either --left-keV/--right-keV or --left-channel/--right-channel."
+    )
+
+
+def _roi_analysis_payload(result: Any) -> Dict[str, Any]:
+    return {
+        "label": result.label,
+        "roi_bounds_keV": list(result.roi_bounds_keV),
+        "gross_counts": result.gross_counts,
+        "gross_counts_uncertainty": result.gross_counts_uncertainty,
+        "background_counts": result.background_counts,
+        "background_counts_uncertainty": result.background_counts_uncertainty,
+        "net_counts": result.net_counts,
+        "net_counts_uncertainty": result.net_counts_uncertainty,
+        "centroid_keV": result.centroid_keV,
+        "centroid_uncertainty_keV": result.centroid_uncertainty_keV,
+        "significance": result.significance,
+        "background_method": result.background_method,
+        "peak_search_method": result.peak_search_method,
+        "sideband_bounds_keV": [list(bounds) for bounds in result.sideband_bounds_keV],
+        "overlap_components": [
+            {
+                "centroid_channel": component.centroid_channel,
+                "centroid_keV": component.centroid_keV,
+                "net_counts": component.net_counts,
+                "net_counts_uncertainty": component.net_counts_uncertainty,
+                "fwhm_channels": component.fwhm_channels,
+                "reduced_chi_squared": component.reduced_chi_squared,
+            }
+            for component in result.overlap_components
+        ],
+        "notes": list(result.notes),
+    }
+
+
+def _roi_statistics_payload(result: Any) -> Dict[str, Any]:
+    return {
+        "label": result.label,
+        "roi_bounds_keV": list(result.roi_bounds_keV),
+        "sample_count": result.sample_count,
+        "mean_net_counts": result.mean_net_counts,
+        "stdev_net_counts": result.stdev_net_counts,
+        "relative_std": result.relative_std,
+        "mean_centroid_keV": result.mean_centroid_keV,
+        "stdev_centroid_keV": result.stdev_centroid_keV,
+        "min_net_counts": result.min_net_counts,
+        "max_net_counts": result.max_net_counts,
+        "samples": [
+            {
+                "label": sample.label,
+                "net_counts": sample.net_counts,
+                "net_counts_uncertainty": sample.net_counts_uncertainty,
+                "centroid_keV": sample.centroid_keV,
+                "significance": sample.significance,
+            }
+            for sample in result.samples
+        ],
+    }
+
+
 def _print_warning_messages(messages: List[str]) -> None:
     if not messages:
         print("Warnings: none")
@@ -980,6 +1066,47 @@ def cmd_peaks(args: argparse.Namespace) -> None:
         if spectrum.energies is not None
         else spectrum.channels.astype(float)
     )
+    method = str(getattr(args, "method", "segmented"))
+    if method != "segmented":
+        candidates = detect_peak_candidates(
+            spectrum,
+            method=method,
+            max_peaks=int(getattr(args, "max_peaks", 12)),
+        )
+        peak_payload = [
+            {
+                "channel": int(round(peak.channel)),
+                "energy_keV": peak.energy_keV,
+                "amplitude": peak.net_counts,
+                "raw_counts": peak.net_counts,
+                "sigma_keV": 0.0,
+                "area": peak.net_counts,
+                "region": f"{peak.roi_bounds_keV[0]:.3f}:{peak.roi_bounds_keV[1]:.3f}",
+                "is_report": bool(peak.nuclide),
+                "report_isotope": peak.nuclide or "",
+                "report_file": "",
+                "label": peak.peak_id,
+                "manual": False,
+                "left_energy_keV": peak.roi_bounds_keV[0],
+                "right_energy_keV": peak.roi_bounds_keV[1],
+                "net_counts": peak.net_counts,
+                "net_counts_unc": np.sqrt(max(peak.net_counts, 0.0)),
+                "significance": peak.significance,
+                "fit_quality": peak.fit_quality,
+                "peak_search_method": method,
+            }
+            for peak in candidates
+        ]
+        write_peak_report(
+            args.output,
+            spectrum_id=spectrum.spectrum_id,
+            live_time_s=spectrum.live_time,
+            peaks=peak_payload,
+            source_path=args.spectrum_file,
+        )
+        print(f"Wrote peak report to {args.output}")
+        return
+
     if args.sensitivity == "sensitive":
         config = SegmentedDetectionConfig.sensitive()
     elif args.sensitivity == "conservative":
@@ -1006,6 +1133,7 @@ def cmd_peaks(args: argparse.Namespace) -> None:
             "is_report": peak.is_report,
             "report_isotope": peak.report_isotope,
             "report_file": peak.report_file,
+            "peak_search_method": method,
         }
         for peak in peaks
     ]
@@ -1018,6 +1146,113 @@ def cmd_peaks(args: argparse.Namespace) -> None:
         source_path=args.spectrum_file,
     )
     print(f"Wrote peak report to {args.output}")
+
+
+def cmd_roi_analyze(args: argparse.Namespace) -> None:
+    profile_name = getattr(args, "profile", None)
+    energy_override = _parse_csv_floats(getattr(args, "energy_calibration", None))
+    efficiency_override = _parse_efficiency_override(
+        getattr(args, "efficiency_coefficients", None)
+    )
+    if efficiency_override is None:
+        efficiency_override = _profile_efficiency_override(profile_name)
+
+    background_file: Optional[Path] = getattr(args, "background_file", None)
+    if background_file is None:
+        background_file = _profile_background_file(profile_name)
+
+    background = None
+    if background_file is not None:
+        background = _load_spectrum_from_path(
+            background_file,
+            validate=args.validate,
+            energy_override=energy_override,
+            efficiency_override=efficiency_override,
+        )
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        raw_spectrum, _analysis_spectrum = _load_plot_and_analysis_spectra(
+            args.input,
+            validate=args.validate,
+            energy_override=energy_override,
+            efficiency_override=efficiency_override,
+            background=background,
+            background_scale_mode=getattr(args, "background_scale_mode", "live"),
+            background_scale_factor=getattr(args, "background_scale_factor", None),
+            use_background_subtracted=False,
+        )
+        roi_bounds = _resolve_cli_roi_bounds(args, raw_spectrum)
+        result = analyze_roi_region(
+            raw_spectrum,
+            roi_bounds_keV=roi_bounds,
+            label=str(getattr(args, "label", None) or raw_spectrum.spectrum_id or "ROI"),
+            background_method=str(getattr(args, "background_method", "roi_sideband")),
+            peak_search_method=str(getattr(args, "peak_search_method", "mariscotti")),
+            sideband_width_keV=getattr(args, "sideband_width_keV", None),
+            background_spectrum=background,
+            background_mode={
+                "manual": "scaled",
+                "live": "statistical",
+                "real": "statistical",
+            }.get(str(getattr(args, "background_scale_mode", "live")), "statistical"),
+            background_scale=float(getattr(args, "background_scale_factor", 1.0) or 1.0),
+            decompose_overlaps=bool(getattr(args, "decompose_overlaps", False)),
+            max_components=int(getattr(args, "max_components", 3)),
+        )
+
+    payload = {
+        "schema": "fluxforge.roi_analysis.v1",
+        "spectrum_id": raw_spectrum.spectrum_id,
+        "analysis": _roi_analysis_payload(result),
+    }
+    _ensure_parent_dir(args.output)
+    args.output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Wrote ROI analysis to {args.output}")
+    _print_warning_messages([str(record.message) for record in caught])
+
+
+def cmd_roi_statistics(args: argparse.Namespace) -> None:
+    profile_name = getattr(args, "profile", None)
+    energy_override = _parse_csv_floats(getattr(args, "energy_calibration", None))
+    efficiency_override = _parse_efficiency_override(
+        getattr(args, "efficiency_coefficients", None)
+    )
+    if efficiency_override is None:
+        efficiency_override = _profile_efficiency_override(profile_name)
+
+    loaded: list[tuple[str, GammaSpectrum]] = []
+    first_spectrum: GammaSpectrum | None = None
+    for path in getattr(args, "inputs", []):
+        spectrum = _load_spectrum_from_path(
+            path,
+            validate=args.validate,
+            energy_override=energy_override,
+            efficiency_override=efficiency_override,
+        )
+        loaded.append((Path(path).name, spectrum))
+        if first_spectrum is None:
+            first_spectrum = spectrum
+    if first_spectrum is None:
+        raise ValueError("At least one ROI statistics input spectrum is required.")
+
+    roi_bounds = _resolve_cli_roi_bounds(args, first_spectrum)
+    result = compute_roi_statistics(
+        loaded,
+        roi_bounds_keV=roi_bounds,
+        label=str(getattr(args, "label", None) or "ROI Statistics"),
+        background_method=str(getattr(args, "background_method", "roi_sideband")),
+        peak_search_method=str(getattr(args, "peak_search_method", "mariscotti")),
+        sideband_width_keV=getattr(args, "sideband_width_keV", None),
+    )
+
+    payload = {
+        "schema": "fluxforge.roi_statistics.v1",
+        "statistics": _roi_statistics_payload(result),
+    }
+    _ensure_parent_dir(args.output)
+    args.output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Wrote ROI statistics to {args.output}")
 
 
 def cmd_activity(args: argparse.Namespace) -> None:
@@ -3173,8 +3408,101 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Use the background-subtracted spectrum to compute manual ROI areas",
     )
+    peaks.add_argument(
+        "--method",
+        choices=["segmented", "mariscotti", "second_difference", "nasa_peaksearch"],
+        default="segmented",
+        help="Peak-search method for automatic detection from a spectrum artifact",
+    )
+    peaks.add_argument(
+        "--max-peaks",
+        type=int,
+        default=12,
+        help="Maximum number of auto-detected peaks when using a parity peak-search method",
+    )
     _add_validate_option(peaks)
     peaks.set_defaults(func=cmd_peaks)
+
+    roi_analyze = subparsers.add_parser(
+        "roi-analyze",
+        help="Analyze one explicit ROI with sideband/SNIP background handling and optional overlap decomposition",
+    )
+    roi_analyze.add_argument("--input", type=Path, required=True)
+    roi_analyze.add_argument("--output", type=Path, default=Path("roi_analysis.json"))
+    roi_analyze.add_argument("--label", type=str, default=None)
+    roi_analyze.add_argument("--left-keV", type=float, default=None)
+    roi_analyze.add_argument("--right-keV", type=float, default=None)
+    roi_analyze.add_argument("--left-channel", type=int, default=None)
+    roi_analyze.add_argument("--right-channel", type=int, default=None)
+    roi_analyze.add_argument(
+        "--background-method",
+        choices=["roi_sideband", "snip", "linear_minima"],
+        default="roi_sideband",
+    )
+    roi_analyze.add_argument(
+        "--peak-search-method",
+        choices=["mariscotti", "second_difference", "nasa_peaksearch"],
+        default="mariscotti",
+    )
+    roi_analyze.add_argument("--sideband-width-keV", type=float, default=4.0)
+    roi_analyze.add_argument("--decompose-overlaps", action="store_true")
+    roi_analyze.add_argument("--max-components", type=int, default=3)
+    roi_analyze.add_argument(
+        "--profile",
+        type=str,
+        default=None,
+        choices=list_rafm_profiles(),
+        help="Bundled detector/background preset to apply before explicit user overrides",
+    )
+    roi_analyze.add_argument("--background-file", type=Path, default=None)
+    roi_analyze.add_argument(
+        "--background-scale-mode",
+        choices=["live", "real", "manual"],
+        default="live",
+    )
+    roi_analyze.add_argument("--background-scale-factor", type=float, default=None)
+    roi_analyze.add_argument("--energy-calibration", type=str, default=None)
+    roi_analyze.add_argument("--efficiency-coefficients", type=str, default=None)
+    _add_validate_option(roi_analyze)
+    roi_analyze.set_defaults(func=cmd_roi_analyze)
+
+    roi_statistics = subparsers.add_parser(
+        "roi-statistics",
+        help="Run the same ROI across many spectra and summarize detector-consistency statistics",
+    )
+    roi_statistics.add_argument("--inputs", type=Path, nargs="+", required=True)
+    roi_statistics.add_argument(
+        "--output",
+        type=Path,
+        default=Path("roi_statistics.json"),
+    )
+    roi_statistics.add_argument("--label", type=str, default=None)
+    roi_statistics.add_argument("--left-keV", type=float, default=None)
+    roi_statistics.add_argument("--right-keV", type=float, default=None)
+    roi_statistics.add_argument("--left-channel", type=int, default=None)
+    roi_statistics.add_argument("--right-channel", type=int, default=None)
+    roi_statistics.add_argument(
+        "--background-method",
+        choices=["roi_sideband", "snip", "linear_minima"],
+        default="roi_sideband",
+    )
+    roi_statistics.add_argument(
+        "--peak-search-method",
+        choices=["mariscotti", "second_difference", "nasa_peaksearch"],
+        default="mariscotti",
+    )
+    roi_statistics.add_argument("--sideband-width-keV", type=float, default=4.0)
+    roi_statistics.add_argument(
+        "--profile",
+        type=str,
+        default=None,
+        choices=list_rafm_profiles(),
+        help="Bundled detector/background preset to apply before explicit user overrides",
+    )
+    roi_statistics.add_argument("--energy-calibration", type=str, default=None)
+    roi_statistics.add_argument("--efficiency-coefficients", type=str, default=None)
+    _add_validate_option(roi_statistics)
+    roi_statistics.set_defaults(func=cmd_roi_statistics)
 
     activity = subparsers.add_parser(
         "activity", help="Compute line activities from peak report"

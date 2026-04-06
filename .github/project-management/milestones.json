@@ -20,6 +20,10 @@
     "description": "ASTM modules, QA monitoring, standards locking, and compliance reporting."
   },
   {
+    "title": "M3B \u2014 Offline Spectroscopy Parity",
+    "description": "Offline spectroscopy parity against the newly added testing repos, including parity fixtures, reference workflows, and GUI parity."
+  },
+  {
     "title": "M5 \u2014 MCA Foundations",
     "description": "HAL drivers, live acquisition, device status integration, and dashboard groundwork."
   },

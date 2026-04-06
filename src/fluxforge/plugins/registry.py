@@ -131,6 +131,12 @@ class PluginRegistry(Generic[T]):
 class PluginRegistries:
     """Named registries for the analytical surfaces defined in the roadmap."""
 
+    peak_search_methods: PluginRegistry[Any] = field(
+        default_factory=lambda: PluginRegistry("peak_search_methods")
+    )
+    roi_background_models: PluginRegistry[Any] = field(
+        default_factory=lambda: PluginRegistry("roi_background_models")
+    )
     peak_fitters: PluginRegistry[Any] = field(
         default_factory=lambda: PluginRegistry("peak_fitters")
     )
@@ -154,6 +160,8 @@ class PluginRegistries:
         """Clear every registry."""
 
         for registry in (
+            self.peak_search_methods,
+            self.roi_background_models,
             self.peak_fitters,
             self.unfolders,
             self.calibration_models,

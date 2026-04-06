@@ -21,9 +21,12 @@ def test_stage0_tracker_counts_and_integrity():
     label_names = {item["name"] for item in labels}
     epic_ids = {item["id"] for item in issues["epics"]}
 
-    assert len(milestones) == 7
-    assert len(issues["epics"]) == 10
-    assert len(issues["issues"]) == 25
+    # The tracker is additive: later roadmap modules can append milestones and
+    # planning items, but the Stage 0 baseline must remain present.
+    assert len(milestones) >= 7
+    assert len(issues["epics"]) >= 10
+    assert len(issues["issues"]) >= 25
+    assert "M3B — Offline Spectroscopy Parity" in milestone_titles
     assert "area/adr" in label_names
     assert "type/adr" in label_names
     assert "priority/p0-blocking" in label_names

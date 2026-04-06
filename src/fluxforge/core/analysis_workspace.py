@@ -11,7 +11,8 @@ import numpy as np
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
 from fluxforge.analysis.efficiency_models import semi_empirical_efficiency
-from fluxforge.analysis.peakfit import auto_find_peaks
+from fluxforge.analysis.peak_finders import get_peak_finder
+from fluxforge.analysis.peakfit import auto_find_peaks, estimate_background, fit_multiple_peaks
 from fluxforge.data.efficiency import EfficiencyCurve
 from fluxforge.data.gamma_database import FLUXFORGE_GAMMA_DATA, GammaDatabase
 from fluxforge.data.nuclear_data_sources import load_gamma_identification_source
@@ -54,6 +55,25 @@ class SpectralPhenomenonEstimate:
 
 
 @dataclass(frozen=True)
+class PeakSearchMethodDefinition:
+    """Registered peak-search metadata."""
+
+    key: str
+    label: str
+    finder_key: str
+    summary: str
+
+
+@dataclass(frozen=True)
+class ROIBackgroundMethodDefinition:
+    """Registered ROI/background workflow metadata."""
+
+    key: str
+    label: str
+    summary: str
+
+
+@dataclass(frozen=True)
 class EfficiencyModelDefinition:
     """Registered efficiency-model metadata."""
 
@@ -89,6 +109,68 @@ class ActivityCalculationResult:
     half_life_s: float
     source_age_s: float
     chain_summary: str
+
+
+@dataclass(frozen=True)
+class ROIComponentFit:
+    """One deconvolved peak component inside an ROI."""
+
+    centroid_channel: float
+    centroid_keV: float
+    net_counts: float
+    net_counts_uncertainty: float
+    fwhm_channels: float
+    reduced_chi_squared: float
+
+
+@dataclass(frozen=True)
+class ROIAnalysisResult:
+    """Explicit ROI/background analysis payload shared by CLI and GUI."""
+
+    label: str
+    roi_bounds_keV: tuple[float, float]
+    gross_counts: float
+    gross_counts_uncertainty: float
+    background_counts: float
+    background_counts_uncertainty: float
+    net_counts: float
+    net_counts_uncertainty: float
+    centroid_keV: float
+    centroid_uncertainty_keV: float
+    significance: float
+    background_method: str
+    peak_search_method: str
+    sideband_bounds_keV: tuple[tuple[float, float], tuple[float, float]]
+    overlap_components: tuple[ROIComponentFit, ...] = ()
+    notes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ROISpectrumStatistic:
+    """ROI result for one spectrum in a multi-spectrum statistics workflow."""
+
+    label: str
+    net_counts: float
+    net_counts_uncertainty: float
+    centroid_keV: float
+    significance: float
+
+
+@dataclass(frozen=True)
+class ROIStatisticsResult:
+    """Summary statistics for the same ROI across many spectra."""
+
+    label: str
+    roi_bounds_keV: tuple[float, float]
+    sample_count: int
+    mean_net_counts: float
+    stdev_net_counts: float
+    relative_std: float
+    mean_centroid_keV: float
+    stdev_centroid_keV: float
+    min_net_counts: float
+    max_net_counts: float
+    samples: tuple[ROISpectrumStatistic, ...]
 
 
 @dataclass(frozen=True)
@@ -197,6 +279,92 @@ def register_builtin_nuclide_id_engines(
         description=MLPeakAnalysisEngine.summary,
         tags=("analysis", "id", "ml", "onnx"),
     )
+    return registries
+
+
+def register_builtin_peak_search_methods(
+    registries: PluginRegistries,
+) -> PluginRegistries:
+    """Register the built-in peak-search methods used by 3.16."""
+
+    registries.peak_search_methods.clear()
+    for key, label, finder_key, summary, recommended in (
+        (
+            "mariscotti",
+            "Mariscotti",
+            "second_difference",
+            "Second-difference peak search tuned for explicit ROI review and classic GSA-style workflows.",
+            True,
+        ),
+        (
+            "second_difference",
+            "Second Difference",
+            "second_difference",
+            "FluxForge second-difference search for sharp peaks against smooth continua.",
+            False,
+        ),
+        (
+            "nasa_peaksearch",
+            "NASA Peak Search",
+            "scipy",
+            "Smoothed SciPy peak search inspired by modular NASA-gamma analysis flows.",
+            False,
+        ),
+    ):
+        registries.peak_search_methods.register(
+            key,
+            PeakSearchMethodDefinition(
+                key=key,
+                label=label,
+                finder_key=finder_key,
+                summary=summary,
+            ),
+            description=summary,
+            recommended=recommended,
+            tags=("analysis", "peaks", "roi"),
+            set_default=recommended,
+        )
+    return registries
+
+
+def register_builtin_roi_background_methods(
+    registries: PluginRegistries,
+) -> PluginRegistries:
+    """Register the built-in ROI/background workflows used by 3.16."""
+
+    registries.roi_background_models.clear()
+    for key, label, summary, recommended in (
+        (
+            "roi_sideband",
+            "ROI Sideband",
+            "Explicit sideband background estimate using analyst-visible left/right continuum windows.",
+            True,
+        ),
+        (
+            "snip",
+            "SNIP",
+            "Statistics-sensitive nonlinear peak clipping for continuum estimation beneath the ROI.",
+            False,
+        ),
+        (
+            "linear_minima",
+            "Linear Minima",
+            "Linear-minima continuum estimate across the ROI while excluding the current peak bounds.",
+            False,
+        ),
+    ):
+        registries.roi_background_models.register(
+            key,
+            ROIBackgroundMethodDefinition(
+                key=key,
+                label=label,
+                summary=summary,
+            ),
+            description=summary,
+            recommended=recommended,
+            tags=("analysis", "background", "roi"),
+            set_default=recommended,
+        )
     return registries
 
 
@@ -348,9 +516,11 @@ def estimate_spectral_phenomena(
 def detect_peak_candidates(
     spectrum: GammaSpectrum,
     *,
+    method: str = "mariscotti",
     threshold: float = 4.0,
     min_distance: int = 18,
     max_peaks: int = 12,
+    registries: PluginRegistries | None = None,
 ) -> tuple[PeakCandidate, ...]:
     """Detect candidate peaks and attach lightweight fit diagnostics."""
 
@@ -364,11 +534,13 @@ def detect_peak_candidates(
     if channels.size == 0:
         channels = np.arange(len(counts), dtype=float)
 
-    peaks = auto_find_peaks(
-        channels,
+    peaks = _detect_peak_method_results(
         counts,
+        channels=channels,
+        method=method,
         threshold=threshold,
         min_distance=min_distance,
+        registries=registries,
     )
     ordered = sorted(peaks, key=lambda item: item[1], reverse=True)[:max_peaks]
 
@@ -405,6 +577,65 @@ def detect_peak_candidates(
             )
         )
     return tuple(candidates)
+
+
+def _peak_search_definition(
+    method: str,
+    *,
+    registries: PluginRegistries | None = None,
+) -> PeakSearchMethodDefinition:
+    shared = bootstrap_builtin_registries(registries)
+    if len(shared.peak_search_methods) == 0:
+        register_builtin_peak_search_methods(shared)
+    return shared.peak_search_methods.get(method)
+
+
+def _detect_peak_method_results(
+    counts: np.ndarray,
+    *,
+    channels: np.ndarray,
+    method: str,
+    threshold: float,
+    min_distance: int,
+    registries: PluginRegistries | None = None,
+) -> list[tuple[float, float]]:
+    definition = _peak_search_definition(method, registries=registries)
+    finder_kwargs: dict[str, float | int | None] = {
+        "threshold_sigma": max(float(threshold), 0.5),
+        "min_distance": max(int(min_distance), 1),
+    }
+    if definition.key == "nasa_peaksearch":
+        finder_kwargs = {
+            "threshold_factor": max(float(threshold) / 3.0, 1.0),
+            "smooth_window": min(max(int(min_distance) * 5, 11), 101),
+            "distance": max(int(min_distance), 1),
+            "prominence": None,
+        }
+    elif definition.key == "mariscotti":
+        finder_kwargs["threshold_sigma"] = max(float(threshold) * 0.9, 3.0)
+
+    finder = get_peak_finder(definition.finder_key, **finder_kwargs)
+    found = finder.find_peaks(np.asarray(counts, dtype=float))
+    resolved: list[tuple[float, float]] = []
+    for peak in found:
+        if getattr(peak, "centroid", None) is not None:
+            centroid = float(np.interp(float(peak.centroid), np.arange(len(channels), dtype=float), channels))
+        else:
+            index = int(np.clip(int(round(float(peak.index))), 0, len(channels) - 1))
+            centroid = float(channels[index])
+        significance = float(getattr(peak, "significance", 0.0) or 0.0)
+        resolved.append((centroid, significance))
+
+    if resolved:
+        return resolved
+
+    fallback = auto_find_peaks(
+        channels,
+        counts,
+        threshold=threshold,
+        min_distance=min_distance,
+    )
+    return [(float(channel), float(significance)) for channel, significance in fallback]
 
 
 def bayesian_match_peak_candidates(
@@ -668,6 +899,404 @@ def subtract_background_counts(
     else:
         raise ValueError(f"Unsupported background-subtraction mode: {mode}")
     return np.clip(foreground_counts - factor * background_counts, 0.0, None)
+
+
+def background_adjusted_spectrum(
+    foreground: GammaSpectrum,
+    background: GammaSpectrum | None,
+    *,
+    mode: str = "simple",
+    scale: float = 1.0,
+) -> GammaSpectrum:
+    """Return a spectrum copy with the selected external background workflow applied."""
+
+    adjusted = subtract_background_counts(
+        foreground,
+        background,
+        mode=mode,
+        scale=scale,
+    )
+    factor = _background_subtraction_factor(
+        foreground,
+        background,
+        mode=mode,
+        scale=scale,
+    )
+    foreground_unc = np.asarray(foreground.counts_uncertainty, dtype=float)
+    if background is None:
+        adjusted_unc = foreground_unc.copy()
+    else:
+        background_unc = np.asarray(background.counts_uncertainty, dtype=float)
+        if background_unc.shape != foreground_unc.shape:
+            background_unc = np.resize(background_unc, foreground_unc.shape)
+        adjusted_unc = np.sqrt(np.maximum(foreground_unc**2 + (factor * background_unc) ** 2, 0.0))
+    metadata = dict(getattr(foreground, "metadata", {}) or {})
+    metadata["background_subtraction"] = {
+        "mode": mode,
+        "scale": float(factor),
+        "source": background.spectrum_id if background is not None else None,
+    }
+    return GammaSpectrum(
+        counts=np.asarray(adjusted, dtype=float),
+        counts_uncertainty=np.asarray(adjusted_unc, dtype=float),
+        channels=np.asarray(foreground.channels, dtype=float),
+        energies=(
+            np.asarray(foreground.energies, dtype=float)
+            if foreground.energies is not None
+            else None
+        ),
+        live_time=float(foreground.live_time),
+        real_time=float(foreground.real_time),
+        start_time=foreground.start_time,
+        spectrum_id=foreground.spectrum_id,
+        detector_id=foreground.detector_id,
+        calibration=dict(foreground.calibration),
+        source_type=foreground.source_type,
+        device_id=foreground.device_id,
+        device_label=foreground.device_label,
+        gps=dict(getattr(foreground, "gps", {}) or {}),
+        metadata=metadata,
+    )
+
+
+def analyze_roi_region(
+    spectrum: GammaSpectrum,
+    *,
+    roi_bounds_keV: tuple[float, float],
+    label: str = "ROI",
+    background_method: str = "roi_sideband",
+    peak_search_method: str = "mariscotti",
+    sideband_width_keV: float | None = None,
+    background_spectrum: GammaSpectrum | None = None,
+    background_mode: str = "simple",
+    background_scale: float = 1.0,
+    decompose_overlaps: bool = False,
+    max_components: int = 3,
+    registries: PluginRegistries | None = None,
+) -> ROIAnalysisResult:
+    """Compute explicit ROI/background metrics for one spectrum."""
+
+    shared = bootstrap_builtin_registries(registries)
+    if len(shared.roi_background_models) == 0:
+        register_builtin_roi_background_methods(shared)
+    if len(shared.peak_search_methods) == 0:
+        register_builtin_peak_search_methods(shared)
+    shared.roi_background_models.get(background_method)
+    _peak_search_definition(peak_search_method, registries=shared)
+
+    working = background_adjusted_spectrum(
+        spectrum,
+        background_spectrum,
+        mode=background_mode,
+        scale=background_scale,
+    )
+    lo_keV, hi_keV = sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))
+    roi_lo_ch, roi_hi_ch = _roi_channel_bounds(working, (lo_keV, hi_keV))
+    roi_mask = (working.channels >= roi_lo_ch) & (working.channels <= roi_hi_ch)
+    if np.count_nonzero(roi_mask) == 0:
+        raise ValueError("ROI bounds do not overlap the active spectrum.")
+
+    counts = np.asarray(working.counts, dtype=float)
+    counts_unc = np.asarray(working.counts_uncertainty, dtype=float)
+    gross_counts = float(np.sum(counts[roi_mask]))
+    gross_unc = float(np.sqrt(np.sum(np.square(counts_unc[roi_mask]))))
+
+    background_curve, sideband_bounds = _estimate_roi_background_curve(
+        working,
+        roi_bounds_keV=(lo_keV, hi_keV),
+        background_method=background_method,
+        sideband_width_keV=sideband_width_keV,
+    )
+    background_counts = float(np.sum(background_curve[roi_mask]))
+    background_unc = float(np.sqrt(np.sum(np.clip(background_curve[roi_mask], 0.0, None))))
+    net_curve = counts - background_curve
+    net_counts = float(np.sum(net_curve[roi_mask]))
+    net_unc = float(np.sqrt(max(gross_unc**2 + background_unc**2, 0.0)))
+    centroid_keV, centroid_unc_keV = _weighted_centroid_keV(
+        working,
+        net_curve,
+        roi_mask,
+    )
+    significance = float(
+        net_counts / max(net_unc, 1.0e-12)
+        if net_unc > 0.0
+        else 0.0
+    )
+
+    notes: list[str] = []
+    if background_spectrum is not None:
+        notes.append(
+            f"External background slot applied with {background_mode} normalization."
+        )
+    notes.append(f"ROI continuum estimated with {background_method}.")
+
+    overlap_components: tuple[ROIComponentFit, ...] = ()
+    if decompose_overlaps:
+        overlap_components = _fit_roi_overlap_components(
+            working,
+            roi_bounds_keV=(lo_keV, hi_keV),
+            peak_search_method=peak_search_method,
+            max_components=max_components,
+            registries=shared,
+        )
+        if overlap_components:
+            notes.append(f"{len(overlap_components)} overlap component(s) fitted.")
+
+    return ROIAnalysisResult(
+        label=str(label),
+        roi_bounds_keV=(lo_keV, hi_keV),
+        gross_counts=gross_counts,
+        gross_counts_uncertainty=gross_unc,
+        background_counts=background_counts,
+        background_counts_uncertainty=background_unc,
+        net_counts=net_counts,
+        net_counts_uncertainty=net_unc,
+        centroid_keV=centroid_keV,
+        centroid_uncertainty_keV=centroid_unc_keV,
+        significance=significance,
+        background_method=background_method,
+        peak_search_method=peak_search_method,
+        sideband_bounds_keV=sideband_bounds,
+        overlap_components=overlap_components,
+        notes=tuple(notes),
+    )
+
+
+def compute_roi_statistics(
+    spectra: Sequence[tuple[str, GammaSpectrum] | GammaSpectrum],
+    *,
+    roi_bounds_keV: tuple[float, float],
+    label: str = "ROI Statistics",
+    background_method: str = "roi_sideband",
+    peak_search_method: str = "mariscotti",
+    sideband_width_keV: float | None = None,
+    registries: PluginRegistries | None = None,
+) -> ROIStatisticsResult:
+    """Summarize the same ROI across many spectra."""
+
+    samples: list[ROISpectrumStatistic] = []
+    for index, item in enumerate(spectra):
+        if isinstance(item, tuple):
+            sample_label, spectrum = item
+        else:
+            spectrum = item
+            sample_label = getattr(spectrum, "spectrum_id", None) or f"spectrum-{index + 1}"
+        result = analyze_roi_region(
+            spectrum,
+            roi_bounds_keV=roi_bounds_keV,
+            label=sample_label,
+            background_method=background_method,
+            peak_search_method=peak_search_method,
+            sideband_width_keV=sideband_width_keV,
+            registries=registries,
+        )
+        samples.append(
+            ROISpectrumStatistic(
+                label=str(sample_label),
+                net_counts=float(result.net_counts),
+                net_counts_uncertainty=float(result.net_counts_uncertainty),
+                centroid_keV=float(result.centroid_keV),
+                significance=float(result.significance),
+            )
+        )
+
+    if not samples:
+        raise ValueError("At least one spectrum is required for ROI statistics.")
+
+    net_values = np.asarray([sample.net_counts for sample in samples], dtype=float)
+    centroid_values = np.asarray([sample.centroid_keV for sample in samples], dtype=float)
+    sample_count = len(samples)
+    stdev_net = float(np.std(net_values, ddof=1)) if sample_count > 1 else 0.0
+    stdev_centroid = float(np.std(centroid_values, ddof=1)) if sample_count > 1 else 0.0
+    mean_net = float(np.mean(net_values))
+    return ROIStatisticsResult(
+        label=str(label),
+        roi_bounds_keV=tuple(sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))),
+        sample_count=sample_count,
+        mean_net_counts=mean_net,
+        stdev_net_counts=stdev_net,
+        relative_std=float(stdev_net / mean_net) if abs(mean_net) > 1.0e-12 else 0.0,
+        mean_centroid_keV=float(np.mean(centroid_values)),
+        stdev_centroid_keV=stdev_centroid,
+        min_net_counts=float(np.min(net_values)),
+        max_net_counts=float(np.max(net_values)),
+        samples=tuple(samples),
+    )
+
+
+def _background_subtraction_factor(
+    foreground: GammaSpectrum,
+    background: GammaSpectrum | None,
+    *,
+    mode: str,
+    scale: float,
+) -> float:
+    if background is None:
+        return 0.0
+    if mode == "simple":
+        return 1.0
+    if mode == "scaled":
+        return float(scale)
+    if mode == "statistical":
+        return (
+            max(float(foreground.live_time or 1.0), 1.0)
+            / max(float(background.live_time or 1.0), 1.0)
+        )
+    raise ValueError(f"Unsupported background-subtraction mode: {mode}")
+
+
+def _roi_channel_bounds(
+    spectrum: GammaSpectrum,
+    roi_bounds_keV: tuple[float, float],
+) -> tuple[int, int]:
+    lo_keV, hi_keV = sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))
+    return (
+        int(spectrum.energy_to_channel(lo_keV)),
+        int(spectrum.energy_to_channel(hi_keV)),
+    )
+
+
+def _estimate_roi_background_curve(
+    spectrum: GammaSpectrum,
+    *,
+    roi_bounds_keV: tuple[float, float],
+    background_method: str,
+    sideband_width_keV: float | None,
+) -> tuple[np.ndarray, tuple[tuple[float, float], tuple[float, float]]]:
+    channels = np.asarray(spectrum.channels, dtype=float)
+    counts = np.asarray(spectrum.counts, dtype=float)
+    roi_lo_ch, roi_hi_ch = _roi_channel_bounds(spectrum, roi_bounds_keV)
+    roi_lo_keV, roi_hi_keV = sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))
+    width_keV = max(roi_hi_keV - roi_lo_keV, 1.0)
+    sideband_width_keV = float(sideband_width_keV or max(width_keV * 0.5, 3.0))
+
+    if background_method == "roi_sideband":
+        left_keV = (max(0.0, roi_lo_keV - sideband_width_keV), roi_lo_keV)
+        right_keV = (roi_hi_keV, roi_hi_keV + sideband_width_keV)
+        left_lo_ch, left_hi_ch = _roi_channel_bounds(spectrum, left_keV)
+        right_lo_ch, right_hi_ch = _roi_channel_bounds(spectrum, right_keV)
+        left_mask = (channels >= left_lo_ch) & (channels <= left_hi_ch)
+        right_mask = (channels >= right_lo_ch) & (channels <= right_hi_ch)
+        left_rate = float(np.mean(counts[left_mask])) if np.any(left_mask) else float(counts[max(roi_lo_ch - 1, 0)])
+        right_rate = float(np.mean(counts[right_mask])) if np.any(right_mask) else float(counts[min(roi_hi_ch, len(counts) - 1)])
+        roi_channels = channels[(channels >= roi_lo_ch) & (channels <= roi_hi_ch)]
+        if roi_channels.size:
+            interp = np.interp(
+                roi_channels,
+                np.asarray([float(roi_lo_ch), float(roi_hi_ch)], dtype=float),
+                np.asarray([left_rate, right_rate], dtype=float),
+            )
+        else:
+            interp = np.array([], dtype=float)
+        background_curve = np.zeros_like(counts, dtype=float)
+        background_curve[(channels >= roi_lo_ch) & (channels <= roi_hi_ch)] = interp
+        return background_curve, (left_keV, right_keV)
+
+    peak_regions = [(int(roi_lo_ch), int(roi_hi_ch))]
+    if background_method == "snip":
+        curve = estimate_background(
+            channels,
+            counts,
+            method="snip",
+        )
+    elif background_method == "linear_minima":
+        curve = estimate_background(
+            channels,
+            counts,
+            method="linear",
+            peak_regions=peak_regions,
+        )
+    else:
+        raise ValueError(f"Unsupported ROI background method: {background_method}")
+    empty_bounds = ((roi_lo_keV, roi_lo_keV), (roi_hi_keV, roi_hi_keV))
+    return np.asarray(curve, dtype=float), empty_bounds
+
+
+def _weighted_centroid_keV(
+    spectrum: GammaSpectrum,
+    net_curve: np.ndarray,
+    roi_mask: np.ndarray,
+) -> tuple[float, float]:
+    roi_channels = np.asarray(spectrum.channels[roi_mask], dtype=float)
+    roi_weights = np.clip(np.asarray(net_curve[roi_mask], dtype=float), 0.0, None)
+    if roi_channels.size == 0:
+        return (0.0, 0.0)
+    if float(np.sum(roi_weights)) <= 0.0:
+        center_channel = float(np.mean(roi_channels))
+        center_keV = float(spectrum.channel_to_energy(center_channel))
+        return (center_keV, 0.0)
+    centroid_channel = float(np.average(roi_channels, weights=roi_weights))
+    centroid_keV = float(spectrum.channel_to_energy(centroid_channel))
+    variance = float(np.average((roi_channels - centroid_channel) ** 2, weights=roi_weights))
+    centroid_unc_keV = float(
+        abs(spectrum.channel_to_energy(centroid_channel + math.sqrt(max(variance, 0.0) / max(np.sum(roi_weights), 1.0))))
+        - centroid_keV
+    )
+    return centroid_keV, centroid_unc_keV
+
+
+def _fit_roi_overlap_components(
+    spectrum: GammaSpectrum,
+    *,
+    roi_bounds_keV: tuple[float, float],
+    peak_search_method: str,
+    max_components: int,
+    registries: PluginRegistries | None = None,
+) -> tuple[ROIComponentFit, ...]:
+    roi_lo_keV, roi_hi_keV = sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))
+    roi_lo_ch, roi_hi_ch = _roi_channel_bounds(spectrum, (roi_lo_keV, roi_hi_keV))
+    channels = np.asarray(spectrum.channels, dtype=float)
+    counts = np.asarray(spectrum.counts, dtype=float)
+    mask = (channels >= roi_lo_ch) & (channels <= roi_hi_ch)
+    if np.count_nonzero(mask) < 5:
+        return ()
+
+    local_channels = np.asarray(channels[mask], dtype=float)
+    local_counts = np.asarray(counts[mask], dtype=float)
+    local_peaks = _detect_peak_method_results(
+        local_counts,
+        channels=local_channels,
+        method=peak_search_method,
+        threshold=3.0,
+        min_distance=max(int(max((roi_hi_ch - roi_lo_ch) / 6.0, 1.0)), 1),
+        registries=registries,
+    )
+    peak_channels = [int(round(channel)) for channel, _significance in local_peaks[:max_components]]
+    minimum_distance = max(int(max((roi_hi_ch - roi_lo_ch) / 8.0, 1.0)), 1)
+    if len(peak_channels) < min(2, max_components):
+        ranked_indices = np.argsort(local_counts)[::-1]
+        for index in ranked_indices:
+            candidate_channel = int(round(local_channels[int(index)]))
+            if any(abs(candidate_channel - existing) < minimum_distance for existing in peak_channels):
+                continue
+            if local_counts[int(index)] <= np.median(local_counts):
+                continue
+            peak_channels.append(candidate_channel)
+            if len(peak_channels) >= min(2, max_components):
+                break
+    if not peak_channels:
+        peak_channels = [int(round(local_channels[int(np.argmax(local_counts))]))]
+    fit_results = fit_multiple_peaks(
+        channels,
+        counts,
+        peak_channels=peak_channels,
+        fit_width=max(int((roi_hi_ch - roi_lo_ch) / 2), 4),
+        background_model="linear",
+        share_sigma=True,
+    )
+    components: list[ROIComponentFit] = []
+    for result in fit_results[:max_components]:
+        components.append(
+            ROIComponentFit(
+                centroid_channel=float(result.peak.centroid),
+                centroid_keV=float(spectrum.channel_to_energy(result.peak.centroid)),
+                net_counts=float(result.net_counts),
+                net_counts_uncertainty=float(result.net_counts_uncertainty),
+                fwhm_channels=float(result.peak.fwhm),
+                reduced_chi_squared=float(result.reduced_chi_squared),
+            )
+        )
+    return tuple(components)
 
 
 def extract_survey_points(

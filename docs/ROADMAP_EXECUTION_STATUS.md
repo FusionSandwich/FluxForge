@@ -1,6 +1,6 @@
 # FluxForge Roadmap Execution Status
 
-**Date:** 2026-03-30  
+**Date:** 2026-04-06  
 **Controlling roadmap document:** `docs/FluxForge_Final_Additions.md`  
 **Secondary detail source:** `docs/FluxForge_Additions_v3_Final.md` when it does not
 conflict with the controlling document.  
@@ -21,15 +21,16 @@ officially in progress.
 
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
-| 4.1 | `next` | `not-started` | The formal next step is still Phase 4.1 HAL work, but the user-directed Phase 4+ predictive slice from the secondary GUI plan has now been implemented ahead of it. |
+| 3.17 | `next` | `not-started` | The formal next step is now calibration / efficiency parity after the new ROI/background groundwork landed in 3.16. |
+| 4.1 | `pending` | `not-started` | HAL driver work remains on the roadmap, but it is formally deferred until the new Phase 3B offline-parity module closes. |
 
 ## Completed In Sequence
 
 | Step | Repo Status | Evidence |
 |---|---|---|
 | S0.1 | `complete` | Live GitHub labels, milestones, issue templates, board config source, and successful `Sync Project Planning` run on 2026-03-30 |
-| S0.2 | `complete` | All 10 epic tracker issues from `.github/project-management/issues.json` are now live on GitHub |
-| S0.3 | `complete` | The seed issue set from `.github/project-management/issues.json` is now live on GitHub |
+| S0.2 | `complete` | The original Stage 0 epic seed set from `.github/project-management/issues.json` is live on GitHub; newer Phase 3B epic additions are present in-repo and await sync |
+| S0.3 | `complete` | The original Stage 0 seed issue set from `.github/project-management/issues.json` is live on GitHub; newer Phase 3B issue additions are present in-repo and await sync |
 | S0.4 | `complete` | `docs/adr/ADR-001` through `ADR-007` |
 | S0.5 | `complete` | `docs/adr/`, `tests/spectra/`, `.github/ISSUE_TEMPLATE/` |
 
@@ -93,6 +94,7 @@ officially in progress.
 | 3.13 | `complete` | `src/fluxforge/reporting/engine.py` + `src/fluxforge/reporting/templates/` + `src/fluxforge/gui/dialogs/report_export_dialog.py` now provide the Jinja2 report engine with the three bundled templates and HTML/PDF export |
 | 3.14 | `complete` | `src/fluxforge/core/batch_analysis.py` + `src/fluxforge/gui/panels/modern_shell.py` now provide the ProcessPoolExecutor-backed batch queue, visible progress tracking, and JSON/CSV outputs |
 | 3.15 | `complete` | `src/fluxforge/unfolding/gpu_backend.py` + `src/fluxforge/ml/peak_analysis.py` + `src/fluxforge/core/batch_analysis.py` now provide optional CuPy backend selection with clean CPU fallback |
+| 3.16 | `complete` | `src/fluxforge/core/analysis_workspace.py` + `src/fluxforge/gui/analysis_workspace.py` + `src/fluxforge/gui/panels/modern_shell.py` + `src/fluxforge/cli/app.py` now provide registry-backed peak-search selection, explicit ROI/background workflows, overlap decomposition, ROI statistics, the Qt ROI Tools panel, and matching CLI commands covered by `tests/test_roi_analysis_core.py`, `tests/test_cli_app.py`, and `tests/test_analysis_workspace_qt.py` |
 | 4P.1 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast ROI time-to-target counts from offline spectra |
 | 4P.2 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/panels/modern_shell.py` now project dead-time trend and saturation warnings without live MCA transport |
 | 4P.3 | `complete` | `src/fluxforge/core/predictive.py` + `src/fluxforge/gui/main_window.py` + `src/fluxforge/gui/panels/modern_shell.py` now forecast recalibration timing from `QAMonitor` history and surface it in the dashboard, sidebar, and status bar |
@@ -100,6 +102,26 @@ officially in progress.
 | 4P.5 | `complete` | `src/fluxforge/gui/nuclide_search.py` + `src/fluxforge/gui/panels/modern_shell.py` now surface parent/daughter relationships, age-aware line tables, specific activity, and dose context from the active library |
 | 4P.6 | `complete` | `src/fluxforge/gui/panels/modern_shell.py` now provides an editable nuclide-mixture builder with normalization and combined overlay publishing |
 | 4P.7 | `complete` | `src/fluxforge/gui/main_window.py` + `src/fluxforge/gui/backends/pyqtgraph_backend.py` + `src/fluxforge/gui/panels/modern_shell.py` now expose direct `Log Scale` and `Peak Labels` toggles on the primary canvas |
+
+## Scheduled / Not Started
+
+| Step | Sequence Status | Repo Status | Meaning |
+|---|---|---|---|
+| 3.17 | `next` | `not-started` | Implement calibration/efficiency parity, detector-slot workflows, and NASA-style preserve/fine-tune helpers. |
+| 3.18 | `pending` | `not-started` | Implement identification/activity/reference parity, richer libraries, relative activity, and source-age overlays. |
+| 3.19 | `pending` | `not-started` | Implement detection-limit, dose, shielding, attenuation/material, and units-conversion workspaces. |
+| 3.20 | `pending` | `not-started` | Implement file-query, batch-compare, ROI-statistics review, and KayWin-style k0 workflows without hardware control. |
+| 3.21 | `pending` | `not-started` | Curate repo-backed parity fixtures and manifests under `tests/spectra/reference_parity/`. |
+| 3.22 | `pending` | `not-started` | Add algorithm-level parity tests for parsing, calibration, peak search, fit, activity, calculators, and k0 workflows. |
+| 3.23 | `pending` | `not-started` | Add end-to-end workflow parity tests with source-linked golden outputs and declared tolerances. |
+| 3.24 | `pending` | `not-started` | Add direct-manipulation canvas parity: peak add/delete/move, ROI dragging, background handles, and overlay-role actions. |
+| 3.25 | `pending` | `not-started` | Add dedicated Qt workspaces for ROI statistics, detection limit, dose/shielding, relative activity, file query/batch compare, reference libraries, and k0 reporting. |
+| 3.26 | `pending` | `not-started` | Add GUI polish parity: role-aware overlays, saved themes, graph-table synchronization, and better launch points. |
+| 3.27 | `pending` | `not-started` | Add GUI verification, native probes, artifact galleries, and a release-blocking acceptance checklist for parity surfaces. |
+| 4.1 | `pending` | `not-started` | Implement the first real HAL drivers after the offline-parity module closes. |
+| 4.2 | `pending` | `not-started` | Implement device discovery and thumbnail/device-list surfaces once HAL transport exists. |
+| 4.3 | `pending` | `not-started` | Implement the live Digital Twin dashboard after HAL transport and device telemetry exist. |
+| 4.4 | `pending` | `not-started` | Implement the live spectrogram panel after time-energy acquisition lands. |
 
 ## GUI Direction
 
@@ -201,7 +223,8 @@ officially in progress.
 - Native Phase 2 completion artifacts were also generated at
   `artifacts/gui_review/phase2_complete/`, and the resulting browser gallery was
   inspected with Playwright against the pinned/tagged and survey-map review states.
-- GitHub verification on 2026-03-30 confirmed the synced Stage 0 tracker assets are live: all required labels, all 7 milestones, all 10 epics, and the full seed issue set from the manifest are present on `FusionSandwich/FluxForge`.
+- GitHub verification on 2026-03-30 confirmed the pre-Phase-3B tracker assets are live: the original required labels, 7 milestones, 10 epics, and the initial seed issue set from the manifest are present on `FusionSandwich/FluxForge`.
+- The newly added Phase 3B milestone/epic/issue seeds are now present in the in-repo planning manifests and still require the next planning-sync run before they can be considered live on GitHub.
 
 ## Review Result
 
@@ -218,6 +241,10 @@ officially in progress.
 - Phase 3.5 is now complete in the repository and formally complete in sequence.
 - Phase 3.6 through 3.15 are now complete in the repository and formally complete in sequence.
 - Module 3 as a whole is now complete in the repository and formally complete in sequence.
+- A new formal follow-on module now sits between Module 3 and Phase 4:
+  Phase 3B — Offline Spectroscopy Parity.
+- Phase 3.16 is now complete in the repository and formally complete in sequence.
 - All final-plan GUI features except the deferred live MCA / HAL transport work in
   Phase 4.1 through 4.4 are now implemented in the modern Qt shell.
-- The roadmap's current next step is Phase 4.1: real HAL driver work.
+- The roadmap's current next step is Phase 3.17: calibration / efficiency
+  parity for the offline spectroscopy module.

@@ -11,6 +11,8 @@ from fluxforge.core.analysis_workspace import (
     ActivityCalculationResult,
     EfficiencyCalibrationFitResult,
     PeakCandidate,
+    ROIAnalysisResult,
+    ROIStatisticsResult,
     SurveyPoint,
 )
 from fluxforge.gui.qt_compat import QT_AVAILABLE
@@ -52,11 +54,15 @@ class AnalysisWorkspaceState:
     peaks: tuple[PeakCandidate, ...] = ()
     selected_peak_id: str | None = None
     pinned_nuclides: tuple[str, ...] = ()
+    peak_search_method: str = "mariscotti"
+    roi_background_method: str = "roi_sideband"
     background_mode: str = "simple"
     background_scale: float = 1.0
     background_visible: bool = True
     efficiency_fit: EfficiencyCalibrationFitResult | None = None
     activity_results: tuple[ActivityCalculationResult, ...] = ()
+    roi_analysis: ROIAnalysisResult | None = None
+    roi_statistics: ROIStatisticsResult | None = None
     survey_points: tuple[SurveyPoint, ...] = ()
     cascade_sum_lines_keV: tuple[float, ...] = ()
 
@@ -262,6 +268,12 @@ class AnalysisWorkspaceController:
         }
         return self.update(**payload)
 
+    def set_peak_search_method(self, method: str) -> AnalysisWorkspaceState:
+        return self.update(peak_search_method=str(method))
+
+    def set_roi_background_method(self, method: str) -> AnalysisWorkspaceState:
+        return self.update(roi_background_method=str(method))
+
     def set_efficiency_fit(
         self,
         fit: EfficiencyCalibrationFitResult | None,
@@ -273,6 +285,18 @@ class AnalysisWorkspaceController:
         results: Sequence[ActivityCalculationResult],
     ) -> AnalysisWorkspaceState:
         return self.update(activity_results=tuple(results))
+
+    def set_roi_analysis(
+        self,
+        result: ROIAnalysisResult | None,
+    ) -> AnalysisWorkspaceState:
+        return self.update(roi_analysis=result)
+
+    def set_roi_statistics(
+        self,
+        result: ROIStatisticsResult | None,
+    ) -> AnalysisWorkspaceState:
+        return self.update(roi_statistics=result)
 
     def set_survey_points(self, survey_points: Sequence[SurveyPoint]) -> AnalysisWorkspaceState:
         return self.update(survey_points=tuple(survey_points))
@@ -293,9 +317,13 @@ class AnalysisWorkspaceController:
             "peak_count": len(self._state.peaks),
             "selected_peak_id": self._state.selected_peak_id,
             "pinned_nuclides": list(self._state.pinned_nuclides),
+            "peak_search_method": self._state.peak_search_method,
+            "roi_background_method": self._state.roi_background_method,
             "background_mode": self._state.background_mode,
             "background_visible": self._state.background_visible,
             "activity_result_count": len(self._state.activity_results),
+            "has_roi_analysis": self._state.roi_analysis is not None,
+            "has_roi_statistics": self._state.roi_statistics is not None,
             "survey_point_count": len(self._state.survey_points),
             "cascade_sum_line_count": len(self._state.cascade_sum_lines_keV),
         }

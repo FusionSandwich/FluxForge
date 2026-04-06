@@ -73,6 +73,7 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
 - [17. Bayesian Nuclide ID — "Guess" Mode](#17-bayesian-nuclide-id--guess-mode)
 - [18. GUI Panel Positioning from the Synthesis Plan](#18-gui-panel-positioning-from-the-synthesis-plan)
 - [19. Consolidated Priority Action List](#19-consolidated-priority-action-list)
+- [Appendix — Offline Spectroscopy Parity Crosswalk](#appendix--offline-spectroscopy-parity-crosswalk)
 - [Quick Reference: Category Winners](#quick-reference-category-winners)
 
 ---
@@ -81,7 +82,7 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
 
 > **This entire stage must be completed before any Phase 1 implementation work begins.** The point is to make the roadmap executable through the tracker, not just a document. Every issue created in 0.6 maps directly to a section of this additions document.
 
-### Repository Status — 2026-03-30
+### Repository Status — 2026-04-01
 
 - This document remains a secondary detail source. Where it conflicts with
   `docs/FluxForge_Final_Additions.md`, the final document controls execution.
@@ -165,7 +166,17 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   the report dialog now supports HTML/PDF export, the batch queue is live in
   `src/fluxforge/gui/panels/modern_shell.py` with visible progress, and optional
   CuPy backend selection now exists in `src/fluxforge/unfolding/gpu_backend.py`.
-- Module 3 is now complete in sequence and in-repo.
+- Module 3 remains complete in sequence and in-repo.
+- The controlling roadmap now inserts a new module before HAL work:
+  **Phase 3B — Offline Spectroscopy Parity**.
+- Phase 3B is sourced from `testing/writeup.md` sections `19` through `24` and
+  is limited to offline analysis, reference-data workflows, and GUI parity. MCA
+  acquisition and device control remain in local Phase 4.
+- Phase `3.16` is now implemented in-repo: the shared analysis layer, CLI, and
+  modern Qt shell now expose registry-backed Mariscotti / second-difference /
+  NASA peak search, explicit ROI sideband/SNIP workflows, overlap
+  decomposition, and multi-spectrum ROI statistics through the new ROI Tools
+  surface.
 - The user-directed Predictive Features (Phase 4+) slice from Section 16 is now
   implemented in-repo as well: the modern Qt dashboard, QA sidebar, and status
   bar now forecast ROI target-count timing, dead-time saturation, and
@@ -180,8 +191,11 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
   in the modern Qt shell, the QA & Standards sidebar exposes direct `View QA History`
   and `Run ASTM Check` buttons, and clicking the status-bar hardware LED now opens
   the Dashboard tab as specified in Section 16.
-- The current controlling-roadmap next step is Phase 4.1, real HAL driver work
-  (local Phase 4 work in this document).
+- The current controlling-roadmap next step is Phase `3.17`,
+  calibration/efficiency parity for the new offline spectroscopy module.
+- The newly added Phase 3B milestone, epic, and issue seeds now exist in the
+  in-repo planning manifests and require the next planning-sync run to
+  materialize on GitHub.
 - GUI redesign status in-repo: the Qt shell now covers the repo-side deliverables for
   roadmap items `1.3` through `1.18`, including the `.ffs` session path, reader
   factory, validated N42 export, SQLite nuclide database, and instant overlay search;
@@ -199,6 +213,7 @@ When a workflow is labelled as ASTM-compliant (E181, E261, E1297, E1218, C1232, 
 | `M2 — Core Analysis Parity` | Phase 2: calibration, peak fitting, ID, activity |
 | `M3 — Advanced Analysis` | Phase 3: unfolding, ML, Standards framework |
 | `M4 — Standards & QA` | ASTM modules, QA monitor, C1030, E261 |
+| `M3B — Offline Spectroscopy Parity` | Phase 3B: offline spectroscopy parity, parity fixtures, and GUI parity against the new `testing/` repos |
 | `M5 — MCA Foundations` | Phase 4: HAL drivers, live acquisition, dashboard |
 | `M6 — Packaging & Release` | AppImage, Windows .exe, CI, regression baselines |
 
@@ -1641,6 +1656,28 @@ The following replaces and supersedes the base plan's 23-item list. Items are gr
 | 3-15 | Implement ASTM-compliant report template. Batch summary template. PDF export (WeasyPrint). | area/reporting | p1 |
 | 3-16 | Implement full batch analysis queue panel: ProcessPoolExecutor, progress bars, per-spectrum JSON output. | area/gui | p1 |
 
+The table above retains the original local numbering from this secondary merged
+plan. The controlling roadmap now maps those completed deliverables to official
+steps `3.13` through `3.15` and inserts a new **Phase 3B** below using the
+official controlling-roadmap IDs verbatim.
+
+### Phase 3B — Offline Spectroscopy Parity (Controlling Roadmap IDs)
+
+| # | Action | Area | Priority |
+|---|---|---|---|
+| 3.16 | Implement peak-search / background / ROI parity | area/core + area/gui | p1 |
+| 3.17 | Implement calibration / efficiency parity | area/calibration | p1 |
+| 3.18 | Implement identification / activity / reference parity | area/core + area/nuclide-db | p1 |
+| 3.19 | Implement operational calculator parity | area/core | p1 |
+| 3.20 | Implement archive / batch / k0 parity | area/core + area/gui | p1 |
+| 3.21 | Curate repo-backed parity fixtures and manifests | area/testing | p0 |
+| 3.22 | Add algorithm-level parity tests | area/testing | p1 |
+| 3.23 | Add workflow-level parity tests | area/testing | p1 |
+| 3.24 | Implement direct-manipulation canvas parity | area/gui | p1 |
+| 3.25 | Implement new parity workspaces in the modern Qt shell | area/gui | p1 |
+| 3.26 | Implement GUI polish parity, first-class dark mode, and saved themes | area/gui | p2 |
+| 3.27 | Add GUI verification, artifact review, and release checklist | area/testing | p1 |
+
 ### Phase 4 (Future) — MCA Acquisition
 
 | # | Action | Area | Priority |
@@ -1652,6 +1689,78 @@ The following replaces and supersedes the base plan's 23-item list. Items are gr
 | 4-5 | Implement Windows .exe (PyInstaller) + Linux AppImage packaging. GitHub Actions CI for releases. | area/packaging | p0 |
 
 ---
+
+## Appendix — Offline Spectroscopy Parity Crosswalk
+
+This appendix is the secondary-detail companion to the controlling roadmap's
+Phase 3B module. The source-of-truth feature inventory is
+`testing/writeup.md` sections `19` through `24`. The goal is to implement all
+new offline analysis and GUI features from those repos without reopening
+already-complete roadmap rows unless parity hardening is still missing.
+
+### Repo-to-Feature Crosswalk
+
+| Source repo | Source feature | FluxForge status | Existing evidence | New parity step | Fixture source | GUI source |
+|---|---|---|---|---|---|---|
+| `GSA-v2` / `GSA-v4` | Mariscotti-style peak search, explicit ROI/background workflow, overlap decomposition | `complete` | `2.4`, `2.8`, `2.14`, `3.16` | `3.16` | `testing/GSA-v2/example/`, `testing/GSA-v4/Spectrum/`, `testing/GSA-v4/Parameters/Parameters.txt` | `GSA-v4` |
+| `GSA-v2` / `GSA-v4` | Efficiency families, detector slots, activity parity, transparent coefficient files | `partial` | `2.11`, `2.12`, `2.13` | `3.17`, `3.18` | `testing/GSA-v2/Detectors/`, `testing/GSA-v4/Calibration/` | `GSA-v4` |
+| `GSA-v4` | Multi-spectrum ROI statistics and detector-consistency study | `partial` | `3-16`, `3.16` | `3.16`, `3.20`, `3.25` | `testing/GSA-v4/ROI_Statistic/` | `GSA-v4` |
+| `InterSpec` | Foreground/background/secondary overlay roles plus direct chart manipulation | `partial` | `2.15`, current multi-spectrum work, and direct canvas display toggles in the controlling roadmap | `3.24`, `3.26` | `testing/InterSpec/` and `src/D3SpectrumDisplayDiv.cpp` | `InterSpec` |
+| `InterSpec` | Detection limit, relative activity, dose/shielding/material calculators | `missing` | current roadmap only covers activity + MDA basics | `3.18`, `3.19`, `3.25` | `testing/InterSpec/src/DetectionLimitSimple.cpp`, `src/RelAct*.cpp`, `src/DoseCalc*.cpp` | `InterSpec` |
+| `InterSpec` | File query, compact file manager, batch compare, calibration preserve/multifile | `partial` | `1-8`, `3-16` | `3.17`, `3.20`, `3.25` | `testing/InterSpec/src/SpecFileQueryWidget.cpp`, `src/EnergyCalMultiFile.cpp` | `InterSpec` |
+| `NASA-gamma` | Modular analysis pipeline, peak-search variants, advanced fit, repeated-run diagnostics | `partial` | `1-8`, `2.4`, `2.8`, `3.16` | `3.16`, `3.17`, `3.20`, `3.22` | `testing/NASA-gamma/nasagamma/`, `testing/NASA-gamma/examples/` | `NASA-gamma` |
+| `NASA-gamma` | Expanded reference-data families: common lab, natural, capture, inelastic, delayed activation | `missing` | current roadmap has a bundled nuclide DB only | `3.18`, `3.21` | `testing/NASA-gamma/nasagamma/data/` | `NASA-gamma` |
+| `KayWinV410` | k0-NAA detector/facility characterization and governed irradiation/report workflows | `missing` | no current roadmap step covers this family | `3.20`, `3.22`, `3.25` | `testing/KayWinV410/` workspace bundle | `KayWinV410` |
+| `prospect_trial_installation` | Offline ROI/report/export/spectrogram workstation behaviors, excluding hardware control | `partial` | reporting exists; live spectrogram remains deferred | `3.24`, `3.25`, `3.27` | `testing/prospect_trial_installation/ProSpect User's Manual.pdf` | `ProSpect` |
+
+### GUI Design Guidance from GSA-v4 and InterSpec
+
+- The chart must be a primary input surface, not a passive display. Right-click,
+  drag, and direct-handle edits for peaks, ROI edges, and backgrounds are now
+  roadmap requirements because both `GSA-v4` and `InterSpec` treat the plot as
+  the analyst's main workspace.
+- Foreground, background, and secondary spectra need explicit roles across the
+  UI. This should show up in file-open flows, drag-and-drop targets, chart
+  legends, and saved-session provenance.
+- Graphs and tables must stay tightly synchronized. The required interaction loop
+  is "click table row -> zoom/highlight peak" and "drag ROI/peak -> update table
+  and results immediately."
+- Specialized workflows should open in focused workspaces rather than overloading
+  the main canvas with every tool at once. GSA's calibration/statistics dialogs
+  and InterSpec's dedicated tool panels are the model here.
+- Theme handling should move toward saved theme profiles, central color tokens,
+  and a first-class dark mode. InterSpec already exposes a predefined
+  `DarkColorTheme` plus editable saved themes, so FluxForge should ship a modern
+  dark mode as part of the parity module rather than treating it as optional
+  polish.
+- FluxForge should keep the current modern Qt shell as the only GUI target for
+  this module. Do not create a second shell and do not route parity work back
+  into the legacy Tk path.
+
+### Detailed GUI Feature Notes for Phase 3B
+
+| FluxForge target | How the source feature works | Original scripts / resources to mine |
+|---|---|---|
+| Main analysis workspace | GSA-v4 uses a dense but readable single-window arrangement: menu bar, icon bar, central graph, and result area. This is the right reference for an ergonomic "analysis first" screen that still keeps data visible. | `testing/GSA-v4/Images/F0.png`, `testing/GSA-v4/README.md`, `testing/GSA-v4/PDF Guide/Guide.pdf` |
+| Plot-driven peak and ROI editing | GSA-v4 makes peak/ROI/background edits directly on the plot through popup menus and drag handles, including add/delete peak, add Gaussian for overlaps, and background interaction. | `testing/writeup.md` section `19.2`; compiled class references `ForChatgpt.Graph_FoudPeaks`, `Linear_Graph_FoudPeaks`, `Peaks_Bkgrnd_Graph`; `testing/GSA-v4/PDF Guide/Guide.pdf` |
+| ROI statistics workspace | GSA-v4's separate statistics workflow is not just a report. It uses dedicated ROI tables plus draggable/editable ROI charts across many spectra, then opens standard-deviation and chi-square style review windows. | `testing/GSA-v4/Images/F1.png`, `F2.png`, `F3.png`, `F4.png`, `testing/GSA-v4/ROI_Statistic/ROI_Data.dat`, `testing/GSA-v4/ROI_Statistic/ROI_Spectra.dat`, `testing/writeup.md` section `19.2` |
+| Role-aware upload and overlay UX | InterSpec visually distinguishes foreground, background, and secondary spectra instead of hiding them behind a generic "open file" flow. FluxForge should mirror this with explicit role buttons, legends, and drop targets. | `testing/InterSpec/InterSpec_resources/InterSpec.css` (`.UpForeground`, `.UpBackground`, `.Up2ndForeground`), `testing/InterSpec/InterSpec_resources/images/DragDrop.png`, `testing/InterSpec/src/CompactFileManager.cpp`, `testing/InterSpec/InterSpec_resources/CompactFileManager.css` |
+| Primary chart interaction model | InterSpec's chart is effectively a controller: click, right-click, double-click, shift-drag, existing-ROI edge drag, drag-create ROI, log/linear toggle, peak labels, and visible-range queries all route back into the app state. | `testing/InterSpec/InterSpec/D3SpectrumDisplayDiv.h`, `testing/InterSpec/src/D3SpectrumDisplayDiv.cpp`, `testing/InterSpec/src/SpectrumChart.cpp`, `testing/InterSpec/InterSpec_resources/InterSpec.css` |
+| Peak edit and analyst override UX | InterSpec keeps manual analyst control available after automated fitting. Peak edit includes range, color, peak parameters, continuum terms, and delete actions. FluxForge should copy the "automation never blocks manual correction" rule. | `testing/InterSpec/src/PeakEdit.cpp`, `testing/InterSpec/InterSpec_resources/PeakEdit.css`, `testing/InterSpec/InterSpec/AnalystChecks.h` |
+| Detection-limit workspace | InterSpec's detection-limit tool embeds a spectrum display, supports ROI-edge drag callbacks, FWHM fitting, detector selection, method switching, side-channel controls, and dynamic results text in one dedicated surface. | `testing/InterSpec/src/DetectionLimitSimple.cpp`, `testing/InterSpec/InterSpec_resources/DetectionLimitSimple.css`, `testing/InterSpec/InterSpec_resources/DetectionLimitTool.css`, `testing/InterSpec/InterSpec_resources/DetectionLimitTool.js` |
+| File query and batch-compare workflow | InterSpec goes beyond a recent-files list. It has compact role-aware file management and a separate query widget with recursive scan, filters, caching, progress, and load/open-parent actions. | `testing/InterSpec/src/CompactFileManager.cpp`, `testing/InterSpec/InterSpec_resources/CompactFileManager.css`, `testing/InterSpec/src/SpecFileQueryWidget.cpp`, `testing/InterSpec/InterSpec_resources/SpecFileQueryWidget.css`, `testing/InterSpec/js/SpecFileQueryWidget.js` |
+| Calibration preserve and multi-file flows | InterSpec splits advanced calibration follow-up work into dedicated surfaces rather than stuffing it into one dialog. FluxForge should do the same for preserve/fine-tune/multi-file calibration tasks. | `testing/InterSpec/src/EnergyCal.cpp`, `testing/InterSpec/src/EnergyCalTool.cpp`, `testing/InterSpec/src/EnergyCalGraphical.cpp`, `testing/InterSpec/src/EnergyCalPreserveWindow.cpp`, `testing/InterSpec/src/EnergyCalMultiFile.cpp`, `testing/InterSpec/InterSpec_resources/EnergyCalTool.css`, `EnergyCalPreserveWindow.css`, `EnergyCalMultiFile.css`, `EnergyCalAddActions.css` |
+| Relative activity and shielding workspaces | InterSpec treats these as full workspaces with their own state, sub-panels, and reports, not as tiny calculators. FluxForge should carry over that seriousness if these features are added. | `testing/InterSpec/src/RelActCalcAuto.cpp`, `testing/InterSpec/src/RelActCalcManual.cpp`, `testing/InterSpec/src/RelActAutoGuiFreePeak.cpp`, `testing/InterSpec/InterSpec_resources/RelActAutoGui.css`, `RelActManualGui.css`, `testing/InterSpec/src/ShieldingSourceDisplay.cpp`, `testing/InterSpec/InterSpec_resources/ShieldingSourceDisplay.css`, `ShieldingSourceFitPlot.css`, `ShieldingSourceFitPlot.js` |
+| Dark mode and saved-theme infrastructure | InterSpec already has CSS-variable driven colors, saved/editable themes, import/export, database-backed persistence, and a predefined dark theme. FluxForge should explicitly implement dark mode as a shipped parity feature, then extend it with saved profiles in Qt. | `testing/InterSpec/InterSpec_resources/InterSpec.css` (`--interspec-*` variables), `testing/InterSpec/src/ColorTheme.cpp`, `testing/InterSpec/src/ColorThemeWidget.cpp`, `testing/InterSpec/src/ColorThemeWindow.cpp`, `testing/InterSpec/InterSpec_resources/ColorThemeWidget.css`, `ColorThemeWindow.css` |
+
+### Phase 3B GUI Deliverables by Step
+
+| Step | GUI behavior to implement | Source references |
+|---|---|---|
+| `3.24` | Right-click peak add/delete/move, drag ROI edges, drag background handles, explicit foreground/background/secondary actions, peak-label toggles, overlap Gaussian insertion | `testing/GSA-v4/Images/F0.png`, `testing/writeup.md` section `19.2`, `testing/InterSpec/InterSpec/D3SpectrumDisplayDiv.h`, `testing/InterSpec/src/PeakEdit.cpp` |
+| `3.25` | Dedicated workspaces for ROI Statistics, Detection Limit, Relative Activity, File Query/Batch Compare, Reference/Library Workbench, Dose/Shielding, and k0 reporting | `testing/GSA-v4/Images/F1.png` through `F4.png`, `testing/InterSpec/src/DetectionLimitSimple.cpp`, `SpecFileQueryWidget.cpp`, `RelActCalcAuto.cpp`, `ShieldingSourceDisplay.cpp` |
+| `3.26` | First-class dark mode, saved theme profiles, stronger graph-table synchronization, clearer launch points into calculators and reference workbenches | `testing/InterSpec/src/ColorTheme.cpp`, `ColorThemeWidget.cpp`, `ColorThemeWindow.cpp`, `testing/InterSpec/InterSpec_resources/InterSpec.css` |
+| `3.27` | Native GUI probes and artifact reviews for every new workspace and interaction-heavy chart surface | FluxForge Qt test/probe patterns plus the source reference list above for expected interaction behavior |
 
 ## Quick Reference: Category Winners
 

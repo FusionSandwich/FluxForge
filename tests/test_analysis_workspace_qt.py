@@ -750,3 +750,59 @@ def test_main_window_background_selector_updates_subtracted_foreground_and_overl
     assert "Background" in assigned_roles["background.csv"]
     assert "Secondary Overlay" in assigned_roles["overlay.csv"]
     window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_roi_tools_panel_supports_mouse_driven_roi_analysis_and_statistics(monkeypatch):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    monkeypatch.setattr(AutoPeakReviewDialog, "accepted_peaks", lambda self: peaks)
+
+    bottom = window.bottom_dock.widget()
+    peak_panel = bottom.peak_table_panel
+    QTest.mouseClick(peak_panel.auto_find_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    peak_panel.table.selectRow(0)
+    peak_panel._publish_selected_peak()
+    _qapp().processEvents()
+
+    roi_panel = bottom.roi_tools_panel
+    roi_panel.peak_search_selector.set_current_key("mariscotti")
+    roi_panel.background_selector.set_current_key("roi_sideband")
+    _qapp().processEvents()
+
+    QTest.mouseClick(roi_panel.use_selected_peak_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert roi_panel.roi_right.value() > roi_panel.roi_left.value()
+
+    QTest.mouseClick(roi_panel.analyze_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    roi_result = window.analysis_workspace.state.roi_analysis
+    assert roi_result is not None
+    assert roi_result.net_counts > 0.0
+    assert window.analysis_workspace.state.peak_search_method == "mariscotti"
+    assert window.analysis_workspace.state.roi_background_method == "roi_sideband"
+    assert "Gross:" in roi_panel.summary.toPlainText()
+    assert roi_panel.component_table.rowCount() >= 1
+
+    QTest.mouseClick(roi_panel.statistics_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    stats = window.analysis_workspace.state.roi_statistics
+    assert stats is not None
+    assert stats.sample_count >= 2
+    assert roi_panel.statistics_table.rowCount() == stats.sample_count
+    window.close()
