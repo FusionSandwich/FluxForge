@@ -1,0 +1,63 @@
+name: Performance Issue
+description: Track speed, responsiveness, or memory work.
+title: "[Performance]: "
+labels: ["area/performance", "type/feature", "priority/p1-critical"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - area/gui
+        - area/core
+        - area/io
+        - area/unfolding
+        - area/reporting
+        - area/performance
+        - area/calibration
+        - area/nuclide-db
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - platform/both
+        - platform/linux
+        - platform/windows
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware Spec
+  - type: textarea
+    id: measured_target
+    attributes:
+      label: Measured vs Target
+    validations:
+      required: true
+  - type: textarea
+    id: profile
+    attributes:
+      label: Profile Data
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed Fix
+  - type: dropdown
+    id: benchmark
+    attributes:
+      label: Regression Benchmark Required?
+      options:
+        - "yes"
+        - "no"
+    validations:
+      required: true

@@ -1,0 +1,3 @@
+sample_id,sample_group,isotope,header_activity_bq,header_activity_unc_bq,n_line_activities,min_line_activity_bq,max_line_activity_bq,mean_line_activity_bq,max_relative_line_header_deviation,flag_internal_inconsistency
+RAFM3-N_2hrEOI,RAFM3,W187,40811.0,1768.6000000000001,6,25974.0,45288.0,38825.333333333336,0.36355394378966455,True
+RAFM3-N_2hrEOI,RAFM3,Mn56,297073.0,19795.0,4,233359.0,304399.0,278841.25,0.21447253705318223,False

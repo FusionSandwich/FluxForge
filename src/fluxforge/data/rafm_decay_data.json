@@ -1,0 +1,1293 @@
+{
+  "_metadata": {
+    "source": "curated decay_2012-derived reference dataset vendored into FluxForge",
+    "origin": "decay_2012 via actigamma",
+    "energy_window_keV": [
+      80.0,
+      3000.0
+    ],
+    "min_intensity_fraction": 0.001,
+    "line_uncertainty_source": "actigamma decay_2012 intensities_unc * norms",
+    "line_uncertainty_units": "absolute emission probability fraction per decay"
+  },
+  "Al28": {
+    "half_life_seconds": 134.46,
+    "gamma_lines": [
+      {
+        "energy_keV": 1778.7,
+        "intensity": 1.0,
+        "intensity_uncertainty": 0.0
+      }
+    ]
+  },
+  "Co58": {
+    "half_life_seconds": 6122300.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 810.775,
+        "intensity": 0.9945,
+        "intensity_uncertainty": 0.0
+      },
+      {
+        "energy_keV": 863.959,
+        "intensity": 0.006832215000000001,
+        "intensity_uncertainty": 0.0001989
+      },
+      {
+        "energy_keV": 1674.73,
+        "intensity": 0.00519129,
+        "intensity_uncertainty": 8.9505e-05
+      }
+    ]
+  },
+  "Co60": {
+    "half_life_seconds": 166337000.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 1173.23,
+        "intensity": 0.9984999999999999,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1332.49,
+        "intensity": 0.9998260000000001,
+        "intensity_uncertainty": 5.999999999999999e-06
+      }
+    ]
+  },
+  "Cr51": {
+    "half_life_seconds": 2393540.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 320.084,
+        "intensity": 0.0987,
+        "intensity_uncertainty": 0.0005
+      }
+    ]
+  },
+  "Cu64": {
+    "half_life_seconds": 45723.6,
+    "gamma_lines": [
+      {
+        "energy_keV": 1345.77,
+        "intensity": 0.004749,
+        "intensity_uncertainty": 9.997900000000001e-05
+      }
+    ]
+  },
+  "Fe59": {
+    "half_life_seconds": 3844370.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 142.651,
+        "intensity": 0.00972,
+        "intensity_uncertainty": 0.00015
+      },
+      {
+        "energy_keV": 192.349,
+        "intensity": 0.02918,
+        "intensity_uncertainty": 0.00029
+      },
+      {
+        "energy_keV": 334.8,
+        "intensity": 0.00264,
+        "intensity_uncertainty": 7.000000000000001e-05
+      },
+      {
+        "energy_keV": 1099.25,
+        "intensity": 0.5659000000000001,
+        "intensity_uncertainty": 0.0021
+      },
+      {
+        "energy_keV": 1291.59,
+        "intensity": 0.43210000000000004,
+        "intensity_uncertainty": 0.0025
+      }
+    ]
+  },
+  "In114m": {
+    "half_life_seconds": 4320000.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 190.34,
+        "intensity": 0.186,
+        "intensity_uncertainty": 0.0150000072
+      },
+      {
+        "energy_keV": 558.46,
+        "intensity": 0.034999992,
+        "intensity_uncertainty": 0.0049999962000000005
+      },
+      {
+        "energy_keV": 725.28,
+        "intensity": 0.034999992,
+        "intensity_uncertainty": 0.0049999962000000005
+      }
+    ]
+  },
+  "In115m": {
+    "half_life_seconds": 16149.6,
+    "gamma_lines": [
+      {
+        "energy_keV": 336.241,
+        "intensity": 0.457853,
+        "intensity_uncertainty": 0.0220845
+      }
+    ]
+  },
+  "Mn54": {
+    "half_life_seconds": 26968000.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 834.838,
+        "intensity": 0.999746,
+        "intensity_uncertainty": 1.1000000000000001e-05
+      }
+    ]
+  },
+  "Mn56": {
+    "half_life_seconds": 9296.64,
+    "gamma_lines": [
+      {
+        "energy_keV": 846.764,
+        "intensity": 0.9883,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1238.27,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 1810.73,
+        "intensity": 0.276,
+        "intensity_uncertainty": 0.006
+      },
+      {
+        "energy_keV": 2113.09,
+        "intensity": 0.14800000000000002,
+        "intensity_uncertainty": 0.004
+      },
+      {
+        "energy_keV": 2523.06,
+        "intensity": 0.0103,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 2657.56,
+        "intensity": 0.006600000000000001,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 2959.92,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0001
+      }
+    ]
+  },
+  "Ni57": {
+    "half_life_seconds": 129240.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 127.164,
+        "intensity": 0.16,
+        "intensity_uncertainty": 0.005
+      },
+      {
+        "energy_keV": 1046.68,
+        "intensity": 0.00132,
+        "intensity_uncertainty": 3e-05
+      },
+      {
+        "energy_keV": 1377.62,
+        "intensity": 0.812,
+        "intensity_uncertainty": 0.006
+      },
+      {
+        "energy_keV": 1757.55,
+        "intensity": 0.061,
+        "intensity_uncertainty": 0.004
+      },
+      {
+        "energy_keV": 1919.62,
+        "intensity": 0.125,
+        "intensity_uncertainty": 0.005
+      },
+      {
+        "energy_keV": 2804.08,
+        "intensity": 0.0010199999999999999,
+        "intensity_uncertainty": 0.00017
+      }
+    ]
+  },
+  "Sb124": {
+    "half_life_seconds": 5201280.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 400.03,
+        "intensity": 0.00127,
+        "intensity_uncertainty": 0.0001
+      },
+      {
+        "energy_keV": 444.1,
+        "intensity": 0.002,
+        "intensity_uncertainty": 0.0001
+      },
+      {
+        "energy_keV": 525.35,
+        "intensity": 0.00117,
+        "intensity_uncertainty": 0.00015
+      },
+      {
+        "energy_keV": 602.73,
+        "intensity": 0.9789,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 632.4,
+        "intensity": 0.00111,
+        "intensity_uncertainty": 5e-05
+      },
+      {
+        "energy_keV": 645.855,
+        "intensity": 0.0742,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 709.31,
+        "intensity": 0.013700000000000002,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 713.781,
+        "intensity": 0.022799999999999997,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 722.78,
+        "intensity": 0.10800000000000001,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 735.66,
+        "intensity": 0.0013000000000000002,
+        "intensity_uncertainty": 0.0001
+      },
+      {
+        "energy_keV": 790.73,
+        "intensity": 0.0074,
+        "intensity_uncertainty": 0.0001
+      },
+      {
+        "energy_keV": 968.201,
+        "intensity": 0.0188,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 1045.13,
+        "intensity": 0.0182,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 1325.51,
+        "intensity": 0.015500000000000002,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1355.11,
+        "intensity": 0.0103,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1368.16,
+        "intensity": 0.026099999999999998,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1376.1,
+        "intensity": 0.0049,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 1436.56,
+        "intensity": 0.012,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1445.3,
+        "intensity": 0.0034999999999999996,
+        "intensity_uncertainty": 0.0002
+      },
+      {
+        "energy_keV": 1489.0,
+        "intensity": 0.0068000000000000005,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1526.35,
+        "intensity": 0.004,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1579.7,
+        "intensity": 0.00152,
+        "intensity_uncertainty": 0.00012
+      },
+      {
+        "energy_keV": 1690.98,
+        "intensity": 0.47600000000000003,
+        "intensity_uncertainty": 0.002
+      },
+      {
+        "energy_keV": 2090.94,
+        "intensity": 0.05480000000000001,
+        "intensity_uncertainty": 5e-05
+      }
+    ]
+  },
+  "Sc46": {
+    "half_life_seconds": 7239280.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 889.271,
+        "intensity": 0.999833,
+        "intensity_uncertainty": 5e-06
+      },
+      {
+        "energy_keV": 1120.54,
+        "intensity": 0.9998600000000001,
+        "intensity_uncertainty": 0.0
+      }
+    ]
+  },
+  "Sc47": {
+    "half_life_seconds": 289526.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 159.391,
+        "intensity": 0.68,
+        "intensity_uncertainty": 0.02
+      }
+    ]
+  },
+  "Sc48": {
+    "half_life_seconds": 157212.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 175.35,
+        "intensity": 0.076,
+        "intensity_uncertainty": 0.004
+      },
+      {
+        "energy_keV": 983.5,
+        "intensity": 1.0,
+        "intensity_uncertainty": 0.03
+      },
+      {
+        "energy_keV": 1037.5,
+        "intensity": 0.975,
+        "intensity_uncertainty": 0.02
+      },
+      {
+        "energy_keV": 1212.85,
+        "intensity": 0.024,
+        "intensity_uncertainty": 0.001
+      },
+      {
+        "energy_keV": 1312.1,
+        "intensity": 1.0,
+        "intensity_uncertainty": 0.03
+      }
+    ]
+  },
+  "Ta182": {
+    "half_life_seconds": 9910080.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 84.6808,
+        "intensity": 0.026296008303999998,
+        "intensity_uncertainty": 0.00034600015224
+      },
+      {
+        "energy_keV": 100.106,
+        "intensity": 0.14116811763999998,
+        "intensity_uncertainty": 0.0010379988235999999
+      },
+      {
+        "energy_keV": 113.672,
+        "intensity": 0.019375988928,
+        "intensity_uncertainty": 0.00031140005536
+      },
+      {
+        "energy_keV": 116.419,
+        "intensity": 0.00429041038,
+        "intensity_uncertainty": 3.4600015224e-05
+      },
+      {
+        "energy_keV": 152.431,
+        "intensity": 0.07404402767999999,
+        "intensity_uncertainty": 0.0020760017299999997
+      },
+      {
+        "energy_keV": 156.387,
+        "intensity": 0.026780391696,
+        "intensity_uncertainty": 0.00038059984084
+      },
+      {
+        "energy_keV": 179.395,
+        "intensity": 0.031486022836,
+        "intensity_uncertainty": 0.0006920019376
+      },
+      {
+        "energy_keV": 198.353,
+        "intensity": 0.01422059654,
+        "intensity_uncertainty": 0.00017300007612
+      },
+      {
+        "energy_keV": 222.11,
+        "intensity": 0.07438984084,
+        "intensity_uncertainty": 0.000415200346
+      },
+      {
+        "energy_keV": 229.322,
+        "intensity": 0.03667599654,
+        "intensity_uncertainty": 0.0006920019376
+      },
+      {
+        "energy_keV": 264.076,
+        "intensity": 0.035084398616,
+        "intensity_uncertainty": 0.00027679995848
+      },
+      {
+        "energy_keV": 927.995,
+        "intensity": 0.006020415223999999,
+        "intensity_uncertainty": 0.00010379988235999999
+      },
+      {
+        "energy_keV": 959.732,
+        "intensity": 0.0033907980623999997,
+        "intensity_uncertainty": 6.920019376e-05
+      },
+      {
+        "energy_keV": 1001.7,
+        "intensity": 0.020344796539999998,
+        "intensity_uncertainty": 0.0002421998616
+      },
+      {
+        "energy_keV": 1044.41,
+        "intensity": 0.0021797987544,
+        "intensity_uncertainty": 6.920019376e-05
+      },
+      {
+        "energy_keV": 1113.39,
+        "intensity": 0.00422120692,
+        "intensity_uncertainty": 0.00017300007612
+      },
+      {
+        "energy_keV": 1121.3,
+        "intensity": 0.34600015224,
+        "intensity_uncertainty": 0.0
+      },
+      {
+        "energy_keV": 1157.32,
+        "intensity": 0.005882008304,
+        "intensity_uncertainty": 0.0006920019376
+      },
+      {
+        "energy_keV": 1158.09,
+        "intensity": 0.0041520034599999995,
+        "intensity_uncertainty": 0.0006920019376
+      },
+      {
+        "energy_keV": 1189.05,
+        "intensity": 0.1613053038,
+        "intensity_uncertainty": 0.0004497979932
+      },
+      {
+        "energy_keV": 1221.41,
+        "intensity": 0.26849595155999995,
+        "intensity_uncertainty": 0.0010379988235999999
+      },
+      {
+        "energy_keV": 1223.81,
+        "intensity": 0.0021452011072,
+        "intensity_uncertainty": 0.00034600015224
+      },
+      {
+        "energy_keV": 1231.02,
+        "intensity": 0.11307273772,
+        "intensity_uncertainty": 0.00038059984084
+      },
+      {
+        "energy_keV": 1257.42,
+        "intensity": 0.014704979931999998,
+        "intensity_uncertainty": 6.920019376e-05
+      },
+      {
+        "energy_keV": 1273.73,
+        "intensity": 0.0064702173,
+        "intensity_uncertainty": 3.4600015224e-05
+      },
+      {
+        "energy_keV": 1289.16,
+        "intensity": 0.013459399307999999,
+        "intensity_uncertainty": 0.00013839997924
+      },
+      {
+        "energy_keV": 1342.72,
+        "intensity": 0.0025257997232,
+        "intensity_uncertainty": 3.4600015224e-05
+      },
+      {
+        "energy_keV": 1373.84,
+        "intensity": 0.0021797987544,
+        "intensity_uncertainty": 3.4600015224e-05
+      }
+    ]
+  },
+  "Tb154m": {
+    "half_life_seconds": 32400.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 123.07,
+        "intensity": 0.3,
+        "intensity_uncertainty": 0.07
+      },
+      {
+        "energy_keV": 124.4,
+        "intensity": 0.0023,
+        "intensity_uncertainty": 0.0008
+      },
+      {
+        "energy_keV": 232.1,
+        "intensity": 0.0047,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 247.94,
+        "intensity": 0.22,
+        "intensity_uncertainty": 0.04
+      },
+      {
+        "energy_keV": 330.0,
+        "intensity": 0.002,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 337.9,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0011
+      },
+      {
+        "energy_keV": 346.7,
+        "intensity": 0.016,
+        "intensity_uncertainty": 0.004
+      },
+      {
+        "energy_keV": 382.12,
+        "intensity": 0.010400000000000001,
+        "intensity_uncertainty": 0.0019
+      },
+      {
+        "energy_keV": 415.85,
+        "intensity": 0.021,
+        "intensity_uncertainty": 0.004
+      },
+      {
+        "energy_keV": 444.54,
+        "intensity": 0.0106,
+        "intensity_uncertainty": 0.0018
+      },
+      {
+        "energy_keV": 461.61,
+        "intensity": 0.0025,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 484.74,
+        "intensity": 0.0016,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 492.1,
+        "intensity": 0.0014000000000000002,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 506.43,
+        "intensity": 0.0061,
+        "intensity_uncertainty": 0.0016
+      },
+      {
+        "energy_keV": 518.04,
+        "intensity": 0.061,
+        "intensity_uncertainty": 0.011000000000000001
+      },
+      {
+        "energy_keV": 540.18,
+        "intensity": 0.2,
+        "intensity_uncertainty": 0.04
+      },
+      {
+        "energy_keV": 545.5,
+        "intensity": 0.001,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 557.6,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0008
+      },
+      {
+        "energy_keV": 591.9,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 598.19,
+        "intensity": 0.013999999999999999,
+        "intensity_uncertainty": 0.003
+      },
+      {
+        "energy_keV": 625.19,
+        "intensity": 0.0023,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 642.18,
+        "intensity": 0.0068000000000000005,
+        "intensity_uncertainty": 0.0018
+      },
+      {
+        "energy_keV": 649.44,
+        "intensity": 0.109,
+        "intensity_uncertainty": 0.019
+      },
+      {
+        "energy_keV": 660.4,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 669.1,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 676.55,
+        "intensity": 0.032,
+        "intensity_uncertainty": 0.006
+      },
+      {
+        "energy_keV": 692.41,
+        "intensity": 0.033,
+        "intensity_uncertainty": 0.006
+      },
+      {
+        "energy_keV": 715.8,
+        "intensity": 0.005699999999999999,
+        "intensity_uncertainty": 0.0012
+      },
+      {
+        "energy_keV": 722.5,
+        "intensity": 0.0037,
+        "intensity_uncertainty": 0.0012
+      },
+      {
+        "energy_keV": 723.6,
+        "intensity": 0.0023,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 749.4,
+        "intensity": 0.001,
+        "intensity_uncertainty": 0.001
+      },
+      {
+        "energy_keV": 753.1,
+        "intensity": 0.0023,
+        "intensity_uncertainty": 0.0013000000000000002
+      },
+      {
+        "energy_keV": 756.71,
+        "intensity": 0.027000000000000003,
+        "intensity_uncertainty": 0.005
+      },
+      {
+        "energy_keV": 796.29,
+        "intensity": 0.0025,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 800.7,
+        "intensity": 0.001,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 826.29,
+        "intensity": 0.0014000000000000002,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 830.49,
+        "intensity": 0.0068000000000000005,
+        "intensity_uncertainty": 0.0013000000000000002
+      },
+      {
+        "energy_keV": 845.16,
+        "intensity": 0.0025,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 850.54,
+        "intensity": 0.0016,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 857.2,
+        "intensity": 0.001,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 873.21,
+        "intensity": 0.092,
+        "intensity_uncertainty": 0.016
+      },
+      {
+        "energy_keV": 880.6,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 892.76,
+        "intensity": 0.031000000000000003,
+        "intensity_uncertainty": 0.006
+      },
+      {
+        "energy_keV": 922.1,
+        "intensity": 0.003,
+        "intensity_uncertainty": 0.003
+      },
+      {
+        "energy_keV": 922.1,
+        "intensity": 0.003,
+        "intensity_uncertainty": 0.003
+      },
+      {
+        "energy_keV": 924.6,
+        "intensity": 0.013999999999999999,
+        "intensity_uncertainty": 0.003
+      },
+      {
+        "energy_keV": 927.5,
+        "intensity": 0.0034999999999999996,
+        "intensity_uncertainty": 0.0013000000000000002
+      },
+      {
+        "energy_keV": 953.18,
+        "intensity": 0.005699999999999999,
+        "intensity_uncertainty": 0.001
+      },
+      {
+        "energy_keV": 964.9,
+        "intensity": 0.0033000000000000004,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 982.0,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0008
+      },
+      {
+        "energy_keV": 984.3,
+        "intensity": 0.0045000000000000005,
+        "intensity_uncertainty": 0.001
+      },
+      {
+        "energy_keV": 996.24,
+        "intensity": 0.086,
+        "intensity_uncertainty": 0.016
+      },
+      {
+        "energy_keV": 1004.73,
+        "intensity": 0.109,
+        "intensity_uncertainty": 0.02
+      },
+      {
+        "energy_keV": 1012.9,
+        "intensity": 0.001,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1020.4,
+        "intensity": 0.0029,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 1033.3,
+        "intensity": 0.0047,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 1041.9,
+        "intensity": 0.0022,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 1047.22,
+        "intensity": 0.0014000000000000002,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1053.9,
+        "intensity": 0.0022,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 1058.34,
+        "intensity": 0.0027,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 1061.39,
+        "intensity": 0.0014000000000000002,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1072.37,
+        "intensity": 0.0034999999999999996,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 1084.21,
+        "intensity": 0.0021,
+        "intensity_uncertainty": 0.0021
+      },
+      {
+        "energy_keV": 1084.21,
+        "intensity": 0.0021,
+        "intensity_uncertainty": 0.0021
+      },
+      {
+        "energy_keV": 1102.43,
+        "intensity": 0.0027,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 1118.03,
+        "intensity": 0.0053,
+        "intensity_uncertainty": 0.0015
+      },
+      {
+        "energy_keV": 1128.77,
+        "intensity": 0.016,
+        "intensity_uncertainty": 0.003
+      },
+      {
+        "energy_keV": 1140.75,
+        "intensity": 0.013999999999999999,
+        "intensity_uncertainty": 0.003
+      },
+      {
+        "energy_keV": 1149.66,
+        "intensity": 0.0098,
+        "intensity_uncertainty": 0.0023
+      },
+      {
+        "energy_keV": 1152.42,
+        "intensity": 0.022000000000000002,
+        "intensity_uncertainty": 0.005
+      },
+      {
+        "energy_keV": 1177.71,
+        "intensity": 0.0029,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 1189.1,
+        "intensity": 0.0061,
+        "intensity_uncertainty": 0.0022
+      },
+      {
+        "energy_keV": 1208.06,
+        "intensity": 0.0051,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 1214.3,
+        "intensity": 0.00106,
+        "intensity_uncertainty": 0.00021999999999999998
+      },
+      {
+        "energy_keV": 1229.42,
+        "intensity": 0.0059,
+        "intensity_uncertainty": 0.0014000000000000002
+      },
+      {
+        "energy_keV": 1234.0,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 1237.5,
+        "intensity": 0.0016,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 1241.23,
+        "intensity": 0.0027,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 1246.2,
+        "intensity": 0.0027,
+        "intensity_uncertainty": 0.0008
+      },
+      {
+        "energy_keV": 1258.17,
+        "intensity": 0.016,
+        "intensity_uncertainty": 0.003
+      },
+      {
+        "energy_keV": 1274.46,
+        "intensity": 0.0078000000000000005,
+        "intensity_uncertainty": 0.0019
+      },
+      {
+        "energy_keV": 1275.0,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0013000000000000002
+      },
+      {
+        "energy_keV": 1280.8,
+        "intensity": 0.0018,
+        "intensity_uncertainty": 0.0011
+      },
+      {
+        "energy_keV": 1288.39,
+        "intensity": 0.008,
+        "intensity_uncertainty": 0.008
+      },
+      {
+        "energy_keV": 1288.39,
+        "intensity": 0.008,
+        "intensity_uncertainty": 0.008
+      },
+      {
+        "energy_keV": 1309.05,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1339.53,
+        "intensity": 0.0029,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 1387.76,
+        "intensity": 0.0029,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 1419.4,
+        "intensity": 0.0072,
+        "intensity_uncertainty": 0.0018
+      },
+      {
+        "energy_keV": 1451.1,
+        "intensity": 0.0014000000000000002,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1490.37,
+        "intensity": 0.010400000000000001,
+        "intensity_uncertainty": 0.0019
+      },
+      {
+        "energy_keV": 1494.1,
+        "intensity": 0.0027,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 1515.8,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0007000000000000001
+      },
+      {
+        "energy_keV": 1520.69,
+        "intensity": 0.005699999999999999,
+        "intensity_uncertainty": 0.001
+      },
+      {
+        "energy_keV": 1523.0,
+        "intensity": 0.0033000000000000004,
+        "intensity_uncertainty": 0.0017000000000000001
+      },
+      {
+        "energy_keV": 1553.0,
+        "intensity": 0.0023,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 1618.9,
+        "intensity": 0.0039000000000000003,
+        "intensity_uncertainty": 0.0008
+      },
+      {
+        "energy_keV": 1651.8,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 1673.15,
+        "intensity": 0.0045000000000000005,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 1721.0,
+        "intensity": 0.0014000000000000002,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 1814.9,
+        "intensity": 0.0014000000000000002,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 1858.4,
+        "intensity": 0.0022,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 1894.7,
+        "intensity": 0.0017000000000000001,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 1905.0,
+        "intensity": 0.0016,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 1931.0,
+        "intensity": 0.0012,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 1934.71,
+        "intensity": 0.0072,
+        "intensity_uncertainty": 0.0013000000000000002
+      },
+      {
+        "energy_keV": 1965.03,
+        "intensity": 0.019,
+        "intensity_uncertainty": 0.004
+      },
+      {
+        "energy_keV": 1998.0,
+        "intensity": 0.0037,
+        "intensity_uncertainty": 0.0012
+      },
+      {
+        "energy_keV": 2024.9,
+        "intensity": 0.002,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 2084.7,
+        "intensity": 0.00123,
+        "intensity_uncertainty": 0.00023
+      },
+      {
+        "energy_keV": 2107.0,
+        "intensity": 0.0016,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 2142.9,
+        "intensity": 0.0022,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 2153.81,
+        "intensity": 0.01,
+        "intensity_uncertainty": 0.0017000000000000001
+      },
+      {
+        "energy_keV": 2182.6,
+        "intensity": 0.0018,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 2212.92,
+        "intensity": 0.008199999999999999,
+        "intensity_uncertainty": 0.0015
+      },
+      {
+        "energy_keV": 2245.7,
+        "intensity": 0.0045000000000000005,
+        "intensity_uncertainty": 0.0009
+      },
+      {
+        "energy_keV": 2282.8,
+        "intensity": 0.0022,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 2295.9,
+        "intensity": 0.0031,
+        "intensity_uncertainty": 0.0006
+      },
+      {
+        "energy_keV": 2358.3,
+        "intensity": 0.002,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 2372.4,
+        "intensity": 0.0013000000000000002,
+        "intensity_uncertainty": 0.0003
+      },
+      {
+        "energy_keV": 2389.5,
+        "intensity": 0.002,
+        "intensity_uncertainty": 0.0004
+      },
+      {
+        "energy_keV": 2411.1,
+        "intensity": 0.001,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 2496.3,
+        "intensity": 0.001,
+        "intensity_uncertainty": 0.0005
+      },
+      {
+        "energy_keV": 2559.6,
+        "intensity": 0.0014299999999999998,
+        "intensity_uncertainty": 0.00025
+      },
+      {
+        "energy_keV": 2575.1,
+        "intensity": 0.00108,
+        "intensity_uncertainty": 0.00021
+      }
+    ]
+  },
+  "Ti51": {
+    "half_life_seconds": 348.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 320.085,
+        "intensity": 0.942,
+        "intensity_uncertainty": 0.0
+      },
+      {
+        "energy_keV": 608.57,
+        "intensity": 0.013188,
+        "intensity_uncertainty": 0.001884
+      },
+      {
+        "energy_keV": 928.66,
+        "intensity": 0.056519999999999994,
+        "intensity_uncertainty": 0.00942
+      }
+    ]
+  },
+  "V52": {
+    "half_life_seconds": 224.7,
+    "gamma_lines": [
+      {
+        "energy_keV": 1333.67,
+        "intensity": 0.0059,
+        "intensity_uncertainty": 0.0001
+      },
+      {
+        "energy_keV": 1434.09,
+        "intensity": 1.0,
+        "intensity_uncertainty": 0.0
+      },
+      {
+        "energy_keV": 1530.69,
+        "intensity": 0.00116,
+        "intensity_uncertainty": 2e-05
+      }
+    ]
+  },
+  "W187": {
+    "half_life_seconds": 85860.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 134.25,
+        "intensity": 0.08667000000000001,
+        "intensity_uncertainty": 0.0018900000000000002
+      },
+      {
+        "energy_keV": 206.25,
+        "intensity": 0.001296,
+        "intensity_uncertainty": 0.00010800000000000001
+      },
+      {
+        "energy_keV": 246.3,
+        "intensity": 0.001134,
+        "intensity_uncertainty": 8.1e-05
+      },
+      {
+        "energy_keV": 479.49,
+        "intensity": 0.21681000000000003,
+        "intensity_uncertainty": 0.0018900000000000002
+      },
+      {
+        "energy_keV": 511.65,
+        "intensity": 0.006372,
+        "intensity_uncertainty": 8.1e-05
+      },
+      {
+        "energy_keV": 551.49,
+        "intensity": 0.05049,
+        "intensity_uncertainty": 0.0008100000000000001
+      },
+      {
+        "energy_keV": 588.96,
+        "intensity": 0.001296,
+        "intensity_uncertainty": 5.4000000000000005e-05
+      },
+      {
+        "energy_keV": 618.28,
+        "intensity": 0.06210000000000001,
+        "intensity_uncertainty": 0.00027
+      },
+      {
+        "energy_keV": 625.5,
+        "intensity": 0.0108,
+        "intensity_uncertainty": 8.1e-05
+      },
+      {
+        "energy_keV": 685.74,
+        "intensity": 0.27,
+        "intensity_uncertainty": 0.0
+      },
+      {
+        "energy_keV": 745.4,
+        "intensity": 0.0029970000000000005,
+        "intensity_uncertainty": 8.1e-05
+      },
+      {
+        "energy_keV": 772.91,
+        "intensity": 0.04104,
+        "intensity_uncertainty": 0.00054
+      },
+      {
+        "energy_keV": 864.6,
+        "intensity": 0.0033480000000000003,
+        "intensity_uncertainty": 5.4000000000000005e-05
+      },
+      {
+        "energy_keV": 879.6,
+        "intensity": 0.001404,
+        "intensity_uncertainty": 2.7000000000000002e-05
+      }
+    ]
+  }
+}

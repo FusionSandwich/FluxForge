@@ -1,0 +1,34 @@
+[
+  {
+    "title": "M0 \u2014 Planning & Backlog",
+    "description": "Stage 0 project setup, ADRs, tracker scaffolding, and architecture prerequisites."
+  },
+  {
+    "title": "M1 \u2014 GUI Shell & Architecture",
+    "description": "Phase 1 shell, renderer abstraction, HAL interfaces, file I/O, and nuclide database."
+  },
+  {
+    "title": "M2 \u2014 Core Analysis Parity",
+    "description": "Calibration, peak fitting, nuclide identification, and activity workflows."
+  },
+  {
+    "title": "M3 \u2014 Advanced Analysis",
+    "description": "Unfolding, ML-assisted analysis, batch processing, and advanced reporting."
+  },
+  {
+    "title": "M4 \u2014 Standards & QA",
+    "description": "ASTM modules, QA monitoring, standards locking, and compliance reporting."
+  },
+  {
+    "title": "M3B \u2014 Offline Spectroscopy Parity",
+    "description": "Offline spectroscopy parity against the newly added testing repos, including parity fixtures, reference workflows, and GUI parity."
+  },
+  {
+    "title": "M5 \u2014 MCA Foundations",
+    "description": "HAL drivers, live acquisition, device status integration, and dashboard groundwork."
+  },
+  {
+    "title": "M6 \u2014 Packaging & Release",
+    "description": "Packaging, distribution, CI/CD hardening, and release documentation."
+  }
+]

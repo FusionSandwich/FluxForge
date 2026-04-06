@@ -1,0 +1,59 @@
+Sample: Co-RAFM-1_25cm
+Raw file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Co-RAFM-1_25cm.ASC
+QG file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Co-RAFM-1_25cm.txt
+Sample group: flux_wires
+Irradiation phase: phase2_whale_tube
+Schedule source: sample_schedule.flux_wires
+Decay label: n/a
+Decay time (s): 1989660.0
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+QG peaks not identified by FluxForge
+------------------------------------
+- none
+
+Matched energies with isotope mismatch
+--------------------------------------
+- none
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- none
+
+Peak gross-count parity failures
+--------------------------------
+- none
+
+Isotope activity parity failures
+--------------------------------
+- none
+
+Line-level diagnostic flags
+---------------------------
+- none
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- none
+
+Measurement QC review flags
+---------------------------
+- none
+
+QG internal consistency flags
+-----------------------------
+- none
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- none
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- none
+

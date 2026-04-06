@@ -1,1 +1,131 @@
-"""FluxForge module."""
+"""FluxForge physics module."""
+
+from fluxforge.physics.activation import (
+    GammaLineMeasurement,
+    IrradiationSegment,
+    ReactionRateEstimate,
+    activation_study_metrics,
+    activity_to_atoms,
+    activity_to_radioactive_mass_g,
+    infer_nuclide_atomic_mass_g_mol,
+    radioisotope_specific_activity_bq_g,
+    weighted_activity,
+    irradiation_buildup_factor,
+    reaction_rate_from_activity,
+)
+from fluxforge.physics.dose import (
+    GammaLine,
+    DoseRateResult,
+    decay_constant,
+    decay_activity,
+    gamma_dose_rate,
+    isotope_dose_rate,
+    fluence_from_activity,
+    interpolate_coefficient,
+)
+from fluxforge.physics.nuclides import (
+    NuclideData,
+    GammaLineData,
+    NuclideDatabase,
+    get_nuclide_database,
+    get_half_life,
+    get_gamma_lines,
+)
+from fluxforge.physics.neutron_corrections import (
+    SelfShieldingResult,
+    CdCoverResult,
+    NeutronCorrections,
+    calculate_thermal_self_shielding_factor,
+    calculate_epithermal_self_shielding_factor,
+    calculate_self_shielding,
+    calculate_cd_ratio_correction,
+    calculate_cd_ratio,
+    extract_thermal_epithermal_components,
+    apply_cd_cover_correction,
+    calculate_all_corrections,
+    THERMAL_CROSS_SECTIONS,
+    RESONANCE_INTEGRALS,
+    ATOMIC_WEIGHTS,
+    CD_CUTOFF_ENERGY,
+)
+from fluxforge.physics.decay_library import (
+    DecayDataset,
+    normalize_nuclide_label as normalize_decay_label,
+)
+from fluxforge.physics.decay_inventory import (
+    DecayInventory,
+    DecayNetwork,
+    CountObservation,
+    ProductionSegment,
+    schedule_from_rates,
+    evolve_with_schedule,
+    fit_schedule_scale,
+)
+from fluxforge.physics.attenuation import (
+    AttenuationMaterial,
+    get_material,
+    attenuation_factor,
+    mixture_attenuation_factor,
+)
+
+__all__ = [
+    # activation
+    "GammaLineMeasurement",
+    "IrradiationSegment",
+    "ReactionRateEstimate",
+    "activation_study_metrics",
+    "activity_to_atoms",
+    "activity_to_radioactive_mass_g",
+    "infer_nuclide_atomic_mass_g_mol",
+    "radioisotope_specific_activity_bq_g",
+    "weighted_activity",
+    "irradiation_buildup_factor",
+    "reaction_rate_from_activity",
+    # dose
+    "GammaLine",
+    "DoseRateResult",
+    "decay_constant",
+    "decay_activity",
+    "gamma_dose_rate",
+    "isotope_dose_rate",
+    "fluence_from_activity",
+    "interpolate_coefficient",
+    # nuclides
+    "NuclideData",
+    "GammaLineData",
+    "NuclideDatabase",
+    "get_nuclide_database",
+    "get_half_life",
+    "get_gamma_lines",
+    # neutron corrections
+    "SelfShieldingResult",
+    "CdCoverResult",
+    "NeutronCorrections",
+    "calculate_thermal_self_shielding_factor",
+    "calculate_epithermal_self_shielding_factor",
+    "calculate_self_shielding",
+    "calculate_cd_ratio_correction",
+    "calculate_cd_ratio",
+    "extract_thermal_epithermal_components",
+    "apply_cd_cover_correction",
+    "calculate_all_corrections",
+    "THERMAL_CROSS_SECTIONS",
+    "RESONANCE_INTEGRALS",
+    "ATOMIC_WEIGHTS",
+    "CD_CUTOFF_ENERGY",
+    # decay library/inventory
+    "DecayDataset",
+    "normalize_decay_label",
+    "DecayInventory",
+    "DecayNetwork",
+    "CountObservation",
+    "ProductionSegment",
+    "schedule_from_rates",
+    "evolve_with_schedule",
+    "fit_schedule_scale",
+    # attenuation
+    "AttenuationMaterial",
+    "get_material",
+    "attenuation_factor",
+    "mixture_attenuation_factor",
+]

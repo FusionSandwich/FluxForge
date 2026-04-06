@@ -1,0 +1,2 @@
+sample_id,sample_group,isotope,header_activity_bq,header_activity_unc_bq,n_line_activities,min_line_activity_bq,max_line_activity_bq,mean_line_activity_bq,max_relative_line_header_deviation,flag_internal_inconsistency
+Co-Cd-RAFM-1_25cm,flux_wires,Co60,234.95,22.126,2,219.78,246.42000000000002,233.10000000000002,0.06456692913385821,False

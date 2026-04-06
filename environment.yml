@@ -5,6 +5,19 @@ channels:
 dependencies:
   - python=3.11
   - pip
+  - setuptools
+  - wheel
   - pytest
+  - black=24.10.*
+  - flake8=7.3.*
+  - numpy=1.26.*
+  - scipy
+  - pandas
+  - matplotlib
+  - pillow
+  - tk
+  - pyyaml
+  - h5py
   - pip:
       - -e .
+      - tensorflow==2.15.1

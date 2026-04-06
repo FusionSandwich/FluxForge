@@ -1,0 +1,30 @@
+{
+  "Co60": {
+    "zai": 270600,
+    "halflife": 166349964.0,
+    "gamma": {
+      "lines": {
+        "energies": [1173228.0, 1332492.0],
+        "energies_unc": [5.0, 5.0],
+        "intensities": [0.999, 0.999],
+        "intensities_unc": [0.001, 0.001],
+        "norms": [1.0, 1.0],
+        "norms_unc": [0.0, 0.0]
+      }
+    }
+  },
+  "Cs137": {
+    "zai": 551370,
+    "halflife": 948672000.0,
+    "gamma": {
+      "lines": {
+        "energies": [661657.0],
+        "energies_unc": [5.0],
+        "intensities": [0.851],
+        "intensities_unc": [0.005],
+        "norms": [1.0],
+        "norms_unc": [0.0]
+      }
+    }
+  }
+}

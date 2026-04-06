@@ -1,0 +1,72 @@
+{
+  "_metadata": {
+    "description": "Bundled flux-wire reaction catalog for FluxForge. Nuclear decay data and emission probabilities are loaded separately from rafm_decay_data.json.",
+    "source_notes": [
+      "Reaction/product expectations are committed metadata for the RAFM flux-wire workflow.",
+      "Peak line energies are target search lines only; branching ratios come from the bundled decay-data subset."
+    ]
+  },
+  "isotopes": {
+    "Co60": {
+      "parent_element": "Co",
+      "reaction": "Co59(n,g)",
+      "target_lines_keV": [1173.23, 1332.49]
+    },
+    "Sc46": {
+      "parent_element": "Sc",
+      "reaction": "Sc45(n,g)",
+      "target_lines_keV": [889.271, 1120.54],
+      "expected_elements": ["Sc", "Ti"]
+    },
+    "Sc47": {
+      "parent_element": "Ti",
+      "reaction": "Ti47(n,p)",
+      "target_lines_keV": [159.391]
+    },
+    "Sc48": {
+      "parent_element": "Ti",
+      "reaction": "Ti48(n,p)",
+      "target_lines_keV": [175.35, 983.5, 1037.5, 1312.1]
+    },
+    "Co58": {
+      "parent_element": "Ni",
+      "reaction": "Ni58(n,p)",
+      "target_lines_keV": [810.775]
+    },
+    "Cu64": {
+      "parent_element": "Cu",
+      "reaction": "Cu63(n,g)",
+      "target_lines_keV": [1345.77]
+    },
+    "In114m": {
+      "parent_element": "In",
+      "reaction": "In113(n,g)",
+      "target_lines_keV": [190.34, 558.46, 725.28]
+    },
+    "In115m": {
+      "parent_element": "In",
+      "reaction": "In115(n,n')",
+      "target_lines_keV": [336.241]
+    },
+    "Ni57": {
+      "parent_element": "Ni",
+      "reaction": "Ni58(n,2n)",
+      "target_lines_keV": [127.164, 1377.62, 1919.62]
+    },
+    "Fe59": {
+      "parent_element": "Fe",
+      "reaction": "Fe58(n,g)",
+      "target_lines_keV": [1099.25, 1291.59]
+    },
+    "Mn54": {
+      "parent_element": "Fe",
+      "reaction": "Fe54(n,p)",
+      "target_lines_keV": [834.838]
+    },
+    "Ti51": {
+      "parent_element": "Ti",
+      "reaction": "Ti50(n,g)",
+      "target_lines_keV": [320.085]
+    }
+  }
+}

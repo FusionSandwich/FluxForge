@@ -1,0 +1,60 @@
+{
+  "schema": "fluxforge.report_bundle.v1",
+  "summary": {
+    "validation_overall_passed": true,
+    "validation_n_raw_analyzed": 29,
+    "validation_n_matched_pairs": 27,
+    "validation_qg_internal_consistency_flags": 24,
+    "validation_fluxforge_line_consistency_flags": 334,
+    "validation_measurement_qc_flags": 2,
+    "validation_sample_count": 29,
+    "validation_isotope_rows": 102,
+    "validation_total_activity_Bq": 47639128727.002686,
+    "validation_total_radioactive_mass_g": 1.4462181899219613e-06,
+    "chi2": 4.943194073895318e-10,
+    "integral_flux": 5.167082770623247e-10
+  },
+  "provenance": {
+    "created_at": "2026-03-11T15:58:47.493953+00:00",
+    "versions": {
+      "fluxforge": "0.1.0"
+    },
+    "units": {
+      "summary": "mixed"
+    },
+    "normalization": {
+      "report": "aggregate"
+    },
+    "definitions": {
+      "summary": "aggregate summary across artifacts"
+    }
+  },
+  "inputs": {
+    "validation_results_root": "artifacts/manual_review/rafm_validation_full",
+    "unfold_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/artifacts/manual_review/rafm_validation_full/unfolding/gls.json"
+  },
+  "tables": {
+    "directory": "validation_report_tables",
+    "items": {
+      "validation_sample_summary": {
+        "path": "validation_sample_summary.csv",
+        "row_count": 29,
+        "format": "csv"
+      },
+      "validation_isotope_activity": {
+        "path": "validation_isotope_activity.csv",
+        "row_count": 102,
+        "format": "csv"
+      },
+      "unfold_flux_groups": {
+        "path": "unfold_flux_groups.csv",
+        "row_count": 20,
+        "format": "csv"
+      }
+    }
+  },
+  "text_report": {
+    "path": "validation_report.txt",
+    "format": "text/plain"
+  }
+}

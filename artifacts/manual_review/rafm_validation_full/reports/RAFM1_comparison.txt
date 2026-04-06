@@ -1,0 +1,16 @@
+Sample: RAFM1
+Raw file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/RAFM1/RAFM1.ASC
+QG file: none
+Sample group: RAFM1
+Irradiation phase: n/a
+Schedule source: n/a
+Decay label: n/a
+Decay time (s): n/a
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+No paired QG processed file was found for this raw spectrum.
+
+Unidentified FluxForge peaks
+---------------------------
+- 1038.76 keV | net=1796.01 +/- 94.38 | sig=19.03

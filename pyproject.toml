@@ -4,8 +4,35 @@ version = "0.1.0"
 description = "UWNR Flux-Wire–Driven Neutron Spectrum Reconstruction Tool"
 authors = [{name = "UWNR Team"}]
 readme = "README.md"
+license = {file = "LICENSE"}
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "numpy>=1.26,<2.0",
+    "scipy>=1.11",
+    "pandas>=2.1",
+    "matplotlib>=3.8",
+    "pillow>=10.0",
+    "PyYAML>=6.0",
+    "h5py>=3.10",
+    "lxml>=5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "black==24.10.*",
+    "flake8==7.3.*",
+]
+ml = [
+    "tensorflow==2.15.1",
+]
+bundle = [
+    "pyinstaller>=6.0",
+]
+reporting = [
+    "Jinja2>=3.1",
+    "WeasyPrint>=62.0",
+]
 
 [project.scripts]
 fluxforge = "fluxforge.cli.app:main"
@@ -13,3 +40,35 @@ fluxforge = "fluxforge.cli.app:main"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+fluxforge = [
+    "data/*.json",
+    "reporting/templates/*.j2",
+    "resources/schemas/*.xsd",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+include = "\\.pyi?$"
+extend-exclude = """
+(
+	^/tools/
+	| ^/testing/
+)
+"""
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+	".git",
+	"__pycache__",
+	".venv",
+	"tools",
+	"testing",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

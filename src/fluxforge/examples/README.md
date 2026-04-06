@@ -40,3 +40,28 @@ formats and CLI flow. Replace them with library values (e.g., IRDFF-II Fe58(n,γ
 reaction data) and geometry-specific number densities before drawing physics
 conclusions. The SpecKit and Neutron-Unfolding repositories show similar
 response-matrix and measurement JSON/YAML patterns.
+
+## Flux wire spectrum analysis
+
+The `flux_wire/` subfolder holds experimental scripts and sample inputs for
+gamma-spectrum workflows:
+
+* `flux_wire_spectrum_analysis.py`: end-to-end spectrum processing and flux
+  unfolding workflow based on k₀-NAA and IRDFF-II guidance.
+* `batch_compare_spectra.py`: batch peak-finding and Genie-2000 report matching
+  utility.
+* `Co-Cd-RAFM-1_25cm.ASC` / `Co-Cd-RAFM-1_25cm.txt`: example Genie-2000 exports.
+* `flux_wire_timing.csv`: sample irradiation timing metadata.
+
+Example usage:
+
+```bash
+# Run the comprehensive spectrum analysis (expects repo-relative inputs)
+python src/fluxforge/examples/flux_wire/flux_wire_spectrum_analysis.py
+
+# Batch-process spectra with the shared efficiency curve
+python src/fluxforge/examples/flux_wire/batch_compare_spectra.py \
+  --spectra-dir <path-to-asc-files> \
+  --eff-csv src/fluxforge/examples/eff.csv \
+  --out-dir flux_wire_plots
+```

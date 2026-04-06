@@ -40,4 +40,3 @@ def test_reaction_rate_single_segment():
     factor = irradiation_buildup_factor(segments, half_life)
     rate_estimate = reaction_rate_from_activity(activity, segments, half_life)
     assert math.isclose(rate_estimate.rate * factor, activity, rel_tol=1e-6)
-

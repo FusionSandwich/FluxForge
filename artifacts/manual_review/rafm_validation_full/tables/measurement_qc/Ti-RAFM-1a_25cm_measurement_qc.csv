@@ -1,0 +1,2 @@
+sample_id,sample_group,check,dead_time_pct,threshold_pct,live_time_s,real_time_s,max_peak_significance,max_peak_gross_counts,flag_review,note
+Ti-RAFM-1a_25cm,flux_wires,dead_time_review,0.07633058080632749,15.0,14400.0,14411.0,116.53674121405751,45284.0,False,Dead time within configured review threshold.

@@ -1,0 +1,51 @@
+{
+  "testing_root": "/groupspace/cnerg/users/smandych/projects/ALARA/testing",
+  "all_checks_passed": true,
+  "results": [
+    {
+      "case_id": "spectrum_io",
+      "check_id": "spe_eu_calib_7cm",
+      "passed": true,
+      "correlation": 1.0,
+      "max_relative_error": 0.0,
+      "exact_match": true,
+      "notes": ""
+    },
+    {
+      "case_id": "spectrum_io",
+      "check_id": "cnf_canberra_sample",
+      "passed": true,
+      "correlation": 1.0,
+      "max_relative_error": 0.0,
+      "exact_match": true,
+      "notes": ""
+    },
+    {
+      "case_id": "spectrum_io",
+      "check_id": "iec_hpge_dummy_01",
+      "passed": true,
+      "correlation": 1.0,
+      "max_relative_error": 0.0,
+      "exact_match": true,
+      "notes": ""
+    },
+    {
+      "case_id": "unfolding_case_001",
+      "check_id": "gravel_flux",
+      "passed": true,
+      "correlation": 0.9912651842472224,
+      "max_relative_error": 116.22616450891792,
+      "exact_match": false,
+      "notes": "min_corr=0.98"
+    },
+    {
+      "case_id": "unfolding_case_001",
+      "check_id": "mlem_flux",
+      "passed": true,
+      "correlation": 0.9165720044063618,
+      "max_relative_error": 3.866474238017497,
+      "exact_match": false,
+      "notes": "min_corr=0.90"
+    }
+  ]
+}

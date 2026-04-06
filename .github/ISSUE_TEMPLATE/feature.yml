@@ -1,0 +1,109 @@
+name: Feature Request
+description: Propose a new capability or significant enhancement.
+title: "[Feature]: "
+labels: ["type/feature", "priority/p2-normal"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: Concise name for the feature.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - area/gui
+        - area/core
+        - area/io
+        - area/ml
+        - area/unfolding
+        - area/standards
+        - area/hal
+        - area/reporting
+        - area/performance
+        - area/docs
+        - area/testing
+        - area/packaging
+        - area/registry
+        - area/calibration
+        - area/nuclide-db
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - type/feature
+        - type/refactor
+        - type/design
+        - type/research
+        - type/validation
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - priority/p0-blocking
+        - priority/p1-critical
+        - priority/p2-normal
+        - priority/p3-nice-to-have
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - platform/both
+        - platform/linux
+        - platform/windows
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation / Use Case
+    validations:
+      required: true
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Proposed Implementation
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+  - type: textarea
+    id: additive
+    attributes:
+      label: Additive Policy Check
+      description: Explain whether this change removes any existing capability.
+    validations:
+      required: true
+  - type: textarea
+    id: standards
+    attributes:
+      label: Standards Impact
+      description: Note ASTM or other standards impact, if any.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+    validations:
+      required: true
+  - type: textarea
+    id: related
+    attributes:
+      label: Related Issues

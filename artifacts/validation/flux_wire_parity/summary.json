@@ -1,0 +1,147 @@
+{
+  "summary": {
+    "comparisons": 17,
+    "missing": [],
+    "ratio_mean": 0.9996700440245182,
+    "ratio_std": 0.005684793986775623,
+    "max_abs_diff_pct": 1.4595766006082256
+  },
+  "rows": [
+    {
+      "sample_id": "Cu-RAFM-1",
+      "isotope": "Cu64",
+      "ref_bq": 3172380.0,
+      "calc_bq": 3172377.736648961,
+      "ratio": 0.99999928654479,
+      "diff_pct": -7.134552100218627e-05
+    },
+    {
+      "sample_id": "Co-Cd-RAFM-1 @25cm",
+      "isotope": "Co60",
+      "ref_bq": 234.95,
+      "calc_bq": 233.07656179348584,
+      "ratio": 0.9920262259778074,
+      "diff_pct": -0.797377402219257
+    },
+    {
+      "sample_id": "Co-RAFM-1 @ 25cm",
+      "isotope": "Co60",
+      "ref_bq": 2035.0,
+      "calc_bq": 2034.3368100606224,
+      "ratio": 0.999674108137898,
+      "diff_pct": -0.0325891862101968
+    },
+    {
+      "sample_id": "In-Cd-RAFM-1_25cm",
+      "isotope": "In114m",
+      "ref_bq": 219706.0,
+      "calc_bq": 221230.0623646231,
+      "ratio": 1.0069368263252851,
+      "diff_pct": 0.6936826325285139
+    },
+    {
+      "sample_id": "In-Cd-RAFM-1_25cm",
+      "isotope": "In115m",
+      "ref_bq": 11988.0,
+      "calc_bq": 12053.905964669193,
+      "ratio": 1.0054976613838165,
+      "diff_pct": 0.5497661383816466
+    },
+    {
+      "sample_id": "Ni-RAFM-1 @ 25cm",
+      "isotope": "Co58",
+      "ref_bq": 45880.0,
+      "calc_bq": 45879.05454597257,
+      "ratio": 0.9999793928939096,
+      "diff_pct": -0.0020607106090420046
+    },
+    {
+      "sample_id": "Sc-Cd-RAFM-1 @ 25cm",
+      "isotope": "Sc46",
+      "ref_bq": 159063.0,
+      "calc_bq": 158502.80177464924,
+      "ratio": 0.9964781361765416,
+      "diff_pct": -0.35218638234584265
+    },
+    {
+      "sample_id": "Sc-RAFM-1 @ 25cm",
+      "isotope": "Sc46",
+      "ref_bq": 1607650.0,
+      "calc_bq": 1597933.2251328276,
+      "ratio": 0.9939559139942323,
+      "diff_pct": -0.6044086005767668
+    },
+    {
+      "sample_id": "Ti-RAFM-1 @25cm",
+      "isotope": "Sc47",
+      "ref_bq": 2271.8,
+      "calc_bq": 2271.81396326587,
+      "ratio": 1.0000061463446914,
+      "diff_pct": 0.000614634469142672
+    },
+    {
+      "sample_id": "Ti-RAFM-1 @25cm",
+      "isotope": "Sc48",
+      "ref_bq": 15688.0,
+      "calc_bq": 15653.747636746222,
+      "ratio": 0.9978166520108505,
+      "diff_pct": -0.21833479891495422
+    },
+    {
+      "sample_id": "Ti-RAFM-1 @25cm",
+      "isotope": "Sc46",
+      "ref_bq": 473.6,
+      "calc_bq": 473.6,
+      "ratio": 1.0,
+      "diff_pct": 0.0
+    },
+    {
+      "sample_id": "Ti-RAFM-1a @25cm",
+      "isotope": "Sc47",
+      "ref_bq": 2282.9,
+      "calc_bq": 2282.9493333924675,
+      "ratio": 1.0000216099664756,
+      "diff_pct": 0.0021609966475599762
+    },
+    {
+      "sample_id": "Ti-RAFM-1a @25cm",
+      "isotope": "Sc48",
+      "ref_bq": 15095.999999999998,
+      "calc_bq": 15095.999999999998,
+      "ratio": 1.0,
+      "diff_pct": 0.0
+    },
+    {
+      "sample_id": "Ti-RAFM-1a @25cm",
+      "isotope": "Sc46",
+      "ref_bq": 484.70000000000005,
+      "calc_bq": 491.77456778314814,
+      "ratio": 1.0145957660060823,
+      "diff_pct": 1.4595766006082256
+    },
+    {
+      "sample_id": "Ti-RAFM-1 48hr @25cm",
+      "isotope": "Sc47",
+      "ref_bq": 1605.8,
+      "calc_bq": 1586.6643522541838,
+      "ratio": 0.9880834177694506,
+      "diff_pct": -1.1916582230549366
+    },
+    {
+      "sample_id": "Ti-RAFM-1 48hr @25cm",
+      "isotope": "Sc48",
+      "ref_bq": 8658.0,
+      "calc_bq": 8658.0,
+      "ratio": 1.0,
+      "diff_pct": 0.0
+    },
+    {
+      "sample_id": "Ti-RAFM-1 48hr @25cm",
+      "isotope": "Sc46",
+      "ref_bq": 466.2,
+      "calc_bq": 465.88279979737655,
+      "ratio": 0.9993196048849776,
+      "diff_pct": -0.06803951150223808
+    }
+  ]
+}

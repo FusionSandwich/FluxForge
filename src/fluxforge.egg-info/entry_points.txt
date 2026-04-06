@@ -1,0 +1,2 @@
+[console_scripts]
+fluxforge = fluxforge.cli.app:main

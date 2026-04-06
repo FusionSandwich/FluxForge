@@ -1,0 +1,21 @@
+Sample: RAFM1_Long_72h_EOI
+Raw file: /groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/raw_gamma_spec/RAFM1/RAFM1_Long_72h_EOI.ASC
+QG file: none
+Sample group: RAFM1
+Irradiation phase: n/a
+Schedule source: n/a
+Decay label: n/a
+Decay time (s): n/a
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+No paired QG processed file was found for this raw spectrum.
+
+Unidentified FluxForge peaks
+---------------------------
+- 739.36 keV | net=11836.04 +/- 465.25 | sig=25.44
+- 1460.71 keV | net=4295.76 +/- 163.35 | sig=26.30
+- 1787.23 keV | net=1614.46 +/- 76.74 | sig=21.04
+- 2200.85 keV | net=5495.20 +/- 84.50 | sig=65.03
+- 2506.99 keV | net=2405.37 +/- 52.78 | sig=45.57
+- 2754.14 keV | net=405.50 +/- 20.21 | sig=20.06

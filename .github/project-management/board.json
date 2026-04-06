@@ -1,0 +1,15 @@
+{
+  "name": "FluxForge Roadmap",
+  "columns": ["Backlog", "Ready", "In Progress", "In Review", "Blocked", "Done"],
+  "views": ["table", "board"],
+  "automation": [
+    {"trigger": "issue_opened", "action": "move_to", "column": "Backlog"},
+    {"trigger": "linked_pr_opened", "action": "move_to", "column": "In Review"},
+    {"trigger": "pr_merged", "action": "move_to", "column": "Done"},
+    {"trigger": "label_applied", "label": "blocked", "action": "move_to", "column": "Blocked"}
+  ],
+  "notes": [
+    "Stored as configuration because this local workspace cannot directly create GitHub Projects.",
+    "Apply manually in the GitHub UI or via future PAT-backed automation."
+  ]
+}

@@ -1,0 +1,68 @@
+name: Epic
+description: Track a multi-issue roadmap stream.
+title: "[Epic]: "
+labels: ["type/epic", "priority/p1-critical"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Title
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - area/gui
+        - area/core
+        - area/io
+        - area/ml
+        - area/unfolding
+        - area/standards
+        - area/hal
+        - area/reporting
+        - area/performance
+        - area/docs
+        - area/testing
+        - area/packaging
+        - area/registry
+        - area/calibration
+        - area/nuclide-db
+    validations:
+      required: true
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      options:
+        - M0 — Planning & Backlog
+        - M1 — GUI Shell & Architecture
+        - M2 — Core Analysis Parity
+        - M3 — Advanced Analysis
+        - M4 — Standards & QA
+        - M5 — MCA Foundations
+        - M6 — Packaging & Release
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+  - type: textarea
+    id: child_issues
+    attributes:
+      label: Child Issues
+      description: Checklist or identifiers for the child issues in this epic.
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of Done
+    validations:
+      required: true
+  - type: textarea
+    id: additive
+    attributes:
+      label: Notes on Additive Policy Across the Epic

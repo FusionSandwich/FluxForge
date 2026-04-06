@@ -1,0 +1,2 @@
+sample_id,sample_group,isotope,header_activity_bq,header_activity_unc_bq,n_line_activities,min_line_activity_bq,max_line_activity_bq,mean_line_activity_bq,max_relative_line_header_deviation,flag_internal_inconsistency
+Ni-RAFM-1_25cm,flux_wires,Co58,45880.0,3848.0,1,45880.0,45880.0,45880.0,0.0,False

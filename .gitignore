@@ -1,4 +1,30 @@
 __pycache__/
 *.pyc
+.pytest_cache/
+*.orig
+*.rej
 .env
 .venv
+
+# OpenMC statepoint files
+statepoint.*.h5
+summary.h5
+particle_restart.h5
+
+# MCNP output and test files
+outp*
+mctal*
+meshtal*
+runtpe*
+srctp*
+*.i
+*.o
+
+# Generated examples and temporary validation outputs
+examples_output/
+examples/output/
+examples/RAFM_irradiation/results_tmp_*/
+examples/RAFM_irradiation/results_qg_*/
+
+# Native GUI review artifacts
+artifacts/gui_review/

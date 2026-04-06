@@ -1,0 +1,38 @@
+........................................................................ [  9%]
+........................................................................ [ 18%]
+....................................................F................... [ 27%]
+........................................................................ [ 37%]
+........................................................................ [ 46%]
+....................................sssssssssss......................... [ 55%]
+........................................................................ [ 65%]
+........................................................................ [ 74%]
+........................................................................ [ 83%]
+........................................................................ [ 93%]
+....................................................                     [100%]
+=================================== FAILURES ===================================
+_________________________ test_fe_cd_example_cli_flow __________________________
+
+    def test_fe_cd_example_cli_flow():
+>       boundaries = json.loads((EXAMPLE_DIR / "boundaries.json").read_text())
+
+FluxForge/tests/test_fe_cd_example.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.9/pathlib.py:1255: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+/usr/lib/python3.9/pathlib.py:1241: in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('src/fluxforge/examples/fe_cd_rafm_1/boundaries.json')
+name = 'src/fluxforge/examples/fe_cd_rafm_1/boundaries.json', flags = 524288
+mode = 438
+
+    def _opener(self, name, flags, mode=0o666):
+        # A stub for the opener argument to built-in open()
+>       return self._accessor.open(self, flags, mode)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'src/fluxforge/examples/fe_cd_rafm_1/boundaries.json'
+
+/usr/lib/python3.9/pathlib.py:1109: FileNotFoundError
+=========================== short test summary info ============================
+FAILED FluxForge/tests/test_fe_cd_example.py::test_fe_cd_example_cli_flow - F...
+1 failed, 760 passed, 11 skipped in 13.61s

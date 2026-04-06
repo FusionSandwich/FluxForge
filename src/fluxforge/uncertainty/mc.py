@@ -5,7 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, List
 
-from fluxforge.core.linalg import Matrix, Vector, multivariate_normal_samples, percentile
+from fluxforge.core.linalg import (
+    Matrix,
+    Vector,
+    multivariate_normal_samples,
+    percentile,
+)
 
 
 @dataclass

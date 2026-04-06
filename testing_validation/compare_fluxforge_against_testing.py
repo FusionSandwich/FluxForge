@@ -1,0 +1,328 @@
+#!/usr/bin/env python3
+"""Compare FluxForge against external reference programs in ALARA/testing.
+
+This is the only script in FluxForge that explicitly imports/runs the external
+reference repositories.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import contextlib
+import hashlib
+import io
+import json
+import os
+import sys
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Callable
+
+import numpy as np
+
+FLUXFORGE_DIR = Path(__file__).resolve().parents[1]
+TESTING_DIR = Path(
+    os.environ.get("FLUXFORGE_TESTING_DIR", str(FLUXFORGE_DIR.parent / "testing"))
+)
+DEFAULT_OUT = FLUXFORGE_DIR / "testing_validation" / "external_compare_results.json"
+DEFAULT_BASELINE = (
+    FLUXFORGE_DIR / "tests" / "data" / "parity_baselines" / "external_reference.json"
+)
+
+
+@dataclass
+class CompareResult:
+    case_id: str
+    check_id: str
+    passed: bool
+    correlation: float
+    max_relative_error: float
+    exact_match: bool
+    notes: str = ""
+
+
+def _digest_int64(values: np.ndarray) -> str:
+    arr = np.rint(np.asarray(values, dtype=float)).astype(np.int64, copy=False)
+    return hashlib.sha256(arr.astype("<i8", copy=False).tobytes()).hexdigest()
+
+
+def _digest_float64(values: np.ndarray) -> str:
+    arr = np.asarray(values, dtype=float).astype("<f8", copy=False)
+    return hashlib.sha256(arr.tobytes()).hexdigest()
+
+
+def _summarize_int_counts(values: np.ndarray) -> dict[str, float | int | str]:
+    arr = np.rint(np.asarray(values, dtype=float)).astype(np.int64, copy=False)
+    return {
+        "n_channels": int(arr.size),
+        "sum_counts": float(arr.sum(dtype=np.float64)),
+        "max_counts": float(arr.max() if arr.size else 0.0),
+        "mean_counts": float(arr.mean(dtype=np.float64) if arr.size else 0.0),
+        "sha256_counts_int64_le": _digest_int64(arr),
+    }
+
+
+def _correlate(a: np.ndarray, b: np.ndarray) -> float:
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    if a.size == 0 or b.size == 0:
+        return 0.0
+    n = min(a.size, b.size)
+    a = a[:n]
+    b = b[:n]
+    if np.std(a) == 0 or np.std(b) == 0:
+        return 1.0 if np.allclose(a, b) else 0.0
+    return float(np.corrcoef(a, b)[0, 1])
+
+
+def _max_rel_error(a: np.ndarray, b: np.ndarray, eps: float = 1e-12) -> float:
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    n = min(a.size, b.size)
+    a = a[:n]
+    b = b[:n]
+    return float(np.max(np.abs(a - b) / np.maximum(np.abs(b), eps)))
+
+
+def _load_fluxforge_io_readers() -> dict[str, Callable[[Path], np.ndarray]]:
+    sys.path.insert(0, str(FLUXFORGE_DIR / "src"))
+    from fluxforge.io.cnf import read_cnf_file
+    from fluxforge.io.iec import read_iec_file
+    from fluxforge.io.spe import read_spe_file
+
+    return {
+        "spe_eu_calib_7cm": lambda p: np.asarray(read_spe_file(p).counts, dtype=float),
+        "cnf_canberra_sample": lambda p: np.asarray(
+            read_cnf_file(p).counts, dtype=float
+        ),
+        "iec_hpge_dummy_01": lambda p: np.asarray(read_iec_file(p).counts, dtype=float),
+    }
+
+
+def _load_external_spectrum_reader() -> Callable[[Path], np.ndarray]:
+    repo_path = TESTING_DIR / "becquerel"
+    if not repo_path.exists():
+        raise FileNotFoundError(f"Missing reference repo: {repo_path}")
+    sys.path.insert(0, str(repo_path))
+    import becquerel as bq
+
+    return lambda p: np.asarray(bq.Spectrum.from_file(str(p)).counts_vals, dtype=float)
+
+
+def _io_dataset_paths() -> dict[str, Path]:
+    data_root = FLUXFORGE_DIR / "tests" / "data" / "spectrum_io"
+    return {
+        "spe_eu_calib_7cm": data_root / "examples" / "eu_calib_7cm.Spe",
+        "cnf_canberra_sample": data_root
+        / "samples"
+        / "01122014152731-GT01122014182338-GA37.4963000N-GO122.4633000W.cnf",
+        "iec_hpge_dummy_01": data_root / "samples" / "hpge_dummy_test_01.iec",
+    }
+
+
+def _read_unfolding_measurements(path: Path) -> np.ndarray:
+    with path.open("r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        values = [float(row["NEUTRON 1"]) for row in reader]
+    return np.asarray(values, dtype=float)
+
+
+def _read_response_matrix(path: Path) -> np.ndarray:
+    with path.open("r", encoding="utf-8", errors="ignore") as f:
+        first_line = f.readline()
+    delimiter = "," if "," in first_line else None
+    response = np.genfromtxt(path, delimiter=delimiter)
+    if response.ndim == 1:
+        response = np.atleast_2d(response)
+    if np.isnan(response).any():
+        valid_cols = ~np.all(np.isnan(response), axis=0)
+        response = response[:, valid_cols]
+    return response.T
+
+
+def run_comparison() -> tuple[list[CompareResult], dict[str, object]]:
+    results: list[CompareResult] = []
+
+    baseline: dict[str, object] = {
+        "schema_version": 1,
+        "description": (
+            "Reference baselines generated by running external ALARA/testing "
+            "programs and comparing to FluxForge outputs."
+        ),
+        "spectrum_io": {},
+        "unfolding_case_001": {},
+    }
+
+    # ------------------------------------------------------------------
+    # Spectrum IO comparison (reference parser from testing/becquerel)
+    # ------------------------------------------------------------------
+    io_readers = _load_fluxforge_io_readers()
+    external_reader = _load_external_spectrum_reader()
+
+    for dataset_id, path in _io_dataset_paths().items():
+        ff_counts = io_readers[dataset_id](path)
+        ref_counts = external_reader(path)
+
+        exact = _digest_int64(ff_counts) == _digest_int64(ref_counts)
+        corr = _correlate(ff_counts, ref_counts)
+        err = _max_rel_error(ff_counts, ref_counts)
+        results.append(
+            CompareResult(
+                case_id="spectrum_io",
+                check_id=dataset_id,
+                passed=exact,
+                correlation=corr,
+                max_relative_error=err,
+                exact_match=exact,
+                notes="",
+            )
+        )
+
+        entry = _summarize_int_counts(ref_counts)
+        entry["input_path"] = str(path.relative_to(FLUXFORGE_DIR))
+        baseline["spectrum_io"][dataset_id] = entry
+
+    # CHN baseline: local sample copy generated from reference workflow.
+    from fluxforge.io.hpge import read_chn_file
+
+    chn_path = (
+        FLUXFORGE_DIR
+        / "tests"
+        / "data"
+        / "spectrum_io"
+        / "samples"
+        / "eu_calib_7cm.Chn"
+    )
+    chn_counts = np.asarray(read_chn_file(chn_path).counts, dtype=float)
+    chn_entry = _summarize_int_counts(chn_counts)
+    chn_entry["input_path"] = str(chn_path.relative_to(FLUXFORGE_DIR))
+    baseline["spectrum_io"]["chn_eu_calib_7cm"] = chn_entry
+
+    # ------------------------------------------------------------------
+    # Unfolding comparison (reference algorithms from testing/Neutron-Unfolding)
+    # ------------------------------------------------------------------
+    data_root = (
+        FLUXFORGE_DIR / "tests" / "data" / "external_cases" / "unfolding_case_001"
+    )
+    response = _read_response_matrix(data_root / "response_matrix.txt")
+    measurements = _read_unfolding_measurements(data_root / "reduced_data.csv")
+    initial_flux = np.ones(response.shape[1], dtype=float)
+
+    sys.path.insert(0, str(FLUXFORGE_DIR / "src"))
+    from fluxforge.solvers.iterative import gravel as ff_gravel
+    from fluxforge.solvers.iterative import mlem as ff_mlem
+
+    ff_gravel_sol = ff_gravel(
+        response=response.tolist(),
+        measurements=measurements.tolist(),
+        initial_flux=initial_flux.tolist(),
+        max_iters=500,
+    )
+    ff_mlem_sol = ff_mlem(
+        response=response.tolist(),
+        measurements=measurements.tolist(),
+        initial_flux=initial_flux.tolist(),
+        max_iters=500,
+        convergence_mode="ddJ",
+        relaxation=1.0,
+    )
+    ff_gravel_flux = np.asarray(ff_gravel_sol.flux, dtype=float)
+    ff_mlem_flux = np.asarray(ff_mlem_sol.flux, dtype=float)
+
+    ref_repo = TESTING_DIR / "Neutron-Unfolding"
+    if not ref_repo.exists():
+        raise FileNotFoundError(f"Missing reference repo: {ref_repo}")
+    sys.path.insert(0, str(ref_repo))
+    from gravel import gravel as ref_gravel
+    from mlem import mlem as ref_mlem
+
+    with contextlib.redirect_stdout(io.StringIO()):
+        ref_gravel_flux, _ = ref_gravel(response, measurements, initial_flux, 0.2)
+    with contextlib.redirect_stdout(io.StringIO()):
+        ref_mlem_flux, _ = ref_mlem(response, measurements, initial_flux, 0.2)
+    ref_gravel_flux = np.asarray(ref_gravel_flux, dtype=float)
+    ref_mlem_flux = np.asarray(ref_mlem_flux, dtype=float)
+
+    for check_id, ff_flux, ref_flux, min_corr in (
+        ("gravel_flux", ff_gravel_flux, ref_gravel_flux, 0.98),
+        ("mlem_flux", ff_mlem_flux, ref_mlem_flux, 0.90),
+    ):
+        corr = _correlate(ff_flux, ref_flux)
+        err = _max_rel_error(ff_flux, ref_flux)
+        exact = _digest_float64(ff_flux) == _digest_float64(ref_flux)
+        passed = corr >= min_corr
+        results.append(
+            CompareResult(
+                case_id="unfolding_case_001",
+                check_id=check_id,
+                passed=passed,
+                correlation=corr,
+                max_relative_error=err,
+                exact_match=exact,
+                notes=f"min_corr={min_corr:.2f}",
+            )
+        )
+        baseline["unfolding_case_001"][check_id] = {
+            "n_groups": int(ref_flux.size),
+            "sha256_flux_float64_le": _digest_float64(ref_flux),
+            "reference_flux": ref_flux.tolist(),
+            "min_corr": min_corr,
+            "input_paths": {
+                "response_matrix": "tests/data/external_cases/unfolding_case_001/response_matrix.txt",
+                "measurements": "tests/data/external_cases/unfolding_case_001/reduced_data.csv",
+            },
+        }
+
+    return results, baseline
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Compare FluxForge outputs against ALARA/testing references."
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_OUT,
+        help="Path to write JSON comparison report.",
+    )
+    parser.add_argument(
+        "--write-baseline",
+        type=Path,
+        default=DEFAULT_BASELINE,
+        help="Path to write baseline JSON used by FluxForge tests.",
+    )
+    args = parser.parse_args()
+
+    results, baseline = run_comparison()
+    passed = all(r.passed for r in results)
+
+    payload = {
+        "testing_root": str(TESTING_DIR),
+        "all_checks_passed": passed,
+        "results": [asdict(r) for r in results],
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Wrote comparison report: {args.output}")
+
+    for result in results:
+        status = "PASS" if result.passed else "FAIL"
+        print(
+            f"[{status}] {result.case_id}/{result.check_id}: "
+            f"corr={result.correlation:.6f}, "
+            f"max_rel_err={result.max_relative_error:.3e}, "
+            f"exact={result.exact_match}"
+        )
+
+    if args.write_baseline:
+        args.write_baseline.parent.mkdir(parents=True, exist_ok=True)
+        args.write_baseline.write_text(json.dumps(baseline, indent=2), encoding="utf-8")
+        print(f"Wrote baseline file: {args.write_baseline}")
+
+    return 0 if passed else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
