@@ -68,6 +68,46 @@ from fluxforge.analysis.astm_e262 import (
     analyze_astm_e262_plan,
 )
 
+from fluxforge.analysis.optimization_difom import (
+    DIFOMLineTerm,
+    DIFOMLineScore,
+    DIFOMEvaluation,
+    DIFOMScheduleCandidate,
+    DIFOMScheduleScore,
+    build_difom_terms_from_activity_results,
+    compute_difom_score,
+    difom_line_score,
+    evaluate_difom,
+    parse_difom_sweep_payload,
+    rank_difom_schedules,
+    serialize_difom_ranking,
+)
+
+from fluxforge.analysis.optimization_fim import (
+    FIMDiagnostics,
+    FIMEvaluation,
+    FIMScheduleScore,
+    build_fisher_information,
+    evaluate_fim,
+    rank_fim_schedules,
+    serialize_fim_ranking,
+)
+
+from fluxforge.analysis.optimization_mwdcs import (
+    MWDCSLineTerm,
+    MWDCSWindow,
+    MWDCSWindowScore,
+    MWDCSEvaluation,
+    MWDCSScheduleCandidate,
+    MWDCSScheduleScore,
+    build_mwdcs_candidate_from_activity_results,
+    candidate_from_difom_candidate,
+    evaluate_mwdcs,
+    parse_mwdcs_sweep_payload,
+    rank_mwdcs_schedules,
+    serialize_mwdcs_ranking,
+)
+
 from fluxforge.analysis.segmented_detection import (
     RegionParams,
     SegmentedDetectionConfig,
@@ -290,6 +330,40 @@ __all__ = [
     "aggregate_k0_analysis_bundles",
     "evaluate_k0_qaqc",
     "build_k0_report_payload",
+    # Irradiation optimization (Method 1 DI-FOM)
+    "DIFOMLineTerm",
+    "DIFOMLineScore",
+    "DIFOMEvaluation",
+    "DIFOMScheduleCandidate",
+    "DIFOMScheduleScore",
+    "build_difom_terms_from_activity_results",
+    "compute_difom_score",
+    "difom_line_score",
+    "evaluate_difom",
+    "parse_difom_sweep_payload",
+    "rank_difom_schedules",
+    "serialize_difom_ranking",
+    # Irradiation optimization (Method 2 FIM)
+    "FIMDiagnostics",
+    "FIMEvaluation",
+    "FIMScheduleScore",
+    "build_fisher_information",
+    "evaluate_fim",
+    "rank_fim_schedules",
+    "serialize_fim_ranking",
+    # Irradiation optimization (Method 3 MWDCS)
+    "MWDCSLineTerm",
+    "MWDCSWindow",
+    "MWDCSWindowScore",
+    "MWDCSEvaluation",
+    "MWDCSScheduleCandidate",
+    "MWDCSScheduleScore",
+    "build_mwdcs_candidate_from_activity_results",
+    "candidate_from_difom_candidate",
+    "evaluate_mwdcs",
+    "parse_mwdcs_sweep_payload",
+    "rank_mwdcs_schedules",
+    "serialize_mwdcs_ranking",
     # Advanced peak finders
     "PeakInfo",
     "snip_background",

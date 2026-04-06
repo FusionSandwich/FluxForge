@@ -34,6 +34,20 @@ from fluxforge.analysis.astm_e261 import analyze_astm_e261_plan
 from fluxforge.analysis.astm_e262 import analyze_astm_e262_plan
 from fluxforge.analysis.astm_e3376 import analyze_astm_e3376_plan
 from fluxforge.analysis.astm_e2005 import analyze_astm_e2005_plan
+from fluxforge.analysis.optimization_difom import (
+    parse_difom_sweep_payload,
+    rank_difom_schedules,
+    serialize_difom_ranking,
+)
+from fluxforge.analysis.optimization_fim import (
+    rank_fim_schedules,
+    serialize_fim_ranking,
+)
+from fluxforge.analysis.optimization_mwdcs import (
+    parse_mwdcs_sweep_payload,
+    rank_mwdcs_schedules,
+    serialize_mwdcs_ranking,
+)
 from fluxforge.core.prior_covariance import PriorCovarianceConfig, PriorCovarianceModel
 from fluxforge.core.response import (
     EnergyGroupStructure,
@@ -1640,6 +1654,111 @@ def cmd_inventory_review(args: argparse.Namespace) -> None:
     _ensure_parent_dir(output_path)
     output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
     print(f"Wrote inventory review bundle to {output_path}")
+
+
+def cmd_optimization_sweep(args: argparse.Namespace) -> None:
+    objective = str(getattr(args, "objective", "di-fom")).lower()
+    payload = _load_json(args.input)
+    isotope_weights: Dict[str, float] = {}
+
+    if objective == "di-fom":
+        candidates, isotope_weights = parse_difom_sweep_payload(payload)
+        ranked = rank_difom_schedules(candidates, isotope_weights=isotope_weights)
+        output_payload = serialize_difom_ranking(ranked)
+    elif objective in {"fim-d", "fim-a", "fim-c"}:
+        candidates, isotope_weights = parse_difom_sweep_payload(payload)
+        target_nuclide = getattr(args, "target_nuclide", None)
+        nuisance_variance_fraction = max(
+            float(getattr(args, "nuisance_variance_fraction", 0.0) or 0.0),
+            0.0,
+        )
+        fim_regularization = max(
+            float(getattr(args, "fim_regularization", 1.0e-6) or 1.0e-6),
+            1.0e-12,
+        )
+        ranked = rank_fim_schedules(
+            candidates,
+            objective=objective,
+            target_nuclide=target_nuclide,
+            nuisance_variance_fraction=nuisance_variance_fraction,
+            regularization=fim_regularization,
+        )
+        output_payload = serialize_fim_ranking(ranked, objective=objective)
+        output_payload["target_nuclide"] = target_nuclide
+        output_payload["nuisance_variance_fraction"] = nuisance_variance_fraction
+        output_payload["fim_regularization"] = fim_regularization
+    elif objective == "mwdcs":
+        raw_offsets = _parse_csv_floats(getattr(args, "mwdcs_window_offsets_s", None))
+        window_offsets_s = tuple(raw_offsets) if raw_offsets else (0.0, 7200.0, 86400.0)
+        window_count_time_s = max(
+            float(getattr(args, "mwdcs_window_count_time_s", 900.0) or 900.0),
+            1.0,
+        )
+        overlap_penalty = max(
+            float(getattr(args, "mwdcs_overlap_penalty", 0.0) or 0.0),
+            0.0,
+        )
+        full_spectrum_mode = bool(getattr(args, "mwdcs_full_spectrum_mode", False))
+        candidates, isotope_weights = parse_mwdcs_sweep_payload(
+            payload,
+            default_window_offsets_s=window_offsets_s,
+            default_window_count_time_s=window_count_time_s,
+        )
+        ranked = rank_mwdcs_schedules(
+            candidates,
+            isotope_weights=isotope_weights,
+            full_spectrum_mode=full_spectrum_mode,
+            overlap_penalty=overlap_penalty,
+        )
+        output_payload = serialize_mwdcs_ranking(ranked)
+        output_payload["window_offsets_s"] = list(window_offsets_s)
+        output_payload["window_count_time_s"] = window_count_time_s
+        output_payload["full_spectrum_mode"] = full_spectrum_mode
+        output_payload["overlap_penalty"] = overlap_penalty
+    else:
+        raise ValueError(
+            "Unsupported objective. Use one of: di-fom, fim-d, fim-a, fim-c, mwdcs."
+        )
+
+    output_payload["input"] = str(args.input)
+    output_payload["isotope_weights"] = isotope_weights
+    output_payload["generated_at"] = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+
+    output_path = Path(args.output)
+    _ensure_parent_dir(output_path)
+    output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
+
+    csv_output = getattr(args, "csv_output", None)
+    if csv_output is not None:
+        rows = []
+        for item in output_payload["ranked_candidates"]:
+            first_window = (item.get("window_scores") or [{}])[0]
+            row = {
+                "rank": item["rank"],
+                "label": item["label"],
+                "irradiation_time_s": item["irradiation_time_s"],
+                "cooldown_time_s": item.get(
+                    "cooldown_time_s", first_window.get("cooldown_time_s")
+                ),
+                "count_time_s": item.get(
+                    "count_time_s", first_window.get("count_time_s")
+                ),
+                "objective": objective,
+            }
+            if objective == "di-fom":
+                row["difom_score"] = item["difom_score"]
+            elif objective == "mwdcs":
+                row["objective_score"] = item["total_score"]
+                row["window_count"] = len(item.get("window_scores") or [])
+            else:
+                row["objective_score"] = item["objective_score"]
+                diagnostics = item.get("matrix_diagnostics") or {}
+                row["condition_number"] = diagnostics.get("condition_number")
+                row["effective_rank"] = diagnostics.get("effective_rank")
+            rows.append(row)
+        _write_dict_rows(Path(csv_output), rows)
+
+    print(f"Wrote optimization sweep bundle ({objective}) to {output_path}")
 
 
 def cmd_library_list(args: argparse.Namespace) -> None:
@@ -4012,6 +4131,78 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_review.add_argument("--count-end-csv-output", type=Path, default=None)
     inventory_review.add_argument("--plot-output", type=Path, default=None)
     inventory_review.set_defaults(func=cmd_inventory_review)
+
+    optimization_sweep = subparsers.add_parser(
+        "optimization-sweep",
+        help="Rank irradiation/cooldown/count schedule candidates using DI-FOM or FIM objectives",
+    )
+    optimization_sweep.add_argument(
+        "--input",
+        type=Path,
+        required=True,
+        help="JSON payload with schedule candidates and optional isotope weights",
+    )
+    optimization_sweep.add_argument(
+        "--output",
+        type=Path,
+        default=Path("optimization_sweep.json"),
+        help="Output JSON bundle path",
+    )
+    optimization_sweep.add_argument(
+        "--objective",
+        type=str,
+        default="di-fom",
+        choices=("di-fom", "fim-d", "fim-a", "fim-c", "mwdcs"),
+        help="Optimization objective",
+    )
+    optimization_sweep.add_argument(
+        "--target-nuclide",
+        type=str,
+        default=None,
+        help="Target nuclide used by fim-c objective",
+    )
+    optimization_sweep.add_argument(
+        "--nuisance-variance-fraction",
+        type=float,
+        default=0.0,
+        help="Additional relative variance term for FIM line variances",
+    )
+    optimization_sweep.add_argument(
+        "--fim-regularization",
+        type=float,
+        default=1.0e-6,
+        help="Diagonal regularization added to Fisher matrices for FIM objectives",
+    )
+    optimization_sweep.add_argument(
+        "--mwdcs-window-offsets-s",
+        type=str,
+        default="0,7200,86400",
+        help="Comma-separated cooldown offsets (s) for generated MWDCS windows",
+    )
+    optimization_sweep.add_argument(
+        "--mwdcs-window-count-time-s",
+        type=float,
+        default=900.0,
+        help="Default count duration (s) per generated MWDCS window",
+    )
+    optimization_sweep.add_argument(
+        "--mwdcs-full-spectrum-mode",
+        action="store_true",
+        help="Enable overlap penalty in MWDCS scoring to emulate full-spectrum fitting",
+    )
+    optimization_sweep.add_argument(
+        "--mwdcs-overlap-penalty",
+        type=float,
+        default=0.0,
+        help="Penalty weight for near-energy overlaps in MWDCS full-spectrum mode",
+    )
+    optimization_sweep.add_argument(
+        "--csv-output",
+        type=Path,
+        default=None,
+        help="Optional CSV export with ranked candidate summary",
+    )
+    optimization_sweep.set_defaults(func=cmd_optimization_sweep)
 
     rates = subparsers.add_parser(
         "rates", help="Compute reaction rates from line activities"

@@ -10,6 +10,15 @@ from typing import Callable
 
 import numpy as np
 
+from fluxforge.analysis.optimization_difom import (
+    build_difom_terms_from_activity_results,
+    evaluate_difom,
+)
+from fluxforge.analysis.optimization_fim import evaluate_fim
+from fluxforge.analysis.optimization_mwdcs import (
+    build_mwdcs_candidate_from_activity_results,
+    evaluate_mwdcs,
+)
 from fluxforge.analysis.detector_calibration import EfficiencyPoint
 from fluxforge.core.batch_analysis import (
     BatchAnalysisJob,
@@ -1668,6 +1677,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.activity_unit_combo.addItem(unit, unit)
             controls.addWidget(self.activity_unit_combo, 4, 3)
 
+            controls.addWidget(QLabel("FIM objective", self), 5, 0)
+            self.fim_objective_combo = QComboBox(self)
+            self.fim_objective_combo.setObjectName("InventoryFIMObjectiveCombo")
+            self.fim_objective_combo.addItem("FIM D-opt", "fim-d")
+            self.fim_objective_combo.addItem("FIM A-opt", "fim-a")
+            self.fim_objective_combo.addItem("FIM C-opt", "fim-c")
+            controls.addWidget(self.fim_objective_combo, 5, 1)
+
+            controls.addWidget(QLabel("MWDCS windows", self), 5, 2)
+            self.mwdcs_window_count_spin = QSpinBox(self)
+            self.mwdcs_window_count_spin.setObjectName("InventoryMWDCSWindowCountSpin")
+            self.mwdcs_window_count_spin.setRange(1, 8)
+            self.mwdcs_window_count_spin.setValue(3)
+            controls.addWidget(self.mwdcs_window_count_spin, 5, 3)
+
+            self.mwdcs_full_spectrum_checkbox = QCheckBox("MWDCS full-spectrum mode", self)
+            self.mwdcs_full_spectrum_checkbox.setObjectName("InventoryMWDCSFullSpectrumCheck")
+            controls.addWidget(self.mwdcs_full_spectrum_checkbox, 6, 0, 1, 2)
+
             button_row = QHBoxLayout()
             self.refresh_button = QPushButton("Refresh Timeline", self)
             self.refresh_button.clicked.connect(self._refresh_inventory)
@@ -1680,6 +1708,18 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.export_plot_button = QPushButton("Save Plot", self)
             self.export_plot_button.clicked.connect(self._export_plot_dialog)
             button_row.addWidget(self.export_plot_button)
+
+            self.preview_difom_button = QPushButton("Preview DI-FOM", self)
+            self.preview_difom_button.clicked.connect(self._preview_difom_score)
+            button_row.addWidget(self.preview_difom_button)
+
+            self.preview_fim_button = QPushButton("Preview FIM", self)
+            self.preview_fim_button.clicked.connect(self._preview_fim_score)
+            button_row.addWidget(self.preview_fim_button)
+
+            self.preview_mwdcs_button = QPushButton("Preview MWDCS", self)
+            self.preview_mwdcs_button.clicked.connect(self._preview_mwdcs_score)
+            button_row.addWidget(self.preview_mwdcs_button)
             button_row.addStretch(1)
 
             layout.addLayout(controls)
@@ -1692,6 +1732,30 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.summary.setObjectName("PanelBody")
             self.summary.setWordWrap(True)
             layout.addWidget(self.summary)
+
+            self.difom_summary = QLabel(
+                "DI-FOM preview is unavailable until activity-review results are loaded.",
+                self,
+            )
+            self.difom_summary.setObjectName("PanelBody")
+            self.difom_summary.setWordWrap(True)
+            layout.addWidget(self.difom_summary)
+
+            self.fim_summary = QLabel(
+                "FIM preview is unavailable until activity-review results are loaded.",
+                self,
+            )
+            self.fim_summary.setObjectName("PanelBody")
+            self.fim_summary.setWordWrap(True)
+            layout.addWidget(self.fim_summary)
+
+            self.mwdcs_summary = QLabel(
+                "MWDCS preview is unavailable until activity-review results are loaded.",
+                self,
+            )
+            self.mwdcs_summary.setObjectName("PanelBody")
+            self.mwdcs_summary.setWordWrap(True)
+            layout.addWidget(self.mwdcs_summary)
 
             self.family_browser = QTextBrowser(self)
             self.family_browser.setObjectName("InventoryFamilyBrowser")
@@ -1720,6 +1784,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.nuclide_focus_combo.currentIndexChanged.connect(self._render_last_result)
             self.observable_combo.currentIndexChanged.connect(self._render_last_result)
             self.activity_unit_combo.currentIndexChanged.connect(self._render_last_result)
+            self.fim_objective_combo.currentIndexChanged.connect(self._preview_fim_score)
+            self.mwdcs_window_count_spin.valueChanged.connect(self._preview_mwdcs_score)
+            self.mwdcs_full_spectrum_checkbox.toggled.connect(self._preview_mwdcs_score)
             self._sync_workspace_state(self.workspace_controller.state)
 
         def build_inventory_timeline(self):
@@ -1829,6 +1896,135 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             )
             self._render_result(result)
+            self._preview_difom_score()
+            self._preview_fim_score()
+            self._preview_mwdcs_score()
+
+        def preview_difom_score(self) -> float | None:
+            """Return a proxy DI-FOM score from current activity-review line estimates."""
+
+            activity_results = tuple(self.workspace_controller.state.activity_results)
+            if not activity_results:
+                self.difom_summary.setText(
+                    "DI-FOM preview is unavailable until activity-review results are loaded."
+                )
+                return None
+
+            line_terms = build_difom_terms_from_activity_results(activity_results)
+            if not line_terms:
+                self.difom_summary.setText(
+                    "DI-FOM preview is unavailable because no positive line terms were found."
+                )
+                return None
+
+            evaluation = evaluate_difom(line_terms)
+            self.difom_summary.setText(
+                (
+                    f"DI-FOM preview score: {evaluation.total_score:.6g} from "
+                    f"{len(evaluation.line_scores)} line(s). "
+                    "Proxy model uses age-corrected activity as signal and activity "
+                    "uncertainty as background until full masking terms are enabled."
+                )
+            )
+            return float(evaluation.total_score)
+
+        def _preview_difom_score(self) -> None:
+            self.preview_difom_score()
+
+        def preview_fim_score(self) -> float | None:
+            """Return a proxy FIM score from current activity-review line estimates."""
+
+            activity_results = tuple(self.workspace_controller.state.activity_results)
+            if not activity_results:
+                self.fim_summary.setText(
+                    "FIM preview is unavailable until activity-review results are loaded."
+                )
+                return None
+
+            line_terms = build_difom_terms_from_activity_results(activity_results)
+            if not line_terms:
+                self.fim_summary.setText(
+                    "FIM preview is unavailable because no positive line terms were found."
+                )
+                return None
+
+            objective = str(self.fim_objective_combo.currentData() or "fim-d")
+            focus = self._current_focus()
+            target_nuclide = focus if focus not in {"__top__", "__all__"} else None
+            try:
+                evaluation = evaluate_fim(
+                    line_terms,
+                    objective=objective,
+                    target_nuclide=target_nuclide,
+                    nuisance_variance_fraction=0.05,
+                    regularization=1.0e-6,
+                )
+            except ValueError as exc:
+                self.fim_summary.setText(f"FIM preview unavailable: {exc}")
+                return None
+
+            diagnostics = evaluation.diagnostics
+            self.fim_summary.setText(
+                (
+                    f"FIM preview ({objective}) score: {evaluation.objective_score:.6g} across "
+                    f"{len(diagnostics.nuclides)} nuclide parameter(s). "
+                    f"condition number {diagnostics.condition_number:.6g}, "
+                    f"effective rank {diagnostics.effective_rank}."
+                )
+            )
+            return float(evaluation.objective_score)
+
+        def _preview_fim_score(self) -> None:
+            self.preview_fim_score()
+
+        def preview_mwdcs_score(self) -> float | None:
+            """Return a proxy MWDCS score from activity-review results."""
+
+            activity_results = tuple(self.workspace_controller.state.activity_results)
+            if not activity_results:
+                self.mwdcs_summary.setText(
+                    "MWDCS preview is unavailable until activity-review results are loaded."
+                )
+                return None
+
+            window_count = max(int(self.mwdcs_window_count_spin.value()), 1)
+            stop_time_s = max(float(self.time_stop_hours.value()) * 3600.0, 0.0)
+            if window_count == 1:
+                offsets = (0.0,)
+            elif stop_time_s <= 0.0:
+                offsets = tuple(np.linspace(0.0, 86400.0, window_count))
+            else:
+                offsets = tuple(np.linspace(0.0, stop_time_s, window_count))
+
+            candidate = build_mwdcs_candidate_from_activity_results(
+                activity_results,
+                label="gui_preview",
+                window_offsets_s=offsets,
+                window_count_time_s=900.0,
+            )
+            if len(candidate.windows) == 0:
+                self.mwdcs_summary.setText(
+                    "MWDCS preview is unavailable because no positive line terms were found."
+                )
+                return None
+
+            full_spectrum_mode = bool(self.mwdcs_full_spectrum_checkbox.isChecked())
+            evaluation = evaluate_mwdcs(
+                candidate.windows,
+                full_spectrum_mode=full_spectrum_mode,
+                overlap_penalty=0.1,
+            )
+            self.mwdcs_summary.setText(
+                (
+                    f"MWDCS preview score: {evaluation.total_score:.6g} across "
+                    f"{len(evaluation.window_scores)} window(s). "
+                    f"Full-spectrum mode: {'on' if full_spectrum_mode else 'off'}."
+                )
+            )
+            return float(evaluation.total_score)
+
+        def _preview_mwdcs_score(self) -> None:
+            self.preview_mwdcs_score()
 
         def _selected_plot_data(self, result) -> dict[str, tuple[tuple[float, float, float], ...]]:
             observable = self._current_observable()
@@ -2038,6 +2234,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.refresh_button.setEnabled(enabled)
             self.export_csv_button.setEnabled(enabled)
             self.export_plot_button.setEnabled(enabled)
+            self.preview_difom_button.setEnabled(enabled)
+            self.preview_fim_button.setEnabled(enabled)
+            self.preview_mwdcs_button.setEnabled(enabled)
+            self.fim_objective_combo.setEnabled(enabled)
+            self.mwdcs_window_count_spin.setEnabled(enabled)
+            self.mwdcs_full_spectrum_checkbox.setEnabled(enabled)
             self.nuclide_focus_combo.setEnabled(enabled)
             if not enabled:
                 self._last_result = None
@@ -2045,6 +2247,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Run an activity review first to seed the irradiation-time inventory."
                 )
                 self.table.setRowCount(0)
+                self.difom_summary.setText(
+                    "DI-FOM preview is unavailable until activity-review results are loaded."
+                )
+                self.fim_summary.setText(
+                    "FIM preview is unavailable until activity-review results are loaded."
+                )
+                self.mwdcs_summary.setText(
+                    "MWDCS preview is unavailable until activity-review results are loaded."
+                )
 
 
     class RoiToolsPanel(QWidget):

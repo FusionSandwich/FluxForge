@@ -221,6 +221,71 @@ def test_build_parser_inventory_review_command(tmp_path):
     assert args.observable == "dose"
 
 
+def test_build_parser_optimization_sweep_command(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "optimization-sweep",
+            "--input",
+            str(tmp_path / "optimization_candidates.json"),
+            "--objective",
+            "di-fom",
+        ]
+    )
+    assert args.command == "optimization-sweep"
+    assert args.output.name == "optimization_sweep.json"
+
+
+def test_build_parser_optimization_sweep_supports_fim_options(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "optimization-sweep",
+            "--input",
+            str(tmp_path / "optimization_candidates.json"),
+            "--objective",
+            "fim-c",
+            "--target-nuclide",
+            "Mo-99",
+            "--nuisance-variance-fraction",
+            "0.05",
+            "--fim-regularization",
+            "1e-5",
+        ]
+    )
+    assert args.command == "optimization-sweep"
+    assert args.objective == "fim-c"
+    assert args.target_nuclide == "Mo-99"
+    assert args.nuisance_variance_fraction == pytest.approx(0.05)
+    assert args.fim_regularization == pytest.approx(1.0e-5)
+
+
+def test_build_parser_optimization_sweep_supports_mwdcs_options(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "optimization-sweep",
+            "--input",
+            str(tmp_path / "optimization_candidates.json"),
+            "--objective",
+            "mwdcs",
+            "--mwdcs-window-offsets-s",
+            "0,1800,7200",
+            "--mwdcs-window-count-time-s",
+            "1200",
+            "--mwdcs-full-spectrum-mode",
+            "--mwdcs-overlap-penalty",
+            "0.2",
+        ]
+    )
+    assert args.command == "optimization-sweep"
+    assert args.objective == "mwdcs"
+    assert args.mwdcs_window_offsets_s == "0,1800,7200"
+    assert args.mwdcs_window_count_time_s == pytest.approx(1200.0)
+    assert args.mwdcs_full_spectrum_mode is True
+    assert args.mwdcs_overlap_penalty == pytest.approx(0.2)
+
+
 def test_build_parser_library_registry_commands(tmp_path):
     parser = app.build_parser()
     list_args = parser.parse_args(["library-list", "--json"])
@@ -462,6 +527,331 @@ def test_cmd_inventory_review_writes_json_csv_and_plot_artifacts(monkeypatch, tm
     assert "dose_rate_uSv_h" in (tmp_path / "inventory_review_timeseries.csv").read_text(
         encoding="utf-8"
     )
+
+
+def test_cmd_optimization_sweep_writes_json_and_csv_outputs(tmp_path):
+    input_payload = {
+        "isotope_weights": {"Mo-99": 1.2, "Tc-99m": 0.8},
+        "candidates": [
+            {
+                "label": "candidate_a",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 7200.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 120.0,
+                        "background_counts": 30.0,
+                        "interference_counts": 10.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 60.0,
+                        "background_counts": 25.0,
+                        "interference_counts": 15.0,
+                    },
+                ],
+            },
+            {
+                "label": "candidate_b",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 14400.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 65.0,
+                        "background_counts": 20.0,
+                        "interference_counts": 8.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 22.0,
+                        "background_counts": 12.0,
+                        "interference_counts": 6.0,
+                    },
+                ],
+            },
+        ],
+    }
+    input_path = tmp_path / "optimization_candidates.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    output_path = tmp_path / "optimization_sweep.json"
+    csv_path = tmp_path / "optimization_sweep.csv"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=output_path,
+            objective="di-fom",
+            csv_output=csv_path,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.optimization_sweep.difom.v1"
+    assert payload["objective"] == "di-fom"
+    assert len(payload["ranked_candidates"]) == 2
+    assert payload["ranked_candidates"][0]["difom_score"] >= payload["ranked_candidates"][1]["difom_score"]
+    assert csv_path.exists()
+    assert "difom_score" in csv_path.read_text(encoding="utf-8")
+
+
+def test_cmd_optimization_sweep_writes_fim_outputs(tmp_path):
+    input_payload = {
+        "candidates": [
+            {
+                "label": "balanced",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 7200.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 70.0,
+                        "background_counts": 15.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 60.0,
+                        "background_counts": 15.0,
+                    },
+                ],
+            },
+            {
+                "label": "single_nuclide_dominant",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 7200.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 120.0,
+                        "background_counts": 20.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 5.0,
+                        "background_counts": 12.0,
+                    },
+                ],
+            },
+        ]
+    }
+    input_path = tmp_path / "optimization_candidates_fim.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    output_path = tmp_path / "optimization_sweep_fim.json"
+    csv_path = tmp_path / "optimization_sweep_fim.csv"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=output_path,
+            objective="fim-d",
+            csv_output=csv_path,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.05,
+            fim_regularization=1.0e-6,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.optimization_sweep.fim.v1"
+    assert payload["objective"] == "fim-d"
+    assert len(payload["ranked_candidates"]) == 2
+    assert "matrix_diagnostics" in payload["ranked_candidates"][0]
+    assert csv_path.exists()
+    assert "objective_score" in csv_path.read_text(encoding="utf-8")
+
+
+def test_cmd_optimization_sweep_writes_mwdcs_outputs(tmp_path):
+    input_payload = {
+        "isotope_weights": {"Mo-99": 1.5},
+        "candidates": [
+            {
+                "label": "candidate_a",
+                "irradiation_time_s": 3600.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 100.0,
+                        "background_counts": 10.0,
+                        "half_life_s": 18000.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.6,
+                        "signal_counts": 55.0,
+                        "background_counts": 12.0,
+                    },
+                ],
+            },
+            {
+                "label": "candidate_b",
+                "irradiation_time_s": 3600.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 65.0,
+                        "background_counts": 12.0,
+                        "half_life_s": 18000.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.6,
+                        "signal_counts": 20.0,
+                        "background_counts": 12.0,
+                    },
+                ],
+            },
+        ],
+    }
+    input_path = tmp_path / "optimization_candidates_mwdcs.json"
+    input_path.write_text(json.dumps(input_payload, indent=2), encoding="utf-8")
+
+    output_path = tmp_path / "optimization_sweep_mwdcs.json"
+    csv_path = tmp_path / "optimization_sweep_mwdcs.csv"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=output_path,
+            objective="mwdcs",
+            csv_output=csv_path,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,3600,14400",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=True,
+            mwdcs_overlap_penalty=0.1,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.optimization_sweep.mwdcs.v1"
+    assert payload["objective"] == "mwdcs"
+    assert len(payload["ranked_candidates"]) == 2
+    assert "window_scores" in payload["ranked_candidates"][0]
+    assert csv_path.exists()
+    csv_text = csv_path.read_text(encoding="utf-8")
+    assert "objective_score" in csv_text
+    assert "window_count" in csv_text
+
+
+def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_path):
+    payload = {
+        "isotope_weights": {"Mo-99": 2.0, "Tc-99m": 0.2},
+        "candidates": [
+            {
+                "label": "balanced",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 7200.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 50.0,
+                        "background_counts": 10.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 50.0,
+                        "background_counts": 10.0,
+                    },
+                ],
+            },
+            {
+                "label": "mo99_dominant",
+                "irradiation_time_s": 3600.0,
+                "cooldown_time_s": 7200.0,
+                "count_time_s": 900.0,
+                "lines": [
+                    {
+                        "nuclide": "Mo-99",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 90.0,
+                        "background_counts": 10.0,
+                    },
+                    {
+                        "nuclide": "Tc-99m",
+                        "line_energy_keV": 140.5,
+                        "signal_counts": 5.0,
+                        "background_counts": 10.0,
+                    },
+                ],
+            },
+        ],
+    }
+    input_path = tmp_path / "shared_candidates.json"
+    input_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    difom_output = tmp_path / "difom.json"
+    fim_output = tmp_path / "fim.json"
+    mwdcs_output = tmp_path / "mwdcs.json"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=difom_output,
+            objective="di-fom",
+            csv_output=None,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+        )
+    )
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=fim_output,
+            objective="fim-d",
+            csv_output=None,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.05,
+            fim_regularization=1.0e-6,
+        )
+    )
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=input_path,
+            output=mwdcs_output,
+            objective="mwdcs",
+            csv_output=None,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,3600,21600",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=False,
+            mwdcs_overlap_penalty=0.0,
+        )
+    )
+
+    difom_payload = json.loads(difom_output.read_text(encoding="utf-8"))
+    fim_payload = json.loads(fim_output.read_text(encoding="utf-8"))
+    mwdcs_payload = json.loads(mwdcs_output.read_text(encoding="utf-8"))
+
+    assert difom_payload["schema"] == "fluxforge.optimization_sweep.difom.v1"
+    assert fim_payload["schema"] == "fluxforge.optimization_sweep.fim.v1"
+    assert mwdcs_payload["schema"] == "fluxforge.optimization_sweep.mwdcs.v1"
+    assert difom_payload["ranked_candidates"][0]["label"] != fim_payload["ranked_candidates"][0]["label"]
+    assert len(mwdcs_payload["ranked_candidates"]) == 2
+    assert "window_scores" in mwdcs_payload["ranked_candidates"][0]
 
 
 def test_cmd_library_register_list_and_remove(monkeypatch, tmp_path, capsys):
