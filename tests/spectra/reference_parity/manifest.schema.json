@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fluxforge.reference_parity_manifest.v1",
+  "title": "FluxForge Reference Parity Fixture Manifest",
+  "type": "object",
+  "required": [
+    "schema",
+    "fixture_id",
+    "source_repo",
+    "source_case",
+    "workflow",
+    "input_files",
+    "expected_outputs",
+    "tolerances",
+    "provenance_notes"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "fluxforge.reference_parity_manifest.v1"
+    },
+    "fixture_id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "source_repo": {
+      "type": "string",
+      "minLength": 3
+    },
+    "source_case": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workflow": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "expected_outputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "tolerances": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "provenance_notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": true
+}

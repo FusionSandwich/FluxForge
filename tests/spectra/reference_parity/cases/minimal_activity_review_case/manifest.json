@@ -1,0 +1,22 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "minimal_activity_review_case",
+  "source_repo": "FusionSandwich/FluxForge",
+  "source_case": "activity_review_single_sample",
+  "workflow": "activity-review -> inventory-review",
+  "input_files": [
+    "activity_review_input.json"
+  ],
+  "expected_outputs": [
+    "isotope_summary_expected.csv",
+    "inventory_timeseries_expected.csv"
+  ],
+  "tolerances": {
+    "activity_rel": 0.02,
+    "dose_rel": 0.05
+  },
+  "provenance_notes": [
+    "Seed fixture for roadmap step 3.21 parity-manifest scaffolding.",
+    "Use source-linked updates when external comparison cases are imported."
+  ]
+}

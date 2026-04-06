@@ -147,9 +147,9 @@ following overlays were adopted additively and do not replace that map.
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
 | 3.18 | `next` | `in-progress` | Implement the remaining identification/activity/reference parity work on top of the now-bundled GSA-v4 edited/natural, NASA-gamma common-lab/natural/capture/delayed-activation/inelastic families, ENDF/B-VIII supplement, ICRP-107 plus Kayzero source registrations, collision-safe GUI/CLI user-library registration, and GUI activity-unit selectors, then finish relative activity, source-age overlays, deeper decay-dataset consumption, and the remaining parity surfaces. |
-| 3.19 | `pending` | `not-started` | Implement detection-limit, dose, shielding, attenuation/material, and units-conversion workspaces. |
+| 3.19 | `pending` | `in-progress` | Detection-limit/dose/shielding workspaces remain pending, but masking-analysis scaffolding is now active via the new CLI `masking-review` workflow (line-level masking ranking, masking-isotope rollups, and alternate-line recommendations) and report-table integration. |
 | 3.20 | `pending` | `not-started` | Implement file-query, batch-compare, ROI-statistics review, and KayWin-style k0 workflows without hardware control. |
-| 3.21 | `pending` | `not-started` | Curate repo-backed parity fixtures and manifests under `tests/spectra/reference_parity/`. |
+| 3.21 | `pending` | `in-progress` | Initial fixture-manifest scaffolding now exists under `tests/spectra/reference_parity/` and `tests/activation_inventory/fixtures/` with contract checks in `tests/test_parity_fixture_manifests.py`; source-linked case expansion and golden outputs remain pending. |
 | 3.22 | `pending` | `not-started` | Add algorithm-level parity tests for parsing, calibration, peak search, fit, activity, calculators, and k0 workflows. |
 | 3.23 | `pending` | `not-started` | Add end-to-end workflow parity tests with source-linked golden outputs and declared tolerances. |
 | 3.24 | `pending` | `not-started` | Add direct-manipulation canvas parity: peak add/delete/move, ROI dragging, background handles, and overlay-role actions. |

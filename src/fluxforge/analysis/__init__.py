@@ -147,6 +147,13 @@ from fluxforge.analysis.isotope_priority import (
     rank_isotopes_from_activity_review_payload,
     serialize_isotope_priority_ranking,
 )
+from fluxforge.analysis.masking_review import (
+    AlternateLineRecommendation,
+    rank_line_masking_from_activity_review_payload,
+    recommend_alternate_lines,
+    serialize_masking_review,
+    summarize_masking_isotopes,
+)
 
 from fluxforge.analysis.method_comparison import (
     MethodPairMetric,
@@ -446,6 +453,12 @@ __all__ = [
     "IsotopePriorityScore",
     "rank_isotopes_from_activity_review_payload",
     "serialize_isotope_priority_ranking",
+    # Masking-review workflow
+    "AlternateLineRecommendation",
+    "rank_line_masking_from_activity_review_payload",
+    "recommend_alternate_lines",
+    "serialize_masking_review",
+    "summarize_masking_isotopes",
     # Method-comparison utilities
     "MethodPairMetric",
     "compute_pairwise_method_metrics",

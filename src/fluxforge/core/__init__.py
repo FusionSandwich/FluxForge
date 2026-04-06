@@ -27,6 +27,7 @@ from fluxforge.core.prior_covariance import (
     ResponseUncertaintyConfig,
     ResponseUncertaintyPolicy,
 )
+from fluxforge.core.planning_models import LineMaskingResult, OptimizationScenario
 from fluxforge.core.response import (
     EnergyGroupStructure,
     ReactionCrossSection,
@@ -60,6 +61,8 @@ __all__ = [
     "ResponseMatrix",
     "apply_energy_deviation_pairs",
     "build_response_matrix",
+    "LineMaskingResult",
+    "OptimizationScenario",
     "PriorCovarianceConfig",
     "PriorCovarianceModel",
     "ResponseUncertaintyConfig",

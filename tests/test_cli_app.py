@@ -270,6 +270,28 @@ def test_build_parser_isotope_priority_command(tmp_path):
     assert args.weight_dose == pytest.approx(0.2)
 
 
+def test_build_parser_masking_review_command(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "masking-review",
+            "--activity-review-file",
+            str(tmp_path / "activity_review.json"),
+            "--isotopes-of-interest",
+            "Mo-99,Sc-46",
+            "--energy-window-keV",
+            "2.5",
+            "--top-n",
+            "20",
+        ]
+    )
+    assert args.command == "masking-review"
+    assert args.activity_review_file.name == "activity_review.json"
+    assert args.isotopes_of_interest == "Mo-99,Sc-46"
+    assert args.energy_window_keV == pytest.approx(2.5)
+    assert args.top_n == 20
+
+
 def test_build_parser_optimization_sweep_command(tmp_path):
     parser = app.build_parser()
     args = parser.parse_args(
@@ -807,6 +829,69 @@ def test_cmd_isotope_priority_writes_json_and_csv_outputs(tmp_path):
     csv_text = csv_path.read_text(encoding="utf-8")
     assert "priority_score" in csv_text
     assert "nuclide" in csv_text
+
+
+def test_cmd_masking_review_writes_json_and_csv_outputs(tmp_path):
+    activity_review_path = tmp_path / "activity_review.json"
+    activity_review_path.write_text(
+        json.dumps(
+            {
+                "schema": "fluxforge.activity_review.v1",
+                "line_results": [
+                    {
+                        "nuclide": "Mo-99",
+                        "matched_line_energy_keV": 140.5,
+                        "net_counts": 7000.0,
+                        "net_counts_uncertainty": 90.0,
+                    },
+                    {
+                        "nuclide": "Sc-46",
+                        "matched_line_energy_keV": 140.6,
+                        "net_counts": 12000.0,
+                        "net_counts_uncertainty": 120.0,
+                    },
+                    {
+                        "nuclide": "Co-60",
+                        "matched_line_energy_keV": 1332.5,
+                        "net_counts": 4000.0,
+                        "net_counts_uncertainty": 80.0,
+                    },
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    output_path = tmp_path / "masking_review.json"
+    csv_path = tmp_path / "masking_lines.csv"
+    isotope_csv_path = tmp_path / "masking_isotopes.csv"
+    recommendation_csv_path = tmp_path / "masking_recommendations.csv"
+    app.cmd_masking_review(
+        Namespace(
+            activity_review_file=activity_review_path,
+            output=output_path,
+            isotopes_of_interest="Mo-99,Sc-46",
+            energy_window_keV=3.0,
+            top_n=10,
+            csv_output=csv_path,
+            isotope_csv_output=isotope_csv_path,
+            recommendation_csv_output=recommendation_csv_path,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.masking_review.v1"
+    assert payload["isotopes_of_interest"] == ["Mo-99", "Sc-46"]
+    assert payload["line_masking_results"]
+    assert payload["masking_isotope_ranking"]
+    assert payload["alternate_line_recommendations"]
+    assert csv_path.exists()
+    assert "masking_score" in csv_path.read_text(encoding="utf-8")
+    assert isotope_csv_path.exists()
+    assert "masking_nuclide" in isotope_csv_path.read_text(encoding="utf-8")
+    assert recommendation_csv_path.exists()
+    assert "guidance" in recommendation_csv_path.read_text(encoding="utf-8")
 
 
 def test_cmd_optimization_sweep_writes_json_and_csv_outputs(tmp_path):
@@ -2793,6 +2878,88 @@ def test_cmd_report_includes_optimization_recommendation(monkeypatch, tmp_path):
     report_text = (tmp_path / "report.txt").read_text(encoding="utf-8")
     assert "Optimization Recommendation" in report_text
     assert "Top Optimization Schedules" in report_text
+
+
+def test_cmd_report_includes_masking_review_tables(monkeypatch, tmp_path):
+    report_written = {}
+
+    masking_path = tmp_path / "masking_review.json"
+    masking_path.write_text(
+        json.dumps(
+            {
+                "schema": "fluxforge.masking_review.v1",
+                "energy_window_keV": 3.0,
+                "line_masking_results": [
+                    {
+                        "rank": 1,
+                        "target_nuclide": "Mo-99",
+                        "masking_nuclide": "Sc-46",
+                        "masking_score": 0.8,
+                        "interference_counts": 120.0,
+                        "continuum_counts": 20.0,
+                    }
+                ],
+                "masking_isotope_ranking": [
+                    {
+                        "rank": 1,
+                        "masking_nuclide": "Sc-46",
+                        "total_masking_score": 0.8,
+                        "total_interference_counts": 120.0,
+                        "total_continuum_counts": 20.0,
+                        "target_line_count": 1,
+                    }
+                ],
+                "alternate_line_recommendations": [
+                    {
+                        "rank": 1,
+                        "nuclide": "Mo-99",
+                        "preferred_line_energy_keV": 739.5,
+                        "preferred_masking_score": 0.1,
+                        "strongest_line_energy_keV": 140.5,
+                        "guidance": "switch_to_preferred_line",
+                    }
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        app,
+        "write_report_bundle",
+        lambda output, **kwargs: report_written.update(
+            {"output": output, "payload": kwargs}
+        ),
+    )
+
+    report_out = tmp_path / "report.json"
+    app.cmd_report(
+        Namespace(
+            spectrum_file=None,
+            peaks_file=None,
+            lines_file=None,
+            rates_file=None,
+            masking_file=masking_path,
+            optimization_file=None,
+            unfold_file=None,
+            validation_file=None,
+            validation_results_root=None,
+            output=report_out,
+            validate=False,
+        )
+    )
+
+    summary = report_written["payload"]["summary"]
+    assert summary["masking_line_interactions"] == 1
+    assert summary["dominant_masking_isotope"] == "Sc-46"
+    assert "masking_line_results" in report_written["payload"]["tables"]["items"]
+    assert "masking_isotope_ranking" in report_written["payload"]["tables"]["items"]
+    assert "alternate_line_recommendations" in report_written["payload"]["tables"]["items"]
+
+    report_text = (tmp_path / "report.txt").read_text(encoding="utf-8")
+    assert "Masking Review Summary" in report_text
+    assert "Masking Isotope Ranking" in report_text
 
 
 def test_cmd_report_accepts_validation_results_root(monkeypatch, tmp_path):

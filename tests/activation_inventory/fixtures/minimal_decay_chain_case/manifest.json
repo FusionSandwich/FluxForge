@@ -1,0 +1,23 @@
+{
+  "schema": "fluxforge.activation_inventory_fixture.v1",
+  "fixture_id": "minimal_decay_chain_case",
+  "workflow": "pure_decay_bateman",
+  "source_repo": "FusionSandwich/FluxForge",
+  "source_case": "bateman_smoke_parent_daughter",
+  "input_files": [
+    "inventory_seed.json"
+  ],
+  "expected_outputs": [
+    "inventory_timeseries_expected.csv",
+    "dominant_contributors_expected.csv"
+  ],
+  "tolerances": {
+    "activity_rel": 0.02,
+    "atoms_rel": 0.02,
+    "dose_rel": 0.05
+  },
+  "provenance_notes": [
+    "Initial activation-inventory fixture manifest for roadmap 3N/3.21 scaffolding.",
+    "Extend with measured/source-linked cases before parity acceptance."
+  ]
+}

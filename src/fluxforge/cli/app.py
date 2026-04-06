@@ -68,7 +68,14 @@ from fluxforge.analysis.isotope_priority import (
     rank_isotopes_from_activity_review_payload,
     serialize_isotope_priority_ranking,
 )
+from fluxforge.analysis.masking_review import (
+    rank_line_masking_from_activity_review_payload,
+    recommend_alternate_lines,
+    serialize_masking_review,
+    summarize_masking_isotopes,
+)
 from fluxforge.core.prior_covariance import PriorCovarianceConfig, PriorCovarianceModel
+from fluxforge.core.planning_models import OptimizationScenario
 from fluxforge.core.response import (
     EnergyGroupStructure,
     ReactionCrossSection,
@@ -332,6 +339,44 @@ def _candidate_lines_for_recommendation(candidate: Any) -> list[dict[str, Any]]:
     return lines
 
 
+def _optimization_objective_score(candidate: dict[str, Any]) -> float:
+    return _safe_float(
+        candidate.get("difom_score"),
+        default=_safe_float(
+            candidate.get("objective_score"),
+            default=_safe_float(
+                candidate.get("total_score"),
+                default=_safe_float(candidate.get("total_utility")),
+            ),
+        ),
+    )
+
+
+def _optimization_scenario_from_ranked_candidate(
+    objective: str,
+    candidate: dict[str, Any],
+) -> OptimizationScenario:
+    return OptimizationScenario(
+        objective=str(objective or "unknown"),
+        label=str(candidate.get("label") or ""),
+        rank=int(_safe_float(candidate.get("rank"), default=0.0)),
+        irradiation_time_s=_safe_float(candidate.get("irradiation_time_s")),
+        cooldown_time_s=_safe_float(
+            candidate.get("cooldown_time_s"),
+            default=_safe_float(
+                ((candidate.get("window_scores") or [{}])[0]).get("cooldown_time_s")
+            ),
+        ),
+        count_time_s=_safe_float(
+            candidate.get("count_time_s"),
+            default=_safe_float(
+                ((candidate.get("window_scores") or [{}])[0]).get("count_time_s")
+            ),
+        ),
+        objective_score=_optimization_objective_score(candidate),
+    )
+
+
 def _recommendation_from_optimization_payload(
     optimization_payload: dict[str, Any],
     *,
@@ -341,8 +386,9 @@ def _recommendation_from_optimization_payload(
     if not isinstance(ranked, list):
         ranked = []
 
+    objective = str(optimization_payload.get("objective") or "unknown")
     recommendation: dict[str, Any] = {
-        "objective": str(optimization_payload.get("objective") or "unknown"),
+        "objective": objective,
         "isotopes_of_interest": list(
             optimization_payload.get("isotopes_of_interest") or []
         ),
@@ -351,35 +397,16 @@ def _recommendation_from_optimization_payload(
         return recommendation, []
 
     top = ranked[0] if isinstance(ranked[0], dict) else {}
+    top_scenario = _optimization_scenario_from_ranked_candidate(objective, top)
     recommendation.update(
         {
-            "recommended_label": top.get("label"),
-            "recommended_rank": int(_safe_float(top.get("rank"), default=1.0)),
-            "recommended_irradiation_time_s": _safe_float(
-                top.get("irradiation_time_s")
-            ),
-            "recommended_cooldown_time_s": _safe_float(
-                top.get("cooldown_time_s"),
-                default=_safe_float(
-                    ((top.get("window_scores") or [{}])[0]).get("cooldown_time_s")
-                ),
-            ),
-            "recommended_count_time_s": _safe_float(
-                top.get("count_time_s"),
-                default=_safe_float(
-                    ((top.get("window_scores") or [{}])[0]).get("count_time_s")
-                ),
-            ),
-            "recommended_objective_score": _safe_float(
-                top.get("difom_score"),
-                default=_safe_float(
-                    top.get("objective_score"),
-                    default=_safe_float(
-                        top.get("total_score"),
-                        default=_safe_float(top.get("total_utility")),
-                    ),
-                ),
-            ),
+            "recommended_label": top_scenario.label,
+            "recommended_rank": int(top_scenario.rank),
+            "recommended_irradiation_time_s": float(top_scenario.irradiation_time_s),
+            "recommended_cooldown_time_s": float(top_scenario.cooldown_time_s),
+            "recommended_count_time_s": float(top_scenario.count_time_s),
+            "recommended_objective_score": float(top_scenario.objective_score),
+            "recommended_scenario": top_scenario.to_row(),
         }
     )
 
@@ -439,40 +466,38 @@ def _recommendation_from_optimization_payload(
             "isotopes_of_interest"
         ][0]
 
+    top_scenario = OptimizationScenario(
+        objective=top_scenario.objective,
+        label=top_scenario.label,
+        rank=top_scenario.rank,
+        irradiation_time_s=top_scenario.irradiation_time_s,
+        cooldown_time_s=top_scenario.cooldown_time_s,
+        count_time_s=top_scenario.count_time_s,
+        objective_score=top_scenario.objective_score,
+        mask_isotope=(
+            str(recommendation.get("recommended_mask_isotope"))
+            if recommendation.get("recommended_mask_isotope")
+            else None
+        ),
+        isotope_of_interest=(
+            str(recommendation.get("recommended_isotope_of_interest"))
+            if recommendation.get("recommended_isotope_of_interest")
+            else None
+        ),
+        expected_dose_uSv=(
+            _safe_float(recommendation.get("recommended_expected_dose_uSv"))
+            if "recommended_expected_dose_uSv" in recommendation
+            else None
+        ),
+    )
+    recommendation["recommended_scenario"] = top_scenario.to_row()
+
     top_rows: list[dict[str, Any]] = []
     for item in ranked[:10]:
         if not isinstance(item, dict):
             continue
         top_rows.append(
-            {
-                "rank": int(_safe_float(item.get("rank"), default=0.0)),
-                "label": item.get("label"),
-                "irradiation_time_s": _safe_float(item.get("irradiation_time_s")),
-                "cooldown_time_s": _safe_float(
-                    item.get("cooldown_time_s"),
-                    default=_safe_float(
-                        ((item.get("window_scores") or [{}])[0]).get(
-                            "cooldown_time_s"
-                        )
-                    ),
-                ),
-                "count_time_s": _safe_float(
-                    item.get("count_time_s"),
-                    default=_safe_float(
-                        ((item.get("window_scores") or [{}])[0]).get("count_time_s")
-                    ),
-                ),
-                "objective_score": _safe_float(
-                    item.get("difom_score"),
-                    default=_safe_float(
-                        item.get("objective_score"),
-                        default=_safe_float(
-                            item.get("total_score"),
-                            default=_safe_float(item.get("total_utility")),
-                        ),
-                    ),
-                ),
-            }
+            _optimization_scenario_from_ranked_candidate(objective, item).to_row()
         )
 
     return recommendation, top_rows
@@ -2375,6 +2400,67 @@ def cmd_isotope_priority(args: argparse.Namespace) -> None:
     print(f"Wrote isotope-priority ranking to {output_path}")
 
 
+def cmd_masking_review(args: argparse.Namespace) -> None:
+    payload = _load_json(args.activity_review_file)
+    isotopes_of_interest = _parse_csv_strings(
+        getattr(args, "isotopes_of_interest", None)
+    )
+    top_n = int(getattr(args, "top_n", 0) or 0)
+
+    ranked = rank_line_masking_from_activity_review_payload(
+        payload,
+        energy_window_keV=float(getattr(args, "energy_window_keV", 3.0) or 3.0),
+        isotopes_of_interest=isotopes_of_interest,
+        top_n=top_n if top_n > 0 else None,
+    )
+    isotope_summary_rows = summarize_masking_isotopes(
+        ranked,
+        top_n=top_n if top_n > 0 else None,
+    )
+    recommendations = recommend_alternate_lines(
+        payload,
+        ranked,
+        top_n=top_n if top_n > 0 else None,
+    )
+
+    output_payload = serialize_masking_review(
+        ranked,
+        source_path=str(args.activity_review_file),
+        isotopes_of_interest=isotopes_of_interest,
+        energy_window_keV=float(getattr(args, "energy_window_keV", 3.0) or 3.0),
+        isotope_summary_rows=isotope_summary_rows,
+        recommendations=recommendations,
+    )
+    output_payload["generated_at"] = (
+        datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    )
+
+    output_path = Path(args.output)
+    _ensure_parent_dir(output_path)
+    output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
+
+    csv_output = getattr(args, "csv_output", None)
+    if csv_output is not None:
+        _write_dict_rows(
+            Path(csv_output),
+            list(output_payload.get("line_masking_results") or []),
+        )
+    isotope_csv_output = getattr(args, "isotope_csv_output", None)
+    if isotope_csv_output is not None:
+        _write_dict_rows(
+            Path(isotope_csv_output),
+            list(output_payload.get("masking_isotope_ranking") or []),
+        )
+    recommendation_csv_output = getattr(args, "recommendation_csv_output", None)
+    if recommendation_csv_output is not None:
+        _write_dict_rows(
+            Path(recommendation_csv_output),
+            list(output_payload.get("alternate_line_recommendations") or []),
+        )
+
+    print(f"Wrote masking-review bundle to {output_path}")
+
+
 def cmd_optimization_sweep(args: argparse.Namespace) -> None:
     objective = str(getattr(args, "objective", "di-fom")).lower()
     payload_source = "input"
@@ -3488,6 +3574,10 @@ def _build_standard_report_text(
     line_payload: Optional[Dict[str, Any]],
     isotope_rows: List[Dict[str, Any]],
     rates_payload: Optional[Dict[str, Any]],
+    masking_payload: Optional[Dict[str, Any]],
+    masking_line_rows: List[Dict[str, Any]],
+    masking_isotope_rows: List[Dict[str, Any]],
+    masking_recommendations: List[Dict[str, Any]],
     optimization_payload: Optional[Dict[str, Any]],
     optimization_recommendation: Optional[Dict[str, Any]],
     optimization_top_rows: List[Dict[str, Any]],
@@ -3664,6 +3754,79 @@ def _build_standard_report_text(
                         _safe_float(row.get("half_life_s")),
                     ]
                     for row in rates
+                ],
+            )
+        )
+
+    if masking_payload is not None:
+        sections.append(
+            _format_key_value_section(
+                "Masking Review Summary",
+                [
+                    (
+                        "Energy window (keV)",
+                        masking_payload.get("energy_window_keV"),
+                    ),
+                    (
+                        "Masking interactions",
+                        len(masking_line_rows),
+                    ),
+                    (
+                        "Masking isotope entries",
+                        len(masking_isotope_rows),
+                    ),
+                    (
+                        "Alternate-line recommendations",
+                        len(masking_recommendations),
+                    ),
+                ],
+            )
+        )
+        sections.append(
+            _format_table_section(
+                "Masking Isotope Ranking",
+                [
+                    "Rank",
+                    "Masking isotope",
+                    "Masking score",
+                    "Interference counts",
+                    "Continuum counts",
+                    "Target lines",
+                ],
+                [
+                    [
+                        row.get("rank"),
+                        row.get("masking_nuclide"),
+                        row.get("total_masking_score"),
+                        row.get("total_interference_counts"),
+                        row.get("total_continuum_counts"),
+                        row.get("target_line_count"),
+                    ]
+                    for row in masking_isotope_rows
+                ],
+            )
+        )
+        sections.append(
+            _format_table_section(
+                "Alternate-Line Recommendations",
+                [
+                    "Rank",
+                    "Nuclide",
+                    "Preferred line (keV)",
+                    "Preferred masking score",
+                    "Strongest line (keV)",
+                    "Guidance",
+                ],
+                [
+                    [
+                        row.get("rank"),
+                        row.get("nuclide"),
+                        row.get("preferred_line_energy_keV"),
+                        row.get("preferred_masking_score"),
+                        row.get("strongest_line_energy_keV"),
+                        row.get("guidance"),
+                    ]
+                    for row in masking_recommendations
                 ],
             )
         )
@@ -3887,6 +4050,10 @@ def cmd_report(args: argparse.Namespace) -> None:
     peak_report: Optional[Dict[str, Any]] = None
     line_payload: Optional[Dict[str, Any]] = None
     rates_payload: Optional[Dict[str, Any]] = None
+    masking_payload: Optional[Dict[str, Any]] = None
+    masking_line_rows: List[Dict[str, Any]] = []
+    masking_isotope_rows: List[Dict[str, Any]] = []
+    masking_recommendation_rows: List[Dict[str, Any]] = []
     optimization_payload: Optional[Dict[str, Any]] = None
     optimization_recommendation: Optional[Dict[str, Any]] = None
     optimization_top_rows: List[Dict[str, Any]] = []
@@ -4053,6 +4220,36 @@ def cmd_report(args: argparse.Namespace) -> None:
             summary["total_rate_reactions_s"] = float(
                 sum(float(item.get("rate", 0.0) or 0.0) for item in rates)
             )
+    masking_file = getattr(args, "masking_file", None)
+    if masking_file:
+        masking_file_path = Path(masking_file)
+        inputs["masking_file"] = str(masking_file_path)
+        masking_payload = _load_json(masking_file_path)
+        masking_line_rows = [
+            item
+            for item in (masking_payload.get("line_masking_results", []) or [])
+            if isinstance(item, dict)
+        ]
+        masking_isotope_rows = [
+            item
+            for item in (masking_payload.get("masking_isotope_ranking", []) or [])
+            if isinstance(item, dict)
+        ]
+        masking_recommendation_rows = [
+            item
+            for item in (masking_payload.get("alternate_line_recommendations", []) or [])
+            if isinstance(item, dict)
+        ]
+        summary["masking_line_interactions"] = len(masking_line_rows)
+        summary["masking_isotope_count"] = len(masking_isotope_rows)
+        if masking_isotope_rows:
+            summary["dominant_masking_isotope"] = masking_isotope_rows[0].get(
+                "masking_nuclide"
+            )
+        if masking_recommendation_rows:
+            summary["alternate_line_recommendations"] = len(
+                masking_recommendation_rows
+            )
     optimization_file = getattr(args, "optimization_file", None)
     if optimization_file:
         optimization_file_path = Path(optimization_file)
@@ -4151,6 +4348,25 @@ def cmd_report(args: argparse.Namespace) -> None:
         )
         if rate_table is not None:
             table_items["reaction_rates_summary"] = rate_table
+    if masking_payload is not None:
+        masking_line_table = _write_csv_table(
+            tables_dir / "masking_line_results.csv", masking_line_rows
+        )
+        masking_isotope_table = _write_csv_table(
+            tables_dir / "masking_isotope_ranking.csv", masking_isotope_rows
+        )
+        masking_recommendation_table = _write_csv_table(
+            tables_dir / "alternate_line_recommendations.csv",
+            masking_recommendation_rows,
+        )
+        if masking_line_table is not None:
+            table_items["masking_line_results"] = masking_line_table
+        if masking_isotope_table is not None:
+            table_items["masking_isotope_ranking"] = masking_isotope_table
+        if masking_recommendation_table is not None:
+            table_items[
+                "alternate_line_recommendations"
+            ] = masking_recommendation_table
     if optimization_payload is not None:
         recommendation_rows = []
         if optimization_recommendation:
@@ -4210,6 +4426,10 @@ def cmd_report(args: argparse.Namespace) -> None:
         line_payload=line_payload,
         isotope_rows=isotope_rows,
         rates_payload=rates_payload,
+        masking_payload=masking_payload,
+        masking_line_rows=masking_line_rows,
+        masking_isotope_rows=masking_isotope_rows,
+        masking_recommendations=masking_recommendation_rows,
         optimization_payload=optimization_payload,
         optimization_recommendation=optimization_recommendation,
         optimization_top_rows=optimization_top_rows,
@@ -5277,6 +5497,55 @@ def build_parser() -> argparse.ArgumentParser:
     )
     isotope_priority.set_defaults(func=cmd_isotope_priority)
 
+    masking_review = subparsers.add_parser(
+        "masking-review",
+        help="Rank line-level masking interactions and alternate-line guidance from activity-review outputs",
+    )
+    masking_review.add_argument("--activity-review-file", type=Path, required=True)
+    masking_review.add_argument(
+        "--output",
+        type=Path,
+        default=Path("masking_review.json"),
+        help="Output JSON masking-review bundle path",
+    )
+    masking_review.add_argument(
+        "--isotopes-of-interest",
+        type=str,
+        default=None,
+        help="Optional comma-separated isotope subset for focused masking review",
+    )
+    masking_review.add_argument(
+        "--energy-window-keV",
+        type=float,
+        default=3.0,
+        help="Maximum line-energy delta considered for masking interactions",
+    )
+    masking_review.add_argument(
+        "--top-n",
+        type=int,
+        default=50,
+        help="Optional limit for exported line-level/isotope-level masking rows",
+    )
+    masking_review.add_argument(
+        "--csv-output",
+        type=Path,
+        default=None,
+        help="Optional CSV export of line-level masking interactions",
+    )
+    masking_review.add_argument(
+        "--isotope-csv-output",
+        type=Path,
+        default=None,
+        help="Optional CSV export of aggregated masking-isotope ranking",
+    )
+    masking_review.add_argument(
+        "--recommendation-csv-output",
+        type=Path,
+        default=None,
+        help="Optional CSV export of alternate-line recommendations",
+    )
+    masking_review.set_defaults(func=cmd_masking_review)
+
     optimization_sweep = subparsers.add_parser(
         "optimization-sweep",
         help="Rank schedule candidates using DI-FOM, FIM, MWDCS, or advanced N1/N2 objectives",
@@ -5673,6 +5942,7 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--peaks-file", type=Path)
     report.add_argument("--lines-file", type=Path)
     report.add_argument("--rates-file", type=Path)
+    report.add_argument("--masking-file", type=Path)
     report.add_argument("--optimization-file", type=Path)
     report.add_argument("--unfold-file", type=Path)
     report.add_argument("--validation-file", type=Path)
