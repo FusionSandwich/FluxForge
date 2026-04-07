@@ -7,8 +7,12 @@ from types import SimpleNamespace
 import pytest
 
 from fluxforge.examples.rafm_workflow import (
+    RAFMMetadata,
+    TimingInfo,
     analyze_flux_wire_sample,
     analyze_generic_sample,
+    build_flux_wire_reactions,
+    build_fluxforge_line_consistency_rows,
     default_paths,
     estimate_rafm_sample_mass_g,
     ensure_results_tree,
@@ -26,6 +30,7 @@ from fluxforge.examples.rafm_workflow import (
 from fluxforge.data.rafm_profile import load_rafm_profile
 from fluxforge.analysis.flux_wire_analysis import (
     GammaLine,
+    IdentifiedPeak,
     analyze_raw_spectrum,
     analyze_raw_spectrum_targeted,
 )
@@ -395,3 +400,146 @@ def test_run_rafm_validation_subset_generates_summary(tmp_path):
         Path(summary["results_root"]) / "tables" / "flux_wire_count_disagreement.csv"
     ).exists()
     assert (Path(summary["results_root"]) / "reports").exists()
+
+
+def test_fluxforge_line_consistency_rows_include_single_vs_all_metrics() -> None:
+    peaks = [
+        IdentifiedPeak(
+            channel=10,
+            energy_keV=159.3,
+            net_counts=1000.0,
+            net_counts_unc=35.0,
+            gross_counts=1200.0,
+            background=10.0,
+            fwhm=2.0,
+            significance=15.0,
+            isotope="Sc47",
+            activity_bq=100.0,
+            activity_unc_bq=5.0,
+        ),
+        IdentifiedPeak(
+            channel=20,
+            energy_keV=175.3,
+            net_counts=900.0,
+            net_counts_unc=30.0,
+            gross_counts=1100.0,
+            background=9.0,
+            fwhm=2.2,
+            significance=14.0,
+            isotope="Sc47",
+            activity_bq=104.0,
+            activity_unc_bq=5.0,
+        ),
+        IdentifiedPeak(
+            channel=30,
+            energy_keV=889.4,
+            net_counts=500.0,
+            net_counts_unc=25.0,
+            gross_counts=700.0,
+            background=8.0,
+            fwhm=2.8,
+            significance=7.0,
+            isotope="Sc47",
+            activity_bq=170.0,
+            activity_unc_bq=6.0,
+        ),
+    ]
+    timing = TimingInfo(
+        sample_group="flux_wires",
+        compare_eoi=False,
+        irradiation_phase=None,
+        irradiation_end=None,
+        irradiation_time_s=7200.0,
+        decay_time_s=None,
+        measurement_time=None,
+        decay_label=None,
+        schedule_source=None,
+    )
+    config = {
+        "line_activity_consistency_max_rel_deviation": 0.25,
+        "line_activity_consistency_min_lines": 2,
+        "line_activity_single_peak_drift_rel_threshold": 0.10,
+        "line_activity_outlier_modified_z_threshold": 3.5,
+    }
+
+    rows = build_fluxforge_line_consistency_rows(
+        "Ti-RAFM-1_25cm",
+        "flux_wires",
+        peaks,
+        {"Sc47": 3.349e5},
+        timing,
+        live_time_s=3600.0,
+        config=config,
+    )
+
+    assert rows
+    first = rows[0]
+    assert "line_activity_variance_bq2" in first
+    assert "single_peak_relative_delta_vs_all" in first
+    assert "leave_one_out_consensus_activity_bq" in first
+    assert "all_vs_leave_one_out_relative_delta" in first
+    assert "flag_line_outlier" in first
+    assert any(bool(row["flag_line_outlier"]) for row in rows)
+
+
+def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> None:
+    metadata = RAFMMetadata(
+        config={
+            "ti48_model_relative_uncertainty_additional": 0.15,
+            "ti48_model_relative_uncertainty_floor": 0.20,
+            "cd_model_relative_uncertainty_additional": 0.20,
+            "cd_model_relative_uncertainty_floor": 0.25,
+        },
+        sample_schedule={},
+        sample_schedules={},
+        flux_wire_metadata={
+            "ti-rafm-1": [{"mass_mg": 10.0}],
+            "co-cd-rafm-1": [{"mass_mg": 10.0}],
+        },
+        pairing_aliases={},
+        sample_gamma_library={},
+    )
+    timing = TimingInfo(
+        sample_group="flux_wires",
+        compare_eoi=False,
+        irradiation_phase="phase2_whale_tube",
+        irradiation_end=None,
+        irradiation_time_s=7200.0,
+        decay_time_s=1000.0,
+        measurement_time=None,
+        decay_label=None,
+        schedule_source="test",
+    )
+
+    ti_reactions = build_flux_wire_reactions(
+        "Ti-RAFM-1_25cm",
+        "ti-rafm-1",
+        {
+            "Sc48": {
+                "activity_bq": 1000.0,
+                "activity_unc_bq": 50.0,
+            }
+        },
+        timing,
+        metadata,
+    )
+    assert ti_reactions
+    ti_rel_unc = ti_reactions[0].activity_unc_bq / ti_reactions[0].activity_bq
+    assert ti_reactions[0].reaction_id == "Ti-48(n,p)Sc-48"
+    assert ti_rel_unc >= 0.20 - 1e-12
+
+    cd_reactions = build_flux_wire_reactions(
+        "Co-Cd-RAFM-1_25cm",
+        "co-cd-rafm-1",
+        {
+            "Co60": {
+                "activity_bq": 500.0,
+                "activity_unc_bq": 10.0,
+            }
+        },
+        timing,
+        metadata,
+    )
+    assert cd_reactions
+    cd_rel_unc = cd_reactions[0].activity_unc_bq / cd_reactions[0].activity_bq
+    assert cd_rel_unc >= 0.25 - 1e-12

@@ -251,6 +251,179 @@ class TestSpectrumUnfolder(unittest.TestCase):
         self.assertGreaterEqual(result.chi_squared, 0)
         self.assertEqual(result.method, "GRAVEL")
 
+    def test_support_mask_freezes_weak_bins_to_initial_guess(self):
+        """Support masking should leave weakly contributing bins fixed to the prior."""
+        from fluxforge.workflows.spectrum_unfolding import SpectrumUnfolder
+
+        energy_edges = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+        unfolder = SpectrumUnfolder(custom_energy_edges=energy_edges, verbose=False)
+        unfolder.add_reaction(
+            "Ti-46(n,p)Sc-46",
+            activity_Bq=1.0,
+            uncertainty_Bq=0.1,
+            rate_per_atom=1.0,
+        )
+        unfolder.add_reaction(
+            "Ni-58(n,p)Co-58",
+            activity_Bq=0.5,
+            uncertainty_Bq=0.05,
+            rate_per_atom=0.5,
+        )
+
+        prior_flux = np.array([1.0, 0.8, 0.6, 0.4, 0.2], dtype=float)
+        unfolder.set_initial_guess(prior_flux, source="synthetic prior")
+        unfolder._response_matrix = np.array(
+            [
+                [0.9, 0.1, 0.0, 1e-8, 1e-8],
+                [0.0, 0.2, 0.8, 1e-8, 1e-8],
+            ],
+            dtype=float,
+        )
+        unfolder._reaction_list = ["Ti-46(n,p)Sc-46", "Ni-58(n,p)Co-58"]
+        unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+
+        result = unfolder.unfold(
+            method="MLEM",
+            max_iterations=25,
+            tolerance=1e-6,
+            support_threshold=1e-3,
+            support_metric="prior_contribution",
+        )
+
+        assert result.metadata["support_mask_applied"] is True
+        assert result.metadata["support_mask_active_bins"] == 3
+        np.testing.assert_allclose(result.flux[-2:], prior_flux[-2:])
+
+    def test_prior_shape_basis_preserves_prior_partition_and_reconstructs_native_flux(self):
+        """A coarse prior-shaped basis should expand back to the native grid."""
+        from fluxforge.workflows.spectrum_unfolding import SpectrumUnfolder
+
+        energy_edges = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=float)
+        unfolder = SpectrumUnfolder(custom_energy_edges=energy_edges, verbose=False)
+        prior_flux = np.array([10.0, 6.0, 3.0, 1.0], dtype=float)
+        unfolder.set_initial_guess(prior_flux, source="synthetic prior")
+        unfolder.add_reaction(
+            "Ti-46(n,p)Sc-46",
+            activity_Bq=20.0,
+            uncertainty_Bq=0.1,
+            rate_per_atom=20.0,
+        )
+        unfolder._response_matrix = np.array([[1.0, 1.0, 1.0, 1.0]], dtype=float)
+        unfolder._reaction_list = ["Ti-46(n,p)Sc-46"]
+        unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+
+        result = unfolder.unfold(
+            method="MLEM",
+            max_iterations=10,
+            tolerance=1e-8,
+            chi2_tolerance=1e-8,
+            basis_edges=np.array([1.0, 3.0, 5.0], dtype=float),
+        )
+
+        np.testing.assert_allclose(result.flux, prior_flux, rtol=1e-8, atol=1e-8)
+        assert result.metadata["basis_mode"] == "prior_shape"
+        assert result.metadata["basis_groups"] == 2
+        assert result.metadata["basis_edges"] == [1.0, 3.0, 5.0]
+
+    def test_prior_shape_basis_solves_on_reduced_dimension(self):
+        """Few-channel basis solving should fit coarse scaling factors and expand them."""
+        from fluxforge.workflows.spectrum_unfolding import SpectrumUnfolder
+
+        energy_edges = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=float)
+        unfolder = SpectrumUnfolder(custom_energy_edges=energy_edges, verbose=False)
+        prior_flux = np.array([2.0, 2.0, 1.0, 1.0], dtype=float)
+        unfolder.set_initial_guess(prior_flux, source="synthetic prior")
+        unfolder.add_reaction(
+            "Ti-46(n,p)Sc-46",
+            activity_Bq=8.0,
+            uncertainty_Bq=0.1,
+            rate_per_atom=8.0,
+        )
+        unfolder.add_reaction(
+            "Ni-58(n,p)Co-58",
+            activity_Bq=1.0,
+            uncertainty_Bq=0.1,
+            rate_per_atom=1.0,
+        )
+        unfolder._response_matrix = np.array(
+            [
+                [1.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 1.0],
+            ],
+            dtype=float,
+        )
+        unfolder._reaction_list = ["Ti-46(n,p)Sc-46", "Ni-58(n,p)Co-58"]
+        unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+
+        result = unfolder.unfold(
+            method="MLEM",
+            max_iterations=200,
+            tolerance=1e-10,
+            chi2_tolerance=1e-10,
+            basis_edges=np.array([1.0, 3.0, 5.0], dtype=float),
+        )
+
+        expected_flux = np.array([4.0, 4.0, 0.5, 0.5], dtype=float)
+        np.testing.assert_allclose(result.flux, expected_flux, rtol=1e-5, atol=1e-6)
+        np.testing.assert_allclose(result.predicted_rates, np.array([8.0, 1.0]), rtol=1e-6)
+
+    def test_duplicate_reaction_rows_can_be_aggregated_before_unfolding(self):
+        """Replicate wires with identical response rows should aggregate cleanly."""
+        from fluxforge.workflows.spectrum_unfolding import SpectrumUnfolder
+
+        energy_edges = np.array([1.0, 2.0, 3.0], dtype=float)
+        unfolder = SpectrumUnfolder(custom_energy_edges=energy_edges, verbose=False)
+        unfolder.set_initial_guess(np.array([1.0, 1.0], dtype=float), source="synthetic prior")
+        unfolder.add_reaction(
+            "Ti-46(n,p)Sc-46",
+            activity_Bq=10.0,
+            uncertainty_Bq=1.0,
+            rate_per_atom=1.0,
+        )
+        unfolder.add_reaction(
+            "Ti-46(n,p)Sc-46",
+            activity_Bq=10.0,
+            uncertainty_Bq=2.0,
+            rate_per_atom=1.4,
+        )
+        unfolder.add_reaction(
+            "Ni-58(n,p)Co-58",
+            activity_Bq=10.0,
+            uncertainty_Bq=1.0,
+            rate_per_atom=0.5,
+        )
+        unfolder._response_matrix = np.array(
+            [
+                [1.0, 0.0],
+                [1.0, 0.0],
+                [0.0, 1.0],
+            ],
+            dtype=float,
+        )
+        unfolder._reaction_list = [
+            "Ti-46(n,p)Sc-46",
+            "Ti-46(n,p)Sc-46",
+            "Ni-58(n,p)Co-58",
+        ]
+        unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+
+        result = unfolder.unfold(
+            method="MLEM",
+            max_iterations=50,
+            tolerance=1e-12,
+            chi2_tolerance=1e-12,
+            aggregate_duplicate_reactions=True,
+        )
+
+        expected_rate = (1.0 / 0.1**2 + 1.4 / 0.28**2) / (1.0 / 0.1**2 + 1.0 / 0.28**2)
+        self.assertEqual(result.reactions_used, ["Ti-46(n,p)Sc-46", "Ni-58(n,p)Co-58"])
+        self.assertTrue(result.metadata["duplicate_reaction_aggregation_applied"])
+        self.assertEqual(result.metadata["duplicate_reaction_original_rows"], 3)
+        self.assertEqual(result.metadata["duplicate_reaction_aggregated_rows"], 2)
+        self.assertEqual(result.metadata["duplicate_reaction_counts"]["Ti-46(n,p)Sc-46"], 2)
+        self.assertTrue(np.isclose(result.measured_rates[0], expected_rate))
+        np.testing.assert_allclose(result.predicted_rates, result.measured_rates, rtol=1e-6)
+
     def test_quick_unfold(self):
         """Test quick_unfold convenience function."""
         from fluxforge.workflows.spectrum_unfolding import quick_unfold
@@ -327,6 +500,21 @@ class TestFluxWireMeasurement(unittest.TestCase):
         self.assertTrue(np.isclose(meas.effective_saturation_factor, saturation))
         self.assertTrue(np.isclose(meas.effective_decay_factor, decay))
         self.assertTrue(np.isclose(meas.reaction_rate_per_atom, expected))
+
+    def test_reaction_rate_accepts_pre_normalized_override(self):
+        """Test direct reaction-rate inputs bypass activity normalization."""
+        from fluxforge.workflows.spectrum_unfolding import FluxWireMeasurement
+
+        meas = FluxWireMeasurement(
+            reaction="Ni-58(n,p)Co-58",
+            activity_Bq=1.0,
+            sample_mass_g=1.0e-3,
+            irradiation_time=7200.0,
+            cooling_time=3600.0,
+            rate_per_atom=2.5e-13,
+        )
+
+        self.assertTrue(np.isclose(meas.reaction_rate_per_atom, 2.5e-13))
 
 
 class TestUnfoldingResult(unittest.TestCase):

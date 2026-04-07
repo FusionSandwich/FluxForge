@@ -63,6 +63,8 @@ class GravelUnfolder(UnfoldingMethod):
         chi2_tolerance = float(kwargs.get("chi2_tolerance", self.chi2_tolerance))
         floor = float(kwargs.get("floor", self.floor))
         relaxation = float(kwargs.get("relaxation", self.relaxation))
+        prior_strength = float(kwargs.get("prior_strength", 0.0))
+        smoothing_strength = float(kwargs.get("smoothing_strength", 0.0))
         convergence_mode = str(
             kwargs.get("convergence_mode", self.convergence_mode)
         )
@@ -96,6 +98,8 @@ class GravelUnfolder(UnfoldingMethod):
             chi2_tolerance=chi2_tolerance,
             floor=floor,
             relaxation=relaxation,
+            prior_strength=prior_strength,
+            smoothing_strength=smoothing_strength,
             convergence_mode=convergence_mode,
             verbose=verbose,
         )
@@ -126,6 +130,8 @@ class GravelUnfolder(UnfoldingMethod):
                 "chi2_tolerance": chi2_tolerance,
                 "floor": floor,
                 "relaxation": relaxation,
+                "prior_strength": prior_strength,
+                "smoothing_strength": smoothing_strength,
                 "convergence_mode": convergence_mode,
                 "used_initial_flux": initial_flux is not None,
                 "used_measurement_uncertainty": uncertainty_array is not None,

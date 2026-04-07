@@ -30,6 +30,21 @@
   "generic_targeted_prune_intensity_ratio": 20.0,
   "line_activity_consistency_max_rel_deviation": 0.25,
   "line_activity_consistency_min_lines": 2,
+  "line_activity_single_peak_drift_rel_threshold": 0.15,
+  "line_activity_outlier_modified_z_threshold": 3.5,
+  "ti48_model_relative_uncertainty_additional": 0.15,
+  "ti48_model_relative_uncertainty_floor": 0.2,
+  "cd_model_relative_uncertainty_additional": 0.2,
+  "cd_model_relative_uncertainty_floor": 0.25,
+  "cd_ratio_default_review_min": 1.1,
+  "cd_ratio_expected_ranges": {
+    "Cu": {
+      "min": 1.1
+    },
+    "Sc": {
+      "min": 1.1
+    }
+  },
   "dead_time_review_threshold_pct": 15.0,
   "attenuation_correction": {
     "enabled": false,

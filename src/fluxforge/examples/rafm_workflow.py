@@ -638,6 +638,27 @@ def aggregate_isotope_results(
             "excluded_peak_energies": [
                 float(value) for value in payload.get("excluded_peak_energies", [])
             ],
+            "mean_line_activity_bq": float(payload.get("mean_line_activity_bq", 0.0)),
+            "median_line_activity_bq": float(
+                payload.get("median_line_activity_bq", 0.0)
+            ),
+            "variance_line_activity_bq2": float(
+                payload.get("variance_line_activity_bq2", 0.0)
+            ),
+            "std_line_activity_bq": float(payload.get("std_line_activity_bq", 0.0)),
+            "relative_line_activity_variance": float(
+                payload.get("relative_line_activity_variance", 0.0)
+            ),
+            "max_abs_relative_line_delta": float(
+                payload.get("max_abs_relative_line_delta", 0.0)
+            ),
+            "single_peak_outlier_energies": [
+                float(value)
+                for value in payload.get("single_peak_outlier_energies", [])
+            ],
+            "single_peak_activity_diagnostics": list(
+                payload.get("single_peak_activity_diagnostics", [])
+            ),
         }
         result.update(
             activation_study_metrics(
@@ -804,6 +825,15 @@ def build_fluxforge_line_consistency_rows(
 ) -> List[Dict[str, Any]]:
     rel_limit = float(config.get("line_activity_consistency_max_rel_deviation", 0.25))
     min_lines = int(config.get("line_activity_consistency_min_lines", 2))
+    single_peak_drift_limit = float(
+        config.get(
+            "line_activity_single_peak_drift_rel_threshold",
+            max(0.12, 0.5 * rel_limit),
+        )
+    )
+    robust_outlier_z_limit = float(
+        config.get("line_activity_outlier_modified_z_threshold", 3.5)
+    )
     peaks_by_isotope: Dict[str, List[IdentifiedPeak]] = defaultdict(list)
     for peak in peaks:
         if peak.isotope:
@@ -838,15 +868,64 @@ def build_fluxforge_line_consistency_rows(
         max_rel_deviation = (
             float(np.max(rel_deviations)) if rel_deviations.size else 0.0
         )
+        mean_activity = float(np.mean(activities))
+        median_activity = float(np.median(activities))
+        variance_activity = float(np.var(activities, ddof=1 if activities.size > 1 else 0))
+        std_activity = float(np.sqrt(max(variance_activity, 0.0)))
+        mad_activity = float(np.median(np.abs(activities - median_activity)))
         weighted_scatter = float(
             np.sqrt(np.sum(weights * np.square(activities - consensus)) / weight_sum)
             / max(abs(consensus), 1e-12)
         )
 
-        for (peak, activity, activity_unc), rel_dev in zip(
-            line_payload, rel_deviations
+        for idx, ((peak, activity, activity_unc), rel_dev) in enumerate(
+            zip(line_payload, rel_deviations)
         ):
             combined_unc = math.sqrt(activity_unc**2 + consensus_unc**2)
+            line_consistency_en_score = (
+                (float(activity - consensus) / combined_unc) if combined_unc > 0.0 else None
+            )
+            z_score_vs_all = (
+                float((activity - consensus) / combined_unc) if combined_unc > 0.0 else 0.0
+            )
+
+            leave_one_out_consensus = None
+            leave_one_out_unc = None
+            all_vs_leave_one_out_rel = None
+            single_vs_leave_one_out_rel = None
+            if len(line_payload) > 1:
+                loo_activities = np.delete(activities, idx)
+                loo_uncertainties = np.delete(uncertainties, idx)
+                loo_weights = 1.0 / np.square(np.maximum(loo_uncertainties, 1e-12))
+                loo_weight_sum = float(np.sum(loo_weights))
+                if loo_weight_sum > 0.0:
+                    loo_consensus = float(
+                        np.sum(loo_weights * loo_activities) / loo_weight_sum
+                    )
+                    loo_unc = float(1.0 / np.sqrt(loo_weight_sum))
+                    leave_one_out_consensus = loo_consensus
+                    leave_one_out_unc = loo_unc
+                    all_vs_leave_one_out_rel = float(
+                        (loo_consensus - consensus) / max(abs(consensus), 1e-12)
+                    )
+                    single_vs_leave_one_out_rel = float(
+                        (activity - loo_consensus) / max(abs(loo_consensus), 1e-12)
+                    )
+
+            modified_z = (
+                float(0.6745 * (activity - median_activity) / mad_activity)
+                if mad_activity > 0.0
+                else 0.0
+            )
+            flag_single_peak_vs_all_drift = bool(
+                all_vs_leave_one_out_rel is not None
+                and abs(float(all_vs_leave_one_out_rel)) > single_peak_drift_limit
+            )
+            flag_line_outlier = bool(
+                abs(float(modified_z)) >= robust_outlier_z_limit
+                or abs(float(rel_dev)) > rel_limit
+            )
+
             rows.append(
                 {
                     "sample_id": sample_id,
@@ -855,21 +934,31 @@ def build_fluxforge_line_consistency_rows(
                     "energy_keV": float(peak.energy_keV),
                     "significance": float(peak.significance),
                     "activity_stage": activity_stage,
+                    "line_activity_mean_bq": mean_activity,
+                    "line_activity_median_bq": median_activity,
+                    "line_activity_variance_bq2": variance_activity,
+                    "line_activity_std_bq": std_activity,
                     "line_activity_bq": float(activity),
                     "line_activity_unc_bq": float(activity_unc),
+                    "single_peak_activity_bq": float(activity),
                     "consensus_activity_bq": consensus,
                     "consensus_activity_unc_bq": consensus_unc,
                     "relative_deviation_from_consensus": float(rel_dev),
-                    "line_consistency_en_score": (
-                        (float(activity - consensus) / combined_unc)
-                        if combined_unc > 0.0
-                        else None
-                    ),
+                    "single_peak_relative_delta_vs_all": float(rel_dev),
+                    "single_peak_z_score_vs_all": z_score_vs_all,
+                    "line_consistency_en_score": line_consistency_en_score,
+                    "leave_one_out_consensus_activity_bq": leave_one_out_consensus,
+                    "leave_one_out_consensus_unc_bq": leave_one_out_unc,
+                    "all_vs_leave_one_out_relative_delta": all_vs_leave_one_out_rel,
+                    "single_vs_leave_one_out_relative_delta": single_vs_leave_one_out_rel,
+                    "modified_z_score": float(modified_z),
                     "n_lines_used": len(line_payload),
                     "max_relative_deviation_for_isotope": max_rel_deviation,
                     "weighted_relative_scatter": weighted_scatter,
                     "flag_line_inconsistency": bool(rel_dev > rel_limit),
                     "flag_isotope_scatter": bool(max_rel_deviation > rel_limit),
+                    "flag_single_peak_vs_all_drift": flag_single_peak_vs_all_drift,
+                    "flag_line_outlier": flag_line_outlier,
                 }
             )
     return rows
@@ -1779,7 +1868,11 @@ def build_validation_flags(
         ]
 
     line_consistency_failures = [
-        row for row in fluxforge_consistency_rows if row.get("flag_line_inconsistency")
+        row
+        for row in fluxforge_consistency_rows
+        if row.get("flag_line_inconsistency")
+        or row.get("flag_line_outlier")
+        or row.get("flag_single_peak_vs_all_drift")
     ]
     measurement_qc_flags = [
         row for row in measurement_qc_rows if row.get("flag_review")
@@ -2304,13 +2397,25 @@ def write_sample_comparison_report(
 
     section_rows = []
     for row in fluxforge_consistency_rows:
-        if not row.get("flag_line_inconsistency"):
+        if not (
+            row.get("flag_line_inconsistency")
+            or row.get("flag_line_outlier")
+            or row.get("flag_single_peak_vs_all_drift")
+        ):
             continue
+        drift = row.get("all_vs_leave_one_out_relative_delta")
+        drift_text = (
+            f" | all-vs-LOO drift={float(drift):+.3f}"
+            if drift is not None
+            else ""
+        )
         section_rows.append(
             f"- {row['isotope']} @ {float(row['energy_keV']):.2f} keV | "
             f"stage={row.get('activity_stage') or 'count_start'} | "
             f"rel_dev={float(row.get('relative_deviation_from_consensus') or 0.0):.3f} | "
             f"consensus={float(row.get('consensus_activity_bq') or 0.0):.4g} Bq"
+            f" | mod-z={float(row.get('modified_z_score') or 0.0):+.2f}"
+            f"{drift_text}"
         )
     sections.append(("FluxForge line-activity consistency flags", section_rows))
 
@@ -2748,6 +2853,8 @@ def build_flux_wire_reactions(
     reactions: List[FluxWireReaction] = []
     sample_element = get_sample_element(sample_id)
     mass_mg = flux_wire_mass_mg(sample_key, metadata)
+    normalized_sample_id = str(sample_id).strip().lower()
+    normalized_sample_key = str(sample_key).strip().lower()
     for isotope, payload in isotope_payload.items():
         activity_bq = float(
             payload.get("activity_eoi_bq") or payload.get("activity_bq") or 0.0
@@ -2757,6 +2864,60 @@ def build_flux_wire_reactions(
         )
         half_life_s = FLUX_WIRE_NUCLIDES.get(isotope, {}).get("half_life_s", 0.0)
         reaction_id = get_reaction_id(isotope, sample_element)
+
+        base_relative_unc = (
+            float(activity_unc_bq / activity_bq)
+            if activity_bq > 0.0 and activity_unc_bq >= 0.0
+            else 0.0
+        )
+        additional_relative_terms: List[float] = []
+        relative_uncertainty_floor = 0.0
+
+        if reaction_id == "Ti-48(n,p)Sc-48":
+            additional_relative_terms.append(
+                float(
+                    metadata.config.get(
+                        "ti48_model_relative_uncertainty_additional", 0.15
+                    )
+                )
+            )
+            relative_uncertainty_floor = max(
+                relative_uncertainty_floor,
+                float(
+                    metadata.config.get("ti48_model_relative_uncertainty_floor", 0.20)
+                ),
+            )
+
+        if "-cd-" in normalized_sample_id or "-cd-" in normalized_sample_key:
+            additional_relative_terms.append(
+                float(
+                    metadata.config.get(
+                        "cd_model_relative_uncertainty_additional", 0.20
+                    )
+                )
+            )
+            relative_uncertainty_floor = max(
+                relative_uncertainty_floor,
+                float(
+                    metadata.config.get("cd_model_relative_uncertainty_floor", 0.25)
+                ),
+            )
+
+        effective_relative_unc = float(base_relative_unc)
+        if additional_relative_terms:
+            effective_relative_unc = float(
+                math.sqrt(
+                    effective_relative_unc**2
+                    + sum(max(term, 0.0) ** 2 for term in additional_relative_terms)
+                )
+            )
+        effective_relative_unc = max(
+            effective_relative_unc,
+            float(relative_uncertainty_floor),
+        )
+        if activity_bq > 0.0:
+            activity_unc_bq = float(activity_bq * effective_relative_unc)
+
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
             sample_element or "Co", mass_mg=mass_mg, isotope_fraction=isotope_fraction
@@ -3457,6 +3618,8 @@ def cd_ratio_rows(
     }
     rows: List[Dict[str, Any]] = []
     plot_payload: Dict[str, Dict[str, float]] = {}
+    configured_ranges = metadata.config.get("cd_ratio_expected_ranges", {})
+    default_review_min = float(metadata.config.get("cd_ratio_default_review_min", 1.10))
     for cd_key, artifact in sorted(by_key.items()):
         if "-cd-" not in cd_key:
             continue
@@ -3474,6 +3637,29 @@ def cd_ratio_rows(
         )
         material = bare_key.split("-")[0].capitalize()
         ratio = bare_total / cd_total if cd_total > 0 else None
+
+        expected_range = configured_ranges.get(material, {})
+        expected_min = expected_range.get("min")
+        expected_max = expected_range.get("max")
+        if expected_min is None and material in {"Cu", "Sc"}:
+            expected_min = default_review_min
+
+        flag_cd_ratio_review = False
+        if ratio is None:
+            flag_cd_ratio_review = True
+        else:
+            if expected_min is not None and ratio < float(expected_min):
+                flag_cd_ratio_review = True
+            if expected_max is not None and ratio > float(expected_max):
+                flag_cd_ratio_review = True
+
+        if ratio is None:
+            review_note = "Cd sample has zero/invalid total activity"
+        elif flag_cd_ratio_review:
+            review_note = "Cd ratio is outside configured or default review bounds"
+        else:
+            review_note = "Cd ratio is within configured/default review bounds"
+
         rows.append(
             {
                 "material": material,
@@ -3482,6 +3668,14 @@ def cd_ratio_rows(
                 "bare_activity_bq": bare_total,
                 "cd_activity_bq": cd_total,
                 "cd_ratio": ratio,
+                "expected_cd_ratio_min": (
+                    None if expected_min is None else float(expected_min)
+                ),
+                "expected_cd_ratio_max": (
+                    None if expected_max is None else float(expected_max)
+                ),
+                "flag_cd_ratio_review": bool(flag_cd_ratio_review),
+                "review_note": review_note,
             }
         )
         if ratio is not None:
@@ -3894,6 +4088,7 @@ def run_flux_wire_unfolding(
                 uncertainty_Bq=max(
                     reaction.reaction_rate_unc, 0.05 * reaction.reaction_rate
                 ),
+                rate_per_atom=reaction.reaction_rate,
             )
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)
         unfolder.set_initial_guess(prior_flux, source="VITAMIN-J prior")
@@ -3922,6 +4117,7 @@ def build_summary_markdown(
         f"Unmatched QG files: {len(summary['unmatched_qg'])}",
         f"QG internal consistency flags: {summary.get('qg_internal_consistency_flags', 0)}",
         f"FluxForge line consistency flags: {summary.get('fluxforge_line_consistency_flags', 0)}",
+        f"Cd ratio review flags: {summary.get('cd_ratio_review_flags', 0)}",
         f"Measurement QC review flags: {summary.get('measurement_qc_flags', 0)}",
         "",
         "## Validation failures",
@@ -4191,10 +4387,15 @@ def run_rafm_validation(
                 1
                 for row in fluxforge_consistency_rows
                 if row.get("flag_line_inconsistency")
+                or row.get("flag_line_outlier")
+                or row.get("flag_single_peak_vs_all_drift")
             )
         ),
         "measurement_qc_flags": int(
             sum(1 for row in measurement_qc_rows if row.get("flag_review"))
+        ),
+        "cd_ratio_review_flags": int(
+            sum(1 for row in cd_rows if row.get("flag_cd_ratio_review"))
         ),
         "results_root": str(paths.results_root),
         "unfolding_methods": sorted(unfolding_results.keys()),

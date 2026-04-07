@@ -111,6 +111,9 @@ class FluxWireMeasurement:
         Sample mass in grams
     isotope_abundance : float
         Isotope abundance (0-1)
+    rate_per_atom : float | None
+        Optional pre-normalized reaction rate in reactions/atom/s. When set,
+        this bypasses the activity-to-rate conversion path.
     """
 
     reaction: str
@@ -122,6 +125,7 @@ class FluxWireMeasurement:
     cooling_time: float = 0.0
     sample_mass_g: float = 1.0
     isotope_abundance: float = 1.0
+    rate_per_atom: Optional[float] = None
 
     @property
     def target_isotope(self) -> Optional[str]:
@@ -234,6 +238,8 @@ class FluxWireMeasurement:
     @property
     def reaction_rate_per_atom(self) -> float:
         """Calculate reaction rate per target atom per second."""
+        if self.rate_per_atom is not None:
+            return float(self.rate_per_atom)
         n_target_atoms = self.target_atom_count
         saturation = self.effective_saturation_factor
         decay = self.effective_decay_factor
@@ -439,6 +445,7 @@ class SpectrumUnfolder:
         uncertainty_Bq: float = 0.0,
         saturation_factor: float = 1.0,
         decay_factor: float = 1.0,
+        rate_per_atom: Optional[float] = None,
         **kwargs,
     ) -> None:
         """
@@ -456,6 +463,9 @@ class SpectrumUnfolder:
             Saturation correction
         decay_factor : float
             Decay correction
+        rate_per_atom : float, optional
+            Pre-normalized reaction rate in reactions/atom/s. Use this when the
+            upstream workflow already converted activity to reaction rate.
         **kwargs
             Additional parameters passed to FluxWireMeasurement
         """
@@ -465,6 +475,7 @@ class SpectrumUnfolder:
             uncertainty_Bq=uncertainty_Bq,
             saturation_factor=saturation_factor,
             decay_factor=decay_factor,
+            rate_per_atom=rate_per_atom,
             **kwargs,
         )
         self.measurements.append(meas)
@@ -623,6 +634,253 @@ class SpectrumUnfolder:
 
         return response, valid_reactions, uncertainties
 
+    def _prepare_support_filtered_problem(
+        self,
+        response_matrix: np.ndarray,
+        measured_rates: np.ndarray,
+        rate_uncertainties: np.ndarray,
+        initial_flux: np.ndarray,
+        *,
+        support_threshold: Optional[float] = None,
+        support_metric: str = "prior_contribution",
+        floor: float = 1e-30,
+    ) -> Dict[str, Any]:
+        """Reduce the unfolding problem to energy bins materially constrained by the prior."""
+        n_groups = response_matrix.shape[1]
+        active_mask = np.ones(n_groups, dtype=bool)
+        support_scores = np.ones(n_groups, dtype=float)
+        fixed_prediction = np.zeros_like(measured_rates, dtype=float)
+
+        if (
+            support_threshold is None
+            or support_threshold <= 0.0
+            or initial_flux.size != n_groups
+        ):
+            return {
+                "response": response_matrix,
+                "measurements": measured_rates,
+                "uncertainties": rate_uncertainties,
+                "initial_flux": initial_flux,
+                "active_mask": active_mask,
+                "support_scores": support_scores,
+                "fixed_prediction": fixed_prediction,
+            }
+
+        if support_metric == "prior_contribution":
+            group_contributions = response_matrix * initial_flux.reshape(1, -1)
+            total_prediction = np.sum(group_contributions, axis=1, keepdims=True)
+            support_scores = np.max(
+                group_contributions / np.maximum(total_prediction, floor),
+                axis=0,
+            )
+        elif support_metric == "response_sum":
+            group_sensitivity = np.sum(response_matrix, axis=0)
+            max_sensitivity = float(np.max(group_sensitivity)) if group_sensitivity.size else 0.0
+            if max_sensitivity > 0.0:
+                support_scores = group_sensitivity / max_sensitivity
+            else:
+                support_scores = np.zeros(n_groups, dtype=float)
+        else:
+            raise ValueError(
+                f"Unknown support metric: {support_metric}. Use 'prior_contribution' or 'response_sum'."
+            )
+
+        active_mask = support_scores >= float(support_threshold)
+        if not np.any(active_mask) or np.all(active_mask):
+            return {
+                "response": response_matrix,
+                "measurements": measured_rates,
+                "uncertainties": rate_uncertainties,
+                "initial_flux": initial_flux,
+                "active_mask": np.ones(n_groups, dtype=bool),
+                "support_scores": support_scores,
+                "fixed_prediction": fixed_prediction,
+            }
+
+        fixed_prediction = response_matrix[:, ~active_mask] @ initial_flux[~active_mask]
+        adjusted_measurements = np.maximum(measured_rates - fixed_prediction, floor)
+
+        return {
+            "response": response_matrix[:, active_mask],
+            "measurements": adjusted_measurements,
+            "uncertainties": rate_uncertainties,
+            "initial_flux": initial_flux[active_mask],
+            "active_mask": active_mask,
+            "support_scores": support_scores,
+            "fixed_prediction": fixed_prediction,
+        }
+
+    def _build_prior_shape_basis(
+        self,
+        prior_flux: np.ndarray,
+        basis_edges: np.ndarray,
+        *,
+        floor: float = 1e-30,
+    ) -> Dict[str, Any]:
+        """
+        Build a coarse prior-shaped basis for few-channel unfolding.
+
+        Each coarse coefficient scales the prior spectrum within one contiguous
+        energy interval. This keeps the solve dimension aligned with the number
+        of informative monitors while preserving the prior shape inside each
+        coarse interval.
+        """
+        native_midpoints = np.sqrt(
+            np.maximum(self.energy_edges[:-1], floor)
+            * np.maximum(self.energy_edges[1:], floor)
+        )
+        resolved_edges = np.asarray(basis_edges, dtype=float).reshape(-1)
+        if resolved_edges.size < 2:
+            raise ValueError("basis_edges must contain at least two boundaries")
+        if not np.all(np.diff(resolved_edges) > 0.0):
+            raise ValueError("basis_edges must be strictly increasing")
+        if resolved_edges[0] > float(self.energy_edges[0]) or resolved_edges[-1] < float(
+            self.energy_edges[-1]
+        ):
+            raise ValueError(
+                "basis_edges must span the full unfolding energy range "
+                f"({self.energy_edges[0]:.3e} to {self.energy_edges[-1]:.3e} eV)"
+            )
+
+        basis_columns: List[np.ndarray] = []
+        active_edges: List[float] = [float(resolved_edges[0])]
+        for index, (e_lo, e_hi) in enumerate(zip(resolved_edges[:-1], resolved_edges[1:])):
+            if index == len(resolved_edges) - 2:
+                mask = (native_midpoints >= e_lo) & (native_midpoints <= e_hi)
+            else:
+                mask = (native_midpoints >= e_lo) & (native_midpoints < e_hi)
+            if not np.any(mask):
+                continue
+
+            column = np.zeros_like(prior_flux, dtype=float)
+            column[mask] = np.maximum(prior_flux[mask], floor)
+            if not np.any(column > floor):
+                column[mask] = 1.0
+            basis_columns.append(column)
+            active_edges.append(float(e_hi))
+
+        if not basis_columns:
+            raise ValueError("basis_edges did not capture any native energy groups")
+
+        basis_matrix = np.column_stack(basis_columns)
+        reconstructed_prior = basis_matrix @ np.ones(basis_matrix.shape[1], dtype=float)
+        if not np.allclose(reconstructed_prior, np.maximum(prior_flux, floor)):
+            raise ValueError("basis_edges do not partition the prior spectrum cleanly")
+
+        return {
+            "basis_matrix": basis_matrix,
+            "basis_edges": np.asarray(active_edges, dtype=float),
+            "n_basis_groups": int(basis_matrix.shape[1]),
+        }
+
+    def _aggregate_duplicate_reaction_rows(
+        self,
+        response_matrix: np.ndarray,
+        valid_reactions: List[str],
+        measured_rates: np.ndarray,
+        rate_uncertainties: np.ndarray,
+        response_uncertainties: Optional[np.ndarray] = None,
+        *,
+        floor: float = 1e-30,
+    ) -> Dict[str, Any]:
+        """
+        Aggregate repeated reaction rows using inverse-variance weighting.
+
+        This is useful when multiple wire replicates map to the same reaction
+        response row. Treating those replicates as fully independent rows
+        artificially over-weights one response shape in the inversion.
+        """
+        if len(valid_reactions) <= 1:
+            return {
+                "response": response_matrix,
+                "reactions": list(valid_reactions),
+                "measurements": measured_rates,
+                "uncertainties": rate_uncertainties,
+                "response_uncertainties": response_uncertainties,
+                "metadata": {
+                    "applied": False,
+                    "original_rows": int(len(valid_reactions)),
+                    "aggregated_rows": int(len(valid_reactions)),
+                    "reaction_counts": {
+                        str(reaction): 1 for reaction in valid_reactions
+                    },
+                },
+            }
+
+        order: List[str] = []
+        grouped_indices: Dict[str, List[int]] = {}
+        for idx, reaction in enumerate(valid_reactions):
+            if reaction not in grouped_indices:
+                grouped_indices[reaction] = []
+                order.append(reaction)
+            grouped_indices[reaction].append(idx)
+
+        has_duplicates = any(len(indices) > 1 for indices in grouped_indices.values())
+        if not has_duplicates:
+            return {
+                "response": response_matrix,
+                "reactions": list(valid_reactions),
+                "measurements": measured_rates,
+                "uncertainties": rate_uncertainties,
+                "response_uncertainties": response_uncertainties,
+                "metadata": {
+                    "applied": False,
+                    "original_rows": int(len(valid_reactions)),
+                    "aggregated_rows": int(len(valid_reactions)),
+                    "reaction_counts": {
+                        str(reaction): 1 for reaction in valid_reactions
+                    },
+                },
+            }
+
+        aggregated_response_rows: List[np.ndarray] = []
+        aggregated_reactions: List[str] = []
+        aggregated_measurements: List[float] = []
+        aggregated_uncertainties: List[float] = []
+        aggregated_response_unc_rows: List[np.ndarray] = []
+
+        for reaction in order:
+            indices = grouped_indices[reaction]
+            representative_idx = indices[0]
+            representative_row = np.asarray(response_matrix[representative_idx], dtype=float)
+            weights = 1.0 / np.maximum(rate_uncertainties[indices], floor) ** 2
+            weight_sum = float(np.sum(weights))
+            aggregated_measurement = float(
+                np.sum(weights * measured_rates[indices]) / max(weight_sum, floor)
+            )
+            aggregated_uncertainty = float(np.sqrt(1.0 / max(weight_sum, floor)))
+
+            aggregated_response_rows.append(representative_row)
+            aggregated_reactions.append(reaction)
+            aggregated_measurements.append(aggregated_measurement)
+            aggregated_uncertainties.append(aggregated_uncertainty)
+
+            if response_uncertainties is not None:
+                aggregated_response_unc_rows.append(
+                    np.asarray(response_uncertainties[representative_idx], dtype=float)
+                )
+
+        return {
+            "response": np.asarray(aggregated_response_rows, dtype=float),
+            "reactions": aggregated_reactions,
+            "measurements": np.asarray(aggregated_measurements, dtype=float),
+            "uncertainties": np.asarray(aggregated_uncertainties, dtype=float),
+            "response_uncertainties": (
+                np.asarray(aggregated_response_unc_rows, dtype=float)
+                if response_uncertainties is not None
+                else None
+            ),
+            "metadata": {
+                "applied": True,
+                "original_rows": int(len(valid_reactions)),
+                "aggregated_rows": int(len(aggregated_reactions)),
+                "reaction_counts": {
+                    str(reaction): int(len(grouped_indices[reaction]))
+                    for reaction in order
+                },
+            },
+        }
+
     def unfold(
         self,
         method: str = "GRAVEL",
@@ -630,8 +888,14 @@ class SpectrumUnfolder:
         tolerance: float = 1e-4,
         chi2_tolerance: float = 0.01,
         relaxation: float = 0.7,
+        prior_strength: float = 0.0,
+        smoothing_strength: float = 0.0,
         use_ml_seed: bool = False,
         ml_seed_threshold: float = 0.6,
+        support_threshold: Optional[float] = None,
+        support_metric: str = "prior_contribution",
+        basis_edges: Optional[np.ndarray] = None,
+        aggregate_duplicate_reactions: bool = False,
     ) -> UnfoldingResult:
         """
         Perform spectrum unfolding.
@@ -648,10 +912,30 @@ class SpectrumUnfolder:
             Chi-squared per DOF threshold
         relaxation : float
             Under-relaxation factor (0-1)
+        prior_strength : float
+            Geometric pull toward the initial spectrum after each iteration.
+            Zero disables this regularization.
+        smoothing_strength : float
+            Log-space nearest-neighbour smoothing strength applied after each
+            iterative update. Zero disables smoothing.
         use_ml_seed : bool
             Use the ML Seed approximation to initialize GRAVEL or RMLE
         ml_seed_threshold : float
             Confidence threshold for accepting the ML seed initializer
+        support_threshold : float, optional
+            When set, bins with support scores below this threshold are frozen to the
+            initial spectrum and only the active subset is iteratively unfolded.
+        support_metric : str
+            Support score definition: 'prior_contribution' (default) or
+            'response_sum'.
+        basis_edges : np.ndarray, optional
+            Coarse energy boundaries for a few-channel prior-shaped basis solve.
+            When provided, the solver updates one coefficient per basis interval
+            while preserving the initial spectrum shape inside that interval.
+        aggregate_duplicate_reactions : bool
+            Combine repeated rows with the same reaction identifier using
+            inverse-variance weighting before unfolding. This is useful when
+            replicate wires map to identical response functions.
 
         Returns
         -------
@@ -673,11 +957,18 @@ class SpectrumUnfolder:
         rate_uncertainties = []
         for m in self.measurements:
             if m.reaction in valid_reactions:
-                measured_rates.append(m.reaction_rate_per_atom)
+                rate_value = float(m.reaction_rate_per_atom)
+                if rate_value <= 0.0 and float(m.activity_Bq) > 0.0:
+                    # Preserve historical behavior for synthetic/legacy fixtures:
+                    # when atom-normalization metadata is unavailable, use
+                    # activity as the proxy reaction-rate observable.
+                    rate_value = float(m.activity_Bq)
+                measured_rates.append(rate_value)
+                rel_uncertainty = float(m.relative_uncertainty)
                 rate_uncertainties.append(
-                    m.reaction_rate_per_atom * m.relative_uncertainty
-                    if m.relative_uncertainty > 0
-                    else m.reaction_rate_per_atom * 0.1
+                    rate_value * rel_uncertainty
+                    if rel_uncertainty > 0.0
+                    else rate_value * 0.1
                 )
 
         measured_rates = require_nonnegative("measured_rates", measured_rates).reshape(-1)
@@ -685,6 +976,38 @@ class SpectrumUnfolder:
             "rate_uncertainties",
             rate_uncertainties,
         ).reshape(-1)
+
+        duplicate_metadata: Dict[str, Any] = {
+            "applied": False,
+            "original_rows": int(len(valid_reactions)),
+            "aggregated_rows": int(len(valid_reactions)),
+            "reaction_counts": {
+                str(reaction): 1 for reaction in valid_reactions
+            },
+        }
+        if aggregate_duplicate_reactions:
+            aggregation_payload = self._aggregate_duplicate_reaction_rows(
+                response_matrix,
+                valid_reactions,
+                measured_rates,
+                rate_uncertainties,
+                response_unc,
+            )
+            response_matrix = require_nonnegative(
+                "response_matrix",
+                aggregation_payload["response"],
+            )
+            valid_reactions = list(aggregation_payload["reactions"])
+            measured_rates = require_nonnegative(
+                "measured_rates",
+                aggregation_payload["measurements"],
+            ).reshape(-1)
+            rate_uncertainties = require_nonnegative(
+                "rate_uncertainties",
+                aggregation_payload["uncertainties"],
+            ).reshape(-1)
+            response_unc = aggregation_payload["response_uncertainties"]
+            duplicate_metadata = dict(aggregation_payload["metadata"])
 
         # Prepare initial guess
         if self.initial_flux is not None:
@@ -696,22 +1019,80 @@ class SpectrumUnfolder:
             initial = [
                 avg_rate / (avg_xs * self.n_groups) if avg_xs > 0 else 1.0
             ] * self.n_groups
+        initial_array = require_nonnegative("initial_flux", initial).reshape(-1)
+
+        basis_matrix: Optional[np.ndarray] = None
+        basis_metadata: Dict[str, Any] = {
+            "basis_mode": "native",
+            "basis_edges": [],
+            "basis_groups": int(self.n_groups),
+        }
+        full_solver_initial = initial_array
+        solver_base_response = response_matrix
+        if basis_edges is not None:
+            basis_payload = self._build_prior_shape_basis(initial_array, basis_edges)
+            basis_matrix = np.asarray(basis_payload["basis_matrix"], dtype=float)
+            solver_base_response = response_matrix @ basis_matrix
+            full_solver_initial = np.ones(basis_matrix.shape[1], dtype=float)
+            basis_metadata = {
+                "basis_mode": "prior_shape",
+                "basis_edges": basis_payload["basis_edges"].tolist(),
+                "basis_groups": int(basis_payload["n_basis_groups"]),
+            }
+
+        support_problem = self._prepare_support_filtered_problem(
+            solver_base_response,
+            measured_rates,
+            rate_uncertainties,
+            full_solver_initial,
+            support_threshold=support_threshold,
+            support_metric=support_metric,
+        )
+        solver_response_matrix = require_nonnegative(
+            "solver_response_matrix",
+            support_problem["response"],
+        )
+        solver_measurements = require_nonnegative(
+            "solver_measurements",
+            support_problem["measurements"],
+        ).reshape(-1)
+        solver_rate_uncertainties = require_nonnegative(
+            "solver_rate_uncertainties",
+            support_problem["uncertainties"],
+        ).reshape(-1)
+        solver_initial = require_nonnegative(
+            "solver_initial",
+            support_problem["initial_flux"],
+        ).reshape(-1)
+        active_mask = np.asarray(support_problem["active_mask"], dtype=bool)
+        support_scores = np.asarray(support_problem["support_scores"], dtype=float)
+        fixed_prediction = np.asarray(support_problem["fixed_prediction"], dtype=float)
 
         if self.verbose:
             print(f"\nStarting {method} unfolding:")
             print(f"  Reactions: {len(valid_reactions)}")
             print(f"  Energy groups: {self.n_groups}")
             print(f"  Initial guess: {self.initial_guess_source}")
+            if duplicate_metadata["applied"]:
+                print(
+                    "  Duplicate aggregation: "
+                    f"{duplicate_metadata['original_rows']} -> {duplicate_metadata['aggregated_rows']} rows"
+                )
+            if not np.all(active_mask):
+                print(
+                    f"  Active groups: {int(np.count_nonzero(active_mask))}/{len(active_mask)} "
+                    f"(metric={support_metric}, threshold={support_threshold:.3e})"
+                )
 
         # Run unfolding
         seed_metadata: Dict[str, Any] = {}
         if method.upper() == "GRAVEL":
             if use_ml_seed:
                 seed_result = MLSeedUnfolder().unfold(
-                    measured_rates,
-                    response_matrix,
-                    initial_flux=np.asarray(initial, dtype=float),
-                    measurement_uncertainty=rate_uncertainties,
+                    solver_measurements,
+                    solver_response_matrix,
+                    initial_flux=solver_initial,
+                    measurement_uncertainty=solver_rate_uncertainties,
                     confidence_threshold=ml_seed_threshold,
                 )
                 seed_metadata = {
@@ -727,45 +1108,49 @@ class SpectrumUnfolder:
                     ),
                 }
                 if bool(seed_result.parameters_used.get("accepted", False)):
-                    initial = np.asarray(seed_result.flux, dtype=float).tolist()
+                    solver_initial = np.asarray(seed_result.flux, dtype=float)
             result = gravel(
-                response=response_matrix.tolist(),
-                measurements=measured_rates.tolist(),
-                initial_flux=initial,
-                measurement_uncertainty=rate_uncertainties.tolist(),
+                response=solver_response_matrix.tolist(),
+                measurements=solver_measurements.tolist(),
+                initial_flux=solver_initial.tolist(),
+                measurement_uncertainty=solver_rate_uncertainties.tolist(),
                 max_iters=max_iterations,
                 tolerance=tolerance,
                 chi2_tolerance=chi2_tolerance,
                 relaxation=relaxation,
+                prior_strength=prior_strength,
+                smoothing_strength=smoothing_strength,
                 verbose=self.verbose,
             )
         elif method.upper() == "MLEM":
             result = mlem(
-                response=response_matrix.tolist(),
-                measurements=measured_rates.tolist(),
-                initial_flux=initial,
-                measurement_uncertainty=rate_uncertainties.tolist(),
+                response=solver_response_matrix.tolist(),
+                measurements=solver_measurements.tolist(),
+                initial_flux=solver_initial.tolist(),
+                measurement_uncertainty=solver_rate_uncertainties.tolist(),
                 max_iters=max_iterations,
                 tolerance=tolerance,
                 chi2_tolerance=chi2_tolerance,
                 relaxation=relaxation,
+                prior_strength=prior_strength,
+                smoothing_strength=smoothing_strength,
                 verbose=self.verbose,
             )
         elif method.upper() == "MAXED":
             result = MaxedUnfolder(
                 max_iterations=max_iterations,
             ).unfold(
-                measured_rates,
-                response_matrix,
-                initial_flux=np.asarray(initial, dtype=float),
-                measurement_uncertainty=rate_uncertainties,
+                solver_measurements,
+                solver_response_matrix,
+                initial_flux=solver_initial,
+                measurement_uncertainty=solver_rate_uncertainties,
             )
         elif method.upper() == "ML_SEED":
             result = MLSeedUnfolder().unfold(
-                measured_rates,
-                response_matrix,
-                initial_flux=np.asarray(initial, dtype=float),
-                measurement_uncertainty=rate_uncertainties,
+                solver_measurements,
+                solver_response_matrix,
+                initial_flux=solver_initial,
+                measurement_uncertainty=solver_rate_uncertainties,
                 confidence_threshold=ml_seed_threshold,
             )
         elif method.upper() == "RMLE":
@@ -773,10 +1158,10 @@ class SpectrumUnfolder:
                 max_iterations=max_iterations,
                 tolerance=tolerance,
             ).unfold(
-                measured_rates,
-                response_matrix,
-                initial_flux=np.asarray(initial, dtype=float),
-                measurement_uncertainty=rate_uncertainties,
+                solver_measurements,
+                solver_response_matrix,
+                initial_flux=solver_initial,
+                measurement_uncertainty=solver_rate_uncertainties,
                 seed_with_ml=use_ml_seed,
                 confidence_threshold=ml_seed_threshold,
             )
@@ -786,17 +1171,48 @@ class SpectrumUnfolder:
             )
 
         # Calculate predicted rates
-        flux_array = np.array(result.flux)
+        solver_flux = np.array(result.flux, dtype=float)
+        if np.all(active_mask):
+            solved_state = solver_flux
+        else:
+            solved_state = full_solver_initial.copy()
+            solved_state[active_mask] = solver_flux
+        if basis_matrix is None:
+            flux_array = solved_state
+        else:
+            flux_array = basis_matrix @ solved_state
         predicted_rates = response_matrix @ flux_array
 
         # Estimate flux uncertainties (simplified - from response matrix propagation)
         result_uncertainty = getattr(result, "uncertainties", None)
         if result_uncertainty is not None:
-            flux_uncertainty = np.asarray(result_uncertainty, dtype=float)
+            solved_uncertainty = np.asarray(result_uncertainty, dtype=float)
+            full_state_uncertainty = np.zeros_like(solved_state)
+            if np.all(active_mask):
+                full_state_uncertainty = solved_uncertainty
+            else:
+                full_state_uncertainty[active_mask] = solved_uncertainty
+            if basis_matrix is None:
+                flux_uncertainty = full_state_uncertainty
+            else:
+                flux_uncertainty = basis_matrix @ full_state_uncertainty
         else:
-            flux_uncertainty = self._estimate_flux_uncertainty(
-                flux_array, response_matrix, rate_uncertainties
-            )
+            if basis_matrix is None and np.all(active_mask):
+                flux_uncertainty = self._estimate_flux_uncertainty(
+                    flux_array, response_matrix, rate_uncertainties
+                )
+            else:
+                active_unc = self._estimate_flux_uncertainty(
+                    solver_flux,
+                    solver_response_matrix,
+                    solver_rate_uncertainties,
+                )
+                full_state_uncertainty = np.zeros_like(solved_state)
+                full_state_uncertainty[active_mask] = active_unc
+                if basis_matrix is None:
+                    flux_uncertainty = full_state_uncertainty
+                else:
+                    flux_uncertainty = basis_matrix @ full_state_uncertainty
 
         if self.verbose:
             print(f"\nUnfolding complete:")
@@ -826,8 +1242,33 @@ class SpectrumUnfolder:
                     or list(getattr(result, "convergence_history", [])),
                     "final_residuals": getattr(result, "final_residuals", [])
                     or list(getattr(result, "residuals", [])),
+                    "support_mask_applied": bool(not np.all(active_mask)),
+                    "support_metric": support_metric,
+                    "support_threshold": support_threshold,
+                    "support_mask_active_bins": int(np.count_nonzero(active_mask)),
+                    "support_mask_total_bins": int(len(active_mask)),
+                    "support_mask_fixed_prediction": fixed_prediction.tolist(),
+                    "support_scores_max": float(np.max(support_scores))
+                    if support_scores.size
+                    else 0.0,
+                    "aggregate_duplicate_reactions": bool(aggregate_duplicate_reactions),
+                    "duplicate_reaction_aggregation_applied": bool(
+                        duplicate_metadata["applied"]
+                    ),
+                    "duplicate_reaction_original_rows": int(
+                        duplicate_metadata["original_rows"]
+                    ),
+                    "duplicate_reaction_aggregated_rows": int(
+                        duplicate_metadata["aggregated_rows"]
+                    ),
+                    "duplicate_reaction_counts": dict(
+                        duplicate_metadata["reaction_counts"]
+                    ),
+                    **basis_metadata,
                     "tolerance": tolerance,
                     "relaxation": relaxation,
+                    "prior_strength": prior_strength,
+                    "smoothing_strength": smoothing_strength,
                 },
                 flux_array,
             ),

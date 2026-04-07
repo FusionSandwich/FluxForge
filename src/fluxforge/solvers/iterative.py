@@ -116,6 +116,60 @@ def _compute_chi_squared(
     return chi2, residuals
 
 
+def _blend_with_reference(
+    flux: Vector,
+    reference_flux: Optional[Vector],
+    strength: float,
+    floor: float,
+) -> Vector:
+    """Geometrically blend one iterate toward a positive reference spectrum."""
+    if reference_flux is None or strength <= 0.0:
+        return flux
+
+    blended: Vector = []
+    for current, reference in zip(flux, reference_flux):
+        current_value = max(current, floor)
+        reference_value = max(reference, floor)
+        log_value = (1.0 - strength) * math.log(current_value) + strength * math.log(
+            reference_value
+        )
+        blended.append(max(math.exp(log_value), floor))
+    return blended
+
+
+def _smooth_log_flux(flux: Vector, strength: float, floor: float) -> Vector:
+    """Apply a light nearest-neighbour smoothness prior in log-space."""
+    if strength <= 0.0 or len(flux) < 3:
+        return flux
+
+    log_flux = [math.log(max(value, floor)) for value in flux]
+    smoothed = log_flux[:]
+    for index in range(1, len(log_flux) - 1):
+        neighbor_mean = 0.5 * (log_flux[index - 1] + log_flux[index + 1])
+        smoothed[index] = (1.0 - strength) * log_flux[index] + strength * neighbor_mean
+
+    smoothed_flux = [max(math.exp(value), floor) for value in smoothed]
+    original_total = sum(max(value, floor) for value in flux)
+    smoothed_total = sum(smoothed_flux)
+    if original_total > 0.0 and smoothed_total > 0.0:
+        scale = original_total / smoothed_total
+        smoothed_flux = [max(value * scale, floor) for value in smoothed_flux]
+    return smoothed_flux
+
+
+def _stabilize_iterative_flux(
+    flux: Vector,
+    reference_flux: Optional[Vector],
+    prior_strength: float,
+    smoothing_strength: float,
+    floor: float,
+) -> Vector:
+    """Apply opt-in regularization to one iterative solver update."""
+    stabilized = _blend_with_reference(flux, reference_flux, prior_strength, floor)
+    stabilized = _smooth_log_flux(stabilized, smoothing_strength, floor)
+    return [max(value, floor) for value in stabilized]
+
+
 def gravel(
     response: Matrix,
     measurements: Vector,
@@ -126,6 +180,8 @@ def gravel(
     chi2_tolerance: float = 0.01,
     floor: float = _ITERATIVE_POSITIVE_FLOOR,
     relaxation: float = 0.7,
+    prior_strength: float = 0.0,
+    smoothing_strength: float = 0.0,
     convergence_mode: str = "relative",  # "relative" or "ddJ" (Neutron-Unfolding style)
     verbose: bool = False,
 ) -> IterativeSolution:
@@ -141,6 +197,10 @@ def gravel(
         chi2_tolerance: Chi-squared per DOF threshold for convergence.
         floor: Minimum flux/prediction value to avoid divide-by-zero.
         relaxation: Under-relaxation factor (0-1). Lower = more stable, slower.
+        prior_strength: Geometric pull toward the initial spectrum after each
+            iteration. Zero disables this regularization.
+        smoothing_strength: Log-space nearest-neighbour smoothing strength
+            applied after each update. Zero disables smoothing.
         convergence_mode: "relative" (default) uses max relative flux change,
             "ddJ" uses the Neutron-Unfolding style second-derivative criterion.
         verbose: Print convergence progress.
@@ -167,6 +227,7 @@ def gravel(
         phi = _default_flux(n_groups, scale=avg_meas / n_groups)
 
     phi = elementwise_maximum(phi, floor)
+    regularization_reference = phi[:]
 
     # Weights from uncertainties
     weights = (
@@ -226,8 +287,9 @@ def gravel(
             for i in range(n_meas):
                 if measurements[i] > 0 and predicted[i] > floor:
                     W_ig = measurements[i] * response[i][g] * phi[g] / predicted[i]
-                    num += W_ig * log_ratios[i]
-                    den += W_ig
+                    weighted_W_ig = W_ig * weights[i]
+                    num += weighted_W_ig * log_ratios[i]
+                    den += weighted_W_ig
 
             if den <= floor:
                 updated.append(phi[g])
@@ -244,7 +306,13 @@ def gravel(
             )
             updated.append(new_phi)
 
-        phi = updated
+        phi = _stabilize_iterative_flux(
+            updated,
+            reference_flux=regularization_reference,
+            prior_strength=prior_strength,
+            smoothing_strength=smoothing_strength,
+            floor=floor,
+        )
         history.append(phi[:])
 
         # Check convergence criteria
@@ -301,6 +369,8 @@ def mlem(
     chi2_tolerance: float = 0.01,
     floor: float = _ITERATIVE_POSITIVE_FLOOR,
     relaxation: float = 0.8,
+    prior_strength: float = 0.0,
+    smoothing_strength: float = 0.0,
     convergence_mode: str = "relative",  # "relative" or "ddJ" (Neutron-Unfolding style)
     verbose: bool = False,
 ) -> IterativeSolution:
@@ -316,6 +386,10 @@ def mlem(
         chi2_tolerance: Chi-squared per DOF threshold for convergence.
         floor: Minimum flux/prediction value to avoid divide-by-zero.
         relaxation: Under-relaxation factor (0-1). Lower = more stable, slower.
+        prior_strength: Geometric pull toward the initial spectrum after each
+            iteration. Zero disables this regularization.
+        smoothing_strength: Log-space nearest-neighbour smoothing strength
+            applied after each update. Zero disables smoothing.
         convergence_mode: "relative" (default) uses max relative flux change,
             "ddJ" uses Neutron-Unfolding style second derivative criterion.
         verbose: Print convergence progress.
@@ -341,6 +415,12 @@ def mlem(
         phi = _default_flux(n_groups, scale=avg_meas / n_groups)
 
     phi = elementwise_maximum(phi, floor)
+    regularization_reference = phi[:]
+    weights = (
+        [1.0 / (u * u) if u > 0 else 0.0 for u in measurement_uncertainty]
+        if measurement_uncertainty
+        else [1.0 for _ in measurements]
+    )
 
     history: List[Vector] = [phi[:]]
     chi2_history: List[float] = []
@@ -379,9 +459,10 @@ def mlem(
         max_rel_change = 0.0
         for g in range(n_groups):
             numerator = sum(
-                response[i][g] * measurements[i] / predicted[i] for i in range(n_meas)
+                weights[i] * response[i][g] * measurements[i] / predicted[i]
+                for i in range(n_meas)
             )
-            denominator = sum(response[i][g] for i in range(n_meas))
+            denominator = sum(weights[i] * response[i][g] for i in range(n_meas))
             if denominator <= 0:
                 updated.append(phi[g])
                 continue
@@ -396,7 +477,13 @@ def mlem(
             )
             updated.append(new_phi)
 
-        phi = updated
+        phi = _stabilize_iterative_flux(
+            updated,
+            reference_flux=regularization_reference,
+            prior_strength=prior_strength,
+            smoothing_strength=smoothing_strength,
+            floor=floor,
+        )
         history.append(phi[:])
 
         # Check convergence criteria

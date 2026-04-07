@@ -45,6 +45,65 @@ def test_gravel_recovers_scale_with_weights():
         assert abs(est - truth) / truth < 0.02, f"Expected {truth}, got {est}"
 
 
+def test_gravel_uses_measurement_uncertainty_weights_for_inconsistent_duplicates():
+    """Low-uncertainty duplicate rows should dominate inconsistent constraints."""
+    response = [
+        [1.0],
+        [1.0],
+    ]
+    measurements = [1.0, 10.0]
+
+    unweighted = gravel(
+        response,
+        measurements,
+        initial_flux=[1.0],
+        max_iters=500,
+        tolerance=1e-10,
+    )
+    weighted = gravel(
+        response,
+        measurements,
+        initial_flux=[1.0],
+        measurement_uncertainty=[0.1, 100.0],
+        max_iters=500,
+        tolerance=1e-10,
+    )
+
+    assert abs(weighted.flux[0] - measurements[0]) < abs(
+        unweighted.flux[0] - measurements[0]
+    )
+
+
+def test_mlem_regularization_smooths_sparse_unconstrained_bins():
+    """Iterative regularization should suppress isolated spikes in weak bins."""
+    response = [
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 1.0],
+    ]
+    measurements = [1.0, 1.0]
+    initial_flux = [1.0, 1.0, 10.0, 1.0, 1.0]
+
+    plain = mlem(
+        response,
+        measurements,
+        initial_flux=initial_flux,
+        max_iters=200,
+        tolerance=1e-10,
+    )
+    regularized = mlem(
+        response,
+        measurements,
+        initial_flux=initial_flux,
+        max_iters=200,
+        tolerance=1e-10,
+        prior_strength=0.02,
+        smoothing_strength=0.4,
+    )
+
+    assert regularized.flux[2] < plain.flux[2]
+    assert regularized.flux[2] > 0.0
+
+
 def test_gradient_descent_identity_case():
     """Test gradient descent with identity matrix recovers measurements."""
     response = [

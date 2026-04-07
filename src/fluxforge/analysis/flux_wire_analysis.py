@@ -2256,7 +2256,9 @@ def combine_peak_activities(peaks: List[IdentifiedPeak]) -> Dict[str, Dict[str, 
     """
     Combine activities from multiple peaks of the same nuclide.
 
-    Uses weighted average when multiple gamma lines are available.
+    Uses weighted average when multiple gamma lines are available and emits
+    per-line diagnostics that compare each single-line activity against the
+    combined all-lines estimate.
 
     Parameters
     ----------
@@ -2290,6 +2292,14 @@ def combine_peak_activities(peaks: List[IdentifiedPeak]) -> Dict[str, Dict[str, 
         weighted_avg = float(np.sum(weights * activities) / np.sum(weights))
         weighted_unc = float(1.0 / np.sqrt(np.sum(weights)))
         return weighted_avg, weighted_unc, weights, activities
+
+    def _safe_rel_delta(value: float, baseline: float) -> float:
+        return float((value - baseline) / max(abs(baseline), 1.0e-12))
+
+    def _robust_modified_z(value: float, median: float, mad: float) -> float:
+        if mad <= 0.0:
+            return 0.0
+        return float(0.6745 * (value - median) / mad)
 
     def _select_activity_lines(
         valid_peaks: List[IdentifiedPeak],
@@ -2334,30 +2344,105 @@ def combine_peak_activities(peaks: List[IdentifiedPeak]) -> Dict[str, Dict[str, 
             continue
 
         if len(valid_peaks) == 1:
-            # Single peak: use directly
-            p = valid_peaks[0]
-            results[isotope] = {
-                "activity_bq": p.activity_bq,
-                "activity_unc_bq": p.activity_unc_bq,
-                "activity_uci": p.activity_bq / 3.7e4,
-                "activity_unc_uci": p.activity_unc_bq / 3.7e4,
-                "n_peaks": 1,
-                "peak_energies": [p.energy_keV],
-                "excluded_peak_energies": [],
-            }
+            selected_peaks = [valid_peaks[0]]
+            excluded_peaks: List[IdentifiedPeak] = []
         else:
             selected_peaks, excluded_peaks = _select_activity_lines(valid_peaks)
-            weighted_avg, weighted_unc, _, _ = _weighted_stats(selected_peaks)
 
-            results[isotope] = {
-                "activity_bq": weighted_avg,
-                "activity_unc_bq": weighted_unc,
-                "activity_uci": weighted_avg / 3.7e4,
-                "activity_unc_uci": weighted_unc / 3.7e4,
-                "n_peaks": len(selected_peaks),
-                "peak_energies": [p.energy_keV for p in selected_peaks],
-                "excluded_peak_energies": [p.energy_keV for p in excluded_peaks],
-            }
+        weighted_avg, weighted_unc, _, activities = _weighted_stats(selected_peaks)
+        mean_activity = float(np.mean(activities))
+        median_activity = float(np.median(activities))
+        variance_activity = float(np.var(activities, ddof=1 if len(activities) > 1 else 0))
+        std_activity = float(np.sqrt(max(variance_activity, 0.0)))
+        mad_activity = float(np.median(np.abs(activities - median_activity)))
+
+        single_peak_rows: List[Dict[str, Any]] = []
+        for idx, peak in enumerate(selected_peaks):
+            activity_value = float(peak.activity_bq)
+            activity_unc = float(peak.activity_unc_bq)
+
+            combined_unc = float(
+                np.sqrt(max(activity_unc**2 + weighted_unc**2, 0.0))
+            )
+            z_vs_all = (
+                float((activity_value - weighted_avg) / combined_unc)
+                if combined_unc > 0.0
+                else 0.0
+            )
+
+            leave_one_out_activity = None
+            leave_one_out_unc = None
+            all_vs_leave_one_out_rel = None
+            single_vs_leave_one_out_rel = None
+            if len(selected_peaks) > 1:
+                loo_peaks = [
+                    candidate
+                    for loo_idx, candidate in enumerate(selected_peaks)
+                    if loo_idx != idx
+                ]
+                loo_avg, loo_unc, _, _ = _weighted_stats(loo_peaks)
+                leave_one_out_activity = float(loo_avg)
+                leave_one_out_unc = float(loo_unc)
+                all_vs_leave_one_out_rel = _safe_rel_delta(loo_avg, weighted_avg)
+                single_vs_leave_one_out_rel = _safe_rel_delta(activity_value, loo_avg)
+
+            rel_delta_vs_all = _safe_rel_delta(activity_value, weighted_avg)
+            robust_mz = _robust_modified_z(activity_value, median_activity, mad_activity)
+            is_outlier = bool(abs(robust_mz) >= 3.5 or abs(rel_delta_vs_all) > 0.25)
+
+            single_peak_rows.append(
+                {
+                    "energy_keV": float(peak.energy_keV),
+                    "line_activity_bq": activity_value,
+                    "line_activity_unc_bq": activity_unc,
+                    "relative_delta_vs_combined": rel_delta_vs_all,
+                    "z_score_vs_combined": z_vs_all,
+                    "modified_z_score": float(robust_mz),
+                    "leave_one_out_activity_bq": leave_one_out_activity,
+                    "leave_one_out_activity_unc_bq": leave_one_out_unc,
+                    "all_vs_leave_one_out_relative_delta": all_vs_leave_one_out_rel,
+                    "single_vs_leave_one_out_relative_delta": single_vs_leave_one_out_rel,
+                    "is_outlier": is_outlier,
+                }
+            )
+
+        relative_deltas = np.array(
+            [
+                float(row["relative_delta_vs_combined"])
+                for row in single_peak_rows
+                if row.get("relative_delta_vs_combined") is not None
+            ],
+            dtype=float,
+        )
+        relative_variance = float(
+            np.var(relative_deltas, ddof=1 if relative_deltas.size > 1 else 0)
+        )
+        max_abs_rel_delta = float(
+            np.max(np.abs(relative_deltas)) if relative_deltas.size else 0.0
+        )
+        outlier_energies = [
+            float(row["energy_keV"])
+            for row in single_peak_rows
+            if bool(row.get("is_outlier"))
+        ]
+
+        results[isotope] = {
+            "activity_bq": weighted_avg,
+            "activity_unc_bq": weighted_unc,
+            "activity_uci": weighted_avg / 3.7e4,
+            "activity_unc_uci": weighted_unc / 3.7e4,
+            "n_peaks": len(selected_peaks),
+            "peak_energies": [p.energy_keV for p in selected_peaks],
+            "excluded_peak_energies": [p.energy_keV for p in excluded_peaks],
+            "mean_line_activity_bq": mean_activity,
+            "median_line_activity_bq": median_activity,
+            "variance_line_activity_bq2": variance_activity,
+            "std_line_activity_bq": std_activity,
+            "relative_line_activity_variance": relative_variance,
+            "max_abs_relative_line_delta": max_abs_rel_delta,
+            "single_peak_outlier_energies": outlier_energies,
+            "single_peak_activity_diagnostics": single_peak_rows,
+        }
 
     return results
 

@@ -781,6 +781,7 @@ def rmle_unfolding(
     """
     d = require_nonnegative("counts", spectrum.counts).reshape(-1)
     sigma = require_nonnegative("uncertainty", spectrum.uncertainty).reshape(-1)
+    sigma = np.maximum(sigma, 1e-30)
     R = require_nonnegative("response", response.matrix)
     if R.ndim != 2:
         raise ValueError("response matrix must be a 2-D array")
