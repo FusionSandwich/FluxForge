@@ -188,6 +188,129 @@ def test_build_parser_roi_commands(tmp_path):
     assert len(stats_args.inputs) == 2
 
 
+def test_build_parser_file_query_and_batch_compare_commands(tmp_path):
+    parser = app.build_parser()
+    file_args = parser.parse_args(
+        [
+            "file-query",
+            "--root",
+            str(tmp_path),
+            "--contains",
+            "sample",
+            "--output",
+            str(tmp_path / "file_query.json"),
+        ]
+    )
+    assert file_args.command == "file-query"
+    assert file_args.output.name == "file_query.json"
+
+    compare_args = parser.parse_args(
+        [
+            "batch-compare",
+            "--baseline",
+            str(tmp_path / "baseline.json"),
+            "--candidate",
+            str(tmp_path / "candidate.json"),
+            "--keys",
+            "sample_id,reaction_id",
+        ]
+    )
+    assert compare_args.command == "batch-compare"
+    assert compare_args.keys == "sample_id,reaction_id"
+
+
+def test_cmd_file_query_writes_rows(tmp_path):
+    (tmp_path / "sample_a.json").write_text('{"ok": true}', encoding="utf-8")
+    (tmp_path / "sample_b.csv").write_text("x,y\n1,2\n", encoding="utf-8")
+    (tmp_path / "ignore.log").write_text("ignored", encoding="utf-8")
+
+    output = tmp_path / "query.json"
+    app.cmd_file_query(
+        Namespace(
+            root=tmp_path,
+            patterns="**/*",
+            contains="sample",
+            suffixes=".json,.csv",
+            min_size_bytes=0,
+            max_size_bytes=None,
+            modified_after=None,
+            limit=100,
+            format="json",
+            output=output,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.file_query.v1"
+    assert payload["result_count"] == 2
+    assert {row["path"] for row in payload["rows"]} == {
+        "sample_a.json",
+        "sample_b.csv",
+    }
+
+
+def test_cmd_batch_compare_computes_summary(tmp_path):
+    baseline = tmp_path / "baseline.json"
+    candidate = tmp_path / "candidate.json"
+    baseline.write_text(
+        json.dumps(
+            [
+                {
+                    "sample_id": "s1",
+                    "reaction_id": "r1",
+                    "rate": 10.0,
+                    "uncertainty": 1.0,
+                },
+                {
+                    "sample_id": "s1",
+                    "reaction_id": "r2",
+                    "rate": 20.0,
+                    "uncertainty": 2.0,
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    candidate.write_text(
+        json.dumps(
+            [
+                {
+                    "sample_id": "s1",
+                    "reaction_id": "r1",
+                    "rate": 12.0,
+                    "uncertainty": 1.5,
+                },
+                {
+                    "sample_id": "s1",
+                    "reaction_id": "r2",
+                    "rate": 18.0,
+                    "uncertainty": 1.8,
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    output = tmp_path / "compare.json"
+    app.cmd_batch_compare(
+        Namespace(
+            baseline=baseline,
+            candidate=candidate,
+            keys="sample_id,reaction_id",
+            numeric_fields="rate,uncertainty",
+            max_rows=100,
+            output=output,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.batch_compare.v1"
+    assert payload["summary"]["matched_rows"] == 2
+    assert payload["summary"]["baseline_only_rows"] == 0
+    assert payload["summary"]["candidate_only_rows"] == 0
+    assert "rate" in payload["summary"]["field_stats"]
+
+
 def test_build_parser_activity_review_command(tmp_path):
     parser = app.build_parser()
     args = parser.parse_args(

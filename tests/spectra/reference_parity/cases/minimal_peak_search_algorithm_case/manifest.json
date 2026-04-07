@@ -1,0 +1,22 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "minimal_peak_search_algorithm_case",
+  "parity_scope": "algorithm",
+  "source_repo": "NASA-gamma",
+  "source_case": "peak_search_segmented_smoke",
+  "workflow": "peak-search-only",
+  "input_files": [
+    "input_spectrum.json"
+  ],
+  "expected_outputs": [
+    "detected_peaks_expected.json"
+  ],
+  "tolerances": {
+    "energy_keV_abs": 0.5,
+    "peak_count_abs": 1.0
+  },
+  "provenance_notes": [
+    "3.22 scaffold case for algorithm-level peak-search parity checks.",
+    "Replace expected outputs with source-linked golden artifacts before enabling strict parity gates."
+  ]
+}

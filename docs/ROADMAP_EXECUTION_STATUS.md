@@ -148,10 +148,10 @@ following overlays were adopted additively and do not replace that map.
 |---|---|---|---|
 | 3.18 | `next` | `in-progress` | Implement the remaining identification/activity/reference parity work on top of the now-bundled GSA-v4 edited/natural, NASA-gamma common-lab/natural/capture/delayed-activation/inelastic families, ENDF/B-VIII supplement, ICRP-107 plus Kayzero source registrations, collision-safe GUI/CLI user-library registration, and GUI activity-unit selectors, then finish relative activity, source-age overlays, deeper decay-dataset consumption, and the remaining parity surfaces. |
 | 3.19 | `pending` | `in-progress` | Detection-limit/dose/shielding workspaces remain pending, but masking-analysis scaffolding is now active via the new CLI `masking-review` workflow (line-level masking ranking, masking-isotope rollups, and alternate-line recommendations) and report-table integration. |
-| 3.20 | `pending` | `not-started` | Implement file-query, batch-compare, ROI-statistics review, and KayWin-style k0 workflows without hardware control. |
-| 3.21 | `pending` | `in-progress` | Initial fixture-manifest scaffolding now exists under `tests/spectra/reference_parity/` and `tests/activation_inventory/fixtures/` with contract checks in `tests/test_parity_fixture_manifests.py`; source-linked case expansion and golden outputs remain pending. |
-| 3.22 | `pending` | `not-started` | Add algorithm-level parity tests for parsing, calibration, peak search, fit, activity, calculators, and k0 workflows. |
-| 3.23 | `pending` | `not-started` | Add end-to-end workflow parity tests with source-linked golden outputs and declared tolerances. |
+| 3.20 | `pending` | `in-progress` | CLI now includes explicit `file-query` and `batch-compare` commands in `src/fluxforge/cli/app.py`, with parser/command coverage in `tests/test_cli_app.py`; ROI-statistics and k0 workflows remain active, and archive/workbench depth still needs GUI parity follow-through. |
+| 3.21 | `pending` | `in-progress` | Fixture-manifest scaffolding now includes expanded source-linked case placeholders under `tests/spectra/reference_parity/cases/` and `tests/activation_inventory/fixtures/` (including second-irradiation planning), with contract checks in `tests/test_parity_fixture_manifests.py` and `tests/test_parity_phase3_scaffolding.py`. |
+| 3.22 | `pending` | `in-progress` | Initial algorithm-level parity scaffolding is now present via `parity_scope=algorithm` manifests plus discovery checks in `tests/test_parity_phase3_scaffolding.py`; full parser/calibration/fit/activity/dose/k0 golden comparisons remain pending. |
+| 3.23 | `pending` | `in-progress` | Initial workflow-level parity scaffolding is now present via `parity_scope=workflow` manifests (including activity/inventory and second-irradiation placeholders) plus scaffold verification tests; source-linked end-to-end golden-result suites remain pending. |
 | 3.24 | `pending` | `not-started` | Add direct-manipulation canvas parity: peak add/delete/move, ROI dragging, background handles, and overlay-role actions. |
 | 3.25 | `pending` | `not-started` | Add dedicated Qt workspaces for ROI statistics, detection limit, dose/shielding, relative activity, file query/batch compare, reference libraries, and k0 reporting. |
 | 3.26 | `pending` | `not-started` | Add GUI polish parity: role-aware overlays, saved themes, graph-table synchronization, and better launch points. |
@@ -284,5 +284,6 @@ following overlays were adopted additively and do not replace that map.
 - Phase 3.17 is now complete in the repository and formally complete in sequence.
 - All final-plan GUI features except the deferred live MCA / HAL transport work in
   Phase 4.1 through 4.4 are now implemented in the modern Qt shell.
-- The roadmap's current next step is Phase 3.18: identification / activity /
-  reference parity for the offline spectroscopy module.
+- The roadmap's currently active offline-parity tranche is Phase 3.18 through
+  3.23, with 3.20 command surfaces and 3.21 through 3.23 scaffold fixtures/tests
+  now in progress and pending golden-source expansion.

@@ -182,6 +182,26 @@ def _load_structured_rows(path: Path) -> Any:
     )
 
 
+def _extract_structured_rows(payload: Any) -> List[Dict[str, Any]]:
+    if isinstance(payload, list):
+        return [row for row in payload if isinstance(row, dict)]
+    if isinstance(payload, dict):
+        for key in (
+            "rows",
+            "items",
+            "lines",
+            "reactions",
+            "peaks",
+            "statistics",
+            "results",
+        ):
+            value = payload.get(key)
+            if isinstance(value, list):
+                return [row for row in value if isinstance(row, dict)]
+        return [payload]
+    return []
+
+
 def _ensure_parent_dir(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1992,6 +2012,227 @@ def cmd_roi_statistics(args: argparse.Namespace) -> None:
     _ensure_parent_dir(args.output)
     args.output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"Wrote ROI statistics to {args.output}")
+
+
+def cmd_file_query(args: argparse.Namespace) -> None:
+    root = Path(getattr(args, "root", Path("."))).resolve()
+    if not root.exists():
+        raise ValueError(f"Query root does not exist: {root}")
+
+    patterns = _parse_csv_strings(getattr(args, "patterns", None))
+    if not patterns:
+        patterns = (
+            "**/*.json",
+            "**/*.csv",
+            "**/*.ASC",
+            "**/*.spe",
+            "**/*.txt",
+        )
+    contains = str(getattr(args, "contains", "") or "").strip().lower()
+    suffixes = {value.lower() for value in _parse_csv_strings(getattr(args, "suffixes", None))}
+    min_size = int(getattr(args, "min_size_bytes", 0) or 0)
+    max_size = getattr(args, "max_size_bytes", None)
+    limit = max(int(getattr(args, "limit", 2000) or 0), 0)
+
+    modified_after_raw = getattr(args, "modified_after", None)
+    modified_after = None
+    if modified_after_raw:
+        modified_after = datetime.fromisoformat(str(modified_after_raw))
+
+    candidate_paths: Dict[Path, None] = {}
+    for pattern in patterns:
+        for path in root.glob(pattern):
+            if path.is_file():
+                candidate_paths[path] = None
+
+    rows: List[Dict[str, Any]] = []
+    for path in sorted(candidate_paths.keys()):
+        rel_path = path.relative_to(root).as_posix()
+        if contains and contains not in rel_path.lower():
+            continue
+
+        stat = path.stat()
+        size_bytes = int(stat.st_size)
+        if size_bytes < min_size:
+            continue
+        if max_size is not None and size_bytes > int(max_size):
+            continue
+
+        suffix = path.suffix.lower()
+        if suffixes and suffix not in suffixes:
+            continue
+
+        modified_time = datetime.fromtimestamp(stat.st_mtime)
+        if modified_after is not None and modified_time < modified_after:
+            continue
+
+        rows.append(
+            {
+                "path": rel_path,
+                "suffix": suffix,
+                "size_bytes": size_bytes,
+                "modified_time": modified_time.isoformat(timespec="seconds"),
+            }
+        )
+
+    if limit > 0:
+        rows = rows[:limit]
+
+    payload = {
+        "schema": "fluxforge.file_query.v1",
+        "root": str(root),
+        "patterns": list(patterns),
+        "contains": contains or None,
+        "suffixes": sorted(suffixes),
+        "result_count": len(rows),
+        "rows": rows,
+    }
+
+    output = Path(args.output)
+    _ensure_parent_dir(output)
+    output_format = str(getattr(args, "format", "json") or "json").strip().lower()
+    if output_format == "csv":
+        _write_dict_rows(output, rows)
+    else:
+        output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Wrote file query results to {output}")
+
+
+def cmd_batch_compare(args: argparse.Namespace) -> None:
+    baseline_payload = _load_structured_rows(Path(args.baseline))
+    candidate_payload = _load_structured_rows(Path(args.candidate))
+    baseline_rows = _extract_structured_rows(baseline_payload)
+    candidate_rows = _extract_structured_rows(candidate_payload)
+    if not baseline_rows:
+        raise ValueError("Baseline payload did not contain any tabular rows.")
+    if not candidate_rows:
+        raise ValueError("Candidate payload did not contain any tabular rows.")
+
+    key_fields = _parse_csv_strings(getattr(args, "keys", None))
+    if not key_fields:
+        raise ValueError("At least one key field is required for batch-compare.")
+
+    def _row_key(row: Dict[str, Any]) -> Tuple[str, ...]:
+        return tuple(str(row.get(field, "")).strip() for field in key_fields)
+
+    baseline_by_key: Dict[Tuple[str, ...], Dict[str, Any]] = {}
+    candidate_by_key: Dict[Tuple[str, ...], Dict[str, Any]] = {}
+    baseline_duplicates = 0
+    candidate_duplicates = 0
+    for row in baseline_rows:
+        key = _row_key(row)
+        if key in baseline_by_key:
+            baseline_duplicates += 1
+            continue
+        baseline_by_key[key] = row
+    for row in candidate_rows:
+        key = _row_key(row)
+        if key in candidate_by_key:
+            candidate_duplicates += 1
+            continue
+        candidate_by_key[key] = row
+
+    matched_keys = sorted(set(baseline_by_key) & set(candidate_by_key))
+    baseline_only = sorted(set(baseline_by_key) - set(candidate_by_key))
+    candidate_only = sorted(set(candidate_by_key) - set(baseline_by_key))
+
+    def _to_float(value: Any) -> Optional[float]:
+        try:
+            if value is None or value == "":
+                return None
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    numeric_fields = _parse_csv_strings(getattr(args, "numeric_fields", None))
+    if not numeric_fields:
+        shared_fields = set(baseline_rows[0].keys()) & set(candidate_rows[0].keys())
+        inferred: List[str] = []
+        for field in sorted(shared_fields):
+            if field in key_fields:
+                continue
+            has_numeric_baseline = any(
+                _to_float(row.get(field)) is not None for row in baseline_rows
+            )
+            has_numeric_candidate = any(
+                _to_float(row.get(field)) is not None for row in candidate_rows
+            )
+            if has_numeric_baseline and has_numeric_candidate:
+                inferred.append(field)
+        numeric_fields = tuple(inferred)
+
+    comparisons: List[Dict[str, Any]] = []
+    field_abs_deltas: Dict[str, List[float]] = {field: [] for field in numeric_fields}
+    field_abs_rel_deltas: Dict[str, List[float]] = {field: [] for field in numeric_fields}
+
+    for key in matched_keys:
+        base_row = baseline_by_key[key]
+        cand_row = candidate_by_key[key]
+        record: Dict[str, Any] = {field: key[idx] for idx, field in enumerate(key_fields)}
+        for field in numeric_fields:
+            base_value = _to_float(base_row.get(field))
+            cand_value = _to_float(cand_row.get(field))
+            record[f"baseline_{field}"] = base_value
+            record[f"candidate_{field}"] = cand_value
+            if base_value is None or cand_value is None:
+                record[f"delta_{field}"] = None
+                record[f"relative_delta_{field}"] = None
+                continue
+
+            delta = float(cand_value - base_value)
+            rel_delta = float(delta / max(abs(base_value), 1.0e-12))
+            record[f"delta_{field}"] = delta
+            record[f"relative_delta_{field}"] = rel_delta
+            field_abs_deltas[field].append(abs(delta))
+            field_abs_rel_deltas[field].append(abs(rel_delta))
+        comparisons.append(record)
+
+    max_rows = max(int(getattr(args, "max_rows", 2000) or 0), 0)
+    if max_rows > 0:
+        comparisons = comparisons[:max_rows]
+
+    field_stats: Dict[str, Dict[str, float]] = {}
+    for field in numeric_fields:
+        abs_deltas = field_abs_deltas.get(field, [])
+        abs_rel = field_abs_rel_deltas.get(field, [])
+        field_stats[field] = {
+            "mean_abs_delta": float(np.mean(abs_deltas)) if abs_deltas else 0.0,
+            "max_abs_delta": float(np.max(abs_deltas)) if abs_deltas else 0.0,
+            "mean_abs_relative_delta": float(np.mean(abs_rel)) if abs_rel else 0.0,
+            "max_abs_relative_delta": float(np.max(abs_rel)) if abs_rel else 0.0,
+        }
+
+    payload = {
+        "schema": "fluxforge.batch_compare.v1",
+        "baseline": str(Path(args.baseline)),
+        "candidate": str(Path(args.candidate)),
+        "key_fields": list(key_fields),
+        "numeric_fields": list(numeric_fields),
+        "summary": {
+            "baseline_rows": len(baseline_rows),
+            "candidate_rows": len(candidate_rows),
+            "matched_rows": len(matched_keys),
+            "baseline_only_rows": len(baseline_only),
+            "candidate_only_rows": len(candidate_only),
+            "baseline_duplicate_keys": baseline_duplicates,
+            "candidate_duplicate_keys": candidate_duplicates,
+            "field_stats": field_stats,
+        },
+        "baseline_only_keys": [
+            {field: key[idx] for idx, field in enumerate(key_fields)}
+            for key in baseline_only
+        ],
+        "candidate_only_keys": [
+            {field: key[idx] for idx, field in enumerate(key_fields)}
+            for key in candidate_only
+        ],
+        "comparisons": comparisons,
+    }
+
+    output = Path(args.output)
+    _ensure_parent_dir(output)
+    output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"Wrote batch comparison to {output}")
 
 
 def cmd_activity(args: argparse.Namespace) -> None:
@@ -5276,6 +5517,70 @@ def build_parser() -> argparse.ArgumentParser:
     roi_statistics.add_argument("--efficiency-coefficients", type=str, default=None)
     _add_validate_option(roi_statistics)
     roi_statistics.set_defaults(func=cmd_roi_statistics)
+
+    file_query = subparsers.add_parser(
+        "file-query",
+        help="Query spectrum/artifact files in a workspace tree for archive-style review",
+    )
+    file_query.add_argument("--root", type=Path, default=Path("."))
+    file_query.add_argument(
+        "--patterns",
+        type=str,
+        default="**/*.json,**/*.csv,**/*.ASC,**/*.spe,**/*.txt",
+        help="Comma-separated glob patterns relative to --root",
+    )
+    file_query.add_argument(
+        "--contains",
+        type=str,
+        default=None,
+        help="Optional case-insensitive substring filter against relative path",
+    )
+    file_query.add_argument(
+        "--suffixes",
+        type=str,
+        default=None,
+        help="Optional comma-separated suffix whitelist (for example .json,.csv)",
+    )
+    file_query.add_argument("--min-size-bytes", type=int, default=0)
+    file_query.add_argument("--max-size-bytes", type=int, default=None)
+    file_query.add_argument(
+        "--modified-after",
+        type=str,
+        default=None,
+        help="ISO timestamp lower bound, for example 2026-01-01T00:00:00",
+    )
+    file_query.add_argument("--limit", type=int, default=2000)
+    file_query.add_argument(
+        "--format",
+        choices=["json", "csv"],
+        default="json",
+    )
+    file_query.add_argument("--output", type=Path, default=Path("file_query.json"))
+    file_query.set_defaults(func=cmd_file_query)
+
+    batch_compare = subparsers.add_parser(
+        "batch-compare",
+        help="Compare two tabular JSON/CSV artifacts by key fields and numeric deltas",
+    )
+    batch_compare.add_argument("--baseline", type=Path, required=True)
+    batch_compare.add_argument("--candidate", type=Path, required=True)
+    batch_compare.add_argument(
+        "--keys",
+        type=str,
+        required=True,
+        help="Comma-separated key columns used to match rows",
+    )
+    batch_compare.add_argument(
+        "--numeric-fields",
+        type=str,
+        default=None,
+        help="Optional comma-separated numeric fields to compare (auto-inferred when omitted)",
+    )
+    batch_compare.add_argument("--max-rows", type=int, default=2000)
+    batch_compare.add_argument(
+        "--output", type=Path, default=Path("batch_compare.json")
+    )
+    batch_compare.set_defaults(func=cmd_batch_compare)
 
     library_list = subparsers.add_parser(
         "library-list",

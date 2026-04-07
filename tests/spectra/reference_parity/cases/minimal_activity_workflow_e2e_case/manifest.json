@@ -1,0 +1,23 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "minimal_activity_workflow_e2e_case",
+  "parity_scope": "workflow",
+  "source_repo": "FusionSandwich/FluxForge",
+  "source_case": "activity_review_to_inventory_review_smoke",
+  "workflow": "peaks -> activity-review -> inventory-review",
+  "input_files": [
+    "peaks_report_input.json"
+  ],
+  "expected_outputs": [
+    "activity_review_expected.json",
+    "inventory_review_expected.json"
+  ],
+  "tolerances": {
+    "activity_rel": 0.03,
+    "inventory_rel": 0.05
+  },
+  "provenance_notes": [
+    "3.23 scaffold case for end-to-end activity/inventory parity.",
+    "Promote to strict workflow parity once golden datasets are frozen."
+  ]
+}

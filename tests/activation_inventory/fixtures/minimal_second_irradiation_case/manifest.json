@@ -1,0 +1,25 @@
+{
+  "schema": "fluxforge.activation_inventory_fixture.v1",
+  "fixture_id": "minimal_second_irradiation_case",
+  "parity_scope": "workflow",
+  "source_repo": "FusionSandwich/FluxForge",
+  "source_case": "second_irradiation_planner_smoke",
+  "workflow": "second_irradiation_planner",
+  "input_files": [
+    "inventory_seed.json",
+    "first_irradiation_schedule.json",
+    "second_irradiation_candidates.json"
+  ],
+  "expected_outputs": [
+    "selected_second_irradiation_expected.json",
+    "post_second_irradiation_inventory_expected.csv"
+  ],
+  "tolerances": {
+    "activity_rel": 0.05,
+    "dose_rel": 0.08
+  },
+  "provenance_notes": [
+    "3.21/3.23 scaffold case for second-irradiation workflow parity.",
+    "Source-linked golden outputs are required before enabling release gating."
+  ]
+}
