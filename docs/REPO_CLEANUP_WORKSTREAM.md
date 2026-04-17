@@ -50,3 +50,78 @@ This document tracks the current folder-by-folder cleanup queue for the active b
 - `baseline-captured` means the file is in scope for the cleanup campaign and has an initial suggested action.
 - Accuracy-sensitive folders (`analysis`, `data`, `physics`, `solvers`, `validation`) require characterization tests before logic changes.
 - GUI and CLI hotspots should be split in staged passes rather than one large formatting diff.
+
+## Post-Phase-6 Cleanup Plan (2026-04-17)
+
+This plan is the next execution track after the Phase 6 landing.
+
+### Current Measured Baseline
+
+- Formatter check (Ruff): `143 files would be reformatted` under `src/fluxforge` + `tests`.
+- Lint check (Ruff E/F): `1642` findings total.
+  - `E501 line-too-long`: `1193`
+  - `F401 unused-import`: `317`
+  - `F841 unused-variable`: `55`
+- Large-file hotspots (line count):
+  - `src/fluxforge/cli/app.py`: `6998`
+  - `src/fluxforge/gui/panels/modern_shell.py`: `3409`
+  - `src/fluxforge/analysis/flux_wire_analysis.py`: `2876`
+  - `src/fluxforge/examples/rafm_workflow.py`: `4412`
+  - `src/fluxforge_gui/app.py`: `2185`
+
+### Formatter + PEP8 Execution Policy
+
+- Scope: enforce PEP8 for code under `src/fluxforge` and `tests`, excluding data files.
+- Formatter tool: use `ruff format` as the active formatter in this environment.
+  - Note: `black` currently blocks in this workspace due Python `3.12.5` safety guard.
+- Lint tool: use `ruff check --select E,F` as the baseline gate.
+- Keep formatting commits separate from behavior-changing commits.
+
+### Phase A: Safety-Preserving Auto-Fixes (No Behavior Change)
+
+1. Run `python -m ruff format src/fluxforge tests` in focused slices (module-by-module).
+2. Run `python -m ruff check src/fluxforge tests --select E,F --fix` for safe fixes.
+3. Re-run targeted tests for touched areas after each slice.
+4. Run full suite after each major slice.
+
+Exit gate:
+- zero formatter drift for touched slices
+- no regression in full pytest suite
+
+### Phase B: Modularization of Oversized Files
+
+1. Continue modern-shell decomposition:
+	- split `modern_shell.py` into `modern_shell_bottom.py`, `modern_shell_peak.py`, `modern_shell_activity.py`, and `modern_shell_batch.py` while preserving public imports from `fluxforge.gui.panels`.
+2. Split CLI monolith `src/fluxforge/cli/app.py` into subcommand modules:
+	- `cli/commands/activity.py`
+	- `cli/commands/optimization.py`
+	- `cli/commands/library.py`
+	- `cli/commands/parity.py`
+3. Split analysis hotspots:
+	- `analysis/flux_wire_analysis.py` into parser/model/solver/report modules.
+4. Keep shim imports so existing call sites remain stable during migration.
+
+Exit gate:
+- each split has parity tests + CLI/GUI route tests
+- no public command regressions
+
+### Phase C: Legacy and Unused Surface Reduction
+
+1. Inventory legacy Tk surfaces under `src/fluxforge_gui/` and mark each as:
+	- active fallback
+	- deprecated bridge
+	- removable
+2. Remove unused scripts and dead helpers in `tools/` and stale examples after traceability review.
+3. Add a CI guard to fail on new unused imports/variables in `src/fluxforge`.
+
+Exit gate:
+- documented deprecation map
+- no orphaned workflow entrypoints
+
+### Phase D: Continuous Quality Gates
+
+1. Add CI jobs:
+	- `ruff format --check src/fluxforge tests`
+	- `ruff check src/fluxforge tests --select E,F`
+2. Keep full-suite pytest as release gate.
+3. Require new large modules to stay under an agreed soft cap (for example `<=1200` lines) unless explicitly waived.
