@@ -3,6 +3,10 @@
   "fixture_id": "minimal_activity_workflow_e2e_case",
   "parity_scope": "workflow",
   "source_repo": "FusionSandwich/FluxForge",
+  "source_ref": "optimization-workflows",
+  "source_paths": [
+    "tests/spectra/reference_parity/cases/minimal_activity_workflow_e2e_case"
+  ],
   "source_case": "activity_review_to_inventory_review_smoke",
   "workflow": "peaks -> activity-review -> inventory-review",
   "input_files": [
@@ -17,7 +21,7 @@
     "inventory_rel": 0.05
   },
   "provenance_notes": [
-    "3.23 scaffold case for end-to-end activity/inventory parity.",
-    "Promote to strict workflow parity once golden datasets are frozen."
+    "3.23 end-to-end peaks to activity/inventory parity case.",
+    "JSON expectations assert workflow-level structure and isotope/time-grid coverage."
   ]
 }

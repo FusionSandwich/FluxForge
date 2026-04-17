@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fluxforge.activation_inventory_fixture.v1",
+  "title": "FluxForge Activation Inventory Fixture Manifest",
+  "type": "object",
+  "required": [
+    "schema",
+    "fixture_id",
+    "parity_scope",
+    "source_repo",
+    "source_ref",
+    "source_paths",
+    "source_case",
+    "workflow",
+    "input_files",
+    "expected_outputs",
+    "tolerances",
+    "provenance_notes"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "fluxforge.activation_inventory_fixture.v1"
+    },
+    "fixture_id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "parity_scope": {
+      "type": "string",
+      "enum": [
+        "algorithm",
+        "workflow"
+      ]
+    },
+    "source_repo": {
+      "type": "string",
+      "minLength": 3
+    },
+    "source_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "source_case": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workflow": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "expected_outputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "tolerances": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "provenance_notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": true
+}

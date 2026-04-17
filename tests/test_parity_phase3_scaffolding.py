@@ -25,6 +25,8 @@ def test_phase3_reference_parity_scaffolding_has_algorithm_and_workflow_cases() 
         assert payload.get("fixture_id")
         assert payload.get("workflow")
         assert payload.get("source_case")
+        assert payload.get("source_ref")
+        assert payload.get("source_paths")
 
     assert "algorithm" in scopes
     assert "workflow" in scopes
@@ -35,9 +37,14 @@ def test_phase3_activation_scaffolding_includes_second_irradiation_case() -> Non
     assert manifests
 
     fixture_ids = set()
+    scopes = set()
     for path in manifests:
         payload = _load_json(path)
         fixture_ids.add(str(payload.get("fixture_id") or ""))
+        scopes.add(str(payload.get("parity_scope") or "workflow"))
         assert payload["schema"] == "fluxforge.activation_inventory_fixture.v1"
+        assert payload.get("source_ref")
+        assert payload.get("source_paths")
 
     assert "minimal_second_irradiation_case" in fixture_ids
+    assert "workflow" in scopes

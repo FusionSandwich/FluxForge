@@ -1,7 +1,7 @@
 # FluxForge GUI Master Plan
 
 **Status:** active GUI source of truth  
-**Last Updated:** 2026-04-06  
+**Last Updated:** 2026-04-17  
 **Purpose:** consolidated GUI architecture, interaction, and workspace plan for the
 modern Qt shell.
 
@@ -34,11 +34,13 @@ Use the GUI docs set in this order:
 
 | Area | Implemented GUI Surface | Evidence |
 |---|---|---|
-| Shell architecture | Docked Qt shell, persisted layout, mode switcher, theme handling, hardware LED, dashboard reservation | Steps `1.3` through `1.18` in `docs/ROADMAP_EXECUTION_STATUS.md` |
+| Shell architecture | Docked Qt shell, persisted layout, mode switcher, theme handling, hardware LED, dashboard reservation, and split shell containers in `modern_shell_center.py`, `modern_shell_sidebar.py`, `modern_shell_context.py`, and `modern_shell_shared.py` | Steps `1.3` through `1.18` in `docs/ROADMAP_EXECUTION_STATUS.md` plus `tests/test_modern_gui_shell.py` |
 | Analysis workspace | Peak table, auto-review, background workflows, overlay roles, isotope browser, reassignment, cascade overlays, guide overlays | Steps `2.7` through `2.24`, `3.16` |
 | Calibration and efficiency | Unified calibration dialog, quick slider, deviation pairs, ROI fitter, preserved/fine-tune flows, detector slots, all four efficiency models, NASA smart seed | Steps `2.1` through `2.6`, `2.11`, `3.17` |
 | Standards and QA | Standards locks, QA history, ASTM checks, C1030 wizard, governed selectors and banners | Steps `3.7` through `3.12` |
 | Reporting and batch | Report export dialog, batch queue, progress tracking, JSON/CSV outputs | Steps `3.13`, `3.14` |
+| Workflow persistence | Saved workflow/workspace presets, active-workflow restore across sessions, and built-in `quantumgold-workflow` plus `astm-ldrd-irradiation` presets | `src/fluxforge/gui/workflow_presets.py`, `src/fluxforge/gui/main_window.py`, `tests/test_modern_gui_shell.py` |
+| Phase 6 optimization surfaces | `Inventory / Time Evolution`, `Line Interference / Masking`, `Irradiation Optimizer`, and `Second Irradiation` tabs with `.ffexp` export from the optimizer workspace | `src/fluxforge/gui/panels/phase6.py`, `tests/test_analysis_workspace_qt.py`, `tests/gui_phase6_optimization_probe.py` |
 | Predictive extras | ROI ETA, dead-time forecasting, QA recalibration forecasting, saved lists, mixtures, log-scale and peak-label toggles | Steps `4P.1` through `4P.7` |
 
 ## 4. Interaction Contract
@@ -56,11 +58,11 @@ The GUI must preserve the following behavior contracts:
 | Step | GUI Behavior | Status |
 |---|---|---|
 | 3.18 | Richer library/reference surfaces, source-age and decay-chain views, relative-activity and isotopics workflows, deeper identification context in the modern shell, and spectrum-level activation review/export surfaces | In Progress |
-| 3.20 | File-query/archive workbench, exemplar batch reuse, detector-response lifecycle panels, multi-spectrum review, and governed k0 characterization/report views | Planned |
+| 3.20 | File-query/archive workbench, exemplar batch reuse, detector-response lifecycle panels, multi-spectrum review, governed k0 characterization/report views, and saved workflow/workspace recall | In Progress (repo) |
 | 3.24 | Direct-manipulation canvas parity: right-click peak editing, ROI/background drag handles, overlap actions, and explicit role actions | Planned |
-| 3.25 | Dedicated Qt workspaces for ROI Statistics, Detection Limit, Relative Activity, Dose/Shielding, File Query/Batch Compare, Reference/Library Workbench, and k0 reporting | Planned |
-| 3.26 | First-class dark mode, saved themes, stronger graph-table synchronization, and improved launch/discovery paths | Planned |
-| 3.27 | Native probes, artifact reviews, and release-blocking GUI acceptance for every new parity workspace | Planned |
+| 3.25 | Dedicated Qt workspaces for ROI Statistics, Detection Limit, Relative Activity, Dose/Shielding, File Query/Batch Compare, Reference/Library Workbench, and k0 reporting; the first Phase 6 parity tabs are already live in the modern shell | In Progress (repo) |
+| 3.26 | First-class dark mode, saved themes, stronger graph-table synchronization, and improved launch/discovery paths | Complete (repo) |
+| 3.27 | Native probes, artifact reviews, and release-blocking GUI acceptance for every new parity workspace | Complete (repo) |
 | 4.1-4.4 | Live-MCA device discovery, dashboard telemetry, and spectrogram surfaces | Deferred |
 
 ## 6. Source Behaviors to Preserve
@@ -86,6 +88,11 @@ Additive `3N` GUI overlay on the existing roadmap map:
 - `3N.12` and `3N.13` extend the planned calculator and parity workspaces with optimization heatmaps, Pareto views, recommended-schedule summary cards, pulse timeline views, and second-irradiation comparison panels.
 - `3N.14` adds long-term dose and hazard review surfaces, including shutdown-through-100-year endpoint presets, dominant-contributor plots, and domain quick-look presets for microreactor, fusion-material, and activation-experiment use cases.
 - `3N.15` requires GUI launch points for benchmark experimental bundle export, including `.ffexp` packaging and plot-manifest review.
+
+Current repo implementation note (2026-04-17):
+- The additive `3N` GUI slice is no longer only planned: `src/fluxforge/gui/panels/phase6.py` now lands the first inventory, masking, optimization, second-irradiation, and `.ffexp` export surfaces in the modern shell.
+- Workflow-state round-tripping is now part of the GUI contract for these panels and the surrounding shell containers so analysts can save a workspace and resume it in a later session.
+- The default saved workflows intentionally preserve two governed starting points: `quantumgold-workflow` and `astm-ldrd-irradiation`.
 
 ## 7. Non-Negotiable GUI Acceptance Rules
 

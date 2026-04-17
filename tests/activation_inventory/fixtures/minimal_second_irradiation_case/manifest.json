@@ -3,6 +3,10 @@
   "fixture_id": "minimal_second_irradiation_case",
   "parity_scope": "workflow",
   "source_repo": "FusionSandwich/FluxForge",
+  "source_ref": "optimization-workflows",
+  "source_paths": [
+    "tests/activation_inventory/fixtures/minimal_second_irradiation_case"
+  ],
   "source_case": "second_irradiation_planner_smoke",
   "workflow": "second_irradiation_planner",
   "input_files": [
@@ -19,7 +23,7 @@
     "dose_rel": 0.08
   },
   "provenance_notes": [
-    "3.21/3.23 scaffold case for second-irradiation workflow parity.",
-    "Source-linked golden outputs are required before enabling release gating."
+    "Second-irradiation planner fixture for workflow parity execution.",
+    "Expected outputs capture selected candidate and post-second-irradiation isotope activity table."
   ]
 }

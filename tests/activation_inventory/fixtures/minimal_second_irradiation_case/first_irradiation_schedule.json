@@ -1,0 +1,8 @@
+{
+  "first_cooling_time_s": 3600.0,
+  "second_irradiation_time_s": 1800.0,
+  "target_weights": {
+    "Co60": 1.5,
+    "Mn56": 0.5
+  }
+}

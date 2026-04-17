@@ -1,0 +1,26 @@
+{
+  "spectrum_id": "minimal_second_irradiation_seed",
+  "source_id": "fluxforge_bundled_gamma",
+  "cooling_time_s": 1800.0,
+  "live_time_s": 900.0,
+  "isotope_summaries": [
+    {
+      "nuclide": "Co-60",
+      "line_count": 2,
+      "half_life_s": 166349520.0,
+      "count_time_activity_Bq": 1200.0,
+      "count_time_activity_unc_Bq": 45.0,
+      "irradiation_time_activity_Bq": 1210.0,
+      "irradiation_time_activity_unc_Bq": 49.0
+    },
+    {
+      "nuclide": "Mn-56",
+      "line_count": 1,
+      "half_life_s": 9288.0,
+      "count_time_activity_Bq": 340.0,
+      "count_time_activity_unc_Bq": 22.0,
+      "irradiation_time_activity_Bq": 420.0,
+      "irradiation_time_activity_unc_Bq": 27.0
+    }
+  ]
+}

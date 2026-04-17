@@ -12,6 +12,16 @@ import pytest
 
 from fluxforge.cli import app
 from fluxforge.io.spe import GammaSpectrum
+from tests._phase6_real_data import (
+    DEFAULT_PHASE6_SAMPLE_ID,
+    RAFM_UNFOLD_MLEM_PATH,
+    load_phase6_real_activity_review_payload,
+    load_phase6_real_optimization_grids,
+    write_phase6_real_second_irradiation_inputs,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _dummy_spectrum() -> GammaSpectrum:
@@ -23,6 +33,15 @@ def _dummy_spectrum() -> GammaSpectrum:
         calibration={"energy": [0.0, 1.0, 0.0]},
         spectrum_id="dummy",
     )
+
+
+def _write_phase6_real_activity_review(tmp_path: Path) -> Path:
+    activity_review_path = tmp_path / f"{DEFAULT_PHASE6_SAMPLE_ID}_activity_review.json"
+    activity_review_path.write_text(
+        json.dumps(load_phase6_real_activity_review_payload(), indent=2),
+        encoding="utf-8",
+    )
+    return activity_review_path
 
 
 def test_build_parser_and_reactions_json(capsys):
@@ -218,6 +237,32 @@ def test_build_parser_file_query_and_batch_compare_commands(tmp_path):
     assert compare_args.command == "batch-compare"
     assert compare_args.keys == "sample_id,reaction_id"
 
+    parity_args = parser.parse_args(
+        [
+            "parity-check",
+            "--reference-root",
+            str(tmp_path / "reference"),
+            "--activation-root",
+            str(tmp_path / "activation"),
+            "--scope",
+            "workflow",
+        ]
+    )
+    assert parity_args.command == "parity-check"
+    assert parity_args.scope == "workflow"
+
+    gui_acceptance_args = parser.parse_args(
+        [
+            "gui-acceptance-check",
+            "--checklist",
+            str(tmp_path / "checklist.md"),
+            "--artifact-dir",
+            str(tmp_path / "phase327_probe"),
+        ]
+    )
+    assert gui_acceptance_args.command == "gui-acceptance-check"
+    assert gui_acceptance_args.checklist.name == "checklist.md"
+
 
 def test_cmd_file_query_writes_rows(tmp_path):
     (tmp_path / "sample_a.json").write_text('{"ok": true}', encoding="utf-8")
@@ -311,6 +356,57 @@ def test_cmd_batch_compare_computes_summary(tmp_path):
     assert "rate" in payload["summary"]["field_stats"]
 
 
+def test_cmd_parity_check_writes_summary_payload(tmp_path):
+    output = tmp_path / "parity.json"
+    app.cmd_parity_check(
+        Namespace(
+            reference_root=Path("tests/spectra/reference_parity"),
+            activation_root=Path("tests/activation_inventory/fixtures"),
+            scope="all",
+            fixture_id=None,
+            include_activation=True,
+            output=output,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.reference_parity.run.v1"
+    assert payload["summary"]["total"] >= 5
+
+
+def test_cmd_gui_acceptance_checklist_writes_readiness_payload(tmp_path):
+    checklist = tmp_path / "checklist.md"
+    checklist.write_text(
+        "\n".join(
+            [
+                "# Checklist",
+                "- [x] Qt tests passed",
+                "- [x] Probes generated",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    phase327 = tmp_path / "phase327_probe"
+    phase327.mkdir(parents=True, exist_ok=True)
+    (phase327 / "index.html").write_text("<html></html>\n", encoding="utf-8")
+
+    output = tmp_path / "gui_acceptance.json"
+    app.cmd_gui_acceptance_checklist(
+        Namespace(
+            checklist=checklist,
+            artifact_dir=[phase327],
+            output=output,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.gui_acceptance_check.v1"
+    assert payload["checklist"]["exists"] is True
+    assert payload["checklist"]["unchecked_items"] == []
+    assert payload["ready"] is True
+
+
 def test_build_parser_activity_review_command(tmp_path):
     parser = app.build_parser()
     args = parser.parse_args(
@@ -370,6 +466,41 @@ def test_build_parser_inventory_review_command(tmp_path):
     assert args.command == "inventory-review"
     assert args.time_origin == "count_start"
     assert args.observable == "dose"
+
+
+def test_build_parser_second_irradiation_plan_command(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "second-irradiation-plan",
+            "--inventory-file",
+            str(tmp_path / "inventory_seed.json"),
+            "--schedule-file",
+            str(tmp_path / "schedule.json"),
+            "--candidates-file",
+            str(tmp_path / "candidates.json"),
+        ]
+    )
+    assert args.command == "second-irradiation-plan"
+    assert args.output.name == "second_irradiation_plan.json"
+
+
+def test_build_parser_ffexp_export_command(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "ffexp-export",
+            "--activity-review-file",
+            str(tmp_path / "activity_review.json"),
+            "--optimization-file",
+            str(tmp_path / "optimization.json"),
+            "--plot-paths",
+            "inventory.png,pareto.png",
+        ]
+    )
+    assert args.command == "ffexp-export"
+    assert args.output.name == "benchmark_bundle.ffexp"
+    assert args.plot_paths == "inventory.png,pareto.png"
 
 
 def test_build_parser_isotope_priority_command(tmp_path):
@@ -887,6 +1018,32 @@ def test_cmd_inventory_review_writes_json_csv_and_plot_artifacts(monkeypatch, tm
     )
 
 
+def test_cmd_second_irradiation_plan_writes_json_and_csv_outputs(tmp_path):
+    phase6_inputs = write_phase6_real_second_irradiation_inputs(tmp_path)
+    inventory_path = phase6_inputs["inventory"]
+    schedule_path = phase6_inputs["schedule"]
+    candidates_path = phase6_inputs["candidates"]
+
+    output_path = tmp_path / "second_irradiation_plan.json"
+    csv_path = tmp_path / "second_irradiation_selected.csv"
+    app.cmd_second_irradiation_plan(
+        Namespace(
+            inventory_file=inventory_path,
+            schedule_file=schedule_path,
+            candidates_file=candidates_path,
+            output=output_path,
+            csv_output=csv_path,
+        )
+    )
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.second_irradiation_plan.v1"
+    assert payload["selected_candidate"]["label"].startswith(f"{DEFAULT_PHASE6_SAMPLE_ID}_window_")
+    assert payload["selected_inventory_rows"]
+    assert csv_path.exists()
+    assert "weighted_activity" in csv_path.read_text(encoding="utf-8")
+
+
 def test_cmd_isotope_priority_writes_json_and_csv_outputs(tmp_path):
     activity_review_path = tmp_path / "activity_review.json"
     activity_review_path.write_text(
@@ -1094,45 +1251,12 @@ def test_cmd_optimization_sweep_writes_json_and_csv_outputs(tmp_path):
 
 
 def test_cmd_optimization_sweep_builds_candidates_from_activity_review(tmp_path):
-    activity_review = {
-        "schema": "fluxforge.activity_review.v1",
-        "live_time_s": 300.0,
-        "cooling_time_s": 3600.0,
-        "line_results": [
-            {"nuclide": "Mo-99", "matched_line_energy_keV": 140.5},
-            {"nuclide": "Sc-46", "matched_line_energy_keV": 889.3},
-        ],
-        "isotope_summaries": [
-            {
-                "nuclide": "Mo-99",
-                "line_count": 2,
-                "total_net_counts": 9000.0,
-                "half_life_s": 65.94 * 3600.0,
-                "cooling_time_s": 3600.0,
-                "irradiation_time_activity_Bq": 850.0,
-                "irradiation_time_activity_unc_Bq": 42.0,
-            },
-            {
-                "nuclide": "Sc-46",
-                "line_count": 1,
-                "total_net_counts": 5000.0,
-                "half_life_s": 83.79 * 24.0 * 3600.0,
-                "cooling_time_s": 3600.0,
-                "irradiation_time_activity_Bq": 450.0,
-                "irradiation_time_activity_unc_Bq": 30.0,
-            },
-        ],
-    }
-    activity_review_path = tmp_path / "activity_review.json"
-    activity_review_path.write_text(json.dumps(activity_review, indent=2), encoding="utf-8")
-
-    neutron_csv = tmp_path / "neutron_flux.csv"
-    neutron_csv.write_text(
-        "energy_eV,flux\n"
-        "1.0e2,1.0\n"
-        "1.0e4,2.0\n"
-        "2.0e5,3.0\n",
-        encoding="utf-8",
+    activity_review_payload = load_phase6_real_activity_review_payload()
+    activity_review_path = _write_phase6_real_activity_review(tmp_path)
+    grids = load_phase6_real_optimization_grids()
+    isotopes_of_interest = ",".join(
+        row["nuclide"]
+        for row in activity_review_payload["isotope_summaries"][:3]
     )
 
     output_path = tmp_path / "optimization_sweep.json"
@@ -1144,13 +1268,13 @@ def test_cmd_optimization_sweep_builds_candidates_from_activity_review(tmp_path)
             output=output_path,
             objective="di-fom",
             csv_output=None,
-            isotopes_of_interest="Mo-99,Sc-46",
-            irradiation_grid_s="1800,3600",
-            cooldown_grid_s="0,3600",
-            count_grid_s="300,900",
+            isotopes_of_interest=isotopes_of_interest,
+            irradiation_grid_s=grids["irradiation_grid_s"],
+            cooldown_grid_s=grids["cooldown_grid_s"],
+            count_grid_s=grids["count_grid_s"],
             reference_irradiation_time_s=3600.0,
-            unfold_file=None,
-            neutron_spectrum_file=neutron_csv,
+            unfold_file=RAFM_UNFOLD_MLEM_PATH,
+            neutron_spectrum_file=None,
             flux_scale=1.0,
             reference_flux_integral=0.0,
             generated_candidates_output=generated_path,
@@ -1177,7 +1301,14 @@ def test_cmd_optimization_sweep_builds_candidates_from_activity_review(tmp_path)
     assert payload["candidate_source"] == "activity-review"
     assert payload["objective"] == "di-fom"
     assert payload["ranked_candidates"]
-    assert payload["neutron_source"]["source"] == "csv"
+    assert payload["neutron_source"]["source"] == "unfold"
+    assert "support_artifacts" in payload
+    assert (tmp_path / "optimization_sweep_optimization_grid.csv").exists()
+    assert (tmp_path / "optimization_sweep_recommended_schedules.csv").exists()
+    assert (tmp_path / "optimization_sweep_dose_endpoints.csv").exists()
+    assert (tmp_path / "optimization_sweep_masking_candidates.csv").exists()
+    assert (tmp_path / "optimization_sweep_inventory_timeseries.csv").exists()
+    assert (tmp_path / "optimization_sweep_activities_at_irradiation.csv").exists()
     assert generated_path.exists()
 
 
@@ -1812,6 +1943,72 @@ def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_pat
     assert "action_scores" in bassd_payload["ranked_candidates"][0]
     assert len(stbdmr_payload["ranked_candidates"]) == 2
     assert "diagnostics" in stbdmr_payload["ranked_candidates"][0]
+
+
+def test_cmd_ffexp_export_packages_phase6_products(tmp_path):
+    activity_review_path = _write_phase6_real_activity_review(tmp_path)
+    grids = load_phase6_real_optimization_grids()
+    optimization_path = tmp_path / "optimization.json"
+    app.cmd_optimization_sweep(
+        Namespace(
+            input=None,
+            activity_review_file=activity_review_path,
+            output=optimization_path,
+            objective="di-fom",
+            csv_output=None,
+            isotopes_of_interest=None,
+            irradiation_grid_s=grids["irradiation_grid_s"],
+            cooldown_grid_s=grids["cooldown_grid_s"],
+            count_grid_s=grids["count_grid_s"],
+            reference_irradiation_time_s=3600.0,
+            unfold_file=RAFM_UNFOLD_MLEM_PATH,
+            neutron_spectrum_file=None,
+            flux_scale=1.0,
+            reference_flux_integral=0.0,
+            generated_candidates_output=None,
+            target_nuclide=None,
+            nuisance_variance_fraction=0.0,
+            fim_regularization=1.0e-6,
+            mwdcs_window_offsets_s="0,7200,86400",
+            mwdcs_window_count_time_s=900.0,
+            mwdcs_full_spectrum_mode=False,
+            mwdcs_overlap_penalty=0.0,
+            enable_advanced_objectives=False,
+            bassd_dose_weight=0.02,
+            bassd_exploration_temperature=0.0,
+            bassd_seed=17,
+            stbdmr_window_offsets_s="0,7200,86400",
+            stbdmr_window_count_time_s=900.0,
+            stbdmr_masking_regularization=0.1,
+            stbdmr_differentiable_graph=False,
+            stbdmr_graph_temperature=2.0,
+        )
+    )
+
+    output_path = tmp_path / "benchmark.ffexp"
+    app.cmd_ffexp_export(
+        Namespace(
+            activity_review_file=activity_review_path,
+            inventory_review_file=None,
+            masking_file=None,
+            optimization_file=optimization_path,
+            second_irradiation_file=None,
+            plot_paths="inventory.png,pareto.png",
+            output=output_path,
+        )
+    )
+
+    payload = app.read_ffexp_bundle(output_path)
+    optimization_payload = json.loads(optimization_path.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.ffexp_bundle.v1"
+    assert payload["format"] == ".ffexp"
+    assert payload["summary"]["optimization_candidate_count"] == len(
+        optimization_payload["ranked_candidates"]
+    )
+    assert payload["inventory"]["dose_endpoints"]
+    assert payload["masking"]["line_masking_results"]
+    assert payload["optimization"]["recommended_schedules"]
+    assert payload["plot_manifest"]["paths"] == ["inventory.png", "pareto.png"]
 
 
 def test_cmd_library_register_list_and_remove(monkeypatch, tmp_path, capsys):

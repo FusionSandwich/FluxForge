@@ -56,6 +56,8 @@ class SpectralPhenomenonEstimate:
     energy_keV: float
     summary: str
     color: str = "#f59e0b"
+    relative_height: float | None = None
+    estimated_height_counts: float | None = None
 
 
 @dataclass(frozen=True)
@@ -194,6 +196,16 @@ class BayesianNuclideMatchDefinition:
 
     key: str
     label: str
+    summary: str
+
+
+@dataclass(frozen=True)
+class ContinuumDriverEstimate:
+    """Estimated dominant continuum-driving line for spectral-feature overlays."""
+
+    nuclide: str
+    line_energy_keV: float
+    score: float
     summary: str
 
 
@@ -498,6 +510,7 @@ def estimate_spectral_phenomena(
     photopeak_energy_keV: float,
     *,
     detector_material: str = "hpge",
+    spectrum: GammaSpectrum | None = None,
 ) -> tuple[SpectralPhenomenonEstimate, ...]:
     """Estimate common gamma-spectroscopy artifacts near a selected line."""
 
@@ -519,6 +532,7 @@ def estimate_spectral_phenomena(
                 "Upper bound of the single-scatter Compton continuum for the selected line."
             ),
             color="#f59e0b",
+            relative_height=0.28,
         )
     )
     phenomena.append(
@@ -528,6 +542,7 @@ def estimate_spectral_phenomena(
             energy_keV=backscatter_peak,
             summary="Expected backscatter feature from 180° scattering before detector absorption.",
             color="#f97316",
+            relative_height=0.22,
         )
     )
 
@@ -544,6 +559,7 @@ def estimate_spectral_phenomena(
                         energy_keV=escape_energy,
                         summary="Detector escape feature estimated for an HPGe crystal.",
                         color="#22c55e",
+                        relative_height=0.16,
                     )
                 )
 
@@ -558,6 +574,7 @@ def estimate_spectral_phenomena(
                     energy_keV=single_escape,
                     summary="Pair-production escape peak after one annihilation photon leaves the detector.",
                     color="#10b981",
+                    relative_height=0.2,
                 )
             )
         if double_escape > 0.0:
@@ -568,6 +585,7 @@ def estimate_spectral_phenomena(
                     energy_keV=double_escape,
                     summary="Pair-production escape peak after both annihilation photons leave the detector.",
                     color="#059669",
+                    relative_height=0.14,
                 )
             )
         phenomena.append(
@@ -577,14 +595,79 @@ def estimate_spectral_phenomena(
                 energy_keV=electron_rest_keV,
                 summary="511 keV annihilation feature expected when pair production contributes.",
                 color="#38bdf8",
+                relative_height=0.1,
             )
         )
 
-    return tuple(
-        sorted(
-            phenomena,
-            key=lambda item: (item.energy_keV, item.label),
+    if spectrum is not None and len(spectrum.counts):
+        energies = np.asarray(spectrum.energies, dtype=float)
+        counts = np.asarray(spectrum.counts, dtype=float)
+        peak_index = int(np.argmin(np.abs(energies - energy))) if len(energies) else 0
+        peak_height = float(counts[peak_index]) if len(counts) else 0.0
+        enriched: list[SpectralPhenomenonEstimate] = []
+        for item in phenomena:
+            rel = item.relative_height if item.relative_height is not None else 0.15
+            est_height = max(0.0, peak_height * float(rel))
+            enriched.append(
+                SpectralPhenomenonEstimate(
+                    kind=item.kind,
+                    label=item.label,
+                    energy_keV=item.energy_keV,
+                    summary=item.summary,
+                    color=item.color,
+                    relative_height=item.relative_height,
+                    estimated_height_counts=est_height,
+                )
+            )
+        phenomena = enriched
+
+    return tuple(sorted(phenomena, key=lambda item: (item.energy_keV, item.label)))
+
+
+def estimate_dominant_continuum_driver(
+    spectrum: GammaSpectrum,
+    *,
+    tolerance_keV: float = 2.0,
+    min_intensity: float = 0.02,
+    source_id: str = "fluxforge_bundled_gamma",
+    custom_path: str | None = None,
+) -> ContinuumDriverEstimate | None:
+    """Estimate the most likely continuum-driving photopeak from loaded spectrum data."""
+
+    del min_intensity
+    peaks = detect_peak_candidates(spectrum)
+    if not peaks:
+        return None
+    matched = bayesian_match_peak_candidates(
+        peaks,
+        source_id=source_id,
+        custom_path=custom_path,
+        tolerance_keV=tolerance_keV,
+    )
+    candidates = [peak for peak in matched if peak.nuclide]
+    if not candidates:
+        return None
+
+    lead = max(candidates, key=lambda peak: float(peak.significance))
+    line_energy_keV = float(lead.energy_keV)
+    if lead.reference_lines_keV:
+        line_energy_keV = float(
+            min(
+                lead.reference_lines_keV,
+                key=lambda energy: abs(float(energy) - float(lead.energy_keV)),
+            )
         )
+    delta_keV = abs(line_energy_keV - float(lead.energy_keV))
+    score = float(lead.significance) / max(1.0, 1.0 + delta_keV)
+    nuclide = str(lead.nuclide or "unknown")
+    return ContinuumDriverEstimate(
+        nuclide=nuclide,
+        line_energy_keV=line_energy_keV,
+        score=score,
+        summary=(
+            f"{nuclide} near {line_energy_keV:.3f} keV "
+            f"(peak {lead.energy_keV:.3f} keV, significance {lead.significance:.3f})"
+        ),
     )
 
 
@@ -1538,6 +1621,7 @@ __all__ = [
     "ActivityCalculationResult",
     "apply_ml_peak_predictions",
     "BayesianNuclideMatchDefinition",
+    "ContinuumDriverEstimate",
     "EfficiencyCalibrationFitResult",
     "EfficiencyModelDefinition",
     "PeakCandidate",
@@ -1548,6 +1632,7 @@ __all__ = [
     "calculate_peak_activity",
     "compute_cascade_sum_lines",
     "detect_peak_candidates",
+    "estimate_dominant_continuum_driver",
     "estimate_spectral_phenomena",
     "extract_survey_points",
     "fit_efficiency_model",

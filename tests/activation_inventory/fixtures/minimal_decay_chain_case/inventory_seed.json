@@ -1,0 +1,30 @@
+{
+  "spectrum_id": "minimal_decay_chain_seed",
+  "source_id": "fluxforge_bundled_gamma",
+  "cooling_time_s": 3600.0,
+  "live_time_s": 600.0,
+  "time_origin": "eoi",
+  "relative_times_s": [0.0, 3600.0, 7200.0, 21600.0],
+  "distance_cm": 25.0,
+  "dominant_top_n": 3,
+  "isotope_summaries": [
+    {
+      "nuclide": "Co-60",
+      "line_count": 2,
+      "half_life_s": 166349520.0,
+      "count_time_activity_Bq": 820.0,
+      "count_time_activity_unc_Bq": 32.0,
+      "irradiation_time_activity_Bq": 830.0,
+      "irradiation_time_activity_unc_Bq": 35.0
+    },
+    {
+      "nuclide": "Cs-137",
+      "line_count": 1,
+      "half_life_s": 952068480.0,
+      "count_time_activity_Bq": 410.0,
+      "count_time_activity_unc_Bq": 24.0,
+      "irradiation_time_activity_Bq": 412.0,
+      "irradiation_time_activity_unc_Bq": 26.0
+    }
+  ]
+}

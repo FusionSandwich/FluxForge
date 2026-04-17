@@ -1,7 +1,7 @@
 # FluxForge Testing Master
 
 **Status:** active testing and validation source of truth  
-**Last Updated:** 2026-04-06  
+**Last Updated:** 2026-04-17  
 **Purpose:** consolidated testing contract for unit, integration, GUI, parity, and
 artifact-backed validation work.
 
@@ -37,6 +37,7 @@ Additional rules:
 | File and schema IO | `tests/test_n42.py`, `tests/test_cnf_io.py`, `tests/test_csv_readers.py`, `tests/test_spectrum_io_parity.py` | spectrum import/export, calibration extraction, parity baselines |
 | Calibration and efficiency | `tests/test_calibration_workspace_qt.py`, `tests/test_pipeline_validation.py`, `tests/test_genie_overrides.py` | energy calibration, efficiency workflows, Qt calibration behavior |
 | Analysis workspace and peak workflows | `tests/test_analysis_workspace_qt.py`, `tests/test_roi_analysis_core.py`, `tests/test_peak_finder_methods.py` | peak search, ROI/background workflows, GUI peak review, library behavior |
+| Phase 6 optimization and saved workflows | `tests/test_cli_app.py`, `tests/test_analysis_workspace_qt.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase6_optimization_probe.py`, `tests/_phase6_real_data.py` | real RAFM/LDRD activity-review inputs, masking, optimization, second irradiation, `.ffexp`, GUI workflow/session persistence, and mouse-driven probe actions for Playwright artifact review |
 | Unfolding and inverse analysis | `tests/test_unfolding_registry.py`, `tests/test_unfolding_workflows.py`, `tests/test_unfolding_reference_parity.py`, validation scripts under `examples/validation/` | registry-backed unfolding, external parity, diagnostic outputs |
 | Standards and QA | `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_module3_backends.py`, `tests/test_module3_workflows_qt.py` | governed calculations, QA monitor, standards review, reporting |
 | Batch, reporting, and predictive GUI | `tests/test_cli_app.py`, `tests/test_predictive_features.py`, `tests/test_predictive_dashboard_qt.py` | CLI contract, offline predictive features, dashboard/status behavior |
@@ -46,10 +47,34 @@ Additional rules:
 
 Documented verification state:
 
-- The roadmap tracker currently records the full suite as `1131 passed, 2 skipped`.
-- The focused Phase 3.17 regression subset was rerun during this consolidation:
-  `pytest FluxForge/tests/test_calibration_workspace_qt.py FluxForge/tests/test_analysis_workspace_qt.py FluxForge/tests/test_cli_app.py -q`
-  with `68 passed`.
+- Full-suite baseline in this workspace is `1279 passed, 2 skipped`.
+- Targeted parity/fixture/CLI verification:
+  `pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py tests/test_cli_app.py -k "parity or fixture or manifest"`
+  with `10 passed, 67 deselected`.
+- Targeted Qt workflow verification:
+  `pytest -q tests/test_analysis_workspace_qt.py tests/test_module3_workflows_qt.py tests/test_modern_gui_shell.py`
+  with `49 passed`.
+- Saved-workflow and shell-modularization regression:
+  `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py`
+  with `14 passed`.
+- Phase 6 CLI/export regression on the real RAFM/LDRD corpus:
+  `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "second_irradiation_plan_writes_json_and_csv_outputs or optimization_sweep_builds_candidates_from_activity_review or ffexp_export_packages_phase6_products"`
+  with `3 passed`.
+- Phase 6 Qt workflow regression after the modern-shell split:
+  `PYTHONPATH=src pytest -q tests/test_analysis_workspace_qt.py -k "masking_review_panel_runs_and_exports_tables or optimization_workspace_panel_runs_and_exports_phase6_bundle or optimization_workspace_panel_advanced_guard_and_second_irradiation_panel"`
+  with `3 passed, 29 deselected`.
+- Broad Phase 3 regression slice:
+  `pytest -q tests/test_unfolding_registry.py tests/test_unfolding_workflows.py tests/test_unfolding_workspace_qt.py tests/test_module3_backends.py tests/test_module3_workflows_qt.py tests/test_analysis_workspace_qt.py tests/test_calibration_workspace_qt.py tests/test_modern_gui_shell.py tests/test_cli_app.py`
+  with `204 passed`.
+- Native probe galleries were refreshed at:
+  `artifacts/gui_review/phase326_probe/`,
+  `artifacts/gui_review/phase317_calibration_probe/`,
+  `artifacts/gui_review/phase31x_unfolding_probe/`, and
+  `artifacts/gui_review/phase327_probe/`, and
+  `artifacts/gui_review/phase6_optimization_probe/`.
+- The Phase 6 probe now drives masking/optimization/second-irradiation actions with
+  `QTest.mouseClick(...)` before screenshot capture so browser artifact inspection
+  can validate mouse-path behavior instead of method-only programmatic calls.
 
 Use `docs/ROADMAP_EXECUTION_STATUS.md` for the live verification snapshot after this date.
 
@@ -60,7 +85,7 @@ Use `docs/ROADMAP_EXECUTION_STATUS.md` for the live verification snapshot after 
 | 3.21 | Curate repo-backed parity fixtures and manifests under `tests/spectra/reference_parity/` with source repo, source case, workflow, expected outputs, tolerances, and provenance notes | Planned |
 | 3.22 | Add algorithm-level parity tests for parsing, calibration, peak search, fit, activity, detector-response, detection-limit, dose/shielding, and k0 workflows | Planned |
 | 3.23 | Add end-to-end workflow parity suites covering "same input -> same workflow -> nearly same result" behavior for each source family and tutorial/example dataset | Planned |
-| 3.27 | Expand Qt workflow tests, native probes, artifact galleries, and release-blocking acceptance checklists for every new parity workspace | Planned |
+| 3.27 | Expand Qt workflow tests, native probes, artifact galleries, and release-blocking acceptance checklists for every new parity workspace | Complete (repo) |
 
 Additive testing overlay from the activation / FISPACT-style supplement:
 
@@ -96,6 +121,9 @@ Additive testing overlay from the activation / FISPACT-style supplement:
   against accidental overwrite of bundled libraries.
 - Add masking, optimization, second-irradiation, and shutdown-to-100-year dose
   regression coverage once those `3N` additive workflows land.
+- Keep regression coverage around workflow-preset persistence, active-workflow
+  restore, and the built-in `quantumgold-workflow` / `astm-ldrd-irradiation`
+  starting points as the modern shell continues to be split into smaller modules.
 
 ## 7. Artifact and Probe Requirements
 

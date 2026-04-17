@@ -7,7 +7,7 @@ import copy
 import csv
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import warnings
@@ -125,6 +125,7 @@ from fluxforge.io.artifacts import (
     read_line_activities,
     read_detector_characterization,
     read_facility_characterization,
+    read_ffexp_bundle,
     read_k0_aggregation_bundle,
     read_k0_analysis_bundle,
     read_peak_observation_bundle,
@@ -137,6 +138,7 @@ from fluxforge.io.artifacts import (
     read_validation_bundle,
     write_detector_characterization,
     write_facility_characterization,
+    write_ffexp_bundle,
     write_k0_aggregation_bundle,
     write_k0_analysis_bundle,
     write_k0_qaqc_bundle,
@@ -162,8 +164,14 @@ from fluxforge.physics.activation import (
 from fluxforge.solvers.gls import gls_adjust
 from fluxforge.solvers.iterative import gravel, mlem
 from fluxforge.unfolding import GravelUnfolder, MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
-from fluxforge.validation import spectrum_comparison_metrics
+from fluxforge.validation import run_reference_parity_suite, spectrum_comparison_metrics
 from fluxforge.plugins import PluginRegistries
+from fluxforge.workflows.irradiation_optimization import (
+    build_phase6_support_artifacts,
+    parse_second_irradiation_candidates,
+    plan_second_irradiation,
+    serialize_second_irradiation_plan,
+)
 
 
 def _load_json(path: Path):
@@ -680,6 +688,96 @@ def _filter_optimization_payload_by_isotopes(
     }
 
 
+def _write_phase6_support_artifacts(
+    *,
+    output_path: Path,
+    activity_review_payload: Optional[Dict[str, Any]],
+    optimization_payload: Optional[Dict[str, Any]],
+    isotopes_of_interest: tuple[str, ...],
+) -> Dict[str, Path]:
+    if activity_review_payload is None:
+        return {}
+
+    support = build_phase6_support_artifacts(
+        activity_review_payload,
+        optimization_payload,
+        isotopes_of_interest=isotopes_of_interest,
+    )
+
+    outputs = {
+        "optimization_grid": _phase6_artifact_path(output_path, "_optimization_grid.csv"),
+        "recommended_schedules": _phase6_artifact_path(
+            output_path, "_recommended_schedules.csv"
+        ),
+        "dose_endpoints": _phase6_artifact_path(output_path, "_dose_endpoints.csv"),
+        "masking_candidates": _phase6_artifact_path(
+            output_path, "_masking_candidates.csv"
+        ),
+        "inventory_timeseries": _phase6_artifact_path(
+            output_path, "_inventory_timeseries.csv"
+        ),
+        "activities_at_irradiation": _phase6_artifact_path(
+            output_path, "_activities_at_irradiation.csv"
+        ),
+    }
+
+    _write_dict_rows(outputs["optimization_grid"], support["optimization_grid_rows"])
+    _write_dict_rows(
+        outputs["recommended_schedules"],
+        support["recommended_schedule_rows"],
+    )
+    _write_dict_rows(outputs["dose_endpoints"], support["dose_endpoints_rows"])
+    _write_dict_rows(outputs["masking_candidates"], support["masking_candidates_rows"])
+    _write_dict_rows(outputs["inventory_timeseries"], support["inventory_timeseries_rows"])
+    _write_dict_rows(
+        outputs["activities_at_irradiation"],
+        support["activities_at_irradiation_rows"],
+    )
+    return outputs
+
+
+def _build_ffexp_summary(
+    *,
+    activity_review_payload: Optional[Dict[str, Any]] = None,
+    optimization_payload: Optional[Dict[str, Any]] = None,
+    second_irradiation_payload: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    isotope_rows = (
+        list(activity_review_payload.get("isotope_summaries") or [])
+        if activity_review_payload is not None
+        else []
+    )
+    line_rows = (
+        list(activity_review_payload.get("line_results") or [])
+        if activity_review_payload is not None
+        else []
+    )
+    ranked_candidates = (
+        list(optimization_payload.get("ranked_candidates") or [])
+        if optimization_payload is not None
+        else []
+    )
+    summary: Dict[str, Any] = {
+        "isotope_count": len(isotope_rows),
+        "line_count": len(line_rows),
+        "optimization_candidate_count": len(ranked_candidates),
+        "peak_fit_complete": bool(line_rows),
+        "activity_complete": bool(isotope_rows),
+        "naa_quant_complete": bool(isotope_rows),
+        "inverse_adjustment_complete": False,
+        "comparison_ready": bool(isotope_rows),
+    }
+    if ranked_candidates:
+        top = ranked_candidates[0]
+        summary["optimization_objective"] = optimization_payload.get("objective")
+        summary["recommended_schedule_label"] = top.get("label")
+    if second_irradiation_payload is not None:
+        summary["second_irradiation_selected_label"] = (
+            second_irradiation_payload.get("selected_candidate") or {}
+        ).get("label")
+    return summary
+
+
 def _parse_efficiency_override(raw: Optional[str]) -> Optional[Dict[str, float]]:
     values = _parse_csv_floats(raw)
     if values is None:
@@ -755,6 +853,10 @@ def _activity_review_artifact_path(output: Path, suffix: str) -> Path:
 
 
 def _inventory_review_artifact_path(output: Path, suffix: str) -> Path:
+    return output.with_name(f"{output.stem}{suffix}")
+
+
+def _phase6_artifact_path(output: Path, suffix: str) -> Path:
     return output.with_name(f"{output.stem}{suffix}")
 
 
@@ -1710,11 +1812,10 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
         from matplotlib import pyplot as plt
         from fluxforge.plots.spectrum_inspection import plot_gamma_spectrum
 
-        fig, _ = plot_gamma_spectrum(
+        fig, ax = plot_gamma_spectrum(
             spectrum_for_plot,
             title=args.title or spectrum_for_plot.spectrum_id,
             manual_regions=manual_regions,
-            feature_annotations=feature_annotations,
             x_min_keV=getattr(args, "x_min_keV", None),
             x_max_keV=getattr(args, "x_max_keV", None),
             y_log=bool(getattr(args, "y_log", False)),
@@ -1722,6 +1823,30 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
                 "background-subtracted" if args.background_subtracted else "raw counts"
             ),
         )
+        if feature_annotations:
+            ymax = ax.get_ylim()[1]
+            label_y = ymax * 0.96 if np.isfinite(ymax) and ymax > 0 else 1.0
+            for item in feature_annotations:
+                energy = float(item.get("energy_keV", 0.0) or 0.0)
+                if energy <= 0.0:
+                    continue
+                ax.axvline(
+                    energy,
+                    color=str(item.get("color") or "#72d6ff"),
+                    linewidth=1.0,
+                    linestyle=str(item.get("line_style") or "--"),
+                    alpha=0.9,
+                )
+                ax.text(
+                    energy,
+                    label_y,
+                    str(item.get("label") or "feature"),
+                    rotation=90,
+                    va="top",
+                    ha="center",
+                    fontsize=8,
+                    color=str(item.get("color") or "#72d6ff"),
+                )
         _ensure_parent_dir(args.output)
         fig.savefig(args.output, bbox_inches="tight", dpi=200)
         plt.close(fig)
@@ -2235,6 +2360,105 @@ def cmd_batch_compare(args: argparse.Namespace) -> None:
     print(f"Wrote batch comparison to {output}")
 
 
+def cmd_parity_check(args: argparse.Namespace) -> None:
+    reference_root = Path(getattr(args, "reference_root", Path("tests/spectra/reference_parity")))
+    activation_root_arg = getattr(args, "activation_root", None)
+    activation_root = Path(activation_root_arg) if activation_root_arg else None
+    output = Path(getattr(args, "output", Path("parity_check.json")))
+
+    payload = run_reference_parity_suite(
+        reference_root=reference_root,
+        activation_root=activation_root,
+        scope=str(getattr(args, "scope", "all") or "all"),
+        fixture_id=(str(getattr(args, "fixture_id", "") or "").strip() or None),
+        include_activation=bool(getattr(args, "include_activation", True)),
+    )
+
+    _ensure_parent_dir(output)
+    output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    summary = payload.get("summary") or {}
+    print(
+        "Parity check complete: "
+        f"{summary.get('passed', 0)} passed, {summary.get('failed', 0)} failed "
+        f"(total {summary.get('total', 0)})."
+    )
+    print(f"Wrote parity report to {output}")
+
+
+def cmd_gui_acceptance_checklist(args: argparse.Namespace) -> None:
+    checklist = Path(
+        getattr(
+            args,
+            "checklist",
+            Path("docs/PHASE3_27_RELEASE_CHECKLIST.md"),
+        )
+    )
+    output = Path(getattr(args, "output", Path("gui_acceptance_check.json")))
+
+    artifact_dirs = [
+        Path(item)
+        for item in (
+            getattr(args, "artifact_dir", None)
+            or [
+                "artifacts/gui_review/phase325_probe",
+                "artifacts/gui_review/phase326_probe",
+                "artifacts/gui_review/phase327_probe",
+            ]
+        )
+    ]
+
+    checklist_exists = checklist.exists()
+    checklist_item_count = 0
+    unchecked_items = []
+    if checklist_exists:
+        lines = checklist.read_text(encoding="utf-8").splitlines()
+        for line in lines:
+            token = line.strip()
+            if token.startswith("- [ ]") or token.startswith("- [x]") or token.startswith("- [X]"):
+                checklist_item_count += 1
+                if token.startswith("- [ ]"):
+                    unchecked_items.append(token[5:].strip())
+
+    artifact_status = []
+    for directory in artifact_dirs:
+        gallery = directory / "index.html"
+        artifact_status.append(
+            {
+                "path": str(directory),
+                "exists": directory.exists(),
+                "gallery_exists": gallery.exists(),
+            }
+        )
+
+    payload = {
+        "schema": "fluxforge.gui_acceptance_check.v1",
+        "generated_at": datetime.now(timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
+        "checklist": {
+            "path": str(checklist),
+            "exists": checklist_exists,
+            "item_count": checklist_item_count,
+            "unchecked_items": unchecked_items,
+        },
+        "artifacts": artifact_status,
+    }
+    payload["ready"] = bool(
+        checklist_exists
+        and checklist_item_count > 0
+        and not unchecked_items
+        and all(item["gallery_exists"] for item in artifact_status)
+    )
+
+    _ensure_parent_dir(output)
+    output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(
+        "GUI acceptance checklist: "
+        + ("READY" if payload["ready"] else "NOT READY")
+    )
+    print(f"Wrote GUI acceptance report to {output}")
+
+
 def cmd_activity(args: argparse.Namespace) -> None:
     peak_report = read_peak_report(args.peaks_file)
     if args.validate:
@@ -2707,6 +2931,7 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
     payload_source = "input"
     input_path = getattr(args, "input", None)
     neutron_source_summary: dict[str, Any] | None = None
+    activity_review_payload: dict[str, Any] | None = None
 
     if input_path is not None:
         payload = _load_json(Path(input_path))
@@ -2971,7 +3196,191 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
             rows.append(row)
         _write_dict_rows(Path(csv_output), rows)
 
+    if activity_review_payload is not None:
+        support_outputs = _write_phase6_support_artifacts(
+            output_path=output_path,
+            activity_review_payload=activity_review_payload,
+            optimization_payload=output_payload,
+            isotopes_of_interest=isotopes_of_interest,
+        )
+        output_payload["support_artifacts"] = {
+            key: str(path) for key, path in support_outputs.items()
+        }
+        output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
+
     print(f"Wrote optimization sweep bundle ({objective}) to {output_path}")
+
+
+def cmd_second_irradiation_plan(args: argparse.Namespace) -> None:
+    inventory_payload = _load_json(Path(args.inventory_file))
+    schedule_payload = _load_json(Path(args.schedule_file))
+    candidates_payload = _load_json(Path(args.candidates_file))
+
+    inventory_state = build_inventory_state_from_payload(
+        inventory_payload,
+        decay_source_id=str(
+            inventory_payload.get("decay_source_id") or DEFAULT_DECAY_SOURCE_ID
+        ),
+    )
+    candidates = parse_second_irradiation_candidates(candidates_payload)
+    plan = plan_second_irradiation(
+        inventory_state,
+        first_cooling_time_s=float(
+            schedule_payload.get("first_cooling_time_s")
+            or schedule_payload.get("cooling_time_s")
+            or 0.0
+        ),
+        second_irradiation_time_s=float(
+            schedule_payload.get("second_irradiation_time_s") or 0.0
+        ),
+        target_weights=schedule_payload.get("target_weights") or {},
+        candidates=candidates,
+    )
+
+    output_payload = serialize_second_irradiation_plan(
+        plan,
+        inventory_source=str(args.inventory_file),
+        schedule_source=str(args.schedule_file),
+        candidates_source=str(args.candidates_file),
+    )
+    output_payload["generated_at"] = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+
+    output_path = Path(args.output)
+    _ensure_parent_dir(output_path)
+    output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
+
+    selected_csv_output = (
+        getattr(args, "csv_output", None)
+        or _phase6_artifact_path(output_path, "_selected_inventory.csv")
+    )
+    _write_dict_rows(Path(selected_csv_output), output_payload["selected_inventory_rows"])
+    ranked_csv_output = _phase6_artifact_path(output_path, "_ranked_candidates.csv")
+    _write_dict_rows(Path(ranked_csv_output), output_payload["ranked_candidates"])
+    output_payload["support_artifacts"] = {
+        "selected_inventory": str(selected_csv_output),
+        "ranked_candidates": str(ranked_csv_output),
+    }
+    output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
+    print(f"Wrote second-irradiation plan bundle to {output_path}")
+
+
+def cmd_ffexp_export(args: argparse.Namespace) -> None:
+    activity_review_payload = (
+        None
+        if getattr(args, "activity_review_file", None) is None
+        else _load_json(Path(args.activity_review_file))
+    )
+    inventory_payload = (
+        None
+        if getattr(args, "inventory_review_file", None) is None
+        else _load_json(Path(args.inventory_review_file))
+    )
+    masking_payload = (
+        None
+        if getattr(args, "masking_file", None) is None
+        else _load_json(Path(args.masking_file))
+    )
+    optimization_payload = (
+        None
+        if getattr(args, "optimization_file", None) is None
+        else _load_json(Path(args.optimization_file))
+    )
+    second_irradiation_payload = (
+        None
+        if getattr(args, "second_irradiation_file", None) is None
+        else _load_json(Path(args.second_irradiation_file))
+    )
+
+    support_artifacts = None
+    if activity_review_payload is not None:
+        support_artifacts = build_phase6_support_artifacts(
+            activity_review_payload,
+            optimization_payload,
+            isotopes_of_interest=tuple(
+                str(item)
+                for item in ((optimization_payload or {}).get("isotopes_of_interest") or [])
+            ),
+        )
+
+    if inventory_payload is None and support_artifacts is not None:
+        inventory_payload = {
+            "schema": "fluxforge.inventory_time_evolution.v1",
+            "time_series_rows": support_artifacts["inventory_timeseries_rows"],
+            "activities_at_irradiation": support_artifacts["activities_at_irradiation_rows"],
+            "activities_at_count_start": support_artifacts["activities_at_count_start_rows"],
+            "activities_at_count_end": support_artifacts["activities_at_count_end_rows"],
+            "dose_endpoints": support_artifacts["dose_endpoints_rows"],
+        }
+
+    if masking_payload is None and support_artifacts is not None:
+        masking_payload = {
+            "schema": "fluxforge.masking_review.v1",
+            "line_masking_results": support_artifacts["masking_candidates_rows"],
+            "masking_isotope_ranking": support_artifacts["masking_isotope_rows"],
+            "alternate_line_recommendations": support_artifacts["alternate_line_rows"],
+        }
+
+    optimization_section = optimization_payload
+    if support_artifacts is not None:
+        optimization_section = {
+            "payload": optimization_payload,
+            "optimization_grid": support_artifacts["optimization_grid_rows"],
+            "recommended_schedules": support_artifacts["recommended_schedule_rows"],
+            "dose_endpoints": support_artifacts["dose_endpoints_rows"],
+        }
+
+    summary = _build_ffexp_summary(
+        activity_review_payload=activity_review_payload,
+        optimization_payload=optimization_payload,
+        second_irradiation_payload=second_irradiation_payload,
+    )
+    metadata = {
+        "generated_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "activity_review_file": (
+            None if getattr(args, "activity_review_file", None) is None else str(args.activity_review_file)
+        ),
+        "inventory_review_file": (
+            None if getattr(args, "inventory_review_file", None) is None else str(args.inventory_review_file)
+        ),
+        "masking_file": (
+            None if getattr(args, "masking_file", None) is None else str(args.masking_file)
+        ),
+        "optimization_file": (
+            None if getattr(args, "optimization_file", None) is None else str(args.optimization_file)
+        ),
+        "second_irradiation_file": (
+            None
+            if getattr(args, "second_irradiation_file", None) is None
+            else str(args.second_irradiation_file)
+        ),
+    }
+    plot_manifest = {
+        "paths": [
+            value
+            for value in _parse_csv_strings(getattr(args, "plot_paths", None))
+            if value
+        ]
+    }
+
+    output_path = Path(args.output)
+    _ensure_parent_dir(output_path)
+    write_ffexp_bundle(
+        output_path,
+        summary=summary,
+        metadata=metadata,
+        activities=activity_review_payload,
+        inventory=inventory_payload,
+        masking=masking_payload,
+        optimization=optimization_section,
+        second_irradiation=second_irradiation_payload,
+        plot_manifest=plot_manifest,
+        source_path=(
+            None
+            if getattr(args, "activity_review_file", None) is None
+            else Path(args.activity_review_file)
+        ),
+    )
+    print(f"Wrote ffexp benchmark bundle to {output_path}")
 
 
 def cmd_library_list(args: argparse.Namespace) -> None:
@@ -5582,6 +5991,73 @@ def build_parser() -> argparse.ArgumentParser:
     )
     batch_compare.set_defaults(func=cmd_batch_compare)
 
+    parity_check = subparsers.add_parser(
+        "parity-check",
+        help="Run algorithm/workflow parity fixtures and report pass/fail summaries",
+    )
+    parity_check.add_argument(
+        "--reference-root",
+        type=Path,
+        default=Path("tests/spectra/reference_parity"),
+        help="Root path that contains reference parity manifests and case fixtures",
+    )
+    parity_check.add_argument(
+        "--activation-root",
+        type=Path,
+        default=Path("tests/activation_inventory/fixtures"),
+        help="Root path that contains activation-inventory fixture manifests",
+    )
+    parity_check.add_argument(
+        "--scope",
+        choices=["all", "algorithm", "workflow"],
+        default="all",
+    )
+    parity_check.add_argument(
+        "--fixture-id",
+        type=str,
+        default=None,
+        help="Optional fixture_id filter to run one case",
+    )
+    parity_check.add_argument(
+        "--no-activation",
+        dest="include_activation",
+        action="store_false",
+        help="Disable activation-inventory fixtures and run only reference-parity cases",
+    )
+    parity_check.set_defaults(include_activation=True)
+    parity_check.add_argument(
+        "--output",
+        type=Path,
+        default=Path("parity_check.json"),
+    )
+    parity_check.set_defaults(func=cmd_parity_check)
+
+    gui_acceptance_check = subparsers.add_parser(
+        "gui-acceptance-check",
+        help="Validate 3.27 GUI release-checklist and probe artifact readiness",
+    )
+    gui_acceptance_check.add_argument(
+        "--checklist",
+        type=Path,
+        default=Path("docs/PHASE3_27_RELEASE_CHECKLIST.md"),
+        help="Markdown checklist path for GUI release acceptance",
+    )
+    gui_acceptance_check.add_argument(
+        "--artifact-dir",
+        action="append",
+        default=None,
+        help=(
+            "Probe artifact directory (repeatable). Defaults to phase325/326/327 "
+            "review directories."
+        ),
+    )
+    gui_acceptance_check.add_argument(
+        "--output",
+        type=Path,
+        default=Path("gui_acceptance_check.json"),
+    )
+    gui_acceptance_check.set_defaults(func=cmd_gui_acceptance_checklist)
+
     library_list = subparsers.add_parser(
         "library-list",
         help="List bundled and user-registered nuclear-data sources",
@@ -5740,6 +6216,50 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_review.add_argument("--count-end-csv-output", type=Path, default=None)
     inventory_review.add_argument("--plot-output", type=Path, default=None)
     inventory_review.set_defaults(func=cmd_inventory_review)
+
+    second_irradiation = subparsers.add_parser(
+        "second-irradiation-plan",
+        help="Rank second-irradiation candidates from an inventory seed and schedule definition",
+    )
+    second_irradiation.add_argument("--inventory-file", type=Path, required=True)
+    second_irradiation.add_argument("--schedule-file", type=Path, required=True)
+    second_irradiation.add_argument("--candidates-file", type=Path, required=True)
+    second_irradiation.add_argument(
+        "--output",
+        type=Path,
+        default=Path("second_irradiation_plan.json"),
+        help="Output JSON bundle path",
+    )
+    second_irradiation.add_argument(
+        "--csv-output",
+        type=Path,
+        default=None,
+        help="Optional CSV export of the selected post-second-irradiation inventory",
+    )
+    second_irradiation.set_defaults(func=cmd_second_irradiation_plan)
+
+    ffexp_export = subparsers.add_parser(
+        "ffexp-export",
+        help="Package activity, inventory, masking, optimization, and second-irradiation products into a benchmark .ffexp bundle",
+    )
+    ffexp_export.add_argument("--activity-review-file", type=Path, default=None)
+    ffexp_export.add_argument("--inventory-review-file", type=Path, default=None)
+    ffexp_export.add_argument("--masking-file", type=Path, default=None)
+    ffexp_export.add_argument("--optimization-file", type=Path, default=None)
+    ffexp_export.add_argument("--second-irradiation-file", type=Path, default=None)
+    ffexp_export.add_argument(
+        "--plot-paths",
+        type=str,
+        default=None,
+        help="Optional comma-separated list of plot paths to include in the plot manifest",
+    )
+    ffexp_export.add_argument(
+        "--output",
+        type=Path,
+        default=Path("benchmark_bundle.ffexp"),
+        help="Output ffexp bundle path",
+    )
+    ffexp_export.set_defaults(func=cmd_ffexp_export)
 
     isotope_priority = subparsers.add_parser(
         "isotope-priority",

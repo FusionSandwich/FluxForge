@@ -1,8 +1,13 @@
 {
   "schema": "fluxforge.activation_inventory_fixture.v1",
   "fixture_id": "minimal_decay_chain_case",
+  "parity_scope": "workflow",
   "workflow": "pure_decay_bateman",
   "source_repo": "FusionSandwich/FluxForge",
+  "source_ref": "optimization-workflows",
+  "source_paths": [
+    "tests/activation_inventory/fixtures/minimal_decay_chain_case"
+  ],
   "source_case": "bateman_smoke_parent_daughter",
   "input_files": [
     "inventory_seed.json"
@@ -17,7 +22,7 @@
     "dose_rel": 0.05
   },
   "provenance_notes": [
-    "Initial activation-inventory fixture manifest for roadmap 3N/3.21 scaffolding.",
-    "Extend with measured/source-linked cases before parity acceptance."
+    "Activation inventory decay-chain workflow fixture for 3.23 parity execution.",
+    "Expected CSVs are fixture-linked workflow outputs used for regression checks."
   ]
 }

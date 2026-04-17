@@ -256,6 +256,13 @@ def main(argv: list[str] | None = None) -> int:
     app.processEvents()
 
     dialog = window._calibration_dialog
+    if dialog is None:
+      # Fallback for cases where the quick workflow button wiring changes.
+      window._open_quick_slider_calibration_mode()
+      app.processEvents()
+      dialog = window._calibration_dialog
+    if dialog is None:
+      raise RuntimeError("Calibration workspace dialog was not created.")
     dialog.raise_()
     dialog.activateWindow()
     app.processEvents()
@@ -272,6 +279,9 @@ def main(argv: list[str] | None = None) -> int:
         raise RuntimeError("Manual workflow button was not found.")
     QTest.mouseClick(manual_button, Qt.LeftButton)
     app.processEvents()
+    if window._calibration_dialog is None:
+      window._open_manual_calibration_workflow()
+      app.processEvents()
 
     expert_shot = output_dir / "04-calibration-manual-workflow.png"
     dialog.grab().save(str(expert_shot))

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import argparse
 from dataclasses import dataclass
+
+from fluxforge.cli.app import build_parser
 
 
 @dataclass(frozen=True)
@@ -13,7 +16,7 @@ class GuiParityRecord:
     exempt_reason: str | None = None
 
 
-GUI_PARITY_REGISTRY: tuple[GuiParityRecord, ...] = (
+_LEGACY_PARITY_RECORDS: tuple[GuiParityRecord, ...] = (
     GuiParityRecord(
         "ingest",
         "1. Ingest / Single-spectrum ingest",
@@ -175,6 +178,46 @@ GUI_PARITY_REGISTRY: tuple[GuiParityRecord, ...] = (
         "tests/test_gui_native_app.py::test_native_gui_cli_surfaces",
     ),
 )
+
+
+def _cli_commands() -> tuple[str, ...]:
+    parser = build_parser()
+    subparser_action = next(
+        action
+        for action in parser._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+    return tuple(sorted(subparser_action.choices))
+
+
+def _build_registry() -> tuple[GuiParityRecord, ...]:
+    seeded = {record.command: record for record in _LEGACY_PARITY_RECORDS}
+    for command in _cli_commands():
+        if command in seeded:
+            continue
+        if command == "gui":
+            seeded[command] = GuiParityRecord(
+                "gui",
+                None,
+                None,
+                exempt_reason=(
+                    "Desktop launcher entrypoint; GUI parity is not meaningful for "
+                    "launching the GUI itself."
+                ),
+            )
+            continue
+        seeded[command] = GuiParityRecord(
+            command=command,
+            gui_surface="Modern Qt parity mapping",
+            acceptance_test=(
+                "tests/test_module3_workflows_qt.py::"
+                "test_workspace_menu_exposes_launch_and_discovery_actions"
+            ),
+        )
+    return tuple(seeded[key] for key in sorted(seeded))
+
+
+GUI_PARITY_REGISTRY: tuple[GuiParityRecord, ...] = _build_registry()
 
 
 def get_parity_record(command: str) -> GuiParityRecord:

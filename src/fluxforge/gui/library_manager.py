@@ -406,6 +406,43 @@ class DataLibraryManager:
             "custom_gamma_path": self._state.custom_gamma_path,
         }
 
+    def apply_state(
+        self,
+        state: DataLibraryState | dict[str, object],
+    ) -> DataLibraryState:
+        """Replace the current library-selection state from a serialized payload."""
+
+        if isinstance(state, DataLibraryState):
+            next_state = state
+        else:
+            next_state = DataLibraryState(
+                gamma_identification_source_id=str(
+                    state.get(
+                        "gamma_identification_source_id",
+                        self._state.gamma_identification_source_id,
+                    )
+                ),
+                calibration_source_id=str(
+                    state.get("calibration_source_id", self._state.calibration_source_id)
+                ),
+                naa_monitor_source_id=str(
+                    state.get("naa_monitor_source_id", self._state.naa_monitor_source_id)
+                ),
+                dosimetry_source_id=str(
+                    state.get("dosimetry_source_id", self._state.dosimetry_source_id)
+                ),
+                activation_catalog_source_id=str(
+                    state.get(
+                        "activation_catalog_source_id",
+                        self._state.activation_catalog_source_id,
+                    )
+                ),
+                custom_gamma_path=self._normalize_optional_text(
+                    state.get("custom_gamma_path", self._state.custom_gamma_path)
+                ),
+            )
+        return self._publish(next_state)
+
     def registered_user_gamma_sources(self) -> tuple[NuclearDataSourceRecord, ...]:
         return list_registered_user_gamma_sources()
 

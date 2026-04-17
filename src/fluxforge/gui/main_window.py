@@ -9,6 +9,7 @@ from pathlib import Path
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
 from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
+from fluxforge.gui.workflow_presets import WorkflowPresetManager
 from fluxforge.gui.analysis_workspace import (
     LoadedSpectrumRecord,
     AnalysisWorkspaceController,
@@ -51,11 +52,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QAction,
         QApplication,
         QByteArray,
+        QComboBox,
         QDockWidget,
+        QInputDialog,
         QKeySequence,
         QLabel,
         QMainWindow,
         QProgressBar,
+        QPushButton,
         QSettings,
         QStatusBar,
         QToolBar,
@@ -125,6 +129,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self,
             mode_manager: ModeManager | None = None,
             selection_bus: SelectionBus | None = None,
+            settings=None,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -132,10 +137,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.setWindowTitle("FluxForge Next")
             self.resize(1560, 980)
 
-            self.settings = QSettings(self.ORGANIZATION, self.APPLICATION)
+            self.settings = settings or QSettings(self.ORGANIZATION, self.APPLICATION)
             self.mode_manager = mode_manager or ModeManager(settings=self.settings)
             self.selection_bus = selection_bus or SelectionBus.shared()
             self.library_manager = DataLibraryManager(settings=self.settings)
+            self.workflow_presets = WorkflowPresetManager(settings=self.settings)
             self.recent_files = RecentFilesManager(self.settings)
             self.qa_monitor = QAMonitor()
             self.qa_monitor.seed_demo_history()
@@ -166,6 +172,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._build_status_bar()
             self._restore_layout()
             self._refresh_analysis_workspace_derivatives()
+            self.workflow_presets.subscribe(self._on_workflow_presets_changed)
+            self._refresh_workflow_controls()
+            self._restore_active_workflow()
 
             self.mode_manager.subscribe(self._on_mode_state_changed)
             self.selection_bus.subscribe(self._on_selection_changed)
@@ -344,6 +353,80 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             tools_menu.addAction(self._qa_history_action)
             tools_menu.addAction(self._action("Hardware Dashboard"))
 
+            workspace_menu = self.menuBar().addMenu("&Workspaces")
+            workspace_menu.addAction(
+                self._action(
+                    "Analysis Surface",
+                    enabled=True,
+                    handler=self._focus_analysis_surface_dock,
+                )
+            )
+            workspace_menu.addAction(
+                self._action(
+                    "Workspace Sidebar",
+                    enabled=True,
+                    handler=self._focus_workspace_dock,
+                )
+            )
+            workspace_menu.addAction(
+                self._action(
+                    "Tool Inspector",
+                    enabled=True,
+                    handler=self._focus_inspector_dock,
+                )
+            )
+            workspace_menu.addSeparator()
+            workspace_menu.addAction(
+                self._action(
+                    "Open QA History",
+                    enabled=True,
+                    handler=self._open_qa_history,
+                )
+            )
+            workspace_menu.addAction(
+                self._action(
+                    "Open Standards Review",
+                    enabled=True,
+                    handler=self._open_standards_review,
+                )
+            )
+            workspace_menu.addAction(
+                self._action(
+                    "Open Report Export",
+                    enabled=True,
+                    handler=self._open_report_export,
+                )
+            )
+            workspace_menu.addAction(
+                self._action(
+                    "Open Unfolding Workspace",
+                    enabled=True,
+                    handler=self._open_unfolding_workspace,
+                )
+            )
+            workspace_menu.addSeparator()
+            workspace_menu.addAction(
+                self._action(
+                    "Load Saved Workflow",
+                    enabled=True,
+                    handler=self._load_selected_workflow,
+                )
+            )
+            workspace_menu.addAction(
+                self._action(
+                    "Save Current Workflow...",
+                    enabled=True,
+                    handler=self._save_current_workflow_dialog,
+                )
+            )
+            workspace_menu.addAction(
+                self._action(
+                    "Delete Saved Workflow",
+                    enabled=True,
+                    handler=self._delete_selected_workflow,
+                )
+            )
+
             help_menu = self.menuBar().addMenu("&Help")
             help_menu.addAction(self._action("Shortcut Reference", "F1"))
             help_menu.addAction(self._action("About FluxForge Next"))
@@ -353,6 +436,26 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             toolbar.setObjectName("PrimaryToolbar")
             toolbar.setMovable(False)
             toolbar.addWidget(ModeSwitcherWidget(self.mode_manager, toolbar))
+            toolbar.addSeparator()
+            workflow_label = QLabel("Workflow", toolbar)
+            workflow_label.setObjectName("WorkflowPresetLabel")
+            toolbar.addWidget(workflow_label)
+            self.workflow_combo = QComboBox(toolbar)
+            self.workflow_combo.setObjectName("WorkflowPresetCombo")
+            self.workflow_combo.setMinimumContentsLength(24)
+            toolbar.addWidget(self.workflow_combo)
+            self.load_workflow_button = QPushButton("Load", toolbar)
+            self.load_workflow_button.setObjectName("LoadWorkflowPresetButton")
+            self.load_workflow_button.clicked.connect(self._load_selected_workflow)
+            toolbar.addWidget(self.load_workflow_button)
+            self.save_workflow_button = QPushButton("Save", toolbar)
+            self.save_workflow_button.setObjectName("SaveWorkflowPresetButton")
+            self.save_workflow_button.clicked.connect(self._save_current_workflow_dialog)
+            toolbar.addWidget(self.save_workflow_button)
+            self.delete_workflow_button = QPushButton("Delete", toolbar)
+            self.delete_workflow_button.setObjectName("DeleteWorkflowPresetButton")
+            self.delete_workflow_button.clicked.connect(self._delete_selected_workflow)
+            toolbar.addWidget(self.delete_workflow_button)
             toolbar.addSeparator()
             toolbar.addAction(self._log_scale_action)
             toolbar.addAction(self._peak_labels_action)
@@ -517,8 +620,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if state.standard:
                 label += f" · {state.standard}"
             self.mode_label.setText(label)
+            profile = state.theme_profile or "custom"
             self.progress.setFormat(f"{state.mode.value.title()} shell ready")
-            self.renderer_label.setText("Renderer: PyQtGraph-first")
+            self.renderer_label.setText(
+                f"Renderer: PyQtGraph-first | Theme {state.theme} ({profile})"
+            )
             if hasattr(self, "_pu_isotopics_action"):
                 self._pu_isotopics_action.setEnabled(state.mode is not GUIMode.SIMPLE)
 
@@ -875,6 +981,359 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _open_dashboard_tab(self) -> None:
             if hasattr(self, "central_tabs"):
                 self.central_tabs.setCurrentIndex(1)
+
+        def _focus_workspace_dock(self) -> None:
+            self.left_dock.show()
+            self.left_dock.raise_()
+
+        def _focus_analysis_surface_dock(self) -> None:
+            self.bottom_dock.show()
+            self.bottom_dock.raise_()
+
+        def _focus_inspector_dock(self) -> None:
+            self.right_dock.show()
+            self.right_dock.raise_()
+
+        def _on_workflow_presets_changed(self, _presets, _active_name) -> None:
+            self._refresh_workflow_controls()
+
+        def _refresh_workflow_controls(self) -> None:
+            if not hasattr(self, "workflow_combo"):
+                return
+            active_name = self.workflow_presets.active_workflow_name()
+            self.workflow_combo.blockSignals(True)
+            self.workflow_combo.clear()
+            for preset in self.workflow_presets.available_workflows():
+                suffix = " [built-in]" if preset.built_in else ""
+                label = f"{preset.name}{suffix}"
+                self.workflow_combo.addItem(label, preset.name)
+                index = self.workflow_combo.count() - 1
+                self.workflow_combo.setItemData(index, preset.description, Qt.ToolTipRole)
+            if active_name:
+                active_index = self.workflow_combo.findData(active_name)
+                if active_index >= 0:
+                    self.workflow_combo.setCurrentIndex(active_index)
+            elif self.workflow_combo.count() > 0:
+                self.workflow_combo.setCurrentIndex(0)
+            self.workflow_combo.blockSignals(False)
+            selected_name = self._selected_workflow_name()
+            selected = (
+                self.workflow_presets.get_workflow(selected_name)
+                if selected_name is not None
+                else None
+            )
+            can_delete = bool(selected is not None and not selected.built_in)
+            self.delete_workflow_button.setEnabled(can_delete)
+            self.load_workflow_button.setEnabled(self.workflow_combo.count() > 0)
+
+        def _selected_workflow_name(self) -> str | None:
+            if not hasattr(self, "workflow_combo"):
+                return None
+            value = self.workflow_combo.currentData()
+            text = str(value or "").strip()
+            return text or None
+
+        def _snapshot_current_workflow(self) -> dict[str, object]:
+            state = self.analysis_workspace.state
+            loaded_spectra = []
+            seen_paths: set[str] = set()
+            for record in state.loaded_spectra:
+                source_path = str(record.source_path or "").strip()
+                if not source_path or source_path in seen_paths:
+                    continue
+                seen_paths.add(source_path)
+                loaded_spectra.append(
+                    {
+                        "source_path": source_path,
+                        "label": record.label,
+                    }
+                )
+            slot_assignments = {
+                slot.key: str(slot.source_path)
+                for slot in state.spectra
+                if slot.source_path
+            }
+            workspace_payload = {
+                "active_spectrum_key": state.active_spectrum_key,
+                "peak_search_method": state.peak_search_method,
+                "bayesian_source_id": state.bayesian_source_id,
+                "ml_source_id": state.ml_source_id,
+                "roi_background_method": state.roi_background_method,
+                "background_mode": state.background_mode,
+                "background_scale": float(state.background_scale),
+                "background_visible": bool(state.background_visible),
+                "pinned_nuclides": list(state.pinned_nuclides),
+                "loaded_spectra": loaded_spectra,
+                "slot_assignments": slot_assignments,
+            }
+            payload = {
+                "version": 1,
+                "mode_state": self.mode_manager.describe(),
+                "library_state": self.library_manager.describe(),
+                "view_state": {
+                    "log_scale": bool(self._log_scale_action.isChecked()),
+                    "peak_labels": bool(self._peak_labels_action.isChecked()),
+                },
+                "central_state": (
+                    self.central_tabs.workflow_state()
+                    if hasattr(self.central_tabs, "workflow_state")
+                    else {}
+                ),
+                "sidebar_state": (
+                    self.left_dock.widget().workflow_state()
+                    if hasattr(self.left_dock.widget(), "workflow_state")
+                    else {}
+                ),
+                "bottom_state": (
+                    self.bottom_dock.widget().workflow_state()
+                    if hasattr(self.bottom_dock.widget(), "workflow_state")
+                    else {}
+                ),
+                "workspace_state": workspace_payload,
+            }
+            return payload
+
+        def _save_current_workflow_dialog(self) -> None:
+            current_name = self.workflow_presets.active_workflow_name() or "custom-workflow"
+            name, accepted = QInputDialog.getText(
+                self,
+                "Save Workflow",
+                "Workflow name:",
+                text=current_name,
+            )
+            if not accepted:
+                return
+            workflow_name = name.strip()
+            if not workflow_name:
+                self.statusBar().showMessage("Workflow name cannot be empty.", 4000)
+                return
+            try:
+                self.workflow_presets.save_workflow(
+                    workflow_name,
+                    self._snapshot_current_workflow(),
+                    description=f"Saved from the modern Qt shell at {datetime.now().isoformat(timespec='minutes')}",
+                )
+            except Exception as exc:
+                self.statusBar().showMessage(str(exc), 6000)
+                return
+            self._refresh_workflow_controls()
+            self.statusBar().showMessage(
+                f"Saved workflow preset: {workflow_name}",
+                5000,
+            )
+
+        def _load_selected_workflow(self) -> None:
+            workflow_name = self._selected_workflow_name()
+            if not workflow_name:
+                self.statusBar().showMessage("Select a workflow preset first.", 4000)
+                return
+            preset = self.workflow_presets.get_workflow(workflow_name)
+            if preset is None:
+                self.statusBar().showMessage(
+                    f"Unknown workflow preset: {workflow_name}",
+                    5000,
+                )
+                return
+            self._apply_workflow_payload(preset.payload)
+            self.workflow_presets.set_active_workflow(preset.name)
+            self._refresh_workflow_controls()
+            self.statusBar().showMessage(
+                f"Loaded workflow preset: {preset.name}",
+                5000,
+            )
+
+        def _delete_selected_workflow(self) -> None:
+            workflow_name = self._selected_workflow_name()
+            if not workflow_name:
+                self.statusBar().showMessage("Select a workflow preset first.", 4000)
+                return
+            preset = self.workflow_presets.get_workflow(workflow_name)
+            if preset is None:
+                self.statusBar().showMessage(
+                    f"Unknown workflow preset: {workflow_name}",
+                    5000,
+                )
+                return
+            if preset.built_in:
+                self.statusBar().showMessage(
+                    "Built-in workflow presets cannot be deleted.",
+                    5000,
+                )
+                return
+            self.workflow_presets.delete_workflow(workflow_name)
+            self._refresh_workflow_controls()
+            self.statusBar().showMessage(
+                f"Deleted workflow preset: {workflow_name}",
+                5000,
+            )
+
+        def _restore_active_workflow(self) -> None:
+            preset = self.workflow_presets.active_workflow()
+            if preset is None:
+                return
+            self._apply_workflow_payload(preset.payload)
+            self.statusBar().showMessage(
+                f"Restored workflow preset: {preset.name}",
+                5000,
+            )
+
+        def _reset_analysis_workspace(self) -> None:
+            self.analysis_workspace.set_state(self._build_initial_workspace_state())
+
+        def _restore_loaded_spectra_from_payload(
+            self,
+            payload: dict[str, object],
+        ) -> list[str]:
+            loaded_entries = payload.get("loaded_spectra")
+            if not isinstance(loaded_entries, list) or not loaded_entries:
+                return []
+
+            self._reset_analysis_workspace()
+            loaded_key_by_path: dict[str, str] = {}
+            missing_paths: list[str] = []
+            for entry in loaded_entries:
+                if not isinstance(entry, dict):
+                    continue
+                source_path = str(entry.get("source_path") or "").strip()
+                if not source_path:
+                    continue
+                path = Path(source_path)
+                if not path.exists():
+                    missing_paths.append(source_path)
+                    continue
+                spectrum = read_spectrum_any(path)
+                loaded_key = self.analysis_workspace.register_loaded_spectrum(
+                    spectrum,
+                    label=str(entry.get("label") or path.name),
+                    source_path=str(path),
+                )
+                loaded_key_by_path[str(path)] = loaded_key
+
+            slot_assignments = payload.get("slot_assignments")
+            if isinstance(slot_assignments, dict):
+                for slot_key, source_path in slot_assignments.items():
+                    resolved_path = str(source_path or "").strip()
+                    loaded_key = loaded_key_by_path.get(resolved_path)
+                    if loaded_key:
+                        self.analysis_workspace.assign_loaded_spectrum_to_slot(
+                            loaded_key,
+                            str(slot_key),
+                        )
+
+            if loaded_key_by_path and not slot_assignments:
+                first_key = next(iter(loaded_key_by_path.values()))
+                self.analysis_workspace.assign_loaded_spectrum_to_slot(
+                    first_key,
+                    "foreground",
+                )
+            return missing_paths
+
+        def _apply_workflow_payload(self, payload: dict[str, object]) -> None:
+            mode_payload, library_payload = self.workflow_presets.extract_mode_and_library_state(
+                payload
+            )
+            if mode_payload:
+                self.mode_manager.apply_state(mode_payload)
+            if library_payload:
+                self.library_manager.apply_state(library_payload)
+
+            workspace_payload = payload.get("workspace_state")
+            missing_paths: list[str] = []
+            if isinstance(workspace_payload, dict):
+                missing_paths = self._restore_loaded_spectra_from_payload(workspace_payload)
+                config_payload = {
+                    key: workspace_payload.get(key)
+                    for key in (
+                        "peak_search_method",
+                        "bayesian_source_id",
+                        "ml_source_id",
+                        "roi_background_method",
+                        "background_mode",
+                        "background_scale",
+                        "background_visible",
+                    )
+                }
+                if config_payload.get("peak_search_method") is not None:
+                    self.analysis_workspace.set_peak_search_method(
+                        str(config_payload["peak_search_method"])
+                    )
+                if config_payload.get("bayesian_source_id") is not None:
+                    self.analysis_workspace.set_bayesian_source_id(
+                        str(config_payload["bayesian_source_id"])
+                    )
+                if config_payload.get("ml_source_id") is not None:
+                    self.analysis_workspace.set_ml_source_id(
+                        str(config_payload["ml_source_id"])
+                    )
+                if config_payload.get("roi_background_method") is not None:
+                    self.analysis_workspace.set_roi_background_method(
+                        str(config_payload["roi_background_method"])
+                    )
+                self.analysis_workspace.set_background_config(
+                    mode=(
+                        str(config_payload["background_mode"])
+                        if config_payload.get("background_mode") is not None
+                        else None
+                    ),
+                    scale=(
+                        float(config_payload["background_scale"])
+                        if config_payload.get("background_scale") is not None
+                        else None
+                    ),
+                    visible=(
+                        bool(config_payload["background_visible"])
+                        if config_payload.get("background_visible") is not None
+                        else None
+                    ),
+                )
+                pinned = workspace_payload.get("pinned_nuclides")
+                if isinstance(pinned, list):
+                    self.analysis_workspace.set_pinned_nuclides(
+                        [str(item) for item in pinned]
+                    )
+                active_spectrum_key = workspace_payload.get("active_spectrum_key")
+                if active_spectrum_key:
+                    self.analysis_workspace.select_spectrum(str(active_spectrum_key))
+
+            view_payload = payload.get("view_state")
+            if isinstance(view_payload, dict):
+                if "log_scale" in view_payload:
+                    self._log_scale_action.setChecked(bool(view_payload["log_scale"]))
+                    self._toggle_log_scale(bool(view_payload["log_scale"]))
+                if "peak_labels" in view_payload:
+                    self._peak_labels_action.setChecked(bool(view_payload["peak_labels"]))
+                    self._toggle_peak_labels(bool(view_payload["peak_labels"]))
+
+            central_payload = payload.get("central_state")
+            if isinstance(central_payload, dict) and hasattr(
+                self.central_tabs,
+                "apply_workflow_state",
+            ):
+                self.central_tabs.apply_workflow_state(central_payload)
+
+            sidebar_payload = payload.get("sidebar_state")
+            sidebar_widget = self.left_dock.widget()
+            if isinstance(sidebar_payload, dict) and hasattr(
+                sidebar_widget,
+                "apply_workflow_state",
+            ):
+                sidebar_widget.apply_workflow_state(sidebar_payload)
+
+            bottom_payload = payload.get("bottom_state")
+            bottom_widget = self.bottom_dock.widget()
+            if isinstance(bottom_payload, dict) and hasattr(
+                bottom_widget,
+                "apply_workflow_state",
+            ):
+                bottom_widget.apply_workflow_state(bottom_payload)
+
+            self._refresh_analysis_workspace_derivatives()
+            if missing_paths:
+                self.statusBar().showMessage(
+                    "Workflow restored with missing spectrum files: "
+                    + ", ".join(Path(path).name for path in missing_paths),
+                    8000,
+                )
 
         def _open_pu_isotopics_wizard(self) -> None:
             if self.mode_manager.state.mode is GUIMode.SIMPLE:

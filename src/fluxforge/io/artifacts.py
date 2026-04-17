@@ -957,3 +957,82 @@ def write_report_bundle(
 
 def read_report_bundle(path: Path) -> Dict[str, Any]:
     return read_artifact(path)
+
+
+def make_ffexp_bundle(
+    *,
+    summary: Dict[str, Any],
+    metadata: Optional[Dict[str, Any]] = None,
+    activities: Optional[Dict[str, Any]] = None,
+    inventory: Optional[Dict[str, Any]] = None,
+    masking: Optional[Dict[str, Any]] = None,
+    optimization: Optional[Dict[str, Any]] = None,
+    second_irradiation: Optional[Dict[str, Any]] = None,
+    plot_manifest: Optional[Dict[str, Any]] = None,
+    source_path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    units = {"summary": "mixed", "metadata": "mixed"}
+    definitions = {
+        "summary": "aggregate readiness and workflow summary for benchmark export",
+        "metadata": "sample, detector, method, and provenance metadata included in the ffexp bundle",
+    }
+    hashes = {"source": hash_file(source_path)} if source_path else None
+    provenance = build_provenance(
+        units=units,
+        normalization={"bundle": "experimental"},
+        definitions=definitions,
+        source_hashes=hashes,
+    )
+    payload = {
+        "schema": _schema_id("ffexp_bundle"),
+        "format": ".ffexp",
+        "summary": summary,
+        "provenance": provenance,
+    }
+    if metadata is not None:
+        payload["metadata"] = metadata
+    if activities is not None:
+        payload["activities"] = activities
+    if inventory is not None:
+        payload["inventory"] = inventory
+    if masking is not None:
+        payload["masking"] = masking
+    if optimization is not None:
+        payload["optimization"] = optimization
+    if second_irradiation is not None:
+        payload["second_irradiation"] = second_irradiation
+    if plot_manifest is not None:
+        payload["plot_manifest"] = plot_manifest
+    return payload
+
+
+def write_ffexp_bundle(
+    path: Path,
+    *,
+    summary: Dict[str, Any],
+    metadata: Optional[Dict[str, Any]] = None,
+    activities: Optional[Dict[str, Any]] = None,
+    inventory: Optional[Dict[str, Any]] = None,
+    masking: Optional[Dict[str, Any]] = None,
+    optimization: Optional[Dict[str, Any]] = None,
+    second_irradiation: Optional[Dict[str, Any]] = None,
+    plot_manifest: Optional[Dict[str, Any]] = None,
+    source_path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    payload = make_ffexp_bundle(
+        summary=summary,
+        metadata=metadata,
+        activities=activities,
+        inventory=inventory,
+        masking=masking,
+        optimization=optimization,
+        second_irradiation=second_irradiation,
+        plot_manifest=plot_manifest,
+        source_path=source_path,
+    )
+    write_artifact(path, payload)
+    return payload
+
+
+def read_ffexp_bundle(path: Path) -> Dict[str, Any]:
+    return read_artifact(path)

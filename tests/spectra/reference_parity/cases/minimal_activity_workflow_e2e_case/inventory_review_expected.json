@@ -1,0 +1,9 @@
+{
+  "schema": "fluxforge.inventory_time_evolution.v1",
+  "sample_id": "minimal_activity_e2e_case",
+  "time_point_count": 4,
+  "nuclides": [
+    "Co-60",
+    "Ni-60"
+  ]
+}

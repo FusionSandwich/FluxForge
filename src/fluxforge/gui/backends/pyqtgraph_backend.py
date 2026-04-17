@@ -61,6 +61,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_bus = selection_bus
             self.buffer = HierarchicalSpectrumBuffer.from_counts(())
             self._current_traces: tuple[SpectrumTrace, ...] = ()
+            self._peak_candidates_by_id: dict[str, PeakCandidate] = {}
             self._annotation_specs: tuple[ReferenceLine, ...] = ()
             self._reference_lines: list[object] = []
             self._annotation_label_items: list[object] = []
@@ -111,6 +112,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 brush=pg.mkBrush("#f59e0b"),
                 pen=pg.mkPen(color="#f59e0b", width=1.5),
             )
+            self._peak_scatter.sigClicked.connect(self._peak_scatter_clicked)
             self.plot_item.addItem(self._peak_scatter)
             shell.addWidget(self.plot, 1)
 
@@ -272,8 +274,12 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             if self._peak_scatter is None:
                 return
             if not peaks:
+                self._peak_candidates_by_id = {}
                 self._peak_scatter.setData([], [])
                 return
+            self._peak_candidates_by_id = {
+                str(peak.peak_id): peak for peak in peaks if peak.peak_id
+            }
             x_values = [float(peak.channel) for peak in peaks]
             y_values = [
                 self._display_value(
@@ -296,6 +302,24 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 y=y_values,
                 brush=brushes,
                 data=[peak.peak_id for peak in peaks],
+            )
+
+        def _peak_scatter_clicked(self, _scatter, points) -> None:
+            if self.selection_bus is None or not points:
+                return
+            peak_id = points[0].data()
+            if peak_id is None:
+                return
+            peak = self._peak_candidates_by_id.get(str(peak_id))
+            if peak is None:
+                return
+            self.selection_bus.publish(
+                SelectionState(
+                    peak_energy_keV=float(peak.energy_keV),
+                    roi_bounds_keV=peak.roi_bounds_keV,
+                    nuclide=peak.nuclide,
+                    reference_lines_keV=peak.reference_lines_keV,
+                )
             )
 
         def set_peak_residuals(self, peaks: Sequence[PeakCandidate], *, visible: bool) -> None:

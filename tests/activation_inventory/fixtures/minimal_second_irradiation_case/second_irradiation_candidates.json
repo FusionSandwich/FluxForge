@@ -1,0 +1,22 @@
+{
+  "candidates": [
+    {
+      "label": "boost-low",
+      "flux_scale": 0.75,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 1200.0
+    },
+    {
+      "label": "boost-medium",
+      "flux_scale": 1.0,
+      "duration_factor": 1.1,
+      "second_cooling_time_s": 900.0
+    },
+    {
+      "label": "boost-high",
+      "flux_scale": 1.35,
+      "duration_factor": 1.2,
+      "second_cooling_time_s": 600.0
+    }
+  ]
+}

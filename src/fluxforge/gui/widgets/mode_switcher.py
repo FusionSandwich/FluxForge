@@ -11,7 +11,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QButtonGroup,
         QComboBox,
         QHBoxLayout,
+        QInputDialog,
         QLabel,
+        QPushButton,
         QToolButton,
         QWidget,
     )
@@ -74,8 +76,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.theme_combo = QComboBox(self)
             self.theme_combo.setObjectName("ThemeCombo")
             self.theme_combo.addItems(list(available_themes()))
-            self.theme_combo.currentTextChanged.connect(self.mode_manager.set_theme)
+            self.theme_combo.currentTextChanged.connect(self._theme_changed)
             layout.addWidget(self.theme_combo)
+
+            self.theme_profile_label = QLabel("Profile", self)
+            self.theme_profile_label.setObjectName("ModeMetaLabel")
+            layout.addWidget(self.theme_profile_label)
+
+            self.theme_profile_combo = QComboBox(self)
+            self.theme_profile_combo.setObjectName("ThemeProfileCombo")
+            self.theme_profile_combo.currentTextChanged.connect(self._profile_changed)
+            layout.addWidget(self.theme_profile_combo)
+
+            self.save_theme_profile_button = QPushButton("Save Profile", self)
+            self.save_theme_profile_button.setObjectName("SaveThemeProfileButton")
+            self.save_theme_profile_button.clicked.connect(self._save_profile)
+            layout.addWidget(self.save_theme_profile_button)
 
             self.mode_manager.subscribe(self._sync_from_state)
             self._sync_from_state(self.mode_manager.state)
@@ -89,6 +105,41 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _standard_changed(self, standard: str) -> None:
             if self.mode_manager.state.mode is GUIMode.STANDARDS and standard:
                 self.mode_manager.set_standard(standard)
+
+        def _theme_changed(self, theme: str) -> None:
+            if theme:
+                self.mode_manager.set_theme(theme)
+
+        def _profile_changed(self, profile_name: str) -> None:
+            profile = profile_name.strip()
+            if not profile:
+                return
+            resolved_theme = self.mode_manager.theme_for_profile(profile)
+            if resolved_theme is None:
+                return
+            if (
+                self.mode_manager.state.theme_profile == profile
+                and self.mode_manager.state.theme == resolved_theme
+            ):
+                return
+            self.mode_manager.set_theme_profile(profile)
+
+        def _save_profile(self) -> None:
+            current = self.mode_manager.state
+            default_name = current.theme_profile or f"{current.theme}-profile"
+            name, accepted = QInputDialog.getText(
+                self,
+                "Save Theme Profile",
+                "Profile name:",
+                text=default_name,
+            )
+            if not accepted:
+                return
+            profile_name = name.strip()
+            if not profile_name:
+                return
+            self.mode_manager.save_theme_profile(profile_name, theme=current.theme)
+            self.mode_manager.set_theme_profile(profile_name)
 
         def _sync_from_state(self, state) -> None:
             for mode, button in self.mode_buttons.items():
@@ -111,6 +162,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.theme_combo.blockSignals(True)
                 self.theme_combo.setCurrentIndex(index)
                 self.theme_combo.blockSignals(False)
+
+            self.theme_profile_combo.blockSignals(True)
+            self.theme_profile_combo.clear()
+            for profile_name in self.mode_manager.available_theme_profiles():
+                profile_theme = self.mode_manager.theme_for_profile(profile_name)
+                self.theme_profile_combo.addItem(f"{profile_name} ({profile_theme})", profile_name)
+            if state.theme_profile:
+                profile_index = self.theme_profile_combo.findData(state.theme_profile)
+                if profile_index >= 0:
+                    self.theme_profile_combo.setCurrentIndex(profile_index)
+            elif self.theme_profile_combo.count() > 0:
+                self.theme_profile_combo.setCurrentIndex(-1)
+            self.theme_profile_combo.blockSignals(False)
 
 else:
 

@@ -19,6 +19,16 @@ from fluxforge.workflows.spectrum_unfolding import (
     quick_unfold,
     build_flux_wire_response_matrix,
 )
+from fluxforge.workflows.irradiation_optimization import (
+    SecondIrradiationCandidate,
+    SecondIrradiationPlan,
+    SecondIrradiationScore,
+    build_phase6_support_artifacts,
+    build_second_irradiation_candidates,
+    parse_second_irradiation_candidates,
+    plan_second_irradiation,
+    serialize_second_irradiation_plan,
+)
 
 __all__ = [
     # Batch processing
@@ -37,4 +47,13 @@ __all__ = [
     "SpectrumUnfolder",
     "quick_unfold",
     "build_flux_wire_response_matrix",
+    # Phase 6 irradiation optimization
+    "SecondIrradiationCandidate",
+    "SecondIrradiationPlan",
+    "SecondIrradiationScore",
+    "build_phase6_support_artifacts",
+    "build_second_irradiation_candidates",
+    "parse_second_irradiation_candidates",
+    "plan_second_irradiation",
+    "serialize_second_irradiation_plan",
 ]

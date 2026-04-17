@@ -1,0 +1,36 @@
+{
+  "sample_id": "minimal_activity_e2e_case",
+  "source_id": "fluxforge_bundled_gamma",
+  "live_time_s": 1200.0,
+  "cooling_time_s": 5400.0,
+  "energy_tolerance_keV": 2.0,
+  "inventory_relative_times_s": [0.0, 3600.0, 7200.0, 21600.0],
+  "inventory_time_origin": "eoi",
+  "efficiency_curve": {
+    "model_type": "polynomial",
+    "coefficients": [-7.0, 1.2, -0.17],
+    "energy_range": [50.0, 2500.0]
+  },
+  "peaks": [
+    {
+      "peak_id": "peak-co1173",
+      "channel": 1173,
+      "energy_keV": 1173.228,
+      "left_keV": 1168.0,
+      "right_keV": 1178.0,
+      "net_counts": 3100.0,
+      "significance": 9.0,
+      "nuclide": "Co-60"
+    },
+    {
+      "peak_id": "peak-co1332",
+      "channel": 1332,
+      "energy_keV": 1332.492,
+      "left_keV": 1328.0,
+      "right_keV": 1337.0,
+      "net_counts": 2800.0,
+      "significance": 8.6,
+      "nuclide": "Co-60"
+    }
+  ]
+}

@@ -130,6 +130,7 @@ from fluxforge.io.flux_wire import (
 
 from fluxforge.io.artifacts import (
     read_artifact,
+    read_ffexp_bundle,
     write_artifact,
     read_line_activities,
     read_peak_report,
@@ -142,6 +143,7 @@ from fluxforge.io.artifacts import (
     write_line_activities,
     write_peak_report,
     write_reaction_rates,
+    write_ffexp_bundle,
     write_report_bundle,
     write_response_bundle,
     write_spectrum_file,
@@ -175,6 +177,7 @@ __all__ = [
     "read_hpge_report",
     # Artifact I/O
     "read_artifact",
+    "read_ffexp_bundle",
     "write_artifact",
     "read_line_activities",
     "read_peak_report",
@@ -187,6 +190,7 @@ __all__ = [
     "write_line_activities",
     "write_peak_report",
     "write_reaction_rates",
+    "write_ffexp_bundle",
     "write_report_bundle",
     "write_response_bundle",
     "write_spectrum_file",

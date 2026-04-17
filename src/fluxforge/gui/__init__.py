@@ -30,6 +30,11 @@ from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_pa
 from fluxforge.gui.nuclide_search import NuclideSearchController
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
+from fluxforge.gui.workflow_presets import (
+    DEFAULT_WORKFLOW_PRESETS,
+    WorkflowPreset,
+    WorkflowPresetManager,
+)
 from fluxforge.gui.spectrum_canvas import (
     HierarchicalSpectrumBuffer,
     HierarchicalSpectrumLevel,
@@ -58,6 +63,7 @@ __all__ = [
     "StandardsReviewDialog",
     "DataLibraryManager",
     "DataLibraryState",
+    "DEFAULT_WORKFLOW_PRESETS",
     "PYQTGRAPH_AVAILABLE",
     "QT_AVAILABLE",
     "PyQtGraphSpectrumCanvas",
@@ -68,6 +74,8 @@ __all__ = [
     "SelectionState",
     "SpectrumCanvas",
     "SpectrumTrace",
+    "WorkflowPreset",
+    "WorkflowPresetManager",
     "UnfoldingWorkspaceDialog",
     "VISPY_AVAILABLE",
     "VispySpectrumCanvas",

@@ -226,3 +226,46 @@ def test_peak_table_ml_button_updates_summary_and_sidebar_shows_qa_locks():
     assert "ASTM Status" in sidebar.qa_note.toPlainText()
     assert "energy_fit_order" in sidebar.qa_note.toPlainText()
     window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt module-3 workspace dependencies are unavailable.",
+)
+def test_workspace_menu_exposes_launch_and_discovery_actions():
+    _qapp()
+    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window.show()
+    _qapp().processEvents()
+
+    menu_titles = {action.text().replace("&", "") for action in window.menuBar().actions()}
+    assert "Workspaces" in menu_titles
+
+    window._focus_workspace_dock()
+    window._focus_analysis_surface_dock()
+    window._focus_inspector_dock()
+    _qapp().processEvents()
+
+    assert window.left_dock.isVisible() is True
+    assert window.bottom_dock.isVisible() is True
+    assert window.right_dock.isVisible() is True
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt module-3 workspace dependencies are unavailable.",
+)
+def test_theme_profile_updates_renderer_status_label():
+    _qapp()
+    manager = ModeManager()
+    manager.save_theme_profile("qa-dark", theme="dark")
+    window = FluxForgeMainWindow(mode_manager=manager, selection_bus=SelectionBus())
+
+    manager.set_theme_profile("qa-dark")
+    _qapp().processEvents()
+
+    status = window.renderer_label.text().lower()
+    assert "theme dark" in status
+    assert "qa-dark" in status
+    window.close()

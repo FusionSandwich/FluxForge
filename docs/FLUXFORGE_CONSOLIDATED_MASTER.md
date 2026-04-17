@@ -1,7 +1,7 @@
 # FLUXFORGE Consolidated Master
 
 **Status:** active feature master  
-**Last Updated:** 2026-04-06  
+**Last Updated:** 2026-04-17  
 **Purpose:** consolidated source of truth for product scope, feature commitments, and
 roadmap-level capability planning.
 
@@ -59,6 +59,10 @@ The repository is currently implemented through:
 - Phase 2 core analysis in the redesigned Qt path
 - Phase 3.1 through 3.17, including unfolding, standards, reporting, batch, ROI parity,
   and calibration/efficiency parity
+- the first landed Phase 6 irradiation-optimization slice, including deterministic
+  masking/inventory/optimization/second-irradiation workflows, `.ffexp` bundle export,
+  and saved GUI workflow/workspace presets for `quantumgold-workflow` and
+  `astm-ldrd-irradiation`
 - User-directed predictive items `4P.1` through `4P.7`
 
 Live acquisition, HAL transport, and true MCA device surfaces remain deferred until
@@ -76,8 +80,8 @@ the offline-parity module closes.
 | 3.23 | Workflow-level parity tests | Planned | End-to-end parity suites for source families, tutorial/example datasets, NAA/activation inventory workflows, second-irradiation planners, and benchmark export bundles |
 | 3.24 | Direct-manipulation canvas parity | Planned | Right-click peak actions, ROI/background drag handles, plot-driven edits, explicit foreground/background/secondary actions, overlap Gaussian insertion, and peak-label toggles |
 | 3.25 | New parity workspaces in the Qt shell | Planned | ROI Statistics, Detection Limit, Relative Activity, Dose/Shielding, File Query/Batch Compare, Reference/Library Workbench, detector-response tools, and k0 characterization/report views |
-| 3.26 | GUI polish and theme parity | Planned | Shipped dark mode, saved theme profiles, stronger graph-table synchronization, clearer launch points, and role-aware overlay polish |
-| 3.27 | GUI verification and release acceptance | Planned | Qt workflow tests, native probes, artifact-gallery review states, and release-blocking checklists for new parity surfaces |
+| 3.26 | GUI polish and theme parity | Implemented (repo) | Shipped dark mode, saved theme profiles, stronger graph-table synchronization, clearer launch points, and role-aware overlay polish |
+| 3.27 | GUI verification and release acceptance | Implemented (repo) | Qt workflow tests, native probes, artifact-gallery review states, and release-blocking checklists for new parity surfaces |
 | 4.1 | HAL drivers | Deferred | First real MCA hardware drivers after offline-parity closure |
 | 4.2 | Device discovery surfaces | Deferred | Device list, thumbnails, and discovery dialogs after HAL transport exists |
 | 4.3 | Live Digital Twin dashboard | Deferred | Telemetry-driven dashboard once live acquisition is present |
@@ -148,6 +152,11 @@ they span multiple roadmap steps.
 - Adopt the additive `3N` workstream from the activation / FISPACT-style supplement as a preserved cross-cutting scope across `3.18` through `3.23`.
 - Preserve the planned `Inventory / Time Evolution`, masking/interference, optimization, and long-term dose-study surfaces together with their machine-readable outputs.
 - Add a benchmark experimental bundle export contract centered on `.ffexp` packaging for downstream comparison-tool ingestion.
+- Repo status note: the first deterministic landing now exists in
+  `src/fluxforge/workflows/irradiation_optimization.py`,
+  `src/fluxforge/io/artifacts.py`, and `src/fluxforge/gui/panels/phase6.py`,
+  with workflow-preset persistence in `src/fluxforge/gui/workflow_presets.py`
+  and built-in `quantumgold-workflow` / `astm-ldrd-irradiation` presets.
 
 ### 6.7 De-Hardcoding and Configuration Cleanup
 

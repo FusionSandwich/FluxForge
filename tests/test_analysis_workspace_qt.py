@@ -35,6 +35,13 @@ from fluxforge.gui.analysis_workspace import (  # noqa: E402
 )
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QApplication  # noqa: E402
 from fluxforge.gui.selection_bus import SelectionBus  # noqa: E402
+from tests._phase6_real_data import (  # noqa: E402
+    DEFAULT_PHASE6_SAMPLE_ID,
+    load_phase6_real_activity_results,
+    load_phase6_real_activity_review,
+    load_phase6_real_optimization_grids,
+    load_phase6_real_target_weights_text,
+)
 
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # noqa: E402
     from PySide6.QtCore import Qt  # noqa: E402
@@ -89,6 +96,13 @@ def _make_efficiency_points():
             count_uncertainty=101.0,
         ),
     )
+
+def _seed_phase6_real_workspace(window: FluxForgeMainWindow) -> dict[str, str]:
+    review = load_phase6_real_activity_review(DEFAULT_PHASE6_SAMPLE_ID)
+    results = load_phase6_real_activity_results(DEFAULT_PHASE6_SAMPLE_ID)
+    window.analysis_workspace.set_activity_results(results)
+    window.bottom_dock.widget().activity_results_panel._last_activity_review = review  # noqa: SLF001
+    return load_phase6_real_optimization_grids(DEFAULT_PHASE6_SAMPLE_ID)
 
 
 def test_analysis_core_helpers_cover_workspace_surfaces():
@@ -272,6 +286,38 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
     window.undo_stack.redo()
     _qapp().processEvents()
     assert "qa-check" in peak_panel.table.item(co60_row, 5).text()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_peak_table_follows_selection_bus_peak_energy_updates():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    peaks = detect_peak_candidates(build_demo_spectrum())
+    window.analysis_workspace.replace_peaks(peaks)
+    _qapp().processEvents()
+
+    target_row = min(
+        range(len(peaks)),
+        key=lambda idx: abs(float(peaks[idx].energy_keV) - 661.657),
+    )
+    window.selection_bus.publish_peak(float(peaks[target_row].energy_keV))
+    _qapp().processEvents()
+
+    peak_panel = window.bottom_dock.widget().peak_table_panel
+    assert peak_panel.table.currentRow() == target_row
+    selected = window.analysis_workspace.selected_peak()
+    assert selected is not None
+    assert selected.peak_id == peaks[target_row].peak_id
     window.close()
 
 
@@ -601,6 +647,136 @@ def test_inventory_timeline_panel_stbdmr_preview_requires_guard_and_reports_diag
     assert score == pytest.approx(score)
     assert "STBD-MR preview score" in panel.stbdmr_summary.text()
     assert "graph density" in panel.stbdmr_summary.text()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_masking_review_panel_runs_and_exports_tables(tmp_path):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
+    _seed_phase6_real_workspace(window)
+    window.show()
+    _qapp().processEvents()
+
+    panel = window.bottom_dock.widget().masking_review_panel
+    panel.energy_window_spin.setValue(10.0)
+    QTest.mouseClick(panel.refresh_button, Qt.LeftButton)
+    _qapp().processEvents()
+    result = panel._last_rows
+
+    assert result is not None
+    assert panel.line_table.rowCount() > 0
+    assert panel.isotope_table.rowCount() > 0
+    assert "alternate-line" in panel.summary.text().lower() or "recommendation" in panel.summary.text().lower()
+
+    lines_csv = tmp_path / "masking_lines.csv"
+    isotopes_csv = tmp_path / "masking_isotopes.csv"
+    panel.export_lines_csv(lines_csv)
+    panel.export_isotopes_csv(isotopes_csv)
+    assert lines_csv.exists()
+    assert isotopes_csv.exists()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_optimization_workspace_panel_runs_and_exports_phase6_bundle(tmp_path):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
+    grids = _seed_phase6_real_workspace(window)
+    window.show()
+    _qapp().processEvents()
+
+    panel = window.bottom_dock.widget().optimization_workspace_panel
+    panel.irradiation_grid_edit.setText(grids["irradiation_grid_s"])
+    panel.cooldown_grid_edit.setText(grids["cooldown_grid_s"])
+    panel.count_grid_edit.setText(grids["count_grid_s"])
+    panel.objective_combo.setCurrentIndex(
+        max(panel.objective_combo.findData("di-fom"), 0)
+    )
+    QTest.mouseClick(panel.run_button, Qt.LeftButton)
+    _qapp().processEvents()
+    payload = panel._last_output_payload
+
+    assert payload is not None
+    assert panel.heatmap_table.rowCount() > 0
+    assert "Objective: di-fom" in panel.recommendation_browser.toPlainText()
+
+    grid_csv = tmp_path / "optimization_grid.csv"
+    ffexp_path = tmp_path / "phase6_bundle.ffexp"
+    panel.export_grid_csv(grid_csv)
+    panel.export_ffexp(ffexp_path)
+
+    assert grid_csv.exists()
+    assert ffexp_path.exists()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
+def test_optimization_workspace_panel_advanced_guard_and_second_irradiation_panel(tmp_path):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
+    grids = _seed_phase6_real_workspace(window)
+    window.show()
+    _qapp().processEvents()
+
+    optimizer = window.bottom_dock.widget().optimization_workspace_panel
+    optimizer.irradiation_grid_edit.setText(grids["irradiation_grid_s"])
+    optimizer.cooldown_grid_edit.setText(grids["cooldown_grid_s"])
+    optimizer.count_grid_edit.setText(grids["count_grid_s"])
+    optimizer.objective_combo.setCurrentIndex(
+        max(optimizer.objective_combo.findData("bass-d"), 0)
+    )
+    QTest.mouseClick(optimizer.run_button, Qt.LeftButton)
+    _qapp().processEvents()
+    disabled = optimizer._last_output_payload
+    assert disabled is None
+    assert "advanced objectives" in optimizer.summary.text().lower()
+
+    optimizer.advanced_checkbox.setChecked(True)
+    QTest.mouseClick(optimizer.run_button, Qt.LeftButton)
+    _qapp().processEvents()
+    enabled = optimizer._last_output_payload
+    assert enabled is not None
+    assert optimizer.heatmap_table.rowCount() > 0
+
+    panel = window.bottom_dock.widget().second_irradiation_panel
+    panel.flux_scales_edit.setText("1.0")
+    panel.duration_factors_edit.setText("1.0")
+    panel.cooling_grid_edit.setText(grids["cooldown_grid_s"])
+    panel.target_weights_edit.setText(
+        load_phase6_real_target_weights_text(DEFAULT_PHASE6_SAMPLE_ID)
+    )
+    QTest.mouseClick(panel.run_button, Qt.LeftButton)
+    _qapp().processEvents()
+    payload = panel._last_payload
+    assert payload is not None
+    assert panel.table.rowCount() > 0
+    assert "Selected label" in panel.browser.toPlainText()
+
+    selected_csv = tmp_path / "second_irradiation_selected.csv"
+    panel.export_selected_csv(selected_csv)
+    assert selected_csv.exists()
     window.close()
 
 
