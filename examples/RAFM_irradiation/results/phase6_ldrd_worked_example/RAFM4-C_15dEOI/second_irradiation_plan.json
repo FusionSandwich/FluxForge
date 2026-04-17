@@ -1,0 +1,112 @@
+{
+  "schema": "fluxforge.second_irradiation_plan.v1",
+  "inventory_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+  "schedule_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_schedule.json",
+  "candidates_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_candidates.json",
+  "first_cooling_time_s": 1385628.0,
+  "second_irradiation_time_s": 7200.0,
+  "target_weights": {
+    "Cr-51": 1.0,
+    "Ta-182": 0.8,
+    "Fe-59": 0.6
+  },
+  "selected_candidate": {
+    "label": "RAFM4-C_15dEOI_window_300s",
+    "score": 28035027.97977942,
+    "flux_scale": 1.0,
+    "duration_factor": 1.0,
+    "second_cooling_time_s": 360.0,
+    "pulse_delay_s": 0.0
+  },
+  "ranked_candidates": [
+    {
+      "rank": 1,
+      "label": "RAFM4-C_15dEOI_window_300s",
+      "score": 28035027.97977942,
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 360.0,
+      "pulse_delay_s": 0.0,
+      "nuclide_count": 6
+    },
+    {
+      "rank": 2,
+      "label": "RAFM4-C_15dEOI_window_2h",
+      "score": 26533945.478025805,
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 9645.0,
+      "pulse_delay_s": 0.0,
+      "nuclide_count": 6
+    },
+    {
+      "rank": 3,
+      "label": "RAFM4-C_15dEOI_window_24h",
+      "score": 16676921.850235216,
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 97565.0,
+      "pulse_delay_s": 0.0,
+      "nuclide_count": 6
+    },
+    {
+      "rank": 4,
+      "label": "RAFM4-C_15dEOI_window_4d",
+      "score": 8079604.384057821,
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 346788.0,
+      "pulse_delay_s": 0.0,
+      "nuclide_count": 6
+    }
+  ],
+  "selected_inventory_rows": [
+    {
+      "candidate": "RAFM4-C_15dEOI_window_300s",
+      "nuclide": "Co-60",
+      "activity_bq": 2449.4703304143654,
+      "weight": 1.0,
+      "weighted_activity": 2449.4703304143654
+    },
+    {
+      "candidate": "RAFM4-C_15dEOI_window_300s",
+      "nuclide": "Cr-51",
+      "activity_bq": 6765417.471999274,
+      "weight": 1.0,
+      "weighted_activity": 6765417.471999274
+    },
+    {
+      "candidate": "RAFM4-C_15dEOI_window_300s",
+      "nuclide": "Fe-59",
+      "activity_bq": 335831.52008265036,
+      "weight": 0.6,
+      "weighted_activity": 201498.9120495902
+    },
+    {
+      "candidate": "RAFM4-C_15dEOI_window_300s",
+      "nuclide": "Mn-54",
+      "activity_bq": 18133.31321094231,
+      "weight": 1.0,
+      "weighted_activity": 18133.31321094231
+    },
+    {
+      "candidate": "RAFM4-C_15dEOI_window_300s",
+      "nuclide": "Ta-182",
+      "activity_bq": 634109.9433647968,
+      "weight": 0.8,
+      "weighted_activity": 507287.9546918375
+    },
+    {
+      "candidate": "RAFM4-C_15dEOI_window_300s",
+      "nuclide": "W-187",
+      "activity_bq": 20540240.85749736,
+      "weight": 1.0,
+      "weighted_activity": 20540240.85749736
+    }
+  ],
+  "generated_at": "2026-04-17T19:47:49Z",
+  "support_artifacts": {
+    "selected_inventory": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_plan_selected_inventory.csv",
+    "ranked_candidates": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_plan_ranked_candidates.csv"
+  }
+}

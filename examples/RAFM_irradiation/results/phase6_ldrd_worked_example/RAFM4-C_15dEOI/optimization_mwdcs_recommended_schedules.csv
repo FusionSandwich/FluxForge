@@ -1,0 +1,6 @@
+cooldown_time_s,count_time_s,irradiation_time_s,label,objective,objective_score,rank
+0.0,900.0,7200.0,irr_7200s_cool_360s_count_900s,mwdcs,3.1489625596731856e+16,1
+0.0,900.0,7200.0,irr_7200s_cool_9645s_count_900s,mwdcs,2.923059704016288e+16,2
+0.0,900.0,7200.0,irr_7200s_cool_360s_count_600s,mwdcs,2.0993083731154576e+16,3
+0.0,900.0,7200.0,irr_7200s_cool_9645s_count_600s,mwdcs,1.9487064693441924e+16,4
+0.0,900.0,3600.0,irr_3600s_cool_360s_count_900s,mwdcs,1.5972066380153164e+16,5

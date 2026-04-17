@@ -1,0 +1,1554 @@
+{
+  "schema": "fluxforge.optimization_sweep.mwdcs.v1",
+  "objective": "mwdcs",
+  "ranked_candidates": [
+    {
+      "rank": 1,
+      "label": "irr_7200s_cool_360s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 3.1489625596731856e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1.6391098400540012e+16,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1.6391098400540012e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1.0862791290102846e+16,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1.0862791290102846e+16
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 4235735906088999.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 4235735906088999.0
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "label": "irr_7200s_cool_9645s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 2.923059704016288e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1.5214159573870412e+16,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1.5214159573870412e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1.0083056133381052e+16,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1.0083056133381052e+16
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 3933381332911417.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3933381332911417.0
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "label": "irr_7200s_cool_360s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 2.0993083731154576e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1.0927398933693342e+16,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1.0927398933693342e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 7241860860068565.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 7241860860068565.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 2823823937392666.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2823823937392666.0
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "label": "irr_7200s_cool_9645s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1.9487064693441924e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1.0142773049246944e+16,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1.0142773049246944e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 6722037422254036.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 6722037422254036.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 2622254221940944.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2622254221940944.5
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "label": "irr_3600s_cool_360s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1.5972066380153164e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 8313946945761927.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 8313946945761927.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 5509835443708147.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5509835443708147.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 2148283990683089.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2148283990683089.5
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "label": "irr_3600s_cool_9645s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1.4826156501671368e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 7716935250061166.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 7716935250061166.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 5114308574893279.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5114308574893279.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1994912676716923.2,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1994912676716923.2
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "label": "irr_7200s_cool_97565s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1.4474730711497646e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 7526565345060946.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 7526565345060946.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 4989911858898607.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 4989911858898607.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1958253507538093.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1958253507538093.8
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "label": "irr_3600s_cool_360s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1.0648044253435444e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 5542631297174619.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5542631297174619.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 3673223629138765.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3673223629138765.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1432189327122060.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1432189327122060.0
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "label": "irr_7200s_cool_360s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1.0496541865577288e+16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 5463699466846671.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5463699466846671.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 3620930430034282.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3620930430034282.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1411911968696333.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1411911968696333.0
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "label": "irr_3600s_cool_9645s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 9884104334447578.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 5144623500040777.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5144623500040777.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 3409539049928853.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3409539049928853.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1329941784477948.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1329941784477948.8
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "label": "irr_7200s_cool_9645s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 9743532346720962.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 5071386524623472.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5071386524623472.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 3361018711127018.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3361018711127018.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1311127110970472.2,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1311127110970472.2
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "label": "irr_7200s_cool_97565s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 9649820474331762.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 5017710230040630.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5017710230040630.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 3326607905932404.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3326607905932404.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1305502338358728.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1305502338358728.8
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "label": "irr_1800s_cool_360s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 8043674310579238.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 4187004162846346.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 4187004162846346.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 2774813378451441.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2774813378451441.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1081856769281450.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1081856769281450.0
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "label": "irr_1800s_cool_9645s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 7466560741644441.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 3886331624586364.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3886331624586364.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 2575614504456372.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2575614504456372.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 1004614612601705.1,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1004614612601705.1
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "label": "irr_3600s_cool_97565s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 7341138008081906.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 3817345567869422.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3817345567869422.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 2530773669087793.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2530773669087793.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 993018771124690.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 993018771124690.0
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "label": "irr_1800s_cool_360s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 5362449540386160.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 2791336108564231.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2791336108564231.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1849875585634294.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1849875585634294.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 721237846187633.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 721237846187633.8
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "label": "irr_3600s_cool_360s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 5324022126717722.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 2771315648587309.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2771315648587309.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1836611814569382.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1836611814569382.8
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 716094663561030.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 716094663561030.0
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "label": "irr_1800s_cool_9645s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 4977707161096294.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 2590887749724243.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2590887749724243.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1717076336304247.2,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1717076336304247.2
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 669743075067803.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 669743075067803.5
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "label": "irr_3600s_cool_9645s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 4942052167223789.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 2572311750020388.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2572311750020388.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1704769524964426.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1704769524964426.8
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 664970892238974.4,
+          "overlap_penalty": 0.0,
+          "marginal_score": 664970892238974.4
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "label": "irr_3600s_cool_97565s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 4894092005387936.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 2544897045246281.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2544897045246281.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1687182446058528.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1687182446058528.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 662012514083126.6,
+          "overlap_penalty": 0.0,
+          "marginal_score": 662012514083126.6
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "label": "irr_7200s_cool_97565s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 4824910237165881.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 2508855115020315.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2508855115020315.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1663303952966202.2,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1663303952966202.2
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 652751169179364.4,
+          "overlap_penalty": 0.0,
+          "marginal_score": 652751169179364.4
+        }
+      ]
+    },
+    {
+      "rank": 22,
+      "label": "irr_1800s_cool_97565s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 3696890048887035.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1922385387939267.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1922385387939267.8
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 1274471703280531.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1274471703280531.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 500032957667236.1,
+          "overlap_penalty": 0.0,
+          "marginal_score": 500032957667236.1
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "label": "irr_1800s_cool_360s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 2681224770193080.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1395668054282115.8,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1395668054282115.8
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 924937792817147.0,
+          "overlap_penalty": 0.0,
+          "marginal_score": 924937792817147.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 360618923093816.9,
+          "overlap_penalty": 0.0,
+          "marginal_score": 360618923093816.9
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "label": "irr_1800s_cool_9645s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 2488853580548147.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1295443874862121.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1295443874862121.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 858538168152123.6,
+          "overlap_penalty": 0.0,
+          "marginal_score": 858538168152123.6
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 334871537533901.75,
+          "overlap_penalty": 0.0,
+          "marginal_score": 334871537533901.75
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "label": "irr_1800s_cool_97565s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 2464593365924690.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1281590258626178.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1281590258626178.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 849647802187021.1,
+          "overlap_penalty": 0.0,
+          "marginal_score": 849647802187021.1
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 333355305111490.75,
+          "overlap_penalty": 0.0,
+          "marginal_score": 333355305111490.75
+        }
+      ]
+    },
+    {
+      "rank": 26,
+      "label": "irr_3600s_cool_97565s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 2447046002693968.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1272448522623140.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1272448522623140.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 843591223029264.2,
+          "overlap_penalty": 0.0,
+          "marginal_score": 843591223029264.2
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 331006257041563.3,
+          "overlap_penalty": 0.0,
+          "marginal_score": 331006257041563.3
+        }
+      ]
+    },
+    {
+      "rank": 27,
+      "label": "irr_7200s_cool_346788s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 2087345432348532.5,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 1073620712041596.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 1073620712041596.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 714573966649013.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 714573966649013.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 299150753657922.5,
+          "overlap_penalty": 0.0,
+          "marginal_score": 299150753657922.5
+        }
+      ]
+    },
+    {
+      "rank": 28,
+      "label": "irr_7200s_cool_346788s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1391563621565688.2,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 715747141361064.4,
+          "overlap_penalty": 0.0,
+          "marginal_score": 715747141361064.4
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 476382644432675.75,
+          "overlap_penalty": 0.0,
+          "marginal_score": 476382644432675.75
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 199433835771948.28,
+          "overlap_penalty": 0.0,
+          "marginal_score": 199433835771948.28
+        }
+      ]
+    },
+    {
+      "rank": 29,
+      "label": "irr_1800s_cool_97565s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 1232296682962345.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 640795129313089.2,
+          "overlap_penalty": 0.0,
+          "marginal_score": 640795129313089.2
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 424823901093510.56,
+          "overlap_penalty": 0.0,
+          "marginal_score": 424823901093510.56
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 166677652555745.38,
+          "overlap_penalty": 0.0,
+          "marginal_score": 166677652555745.38
+        }
+      ]
+    },
+    {
+      "rank": 30,
+      "label": "irr_3600s_cool_346788s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1057610038115766.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 544068294973253.56,
+          "overlap_penalty": 0.0,
+          "marginal_score": 544068294973253.56
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 362096234566114.06,
+          "overlap_penalty": 0.0,
+          "marginal_score": 362096234566114.06
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 151445508576398.38,
+          "overlap_penalty": 0.0,
+          "marginal_score": 151445508576398.38
+        }
+      ]
+    },
+    {
+      "rank": 31,
+      "label": "irr_3600s_cool_346788s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 705073358743844.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 362712196648835.7,
+          "overlap_penalty": 0.0,
+          "marginal_score": 362712196648835.7
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 241397489710742.72,
+          "overlap_penalty": 0.0,
+          "marginal_score": 241397489710742.72
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 100963672384265.61,
+          "overlap_penalty": 0.0,
+          "marginal_score": 100963672384265.61
+        }
+      ]
+    },
+    {
+      "rank": 32,
+      "label": "irr_7200s_cool_346788s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 695781810782844.1,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 357873570680532.2,
+          "overlap_penalty": 0.0,
+          "marginal_score": 357873570680532.2
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 238191322216337.88,
+          "overlap_penalty": 0.0,
+          "marginal_score": 238191322216337.88
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 99716917885974.14,
+          "overlap_penalty": 0.0,
+          "marginal_score": 99716917885974.14
+        }
+      ]
+    },
+    {
+      "rank": 33,
+      "label": "irr_1800s_cool_346788s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 532339967718326.7,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 273875004403393.78,
+          "overlap_penalty": 0.0,
+          "marginal_score": 273875004403393.78
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 182267901851343.78,
+          "overlap_penalty": 0.0,
+          "marginal_score": 182267901851343.78
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 76197061463589.11,
+          "overlap_penalty": 0.0,
+          "marginal_score": 76197061463589.11
+        }
+      ]
+    },
+    {
+      "rank": 34,
+      "label": "irr_1800s_cool_346788s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 354893311812217.8,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 182583336268929.22,
+          "overlap_penalty": 0.0,
+          "marginal_score": 182583336268929.22
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 121511934567562.52,
+          "overlap_penalty": 0.0,
+          "marginal_score": 121511934567562.52
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 50798040975726.08,
+          "overlap_penalty": 0.0,
+          "marginal_score": 50798040975726.08
+        }
+      ]
+    },
+    {
+      "rank": 35,
+      "label": "irr_3600s_cool_346788s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 352536679371922.0,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 181356098324417.84,
+          "overlap_penalty": 0.0,
+          "marginal_score": 181356098324417.84
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 120698744855371.36,
+          "overlap_penalty": 0.0,
+          "marginal_score": 120698744855371.36
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 50481836192132.805,
+          "overlap_penalty": 0.0,
+          "marginal_score": 50481836192132.805
+        }
+      ]
+    },
+    {
+      "rank": 36,
+      "label": "irr_1800s_cool_346788s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 177446655906108.9,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 91291668134464.61,
+          "overlap_penalty": 0.0,
+          "marginal_score": 91291668134464.61
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 60755967283781.26,
+          "overlap_penalty": 0.0,
+          "marginal_score": 60755967283781.26
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 25399020487863.04,
+          "overlap_penalty": 0.0,
+          "marginal_score": 25399020487863.04
+        }
+      ]
+    },
+    {
+      "rank": 37,
+      "label": "irr_7200s_cool_1385628s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 129634798383081.22,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 57185713320034.61,
+          "overlap_penalty": 0.0,
+          "marginal_score": 57185713320034.61
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 40340114464317.22,
+          "overlap_penalty": 0.0,
+          "marginal_score": 40340114464317.22
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 32108970598729.387,
+          "overlap_penalty": 0.0,
+          "marginal_score": 32108970598729.387
+        }
+      ]
+    },
+    {
+      "rank": 38,
+      "label": "irr_7200s_cool_1385628s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 86423198922054.16,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 38123808880023.07,
+          "overlap_penalty": 0.0,
+          "marginal_score": 38123808880023.07
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 26893409642878.152,
+          "overlap_penalty": 0.0,
+          "marginal_score": 26893409642878.152
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 21405980399152.93,
+          "overlap_penalty": 0.0,
+          "marginal_score": 21405980399152.93
+        }
+      ]
+    },
+    {
+      "rank": 39,
+      "label": "irr_3600s_cool_1385628s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 64853562394317.78,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 28609056573309.344,
+          "overlap_penalty": 0.0,
+          "marginal_score": 28609056573309.344
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 20181415911344.117,
+          "overlap_penalty": 0.0,
+          "marginal_score": 20181415911344.117
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 16063089909664.316,
+          "overlap_penalty": 0.0,
+          "marginal_score": 16063089909664.316
+        }
+      ]
+    },
+    {
+      "rank": 40,
+      "label": "irr_3600s_cool_1385628s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 43235708262878.516,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 19072704382206.23,
+          "overlap_penalty": 0.0,
+          "marginal_score": 19072704382206.23
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 13454277274229.41,
+          "overlap_penalty": 0.0,
+          "marginal_score": 13454277274229.41
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 10708726606442.879,
+          "overlap_penalty": 0.0,
+          "marginal_score": 10708726606442.879
+        }
+      ]
+    },
+    {
+      "rank": 41,
+      "label": "irr_7200s_cool_1385628s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 43211599461027.08,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 19061904440011.535,
+          "overlap_penalty": 0.0,
+          "marginal_score": 19061904440011.535
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 13446704821439.076,
+          "overlap_penalty": 0.0,
+          "marginal_score": 13446704821439.076
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 10702990199576.465,
+          "overlap_penalty": 0.0,
+          "marginal_score": 10702990199576.465
+        }
+      ]
+    },
+    {
+      "rank": 42,
+      "label": "irr_1800s_cool_1385628s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 32435837884550.207,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 14308586199817.244,
+          "overlap_penalty": 0.0,
+          "marginal_score": 14308586199817.244
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 10093552963473.777,
+          "overlap_penalty": 0.0,
+          "marginal_score": 10093552963473.777
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 8033698721259.184,
+          "overlap_penalty": 0.0,
+          "marginal_score": 8033698721259.184
+        }
+      ]
+    },
+    {
+      "rank": 43,
+      "label": "irr_1800s_cool_1385628s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 21623891923033.465,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 9539057466544.828,
+          "overlap_penalty": 0.0,
+          "marginal_score": 9539057466544.828
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 6729035308982.517,
+          "overlap_penalty": 0.0,
+          "marginal_score": 6729035308982.517
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 5355799147506.121,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5355799147506.121
+        }
+      ]
+    },
+    {
+      "rank": 44,
+      "label": "irr_3600s_cool_1385628s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 21617854131439.258,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 9536352191103.115,
+          "overlap_penalty": 0.0,
+          "marginal_score": 9536352191103.115
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 6727138637114.705,
+          "overlap_penalty": 0.0,
+          "marginal_score": 6727138637114.705
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 5354363303221.439,
+          "overlap_penalty": 0.0,
+          "marginal_score": 5354363303221.439
+        }
+      ]
+    },
+    {
+      "rank": 45,
+      "label": "irr_1800s_cool_1385628s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 10811945961516.732,
+      "full_spectrum_mode": true,
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_score": 4769528733272.414,
+          "overlap_penalty": 0.0,
+          "marginal_score": 4769528733272.414
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 7200.0,
+          "count_time_s": 900.0,
+          "base_score": 3364517654491.2583,
+          "overlap_penalty": 0.0,
+          "marginal_score": 3364517654491.2583
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 86400.0,
+          "count_time_s": 900.0,
+          "base_score": 2677899573753.0605,
+          "overlap_penalty": 0.0,
+          "marginal_score": 2677899573753.0605
+        }
+      ]
+    }
+  ],
+  "window_offsets_s": [
+    0.0,
+    7200.0,
+    86400.0
+  ],
+  "window_count_time_s": 900.0,
+  "full_spectrum_mode": true,
+  "overlap_penalty": 0.1,
+  "input": null,
+  "candidate_source": "activity-review",
+  "activity_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+  "candidate_generation": {
+    "irradiation_grid_s": [
+      1800.0,
+      3600.0,
+      7200.0
+    ],
+    "cooldown_grid_s": [
+      360.0,
+      9645.0,
+      97565.0,
+      346788.0,
+      1385628.0
+    ],
+    "count_grid_s": [
+      300.0,
+      600.0,
+      900.0
+    ],
+    "reference_irradiation_time_s": 3600.0
+  },
+  "neutron_source": {
+    "source": "unfold",
+    "integral_flux": 2.4042465189891076e-08,
+    "high_energy_fraction": 0.9999999999459287,
+    "hardness_scale": 1.4999999999459286,
+    "applied_flux_scale": 1.4999999999459286
+  },
+  "isotope_weights": {
+    "W-187": 19104.9041868097,
+    "Cr-51": 3174.9802103698544,
+    "Ta-182": 835.7741636987821,
+    "Fe-59": 656.195997644508,
+    "Mn-54": 137.0700955679112,
+    "Co-60": 49.63468715731319
+  },
+  "isotopes_of_interest": [],
+  "isotope_filter_summary": {
+    "requested_isotopes": [],
+    "candidates_before": 45,
+    "candidates_after": 45,
+    "line_terms_before": 270,
+    "line_terms_after": 270
+  },
+  "generated_at": "2026-04-17T19:47:38Z",
+  "support_artifacts": {
+    "optimization_grid": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_mwdcs_optimization_grid.csv",
+    "recommended_schedules": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_mwdcs_recommended_schedules.csv",
+    "dose_endpoints": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_mwdcs_dose_endpoints.csv",
+    "masking_candidates": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_mwdcs_masking_candidates.csv",
+    "inventory_timeseries": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_mwdcs_inventory_timeseries.csv",
+    "activities_at_irradiation": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_mwdcs_activities_at_irradiation.csv"
+  }
+}

@@ -1,0 +1,1324 @@
+{
+  "schema": "fluxforge.optimization_sweep.fim.v1",
+  "objective": "fim-d",
+  "ranked_candidates": [
+    {
+      "rank": 1,
+      "label": "irr_7200s_cool_360s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 126.8066912076377,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 143631.388152476,
+        "determinant": 1.178816646051093e+55,
+        "log_determinant": 126.8066912076377,
+        "trace_inverse": 1.9130307370454951e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 5942513.942373692,
+        "max_eigenvalue": 853531526658.576,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 2,
+      "label": "irr_7200s_cool_9645s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 126.72649521288132,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 133271.8589655495,
+        "determinant": 1.087971657724422e+55,
+        "log_determinant": 126.72649521288132,
+        "trace_inverse": 1.9131685120872327e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 5942283.726117997,
+        "max_eigenvalue": 791939198680.4778,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 3,
+      "label": "irr_7200s_cool_97565s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 125.96711644508574,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 65598.14364115716,
+        "determinant": 5.0912400386063584e+54,
+        "log_determinant": 125.96711644508574,
+        "trace_inverse": 1.9144798140794017e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 5940104.242101429,
+        "max_eigenvalue": 389659811316.8165,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 4,
+      "label": "irr_7200s_cool_360s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 124.37390055898882,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 143631.38815246391,
+        "determinant": 1.0349007592219245e+54,
+        "log_determinant": 124.37390055898882,
+        "trace_inverse": 2.869546105568029e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 3961675.9615827934,
+        "max_eigenvalue": 569021017772.3839,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 5,
+      "label": "irr_7200s_cool_9645s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 124.29370456423244,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 133271.8589655383,
+        "determinant": 9.551465856566626e+53,
+        "log_determinant": 124.29370456423244,
+        "trace_inverse": 2.8697527681306334e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 3961522.4840789977,
+        "max_eigenvalue": 527959465786.98517,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 6,
+      "label": "irr_7200s_cool_346788s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 123.8145384805006,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8795.31330044001,
+        "determinant": 5.915219180752966e+53,
+        "log_determinant": 123.8145384805006,
+        "trace_inverse": 1.9183488245258957e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 5933930.497190962,
+        "max_eigenvalue": 52190777825.83027,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 7,
+      "label": "irr_7200s_cool_97565s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 123.53432579643682,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 65598.14364115166,
+        "determinant": 4.469675754058012e+53,
+        "log_determinant": 123.53432579643682,
+        "trace_inverse": 2.8717197211188866e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 3960069.494734619,
+        "max_eigenvalue": 259773207544.5444,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 8,
+      "label": "irr_3600s_cool_360s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 122.66324939894173,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 145715.64323704585,
+        "determinant": 1.8705630284034327e+53,
+        "log_determinant": 122.66324939894173,
+        "trace_inverse": 3.8260080860386013e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 2971279.2865954554,
+        "max_eigenvalue": 432961872483.1675,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 9,
+      "label": "irr_3600s_cool_9645s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 122.58305340418532,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 135205.78547877198,
+        "determinant": 1.7264089082110167e+53,
+        "log_determinant": 122.58305340418532,
+        "trace_inverse": 3.826283592148903e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 2971164.1776030976,
+        "max_eigenvalue": 401718586419.2164,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 10,
+      "label": "irr_3600s_cool_97565s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 121.82367463638971,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 66550.04744283376,
+        "determinant": 8.078852141125097e+52,
+        "log_determinant": 121.82367463638971,
+        "trace_inverse": 3.828905652502826e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 2970074.4274103846,
+        "max_eigenvalue": 197658594052.90842,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 11,
+      "label": "irr_7200s_cool_346788s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 121.3817478318517,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8795.313300439271,
+        "determinant": 5.193059363075732e+52,
+        "log_determinant": 121.3817478318517,
+        "trace_inverse": 2.8775232367886274e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 3955953.664794307,
+        "max_eigenvalue": 34793851883.88685,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 12,
+      "label": "irr_3600s_cool_360s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 120.23045875029293,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 145715.64323702132,
+        "determinant": 1.642195251273545e+52,
+        "log_determinant": 120.23045875029293,
+        "trace_inverse": 5.739012129057038e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1980852.857730637,
+        "max_eigenvalue": 288641248322.11163,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 13,
+      "label": "irr_7200s_cool_360s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 120.21501747562944,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 143631.38815242765,
+        "determinant": 1.6170324362847214e+52,
+        "log_determinant": 120.21501747562944,
+        "trace_inverse": 5.739092211134762e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1980837.9807918968,
+        "max_eigenvalue": 284510508886.19196,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 14,
+      "label": "irr_3600s_cool_9645s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 120.15026275553655,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 135205.7854787492,
+        "determinant": 1.51564019376582e+52,
+        "log_determinant": 120.15026275553655,
+        "trace_inverse": 5.739425388222489e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1980776.1184023982,
+        "max_eigenvalue": 267812390946.1442,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 15,
+      "label": "irr_7200s_cool_9645s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 120.13482148087306,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 133271.85896550465,
+        "determinant": 1.492416540088964e+52,
+        "log_determinant": 120.13482148087306,
+        "trace_inverse": 5.739505536259971e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1980761.242039999,
+        "max_eigenvalue": 263979732893.49258,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 16,
+      "label": "irr_3600s_cool_346788s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 119.67109667180459,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8922.943317128049,
+        "determinant": 9.386353969028777e+51,
+        "log_determinant": 119.67109667180459,
+        "trace_inverse": 3.836638429623794e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 2966987.531771422,
+        "max_eigenvalue": 26474261568.62205,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 17,
+      "label": "irr_3600s_cool_97565s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 119.39088398774093,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 66550.04744282251,
+        "determinant": 7.092545089603771e+51,
+        "log_determinant": 119.39088398774093,
+        "trace_inverse": 5.743358478753373e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1980049.6182739236,
+        "max_eigenvalue": 131772396035.27223,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 18,
+      "label": "irr_7200s_cool_97565s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 119.37544271307743,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 65598.14364113509,
+        "determinant": 6.98386836571765e+51,
+        "log_determinant": 119.37544271307743,
+        "trace_inverse": 5.743439442236476e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1980034.7473678095,
+        "max_eigenvalue": 129886603772.2722,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 19,
+      "label": "irr_1800s_cool_360s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 118.5121133538161,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 146772.95295801177,
+        "determinant": 2.945485358368761e+51,
+        "log_determinant": 118.5121133538161,
+        "trace_inverse": 7.65196278815828e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1485645.222191433,
+        "max_eigenvalue": 218052536308.99814,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 20,
+      "label": "irr_1800s_cool_9645s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 118.4319173590597,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 136186.83588723766,
+        "determinant": 2.7184928197972588e+51,
+        "log_determinant": 118.4319173590597,
+        "trace_inverse": 7.652513756594422e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1485587.6674791246,
+        "max_eigenvalue": 202317483867.08374,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 21,
+      "label": "irr_1800s_cool_97565s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 117.6725385912641,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 67032.93322317227,
+        "determinant": 1.2721378714739682e+51,
+        "log_determinant": 117.6725385912641,
+        "trace_inverse": 7.657757336361675e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1485042.7903366464,
+        "max_eigenvalue": 99546774198.18982,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 22,
+      "label": "irr_3600s_cool_346788s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 117.23830602315581,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8922.943317126543,
+        "determinant": 8.240420494073634e+50,
+        "log_determinant": 117.23830602315581,
+        "trace_inverse": 5.754957644434824e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1977991.6878479482,
+        "max_eigenvalue": 17649507712.4147,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 23,
+      "label": "irr_7200s_cool_346788s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 117.22286474849233,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8795.313300437047,
+        "determinant": 8.114155254808278e+50,
+        "log_determinant": 117.22286474849233,
+        "trace_inverse": 5.755046473575955e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1977976.8323976537,
+        "max_eigenvalue": 17396925941.943424,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 24,
+      "label": "irr_1800s_cool_360s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 116.0793227051675,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 146772.9529579624,
+        "determinant": 2.585885636977674e+50,
+        "log_determinant": 116.0793227051675,
+        "trace_inverse": 1.1477944182233968e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 990430.1481279554,
+        "max_eigenvalue": 145368357539.33212,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 25,
+      "label": "irr_3600s_cool_360s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 116.07157566693382,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 145715.64323694774,
+        "determinant": 2.5659300801163803e+50,
+        "log_determinant": 116.07157566693382,
+        "trace_inverse": 1.1478024258108897e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 990426.4288658185,
+        "max_eigenvalue": 144320624161.05582,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 26,
+      "label": "irr_1800s_cool_9645s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 115.99912671041109,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 136186.8358871918,
+        "determinant": 2.386605493375731e+50,
+        "log_determinant": 115.99912671041109,
+        "trace_inverse": 1.1478770634888178e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 990391.7783197499,
+        "max_eigenvalue": 134878322578.05582,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 27,
+      "label": "irr_3600s_cool_9645s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 115.99137967217743,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 135205.78547868095,
+        "determinant": 2.3681878027604136e+50,
+        "log_determinant": 115.99137967217743,
+        "trace_inverse": 1.14788507764398e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 990388.0592016991,
+        "max_eigenvalue": 133906195473.0721,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 28,
+      "label": "irr_1800s_cool_346788s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 115.51996062667897,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8987.688010966305,
+        "determinant": 1.4780238764709478e+50,
+        "log_determinant": 115.51996062667897,
+        "trace_inverse": 7.673217680874058e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1483499.3367211893,
+        "max_eigenvalue": 13333229202.925499,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 29,
+      "label": "irr_1800s_cool_97565s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 115.23974794261551,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 67032.93322314971,
+        "determinant": 1.1168288583589316e+50,
+        "log_determinant": 115.23974794261551,
+        "trace_inverse": 1.1486636004539057e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 990028.5268914308,
+        "max_eigenvalue": 66364516132.12656,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 30,
+      "label": "irr_3600s_cool_97565s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 115.23200090438182,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 66550.04744278891,
+        "determinant": 1.1082101702512066e+50,
+        "log_determinant": 115.23200090438182,
+        "trace_inverse": 1.148671695750156e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 990024.8091374618,
+        "max_eigenvalue": 65886198017.636116,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 31,
+      "label": "irr_7200s_cool_1385628s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 114.84191519641531,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2934.109000430558,
+        "determinant": 7.502570083990957e+49,
+        "log_determinant": 114.84191519641531,
+        "trace_inverse": 2.769061532333144e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 5908265.423763643,
+        "max_eigenvalue": 17335494756.79757,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 32,
+      "label": "irr_1800s_cool_346788s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 113.08716997803037,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8987.688010963273,
+        "determinant": 1.2975792605511386e+49,
+        "log_determinant": 113.08716997803037,
+        "trace_inverse": 1.1509826521307618e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 988999.5578144598,
+        "max_eigenvalue": 8888819468.616999,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 33,
+      "label": "irr_3600s_cool_346788s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 113.0794229397967,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8922.943317122033,
+        "determinant": 1.2875657021997228e+49,
+        "log_determinant": 113.0794229397967,
+        "trace_inverse": 1.1509915288864452e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 988995.8439244741,
+        "max_eigenvalue": 8824753856.207352,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 34,
+      "label": "irr_7200s_cool_1385628s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 112.40912454776648,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2934.10900043031,
+        "determinant": 6.586618455082234e+48,
+        "log_determinant": 112.40912454776648,
+        "trace_inverse": 4.153592298499446e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 3938843.6158427615,
+        "max_eigenvalue": 11556996504.531713,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 35,
+      "label": "irr_1800s_cool_360s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 360.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 111.92043962180897,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 146772.9529578142,
+        "determinant": 4.0404463077822215e+48,
+        "log_determinant": 111.92043962180897,
+        "trace_inverse": 2.2955888364447214e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 495215.0740644777,
+        "max_eigenvalue": 72684178769.66606,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 36,
+      "label": "irr_1800s_cool_9645s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 9645.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 111.84024362705256,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 136186.8358870543,
+        "determinant": 3.7290710834038306e+48,
+        "log_determinant": 111.84024362705256,
+        "trace_inverse": 2.2957541269755638e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 495195.88916037494,
+        "max_eigenvalue": 67439161289.02791,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 37,
+      "label": "irr_1800s_cool_97565s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 97565.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 111.08086485925698,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 67032.933223082,
+        "determinant": 1.7450450911878196e+48,
+        "log_determinant": 111.08086485925698,
+        "trace_inverse": 2.2973272009057374e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 495014.2634462154,
+        "max_eigenvalue": 33182258066.06328,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 38,
+      "label": "irr_3600s_cool_1385628s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 110.69847338771939,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2935.618383495742,
+        "determinant": 1.1905184970141192e+48,
+        "log_determinant": 110.69847338771939,
+        "trace_inverse": 5.514165447241236e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 2954154.8986799344,
+        "max_eigenvalue": 8672271428.258816,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 39,
+      "label": "irr_1800s_cool_346788s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 346788.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 108.92828689467186,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 8987.688010954185,
+        "determinant": 2.027467594613494e+47,
+        "log_determinant": 108.92828689467186,
+        "trace_inverse": 2.3019653042594454e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 494499.7789077299,
+        "max_eigenvalue": 4444409734.308499,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 40,
+      "label": "irr_3600s_cool_1385628s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 108.26568273907068,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2935.6183834952444,
+        "determinant": 1.0451739891484916e+47,
+        "log_determinant": 108.26568273907068,
+        "trace_inverse": 8.271248170860777e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1969436.59912029,
+        "max_eigenvalue": 5781514285.5058775,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 41,
+      "label": "irr_7200s_cool_1385628s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 108.25024146440721,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2934.109000429565,
+        "determinant": 1.0291591336070115e+47,
+        "log_determinant": 108.25024146440721,
+        "trace_inverse": 8.307184596997266e-07,
+        "effective_rank": 6,
+        "min_eigenvalue": 1969421.8079218809,
+        "max_eigenvalue": 5778498252.265857,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 42,
+      "label": "irr_1800s_cool_1385628s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 900.0,
+      "objective": "fim-d",
+      "objective_score": 106.54733734259395,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2936.3734661496833,
+        "determinant": 1.874652042500769e+46,
+        "log_determinant": 106.54733734259395,
+        "trace_inverse": 1.1004544298046077e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 1477082.9960808114,
+        "max_eigenvalue": 4337267316.992571,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 43,
+      "label": "irr_1800s_cool_1385628s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 600.0,
+      "objective": "fim-d",
+      "objective_score": 104.1145466939455,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2936.37346614869,
+        "determinant": 1.645785057889076e+45,
+        "log_determinant": 104.1145466939455,
+        "trace_inverse": 1.6506816447064818e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 984721.9973875406,
+        "max_eigenvalue": 2891511544.661714,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 44,
+      "label": "irr_3600s_cool_1385628s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 104.10679965571184,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2935.618383493754,
+        "determinant": 1.633084358045869e+45,
+        "log_determinant": 104.10679965571184,
+        "trace_inverse": 1.654249634171509e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 984718.299560645,
+        "max_eigenvalue": 2890757142.752939,
+        "target_nuclide": null
+      }
+    },
+    {
+      "rank": 45,
+      "label": "irr_1800s_cool_1385628s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "cooldown_time_s": 1385628.0,
+      "count_time_s": 300.0,
+      "objective": "fim-d",
+      "objective_score": 99.95566361058748,
+      "matrix_diagnostics": {
+        "nuclides": [
+          "Co-60",
+          "Cr-51",
+          "Fe-59",
+          "Mn-54",
+          "Ta-182",
+          "W-187"
+        ],
+        "regularization": 1e-06,
+        "condition_number": 2936.3734661457092,
+        "determinant": 2.571539152955928e+43,
+        "log_determinant": 99.95566361058748,
+        "trace_inverse": 3.3013632894103836e-06,
+        "effective_rank": 6,
+        "min_eigenvalue": 492360.9986942703,
+        "max_eigenvalue": 1445755772.3308575,
+        "target_nuclide": null
+      }
+    }
+  ],
+  "target_nuclide": null,
+  "nuisance_variance_fraction": 0.0,
+  "fim_regularization": 1e-06,
+  "input": null,
+  "candidate_source": "activity-review",
+  "activity_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+  "candidate_generation": {
+    "irradiation_grid_s": [
+      1800.0,
+      3600.0,
+      7200.0
+    ],
+    "cooldown_grid_s": [
+      360.0,
+      9645.0,
+      97565.0,
+      346788.0,
+      1385628.0
+    ],
+    "count_grid_s": [
+      300.0,
+      600.0,
+      900.0
+    ],
+    "reference_irradiation_time_s": 3600.0
+  },
+  "neutron_source": {
+    "source": "unfold",
+    "integral_flux": 2.4042465189891076e-08,
+    "high_energy_fraction": 0.9999999999459287,
+    "hardness_scale": 1.4999999999459286,
+    "applied_flux_scale": 1.4999999999459286
+  },
+  "isotope_weights": {
+    "W-187": 19104.9041868097,
+    "Cr-51": 3174.9802103698544,
+    "Ta-182": 835.7741636987821,
+    "Fe-59": 656.195997644508,
+    "Mn-54": 137.0700955679112,
+    "Co-60": 49.63468715731319
+  },
+  "isotopes_of_interest": [],
+  "isotope_filter_summary": {
+    "requested_isotopes": [],
+    "candidates_before": 45,
+    "candidates_after": 45,
+    "line_terms_before": 270,
+    "line_terms_after": 270
+  },
+  "generated_at": "2026-04-17T19:47:34Z",
+  "support_artifacts": {
+    "optimization_grid": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_fim_d_optimization_grid.csv",
+    "recommended_schedules": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_fim_d_recommended_schedules.csv",
+    "dose_endpoints": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_fim_d_dose_endpoints.csv",
+    "masking_candidates": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_fim_d_masking_candidates.csv",
+    "inventory_timeseries": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_fim_d_inventory_timeseries.csv",
+    "activities_at_irradiation": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_fim_d_activities_at_irradiation.csv"
+  }
+}

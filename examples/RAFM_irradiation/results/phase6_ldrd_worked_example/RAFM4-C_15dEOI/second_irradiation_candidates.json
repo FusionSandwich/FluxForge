@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "label": "RAFM4-C_15dEOI_window_300s",
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 360.0
+    },
+    {
+      "label": "RAFM4-C_15dEOI_window_2h",
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 9645.0
+    },
+    {
+      "label": "RAFM4-C_15dEOI_window_24h",
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 97565.0
+    },
+    {
+      "label": "RAFM4-C_15dEOI_window_4d",
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 346788.0
+    }
+  ]
+}

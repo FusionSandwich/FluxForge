@@ -1,0 +1,6 @@
+cooldown_time_s,count_time_s,expected_dose_uSv,irradiation_time_s,label,objective,objective_score,rank
+9645.0,300.0,0.0,1800.0,irr_1800s_cool_9645s_count_300s,bass-d,7653.278807569258,1
+9645.0,600.0,0.0,1800.0,irr_1800s_cool_9645s_count_600s,bass-d,7653.278807569258,2
+360.0,900.0,0.0,3600.0,irr_3600s_cool_360s_count_900s,bass-d,7653.278807569258,3
+97565.0,900.0,0.0,3600.0,irr_3600s_cool_97565s_count_900s,bass-d,7653.278807569258,4
+1385628.0,900.0,0.0,3600.0,irr_3600s_cool_1385628s_count_900s,bass-d,7653.278807569258,5

@@ -1,0 +1,1961 @@
+{
+  "schema": "fluxforge.optimization_sweep.stbdmr.v1",
+  "objective": "stbd-mr",
+  "ranked_candidates": [
+    {
+      "rank": 1,
+      "label": "irr_7200s_cool_360s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 4.574036564224454e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1.6391098400540012e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.047799008659248646,
+          "marginal_score": 1.6391098400540012e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1.5869037842228686e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.047403845101915906,
+          "marginal_score": 1.5869037842228686e+16
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 1.3480229399475848e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.045506132542838376,
+          "marginal_score": 1.3480229399475848e+16
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "label": "irr_7200s_cool_9645s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 4.2457231301737736e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1.5214159573870412e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.04689665160458989,
+          "marginal_score": 1.5214159573870412e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1.4729765509941024e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.04651590130801986,
+          "marginal_score": 1.4729765509941024e+16
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 1.2513306217926298e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.04468732404780262,
+          "marginal_score": 1.2513306217926298e+16
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "label": "irr_7200s_cool_360s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 3.0493577094829696e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1.0927398933693342e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.03186600577283243,
+          "marginal_score": 1.0927398933693342e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1.057935856148579e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.031602563401277275,
+          "marginal_score": 1.057935856148579e+16
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 8986819599650565.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.030337421695225575,
+          "marginal_score": 8986819599650565.0
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "label": "irr_7200s_cool_9645s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 2.830482086782516e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1.0142773049246944e+16,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.03126443440305992,
+          "marginal_score": 1.0142773049246944e+16
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 9819843673294016.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.03101060087201324,
+          "marginal_score": 9819843673294016.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 8342204145284202.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.029791549365201755,
+          "marginal_score": 8342204145284202.0
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "label": "irr_3600s_cool_360s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 2.320045955821125e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 8313946945761927.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.023988306929286204,
+          "marginal_score": 8313946945761927.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 8049127466467408.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.02378930606378998,
+          "marginal_score": 8049127466467408.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 6837385145981910.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0228336429321271,
+          "marginal_score": 6837385145981910.0
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "label": "irr_3600s_cool_9645s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 2.1535063547604456e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 7716935250061166.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.023533893447060035,
+          "marginal_score": 7716935250061166.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 7471222451630449.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.023342152469086105,
+          "marginal_score": 7471222451630449.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 6346905845912842.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.022421312432766672,
+          "marginal_score": 6346905845912842.0
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "label": "irr_7200s_cool_97565s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 2.1012145423644236e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 7526565345060946.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.03981976791930909,
+          "marginal_score": 7526565345060946.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 7288184002836390.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.03955133957576962,
+          "marginal_score": 7288184002836390.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 6197396075746901.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.03826153526122894,
+          "marginal_score": 6197396075746901.0
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "label": "irr_3600s_cool_360s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1.54669730388075e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 5542631297174619.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.015992204619524136,
+          "marginal_score": 5542631297174619.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 5366084977644940.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01585953737585999,
+          "marginal_score": 5366084977644940.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 4558256763987941.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.015222428621418066,
+          "marginal_score": 4558256763987941.0
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "label": "irr_7200s_cool_360s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1.5246788547414848e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 5463699466846671.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.015933002886416216,
+          "marginal_score": 5463699466846671.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 5289679280742895.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.015801281700638638,
+          "marginal_score": 5289679280742895.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 4493409799825282.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.015168710847612787,
+          "marginal_score": 4493409799825282.5
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "label": "irr_3600s_cool_9645s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1.4356709031736304e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 5144623500040777.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.015689262298040022,
+          "marginal_score": 5144623500040777.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 4980814967753630.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.015561434979390732,
+          "marginal_score": 4980814967753630.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 4231270563941895.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.014947541621844446,
+          "marginal_score": 4231270563941895.0
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "label": "irr_7200s_cool_9645s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1.415241043391258e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 5071386524623472.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01563221720152996,
+          "marginal_score": 5071386524623472.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 4909921836647008.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01550530043600662,
+          "marginal_score": 4909921836647008.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 4171102072642101.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.014895774682600877,
+          "marginal_score": 4171102072642101.0
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "label": "irr_7200s_cool_97565s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1.4008096949096158e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 5017710230040630.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.026546511946206067,
+          "marginal_score": 5017710230040630.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 4858789335224260.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.02636755971717974,
+          "marginal_score": 4858789335224260.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 4131597383831268.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.025507690174152626,
+          "marginal_score": 4131597383831268.0
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "label": "irr_1800s_cool_360s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 1.1684001952505278e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 4187004162846346.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.012016550968804104,
+          "marginal_score": 4187004162846346.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 4053633318974994.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.011916692523016692,
+          "marginal_score": 4053633318974994.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 3443364470683938.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.011437143697228626,
+          "marginal_score": 3443364470683938.0
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "label": "irr_1800s_cool_9645s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 1.0845259927898742e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 3886331624586364.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.011788528100415741,
+          "marginal_score": 3886331624586364.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 3762583475699358.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.011692313034427235,
+          "marginal_score": 3762583475699358.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 3196344827613019.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.011230240201770023,
+          "marginal_score": 3196344827613019.5
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "label": "irr_3600s_cool_97565s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1.0656886269211462e+16,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 3817345567869422.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.019970241517152956,
+          "marginal_score": 3817345567869422.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 3696425014100484.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01983507646658271,
+          "marginal_score": 3696425014100484.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 3143115687241556.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.019185613200236526,
+          "marginal_score": 3143115687241556.5
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "label": "irr_1800s_cool_360s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 7789334635003518.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 2791336108564231.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.008011033979202737,
+          "marginal_score": 2791336108564231.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 2702422212649995.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007944461682011128,
+          "marginal_score": 2702422212649995.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 2295576313789291.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007624762464819085,
+          "marginal_score": 2295576313789291.0
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "label": "irr_3600s_cool_360s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 7733486519403750.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 2771315648587309.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007996102309762068,
+          "marginal_score": 2771315648587309.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 2683042488822470.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007929768687929994,
+          "marginal_score": 2683042488822470.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 2279128381993970.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007611214310709033,
+          "marginal_score": 2279128381993970.5
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "label": "irr_1800s_cool_9645s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 7230173285265828.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 2590887749724243.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007859018733610496,
+          "marginal_score": 2590887749724243.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 2508388983799572.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0077948753562848225,
+          "marginal_score": 2508388983799572.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 2130896551742012.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007486826801180017,
+          "marginal_score": 2130896551742012.0
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "label": "irr_3600s_cool_9645s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 7178354515868152.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 2572311750020388.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007844631149020011,
+          "marginal_score": 2572311750020388.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 2490407483876815.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007780717489695366,
+          "marginal_score": 2490407483876815.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 2115635281970947.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007473770810922223,
+          "marginal_score": 2115635281970947.5
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "label": "irr_3600s_cool_97565s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 7104590846140973.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 2544897045246281.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.013313494344768638,
+          "marginal_score": 2544897045246281.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 2464283342733655.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.013223384311055138,
+          "marginal_score": 2464283342733655.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 2095410458161037.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.012790408800157683,
+          "marginal_score": 2095410458161037.0
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "label": "irr_7200s_cool_97565s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 7004048474548079.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 2508855115020315.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.013273255973103033,
+          "marginal_score": 2508855115020315.0
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 2429394667612130.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01318377985858987,
+          "marginal_score": 2429394667612130.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 2065798691915634.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.012753845087076313,
+          "marginal_score": 2065798691915634.0
+        }
+      ]
+    },
+    {
+      "rank": 22,
+      "label": "irr_1800s_cool_97565s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 5366695724782488.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1922385387939267.8,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.010000342046084843,
+          "marginal_score": 1922385387939267.8
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1861486338409967.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.009932519630144602,
+          "marginal_score": 1861486338409967.0
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 1582823998433252.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.009606637306794065,
+          "marginal_score": 1582823998433252.5
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "label": "irr_1800s_cool_360s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 3894667317501759.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1395668054282115.8,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0040055169896013685,
+          "marginal_score": 1395668054282115.8
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1351211106324997.8,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.003972230841005564,
+          "marginal_score": 1351211106324997.8
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 1147788156894645.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0038123812324095427,
+          "marginal_score": 1147788156894645.5
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "label": "irr_1800s_cool_9645s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 3615086642632914.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1295443874862121.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.003929509366805248,
+          "marginal_score": 1295443874862121.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1254194491899786.2,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0038974376781424113,
+          "marginal_score": 1254194491899786.2
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 1065448275871006.0,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0037434134005900083,
+          "marginal_score": 1065448275871006.0
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "label": "irr_1800s_cool_97565s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 3577797149854992.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1281590258626178.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0066668946973898946,
+          "marginal_score": 1281590258626178.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1240990892273311.8,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006621679753429734,
+          "marginal_score": 1240990892273311.8
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 1055215998955501.8,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006404424871196044,
+          "marginal_score": 1055215998955501.8
+        }
+      ]
+    },
+    {
+      "rank": 26,
+      "label": "irr_3600s_cool_97565s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 3552295423070486.5,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1272448522623140.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006656747172384319,
+          "marginal_score": 1272448522623140.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1232141671366827.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006611692155527569,
+          "marginal_score": 1232141671366827.5
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 1047705229080518.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006395204400078841,
+          "marginal_score": 1047705229080518.5
+        }
+      ]
+    },
+    {
+      "rank": 27,
+      "label": "irr_7200s_cool_346788s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 3010414203166421.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 1073620712041596.5,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.02906901991470905,
+          "marginal_score": 1073620712041596.5
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 1041621738645959.9,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.02896582454443647,
+          "marginal_score": 1041621738645959.9
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 895171752478864.4,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.028468623874270717,
+          "marginal_score": 895171752478864.4
+        }
+      ]
+    },
+    {
+      "rank": 28,
+      "label": "irr_7200s_cool_346788s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 2006942802110947.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 715747141361064.4,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01937934660980604,
+          "marginal_score": 715747141361064.4
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 694414492430639.8,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01931054969629098,
+          "marginal_score": 694414492430639.8
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 596781168319242.9,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.018979082582847147,
+          "marginal_score": 596781168319242.9
+        }
+      ]
+    },
+    {
+      "rank": 29,
+      "label": "irr_1800s_cool_97565s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 1788898574927496.0,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 640795129313089.2,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0033334473486949473,
+          "marginal_score": 640795129313089.2
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 620495446136655.9,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.003310839876714867,
+          "marginal_score": 620495446136655.9
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 527607999477750.9,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.003202212435598022,
+          "marginal_score": 527607999477750.9
+        }
+      ]
+    },
+    {
+      "rank": 30,
+      "label": "irr_3600s_cool_346788s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1525457213762983.2,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 544068294973253.56,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.014557780183613589,
+          "marginal_score": 544068294973253.56
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 527837090685212.2,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.014505841434155377,
+          "marginal_score": 527837090685212.2
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 453551828104517.56,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01425560494714569,
+          "marginal_score": 453551828104517.56
+        }
+      ]
+    },
+    {
+      "rank": 31,
+      "label": "irr_3600s_cool_346788s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 1016971475841988.8,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 362712196648835.7,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.009705186789075726,
+          "marginal_score": 362712196648835.7
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 351891393790141.44,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.009670560956103583,
+          "marginal_score": 351891393790141.44
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 302367885403011.6,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.009503736631430462,
+          "marginal_score": 302367885403011.6
+        }
+      ]
+    },
+    {
+      "rank": 32,
+      "label": "irr_7200s_cool_346788s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 1003471401055473.5,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 357873570680532.2,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.00968967330490302,
+          "marginal_score": 357873570680532.2
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 347207246215319.9,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.00965527484814549,
+          "marginal_score": 347207246215319.9
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 298390584159621.44,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.009489541291423573,
+          "marginal_score": 298390584159621.44
+        }
+      ]
+    },
+    {
+      "rank": 33,
+      "label": "irr_1800s_cool_346788s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 767864701042416.8,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 273875004403393.78,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007284754945155189,
+          "marginal_score": 273875004403393.78
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 265700628776311.84,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.007258699527452489,
+          "marginal_score": 265700628776311.84
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 228289067862711.06,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0071331685196163695,
+          "marginal_score": 228289067862711.06
+        }
+      ]
+    },
+    {
+      "rank": 34,
+      "label": "irr_1800s_cool_346788s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 511909800694944.5,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 182583336268929.22,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0048565032967701266,
+          "marginal_score": 182583336268929.22
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 177133752517541.22,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.00483913301830166,
+          "marginal_score": 177133752517541.22
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 152192711908474.1,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0047554456797442475,
+          "marginal_score": 152192711908474.1
+        }
+      ]
+    },
+    {
+      "rank": 35,
+      "label": "irr_3600s_cool_346788s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 508485737920994.4,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 181356098324417.84,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.004852593394537863,
+          "marginal_score": 181356098324417.84
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 175945696895070.72,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.004835280478051792,
+          "marginal_score": 175945696895070.72
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 151183942701505.8,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.004751868315715231,
+          "marginal_score": 151183942701505.8
+        }
+      ]
+    },
+    {
+      "rank": 36,
+      "label": "irr_1800s_cool_346788s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 255954900347472.25,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 91291668134464.61,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0024282516483850633,
+          "marginal_score": 91291668134464.61
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 88566876258770.61,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.00241956650915083,
+          "marginal_score": 88566876258770.61
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 76096355954237.05,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0023777228398721238,
+          "marginal_score": 76096355954237.05
+        }
+      ]
+    },
+    {
+      "rank": 37,
+      "label": "irr_7200s_cool_1385628s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 171083605129603.97,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 57185713320034.61,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.020701824413459385,
+          "marginal_score": 57185713320034.63
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 57117485926161.86,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.02069061776682903,
+          "marginal_score": 57117485926161.88
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 56780405883407.44,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.020634909216218838,
+          "marginal_score": 56780405883407.46
+        }
+      ]
+    },
+    {
+      "rank": 38,
+      "label": "irr_7200s_cool_1385628s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 114055736753069.34,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 38123808880023.07,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.013801216275639589,
+          "marginal_score": 38123808880023.086
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 38078323950774.6,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01379374517788602,
+          "marginal_score": 38078323950774.62
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 37853603922271.63,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.013756606144145892,
+          "marginal_score": 37853603922271.65
+        }
+      ]
+    },
+    {
+      "rank": 39,
+      "label": "irr_3600s_cool_1385628s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 85589942485227.36,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 28609056573309.344,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.01035352366579792,
+          "marginal_score": 28609056573309.355
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 28574873929922.926,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.010347914534822287,
+          "marginal_score": 28574873929922.938
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 28406011981995.055,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.010320032182589048,
+          "marginal_score": 28406011981995.066
+        }
+      ]
+    },
+    {
+      "rank": 40,
+      "label": "irr_3600s_cool_1385628s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 57059961656818.25,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 19072704382206.23,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006902349110531947,
+          "marginal_score": 19072704382206.24
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 19049915953281.953,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006898609689881524,
+          "marginal_score": 19049915953281.96
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 18937341321330.035,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006880021455059365,
+          "marginal_score": 18937341321330.043
+        }
+      ]
+    },
+    {
+      "rank": 41,
+      "label": "irr_7200s_cool_1385628s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_score": 57027868376534.67,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 19061904440011.535,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0069006081378197946,
+          "marginal_score": 19061904440011.543
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 19039161975387.3,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.00689687258894301,
+          "marginal_score": 19039161975387.31
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 18926801961135.816,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.006878303072072946,
+          "marginal_score": 18926801961135.824
+        }
+      ]
+    },
+    {
+      "rank": 42,
+      "label": "irr_1800s_cool_1385628s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 42807028739378.33,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 14308586199817.244,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.005177415485448802,
+          "marginal_score": 14308586199817.25
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 14291477445786.555,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0051746094572660065,
+          "marginal_score": 14291477445786.56
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 14206965093774.508,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.005160661210199143,
+          "marginal_score": 14206965093774.514
+        }
+      ]
+    },
+    {
+      "rank": 43,
+      "label": "irr_1800s_cool_1385628s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 28538019159585.547,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 9539057466544.828,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0034516103236325335,
+          "marginal_score": 9539057466544.832
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 9527651630524.371,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0034497396381773363,
+          "marginal_score": 9527651630524.375
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 9471310062516.336,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0034404408067994284,
+          "marginal_score": 9471310062516.34
+        }
+      ]
+    },
+    {
+      "rank": 44,
+      "label": "irr_3600s_cool_1385628s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_score": 28529980828409.125,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 9536352191103.115,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0034511745552659734,
+          "marginal_score": 9536352191103.12
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 9524957976640.977,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.003449304844940762,
+          "marginal_score": 9524957976640.98
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 9468670660665.018,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0034400107275296826,
+          "marginal_score": 9468670660665.021
+        }
+      ]
+    },
+    {
+      "rank": 45,
+      "label": "irr_1800s_cool_1385628s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_score": 14269009579792.773,
+      "diagnostics": {
+        "graph_density": 0.0,
+        "average_degree": 0.0,
+        "masking_penalty": 0.0,
+        "differentiable_graph_mode": true,
+        "gradient_norm": 0.0
+      },
+      "window_scores": [
+        {
+          "label": "window_1",
+          "cooldown_time_s": 0.0,
+          "count_time_s": 900.0,
+          "base_information": 4769528733272.414,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0017258051618162667,
+          "marginal_score": 4769528733272.416
+        },
+        {
+          "label": "window_2",
+          "cooldown_time_s": 3600.0,
+          "count_time_s": 900.0,
+          "base_information": 4763825815262.186,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0017248698190886682,
+          "marginal_score": 4763825815262.1875
+        },
+        {
+          "label": "window_3",
+          "cooldown_time_s": 21600.0,
+          "count_time_s": 900.0,
+          "base_information": 4735655031258.168,
+          "masking_penalty": 0.0,
+          "graph_bonus": 0.0017202204033997142,
+          "marginal_score": 4735655031258.17
+        }
+      ]
+    }
+  ],
+  "advanced_objective": true,
+  "window_offsets_s": [
+    0.0,
+    3600.0,
+    21600.0
+  ],
+  "window_count_time_s": 900.0,
+  "masking_regularization": 0.2,
+  "differentiable_graph_mode": true,
+  "graph_temperature": 2.0,
+  "input": null,
+  "candidate_source": "activity-review",
+  "activity_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+  "candidate_generation": {
+    "irradiation_grid_s": [
+      1800.0,
+      3600.0,
+      7200.0
+    ],
+    "cooldown_grid_s": [
+      360.0,
+      9645.0,
+      97565.0,
+      346788.0,
+      1385628.0
+    ],
+    "count_grid_s": [
+      300.0,
+      600.0,
+      900.0
+    ],
+    "reference_irradiation_time_s": 3600.0
+  },
+  "neutron_source": {
+    "source": "unfold",
+    "integral_flux": 2.4042465189891076e-08,
+    "high_energy_fraction": 0.9999999999459287,
+    "hardness_scale": 1.4999999999459286,
+    "applied_flux_scale": 1.4999999999459286
+  },
+  "isotope_weights": {
+    "W-187": 19104.9041868097,
+    "Cr-51": 3174.9802103698544,
+    "Ta-182": 835.7741636987821,
+    "Fe-59": 656.195997644508,
+    "Mn-54": 137.0700955679112,
+    "Co-60": 49.63468715731319
+  },
+  "isotopes_of_interest": [],
+  "isotope_filter_summary": {
+    "requested_isotopes": [],
+    "candidates_before": 45,
+    "candidates_after": 45,
+    "line_terms_before": 270,
+    "line_terms_after": 270
+  },
+  "generated_at": "2026-04-17T19:47:45Z",
+  "support_artifacts": {
+    "optimization_grid": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_stbd_mr_optimization_grid.csv",
+    "recommended_schedules": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_stbd_mr_recommended_schedules.csv",
+    "dose_endpoints": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_stbd_mr_dose_endpoints.csv",
+    "masking_candidates": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_stbd_mr_masking_candidates.csv",
+    "inventory_timeseries": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_stbd_mr_inventory_timeseries.csv",
+    "activities_at_irradiation": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_stbd_mr_activities_at_irradiation.csv"
+  }
+}

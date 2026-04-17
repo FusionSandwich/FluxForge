@@ -1,0 +1,830 @@
+{
+  "schema": "fluxforge.optimization_sweep.bassd.v1",
+  "objective": "bass-d",
+  "ranked_candidates": [
+    {
+      "rank": 1,
+      "label": "irr_1800s_cool_9645s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569258,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569258,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 688481154008160.5,
+          "utility_score": 7653.278807569258
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "label": "irr_1800s_cool_9645s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569258,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569258,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 1376962308016321.0,
+          "utility_score": 7653.278807569258
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "label": "irr_3600s_cool_360s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569258,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569258,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 4418614188918957.0,
+          "utility_score": 7653.278807569258
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "label": "irr_3600s_cool_97565s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569258,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569258,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2028386087473697.5,
+          "utility_score": 7653.278807569258
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "label": "irr_3600s_cool_1385628s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569258,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569258,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 14657769983177.158,
+          "utility_score": 7653.278807569258
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "label": "irr_7200s_cool_346788s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569258,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569258,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 569225271482748.8,
+          "utility_score": 7653.278807569258
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "label": "irr_1800s_cool_360s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 741756783434335.0,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "label": "irr_1800s_cool_360s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 1483513566868670.0,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "label": "irr_1800s_cool_360s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2225270350303005.2,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "label": "irr_1800s_cool_9645s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2065443462024481.0,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "label": "irr_1800s_cool_346788s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 48404539793009.26,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "label": "irr_1800s_cool_346788s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 96809079586018.52,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "label": "irr_1800s_cool_346788s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 145213619379027.78,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "label": "irr_1800s_cool_1385628s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2443657254808.6963,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "label": "irr_1800s_cool_1385628s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 4887314509617.393,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "label": "irr_1800s_cool_1385628s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 7330971764426.091,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "label": "irr_3600s_cool_360s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 1472871396306318.8,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "label": "irr_3600s_cool_360s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2945742792612637.5,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "label": "irr_3600s_cool_9645s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 1367087966454876.5,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "label": "irr_3600s_cool_9645s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2734175932909753.0,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "label": "irr_3600s_cool_9645s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 4101263899364630.0,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 22,
+      "label": "irr_3600s_cool_97565s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 676128695824565.6,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "label": "irr_3600s_cool_97565s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 1352257391649131.2,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "label": "irr_3600s_cool_346788s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 96156782111703.88,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "label": "irr_3600s_cool_346788s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 192313564223407.75,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 26,
+      "label": "irr_7200s_cool_9645s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 8085737286768859.0,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 27,
+      "label": "irr_7200s_cool_346788s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 189741757160916.25,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 28,
+      "label": "irr_7200s_cool_346788s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 379483514321832.5,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 29,
+      "label": "irr_7200s_cool_1385628s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569256,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569256,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 29298879235296.727,
+          "utility_score": 7653.278807569256
+        }
+      ]
+    },
+    {
+      "rank": 30,
+      "label": "irr_7200s_cool_360s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569255,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569255,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 8711356256318043.0,
+          "utility_score": 7653.278807569255
+        }
+      ]
+    },
+    {
+      "rank": 31,
+      "label": "irr_7200s_cool_9645s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569255,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569255,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2695245762256287.0,
+          "utility_score": 7653.278807569255
+        }
+      ]
+    },
+    {
+      "rank": 32,
+      "label": "irr_7200s_cool_9645s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569255,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569255,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 5390491524512574.0,
+          "utility_score": 7653.278807569255
+        }
+      ]
+    },
+    {
+      "rank": 33,
+      "label": "irr_7200s_cool_97565s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569255,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569255,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 1333098918281286.8,
+          "utility_score": 7653.278807569255
+        }
+      ]
+    },
+    {
+      "rank": 34,
+      "label": "irr_7200s_cool_97565s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569255,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569255,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2666197836562573.5,
+          "utility_score": 7653.278807569255
+        }
+      ]
+    },
+    {
+      "rank": 35,
+      "label": "irr_1800s_cool_97565s_count_300s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 340494042146628.75,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 36,
+      "label": "irr_1800s_cool_97565s_count_600s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 680988084293257.5,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 37,
+      "label": "irr_1800s_cool_97565s_count_900s",
+      "irradiation_time_s": 1800.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 1021482126439886.4,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 38,
+      "label": "irr_3600s_cool_346788s_count_900s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 288470346335111.7,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 39,
+      "label": "irr_3600s_cool_1385628s_count_300s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 4885923327725.718,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 40,
+      "label": "irr_3600s_cool_1385628s_count_600s",
+      "irradiation_time_s": 3600.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 9771846655451.436,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 41,
+      "label": "irr_7200s_cool_360s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 2903785418772680.5,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 42,
+      "label": "irr_7200s_cool_360s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 360.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 5807570837545361.0,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 43,
+      "label": "irr_7200s_cool_97565s_count_900s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 900.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 3999296754843859.0,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 44,
+      "label": "irr_7200s_cool_1385628s_count_300s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 300.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 9766293078432.242,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    },
+    {
+      "rank": 45,
+      "label": "irr_7200s_cool_1385628s_count_600s",
+      "irradiation_time_s": 7200.0,
+      "total_utility": 7653.278807569254,
+      "action_scores": [
+        {
+          "label": "action_1",
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 600.0,
+          "value_of_information": 7653.278807569254,
+          "expected_dose_uSv": 0.0,
+          "posterior_variance_reduction": 19532586156864.484,
+          "utility_score": 7653.278807569254
+        }
+      ]
+    }
+  ],
+  "advanced_objective": true,
+  "dose_weight": 0.03,
+  "exploration_temperature": 0.0,
+  "seed": 17,
+  "input": null,
+  "candidate_source": "activity-review",
+  "activity_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+  "candidate_generation": {
+    "irradiation_grid_s": [
+      1800.0,
+      3600.0,
+      7200.0
+    ],
+    "cooldown_grid_s": [
+      360.0,
+      9645.0,
+      97565.0,
+      346788.0,
+      1385628.0
+    ],
+    "count_grid_s": [
+      300.0,
+      600.0,
+      900.0
+    ],
+    "reference_irradiation_time_s": 3600.0
+  },
+  "neutron_source": {
+    "source": "unfold",
+    "integral_flux": 2.4042465189891076e-08,
+    "high_energy_fraction": 0.9999999999459287,
+    "hardness_scale": 1.4999999999459286,
+    "applied_flux_scale": 1.4999999999459286
+  },
+  "isotope_weights": {
+    "W-187": 19104.9041868097,
+    "Cr-51": 3174.9802103698544,
+    "Ta-182": 835.7741636987821,
+    "Fe-59": 656.195997644508,
+    "Mn-54": 137.0700955679112,
+    "Co-60": 49.63468715731319
+  },
+  "isotopes_of_interest": [],
+  "isotope_filter_summary": {
+    "requested_isotopes": [],
+    "candidates_before": 45,
+    "candidates_after": 45,
+    "line_terms_before": 270,
+    "line_terms_after": 270
+  },
+  "generated_at": "2026-04-17T19:47:41Z",
+  "support_artifacts": {
+    "optimization_grid": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_bass_d_optimization_grid.csv",
+    "recommended_schedules": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_bass_d_recommended_schedules.csv",
+    "dose_endpoints": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_bass_d_dose_endpoints.csv",
+    "masking_candidates": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_bass_d_masking_candidates.csv",
+    "inventory_timeseries": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_bass_d_inventory_timeseries.csv",
+    "activities_at_irradiation": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_bass_d_activities_at_irradiation.csv"
+  }
+}

@@ -1,0 +1,6 @@
+cooldown_time_s,count_time_s,graph_density,irradiation_time_s,label,masking_penalty,objective,objective_score,rank
+0.0,900.0,0.0,7200.0,irr_7200s_cool_360s_count_900s,0.0,stbd-mr,4.574036564224454e+16,1
+0.0,900.0,0.0,7200.0,irr_7200s_cool_9645s_count_900s,0.0,stbd-mr,4.2457231301737736e+16,2
+0.0,900.0,0.0,7200.0,irr_7200s_cool_360s_count_600s,0.0,stbd-mr,3.0493577094829696e+16,3
+0.0,900.0,0.0,7200.0,irr_7200s_cool_9645s_count_600s,0.0,stbd-mr,2.830482086782516e+16,4
+0.0,900.0,0.0,3600.0,irr_3600s_cool_360s_count_900s,0.0,stbd-mr,2.320045955821125e+16,5

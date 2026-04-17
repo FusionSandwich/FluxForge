@@ -1,0 +1,5 @@
+duration_factor,flux_scale,label,nuclide_count,pulse_delay_s,rank,score,second_cooling_time_s
+1.0,1.0,RAFM4-C_15dEOI_window_300s,6,0.0,1,28035027.97977942,360.0
+1.0,1.0,RAFM4-C_15dEOI_window_2h,6,0.0,2,26533945.478025805,9645.0
+1.0,1.0,RAFM4-C_15dEOI_window_24h,6,0.0,3,16676921.850235216,97565.0
+1.0,1.0,RAFM4-C_15dEOI_window_4d,6,0.0,4,8079604.384057821,346788.0

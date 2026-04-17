@@ -1,0 +1,5058 @@
+{
+  "schema": "fluxforge.ffexp_bundle.v1",
+  "format": ".ffexp",
+  "summary": {
+    "isotope_count": 6,
+    "line_count": 45,
+    "optimization_candidate_count": 45,
+    "peak_fit_complete": true,
+    "activity_complete": true,
+    "naa_quant_complete": true,
+    "inverse_adjustment_complete": false,
+    "comparison_ready": true,
+    "optimization_objective": "di-fom",
+    "recommended_schedule_label": "irr_7200s_cool_360s_count_900s",
+    "second_irradiation_selected_label": "RAFM4-C_15dEOI_window_300s"
+  },
+  "provenance": {
+    "created_at": "2026-04-17T19:47:53.260308+00:00",
+    "versions": {
+      "fluxforge": "0.1.0"
+    },
+    "units": {
+      "summary": "mixed",
+      "metadata": "mixed"
+    },
+    "normalization": {
+      "bundle": "experimental"
+    },
+    "definitions": {
+      "summary": "aggregate readiness and workflow summary for benchmark export",
+      "metadata": "sample, detector, method, and provenance metadata included in the ffexp bundle"
+    },
+    "hashes": {
+      "source": {
+        "sha256": "2eb9125b3babdf445efeec56ca7b5a025741531c979ed9d8a52842e20f5ac298",
+        "md5": "aeaab0e5059089b09ab661b6aab19d65"
+      }
+    }
+  },
+  "metadata": {
+    "generated_at": "2026-04-17T19:47:53Z",
+    "activity_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+    "inventory_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/inventory_review.json",
+    "masking_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/masking_review.json",
+    "optimization_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_di_fom.json",
+    "second_irradiation_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_plan.json"
+  },
+  "activities": {
+    "schema": "fluxforge.activity_review.v1",
+    "source_id": "fluxforge_bundled_gamma",
+    "custom_gamma_path": null,
+    "spectrum_id": "RAFM4-C_15dEOI",
+    "sample_group": "RAFM4",
+    "analysis_json_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/analysis_json/RAFM4-C_15dEOI.json",
+    "schedule_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/metadata/sample_schedules.json",
+    "live_time_s": 3600.0,
+    "cooling_time_s": 1385628.0,
+    "irradiation_reference": "end_of_irradiation",
+    "plot_horizon_s": 1385628.0,
+    "line_results": [
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-1",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 84.11605493158743,
+        "matched_line_energy_keV": 84.11605493158743,
+        "line_delta_keV": 0.0,
+        "net_counts": 129990.5,
+        "net_counts_uncertainty": 955.8188150182319,
+        "efficiency": 0.0006835399353697281,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 2008886.4629404591,
+        "count_time_activity_unc_Bq": 14771.321585145968,
+        "irradiation_time_activity_Bq": 2213604.865983782,
+        "irradiation_time_activity_unc_Bq": 16276.61390581012
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-2",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 99.7275651239,
+        "matched_line_energy_keV": 99.7275651239,
+        "line_delta_keV": 0.0,
+        "net_counts": 783310.8560602255,
+        "net_counts_uncertainty": 939.16030657166,
+        "efficiency": 0.0008251912943852409,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 405630.99999999994,
+        "count_time_activity_unc_Bq": 2669.345881982171,
+        "irradiation_time_activity_Bq": 446967.39808758424,
+        "irradiation_time_activity_unc_Bq": 2941.3693318937135
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-3",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 113.16759651551624,
+        "matched_line_energy_keV": 113.16759651551624,
+        "line_delta_keV": 0.0,
+        "net_counts": 37917.45175264398,
+        "net_counts_uncertainty": 835.8860112663912,
+        "efficiency": 0.0008931667748840376,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 256558.0,
+        "count_time_activity_unc_Bq": 15986.729732891401,
+        "irradiation_time_activity_Bq": 282702.9041630311,
+        "irradiation_time_activity_unc_Bq": 17615.879931858984
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-4",
+        "nuclide": "Fe-59",
+        "peak_energy_keV": 142.2441870771751,
+        "matched_line_energy_keV": 142.2441870771751,
+        "line_delta_keV": 0.0,
+        "net_counts": 556060.0,
+        "net_counts_uncertainty": 2286.167506640984,
+        "efficiency": 0.0009454889101864427,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 3839380.7223994713,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 16807241.88585854,
+        "count_time_activity_unc_Bq": 69100.76300346208,
+        "irradiation_time_activity_Bq": 21584289.942331336,
+        "irradiation_time_activity_unc_Bq": 88740.96737775726
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-5",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 152.1891653744,
+        "matched_line_energy_keV": 152.1891653744,
+        "line_delta_keV": 0.0,
+        "net_counts": 644183.3371036103,
+        "net_counts_uncertainty": 1128.5371506496317,
+        "efficiency": 0.0009476059733596715,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 388241.0,
+        "count_time_activity_unc_Bq": 5593.152361360354,
+        "irradiation_time_activity_Bq": 427805.24565657414,
+        "irradiation_time_activity_unc_Bq": 6163.130426581463
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-6",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 156.35866730533596,
+        "matched_line_energy_keV": 156.35866730533596,
+        "line_delta_keV": 0.0,
+        "net_counts": 67528.8593790362,
+        "net_counts_uncertainty": 663.840945369906,
+        "efficiency": 0.0009482599610496127,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 327597.99999999994,
+        "count_time_activity_unc_Bq": 9259.773094992104,
+        "irradiation_time_activity_Bq": 360982.335370562,
+        "irradiation_time_activity_unc_Bq": 10203.403307809409
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-7",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 179.55568732593406,
+        "matched_line_energy_keV": 179.55568732593406,
+        "line_delta_keV": 0.0,
+        "net_counts": 92332.0,
+        "net_counts_uncertainty": 953.8528654299304,
+        "efficiency": 0.000939637812676308,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 479779.0,
+        "count_time_activity_unc_Bq": 10583.194460113758,
+        "irradiation_time_activity_Bq": 528671.5544104448,
+        "irradiation_time_activity_unc_Bq": 11661.6897902083
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-8",
+        "nuclide": "Fe-59",
+        "peak_energy_keV": 192.53449755243872,
+        "matched_line_energy_keV": 192.53449755243872,
+        "line_delta_keV": 0.0,
+        "net_counts": 37330.5,
+        "net_counts_uncertainty": 842.7607481197903,
+        "efficiency": 0.0009285966470588331,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 3839380.7223994713,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 208606.0,
+        "count_time_activity_unc_Bq": 10164.341832870487,
+        "irradiation_time_activity_Bq": 267897.16113376274,
+        "irradiation_time_activity_unc_Bq": 13053.307775515324
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-9",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 198.560346054941,
+        "matched_line_energy_keV": 198.560346054941,
+        "line_delta_keV": 0.0,
+        "net_counts": 40154.0,
+        "net_counts_uncertainty": 828.8023200463942,
+        "efficiency": 0.0009224802521310393,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 440411.0,
+        "count_time_activity_unc_Bq": 22780.953052970955,
+        "irradiation_time_activity_Bq": 485291.70294960466,
+        "irradiation_time_activity_unc_Bq": 25102.478144031986
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-10",
+        "nuclide": "W-187",
+        "peak_energy_keV": 209.77219439190313,
+        "matched_line_energy_keV": 209.77219439190313,
+        "line_delta_keV": 0.0,
+        "net_counts": 276254.0,
+        "net_counts_uncertainty": 1342.7122633767156,
+        "efficiency": 0.0009121791260928785,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 64911395.05628562,
+        "count_time_activity_unc_Bq": 315497.0649292514,
+        "irradiation_time_activity_Bq": 4750139534306.098,
+        "irradiation_time_activity_unc_Bq": 23087704089.219913
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-11",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 222.1402672384,
+        "matched_line_energy_keV": 222.1402672384,
+        "line_delta_keV": 0.0,
+        "net_counts": 289905.1849599514,
+        "net_counts_uncertainty": 964.2105268249505,
+        "efficiency": 0.0008996274762029722,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 544418.0,
+        "count_time_activity_unc_Bq": 4294.049739183942,
+        "irradiation_time_activity_Bq": 599897.6827018805,
+        "irradiation_time_activity_unc_Bq": 4731.640922862692
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-12",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 229.54465955123754,
+        "matched_line_energy_keV": 229.54465955123754,
+        "line_delta_keV": 0.0,
+        "net_counts": 96776.0,
+        "net_counts_uncertainty": 775.4235708860766,
+        "efficiency": 0.0008915303696472852,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 532467.0,
+        "count_time_activity_unc_Bq": 8202.02007223994,
+        "irradiation_time_activity_Bq": 586728.7992226969,
+        "irradiation_time_activity_unc_Bq": 9037.85847420741
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-13",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 264.1121909104,
+        "matched_line_energy_keV": 264.1121909104,
+        "line_delta_keV": 0.0,
+        "net_counts": 107903.25468927503,
+        "net_counts_uncertainty": 752.1391961005123,
+        "efficiency": 0.0008504562944468477,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 564509.0,
+        "count_time_activity_unc_Bq": 7578.242426749682,
+        "irradiation_time_activity_Bq": 622036.0843402604,
+        "irradiation_time_activity_unc_Bq": 8350.513889621961
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-14",
+        "nuclide": "Cr-51",
+        "peak_energy_keV": 320.07622878559994,
+        "matched_line_energy_keV": 320.07622878559994,
+        "line_delta_keV": 0.0,
+        "net_counts": 3031711.231240962,
+        "net_counts_uncertainty": 1821.2542947812196,
+        "efficiency": 0.0007828482898798358,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 2390434.176355029,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 6745100.0,
+        "count_time_activity_unc_Bq": 5383.365095654751,
+        "irradiation_time_activity_Bq": 10080497.982528158,
+        "irradiation_time_activity_unc_Bq": 8045.396063210362
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-15",
+        "nuclide": "Fe-59",
+        "peak_energy_keV": 335.2830019914332,
+        "matched_line_energy_keV": 335.2830019914332,
+        "line_delta_keV": 0.0,
+        "net_counts": 4007.5,
+        "net_counts_uncertainty": 351.2533985600709,
+        "efficiency": 0.0007656326288372844,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 3839380.7223994713,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 550740.0630638174,
+        "count_time_activity_unc_Bq": 48271.820055983444,
+        "irradiation_time_activity_Bq": 707274.4763689737,
+        "irradiation_time_activity_unc_Bq": 61991.9060609848
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-16",
+        "nuclide": "W-187",
+        "peak_energy_keV": 479.98275576159995,
+        "matched_line_energy_keV": 479.98275576159995,
+        "line_delta_keV": 0.0,
+        "net_counts": 6526.025966744026,
+        "net_counts_uncertainty": 388.6605672476383,
+        "efficiency": 0.0006241668847472187,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 5032.0,
+        "count_time_activity_unc_Bq": 909.4410710016734,
+        "irradiation_time_activity_Bq": 368235840.8088734,
+        "irradiation_time_activity_unc_Bq": 66551827.791419625
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-17",
+        "nuclide": "W-187",
+        "peak_energy_keV": 511.09484760544757,
+        "matched_line_energy_keV": 511.09484760544757,
+        "line_delta_keV": 0.0,
+        "net_counts": 1793.0,
+        "net_counts_uncertainty": 397.22861105973277,
+        "efficiency": 0.0005994474835639502,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 130391.98004003566,
+        "count_time_activity_unc_Bq": 28887.576756626753,
+        "irradiation_time_activity_Bq": 9541931717.96033,
+        "irradiation_time_activity_unc_Bq": 2113958886.309086
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-18",
+        "nuclide": "W-187",
+        "peak_energy_keV": 551.577450615717,
+        "matched_line_energy_keV": 551.577450615717,
+        "line_delta_keV": 0.0,
+        "net_counts": 929.0,
+        "net_counts_uncertainty": 336.62144910863896,
+        "efficiency": 0.0005702229361913307,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 8963.201513809956,
+        "count_time_activity_unc_Bq": 3247.7996579455908,
+        "irradiation_time_activity_Bq": 655916543.2784531,
+        "irradiation_time_activity_unc_Bq": 237670158.5497548
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-19",
+        "nuclide": "W-187",
+        "peak_energy_keV": 618.3666740325963,
+        "matched_line_energy_keV": 618.3666740325963,
+        "line_delta_keV": 0.0,
+        "net_counts": 1349.0,
+        "net_counts_uncertainty": 333.7133944414423,
+        "efficiency": 0.0005280025565158068,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 11428.305026982576,
+        "count_time_activity_unc_Bq": 2827.115243340663,
+        "irradiation_time_activity_Bq": 836309918.6469005,
+        "irradiation_time_activity_unc_Bq": 206884967.9441836
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-20",
+        "nuclide": "W-187",
+        "peak_energy_keV": 685.8826455296,
+        "matched_line_energy_keV": 685.8826455296,
+        "line_delta_keV": 0.0,
+        "net_counts": 6088.7732876164955,
+        "net_counts_uncertainty": 378.75772495407074,
+        "efficiency": 0.0004924345210498009,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 5216.999999999999,
+        "count_time_activity_unc_Bq": 920.8018154311648,
+        "irradiation_time_activity_Bq": 381773923.1915525,
+        "irradiation_time_activity_unc_Bq": 67383193.70501432
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-21",
+        "nuclide": "Sb-124",
+        "peak_energy_keV": 719.5561519226326,
+        "matched_line_energy_keV": 719.5561519226326,
+        "line_delta_keV": 0.0,
+        "net_counts": 1194.5,
+        "net_counts_uncertainty": 554.540931068906,
+        "efficiency": 0.00047665293160867756,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 1000000.0,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 6445.5150882691205,
+        "count_time_activity_unc_Bq": 2992.2996553097028,
+        "irradiation_time_activity_Bq": 7754.549966490591,
+        "irradiation_time_activity_unc_Bq": 3600.0128576291722
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-22",
+        "nuclide": "W-187",
+        "peak_energy_keV": 773.4649069409531,
+        "matched_line_energy_keV": 773.4649069409531,
+        "line_delta_keV": 0.0,
+        "net_counts": 3235.0,
+        "net_counts_uncertainty": 503.9518082118567,
+        "efficiency": 0.0004538070171135805,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 48249.545321749145,
+        "count_time_activity_unc_Bq": 7516.366494681734,
+        "irradiation_time_activity_Bq": 3530844970.2305527,
+        "irradiation_time_activity_unc_Bq": 550038858.5049231
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-23",
+        "nuclide": "Mn-54",
+        "peak_energy_keV": 834.8244327195999,
+        "matched_line_energy_keV": 834.8244327195999,
+        "line_delta_keV": 0.0,
+        "net_counts": 40692.47714983273,
+        "net_counts_uncertainty": 475.9546568216003,
+        "efficiency": 0.0004315460057033433,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 26932182.019928318,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 18130.0,
+        "count_time_activity_unc_Bq": 470.6781665560908,
+        "irradiation_time_activity_Bq": 18788.190428046488,
+        "irradiation_time_activity_unc_Bq": 487.7656383662226
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-24",
+        "nuclide": "Mn-56",
+        "peak_energy_keV": 847.6249408805987,
+        "matched_line_energy_keV": 847.6249408805987,
+        "line_delta_keV": 0.0,
+        "net_counts": 764.5,
+        "net_counts_uncertainty": 373.99057969914656,
+        "efficiency": 0.00042736572072753275,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 1000000.0,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 502.78985877634085,
+        "count_time_activity_unc_Bq": 245.9629440819042,
+        "irradiation_time_activity_Bq": 4.223937265256527e+47,
+        "irradiation_time_activity_unc_Bq": 2.066334527725463e+47
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-25",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 928.2939888391,
+        "matched_line_energy_keV": 928.2939888391,
+        "line_delta_keV": 0.0,
+        "net_counts": 10968.160927045406,
+        "net_counts_uncertainty": 452.9777467745569,
+        "efficiency": 0.0004037187159368691,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 1253504.7515955078,
+        "count_time_activity_unc_Bq": 51768.912010474116,
+        "irradiation_time_activity_Bq": 1381244.9179452946,
+        "irradiation_time_activity_unc_Bq": 57044.49586729493
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-26",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 959.7847891696001,
+        "matched_line_energy_keV": 959.7847891696001,
+        "line_delta_keV": 0.0,
+        "net_counts": 13750.978439324535,
+        "net_counts_uncertainty": 437.0604466897862,
+        "efficiency": 0.00039564762064501607,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 2847217.312895199,
+        "count_time_activity_unc_Bq": 90495.82006747696,
+        "irradiation_time_activity_Bq": 3137367.0013748715,
+        "irradiation_time_activity_unc_Bq": 99717.92400818078
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-27",
+        "nuclide": "Tb154m",
+        "peak_energy_keV": 999.2714576006701,
+        "matched_line_energy_keV": 999.2714576006701,
+        "line_delta_keV": 0.0,
+        "net_counts": 768.8439469471969,
+        "net_counts_uncertainty": 280.5193833883093,
+        "efficiency": 0.00038635735883595535,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 1000000.0,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 5071.308286990331,
+        "count_time_activity_unc_Bq": 1850.310819623651,
+        "irradiation_time_activity_Bq": 3.941618253537265e+16,
+        "irradiation_time_activity_unc_Bq": 1.438133611410634e+16
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-28",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1001.7733514944,
+        "matched_line_energy_keV": 1001.7733514944,
+        "line_delta_keV": 0.0,
+        "net_counts": 35766.16835195139,
+        "net_counts_uncertainty": 425.79486745150956,
+        "efficiency": 0.00038580621981962673,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 704554.0000000001,
+        "count_time_activity_unc_Bq": 22412.37878724209,
+        "irradiation_time_activity_Bq": 776352.5672155233,
+        "irradiation_time_activity_unc_Bq": 24696.34379888856
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-29",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1044.4801372666082,
+        "matched_line_energy_keV": 1044.4801372666082,
+        "line_delta_keV": 0.0,
+        "net_counts": 2375.5,
+        "net_counts_uncertainty": 283.69821276477217,
+        "efficiency": 0.00037696025476417446,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 803046.2745919293,
+        "count_time_activity_unc_Bq": 95905.19590365767,
+        "irradiation_time_activity_Bq": 884881.8357035888,
+        "irradiation_time_activity_unc_Bq": 105678.54990407026
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-30",
+        "nuclide": "Fe-59",
+        "peak_energy_keV": 1099.2967410139415,
+        "matched_line_energy_keV": 1099.2967410139415,
+        "line_delta_keV": 0.0,
+        "net_counts": 277796.0,
+        "net_counts_uncertainty": 586.4420182257925,
+        "efficiency": 0.0003669222547198477,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 3839380.7223994713,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 324749.0,
+        "count_time_activity_unc_Bq": 946.0823993116071,
+        "irradiation_time_activity_Bq": 417050.97255605453,
+        "irradiation_time_activity_unc_Bq": 1214.9832170416885
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-31",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1121.2459885039002,
+        "matched_line_energy_keV": 1121.2459885039002,
+        "line_delta_keV": 0.0,
+        "net_counts": 389118.3118214387,
+        "net_counts_uncertainty": 672.4572946875968,
+        "efficiency": 0.00036328756704008595,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 707736.0,
+        "count_time_activity_unc_Bq": 1671.3371146840027,
+        "irradiation_time_activity_Bq": 779858.8334050272,
+        "irradiation_time_activity_unc_Bq": 1841.6570762035426
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-32",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1157.2392477631001,
+        "matched_line_energy_keV": 1157.2392477631001,
+        "line_delta_keV": 0.0,
+        "net_counts": 12154.370551862987,
+        "net_counts_uncertainty": 238.0391342786665,
+        "efficiency": 0.00035777107746866424,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 1604349.9668648648,
+        "count_time_activity_unc_Bq": 31420.637997085207,
+        "irradiation_time_activity_Bq": 1767843.5087838226,
+        "irradiation_time_activity_unc_Bq": 34622.60234501077
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-33",
+        "nuclide": "Co-60",
+        "peak_energy_keV": 1173.2956235317265,
+        "matched_line_energy_keV": 1173.2956235317265,
+        "line_delta_keV": 0.0,
+        "net_counts": 2589.8066295854014,
+        "net_counts_uncertainty": 176.75678521691404,
+        "efficiency": 0.00035548016714035367,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 166124306.05215433,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 1868.5000000000002,
+        "count_time_activity_unc_Bq": 281.97106656580945,
+        "irradiation_time_activity_Bq": 1879.3341841614588,
+        "irradiation_time_activity_unc_Bq": 283.60602854781473
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-34",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1189.2338400319002,
+        "matched_line_energy_keV": 1189.2338400319002,
+        "line_delta_keV": 0.0,
+        "net_counts": 173924.20976614548,
+        "net_counts_uncertainty": 457.3216622180219,
+        "efficiency": 0.00035330561921166875,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 710363.0000000001,
+        "count_time_activity_unc_Bq": 2641.493935355085,
+        "irradiation_time_activity_Bq": 782753.5415382225,
+        "irradiation_time_activity_unc_Bq": 2910.679093436636
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-35",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1221.2289819839,
+        "matched_line_energy_keV": 1221.2289819839,
+        "line_delta_keV": 0.0,
+        "net_counts": 292717.6823220984,
+        "net_counts_uncertainty": 567.3554376913132,
+        "efficiency": 0.0003492283342606576,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 720020.0,
+        "count_time_activity_unc_Bq": 2028.6846286342172,
+        "irradiation_time_activity_Bq": 793394.6517179961,
+        "irradiation_time_activity_unc_Bq": 2235.4205916237006
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-36",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1231.0343413813696,
+        "matched_line_energy_keV": 1231.0343413813696,
+        "line_delta_keV": 0.0,
+        "net_counts": 111318.0,
+        "net_counts_uncertainty": 376.6479346374631,
+        "efficiency": 0.00034805315974455013,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 701372.0,
+        "count_time_activity_unc_Bq": 3459.038322643238,
+        "irradiation_time_activity_Bq": 772846.3010260192,
+        "irradiation_time_activity_unc_Bq": 3811.5364924206733
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-37",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1257.4326041200156,
+        "matched_line_energy_keV": 1257.4326041200156,
+        "line_delta_keV": 0.0,
+        "net_counts": 14243.0,
+        "net_counts_uncertainty": 174.29955058270613,
+        "efficiency": 0.0003450987988355694,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 729492.0,
+        "count_time_activity_unc_Bq": 17793.69,
+        "irradiation_time_activity_Bq": 803831.9092123335,
+        "irradiation_time_activity_unc_Bq": 19606.981028760296
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-38",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1273.7528637312832,
+        "matched_line_energy_keV": 1273.7528637312832,
+        "line_delta_keV": 0.0,
+        "net_counts": 5586.0,
+        "net_counts_uncertainty": 143.49063558295364,
+        "efficiency": 0.00034345635202749923,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 698245.2841857998,
+        "count_time_activity_unc_Bq": 17936.208310171947,
+        "irradiation_time_activity_Bq": 769400.9528350959,
+        "irradiation_time_activity_unc_Bq": 19764.022867962416
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-39",
+        "nuclide": "Fe-59",
+        "peak_energy_keV": 1291.7202186224,
+        "matched_line_energy_keV": 1291.7202186224,
+        "line_delta_keV": 0.0,
+        "net_counts": 213179.87315202065,
+        "net_counts_uncertainty": 481.13765114359876,
+        "efficiency": 0.0003417463759763781,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 3839380.7223994713,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 354238.0,
+        "count_time_activity_unc_Bq": 1081.2782843098391,
+        "irradiation_time_activity_Bq": 454921.50065531116,
+        "irradiation_time_activity_unc_Bq": 1388.6052307325363
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-40",
+        "nuclide": "Co-60",
+        "peak_energy_keV": 1332.575555310047,
+        "matched_line_energy_keV": 1332.575555310047,
+        "line_delta_keV": 0.0,
+        "net_counts": 3496.0,
+        "net_counts_uncertainty": 108.28092749537778,
+        "efficiency": 0.000338225537130022,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 166124306.05215433,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 2708.4,
+        "count_time_activity_unc_Bq": 181.28306636155605,
+        "irradiation_time_activity_Bq": 2724.104203576609,
+        "irradiation_time_activity_unc_Bq": 182.33420584580276
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-41",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1342.6562775849716,
+        "matched_line_energy_keV": 1342.6562775849716,
+        "line_delta_keV": 0.0,
+        "net_counts": 2442.0,
+        "net_counts_uncertainty": 109.805282204455,
+        "efficiency": 0.00033743234198370956,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 795898.2345345746,
+        "count_time_activity_unc_Bq": 35787.80927481428,
+        "irradiation_time_activity_Bq": 877005.3645614382,
+        "irradiation_time_activity_unc_Bq": 39434.816359741875
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-42",
+        "nuclide": "Ta-182",
+        "peak_energy_keV": 1374.2133515039,
+        "matched_line_energy_keV": 1374.2133515039,
+        "line_delta_keV": 0.0,
+        "net_counts": 3306.3639335899297,
+        "net_counts_uncertainty": 117.2271238511381,
+        "efficiency": 0.0003351339985017102,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 1257225.7457559083,
+        "count_time_activity_unc_Bq": 44574.93523604537,
+        "irradiation_time_activity_Bq": 1385345.1052538913,
+        "irradiation_time_activity_unc_Bq": 49117.406762248895
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-43",
+        "nuclide": "V-52",
+        "peak_energy_keV": 1436.9492947938536,
+        "matched_line_energy_keV": 1436.9492947938536,
+        "line_delta_keV": 0.0,
+        "net_counts": 266.5000000000009,
+        "net_counts_uncertainty": 97.01992445235535,
+        "efficiency": 0.00033135083361826215,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 1000000.0,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 223.41207646715287,
+        "count_time_activity_unc_Bq": 81.33366897030744,
+        "irradiation_time_activity_Bq": 223.41207646715287,
+        "irradiation_time_activity_unc_Bq": 81.33366897030744
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-45",
+        "nuclide": "Sb-124",
+        "peak_energy_keV": 1691.3037207266084,
+        "matched_line_energy_keV": 1691.3037207266084,
+        "line_delta_keV": 0.0,
+        "net_counts": 185.9999999999999,
+        "net_counts_uncertainty": 36.58779395736598,
+        "efficiency": 0.0003254085167512314,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 1000000.0,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 333.5604687013343,
+        "count_time_activity_unc_Bq": 65.61420269444544,
+        "irradiation_time_activity_Bq": 401.30405188224086,
+        "irradiation_time_activity_unc_Bq": 78.93994604582552
+      },
+      {
+        "peak_id": "RAFM4-C_15dEOI-peak-47",
+        "nuclide": "Mn-56",
+        "peak_energy_keV": 2108.5474068869567,
+        "matched_line_energy_keV": 2108.5474068869567,
+        "line_delta_keV": 0.0,
+        "net_counts": 244.0,
+        "net_counts_uncertainty": 43.78040296994223,
+        "efficiency": 0.000338213159154692,
+        "efficiency_rel_uncertainty": 0.05,
+        "emission_probability": 1.0,
+        "emission_probability_uncertainty": 0.0,
+        "half_life_s": 1000000.0,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 1354.0512708096526,
+        "count_time_activity_unc_Bq": 242.95455031970886,
+        "irradiation_time_activity_Bq": 1.1375383814940981e+48,
+        "irradiation_time_activity_unc_Bq": 2.0410610137535856e+47
+      }
+    ],
+    "isotope_summaries": [
+      {
+        "nuclide": "W-187",
+        "line_count": 2,
+        "peak_energies_keV": "479.750, 686.010",
+        "matched_line_energies_keV": "479.750, 686.010",
+        "total_net_counts": 0.0,
+        "half_life_s": 85928.64417643767,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 5106.0,
+        "count_time_activity_unc_Bq": 688.1999999999998,
+        "irradiation_time_activity_Bq": 364997363.98717886,
+        "irradiation_time_activity_unc_Bq": 49195296.88522844,
+        "relative_uncertainty": 0.13478260869565215,
+        "chain_summary": "W-187 activity back-corrected to EOI"
+      },
+      {
+        "nuclide": "Cr-51",
+        "line_count": 1,
+        "peak_energies_keV": "320.340",
+        "matched_line_energies_keV": "320.340",
+        "total_net_counts": 0.0,
+        "half_life_s": 2390434.176355029,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 6745100.0,
+        "count_time_activity_unc_Bq": 264846.0,
+        "irradiation_time_activity_Bq": 10080499.336240206,
+        "irradiation_time_activity_unc_Bq": 395810.28112346353,
+        "relative_uncertainty": 0.03926494788809655,
+        "chain_summary": "Cr-51 activity back-corrected to EOI"
+      },
+      {
+        "nuclide": "Ta-182",
+        "line_count": 15,
+        "peak_energies_keV": "99.600, 113.160, 152.220, 156.500, 179.550, 198.620, 222.330, 229.550, 264.320, 1001.800, 1121.380, 1189.130, 1221.450, 1231.090, 1257.460",
+        "matched_line_energies_keV": "99.600, 113.160, 152.220, 156.500, 179.550, 198.620, 222.330, 229.550, 264.320, 1001.800, 1121.380, 1189.130, 1221.450, 1231.090, 1257.460",
+        "total_net_counts": 0.0,
+        "half_life_s": 9873925.547168266,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 633773.0,
+        "count_time_activity_unc_Bq": 28045.999999999996,
+        "irradiation_time_activity_Bq": 698518.4527063987,
+        "irradiation_time_activity_unc_Bq": 30911.144091975606,
+        "relative_uncertainty": 0.04425243738688773,
+        "chain_summary": "Ta-182 activity back-corrected to EOI"
+      },
+      {
+        "nuclide": "Fe-59",
+        "line_count": 3,
+        "peak_energies_keV": "192.510, 1099.340, 1291.570",
+        "matched_line_energies_keV": "192.510, 1099.340, 1291.570",
+        "total_net_counts": 0.0,
+        "half_life_s": 3839380.7223994713,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 335294.0,
+        "count_time_activity_unc_Bq": 27565.0,
+        "irradiation_time_activity_Bq": 430593.1873246712,
+        "irradiation_time_activity_unc_Bq": 35399.682692218055,
+        "relative_uncertainty": 0.08221143235488854,
+        "chain_summary": "Fe-59 activity back-corrected to EOI"
+      },
+      {
+        "nuclide": "Mn-54",
+        "line_count": 1,
+        "peak_energies_keV": "834.980",
+        "matched_line_energies_keV": "834.980",
+        "total_net_counts": 0.0,
+        "half_life_s": 26932182.019928318,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 18130.0,
+        "count_time_activity_unc_Bq": 1639.1000000000001,
+        "irradiation_time_activity_Bq": 18788.211098996315,
+        "irradiation_time_activity_unc_Bq": 1698.6076565010953,
+        "relative_uncertainty": 0.09040816326530612,
+        "chain_summary": "Mn-54 activity back-corrected to EOI"
+      },
+      {
+        "nuclide": "Co-60",
+        "line_count": 2,
+        "peak_energies_keV": "1173.280, 1332.580",
+        "matched_line_energies_keV": "1173.280, 1332.580",
+        "total_net_counts": 0.0,
+        "half_life_s": 166124306.05215433,
+        "cooling_time_s": 1385628.0,
+        "count_time_activity_Bq": 2449.3999999999996,
+        "count_time_activity_unc_Bq": 292.3,
+        "irradiation_time_activity_Bq": 2463.602169204351,
+        "irradiation_time_activity_unc_Bq": 293.9948207962897,
+        "relative_uncertainty": 0.11933534743202419,
+        "chain_summary": "Co-60 activity back-corrected to EOI"
+      }
+    ]
+  },
+  "inventory": {
+    "schema": "fluxforge.inventory_time_evolution.v1",
+    "sample_id": "RAFM4-C_15dEOI",
+    "activity_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+    "gamma_source_id": "fluxforge_bundled_gamma",
+    "custom_gamma_path": null,
+    "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+    "time_origin": "eoi",
+    "relative_times_s": [
+      0.0,
+      360.0,
+      9645.0,
+      97565.0,
+      346788.0,
+      1385628.0
+    ],
+    "absolute_times_s": [
+      0.0,
+      360.0,
+      9645.0,
+      97565.0,
+      346788.0,
+      1385628.0
+    ],
+    "observable": "activity",
+    "distance_cm": 25.0,
+    "notes": [
+      "Inventory seeds are reconstructed from irradiation-time isotope activities.",
+      "Time-series uncertainty combines seed-activity uncertainty, available line-intensity dose uncertainty, and direct per-nuclide half-life uncertainty.",
+      "Full chain-covariance uncertainty propagation remains planned for a later phase."
+    ],
+    "reference_states": {
+      "eoi": [
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "eoi",
+          "absolute_time_s": 0.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Total",
+          "line_count": 0,
+          "activity_bq": 376228226.7767183,
+          "activity_uncertainty_bq": 49196911.620674685,
+          "atoms": 93442781019915.66,
+          "atoms_uncertainty": 6232233016084.094,
+          "mass_g": 2.0271553828429722e-08,
+          "mass_uncertainty_g": 1.889877148079361e-09,
+          "dose_rate_uSv_h": 0.01294123925181042,
+          "dose_rate_uncertainty_uSv_h": 0.0015443745118097908,
+          "half_life_s": null,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "",
+          "immediate_daughters": "",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "eoi",
+          "absolute_time_s": 0.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Co-60",
+          "line_count": 2,
+          "activity_bq": 2463.602169204351,
+          "activity_uncertainty_bq": 293.9948207962897,
+          "atoms": 591231099027.5345,
+          "atoms_uncertainty": 70554768615.06833,
+          "mass_g": 5.884076284570738e-11,
+          "mass_uncertainty_g": 7.02178287735783e-12,
+          "dose_rate_uSv_h": 0.01294123925181042,
+          "dose_rate_uncertainty_uSv_h": 0.0015443745118097908,
+          "half_life_s": 166345920.0,
+          "half_life_uncertainty_s": 25920.0,
+          "immediate_parents": "Co-60m",
+          "immediate_daughters": "Ni-60",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "eoi",
+          "absolute_time_s": 0.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Cr-51",
+          "line_count": 1,
+          "activity_bq": 10080499.336240206,
+          "activity_uncertainty_bq": 395810.28112346353,
+          "atoms": 34805677824365.793,
+          "atoms_uncertainty": 1366643125983.6006,
+          "mass_g": 2.9444132271206317e-09,
+          "mass_uncertainty_g": 1.1561223192391379e-10,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 2393280.0,
+          "half_life_uncertainty_s": 207.35999999999999,
+          "immediate_parents": "Mn-51",
+          "immediate_daughters": "V-51",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "eoi",
+          "absolute_time_s": 0.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Fe-59",
+          "line_count": 3,
+          "activity_bq": 430593.1873246712,
+          "activity_uncertainty_bq": 35399.682692218055,
+          "atoms": 2388446109365.253,
+          "atoms_uncertainty": 196357575753.3782,
+          "mass_g": 2.337420776227436e-10,
+          "mass_uncertainty_g": 1.921627100297329e-11,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 3844800.0,
+          "half_life_uncertainty_s": 518.4000000000001,
+          "immediate_parents": "",
+          "immediate_daughters": "Co-59",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "eoi",
+          "absolute_time_s": 0.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Mn-54",
+          "line_count": 1,
+          "activity_bq": 18788.211098996315,
+          "activity_uncertainty_bq": 1698.6076565010953,
+          "atoms": 730962859456.1967,
+          "atoms_uncertainty": 66085009538.59084,
+          "mass_g": 6.547239306838402e-11,
+          "mass_uncertainty_g": 5.919238801896759e-12,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 26967168.0,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "",
+          "immediate_daughters": "Cr-54, Fe-54",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "eoi",
+          "absolute_time_s": 0.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Ta-182",
+          "line_count": 15,
+          "activity_bq": 698518.4527063987,
+          "activity_uncertainty_bq": 30911.144091975606,
+          "atoms": 9960753420254.844,
+          "atoms_uncertainty": 440787617056.05524,
+          "mass_g": 3.009495621399883e-09,
+          "mass_uncertainty_g": 1.331775165521111e-10,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 9884160.0,
+          "half_life_uncertainty_s": 3456.0,
+          "immediate_parents": "Hf-182, Hf-182m, Ta-182m",
+          "immediate_daughters": "W-182",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "eoi",
+          "absolute_time_s": 0.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "W-187",
+          "line_count": 2,
+          "activity_bq": 364997363.98717886,
+          "activity_uncertainty_bq": 49195296.88522845,
+          "atoms": 44965709707446.03,
+          "atoms_uncertainty": 6060595656220.985,
+          "mass_g": 1.3959589746372374e-08,
+          "mass_uncertainty_g": 1.8815099223371456e-09,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 85392.0,
+          "half_life_uncertainty_s": 216.0,
+          "immediate_parents": "",
+          "immediate_daughters": "Re-187",
+          "provenance_tag": "inventory_time_evolution"
+        }
+      ],
+      "count_start": [
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Total",
+          "line_count": 0,
+          "activity_bq": 7742912.292580539,
+          "activity_uncertainty_bq": 267882.0988045919,
+          "atoms": 93442781094084.1,
+          "atoms_uncertainty": 6161727222749.342,
+          "mass_g": 2.0271428658532836e-08,
+          "mass_uncertainty_g": 1.887448993511717e-09,
+          "dose_rate_uSv_h": 0.012866734723687708,
+          "dose_rate_uncertainty_uSv_h": 0.001535483331340629,
+          "half_life_s": null,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "",
+          "immediate_daughters": "",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Co-60",
+          "line_count": 2,
+          "activity_bq": 2449.4188662356664,
+          "activity_uncertainty_bq": 292.30225141709474,
+          "atoms": 587827298727.7792,
+          "atoms_uncertainty": 70148574925.7013,
+          "mass_g": 5.850200832731097e-11,
+          "mass_uncertainty_g": 6.981357489409225e-12,
+          "dose_rate_uSv_h": 0.012866734723687708,
+          "dose_rate_uncertainty_uSv_h": 0.001535483331340629,
+          "half_life_s": 166345920.0,
+          "half_life_uncertainty_s": 25920.0,
+          "immediate_parents": "Co-60m",
+          "immediate_daughters": "Ni-60",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Cr-51",
+          "line_count": 1,
+          "activity_bq": 6748323.3089604,
+          "activity_uncertainty_bq": 264972.6669500736,
+          "atoms": 23300429781481.3,
+          "atoms_uncertainty": 914890519854.6486,
+          "mass_g": 1.9711178731350893e-09,
+          "mass_uncertainty_g": 7.73958709156782e-11,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 2393280.0,
+          "half_life_uncertainty_s": 207.35999999999999,
+          "immediate_parents": "Mn-51",
+          "immediate_daughters": "V-51",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Fe-59",
+          "line_count": 3,
+          "activity_bq": 335412.244493725,
+          "activity_uncertainty_bq": 27574.723363370515,
+          "atoms": 1860489422445.1748,
+          "atoms_uncertainty": 152953513136.76462,
+          "mass_g": 1.8207430399718942e-10,
+          "mass_uncertainty_g": 1.4968590582848124e-11,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 3844800.0,
+          "half_life_uncertainty_s": 518.4000000000001,
+          "immediate_parents": "",
+          "immediate_daughters": "Co-59",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Mn-54",
+          "line_count": 1,
+          "activity_bq": 18130.838816809875,
+          "activity_uncertainty_bq": 1639.175835887097,
+          "atoms": 705387528170.9358,
+          "atoms_uncertainty": 63772790812.18868,
+          "mass_g": 6.318160890459151e-11,
+          "mass_uncertainty_g": 5.712133213211029e-12,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 26967168.0,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "",
+          "immediate_daughters": "Cr-54, Fe-54",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Re-187",
+          "line_count": 0,
+          "activity_bq": 2.3972279993244075e-05,
+          "activity_uncertainty_bq": 3.2310464338720266e-06,
+          "atoms": 44965123344677.94,
+          "atoms_uncertainty": 6060516624717.46,
+          "mass_g": 1.3959302502976452e-08,
+          "mass_uncertainty_g": 1.881471206922913e-09,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 1.3001453544960003e+18,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "W-187",
+          "immediate_daughters": "Os-187",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Ta-182",
+          "line_count": 15,
+          "activity_bq": 633836.8355683954,
+          "activity_uncertainty_bq": 28048.83314639648,
+          "atoms": 9038404645303.035,
+          "atoms_uncertainty": 399971553528.2478,
+          "mass_g": 2.730821460670584e-09,
+          "mass_uncertainty_g": 1.2084554132020408e-10,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 9884160.0,
+          "half_life_uncertainty_s": 3456.0,
+          "immediate_parents": "Hf-182, Hf-182m, Ta-182m",
+          "immediate_daughters": "W-182",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_start",
+          "absolute_time_s": 1385628.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "W-187",
+          "line_count": 2,
+          "activity_bq": 4759.645851001693,
+          "activity_uncertainty_bq": 655.6537581581606,
+          "atoms": 586362737.8248954,
+          "atoms_uncertainty": 80773012.26474468,
+          "mass_g": 1.8203611854123134e-13,
+          "mass_uncertainty_g": 2.5075955013956415e-14,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 85392.0,
+          "half_life_uncertainty_s": 216.0,
+          "immediate_parents": "",
+          "immediate_daughters": "Re-187",
+          "provenance_tag": "inventory_time_evolution"
+        }
+      ],
+      "count_end": [
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Total",
+          "line_count": 0,
+          "activity_bq": 7735363.484668042,
+          "activity_uncertainty_bq": 267606.3429852821,
+          "atoms": 93442781094273.38,
+          "atoms_uncertainty": 6161650230616.427,
+          "mass_g": 2.0271428614987015e-08,
+          "mass_uncertainty_g": 1.8874462167370176e-09,
+          "dose_rate_uSv_h": 0.0128665417132044,
+          "dose_rate_uncertainty_uSv_h": 0.0015354602979616605,
+          "half_life_s": null,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "",
+          "immediate_daughters": "",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Co-60",
+          "line_count": 2,
+          "activity_bq": 2449.3821231513216,
+          "activity_uncertainty_bq": 292.2978666684018,
+          "atoms": 587818480885.9984,
+          "atoms_uncertainty": 70147522645.49913,
+          "mass_g": 5.850113075416252e-11,
+          "mass_uncertainty_g": 6.981252763913687e-12,
+          "dose_rate_uSv_h": 0.0128665417132044,
+          "dose_rate_uncertainty_uSv_h": 0.0015354602979616605,
+          "half_life_s": 166345920.0,
+          "half_life_uncertainty_s": 25920.0,
+          "immediate_parents": "Co-60m",
+          "immediate_daughters": "Ni-60",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Cr-51",
+          "line_count": 1,
+          "activity_bq": 6741290.902815185,
+          "activity_uncertainty_bq": 264696.5403209686,
+          "atoms": 23276148478099.78,
+          "atoms_uncertainty": 913937117233.3313,
+          "mass_g": 1.9690637775013526e-09,
+          "mass_uncertainty_g": 7.731521708376195e-11,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 2393280.0,
+          "half_life_uncertainty_s": 207.35999999999999,
+          "immediate_parents": "Mn-51",
+          "immediate_daughters": "V-51",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Fe-59",
+          "line_count": 3,
+          "activity_bq": 335194.6278052972,
+          "activity_uncertainty_bq": 27556.832794241807,
+          "atoms": 1859282330117.4077,
+          "atoms_uncertainty": 152854276405.9299,
+          "mass_g": 1.8195617352421436e-10,
+          "mass_uncertainty_g": 1.495887891317685e-11,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 3844800.0,
+          "half_life_uncertainty_s": 518.4000000000001,
+          "immediate_parents": "",
+          "immediate_daughters": "Co-59",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Mn-54",
+          "line_count": 1,
+          "activity_bq": 18129.16120905437,
+          "activity_uncertainty_bq": 1639.024166451242,
+          "atoms": 705322260170.9358,
+          "atoms_uncertainty": 63766890052.18868,
+          "mass_g": 6.317576284538959e-11,
+          "mass_uncertainty_g": 5.7116046817362425e-12,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 26967168.0,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "",
+          "immediate_daughters": "Cr-54, Fe-54",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Re-187",
+          "line_count": 0,
+          "activity_bq": 2.3972288996107332e-05,
+          "activity_uncertainty_bq": 3.2310476473014224e-06,
+          "atoms": 44965140231467.89,
+          "atoms_uncertainty": 6060518900763.0625,
+          "mass_g": 1.395930774543531e-08,
+          "mass_uncertainty_g": 1.8814719135151935e-09,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 1.3001453544960003e+18,
+          "half_life_uncertainty_s": null,
+          "immediate_parents": "W-187",
+          "immediate_daughters": "Os-187",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "Ta-182",
+          "line_count": 15,
+          "activity_bq": 633676.8389328449,
+          "activity_uncertainty_bq": 28041.752946214307,
+          "atoms": 9036123120701.05,
+          "atoms_uncertainty": 399870591087.08765,
+          "mass_g": 2.7301321314592183e-09,
+          "mass_uncertainty_g": 1.2081503699871572e-10,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 9884160.0,
+          "half_life_uncertainty_s": 3456.0,
+          "immediate_parents": "Hf-182, Hf-182m, Ta-182m",
+          "immediate_daughters": "W-182",
+          "provenance_tag": "inventory_time_evolution"
+        },
+        {
+          "sample_id": "RAFM4-C_15dEOI",
+          "reference_state": "count_end",
+          "absolute_time_s": 1389228.0,
+          "count_start_time_s": 1385628.0,
+          "count_live_time_s": 3600.0,
+          "gamma_source_id": "fluxforge_bundled_gamma",
+          "decay_source_id": "radioactivedecay_icrp107_kayzero_2023",
+          "nuclide": "W-187",
+          "line_count": 2,
+          "activity_bq": 4622.571758537613,
+          "activity_uncertainty_bq": 636.8420988706079,
+          "atoms": 569475947.7866858,
+          "atoms_uncertainty": 78455517.14259034,
+          "mass_g": 1.767936201441139e-13,
+          "mass_uncertainty_g": 2.435648941772817e-14,
+          "dose_rate_uSv_h": 0.0,
+          "dose_rate_uncertainty_uSv_h": 0.0,
+          "half_life_s": 85392.0,
+          "half_life_uncertainty_s": 216.0,
+          "immediate_parents": "",
+          "immediate_daughters": "Re-187",
+          "provenance_tag": "inventory_time_evolution"
+        }
+      ]
+    },
+    "time_series_rows": [
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 0.0,
+        "absolute_time_s": 0.0,
+        "nuclide": "Total",
+        "activity_bq": 376228226.7767183,
+        "activity_uncertainty_bq": 49196911.620674685,
+        "atoms": 93442781019915.66,
+        "atoms_uncertainty": 6232233016084.094,
+        "mass_g": 2.0271553828429722e-08,
+        "mass_uncertainty_g": 1.889877148079361e-09,
+        "dose_rate_uSv_h": 0.01294123925181042,
+        "dose_rate_uncertainty_uSv_h": 0.0015443745118097908
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 360.0,
+        "absolute_time_s": 360.0,
+        "nuclide": "Total",
+        "activity_bq": 375162089.5726812,
+        "activity_uncertainty_bq": 49053367.1519711,
+        "atoms": 93442781019935.27,
+        "atoms_uncertainty": 6215029603214.148,
+        "mass_g": 2.0271553515304505e-08,
+        "mass_uncertainty_g": 1.8844184026521196e-09,
+        "dose_rate_uSv_h": 0.012941219838868773,
+        "dose_rate_uncertainty_uSv_h": 0.0015443721951188083
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 9645.0,
+        "absolute_time_s": 9645.0,
+        "nuclide": "Total",
+        "activity_bq": 348712946.4817734,
+        "activity_uncertainty_bq": 45492456.470068924,
+        "atoms": 93442781020441.11,
+        "atoms_uncertainty": 5806427445774.485,
+        "mass_g": 2.0271545741634995e-08,
+        "mass_uncertainty_g": 1.754572445191973e-09,
+        "dose_rate_uSv_h": 0.012940719156810034,
+        "dose_rate_uncertainty_uSv_h": 0.0015443124449978991
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 97565.0,
+        "absolute_time_s": 97565.0,
+        "nuclide": "Total",
+        "activity_bq": 176265758.21626028,
+        "activity_uncertainty_bq": 22289179.84029564,
+        "atoms": 93442781025224.89,
+        "atoms_uncertainty": 4531490314225.196,
+        "mass_g": 2.027149463289296e-08,
+        "mass_uncertainty_g": 1.3477507009802072e-09,
+        "dose_rate_uSv_h": 0.012935979140359342,
+        "dose_rate_uncertainty_uSv_h": 0.0015437467835147307
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 346788.0,
+        "absolute_time_s": 346788.0,
+        "nuclide": "Total",
+        "activity_bq": 32090461.15228767,
+        "activity_uncertainty_bq": 2973228.1922303643,
+        "atoms": 93442781038726.72,
+        "atoms_uncertainty": 5862374350742.437,
+        "mass_g": 2.027144926468893e-08,
+        "mass_uncertainty_g": 1.780364293114156e-09,
+        "dose_rate_uSv_h": 0.012922552255998709,
+        "dose_rate_uncertainty_uSv_h": 0.0015421444533558187
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 1385628.0,
+        "absolute_time_s": 1385628.0,
+        "nuclide": "Total",
+        "activity_bq": 7742912.292580539,
+        "activity_uncertainty_bq": 267882.0988045919,
+        "atoms": 93442781094084.1,
+        "atoms_uncertainty": 6161727222749.342,
+        "mass_g": 2.0271428658532836e-08,
+        "mass_uncertainty_g": 1.887448993511717e-09,
+        "dose_rate_uSv_h": 0.012866734723687708,
+        "dose_rate_uncertainty_uSv_h": 0.001535483331340629
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 0.0,
+        "absolute_time_s": 0.0,
+        "nuclide": "Co-60",
+        "activity_bq": 2463.602169204351,
+        "activity_uncertainty_bq": 293.9948207962897,
+        "atoms": 591231099027.5345,
+        "atoms_uncertainty": 70554768615.06833,
+        "mass_g": 5.884076284570738e-11,
+        "mass_uncertainty_g": 7.02178287735783e-12,
+        "dose_rate_uSv_h": 0.01294123925181042,
+        "dose_rate_uncertainty_uSv_h": 0.0015443745118097908
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 360.0,
+        "absolute_time_s": 360.0,
+        "nuclide": "Co-60",
+        "activity_bq": 2463.5984735949723,
+        "activity_uncertainty_bq": 293.9943797794605,
+        "atoms": 591230212131.4188,
+        "atoms_uncertainty": 70554662777.01222,
+        "mass_g": 5.884067457964003e-11,
+        "mass_uncertainty_g": 7.021772344096017e-12,
+        "dose_rate_uSv_h": 0.012941219838868773,
+        "dose_rate_uncertainty_uSv_h": 0.0015443721951188083
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 9645.0,
+        "absolute_time_s": 9645.0,
+        "nuclide": "Co-60",
+        "activity_bq": 2463.5031595850855,
+        "activity_uncertainty_bq": 293.9830054489759,
+        "atoms": 591207338062.0896,
+        "atoms_uncertainty": 70551933092.00175,
+        "mass_g": 5.883839809639864e-11,
+        "mass_uncertainty_g": 7.021500679177492e-12,
+        "dose_rate_uSv_h": 0.012940719156810034,
+        "dose_rate_uncertainty_uSv_h": 0.0015443124449978991
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 97565.0,
+        "absolute_time_s": 97565.0,
+        "nuclide": "Co-60",
+        "activity_bq": 2462.600810545495,
+        "activity_uncertainty_bq": 293.8753233128724,
+        "atoms": 590990786533.9847,
+        "atoms_uncertainty": 70526090840.16824,
+        "mass_g": 5.8816846359472e-11,
+        "mass_uncertainty_g": 7.018928795164567e-12,
+        "dose_rate_uSv_h": 0.012935979140359342,
+        "dose_rate_uncertainty_uSv_h": 0.0015437467835147307
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 346788.0,
+        "absolute_time_s": 346788.0,
+        "nuclide": "Co-60",
+        "activity_bq": 2460.0447569255225,
+        "activity_uncertainty_bq": 293.5702957665593,
+        "atoms": 590377368340.9825,
+        "atoms_uncertainty": 70452888367.10068,
+        "mass_g": 5.87557974828499e-11,
+        "mass_uncertainty_g": 7.011643506274027e-12,
+        "dose_rate_uSv_h": 0.012922552255998709,
+        "dose_rate_uncertainty_uSv_h": 0.0015421444533558187
+      },
+      {
+        "sample_id": "RAFM4-C_15dEOI",
+        "time_origin": "eoi",
+        "relative_time_s": 1385628.0,
+        "absolute_time_s": 1385628.0,
+        "nuclide": "Co-60",
+        "activity_bq": 2449.4188662356664,
+        "activity_uncertainty_bq": 292.30225141709474,
+        "atoms": 587827298727.7792,
+        "atoms_uncertainty": 70148574925.7013,
+        "mass_g": 5.850200832731097e-11,
+        "mass_uncertainty_g": 6.981357489409225e-12,
+        "dose_rate_uSv_h": 0.012866734723687708,
+        "dose_rate_uncertainty_uSv_h": 0.001535483331340629
+      }
+    ],
+    "artifacts": {
+      "timeseries_csv": {
+        "path": "inventory_review_timeseries.csv",
+        "row_count": 12,
+        "format": "csv"
+      },
+      "eoi_csv": {
+        "path": "inventory_review_activities_at_irradiation.csv",
+        "row_count": 7,
+        "format": "csv"
+      },
+      "count_start_csv": {
+        "path": "inventory_review_activities_at_count_start.csv",
+        "row_count": 8,
+        "format": "csv"
+      },
+      "count_end_csv": {
+        "path": "inventory_review_activities_at_count_end.csv",
+        "row_count": 8,
+        "format": "csv"
+      },
+      "plot": {
+        "path": "inventory_review_activity.png",
+        "format": "png"
+      }
+    }
+  },
+  "masking": {
+    "schema": "fluxforge.masking_review.v1",
+    "source_activity_review": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+    "isotopes_of_interest": [],
+    "energy_window_keV": 10.0,
+    "line_masking_results": [
+      {
+        "rank": 1,
+        "target_nuclide": "Tb154m",
+        "target_line_energy_keV": 999.2714576006701,
+        "masking_nuclide": "Ta-182",
+        "masking_line_energy_keV": 1001.7733514944,
+        "energy_delta_keV": 2.501893893729857,
+        "target_signal_counts": 768.8439469471969,
+        "masking_signal_counts": 35766.16835195139,
+        "background_counts": 77922.28050961005,
+        "interference_counts": 30066.946884208777,
+        "continuum_counts": 4022.6778797647894,
+        "masking_score": 74.90069366394083,
+        "burial_ratio": 69.67629140358596,
+        "recommended_action": "avoid"
+      },
+      {
+        "rank": 2,
+        "target_nuclide": "Fe-59",
+        "target_line_energy_keV": 192.53449755243872,
+        "masking_nuclide": "Ta-182",
+        "masking_line_energy_keV": 198.560346054941,
+        "energy_delta_keV": 6.025848502502271,
+        "target_signal_counts": 37330.5,
+        "masking_signal_counts": 40154.0,
+        "background_counts": 672915.1785714285,
+        "interference_counts": 14670.191524913784,
+        "continuum_counts": 2393.6711884578567,
+        "masking_score": 5.160832784808794,
+        "burial_ratio": 4.9635728789121165,
+        "recommended_action": "avoid"
+      },
+      {
+        "rank": 3,
+        "target_nuclide": "Ta-182",
+        "target_line_energy_keV": 198.560346054941,
+        "masking_nuclide": "Fe-59",
+        "masking_line_energy_keV": 192.53449755243872,
+        "energy_delta_keV": 6.025848502502271,
+        "target_signal_counts": 40154.0,
+        "masking_signal_counts": 37330.5,
+        "background_counts": 646759.2857142857,
+        "interference_counts": 13638.630889096828,
+        "continuum_counts": 2225.3559371600845,
+        "masking_score": 4.597551067999499,
+        "burial_ratio": 4.421821194770841,
+        "recommended_action": "avoid"
+      },
+      {
+        "rank": 4,
+        "target_nuclide": "Fe-59",
+        "target_line_energy_keV": 142.2441870771751,
+        "masking_nuclide": "Ta-182",
+        "masking_line_energy_keV": 152.1891653744,
+        "energy_delta_keV": 9.944978297224907,
+        "target_signal_counts": 556060.0,
+        "masking_signal_counts": 644183.3371036103,
+        "background_counts": 4670501.8684210535,
+        "interference_counts": 41487.91145675066,
+        "continuum_counts": 531.6609616017379,
+        "masking_score": 2.1765827551377477,
+        "burial_ratio": 2.175385820817206,
+        "recommended_action": "avoid"
+      },
+      {
+        "rank": 5,
+        "target_nuclide": "Ta-182",
+        "target_line_energy_keV": 1001.7733514944,
+        "masking_nuclide": "Tb154m",
+        "masking_line_energy_keV": 999.2714576006701,
+        "energy_delta_keV": 2.501893893729857,
+        "target_signal_counts": 35766.16835195139,
+        "masking_signal_counts": 768.8439469471969,
+        "background_counts": 145535.1007960972,
+        "interference_counts": 646.3311889501173,
+        "continuum_counts": 86.47310240060422,
+        "masking_score": 1.1155687579098625,
+        "burial_ratio": 1.037756662249507,
+        "recommended_action": "avoid"
+      },
+      {
+        "rank": 6,
+        "target_nuclide": "Ta-182",
+        "target_line_energy_keV": 152.1891653744,
+        "masking_nuclide": "Fe-59",
+        "masking_line_energy_keV": 142.2441870771751,
+        "energy_delta_keV": 9.944978297224907,
+        "target_signal_counts": 644183.3371036103,
+        "masking_signal_counts": 556060.0,
+        "background_counts": 629412.7632927793,
+        "interference_counts": 35812.42592887844,
+        "continuum_counts": 458.930520676775,
+        "masking_score": 0.30073904684760644,
+        "burial_ratio": 0.30057366609842556,
+        "recommended_action": "alternate_line"
+      }
+    ],
+    "masking_isotope_ranking": [
+      {
+        "masking_nuclide": "Ta-182",
+        "total_masking_score": 82.23810920388736,
+        "total_interference_counts": 86225.04986587322,
+        "total_continuum_counts": 6948.010029824383,
+        "target_line_count": 3,
+        "dominant_target_nuclide": "Tb154m",
+        "rank": 1
+      },
+      {
+        "masking_nuclide": "Fe-59",
+        "total_masking_score": 4.898290114847105,
+        "total_interference_counts": 49451.056817975266,
+        "total_continuum_counts": 2684.2864578368594,
+        "target_line_count": 2,
+        "dominant_target_nuclide": "Ta-182",
+        "rank": 2
+      },
+      {
+        "masking_nuclide": "Tb154m",
+        "total_masking_score": 1.1155687579098625,
+        "total_interference_counts": 646.3311889501173,
+        "total_continuum_counts": 86.47310240060422,
+        "target_line_count": 1,
+        "dominant_target_nuclide": "Ta-182",
+        "rank": 3
+      }
+    ],
+    "alternate_line_recommendations": [
+      {
+        "rank": 1,
+        "nuclide": "Tb154m",
+        "preferred_line_energy_keV": 999.2714576006701,
+        "preferred_masking_score": 74.90069366394083,
+        "strongest_line_energy_keV": 999.2714576006701,
+        "strongest_line_net_counts": 768.8439469471969,
+        "guidance": "defer_to_later_cooldown"
+      },
+      {
+        "rank": 2,
+        "nuclide": "Co-60",
+        "preferred_line_energy_keV": 1173.2956235317265,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 1332.575555310047,
+        "strongest_line_net_counts": 3496.0,
+        "guidance": "switch_to_preferred_line"
+      },
+      {
+        "rank": 3,
+        "nuclide": "Cr-51",
+        "preferred_line_energy_keV": 320.07622878559994,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 320.07622878559994,
+        "strongest_line_net_counts": 3031711.231240962,
+        "guidance": "keep_current_line"
+      },
+      {
+        "rank": 4,
+        "nuclide": "Fe-59",
+        "preferred_line_energy_keV": 335.2830019914332,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 142.2441870771751,
+        "strongest_line_net_counts": 556060.0,
+        "guidance": "switch_to_preferred_line"
+      },
+      {
+        "rank": 5,
+        "nuclide": "Mn-54",
+        "preferred_line_energy_keV": 834.8244327195999,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 834.8244327195999,
+        "strongest_line_net_counts": 40692.47714983273,
+        "guidance": "keep_current_line"
+      },
+      {
+        "rank": 6,
+        "nuclide": "Mn-56",
+        "preferred_line_energy_keV": 847.6249408805987,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 847.6249408805987,
+        "strongest_line_net_counts": 764.5,
+        "guidance": "keep_current_line"
+      },
+      {
+        "rank": 7,
+        "nuclide": "Sb-124",
+        "preferred_line_energy_keV": 719.5561519226326,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 719.5561519226326,
+        "strongest_line_net_counts": 1194.5,
+        "guidance": "keep_current_line"
+      },
+      {
+        "rank": 8,
+        "nuclide": "Ta-182",
+        "preferred_line_energy_keV": 84.11605493158743,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 99.7275651239,
+        "strongest_line_net_counts": 783310.8560602255,
+        "guidance": "switch_to_preferred_line"
+      },
+      {
+        "rank": 9,
+        "nuclide": "V-52",
+        "preferred_line_energy_keV": 1436.9492947938536,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 1436.9492947938536,
+        "strongest_line_net_counts": 266.5000000000009,
+        "guidance": "keep_current_line"
+      },
+      {
+        "rank": 10,
+        "nuclide": "W-187",
+        "preferred_line_energy_keV": 209.77219439190313,
+        "preferred_masking_score": 0.0,
+        "strongest_line_energy_keV": 209.77219439190313,
+        "strongest_line_net_counts": 276254.0,
+        "guidance": "keep_current_line"
+      }
+    ],
+    "generated_at": "2026-04-17T19:47:26Z"
+  },
+  "optimization": {
+    "payload": {
+      "schema": "fluxforge.optimization_sweep.difom.v1",
+      "objective": "di-fom",
+      "ranked_candidates": [
+        {
+          "rank": 1,
+          "label": "irr_7200s_cool_360s_count_900s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 900.0,
+          "difom_score": 1.6391098400540012e+16,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 853531526658.576,
+              "weight": 19104.9041868097,
+              "weighted_score": 1.6306638037233506e+16
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 25905057370.10234,
+              "weight": 3174.9802103698544,
+              "weighted_score": 82248044498570.67
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1795917982.8921335,
+              "weight": 835.7741636987821,
+              "weighted_score": 1500981850223.2766
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 1073864454.5184295,
+              "weight": 656.195997644508,
+              "weighted_score": 704665557067.6963
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 46519598.58407934,
+              "weight": 137.0700955679112,
+              "weighted_score": 6376445823.700623
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 5942513.942372692,
+              "weight": 49.63468715731319,
+              "weighted_score": 294954820.4576404
+            }
+          ]
+        },
+        {
+          "rank": 2,
+          "label": "irr_7200s_cool_9645s_count_900s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 900.0,
+          "difom_score": 1.5214159573870412e+16,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 791939198680.4778,
+              "weight": 19104.9041868097,
+              "weighted_score": 1.512992251256938e+16
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 25835405844.357933,
+              "weight": 3174.9802103698544,
+              "weighted_score": 82026902282710.11
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1794747776.4350026,
+              "weight": 835.7741636987821,
+              "weighted_score": 1500003821900.2131
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 1072065866.4502274,
+              "weight": 656.195997644508,
+              "weighted_score": 703485330775.9308
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 46508483.31714019,
+              "weight": 137.0700955679112,
+              "weighted_score": 6374922252.99901
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 5942283.726116997,
+              "weight": 49.63468715731319,
+              "weighted_score": 294943393.74581045
+            }
+          ]
+        },
+        {
+          "rank": 3,
+          "label": "irr_7200s_cool_360s_count_600s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 600.0,
+          "difom_score": 1.0927398933693342e+16,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 569021017772.384,
+              "weight": 19104.9041868097,
+              "weighted_score": 1.0871092024822338e+16
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 17270038246.734894,
+              "weight": 3174.9802103698544,
+              "weighted_score": 54832029665713.78
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1197278655.2614224,
+              "weight": 835.7741636987821,
+              "weighted_score": 1000654566815.5177
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 715909636.3456196,
+              "weight": 656.195997644508,
+              "weighted_score": 469777038045.13074
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 31013065.72271956,
+              "weight": 137.0700955679112,
+              "weighted_score": 4250963882.4670815
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 3961675.9615817936,
+              "weight": 49.63468715731319,
+              "weighted_score": 196636546.9717602
+            }
+          ]
+        },
+        {
+          "rank": 4,
+          "label": "irr_7200s_cool_9645s_count_600s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 600.0,
+          "difom_score": 1.0142773049246944e+16,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 527959465786.9852,
+              "weight": 19104.9041868097,
+              "weighted_score": 1.0086615008379588e+16
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 17223603896.23862,
+              "weight": 3174.9802103698544,
+              "weighted_score": 54684601521806.74
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1196498517.6233351,
+              "weight": 835.7741636987821,
+              "weighted_score": 1000002547933.4755
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 714710577.6334848,
+              "weight": 656.195997644508,
+              "weighted_score": 468990220517.2872
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 31005655.54476013,
+              "weight": 137.0700955679112,
+              "weighted_score": 4249948168.666007
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 3961522.4840779975,
+              "weight": 49.63468715731319,
+              "weighted_score": 196628929.1638736
+            }
+          ]
+        },
+        {
+          "rank": 5,
+          "label": "irr_3600s_cool_360s_count_900s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 900.0,
+          "difom_score": 8313946945761927.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 432961872483.1675,
+              "weight": 19104.9041868097,
+              "weighted_score": 8271695090332634.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 12959289136.530252,
+              "weight": 3174.9802103698544,
+              "weighted_score": 41145486548944.586
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 898072457.151706,
+              "weight": 835.7741636987821,
+              "weighted_score": 750585756816.8774
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 537106711.51379,
+              "weight": 656.195997644508,
+              "weighted_score": 352447274403.3524
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 23260876.829523586,
+              "weight": 137.0700955679112,
+              "weighted_score": 3188370610.0162096
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 2971279.2865944556,
+              "weight": 49.63468715731319,
+              "weighted_score": 147478517.84712052
+            }
+          ]
+        },
+        {
+          "rank": 6,
+          "label": "irr_3600s_cool_9645s_count_900s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 900.0,
+          "difom_score": 7716935250061166.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 401718586419.2164,
+              "weight": 19104.9041868097,
+              "weighted_score": 7674795103599762.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 12924445196.6761,
+              "weight": 3174.9802103698544,
+              "weighted_score": 41034857729456.336
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 897487279.9897523,
+              "weight": 835.7741636987821,
+              "weighted_score": 750096680863.73
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 536207125.24048036,
+              "weight": 656.195997644508,
+              "weighted_score": 351856969491.2706
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 23255318.938590128,
+              "weight": 137.0700955679112,
+              "weighted_score": 3187608789.3748045
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 2971164.177602098,
+              "weight": 49.63468715731319,
+              "weighted_score": 147472804.44829583
+            }
+          ]
+        },
+        {
+          "rank": 7,
+          "label": "irr_7200s_cool_97565s_count_900s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 900.0,
+          "difom_score": 7526565345060946.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 389659811316.8165,
+              "weight": 19104.9041868097,
+              "weighted_score": 7444413360658126.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 25185085307.13191,
+              "weight": 3174.9802103698544,
+              "weighted_score": 79962147446620.39
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1783704773.6704552,
+              "weight": 835.7741636987821,
+              "weighted_score": 1490774365499.9502
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 1055183579.9519347,
+              "weight": 656.195997644508,
+              "weighted_score": 692407241944.6632
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 46403364.00422906,
+              "weight": 137.0700955679112,
+              "weighted_score": 6360513538.732248
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 5940104.242100428,
+              "weight": 49.63468715731319,
+              "weighted_score": 294835215.73848367
+            }
+          ]
+        },
+        {
+          "rank": 8,
+          "label": "irr_3600s_cool_360s_count_600s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 600.0,
+          "difom_score": 5542631297174619.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 288641248322.1117,
+              "weight": 19104.9041868097,
+              "weighted_score": 5514463393555090.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 8639526091.020168,
+              "weight": 3174.9802103698544,
+              "weighted_score": 27430324365963.06
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 598714971.4344708,
+              "weight": 835.7741636987821,
+              "weighted_score": 500390504544.585
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 358071141.00919336,
+              "weight": 656.195997644508,
+              "weighted_score": 234964849602.23492
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15507251.21968239,
+              "weight": 137.0700955679112,
+              "weighted_score": 2125580406.6774728
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1980852.857729637,
+              "weight": 49.63468715731319,
+              "weighted_score": 98319011.89808035
+            }
+          ]
+        },
+        {
+          "rank": 9,
+          "label": "irr_7200s_cool_360s_count_300s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 300.0,
+          "difom_score": 5463699466846671.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 284510508886.192,
+              "weight": 19104.9041868097,
+              "weighted_score": 5435546012411169.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 8635019123.367447,
+              "weight": 3174.9802103698544,
+              "weighted_score": 27416014832856.89
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 598639327.6307112,
+              "weight": 835.7741636987821,
+              "weighted_score": 500327283407.75885
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 357954818.1728098,
+              "weight": 656.195997644508,
+              "weighted_score": 234888519022.56537
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15506532.86135978,
+              "weight": 137.0700955679112,
+              "weighted_score": 2125481941.2335408
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1980837.9807908968,
+              "weight": 49.63468715731319,
+              "weighted_score": 98318273.4858801
+            }
+          ]
+        },
+        {
+          "rank": 10,
+          "label": "irr_3600s_cool_9645s_count_600s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 600.0,
+          "difom_score": 5144623500040777.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 267812390946.1442,
+              "weight": 19104.9041868097,
+              "weighted_score": 5116530069066507.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 8616296797.784067,
+              "weight": 3174.9802103698544,
+              "weighted_score": 27356571819637.56
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 598324853.3265016,
+              "weight": 835.7741636987821,
+              "weighted_score": 500064453909.1533
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 357471416.82698685,
+              "weight": 656.195997644508,
+              "weighted_score": 234571312994.1804
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15503545.959060086,
+              "weight": 137.0700955679112,
+              "weighted_score": 2125072526.2498696
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1980776.1184013982,
+              "weight": 49.63468715731319,
+              "weighted_score": 98315202.96553054
+            }
+          ]
+        },
+        {
+          "rank": 11,
+          "label": "irr_7200s_cool_9645s_count_300s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 300.0,
+          "difom_score": 5071386524623472.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 263979732893.4926,
+              "weight": 19104.9041868097,
+              "weighted_score": 5043307504189794.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 8611801948.11931,
+              "weight": 3174.9802103698544,
+              "weighted_score": 27342300760903.37
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 598249258.8116676,
+              "weight": 835.7741636987821,
+              "weighted_score": 500001273966.73773
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 357355288.8167424,
+              "weight": 656.195997644508,
+              "weighted_score": 234495110258.6436
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15502827.772380065,
+              "weight": 137.0700955679112,
+              "weighted_score": 2124974084.3330035
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1980761.2420389988,
+              "weight": 49.63468715731319,
+              "weighted_score": 98314464.5819368
+            }
+          ]
+        },
+        {
+          "rank": 12,
+          "label": "irr_7200s_cool_97565s_count_600s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 600.0,
+          "difom_score": 5017710230040630.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 259773207544.54437,
+              "weight": 19104.9041868097,
+              "weighted_score": 4962942240438751.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 16790056871.42127,
+              "weight": 3174.9802103698544,
+              "weighted_score": 53308098297746.92
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1189136515.7803037,
+              "weight": 835.7741636987821,
+              "weighted_score": 993849576999.9669
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 703455719.9679564,
+              "weight": 656.195997644508,
+              "weighted_score": 461604827963.1088
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 30935576.002819374,
+              "weight": 137.0700955679112,
+              "weighted_score": 4240342359.1548324
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 3960069.4947336186,
+              "weight": 49.63468715731319,
+              "weighted_score": 196556810.49232247
+            }
+          ]
+        },
+        {
+          "rank": 13,
+          "label": "irr_1800s_cool_360s_count_900s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 900.0,
+          "difom_score": 4187004162846346.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 218052536308.99814,
+              "weight": 19104.9041868097,
+              "weighted_score": 4165872813874253.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 6481335563.388234,
+              "weight": 3174.9802103698544,
+              "weighted_score": 20578112150523.996
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 449064598.5868521,
+              "weight": 835.7741636987821,
+              "weighted_score": 375316589330.6556
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 268596990.99705815,
+              "weight": 656.195997644508,
+              "weighted_score": 176252270471.6275
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 11630707.811616862,
+              "weight": 137.0700955679112,
+              "weighted_score": 1594222231.2607749
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1485645.222190433,
+              "weight": 49.63468715731319,
+              "weighted_score": 73739535.83017918
+            }
+          ]
+        },
+        {
+          "rank": 14,
+          "label": "irr_1800s_cool_9645s_count_900s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 900.0,
+          "difom_score": 3886331624586364.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 202317483867.0837,
+              "weight": 19104.9041868097,
+              "weighted_score": 3865256144597051.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 6463909046.843535,
+              "weight": 3174.9802103698544,
+              "weighted_score": 20522783305358.895
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 448771991.52019256,
+              "weight": 835.7741636987821,
+              "weighted_score": 375072035904.2259
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 268147124.77685726,
+              "weight": 656.195997644508,
+              "weighted_score": 175957070058.4562
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 11627928.801781178,
+              "weight": 137.0700955679112,
+              "weighted_score": 1593841312.1170132
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1485587.6674781246,
+              "weight": 49.63468715731319,
+              "weighted_score": 73736679.12003933
+            }
+          ]
+        },
+        {
+          "rank": 15,
+          "label": "irr_3600s_cool_97565s_count_900s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 900.0,
+          "difom_score": 3817345567869422.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 197658594052.9084,
+              "weight": 19104.9041868097,
+              "weighted_score": 3776248501080328.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 12599115213.695154,
+              "weight": 3174.9802103698544,
+              "weighted_score": 40001941471651.875
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 891965080.9129778,
+              "weight": 835.7741636987821,
+              "weighted_score": 745481369548.5605
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 527763238.9140648,
+              "weight": 656.195997644508,
+              "weighted_score": 346316125079.3116
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 23202756.84724683,
+              "weight": 137.0700955679112,
+              "weighted_score": 3180404098.491129
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 2970074.427409385,
+              "weight": 49.63468715731319,
+              "weighted_score": 147418715.03840092
+            }
+          ]
+        },
+        {
+          "rank": 16,
+          "label": "irr_1800s_cool_360s_count_600s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 600.0,
+          "difom_score": 2791336108564231.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 145368357539.3321,
+              "weight": 19104.9041868097,
+              "weighted_score": 2777248542582835.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 4320890375.592156,
+              "weight": 3174.9802103698544,
+              "weighted_score": 13718741433682.664
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 299376399.05790144,
+              "weight": 835.7741636987821,
+              "weighted_score": 250211059553.77045
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 179064660.66470543,
+              "weight": 656.195997644508,
+              "weighted_score": 117501513647.75166
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7753805.207744574,
+              "weight": 137.0700955679112,
+              "weighted_score": 1062814820.8405164
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 990430.1481269554,
+              "weight": 49.63468715731319,
+              "weighted_score": 49159690.55345279
+            }
+          ]
+        },
+        {
+          "rank": 17,
+          "label": "irr_3600s_cool_360s_count_300s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 300.0,
+          "difom_score": 2771315648587309.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 144320624161.05585,
+              "weight": 19104.9041868097,
+              "weighted_score": 2757231696777545.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 4319763045.510084,
+              "weight": 3174.9802103698544,
+              "weighted_score": 13715162182981.53
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 299357485.7172354,
+              "weight": 835.7741636987821,
+              "weighted_score": 250195252272.2925
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 179035570.50459668,
+              "weight": 656.195997644508,
+              "weighted_score": 117482424801.11746
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7753625.609841195,
+              "weight": 137.0700955679112,
+              "weighted_score": 1062790203.3387364
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 990426.4288648185,
+              "weight": 49.63468715731319,
+              "weighted_score": 49159505.949040174
+            }
+          ]
+        },
+        {
+          "rank": 18,
+          "label": "irr_1800s_cool_9645s_count_600s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 600.0,
+          "difom_score": 2590887749724243.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 134878322578.05582,
+              "weight": 19104.9041868097,
+              "weighted_score": 2576837429731368.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 4309272697.895691,
+              "weight": 3174.9802103698544,
+              "weighted_score": 13681855536905.932
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 299181327.6801284,
+              "weight": 835.7741636987821,
+              "weighted_score": 250048023936.1506
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 178764749.8512382,
+              "weight": 656.195997644508,
+              "weighted_score": 117304713372.30415
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7751952.534520785,
+              "weight": 137.0700955679112,
+              "weighted_score": 1062560874.7446755
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 990391.7783187499,
+              "weight": 49.63468715731319,
+              "weighted_score": 49157786.080026224
+            }
+          ]
+        },
+        {
+          "rank": 19,
+          "label": "irr_3600s_cool_9645s_count_300s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 300.0,
+          "difom_score": 2572311750020388.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 133906195473.0721,
+              "weight": 19104.9041868097,
+              "weighted_score": 2558265034533253.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 4308148398.892034,
+              "weight": 3174.9802103698544,
+              "weighted_score": 13678285909818.78
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 299162426.6632508,
+              "weight": 835.7741636987821,
+              "weighted_score": 250032226954.57666
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 178735708.41349342,
+              "weight": 656.195997644508,
+              "weighted_score": 117285656497.0902
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7751772.979530043,
+              "weight": 137.0700955679112,
+              "weighted_score": 1062536263.1249348
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 990388.0592006991,
+              "weight": 49.63468715731319,
+              "weighted_score": 49157601.48276527
+            }
+          ]
+        },
+        {
+          "rank": 20,
+          "label": "irr_3600s_cool_97565s_count_600s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 600.0,
+          "difom_score": 2544897045246281.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 131772396035.27223,
+              "weight": 19104.9041868097,
+              "weighted_score": 2517499000720218.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 8399410142.463438,
+              "weight": 3174.9802103698544,
+              "weighted_score": 26667960981101.254
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 594643387.2753185,
+              "weight": 835.7741636987821,
+              "weighted_score": 496987579699.04034
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 351842159.27604324,
+              "weight": 656.195997644508,
+              "weighted_score": 230877416719.54108
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15468504.56483122,
+              "weight": 137.0700955679112,
+              "weighted_score": 2120269398.994086
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1980049.6182729236,
+              "weight": 49.63468715731319,
+              "weighted_score": 98279143.35893396
+            }
+          ]
+        },
+        {
+          "rank": 21,
+          "label": "irr_7200s_cool_97565s_count_300s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 300.0,
+          "difom_score": 2508855115020315.0,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 129886603772.27219,
+              "weight": 19104.9041868097,
+              "weighted_score": 2481471120219375.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 8395028435.710635,
+              "weight": 3174.9802103698544,
+              "weighted_score": 26654049148873.46
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 594568257.8901519,
+              "weight": 835.7741636987821,
+              "weighted_score": 496924788499.98346
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 351727859.9839782,
+              "weight": 656.195997644508,
+              "weighted_score": 230802413981.5544
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15467788.001409687,
+              "weight": 137.0700955679112,
+              "weighted_score": 2120171179.5774162
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1980034.7473668093,
+              "weight": 49.63468715731319,
+              "weighted_score": 98278405.24616124
+            }
+          ]
+        },
+        {
+          "rank": 22,
+          "label": "irr_1800s_cool_97565s_count_900s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 900.0,
+          "difom_score": 1922385387939267.8,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 99546774198.18982,
+              "weight": 19104.9041868097,
+              "weighted_score": 1901831583162396.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 6301201604.612993,
+              "weight": 3174.9802103698544,
+              "weighted_score": 20006190396197.023
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 446010717.5361385,
+              "weight": 835.7741636987821,
+              "weighted_score": 372764234449.45984
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 263924495.62146243,
+              "weight": 656.195997644508,
+              "weighted_score": 173186197707.14914
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 11601647.14735938,
+              "weight": 137.0700955679112,
+              "weighted_score": 1590238883.2337348
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1485042.7903356461,
+              "weight": 49.63468715731319,
+              "weighted_score": 73709634.31353323
+            }
+          ]
+        },
+        {
+          "rank": 23,
+          "label": "irr_1800s_cool_360s_count_300s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 360.0,
+          "count_time_s": 300.0,
+          "difom_score": 1395668054282115.8,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 72684178769.66605,
+              "weight": 19104.9041868097,
+              "weighted_score": 1388624271291417.8
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 2160445187.796078,
+              "weight": 3174.9802103698544,
+              "weighted_score": 6859370716841.332
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 149688199.52895072,
+              "weight": 835.7741636987821,
+              "weighted_score": 125105529776.88522
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 89532330.33235271,
+              "weight": 656.195997644508,
+              "weighted_score": 58750756823.87583
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 3876902.603872287,
+              "weight": 137.0700955679112,
+              "weighted_score": 531407410.4202582
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 495215.0740634777,
+              "weight": 49.63468715731319,
+              "weighted_score": 24579845.276726395
+            }
+          ]
+        },
+        {
+          "rank": 24,
+          "label": "irr_1800s_cool_9645s_count_300s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 9645.0,
+          "count_time_s": 300.0,
+          "difom_score": 1295443874862121.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 67439161289.02791,
+              "weight": 19104.9041868097,
+              "weighted_score": 1288418714865684.0
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 2154636348.9478455,
+              "weight": 3174.9802103698544,
+              "weighted_score": 6840927768452.966
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 149590663.8400642,
+              "weight": 835.7741636987821,
+              "weighted_score": 125024011968.0753
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 89382374.9256191,
+              "weight": 656.195997644508,
+              "weighted_score": 58652356686.15208
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 3875976.2672603927,
+              "weight": 137.0700955679112,
+              "weighted_score": 531280437.37233776
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 495195.8891593749,
+              "weight": 49.63468715731319,
+              "weighted_score": 24578893.040013112
+            }
+          ]
+        },
+        {
+          "rank": 25,
+          "label": "irr_1800s_cool_97565s_count_600s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 600.0,
+          "difom_score": 1281590258626178.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 66364516132.12656,
+              "weight": 19104.9041868097,
+              "weighted_score": 1267887722108264.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 4200801069.741996,
+              "weight": 3174.9802103698544,
+              "weighted_score": 13337460264131.352
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 297340478.3574257,
+              "weight": 835.7741636987821,
+              "weighted_score": 248509489632.97327
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 175949663.74764162,
+              "weight": 656.195997644508,
+              "weighted_score": 115457465138.09941
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7734431.431572922,
+              "weight": 137.0700955679112,
+              "weighted_score": 1060159255.4891567
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 990028.5268904308,
+              "weight": 49.63468715731319,
+              "weighted_score": 49139756.209022164
+            }
+          ]
+        },
+        {
+          "rank": 26,
+          "label": "irr_3600s_cool_97565s_count_300s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 300.0,
+          "difom_score": 1272448522623140.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 65886198017.636116,
+              "weight": 19104.9041868097,
+              "weighted_score": 1258749500360109.2
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 4199705071.231719,
+              "weight": 3174.9802103698544,
+              "weighted_score": 13333980490550.627
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 297321693.63765925,
+              "weight": 835.7741636987821,
+              "weighted_score": 248493789849.52017
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 175921079.63802162,
+              "weight": 656.195997644508,
+              "weighted_score": 115438708359.77054
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7734252.28241561,
+              "weight": 137.0700955679112,
+              "weighted_score": 1060134699.497043
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 990024.8091364618,
+              "weight": 49.63468715731319,
+              "weighted_score": 49139571.67946698
+            }
+          ]
+        },
+        {
+          "rank": 27,
+          "label": "irr_7200s_cool_346788s_count_900s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 900.0,
+          "difom_score": 1073620712041596.5,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 52190777825.83026,
+              "weight": 19104.9041868097,
+              "weighted_score": 997099809797559.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 23429256161.365032,
+              "weight": 3174.9802103698544,
+              "weighted_score": 74387424656019.95
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1752769556.4955711,
+              "weight": 835.7741636987821,
+              "weighted_score": 1464919510236.7712
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 1008759128.117563,
+              "weight": 656.195997644508,
+              "weighted_score": 661943702458.1083
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 46106676.38369478,
+              "weight": 137.0700955679112,
+              "weighted_score": 6319846538.231799
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 5933930.497189961,
+              "weight": 49.63468715731319,
+              "weighted_score": 294528783.84126365
+            }
+          ]
+        },
+        {
+          "rank": 28,
+          "label": "irr_7200s_cool_346788s_count_600s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 600.0,
+          "difom_score": 715747141361064.4,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 34793851883.88685,
+              "weight": 19104.9041868097,
+              "weighted_score": 664733206531706.5
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 15619504107.576685,
+              "weight": 3174.9802103698544,
+              "weighted_score": 49591616437346.625
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1168513037.6637142,
+              "weight": 835.7741636987821,
+              "weighted_score": 976613006824.5142
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 672506085.4117087,
+              "weight": 656.195997644508,
+              "weighted_score": 441295801638.7389
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 30737784.255796526,
+              "weight": 137.0700955679112,
+              "weighted_score": 4213231025.4878664
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 3955953.6647933074,
+              "weight": 49.63468715731319,
+              "weighted_score": 196352522.56084242
+            }
+          ]
+        },
+        {
+          "rank": 29,
+          "label": "irr_1800s_cool_97565s_count_300s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 97565.0,
+          "count_time_s": 300.0,
+          "difom_score": 640795129313089.2,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 33182258066.06328,
+              "weight": 19104.9041868097,
+              "weighted_score": 633943861054132.2
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 2100400534.870998,
+              "weight": 3174.9802103698544,
+              "weighted_score": 6668730132065.676
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 148670239.17871284,
+              "weight": 835.7741636987821,
+              "weighted_score": 124254744816.48663
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 87974831.87382081,
+              "weight": 656.195997644508,
+              "weighted_score": 57728732569.049706
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 3867215.715786461,
+              "weight": 137.0700955679112,
+              "weighted_score": 530079627.74457836
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 495014.2634452154,
+              "weight": 49.63468715731319,
+              "weighted_score": 24569878.104511082
+            }
+          ]
+        },
+        {
+          "rank": 30,
+          "label": "irr_3600s_cool_346788s_count_900s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 900.0,
+          "difom_score": 544068294973253.56,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 26474261568.622055,
+              "weight": 19104.9041868097,
+              "weighted_score": 505788230685062.7
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 11720742421.492764,
+              "weight": 3174.9802103698544,
+              "weighted_score": 37213125239081.97
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 876495517.8452758,
+              "weight": 835.7741636987821,
+              "weighted_score": 732552308412.8663
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 504543469.8327132,
+              "weight": 656.195997644508,
+              "weighted_score": 331079405541.8989
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 23054406.164778683,
+              "weight": 137.0700955679112,
+              "weighted_score": 3160069656.2676554
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 2966987.531770422,
+              "weight": 49.63468715731319,
+              "weighted_score": 147265497.9390737
+            }
+          ]
+        },
+        {
+          "rank": 31,
+          "label": "irr_3600s_cool_346788s_count_600s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 600.0,
+          "difom_score": 362712196648835.7,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 17649507712.4147,
+              "weight": 19104.9041868097,
+              "weighted_score": 337192153790041.7
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 7813828280.995176,
+              "weight": 3174.9802103698544,
+              "weighted_score": 24808750159387.984
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 584330345.2301838,
+              "weight": 835.7741636987821,
+              "weighted_score": 488368205608.5775
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 336362313.2218088,
+              "weight": 656.195997644508,
+              "weighted_score": 220719603694.5993
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15369604.10985246,
+              "weight": 137.0700955679112,
+              "weighted_score": 2106713104.1784375
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1977991.687846948,
+              "weight": 49.63468715731319,
+              "weighted_score": 98176998.62604915
+            }
+          ]
+        },
+        {
+          "rank": 32,
+          "label": "irr_7200s_cool_346788s_count_300s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 300.0,
+          "difom_score": 357873570680532.2,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 17396925941.943424,
+              "weight": 19104.9041868097,
+              "weighted_score": 332366603265853.25
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 7809752053.788342,
+              "weight": 3174.9802103698544,
+              "weighted_score": 24795808218673.312
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 584256518.8318571,
+              "weight": 835.7741636987821,
+              "weighted_score": 488306503412.2571
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 336253042.70585436,
+              "weight": 656.195997644508,
+              "weighted_score": 220647900819.36945
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 15368892.127898263,
+              "weight": 137.0700955679112,
+              "weighted_score": 2106615512.7439332
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1977976.8323966537,
+              "weight": 49.63468715731319,
+              "weighted_score": 98176261.28042121
+            }
+          ]
+        },
+        {
+          "rank": 33,
+          "label": "irr_1800s_cool_346788s_count_900s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 900.0,
+          "difom_score": 273875004403393.78,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 13333229202.925497,
+              "weight": 19104.9041868097,
+              "weighted_score": 254730066422664.7
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 5861900593.883463,
+              "weight": 3174.9802103698544,
+              "weighted_score": 18611418380735.293
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 438275447.32047695,
+              "weight": 835.7741636987821,
+              "weighted_score": 366299295453.98126
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 252312724.67687708,
+              "weight": 656.195997644508,
+              "weighted_score": 165566600087.74744
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 11527470.08799544,
+              "weight": 137.0700955679112,
+              "weighted_score": 1580071426.6177728
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1483499.3367201895,
+              "weight": 49.63468715731319,
+              "weighted_score": 73633025.47618823
+            }
+          ]
+        },
+        {
+          "rank": 34,
+          "label": "irr_1800s_cool_346788s_count_600s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 600.0,
+          "difom_score": 182583336268929.22,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 8888819468.616997,
+              "weight": 19104.9041868097,
+              "weighted_score": 169820044281776.44
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 3907933729.255642,
+              "weight": 3174.9802103698544,
+              "weighted_score": 12407612253823.527
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 292183631.5469846,
+              "weight": 835.7741636987821,
+              "weighted_score": 244199530302.65414
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 168208483.11791807,
+              "weight": 656.195997644508,
+              "weighted_score": 110377733391.83163
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7684980.058663628,
+              "weight": 137.0700955679112,
+              "weighted_score": 1053380951.0785154
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 988999.5578134598,
+              "weight": 49.63468715731319,
+              "weighted_score": 49088683.65079215
+            }
+          ]
+        },
+        {
+          "rank": 35,
+          "label": "irr_3600s_cool_346788s_count_300s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 300.0,
+          "difom_score": 181356098324417.84,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 8824753856.20735,
+              "weight": 19104.9041868097,
+              "weighted_score": 168596076895020.84
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 3906914140.497588,
+              "weight": 3174.9802103698544,
+              "weighted_score": 12404375079693.992
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 292165172.6150919,
+              "weight": 835.7741636987821,
+              "weighted_score": 244184102804.28876
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 168181156.6109044,
+              "weight": 656.195997644508,
+              "weighted_score": 110359801847.29965
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7684802.05492623,
+              "weight": 137.0700955679112,
+              "weighted_score": 1053356552.0892187
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 988995.843923474,
+              "weight": 49.63468715731319,
+              "weighted_score": 49088499.31302457
+            }
+          ]
+        },
+        {
+          "rank": 36,
+          "label": "irr_1800s_cool_346788s_count_300s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 346788.0,
+          "count_time_s": 300.0,
+          "difom_score": 91291668134464.61,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 4444409734.308498,
+              "weight": 19104.9041868097,
+              "weighted_score": 84910022140888.22
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 1953966864.627821,
+              "weight": 3174.9802103698544,
+              "weighted_score": 6203806126911.764
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 146091815.7734923,
+              "weight": 835.7741636987821,
+              "weighted_score": 122099765151.32707
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 84104241.55895904,
+              "weight": 656.195997644508,
+              "weighted_score": 55188866695.91582
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 3842490.029331814,
+              "weight": 137.0700955679112,
+              "weighted_score": 526690475.5392577
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 494499.7789067299,
+              "weight": 49.63468715731319,
+              "weighted_score": 24544341.825396076
+            }
+          ]
+        },
+        {
+          "rank": 37,
+          "label": "irr_7200s_cool_1385628s_count_900s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 900.0,
+          "difom_score": 57185713320034.61,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 11974897.96581701,
+              "weight": 19104.9041868097,
+              "weighted_score": 228779278283.75638
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 17335494756.79757,
+              "weight": 3174.9802103698544,
+              "weighted_score": 55039852789802.66
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1629496097.526662,
+              "weight": 835.7741636987821,
+              "weighted_score": 1361890738160.7751
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 836250366.2013705,
+              "weight": 656.195997644508,
+              "weighted_score": 548744143330.09344
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 44890284.243850775,
+              "weight": 137.0700955679112,
+              "weighted_score": 6153115551.375324
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 5908265.423762643,
+              "weight": 49.63468715731319,
+              "weighted_score": 293254905.9508292
+            }
+          ]
+        },
+        {
+          "rank": 38,
+          "label": "irr_7200s_cool_1385628s_count_600s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 600.0,
+          "difom_score": 38123808880023.07,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 7983265.310544673,
+              "weight": 19104.9041868097,
+              "weighted_score": 152519518855.8376
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 11556996504.531713,
+              "weight": 3174.9802103698544,
+              "weighted_score": 36693235193201.77
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 1086330731.6844413,
+              "weight": 835.7741636987821,
+              "weighted_score": 907927158773.85
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 557500244.134247,
+              "weight": 656.195997644508,
+              "weighted_score": 365829428886.72894
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 29926856.162567183,
+              "weight": 137.0700955679112,
+              "weighted_score": 4102077034.2502165
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 3938843.6158417617,
+              "weight": 49.63468715731319,
+              "weighted_score": 195503270.63388613
+            }
+          ]
+        },
+        {
+          "rank": 39,
+          "label": "irr_3600s_cool_1385628s_count_900s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 900.0,
+          "difom_score": 28609056573309.344,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 6074379.310125874,
+              "weight": 19104.9041868097,
+              "weighted_score": 116050434714.29404
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 8672271428.258814,
+              "weight": 3174.9802103698544,
+              "weighted_score": 27534290163677.645
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 814850999.9706265,
+              "weight": 835.7741636987821,
+              "weighted_score": 681031413039.5667
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 418261059.20792675,
+              "weight": 656.195997644508,
+              "weighted_score": 274461233022.79413
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 22446181.919460382,
+              "weight": 137.0700955679112,
+              "weighted_score": 3076700300.8351555
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 2954154.8986789347,
+              "weight": 49.63468715731319,
+              "weighted_score": 146628554.21017316
+            }
+          ]
+        },
+        {
+          "rank": 40,
+          "label": "irr_3600s_cool_1385628s_count_600s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 600.0,
+          "difom_score": 19072704382206.23,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 4049586.2067505824,
+              "weight": 19104.9041868097,
+              "weighted_score": 77366956476.19601
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 5781514285.505876,
+              "weight": 3174.9802103698544,
+              "weighted_score": 18356193442451.76
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 543233999.9804176,
+              "weight": 835.7741636987821,
+              "weighted_score": 454020942026.37775
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 278840706.1386178,
+              "weight": 656.195997644508,
+              "weighted_score": 182974155348.5294
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 14964121.279640257,
+              "weight": 137.0700955679112,
+              "weighted_score": 2051133533.8901038
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1969436.59911929,
+              "weight": 49.63468715731319,
+              "weighted_score": 97752369.47344878
+            }
+          ]
+        },
+        {
+          "rank": 41,
+          "label": "irr_7200s_cool_1385628s_count_300s",
+          "irradiation_time_s": 7200.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 300.0,
+          "difom_score": 19061904440011.535,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 3991632.6552723367,
+              "weight": 19104.9041868097,
+              "weighted_score": 76259759427.9188
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 5778498252.265857,
+              "weight": 3174.9802103698544,
+              "weighted_score": 18346617596600.887
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 543165365.8422207,
+              "weight": 835.7741636987821,
+              "weighted_score": 453963579386.925
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 278750122.0671235,
+              "weight": 656.195997644508,
+              "weighted_score": 182914714443.36447
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 14963428.081283592,
+              "weight": 137.0700955679112,
+              "weighted_score": 2051038517.1251082
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1969421.8079208808,
+              "weight": 49.63468715731319,
+              "weighted_score": 97751635.31694306
+            }
+          ]
+        },
+        {
+          "rank": 42,
+          "label": "irr_1800s_cool_1385628s_count_900s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 900.0,
+          "difom_score": 14308586199817.244,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 3059238.9290060266,
+              "weight": 19104.9041868097,
+              "weighted_score": 58446466623.21846
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 4337267316.99257,
+              "weight": 3174.9802103698544,
+              "weighted_score": 13770737898535.363
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 407451241.0395541,
+              "weight": 835.7741636987821,
+              "weighted_score": 340537220227.86426
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 209164509.6704533,
+              "weight": 656.195997644508,
+              "weighted_score": 137252914095.02745
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 11223350.921160782,
+              "weight": 137.0700955679112,
+              "weighted_score": 1538385783.3557127
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 1477082.9960798111,
+              "weight": 49.63468715731319,
+              "weighted_score": 73314552.41580829
+            }
+          ]
+        },
+        {
+          "rank": 43,
+          "label": "irr_1800s_cool_1385628s_count_600s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 600.0,
+          "difom_score": 9539057466544.828,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 2039492.6193373515,
+              "weight": 19104.9041868097,
+              "weighted_score": 38964311082.14565
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 2891511544.661713,
+              "weight": 3174.9802103698544,
+              "weighted_score": 9180491932356.908
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 271634160.6930361,
+              "weight": 835.7741636987821,
+              "weighted_score": 227024813485.24283
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 139443006.44696885,
+              "weight": 656.195997644508,
+              "weighted_score": 91501942730.01828
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7482233.947440521,
+              "weight": 137.0700955679112,
+              "weighted_score": 1025590522.2371417
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 984721.9973865406,
+              "weight": 49.63468715731319,
+              "weighted_score": 48876368.27720552
+            }
+          ]
+        },
+        {
+          "rank": 44,
+          "label": "irr_3600s_cool_1385628s_count_300s",
+          "irradiation_time_s": 3600.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 300.0,
+          "difom_score": 9536352191103.115,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 2024793.1033752912,
+              "weight": 19104.9041868097,
+              "weighted_score": 38683478238.09801
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 2890757142.752938,
+              "weight": 3174.9802103698544,
+              "weighted_score": 9178096721225.88
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 271616999.9902088,
+              "weight": 835.7741636987821,
+              "weighted_score": 227010471013.18887
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 139420353.0693089,
+              "weight": 656.195997644508,
+              "weighted_score": 91487077674.2647
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 7482060.639820129,
+              "weight": 137.0700955679112,
+              "weighted_score": 1025566766.9450519
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 984718.299559645,
+              "weight": 49.63468715731319,
+              "weighted_score": 48876184.73672439
+            }
+          ]
+        },
+        {
+          "rank": 45,
+          "label": "irr_1800s_cool_1385628s_count_300s",
+          "irradiation_time_s": 1800.0,
+          "cooldown_time_s": 1385628.0,
+          "count_time_s": 300.0,
+          "difom_score": 4769528733272.414,
+          "line_scores": [
+            {
+              "nuclide": "W-187",
+              "line_energy_keV": 209.77219439190313,
+              "score": 1019746.3096686758,
+              "weight": 19104.9041868097,
+              "weighted_score": 19482155541.072826
+            },
+            {
+              "nuclide": "Cr-51",
+              "line_energy_keV": 320.07622878559994,
+              "score": 1445755772.3308566,
+              "weight": 3174.9802103698544,
+              "weighted_score": 4590245966178.454
+            },
+            {
+              "nuclide": "Ta-182",
+              "line_energy_keV": 84.11605493158743,
+              "score": 135817080.34651804,
+              "weight": 835.7741636987821,
+              "weighted_score": 113512406742.62141
+            },
+            {
+              "nuclide": "Fe-59",
+              "line_energy_keV": 142.2441870771751,
+              "score": 69721503.22348443,
+              "weight": 656.195997644508,
+              "weighted_score": 45750971365.00914
+            },
+            {
+              "nuclide": "Mn-54",
+              "line_energy_keV": 834.8244327195999,
+              "score": 3741116.9737202604,
+              "weight": 137.0700955679112,
+              "weighted_score": 512795261.11857086
+            },
+            {
+              "nuclide": "Co-60",
+              "line_energy_keV": 1173.2956235317265,
+              "score": 492360.9986932703,
+              "weight": 49.63468715731319,
+              "weighted_score": 24438184.13860276
+            }
+          ]
+        }
+      ],
+      "input": null,
+      "candidate_source": "activity-review",
+      "activity_review_file": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+      "candidate_generation": {
+        "irradiation_grid_s": [
+          1800.0,
+          3600.0,
+          7200.0
+        ],
+        "cooldown_grid_s": [
+          360.0,
+          9645.0,
+          97565.0,
+          346788.0,
+          1385628.0
+        ],
+        "count_grid_s": [
+          300.0,
+          600.0,
+          900.0
+        ],
+        "reference_irradiation_time_s": 3600.0
+      },
+      "neutron_source": {
+        "source": "unfold",
+        "integral_flux": 2.4042465189891076e-08,
+        "high_energy_fraction": 0.9999999999459287,
+        "hardness_scale": 1.4999999999459286,
+        "applied_flux_scale": 1.4999999999459286
+      },
+      "isotope_weights": {
+        "W-187": 19104.9041868097,
+        "Cr-51": 3174.9802103698544,
+        "Ta-182": 835.7741636987821,
+        "Fe-59": 656.195997644508,
+        "Mn-54": 137.0700955679112,
+        "Co-60": 49.63468715731319
+      },
+      "isotopes_of_interest": [],
+      "isotope_filter_summary": {
+        "requested_isotopes": [],
+        "candidates_before": 45,
+        "candidates_after": 45,
+        "line_terms_before": 270,
+        "line_terms_after": 270
+      },
+      "generated_at": "2026-04-17T19:47:30Z",
+      "support_artifacts": {
+        "optimization_grid": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_di_fom_optimization_grid.csv",
+        "recommended_schedules": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_di_fom_recommended_schedules.csv",
+        "dose_endpoints": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_di_fom_dose_endpoints.csv",
+        "masking_candidates": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_di_fom_masking_candidates.csv",
+        "inventory_timeseries": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_di_fom_inventory_timeseries.csv",
+        "activities_at_irradiation": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/optimization_di_fom_activities_at_irradiation.csv"
+      }
+    },
+    "optimization_grid": [
+      {
+        "rank": 1,
+        "label": "irr_7200s_cool_360s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 900.0,
+        "objective_score": 1.6391098400540012e+16
+      },
+      {
+        "rank": 2,
+        "label": "irr_7200s_cool_9645s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 900.0,
+        "objective_score": 1.5214159573870412e+16
+      },
+      {
+        "rank": 3,
+        "label": "irr_7200s_cool_360s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 600.0,
+        "objective_score": 1.0927398933693342e+16
+      },
+      {
+        "rank": 4,
+        "label": "irr_7200s_cool_9645s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 600.0,
+        "objective_score": 1.0142773049246944e+16
+      },
+      {
+        "rank": 5,
+        "label": "irr_3600s_cool_360s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 900.0,
+        "objective_score": 8313946945761927.0
+      },
+      {
+        "rank": 6,
+        "label": "irr_3600s_cool_9645s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 900.0,
+        "objective_score": 7716935250061166.0
+      },
+      {
+        "rank": 7,
+        "label": "irr_7200s_cool_97565s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 900.0,
+        "objective_score": 7526565345060946.0
+      },
+      {
+        "rank": 8,
+        "label": "irr_3600s_cool_360s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 600.0,
+        "objective_score": 5542631297174619.0
+      },
+      {
+        "rank": 9,
+        "label": "irr_7200s_cool_360s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 300.0,
+        "objective_score": 5463699466846671.0
+      },
+      {
+        "rank": 10,
+        "label": "irr_3600s_cool_9645s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 600.0,
+        "objective_score": 5144623500040777.0
+      },
+      {
+        "rank": 11,
+        "label": "irr_7200s_cool_9645s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 300.0,
+        "objective_score": 5071386524623472.0
+      },
+      {
+        "rank": 12,
+        "label": "irr_7200s_cool_97565s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 600.0,
+        "objective_score": 5017710230040630.0
+      },
+      {
+        "rank": 13,
+        "label": "irr_1800s_cool_360s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 900.0,
+        "objective_score": 4187004162846346.5
+      },
+      {
+        "rank": 14,
+        "label": "irr_1800s_cool_9645s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 900.0,
+        "objective_score": 3886331624586364.0
+      },
+      {
+        "rank": 15,
+        "label": "irr_3600s_cool_97565s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 900.0,
+        "objective_score": 3817345567869422.0
+      },
+      {
+        "rank": 16,
+        "label": "irr_1800s_cool_360s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 600.0,
+        "objective_score": 2791336108564231.5
+      },
+      {
+        "rank": 17,
+        "label": "irr_3600s_cool_360s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 300.0,
+        "objective_score": 2771315648587309.5
+      },
+      {
+        "rank": 18,
+        "label": "irr_1800s_cool_9645s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 600.0,
+        "objective_score": 2590887749724243.0
+      },
+      {
+        "rank": 19,
+        "label": "irr_3600s_cool_9645s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 300.0,
+        "objective_score": 2572311750020388.5
+      },
+      {
+        "rank": 20,
+        "label": "irr_3600s_cool_97565s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 600.0,
+        "objective_score": 2544897045246281.0
+      },
+      {
+        "rank": 21,
+        "label": "irr_7200s_cool_97565s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 300.0,
+        "objective_score": 2508855115020315.0
+      },
+      {
+        "rank": 22,
+        "label": "irr_1800s_cool_97565s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 900.0,
+        "objective_score": 1922385387939267.8
+      },
+      {
+        "rank": 23,
+        "label": "irr_1800s_cool_360s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 300.0,
+        "objective_score": 1395668054282115.8
+      },
+      {
+        "rank": 24,
+        "label": "irr_1800s_cool_9645s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 300.0,
+        "objective_score": 1295443874862121.5
+      },
+      {
+        "rank": 25,
+        "label": "irr_1800s_cool_97565s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 600.0,
+        "objective_score": 1281590258626178.5
+      },
+      {
+        "rank": 26,
+        "label": "irr_3600s_cool_97565s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 300.0,
+        "objective_score": 1272448522623140.5
+      },
+      {
+        "rank": 27,
+        "label": "irr_7200s_cool_346788s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 900.0,
+        "objective_score": 1073620712041596.5
+      },
+      {
+        "rank": 28,
+        "label": "irr_7200s_cool_346788s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 600.0,
+        "objective_score": 715747141361064.4
+      },
+      {
+        "rank": 29,
+        "label": "irr_1800s_cool_97565s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 97565.0,
+        "count_time_s": 300.0,
+        "objective_score": 640795129313089.2
+      },
+      {
+        "rank": 30,
+        "label": "irr_3600s_cool_346788s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 900.0,
+        "objective_score": 544068294973253.56
+      },
+      {
+        "rank": 31,
+        "label": "irr_3600s_cool_346788s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 600.0,
+        "objective_score": 362712196648835.7
+      },
+      {
+        "rank": 32,
+        "label": "irr_7200s_cool_346788s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 300.0,
+        "objective_score": 357873570680532.2
+      },
+      {
+        "rank": 33,
+        "label": "irr_1800s_cool_346788s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 900.0,
+        "objective_score": 273875004403393.78
+      },
+      {
+        "rank": 34,
+        "label": "irr_1800s_cool_346788s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 600.0,
+        "objective_score": 182583336268929.22
+      },
+      {
+        "rank": 35,
+        "label": "irr_3600s_cool_346788s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 300.0,
+        "objective_score": 181356098324417.84
+      },
+      {
+        "rank": 36,
+        "label": "irr_1800s_cool_346788s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 346788.0,
+        "count_time_s": 300.0,
+        "objective_score": 91291668134464.61
+      },
+      {
+        "rank": 37,
+        "label": "irr_7200s_cool_1385628s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 900.0,
+        "objective_score": 57185713320034.61
+      },
+      {
+        "rank": 38,
+        "label": "irr_7200s_cool_1385628s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 600.0,
+        "objective_score": 38123808880023.07
+      },
+      {
+        "rank": 39,
+        "label": "irr_3600s_cool_1385628s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 900.0,
+        "objective_score": 28609056573309.344
+      },
+      {
+        "rank": 40,
+        "label": "irr_3600s_cool_1385628s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 600.0,
+        "objective_score": 19072704382206.23
+      },
+      {
+        "rank": 41,
+        "label": "irr_7200s_cool_1385628s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 300.0,
+        "objective_score": 19061904440011.535
+      },
+      {
+        "rank": 42,
+        "label": "irr_1800s_cool_1385628s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 900.0,
+        "objective_score": 14308586199817.244
+      },
+      {
+        "rank": 43,
+        "label": "irr_1800s_cool_1385628s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 600.0,
+        "objective_score": 9539057466544.828
+      },
+      {
+        "rank": 44,
+        "label": "irr_3600s_cool_1385628s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 300.0,
+        "objective_score": 9536352191103.115
+      },
+      {
+        "rank": 45,
+        "label": "irr_1800s_cool_1385628s_count_300s",
+        "objective": "di-fom",
+        "irradiation_time_s": 1800.0,
+        "cooldown_time_s": 1385628.0,
+        "count_time_s": 300.0,
+        "objective_score": 4769528733272.414
+      }
+    ],
+    "recommended_schedules": [
+      {
+        "rank": 1,
+        "label": "irr_7200s_cool_360s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 900.0,
+        "objective_score": 1.6391098400540012e+16
+      },
+      {
+        "rank": 2,
+        "label": "irr_7200s_cool_9645s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 900.0,
+        "objective_score": 1.5214159573870412e+16
+      },
+      {
+        "rank": 3,
+        "label": "irr_7200s_cool_360s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 600.0,
+        "objective_score": 1.0927398933693342e+16
+      },
+      {
+        "rank": 4,
+        "label": "irr_7200s_cool_9645s_count_600s",
+        "objective": "di-fom",
+        "irradiation_time_s": 7200.0,
+        "cooldown_time_s": 9645.0,
+        "count_time_s": 600.0,
+        "objective_score": 1.0142773049246944e+16
+      },
+      {
+        "rank": 5,
+        "label": "irr_3600s_cool_360s_count_900s",
+        "objective": "di-fom",
+        "irradiation_time_s": 3600.0,
+        "cooldown_time_s": 360.0,
+        "count_time_s": 900.0,
+        "objective_score": 8313946945761927.0
+      }
+    ],
+    "dose_endpoints": [
+      {
+        "endpoint": "shutdown",
+        "relative_time_s": 0.0,
+        "absolute_time_s": 0.0,
+        "activity_bq": 376228226.7767183,
+        "activity_uncertainty_bq": 49196911.620674685,
+        "dose_rate_uSv_h": 0.008986971702646125,
+        "dose_rate_uncertainty_uSv_h": 0.0010724822998679103
+      },
+      {
+        "endpoint": "1_d",
+        "relative_time_s": 86400.0,
+        "absolute_time_s": 86400.0,
+        "activity_bq": 191982365.51690188,
+        "activity_uncertainty_bq": 24402418.3356123,
+        "dose_rate_uSv_h": 0.008983736792296727,
+        "dose_rate_uncertainty_uSv_h": 0.001072096253911039
+      },
+      {
+        "endpoint": "1_wk",
+        "relative_time_s": 604800.0,
+        "absolute_time_s": 604800.0,
+        "activity_bq": 12230150.719589533,
+        "activity_uncertainty_bq": 495074.8095536174,
+        "dose_rate_uSv_h": 0.00896435176843836,
+        "dose_rate_uncertainty_uSv_h": 0.0010697828945718183
+      },
+      {
+        "endpoint": "1_y",
+        "relative_time_s": 31557600.0,
+        "absolute_time_s": 31557600.0,
+        "activity_bq": 89441.8625679053,
+        "activity_uncertainty_bq": 3476.3087211209204,
+        "dose_rate_uSv_h": 0.007879610762291477,
+        "dose_rate_uncertainty_uSv_h": 0.0009403326811946896
+      },
+      {
+        "endpoint": "100_y",
+        "relative_time_s": 3155760000.0,
+        "absolute_time_s": 3155760000.0,
+        "activity_bq": 0.004818100594840154,
+        "activity_uncertainty_bq": 0.0005722023789145148,
+        "dose_rate_uSv_h": 1.748849438189227e-08,
+        "dose_rate_uncertainty_uSv_h": 2.087339955802124e-09
+      }
+    ]
+  },
+  "second_irradiation": {
+    "schema": "fluxforge.second_irradiation_plan.v1",
+    "inventory_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+    "schedule_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_schedule.json",
+    "candidates_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_candidates.json",
+    "first_cooling_time_s": 1385628.0,
+    "second_irradiation_time_s": 7200.0,
+    "target_weights": {
+      "Cr-51": 1.0,
+      "Ta-182": 0.8,
+      "Fe-59": 0.6
+    },
+    "selected_candidate": {
+      "label": "RAFM4-C_15dEOI_window_300s",
+      "score": 28035027.97977942,
+      "flux_scale": 1.0,
+      "duration_factor": 1.0,
+      "second_cooling_time_s": 360.0,
+      "pulse_delay_s": 0.0
+    },
+    "ranked_candidates": [
+      {
+        "rank": 1,
+        "label": "RAFM4-C_15dEOI_window_300s",
+        "score": 28035027.97977942,
+        "flux_scale": 1.0,
+        "duration_factor": 1.0,
+        "second_cooling_time_s": 360.0,
+        "pulse_delay_s": 0.0,
+        "nuclide_count": 6
+      },
+      {
+        "rank": 2,
+        "label": "RAFM4-C_15dEOI_window_2h",
+        "score": 26533945.478025805,
+        "flux_scale": 1.0,
+        "duration_factor": 1.0,
+        "second_cooling_time_s": 9645.0,
+        "pulse_delay_s": 0.0,
+        "nuclide_count": 6
+      },
+      {
+        "rank": 3,
+        "label": "RAFM4-C_15dEOI_window_24h",
+        "score": 16676921.850235216,
+        "flux_scale": 1.0,
+        "duration_factor": 1.0,
+        "second_cooling_time_s": 97565.0,
+        "pulse_delay_s": 0.0,
+        "nuclide_count": 6
+      },
+      {
+        "rank": 4,
+        "label": "RAFM4-C_15dEOI_window_4d",
+        "score": 8079604.384057821,
+        "flux_scale": 1.0,
+        "duration_factor": 1.0,
+        "second_cooling_time_s": 346788.0,
+        "pulse_delay_s": 0.0,
+        "nuclide_count": 6
+      }
+    ],
+    "selected_inventory_rows": [
+      {
+        "candidate": "RAFM4-C_15dEOI_window_300s",
+        "nuclide": "Co-60",
+        "activity_bq": 2449.4703304143654,
+        "weight": 1.0,
+        "weighted_activity": 2449.4703304143654
+      },
+      {
+        "candidate": "RAFM4-C_15dEOI_window_300s",
+        "nuclide": "Cr-51",
+        "activity_bq": 6765417.471999274,
+        "weight": 1.0,
+        "weighted_activity": 6765417.471999274
+      },
+      {
+        "candidate": "RAFM4-C_15dEOI_window_300s",
+        "nuclide": "Fe-59",
+        "activity_bq": 335831.52008265036,
+        "weight": 0.6,
+        "weighted_activity": 201498.9120495902
+      },
+      {
+        "candidate": "RAFM4-C_15dEOI_window_300s",
+        "nuclide": "Mn-54",
+        "activity_bq": 18133.31321094231,
+        "weight": 1.0,
+        "weighted_activity": 18133.31321094231
+      },
+      {
+        "candidate": "RAFM4-C_15dEOI_window_300s",
+        "nuclide": "Ta-182",
+        "activity_bq": 634109.9433647968,
+        "weight": 0.8,
+        "weighted_activity": 507287.9546918375
+      },
+      {
+        "candidate": "RAFM4-C_15dEOI_window_300s",
+        "nuclide": "W-187",
+        "activity_bq": 20540240.85749736,
+        "weight": 1.0,
+        "weighted_activity": 20540240.85749736
+      }
+    ],
+    "generated_at": "2026-04-17T19:47:49Z",
+    "support_artifacts": {
+      "selected_inventory": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_plan_selected_inventory.csv",
+      "ranked_candidates": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/second_irradiation_plan_ranked_candidates.csv"
+    }
+  },
+  "plot_manifest": {
+    "paths": [
+      "inventory_review_activity.png",
+      "optimization_di_fom_optimization_grid.csv"
+    ]
+  }
+}

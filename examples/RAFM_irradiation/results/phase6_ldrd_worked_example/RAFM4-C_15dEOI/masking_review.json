@@ -1,0 +1,226 @@
+{
+  "schema": "fluxforge.masking_review.v1",
+  "source_activity_review": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/results/phase6_ldrd_worked_example/RAFM4-C_15dEOI/activity_review.json",
+  "isotopes_of_interest": [],
+  "energy_window_keV": 10.0,
+  "line_masking_results": [
+    {
+      "rank": 1,
+      "target_nuclide": "Tb154m",
+      "target_line_energy_keV": 999.2714576006701,
+      "masking_nuclide": "Ta-182",
+      "masking_line_energy_keV": 1001.7733514944,
+      "energy_delta_keV": 2.501893893729857,
+      "target_signal_counts": 768.8439469471969,
+      "masking_signal_counts": 35766.16835195139,
+      "background_counts": 77922.28050961005,
+      "interference_counts": 30066.946884208777,
+      "continuum_counts": 4022.6778797647894,
+      "masking_score": 74.90069366394083,
+      "burial_ratio": 69.67629140358596,
+      "recommended_action": "avoid"
+    },
+    {
+      "rank": 2,
+      "target_nuclide": "Fe-59",
+      "target_line_energy_keV": 192.53449755243872,
+      "masking_nuclide": "Ta-182",
+      "masking_line_energy_keV": 198.560346054941,
+      "energy_delta_keV": 6.025848502502271,
+      "target_signal_counts": 37330.5,
+      "masking_signal_counts": 40154.0,
+      "background_counts": 672915.1785714285,
+      "interference_counts": 14670.191524913784,
+      "continuum_counts": 2393.6711884578567,
+      "masking_score": 5.160832784808794,
+      "burial_ratio": 4.9635728789121165,
+      "recommended_action": "avoid"
+    },
+    {
+      "rank": 3,
+      "target_nuclide": "Ta-182",
+      "target_line_energy_keV": 198.560346054941,
+      "masking_nuclide": "Fe-59",
+      "masking_line_energy_keV": 192.53449755243872,
+      "energy_delta_keV": 6.025848502502271,
+      "target_signal_counts": 40154.0,
+      "masking_signal_counts": 37330.5,
+      "background_counts": 646759.2857142857,
+      "interference_counts": 13638.630889096828,
+      "continuum_counts": 2225.3559371600845,
+      "masking_score": 4.597551067999499,
+      "burial_ratio": 4.421821194770841,
+      "recommended_action": "avoid"
+    },
+    {
+      "rank": 4,
+      "target_nuclide": "Fe-59",
+      "target_line_energy_keV": 142.2441870771751,
+      "masking_nuclide": "Ta-182",
+      "masking_line_energy_keV": 152.1891653744,
+      "energy_delta_keV": 9.944978297224907,
+      "target_signal_counts": 556060.0,
+      "masking_signal_counts": 644183.3371036103,
+      "background_counts": 4670501.8684210535,
+      "interference_counts": 41487.91145675066,
+      "continuum_counts": 531.6609616017379,
+      "masking_score": 2.1765827551377477,
+      "burial_ratio": 2.175385820817206,
+      "recommended_action": "avoid"
+    },
+    {
+      "rank": 5,
+      "target_nuclide": "Ta-182",
+      "target_line_energy_keV": 1001.7733514944,
+      "masking_nuclide": "Tb154m",
+      "masking_line_energy_keV": 999.2714576006701,
+      "energy_delta_keV": 2.501893893729857,
+      "target_signal_counts": 35766.16835195139,
+      "masking_signal_counts": 768.8439469471969,
+      "background_counts": 145535.1007960972,
+      "interference_counts": 646.3311889501173,
+      "continuum_counts": 86.47310240060422,
+      "masking_score": 1.1155687579098625,
+      "burial_ratio": 1.037756662249507,
+      "recommended_action": "avoid"
+    },
+    {
+      "rank": 6,
+      "target_nuclide": "Ta-182",
+      "target_line_energy_keV": 152.1891653744,
+      "masking_nuclide": "Fe-59",
+      "masking_line_energy_keV": 142.2441870771751,
+      "energy_delta_keV": 9.944978297224907,
+      "target_signal_counts": 644183.3371036103,
+      "masking_signal_counts": 556060.0,
+      "background_counts": 629412.7632927793,
+      "interference_counts": 35812.42592887844,
+      "continuum_counts": 458.930520676775,
+      "masking_score": 0.30073904684760644,
+      "burial_ratio": 0.30057366609842556,
+      "recommended_action": "alternate_line"
+    }
+  ],
+  "masking_isotope_ranking": [
+    {
+      "masking_nuclide": "Ta-182",
+      "total_masking_score": 82.23810920388736,
+      "total_interference_counts": 86225.04986587322,
+      "total_continuum_counts": 6948.010029824383,
+      "target_line_count": 3,
+      "dominant_target_nuclide": "Tb154m",
+      "rank": 1
+    },
+    {
+      "masking_nuclide": "Fe-59",
+      "total_masking_score": 4.898290114847105,
+      "total_interference_counts": 49451.056817975266,
+      "total_continuum_counts": 2684.2864578368594,
+      "target_line_count": 2,
+      "dominant_target_nuclide": "Ta-182",
+      "rank": 2
+    },
+    {
+      "masking_nuclide": "Tb154m",
+      "total_masking_score": 1.1155687579098625,
+      "total_interference_counts": 646.3311889501173,
+      "total_continuum_counts": 86.47310240060422,
+      "target_line_count": 1,
+      "dominant_target_nuclide": "Ta-182",
+      "rank": 3
+    }
+  ],
+  "alternate_line_recommendations": [
+    {
+      "rank": 1,
+      "nuclide": "Tb154m",
+      "preferred_line_energy_keV": 999.2714576006701,
+      "preferred_masking_score": 74.90069366394083,
+      "strongest_line_energy_keV": 999.2714576006701,
+      "strongest_line_net_counts": 768.8439469471969,
+      "guidance": "defer_to_later_cooldown"
+    },
+    {
+      "rank": 2,
+      "nuclide": "Co-60",
+      "preferred_line_energy_keV": 1173.2956235317265,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 1332.575555310047,
+      "strongest_line_net_counts": 3496.0,
+      "guidance": "switch_to_preferred_line"
+    },
+    {
+      "rank": 3,
+      "nuclide": "Cr-51",
+      "preferred_line_energy_keV": 320.07622878559994,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 320.07622878559994,
+      "strongest_line_net_counts": 3031711.231240962,
+      "guidance": "keep_current_line"
+    },
+    {
+      "rank": 4,
+      "nuclide": "Fe-59",
+      "preferred_line_energy_keV": 335.2830019914332,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 142.2441870771751,
+      "strongest_line_net_counts": 556060.0,
+      "guidance": "switch_to_preferred_line"
+    },
+    {
+      "rank": 5,
+      "nuclide": "Mn-54",
+      "preferred_line_energy_keV": 834.8244327195999,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 834.8244327195999,
+      "strongest_line_net_counts": 40692.47714983273,
+      "guidance": "keep_current_line"
+    },
+    {
+      "rank": 6,
+      "nuclide": "Mn-56",
+      "preferred_line_energy_keV": 847.6249408805987,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 847.6249408805987,
+      "strongest_line_net_counts": 764.5,
+      "guidance": "keep_current_line"
+    },
+    {
+      "rank": 7,
+      "nuclide": "Sb-124",
+      "preferred_line_energy_keV": 719.5561519226326,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 719.5561519226326,
+      "strongest_line_net_counts": 1194.5,
+      "guidance": "keep_current_line"
+    },
+    {
+      "rank": 8,
+      "nuclide": "Ta-182",
+      "preferred_line_energy_keV": 84.11605493158743,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 99.7275651239,
+      "strongest_line_net_counts": 783310.8560602255,
+      "guidance": "switch_to_preferred_line"
+    },
+    {
+      "rank": 9,
+      "nuclide": "V-52",
+      "preferred_line_energy_keV": 1436.9492947938536,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 1436.9492947938536,
+      "strongest_line_net_counts": 266.5000000000009,
+      "guidance": "keep_current_line"
+    },
+    {
+      "rank": 10,
+      "nuclide": "W-187",
+      "preferred_line_energy_keV": 209.77219439190313,
+      "preferred_masking_score": 0.0,
+      "strongest_line_energy_keV": 209.77219439190313,
+      "strongest_line_net_counts": 276254.0,
+      "guidance": "keep_current_line"
+    }
+  ],
+  "generated_at": "2026-04-17T19:47:26Z"
+}

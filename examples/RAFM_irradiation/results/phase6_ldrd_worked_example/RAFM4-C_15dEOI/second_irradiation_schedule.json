@@ -1,0 +1,11 @@
+{
+  "sample_id": "RAFM4-C_15dEOI",
+  "schedule_source": "/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/RAFM_irradiation/metadata/sample_schedules.json",
+  "first_cooling_time_s": 1385628.0,
+  "second_irradiation_time_s": 7200.0,
+  "target_weights": {
+    "Cr-51": 1.0,
+    "Ta-182": 0.8,
+    "Fe-59": 0.6
+  }
+}
