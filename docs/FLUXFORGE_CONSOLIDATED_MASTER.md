@@ -1,7 +1,7 @@
 # FLUXFORGE Consolidated Master
 
 **Status:** active feature master  
-**Last Updated:** 2026-04-17  
+**Last Updated:** 2026-04-19  
 **Purpose:** consolidated source of truth for product scope, feature commitments, and
 roadmap-level capability planning.
 
@@ -16,7 +16,9 @@ Use the docs set in this order when there is overlap:
 2. `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` for feature scope and roadmap intent
 3. `docs/GUI_PLAN.md` for GUI architecture, interaction rules, and workspace direction
 4. `docs/FluxForge_Testing_Master.md` for testing, parity, and acceptance rules
-5. `docs/archive/planning_snapshot_2026-04-06/` for historical rationale and source-detail recovery
+5. `../testing/writeup.md` for repo-by-repo capability catalog, replay targets, and feature-to-file traceability
+6. `docs/PHASE3_EXECUTION_HANDOFF.md` for implementation lifecycle, mandatory test/probe gates, and definition-of-done discipline
+7. `docs/archive/planning_snapshot_2026-04-06/` for historical rationale and source-detail recovery
 
 Conflict rules:
 
@@ -86,10 +88,21 @@ the offline-parity module closes.
 | 4.2 | Device discovery surfaces | Deferred | Device list, thumbnails, and discovery dialogs after HAL transport exists |
 | 4.3 | Live Digital Twin dashboard | Deferred | Telemetry-driven dashboard once live acquisition is present |
 | 4.4 | Live spectrogram panel | Deferred | Time-energy spectrogram after live acquisition lands |
+| 5.1 | testing/ catalog crosswalk closure | Planned | Build and maintain a complete crosswalk from every `testing/writeup.md` repo section to FluxForge backend, CLI, modern Qt GUI, fixtures, parity tests, and probe evidence; include exact source script/data paths and replay classification (`replay-now`, `adapter-required`, `reference-only`) |
+| 5.2 | Spectrum IO and analysis parity closure | Planned | Close parser/calibration/background/peak-search/fit parity against `actigamma`, `becquerel`, `curie`, `gamma_spec_analysis`, `NASA-gamma`, `GSA-v2`, `GSA-v4`, `InterSpec`, `PyGammaSpec`, `peakingduck`, and `py-findpeaks`, with source-linked fixtures and algorithm/workflow golden checks |
+| 5.3 | GUI and workflow parity closure | Planned | Close direct-manipulation and analyst-workflow parity (role-aware overlays, marker editing, ROI/statistics, detection-limit, shielding/source-fit, archive/file-query, multi-spectrum diagnostics, saved context, and report/export parity) using `InterSpec`, `GSA-v4`, `Gamma-MCA`, `hdtv`, `SpecKit`, and `NASA-gamma` behavior baselines |
+| 5.4 | Inventory, NAA, and activation parity closure | Planned | Close activity/inventory/time-evolution/k0/INAA/activation parity against `irrad_spectroscopy`, `radioactivedecay`, `activation`, `KayWinV410`, `INAA-INRIM 3.1`, `NAA-ANN-1`, and `npat`; include uncertainty-bearing exports and provenance-complete bundle outputs |
+| 5.5 | Inverse and covariance parity closure | Planned | Close unfolding and covariance-aware inverse-analysis parity against `Neutron-Unfolding`, `Neutron-Spectrometry`, `pyunfold`, `gmapy`, and `SpecKit`; include algorithm-level and workflow-level parity fixtures with explicit tolerances and divergence rationale |
+| 5.6 | Phase 5 acceptance and release gate | Planned | Require backend+CLI+GUI completion, source-linked fixture manifests, targeted and full-suite test pass, native Qt probes, browser-lane artifact review, manual GUI sizing check, and synchronized status docs before any Phase 5 step is marked complete |
 
 The sequence map above remains the controlling roadmap map. The activation /
 FISPACT-style, library-governance, and de-hardcoding additions below are
 explicit additive overlays on that map, not replacements for it.
+
+Phase 5 is an additive closure phase for the audited `testing/` capability
+catalog. It does not remove or downgrade existing FluxForge-native capability
+families already committed in Phases 1 through 4 and the additive `3N` / Phase 6
+workstream.
 
 ## 6. Feature Workstreams That Must Be Preserved
 
@@ -210,3 +223,321 @@ The following superseded inputs were preserved in
 - `GUI_PLAN_old.md`
 - `GUI_CAPABILITY_PROGRAM.md`
 - `GUI_CAPABILITY_PROGRAM_old.md`
+
+## 10. Phase 5 Capability Closure Program (`testing/writeup.md` alignment)
+
+### 10.1 Mission
+
+Phase 5 is the explicit convergence phase that ensures FluxForge planning
+contains all capability families audited in `../testing/writeup.md`, while
+preserving FluxForge-specific capability additions already landed or planned
+(standards-lock workflows, predictive surfaces, benchmark `.ffexp` handoff,
+and additive Phase 6 optimization/inventory tooling).
+
+Phase 5 outputs must be implementation-ready. Every capability entry must say:
+
+- where the behavior is described in `../testing/writeup.md`
+- which local source scripts, tests, notebooks, or sample data define replay
+  expectations
+- where FluxForge backend/CLI/GUI work lands
+- which tests/probes/documentation updates close the slice
+
+### 10.2 Mandatory Execution Method (adopted from `docs/PHASE3_EXECUTION_HANDOFF.md`)
+
+For every Phase 5 capability, execute in this order:
+
+1. Reference extraction from `../testing/writeup.md` and source paths.
+2. Native adaptation in FluxForge backend modules.
+3. Mathematical and physics verification via pytest fixtures/tolerances.
+4. CLI integration with command-level tests.
+5. Modern Qt integration in `src/fluxforge/gui/`.
+6. GUI automation plus native probe artifact generation and browser-lane review.
+7. Manual modern GUI launch and sizing/usability validation.
+8. Status-document updates with evidence and residual-risk notes.
+
+Per-slice exit gate remains strict: backend + CLI + GUI + tests + probe
+evidence + manual GUI check + doc sync are all required before completion.
+
+### 10.3 Full Writeup Crosswalk (all audited `testing/` repos)
+
+The following map is the minimum traceability baseline for Phase 5 issue
+seeding and implementation planning.
+
+| writeup section | Capability families to preserve in FluxForge | Primary local replay evidence to cite in implementation work |
+|---|---|---|
+| `writeup.md` section 1 `actigamma` | deterministic line-engine generation, mixed-radiation binning, nuclide-ID heuristics, database query parity | `testing/actigamma/examples/plotlines.py`, `plotmultilines.py`, `identify.py`, `getenergies.py`, `classifier.py` |
+| `writeup.md` section 2 `becquerel` | multi-format parser normalization, calibration/auto-calibration, fit-model parity, rebinning parity | `testing/becquerel/tests/samples/`, `tests/samples/INVENTORY.md`, `examples/fitting.ipynb`, `tests/fitting_test.py`, `examples/rebinning.ipynb`, `tests/rebin_test.py` |
+| `writeup.md` section 3 `curie` | spectroscopy + efficiency, stacked-target workflows, attenuation/material workflows, reaction/decay API parity | `testing/curie/examples/spectroscopy_examples.py`, `eu_calib_7cm.Spe`, `stack_examples.py`, `test_stack.csv`, `reaction_examples.py`, `isotope_decay_examples.py` |
+| `writeup.md` section 4 `gamma_spec_analysis` | ORTEC `.spe` parsing, smoothing and peak search, trapezoid background, Gaussian fit parity | `testing/gamma_spec_analysis/test_data/`, `test_spec_analysis.ipynb`, `gs_analysis.py` |
+| `writeup.md` section 5 `Gamma-MCA` | role-aware import UX, chronological stream histogramization, calibration workflows, Gaussian-correlation peak finder references, isotope lookup UX, acquisition-oriented interaction model | `testing/Gamma-MCA/README.md`, `source/` workflow files and import/calibration descriptions |
+| `writeup.md` section 6 `gmapy` | covariance-aware evaluation workflows, legacy-data ingest, simplified-vs-full equivalence and controlled-divergence methodology | `testing/gmapy/tests/testdata/`, `tests/test_gmap_simplified.py`, `tests/test_legacy_divergence.py`, `examples/example-005-compute-sacs-results.ipynb`, `legacy-tests/` |
+| `writeup.md` section 7 `hdtv` | marker-centric fit workflows, fit XML import/export, calibrated-bin conversion, integral workflows, matrix cut/projection interaction model | `testing/hdtv/tests/share/osiris_bg.spc`, `tests/share/binning.root`, `tests/plugins/test_calbin.py`, `tests/integral/test.asc`, `tests/mat/mat.prx`, `tests/mat/cut.spc` |
+| `writeup.md` section 8 `irrad_spectroscopy` | energy and efficiency calibration from measured standards, activity reconstruction, dose and fluence helper workflows | `testing/irrad_spectroscopy/tests/test_data/Eu152_point.txt`, `152Eu_peaks.yaml`, `152Eu_point_source_2.yaml`, `example_sample.txt`, `test_spectroscopy.py` |
+| `writeup.md` section 9 `NAA-ANN-1` | ANN-assisted NAA preprocessing and result-surface parity as optional plugin path | `testing/NAA-ANN-1/RID_extracted/`, `NAA2 data augmentation output 4e.zip`, `NAA1 2022-05-09 4e results.csv` |
+| `writeup.md` section 10 `Neutron-Spectrometry` | config-driven unfolding, objective/solver comparators, trend-analysis and dose/fluence report workflows | `testing/Neutron-Spectrometry/unfolding/input/template_measurements.txt`, `template_unfold_spectrum.cfg`, `template_unfold_trend.cfg`, `instructions_plot_spectra.md` |
+| `writeup.md` section 11 `Neutron-Unfolding` | compact GRAVEL/MLEM parity workflows with committed result artifacts | `testing/Neutron-Unfolding/unfolding_inputs/reduced_data.csv`, `response-matrix.txt`, `energy-spectrum.txt`, `final-results/`, `gravel-results/` |
+| `writeup.md` section 12 `npat` | spectroscopy + activation + decay-chain + stacked-target multi-domain integration, listfile parsing | `testing/npat/examples/eu_calib_7cm.Spe`, `mvmelst_007.zip`, `test_stack.csv`, `dbmgr.py`, `Reaction`/`Isotope`/`DecayChain` APIs |
+| `writeup.md` section 13 `peakingduck` | SNIP/background estimation, process-chain peak candidate generation, pluggable low-level peak-processing architecture | `testing/peakingduck/reference/spectrum0.csv`, `examples/py/snip.py`, `examples/py/realspectrum.py`, `include/io/spectralio.hpp` |
+| `writeup.md` section 14 `py-findpeaks` | algorithm-comparison micro-benchmarks for peak and valley index detection | `testing/py-findpeaks/tests/vector.py`, `scipy_signal_find_peaks.py`, `peakutils_indexes.py`, `lows_and_highs.py` |
+| `writeup.md` section 15 `PyGammaSpec` | low-ceremony spectrum arithmetic, polynomial calibration, bounded Gaussian fitting, gamma-line and daughter overlay lookup | `testing/PyGammaSpec/docs/utils/calibration.txt`, `background.txt`, `weak_radium.txt`, `src/pygammaspec/data/gamma_data.csv` |
+| `writeup.md` section 16 `pyunfold` | covariance-aware iterative unfolding with prior sensitivity and regularization paths | `testing/pyunfold/pyunfold/tests/test_data/example1_python3.hdf`, `docs/source/notebooks/user_prior.ipynb`, `regularization.ipynb`, `tests/test_teststat.py` |
+| `writeup.md` section 17 `radioactivedecay` | analytic inventory decay, daughter/progeny logic, inventory file I/O parity, nuclide parser normalization | `testing/radioactivedecay/radioactivedecay/icrp107_ame2020_nubase2020/`, `tests/test_inventory.py`, `tests/test_fileio.py`, `tests/test_nuclide.py` |
+| `writeup.md` section 18 `SpecKit` | response-matrix construction, neutron-spectrum solving, uncertainty/error-band and benchmark comparison workflows | `testing/SpecKit/Example/Au-197_Au-198.txt`, `Example/prior.txt`, `benchmark/double_peak/`, `benchmark/quasi_single_peak/` |
+| `writeup.md` section 19 `GSA-v4` | mature desktop workflow behavior, detector calibration/efficiency state handling, line-library workflows, multi-spectrum ROI statistics | `testing/GSA-v4/Spectrum/`, `Calibration/Detector1.txt`, `Calibration/Efficiency1.txt`, `Lib/libEdit.dat`, `Lib/Lib-gamma-natur.dat`, `ROI_Statistic/` |
+| `writeup.md` section 20 `InterSpec` | role-aware N42 ingest/overlay, activity/detection-limit/shielding calculators, file-query/archive workbench behavior, persisted analyst context and themes | `testing/InterSpec/example_spectra/*.n42`, `target/testing/test_data/SimpleActivityCalc/`, `target/testing/test_data/det_eff/`, `target/testing/analysis_tests/` |
+| `writeup.md` section 21 `KayWinV410` | detector/facility characterization, k0-NAA workspace structure, short/long irradiation campaign organization, results packaging | `testing/KayWinV410/KayWinV4/Calibration CA6C final/`, `PTIC40/`, `FAST/`, `LONG/`, `order/results/PT2020.RES` |
+| `writeup.md` section 22 `NASA-gamma` | parser breadth (`MCA/CNF/CSV/SPE/TXT`), calibration and advanced peak-fit helpers, repeated-run diagnostics, extended capture/reaction reference workflows | `testing/NASA-gamma/examples/data/`, `gui_test_data_cebr_cal.csv`, `gui_test_data_hpge_Cu.Spe`, `test_folder_diag/RUN*.Spe` |
+| `writeup.md` section 23 `prospect_trial_installation` | commercial-workstation workflow shape for ROI, calibration, overlay, preferences, reporting, and live-session assumptions | `testing/prospect_trial_installation/ProSpect User's Manual.pdf`, `readme first.txt` |
+| `writeup.md` section 24 `GSA-v2` | source-visible GSA algorithms for parser parity, derivative peak search, overlap area extraction, identification/activity workflows | `testing/GSA-v2/GSA.v2/example/`, `src/mariscoti.java`, `src/PeakSearch.java`, `src/treatment1.java`, `Lib/Lib.dat`, `Detectors/*.txt` |
+| `writeup.md` section 25 `activation` | request-schema and activation scenario design, resonance/cross-section helpers, web-form input models | `testing/activation/README.md`, `cgi-bin/nact.py`, `endf/isotopes_ENDF-B-VIII.1.txt`, `endf/endf.py`, `activation/index_template.html` |
+| `writeup.md` section 26 `gammaspectroscopy` | large measured-spectrum replay corpus, streamlined process-and-identify pipelines, notebook batch workflows | `testing/gammaspectroscopy/Daten.zip`, `databasegamma.txt`, `databasegamma.parquet`, `notebooks/` |
+| `writeup.md` section 27 `INAA-INRIM 3.1` | k0 data/workspace model parity and correction-chain coverage (decay/efficiency/blank/mass/fission) | `testing/INAA-INRIM 3.1/data/k0data/from_k0data.k0d`, `data/nuclear_data/nndc_nudat_data_export.nds`, `data/eqs/*.png` |
+
+### 10.4 Capability-Bundle Delivery Requirements for Phase 5
+
+Each implementation slice should map one or more crosswalk rows above into a
+single FluxForge capability bundle with all required surfaces:
+
+- Backend: native implementation under `src/fluxforge/` (no runtime dependency
+  on `../testing` code).
+- CLI: command and output support in `src/fluxforge/cli/app.py`.
+- GUI: modern Qt workspace in `src/fluxforge/gui/` and related panels/dialogs.
+- Data provenance: explicit source library/version/selection captured in
+  artifacts and reports.
+- Testing: algorithm-level and workflow-level parity tests, plus fixture
+  manifests with tolerances and provenance notes.
+- GUI evidence: pytest-qt interaction tests, native probe screenshots/artifacts,
+  browser-lane artifact review, and manual GUI sizing validation.
+
+The writeup-driven classification rule also applies throughout Phase 5:
+
+- decay/activity libraries stay in `peak-identification` and activity workflows
+- prompt capture / reaction-gamma datasets remain separate capability buckets
+  (`activation-reference`, `capture-gamma`, `reaction-gamma`,
+  `delayed-activation`)
+
+### 10.5 Testing-Data and Traceability Contract (required in every Phase 5 PR)
+
+For every added fixture or replay path, document all of the following:
+
+- source repo and writeup section (for example, `writeup.md` section 20 `InterSpec`)
+- exact local source path(s) used for replay input and expected output
+- data-class label: `bundled locally`, `downloaded dynamically`,
+  `generated during runtime`, or `docs-only / implied`
+- replay status target: `replay-now`, `adapter-required`, or `reference-only`
+- expected output contract (tables, files, figures, tolerances)
+- FluxForge landing paths (backend module, CLI command, GUI panel, tests)
+
+This contract is mandatory for issue descriptions, implementation PRs,
+parity-fixture manifests, and status-doc updates.
+
+### 10.6 Phase 5 Definition of Done
+
+A Phase 5 capability is complete only when all conditions are true:
+
+- The targeted writeup capability is implemented in native FluxForge backend,
+  CLI, and modern Qt GUI surfaces.
+- Source-linked replay fixtures are added with provenance and tolerances.
+- Algorithm-level and workflow-level tests pass for the added capability.
+- Native GUI probe artifacts and browser-lane review evidence are generated.
+- Manual modern GUI launch confirms sizing/usability for the new surface.
+- `docs/ROADMAP_EXECUTION_STATUS.md`, this master plan, and related testing/GUI
+  docs are updated with evidence and residual risks.
+
+If any requirement above is missing, the Phase 5 slice remains in progress.
+
+### 10.7 Evidence and Provenance Rules (from `testing/writeup.md` methodology)
+
+Phase 5 implementation and review work must apply the writeup evidence rules
+explicitly, not implicitly.
+
+- Every claim about tests, examples, tutorials, notebooks, demos, or sample
+  workflows must cite at least one concrete local path when such a path exists.
+- Every dataset reference must carry one data-class label:
+  `bundled locally`, `downloaded dynamically`, `generated during runtime`, or
+  `docs-only / implied`.
+- Every implementation claim must carry one provenance label when needed:
+  `source-verified`, `binary/workspace-derived`, or `docs-derived`.
+- Every replay target must state input artifact, processing step, and expected
+  output/result to compare.
+- Missing local assets are never implied by omission; absence must be stated
+  explicitly in parity notes and manifests.
+- For compiled or packaged reference apps, workspace-file evidence and
+  installer/manual-only claims must be reported separately.
+
+### 10.8 Code-Level Traceability Packet (required per Phase 5 capability)
+
+Every Phase 5 issue, implementation PR, and parity-fixture manifest must
+include this traceability packet:
+
+1. Parser/importer implementation file(s) for the capability.
+2. Primary numerical or physics algorithm file(s).
+3. User-facing workflow entry file(s): CLI command path and modern Qt
+   panel/dialog path.
+4. Validation-asset path(s) used for checks.
+5. Sample input path(s) and expected output artifact contract.
+6. Replay status (`replay-now`, `adapter-required`, or `reference-only`).
+7. If code is split across multiple files, one primary file plus supporting
+   files listed in order.
+8. If implementation is docs-only for a source capability, the claim must be
+   marked `docs-derived` until source-verified evidence is added.
+
+### 10.9 GUI Behavior-Extraction Checklist (required for GUI-focused sources)
+
+When preserving behaviors from GUI-oriented sources (`InterSpec`, `GSA-v4`,
+`Gamma-MCA`, `hdtv`, `SpecKit`, `NASA-gamma`, and related references), parity
+planning must explicitly record:
+
+- Whether the plot is a primary input surface or only a passive display.
+- Graph/table synchronization behavior, including click-table-to-zoom and
+  plot-edit-to-update-table loops.
+- Foreground/background/secondary spectrum-role preservation across load,
+  legend, drag-drop, and saved-state workflows.
+- Whether automated workflows are manually overridable by analysts.
+- Whether saved themes, saved workspaces, or saved workflow context are
+  first-class and reproducible.
+- Whether specialized workspaces exist for ROI statistics, detection limit,
+  relative activity, shielding/source-fit, and file-query/archive review.
+
+If a source lacks one or more behaviors above, that absence must be stated
+explicitly before marking parity scope complete.
+
+### 10.10 Writeup Addendum Coverage Deltas (section 0 alignment)
+
+The writeup addendum includes high-value capability families that are not all
+expected to land at once. Phase 5 must keep these visible as explicit planning
+targets with provenance-aware staging:
+
+- `testing/InterSpec/data/sandia.reactiongamma.xml` compatibility bridge,
+  staged under `reaction-gamma` / `activation-reference` capability buckets.
+- ENSDF archival ingestion path for richer daughter/cascade traceability.
+- IAEA LiveChart cache/sync layer for optional provenance-tracked updates.
+- DDEP/LNHB recommended-decay overlay support.
+- IAEA X-ray and gamma-ray standards subset support.
+- SandiaDecay-compatible XML import/export path.
+- Coincidence/cascade JSON derivations from ENSDF-style sources.
+
+Classification guardrail remains mandatory: prompt capture or reaction-gamma
+references are not interchangeable with decay emission-probability libraries
+used for activity calculations.
+
+### 10.11 Replay-State Matrix for Audited `testing/` Sources
+
+The table below records the current planning-state classification for each
+audited source family based on `testing/writeup.md` replay guidance.
+
+| Source family | Initial replay-state target | Notes for Phase 5 planning |
+|---|---|---|
+| `actigamma` | `replay-now` | Deterministic synthetic line-engine parity and inventory-to-spectrum checks. |
+| `becquerel` | `replay-now` | Strong parser/calibration/fitting parity with bundled sample assets. |
+| `curie` | `replay-now` + `adapter-required` | Local spectroscopy/stack workflows are replayable; downloaded DB paths need adapter staging. |
+| `gamma_spec_analysis` | `replay-now` | Local `.spe` parser/smoothing/peak/fit parity target. |
+| `Gamma-MCA` | `adapter-required` | UX and workflow parity high value; fixture construction needed for full numerical replay. |
+| `gmapy` | `replay-now` | Covariance-aware methodology and legacy-divergence checks are locally replayable. |
+| `hdtv` | `replay-now` | Strong local fit/cut/XML/matrix fixtures; environment/runtime constraints apply. |
+| `irrad_spectroscopy` | `replay-now` | Local calibration/activity/dose examples and tests are available. |
+| `NAA-ANN-1` | `adapter-required` | Real corpus exists, but zip/path-sensitive ANN preprocessing must be reconstructed first. |
+| `Neutron-Spectrometry` | `replay-now` | Config-driven unfolding and trend workflows are replayable with local templates/inputs. |
+| `Neutron-Unfolding` | `replay-now` | Local compact GRAVEL/MLEM datasets and committed outputs. |
+| `npat` | `replay-now` + `adapter-required` | Local spectroscopy/listfile/stack inputs replay now; downloaded DB-backed workflows need staging. |
+| `peakingduck` | `replay-now` | Local SNIP/background/process-chain replay assets available. |
+| `py-findpeaks` | `replay-now` | Vector-level algorithm benchmark parity. |
+| `PyGammaSpec` | `replay-now` | Local calibration/background/fit/line-lookup tutorial assets. |
+| `pyunfold` | `replay-now` | Local HDF/notebook/test-stat assets for unfolding and uncertainty parity. |
+| `radioactivedecay` | `replay-now` | Local decay-network packaging and inventory regression surfaces. |
+| `SpecKit` | `replay-now` | Local response/benchmark datasets and uncertainty viewer workflows. |
+| `GSA-v4` | `replay-now` | Local spectra/calibration/library/ROI-stat artifacts support parity comparisons. |
+| `InterSpec` | `replay-now` | Rich local N42/activity/det-eff/analysis test assets. |
+| `KayWinV410` | `adapter-required` | Strong data-model/workspace reference; executable/code-level parity needs adapters. |
+| `NASA-gamma` | `replay-now` | High-priority local parser/calibration/fit/diagnostics assets. |
+| `prospect_trial_installation` | `reference-only` | Workflow-design reference; limited local numerical replay corpus. |
+| `GSA-v2` | `replay-now` | Source-visible algorithm parity with local example corpus. |
+| `activation` | `adapter-required` | Request-schema/API parity useful; core physics coupling is external. |
+| `gammaspectroscopy` | `replay-now` | Large local measured-spectrum corpus and notebook workflows. |
+| `INAA-INRIM 3.1` | `adapter-required` | Strong k0 data/workspace reference; code-level replay needs importer/model adapters. |
+
+Status rule: this table tracks planning-state targets, not implementation
+completion. Completion state is tracked in roadmap and parity fixture evidence.
+
+## 11. Online-Informed Future Feature Candidates (Do Not Implement Yet)
+
+This section captures future feature ideas from online references relevant to
+FluxForge goals and planned superconducting-material irradiation campaigns.
+These are planning candidates only.
+
+Reference pages reviewed for this update:
+
+- IAEA LiveChart and API entry points:
+  `https://www-nds.iaea.org/relnsd/vcharthtml/VChartHTML.html`
+- NNDC NuDat 3 data/navigation surfaces:
+  `https://www.nndc.bnl.gov/nudat3/`
+- OpenMC depletion/transmutation user guidance:
+  `https://docs.openmc.org/en/stable/usersguide/depletion.html`
+- UKAEA FISPACT-II capability overview:
+  `https://www.ukaea.org/service/fispact/`
+- ITER machine references for magnet/blanket/divertor constraints:
+  `https://www.iter.org/mach/Magnets`
+  `https://www.iter.org/mach/Blanket`
+  `https://www.iter.org/mach/Divertor`
+
+### 11.1 Nuclear Data and Provenance Expansion
+
+- Add a multi-source nuclear-data resolver that can blend IAEA LiveChart,
+  NuDat, and local bundled libraries with ranked provenance and explicit
+  conflict reporting.
+- Add offline snapshot/cache packs for remote datasets so analysis remains
+  reproducible in air-gapped labs.
+- Add service-health and deprecation tracking in provenance metadata
+  (important when upstream web services are retired or changed).
+
+### 11.2 Activation and Depletion Workflow Expansion
+
+- Add explicit source-rate vs power-normalization controls in depletion-like
+  workflows, with warnings about model assumptions and normalization caveats.
+- Add local-spectrum handling for repeated materials so irradiation estimates do
+  not collapse distinct local spectra into one averaged state.
+- Add material transfer-rate modeling for feed/removal scenarios in long
+  irradiation campaigns (including units, sign conventions, and audit trails).
+- Add optional transport-independent mode hooks for pre-tabulated microscopic
+  cross sections and external flux inputs.
+
+### 11.3 Radiation-Damage and Fusion-Materials Metrics
+
+- Add first-class radiation-damage outputs aligned with fusion materials work:
+  dpa, kerma, PKA proxies, gas production (He/H), and nuclide-production chains.
+- Add uncertainty-aware trend views for damage and gas-production endpoints over
+  irradiation, cooldown, and post-irradiation windows.
+- Add dominant-contributor analysis specifically for damage and gas channels, in
+  parallel with existing activity and dose contributor plots.
+
+### 11.4 HTS Irradiation Campaign Support (Future Research Mode)
+
+- Add campaign objects for superconducting sample metadata:
+  conductor type, geometry, cryogenic test conditions, magnetic-field setpoints,
+  and pre/post irradiation measurement records.
+- Add derived-observable scaffolding for HTS-oriented endpoints:
+  critical current retention, transition-temperature shifts, resistivity change,
+  and quench-margin proxies linked to irradiation state.
+- Add coupled optimization objectives for fusion-material studies:
+  target activation observables + damage/gas limits + cooldown handling windows.
+- Add post-irradiation exam (PIE) planning outputs (measurement queue templates,
+  cooldown gates, transport safety metadata, and sample lineage tracking).
+
+### 11.5 Fusion-Device Context Constraints
+
+- Add high-heat-flux and tungsten-facing-surface constraint templates inspired by
+  divertor/blanket operating envelopes so schedule optimizers can respect
+  realistic fusion-system boundaries.
+- Add shielding-alignment and tolerance-aware review cards for campaigns that
+  depend on narrow geometric windows or strict positional tolerances.
+- Add remote-handling-aware replacement/inspection planning placeholders for
+  long-horizon irradiation facility operations.
+
+### 11.6 Planning Rules for Future Candidates
+
+- These ideas are roadmap candidates only and must not be treated as implemented
+  until they pass the normal FluxForge lifecycle gates.
+- Every future feature must preserve offline-first execution, additive method
+  selection, and provenance-complete outputs.
+- Every future feature should be mapped to explicit backend, CLI, modern Qt GUI,
+  fixture, parity-test, and probe-evidence requirements before implementation.
