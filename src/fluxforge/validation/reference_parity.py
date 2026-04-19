@@ -152,6 +152,10 @@ def _execute_reference_manifest(case_dir: Path, manifest: dict[str, Any]) -> dic
     workflow = str(manifest.get("workflow") or "").strip().lower()
     if workflow == "peak-search-only":
         return _run_peak_search_case(case_dir, manifest)
+    if workflow == "overlay-role-workflow":
+        return _run_overlay_role_case(case_dir, manifest)
+    if workflow == "roi-statistics-workflow":
+        return _run_roi_statistics_case(case_dir, manifest)
     if workflow == "spectrum-io-normalization":
         return _run_spectrum_io_case(case_dir, manifest)
     if workflow == "background-subtraction":
@@ -295,6 +299,170 @@ def _run_background_subtraction_case(case_dir: Path, manifest: dict[str, Any]) -
             "sum_counts": _round_float(float(np.sum(adjusted_counts))),
             "max_counts": _round_float(float(np.max(adjusted_counts))) if adjusted_counts.size else 0.0,
             "first_channels": [_round_float(value) for value in adjusted_counts[:8]],
+        }
+    }
+
+
+def _run_overlay_role_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    input_file = _first_input_file(case_dir, manifest)
+    payload = _load_json(input_file)
+
+    foreground_payload = payload.get("foreground")
+    if not isinstance(foreground_payload, dict):
+        raise ValueError("Overlay-role parity input must define foreground spectrum payload.")
+    foreground = _spectrum_from_payload(foreground_payload)
+
+    background_payload = payload.get("background")
+    background = (
+        _spectrum_from_payload(background_payload)
+        if isinstance(background_payload, dict)
+        else None
+    )
+
+    overlay_payload = payload.get("overlay")
+    overlay = (
+        _spectrum_from_payload(overlay_payload)
+        if isinstance(overlay_payload, dict)
+        else None
+    )
+
+    mode = str(payload.get("mode") or "scaled")
+    scale = float(payload.get("scale") or 1.0)
+    overlay_scale = float(payload.get("overlay_scale") or 1.0)
+
+    adjusted_counts = subtract_background_counts(
+        foreground,
+        background,
+        mode=mode,
+        scale=scale,
+    )
+    display_counts = np.asarray(adjusted_counts, dtype=float)
+    overlay_sum_counts = 0.0
+
+    if overlay is not None:
+        overlay_counts = np.asarray(overlay.counts, dtype=float)
+        overlay_sum_counts = float(np.sum(overlay_counts))
+        sample_count = min(display_counts.size, overlay_counts.size)
+        if sample_count <= 0:
+            raise ValueError("Overlay-role parity input must produce non-empty display channels.")
+        display_counts = display_counts[:sample_count] + (
+            max(overlay_scale, 0.0) * overlay_counts[:sample_count]
+        )
+
+    if display_counts.size == 0:
+        raise ValueError("Overlay-role parity input must produce non-empty display channels.")
+
+    foreground_channels = np.asarray(foreground.channels, dtype=float)
+    if foreground_channels.size >= display_counts.size:
+        display_channels = foreground_channels[: display_counts.size]
+    else:
+        display_channels = np.arange(display_counts.size, dtype=float)
+
+    display_spectrum = GammaSpectrum(
+        counts=display_counts,
+        channels=display_channels,
+        live_time=float(foreground.live_time),
+        real_time=float(foreground.real_time),
+        calibration=dict(foreground.calibration or {}),
+        spectrum_id=f"{foreground.spectrum_id}_overlay",
+    )
+    peaks = detect_peak_candidates(
+        display_spectrum,
+        method=str(payload.get("peak_search_method") or "mariscotti"),
+        threshold=float(payload.get("threshold") or 4.0),
+        min_distance=int(payload.get("min_distance") or 18),
+        max_peaks=int(payload.get("max_peaks") or 12),
+    )
+    peak_energies = sorted(float(peak.energy_keV) for peak in peaks)
+
+    return {
+        "overlay_role_expected.json": {
+            "schema": "fluxforge.reference_parity.overlay_role.v1",
+            "mode": mode,
+            "requested_scale": _round_float(scale),
+            "overlay_scale": _round_float(overlay_scale),
+            "channel_count": int(display_counts.size),
+            "foreground_sum_counts": _round_float(float(np.sum(foreground.counts))),
+            "background_sum_counts": _round_float(
+                float(np.sum(background.counts)) if background is not None else 0.0
+            ),
+            "adjusted_sum_counts": _round_float(float(np.sum(adjusted_counts))),
+            "overlay_sum_counts": _round_float(overlay_sum_counts),
+            "display_sum_counts": _round_float(float(np.sum(display_counts))),
+            "peak_count": len(peaks),
+            "first_peak_keV": _round_float(peak_energies[0]) if peak_energies else None,
+        }
+    }
+
+
+def _run_roi_statistics_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    input_file = _first_input_file(case_dir, manifest)
+    payload = _load_json(input_file)
+
+    spectrum_payload = payload.get("spectrum")
+    if not isinstance(spectrum_payload, dict):
+        raise ValueError("ROI statistics parity input must define spectrum payload.")
+    spectrum = _spectrum_from_payload(spectrum_payload)
+
+    method = str(payload.get("peak_search_method") or "mariscotti")
+    peaks = detect_peak_candidates(
+        spectrum,
+        method=method,
+        threshold=float(payload.get("threshold") or 4.0),
+        min_distance=int(payload.get("min_distance") or 18),
+        max_peaks=int(payload.get("max_peaks") or 12),
+    )
+    if not peaks:
+        raise ValueError("ROI statistics workflow did not detect any peaks.")
+
+    selected_peak = max(peaks, key=lambda peak: float(peak.significance))
+    roi_half_width_keV = max(float(payload.get("roi_half_width_keV") or 1.5), 0.2)
+    roi_bounds = (
+        float(selected_peak.energy_keV) - roi_half_width_keV,
+        float(selected_peak.energy_keV) + roi_half_width_keV,
+    )
+
+    channels = np.asarray(spectrum.channels, dtype=float)
+    energies_keV = np.asarray(
+        [spectrum.channel_to_energy(float(channel)) for channel in channels],
+        dtype=float,
+    )
+    counts = np.asarray(spectrum.counts, dtype=float)
+    fit_result = fit_roi_peak(
+        energies_keV,
+        counts,
+        roi_bounds,
+        fitter_key=str(payload.get("fitter_key") or "gaussian"),
+        background_model=str(payload.get("background_model") or "linear"),
+        prior_fwhm_channels=(
+            float(payload.get("prior_fwhm_channels"))
+            if payload.get("prior_fwhm_channels") is not None
+            else None
+        ),
+    )
+
+    mask = (energies_keV >= roi_bounds[0]) & (energies_keV <= roi_bounds[1])
+    gross_counts = float(np.sum(counts[mask])) if np.any(mask) else 0.0
+
+    return {
+        "roi_statistics_expected.json": {
+            "schema": "fluxforge.reference_parity.roi_statistics.v1",
+            "peak_search_method": method,
+            "peak_count": len(peaks),
+            "selected_peak_keV": _round_float(float(selected_peak.energy_keV)),
+            "roi_bounds_keV": [
+                _round_float(float(roi_bounds[0])),
+                _round_float(float(roi_bounds[1])),
+            ],
+            "gross_counts": _round_float(gross_counts),
+            "centroid_keV": _round_float(fit_result.centroid_channel),
+            "fwhm_keV": _round_float(fit_result.fwhm_channels),
+            "area_counts": _round_float(fit_result.area_counts),
+            "net_counts": _round_float(float(fit_result.peak_result.net_counts)),
+            "reduced_chi_squared": _round_float(
+                float(fit_result.peak_result.reduced_chi_squared)
+            ),
+            "success": bool(fit_result.peak_result.success),
         }
     }
 

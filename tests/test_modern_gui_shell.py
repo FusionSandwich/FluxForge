@@ -252,6 +252,31 @@ def test_main_window_restores_saved_workflow_state_across_sessions():
     second.close()
 
 
+@pytest.mark.skipif(not QT_AVAILABLE, reason="Qt GUI dependencies are unavailable.")
+def test_phase5_parity_panel_runs_workflow_fixture_bundle():
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    panel = window.bottom_dock.widget().phase5_parity_panel
+    scope_index = panel.parity_scope_combo.findText("workflow")
+    if scope_index >= 0:
+        panel.parity_scope_combo.setCurrentIndex(scope_index)
+    panel.fixture_filter_edit.setText("roi_statistics_workflow_case")
+
+    payload = panel.run_parity_suite()
+    assert payload is not None
+    assert payload["summary"]["total"] == 1
+    assert payload["summary"]["failed"] == 0
+    assert payload["results"][0]["fixture_id"] == "roi_statistics_workflow_case"
+    assert "1 passed" in panel.parity_label.text()
+    window.close()
+
+
 def test_selection_bus_helper_publishers_preserve_shared_context():
     bus = SelectionBus()
 

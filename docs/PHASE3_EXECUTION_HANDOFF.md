@@ -786,3 +786,21 @@ Current Phase 5.2 baseline status (2026-04-19):
 	`PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`,
 	`PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`, and
 	`node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`.
+
+Current Phase 5.3 baseline status (2026-04-19):
+- `src/fluxforge/validation/reference_parity.py` now includes executable
+	`overlay-role-workflow` and `roi-statistics-workflow` parity handlers.
+- Source-linked workflow fixtures now exist under:
+	`tests/spectra/reference_parity/cases/overlay_role_workflow_case/` and
+	`tests/spectra/reference_parity/cases/roi_statistics_workflow_case/`.
+- Crosswalk fixture anchors for GUI/workflow-focused source families were
+	updated in `.github/project-management/phase5_crosswalk.json` to point to
+	executable workflow manifests.
+- Modern-shell Phase 5 panel coverage now includes direct workflow fixture
+	execution via `tests/test_modern_gui_shell.py`.
+- Verification commands for this slice were:
+	`PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py tests/test_phase5_crosswalk.py tests/test_modern_gui_shell.py -k "phase5 or parity or manifest or main_window_restores_saved_workflow_state_across_sessions or phase5_parity_panel_runs_workflow_fixture_bundle"`,
+	`PYTHONPATH=src python -m fluxforge.cli.app parity-check --scope workflow --fixture-id roi_statistics_workflow_case --output /tmp/phase5_3_parity_check.json`,
+	`PYTHONPATH=src python -m fluxforge.cli.app phase5-crosswalk-report --include-parity-summary --output /tmp/phase5_crosswalk_report_phase53.json --markdown-output /tmp/phase5_crosswalk_report_phase53.md`,
+	`PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`, and
+	`node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`.

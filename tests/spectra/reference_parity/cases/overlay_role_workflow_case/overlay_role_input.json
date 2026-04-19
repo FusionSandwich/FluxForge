@@ -1,0 +1,39 @@
+{
+  "foreground": {
+    "counts": [10, 12, 15, 21, 38, 64, 39, 20, 14, 11, 9, 8],
+    "channels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "calibration": {
+      "energy": [80.0, 0.75, 0.0]
+    },
+    "live_time_s": 900.0,
+    "real_time_s": 930.0,
+    "spectrum_id": "overlay_foreground"
+  },
+  "background": {
+    "counts": [3, 3, 4, 5, 7, 8, 7, 5, 4, 3, 3, 3],
+    "channels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "calibration": {
+      "energy": [80.0, 0.75, 0.0]
+    },
+    "live_time_s": 900.0,
+    "real_time_s": 930.0,
+    "spectrum_id": "overlay_background"
+  },
+  "overlay": {
+    "counts": [1, 1, 2, 2, 3, 4, 3, 2, 2, 1, 1, 1],
+    "channels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "calibration": {
+      "energy": [80.0, 0.75, 0.0]
+    },
+    "live_time_s": 900.0,
+    "real_time_s": 930.0,
+    "spectrum_id": "overlay_secondary"
+  },
+  "mode": "scaled",
+  "scale": 1.15,
+  "overlay_scale": 0.85,
+  "peak_search_method": "mariscotti",
+  "threshold": 2.0,
+  "min_distance": 1,
+  "max_peaks": 5
+}

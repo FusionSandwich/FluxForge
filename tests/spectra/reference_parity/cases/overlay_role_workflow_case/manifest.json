@@ -1,0 +1,27 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "overlay_role_workflow_case",
+  "parity_scope": "workflow",
+  "source_repo": "InterSpec/InterSpec",
+  "source_ref": "phase5-gui-workflow-baseline",
+  "source_paths": [
+    "testing/InterSpec/example_spectra/",
+    "testing/InterSpec/target/testing/analysis_tests/"
+  ],
+  "source_case": "foreground_background_overlay_role_workflow",
+  "workflow": "overlay-role-workflow",
+  "input_files": [
+    "overlay_role_input.json"
+  ],
+  "expected_outputs": [
+    "overlay_role_expected.json"
+  ],
+  "tolerances": {
+    "counts_abs": 0.001,
+    "peak_abs": 0.001
+  },
+  "provenance_notes": [
+    "Phase 5.3 initial GUI/workflow parity bundle for role-aware foreground/background/overlay behavior.",
+    "Uses deterministic synthetic spectra to lock adjusted and display composition outputs."
+  ]
+}

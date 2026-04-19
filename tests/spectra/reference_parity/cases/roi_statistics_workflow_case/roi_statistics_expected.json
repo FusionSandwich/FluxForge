@@ -1,0 +1,14 @@
+{
+  "schema": "fluxforge.reference_parity.roi_statistics.v1",
+  "peak_search_method": "mariscotti",
+  "peak_count": 2,
+  "selected_peak_keV": 58.607875,
+  "roi_bounds_keV": [54.107875, 63.107875],
+  "gross_counts": 540.0,
+  "centroid_keV": 58.916256,
+  "fwhm_keV": 8.602781,
+  "area_counts": 819.468712,
+  "net_counts": 819.468712,
+  "reduced_chi_squared": 0.0046,
+  "success": true
+}

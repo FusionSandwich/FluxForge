@@ -90,7 +90,7 @@ the offline-parity module closes.
 | 4.4 | Live spectrogram panel | Deferred | Time-energy spectrogram after live acquisition lands |
 | 5.1 | testing/ catalog crosswalk closure | In Progress (repo) | Build and maintain a complete crosswalk from every `testing/writeup.md` repo section to FluxForge backend, CLI, modern Qt GUI, fixtures, parity tests, and probe evidence; include exact source script/data paths and replay classification (`replay-now`, `adapter-required`, `reference-only`). Initial implementation baseline now includes `.github/project-management/phase5_crosswalk.json`, backend report helpers in `src/fluxforge/validation/phase5_crosswalk.py`, CLI command `phase5-crosswalk-report`, and a modern-shell `Phase 5 Parity` tab in `src/fluxforge/gui/panels/phase5.py`. |
 | 5.2 | Spectrum IO and analysis parity closure | In Progress (repo) | Close parser/calibration/background/peak-search/fit parity against `actigamma`, `becquerel`, `curie`, `gamma_spec_analysis`, `NASA-gamma`, `GSA-v2`, `GSA-v4`, `InterSpec`, `PyGammaSpec`, `peakingduck`, and `py-findpeaks`, with source-linked fixtures and algorithm/workflow golden checks. Initial executable bundle now lands `spectrum-io-normalization`, `background-subtraction`, and `peak-fit-roi` parity workflows plus source-linked manifests under `tests/spectra/reference_parity/cases/`. |
-| 5.3 | GUI and workflow parity closure | Planned | Close direct-manipulation and analyst-workflow parity (role-aware overlays, marker editing, ROI/statistics, detection-limit, shielding/source-fit, archive/file-query, multi-spectrum diagnostics, saved context, and report/export parity) using `InterSpec`, `GSA-v4`, `Gamma-MCA`, `hdtv`, `SpecKit`, and `NASA-gamma` behavior baselines |
+| 5.3 | GUI and workflow parity closure | In Progress (repo) | Close direct-manipulation and analyst-workflow parity (role-aware overlays, marker editing, ROI/statistics, detection-limit, shielding/source-fit, archive/file-query, multi-spectrum diagnostics, saved context, and report/export parity) using `InterSpec`, `GSA-v4`, `Gamma-MCA`, `hdtv`, `SpecKit`, and `NASA-gamma` behavior baselines. Initial executable baseline now includes `overlay-role-workflow` and `roi-statistics-workflow` fixture bundles and modern-shell workflow execution coverage. |
 | 5.4 | Inventory, NAA, and activation parity closure | Planned | Close activity/inventory/time-evolution/k0/INAA/activation parity against `irrad_spectroscopy`, `radioactivedecay`, `activation`, `KayWinV410`, `INAA-INRIM 3.1`, `NAA-ANN-1`, and `npat`; include uncertainty-bearing exports and provenance-complete bundle outputs |
 | 5.5 | Inverse and covariance parity closure | Planned | Close unfolding and covariance-aware inverse-analysis parity against `Neutron-Unfolding`, `Neutron-Spectrometry`, `pyunfold`, `gmapy`, and `SpecKit`; include algorithm-level and workflow-level parity fixtures with explicit tolerances and divergence rationale |
 | 5.6 | Phase 5 acceptance and release gate | Planned | Require backend+CLI+GUI completion, source-linked fixture manifests, targeted and full-suite test pass, native Qt probes, browser-lane artifact review, manual GUI sizing check, and synchronized status docs before any Phase 5 step is marked complete |
@@ -500,6 +500,24 @@ in-repo:
   `src/fluxforge/gui/panels/phase5.py` with `parity_scope` and
   `fixture_filter` execution knobs, covered by
   `tests/test_modern_gui_shell.py` and refreshed evidence in
+  `tests/gui_phase5_parity_probe.py` plus
+  `artifacts/gui_review/phase5_parity/`.
+
+### 10.14 Current Phase 5.3 Baseline (2026-04-19)
+
+The first GUI/workflow parity bundle for `5.3` is now landed in-repo:
+
+- Backend parity workflows added in `src/fluxforge/validation/reference_parity.py`:
+  - `overlay-role-workflow`
+  - `roi-statistics-workflow`
+- Source-linked fixture manifests and expected outputs added under:
+  - `tests/spectra/reference_parity/cases/overlay_role_workflow_case/`
+  - `tests/spectra/reference_parity/cases/roi_statistics_workflow_case/`
+- Crosswalk anchors for GUI/workflow source families in
+  `.github/project-management/phase5_crosswalk.json` now point to executable
+  workflow fixtures for `Gamma-MCA`, `hdtv`, `GSA-v4`, and `InterSpec`.
+- Modern-shell parity execution coverage now includes workflow fixture execution
+  in `tests/test_modern_gui_shell.py` and refreshed probe evidence via
   `tests/gui_phase5_parity_probe.py` plus
   `artifacts/gui_review/phase5_parity/`.
 

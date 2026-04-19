@@ -188,13 +188,13 @@ def main(argv: list[str] | None = None) -> int:
         app.processEvents()
     capture("02-adapter-required-filter")
 
-    parity_scope_index = panel.parity_scope_combo.findText("algorithm")
+    parity_scope_index = panel.parity_scope_combo.findText("workflow")
     if parity_scope_index >= 0:
-      panel.parity_scope_combo.setCurrentIndex(parity_scope_index)
-      app.processEvents()
-    panel.fixture_filter_edit.setText("spectrum_io_normalization_algorithm_case")
+        panel.parity_scope_combo.setCurrentIndex(parity_scope_index)
+        app.processEvents()
+    panel.fixture_filter_edit.setText("roi_statistics_workflow_case")
     app.processEvents()
-    capture("03-algorithm-fixture-filter")
+    capture("03-workflow-fixture-filter")
 
     parity_payload = panel.run_parity_suite() or {}
     app.processEvents()

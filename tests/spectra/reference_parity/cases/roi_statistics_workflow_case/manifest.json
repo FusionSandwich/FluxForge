@@ -1,0 +1,27 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "roi_statistics_workflow_case",
+  "parity_scope": "workflow",
+  "source_repo": "hdtv/rootana",
+  "source_ref": "phase5-gui-workflow-baseline",
+  "source_paths": [
+    "testing/hdtv/tests/share/osiris_bg.spc",
+    "testing/GSA-v4/ROI_Statistic/"
+  ],
+  "source_case": "peak_search_to_roi_statistics_workflow",
+  "workflow": "roi-statistics-workflow",
+  "input_files": [
+    "roi_statistics_input.json"
+  ],
+  "expected_outputs": [
+    "roi_statistics_expected.json"
+  ],
+  "tolerances": {
+    "counts_abs": 0.01,
+    "roi_abs": 0.01
+  },
+  "provenance_notes": [
+    "Phase 5.3 initial GUI/workflow parity bundle for ROI selection and statistics flow.",
+    "Covers peak-search selection, ROI bounds, and fit summary metrics with deterministic fixtures."
+  ]
+}

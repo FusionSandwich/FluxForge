@@ -177,7 +177,7 @@ following overlays were adopted additively and do not replace that map.
 | 4.4 | `pending` | `not-started` | Implement the live spectrogram panel after time-energy acquisition lands. |
 | 5.1 | `pending` | `in-progress` | Build and maintain the full `testing/writeup.md` crosswalk in implementation trackers with source scripts/data anchors and replay-state labeling for all audited repos. Initial implementation now includes `.github/project-management/phase5_crosswalk.json`, report helpers in `src/fluxforge/validation/phase5_crosswalk.py`, CLI command `phase5-crosswalk-report`, shell integration via `src/fluxforge/gui/panels/phase5.py`, and coverage in `tests/test_phase5_crosswalk.py`, `tests/test_cli_app.py`, and `tests/test_modern_gui_shell.py`. |
 | 5.2 | `pending` | `in-progress` | Close parser/calibration/background/peak-search/fit parity bundles for the audited spectrum-analysis source families with source-linked fixtures and algorithm/workflow checks. Initial executable bundle now includes `spectrum-io-normalization`, `background-subtraction`, and `peak-fit-roi` parity workflows in `src/fluxforge/validation/reference_parity.py` with fixture cases under `tests/spectra/reference_parity/cases/`. |
-| 5.3 | `pending` | `not-started` | Close GUI/workflow behavior parity bundles (plot-controller actions, role-aware overlays, ROI tools, detection-limit/shielding/archive workspaces, saved analyst context) with Qt tests and probe evidence. |
+| 5.3 | `pending` | `in-progress` | Close GUI/workflow behavior parity bundles (plot-controller actions, role-aware overlays, ROI tools, detection-limit/shielding/archive workspaces, saved analyst context) with Qt tests and probe evidence. Initial executable baseline now includes `overlay-role-workflow` and `roi-statistics-workflow` parity bundles in `src/fluxforge/validation/reference_parity.py` with source-linked fixtures under `tests/spectra/reference_parity/cases/`. |
 | 5.4 | `pending` | `not-started` | Close inventory/NAA/activation/k0 parity bundles with uncertainty-bearing outputs and provenance-complete artifact contracts. |
 | 5.5 | `pending` | `not-started` | Close unfolding/covariance/inverse-analysis parity bundles with explicit tolerances, controlled-divergence rationale, and workflow-level parity suites. |
 | 5.6 | `pending` | `not-started` | Enforce the Phase 5 release gate requiring backend+CLI+GUI completion, fixture/traceability manifests, native and browser-lane GUI evidence, manual sizing validation, and synchronized status docs. |
@@ -269,6 +269,18 @@ following overlays were adopted additively and do not replace that map.
   (`1 passed, 14 deselected`) plus
   `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
   and Playwright audit rerun
+  `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
+  (`1 audited page, 0 failing`).
+- Phase 5.3 workflow-parity regression was validated on 2026-04-19 with:
+  `PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py tests/test_phase5_crosswalk.py tests/test_modern_gui_shell.py -k "phase5 or parity or manifest or main_window_restores_saved_workflow_state_across_sessions or phase5_parity_panel_runs_workflow_fixture_bundle"`
+  (`15 passed, 14 deselected`).
+- Phase 5.3 CLI workflow parity execution was validated with:
+  `PYTHONPATH=src python -m fluxforge.cli.app parity-check --scope workflow --fixture-id roi_statistics_workflow_case --output /tmp/phase5_3_parity_check.json`
+  (`1 passed, 0 failed`) and crosswalk report refresh via
+  `PYTHONPATH=src python -m fluxforge.cli.app phase5-crosswalk-report --include-parity-summary --output /tmp/phase5_crosswalk_report_phase53.json --markdown-output /tmp/phase5_crosswalk_report_phase53.md`.
+- Phase 5.3 GUI workflow evidence was refreshed with:
+  `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
+  and browser-lane audit rerun
   `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
   (`1 audited page, 0 failing`).
 - The optimization planning set now explicitly includes a required

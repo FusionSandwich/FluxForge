@@ -21,7 +21,7 @@ def test_reference_parity_suite_runs_all_fixture_families() -> None:
     )
 
     assert payload["schema"] == "fluxforge.reference_parity.run.v1"
-    assert payload["summary"]["total"] >= 8
+    assert payload["summary"]["total"] >= 10
     assert payload["summary"]["failed"] == 0
 
 
@@ -53,6 +53,38 @@ def test_reference_parity_suite_runs_phase5_spectrum_algorithm_bundle() -> None:
     result = payload["results"][0]
     assert result["fixture_id"] == "spectrum_io_normalization_algorithm_case"
     assert "io_parity_expected.json" in result["compared_outputs"]
+
+
+def test_reference_parity_suite_runs_phase5_overlay_role_workflow_bundle() -> None:
+    payload = run_reference_parity_suite(
+        reference_root=REFERENCE_ROOT,
+        activation_root=ACTIVATION_ROOT,
+        scope="workflow",
+        fixture_id="overlay_role_workflow_case",
+        include_activation=False,
+    )
+
+    assert payload["summary"]["total"] == 1
+    assert payload["summary"]["failed"] == 0
+    result = payload["results"][0]
+    assert result["fixture_id"] == "overlay_role_workflow_case"
+    assert "overlay_role_expected.json" in result["compared_outputs"]
+
+
+def test_reference_parity_suite_runs_phase5_roi_statistics_workflow_bundle() -> None:
+    payload = run_reference_parity_suite(
+        reference_root=REFERENCE_ROOT,
+        activation_root=ACTIVATION_ROOT,
+        scope="workflow",
+        fixture_id="roi_statistics_workflow_case",
+        include_activation=False,
+    )
+
+    assert payload["summary"]["total"] == 1
+    assert payload["summary"]["failed"] == 0
+    result = payload["results"][0]
+    assert result["fixture_id"] == "roi_statistics_workflow_case"
+    assert "roi_statistics_expected.json" in result["compared_outputs"]
 
 
 def test_reference_parity_suite_rejects_invalid_scope() -> None:

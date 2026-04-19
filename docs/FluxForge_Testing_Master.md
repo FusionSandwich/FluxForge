@@ -38,7 +38,7 @@ Additional rules:
 | File and schema IO | `tests/test_n42.py`, `tests/test_cnf_io.py`, `tests/test_csv_readers.py`, `tests/test_spectrum_io_parity.py` | spectrum import/export, calibration extraction, parity baselines |
 | Calibration and efficiency | `tests/test_calibration_workspace_qt.py`, `tests/test_pipeline_validation.py`, `tests/test_genie_overrides.py` | energy calibration, efficiency workflows, Qt calibration behavior |
 | Analysis workspace and peak workflows | `tests/test_analysis_workspace_qt.py`, `tests/test_roi_analysis_core.py`, `tests/test_peak_finder_methods.py` | peak search, ROI/background workflows, GUI peak review, library behavior |
-| Phase 5 crosswalk and parity review | `tests/test_phase5_crosswalk.py`, `tests/test_reference_parity_runner.py`, `tests/test_parity_fixture_manifests.py`, `tests/test_cli_app.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py`, `artifacts/gui_review/phase5_parity/` | machine-readable writeup crosswalk validation, executable parity-manifest workflows (including spectrum IO/background/fit bundles), CLI report + parity contract, modern-shell state persistence, native GUI evidence, and browser-lane gallery audit |
+| Phase 5 crosswalk and parity review | `tests/test_phase5_crosswalk.py`, `tests/test_reference_parity_runner.py`, `tests/test_parity_fixture_manifests.py`, `tests/test_cli_app.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py`, `artifacts/gui_review/phase5_parity/` | machine-readable writeup crosswalk validation, executable parity-manifest workflows (including spectrum IO/background/fit plus overlay-role and ROI-statistics workflow bundles), CLI report + parity contract, modern-shell state persistence and workflow fixture execution, native GUI evidence, and browser-lane gallery audit |
 | Phase 6 optimization and saved workflows | `tests/test_cli_app.py`, `tests/test_analysis_workspace_qt.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase6_optimization_probe.py`, `tests/_phase6_real_data.py` | real RAFM/LDRD activity-review inputs, masking, optimization, second irradiation, `.ffexp`, GUI workflow/session persistence, and mouse-driven probe actions for Playwright artifact review |
 | Unfolding and inverse analysis | `tests/test_unfolding_registry.py`, `tests/test_unfolding_workflows.py`, `tests/test_unfolding_reference_parity.py`, validation scripts under `examples/validation/` | registry-backed unfolding, external parity, diagnostic outputs |
 | Standards and QA | `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_module3_backends.py`, `tests/test_module3_workflows_qt.py`, `tests/test_gui_dialogs_qt.py` | governed calculations, QA monitor, standards review, reporting, and direct dialog-level GUI checks |
@@ -127,6 +127,17 @@ Documented verification state:
   with `1 passed, 14 deselected`, plus refreshed
   `tests/gui_phase5_parity_probe.py` and Playwright audit rerun for
   `artifacts/gui_review/phase5_parity/` (`1 audited, 0 failing`).
+- Phase 5.3 workflow-bundle and GUI execution verification:
+  `PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py tests/test_phase5_crosswalk.py tests/test_modern_gui_shell.py -k "phase5 or parity or manifest or main_window_restores_saved_workflow_state_across_sessions or phase5_parity_panel_runs_workflow_fixture_bundle"`
+  with `15 passed, 14 deselected`.
+- Phase 5.3 CLI workflow execution check:
+  `PYTHONPATH=src python -m fluxforge.cli.app parity-check --scope workflow --fixture-id roi_statistics_workflow_case --output /tmp/phase5_3_parity_check.json`
+  with `1 passed, 0 failed`.
+- Phase 5.3 probe and browser-lane refresh:
+  `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
+  plus
+  `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
+  with `1 audited, 0 failing`.
 - Playwright gallery audit verification:
   `NODE_PATH=/tmp/pw-audit/node_modules node tests/gui_gallery_playwright_audit.js artifacts/gui_review /tmp/gui_playwright_audit`
   with `21 audited, 0 failing`; evidence copied to

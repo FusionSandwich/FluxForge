@@ -1,0 +1,14 @@
+{
+  "schema": "fluxforge.reference_parity.overlay_role.v1",
+  "mode": "scaled",
+  "requested_scale": 1.15,
+  "overlay_scale": 0.85,
+  "channel_count": 12,
+  "foreground_sum_counts": 261.0,
+  "background_sum_counts": 55.0,
+  "adjusted_sum_counts": 197.75,
+  "overlay_sum_counts": 23.0,
+  "display_sum_counts": 217.3,
+  "peak_count": 1,
+  "first_peak_keV": 83.766908
+}

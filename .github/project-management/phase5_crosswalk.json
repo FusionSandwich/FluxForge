@@ -147,7 +147,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/gamma_mca_adapter_case/manifest.json"
+        "tests/spectra/reference_parity/cases/overlay_role_workflow_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -155,7 +155,7 @@
       "probe_paths": [
         "tests/gui_phase5_parity_probe.py"
       ],
-      "notes": "GUI behavior baseline tracked pending adapter fixtures."
+      "notes": "GUI behavior baseline now uses an executable overlay-role proxy while full adapter corpus mapping remains pending."
     },
     {
       "writeup_section": 6,
@@ -212,7 +212,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/hdtv_roi_bundle_case/manifest.json"
+        "tests/spectra/reference_parity/cases/roi_statistics_workflow_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -601,7 +601,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/manifest.json"
+        "tests/spectra/reference_parity/cases/roi_statistics_workflow_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -633,7 +633,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/background_subtraction_algorithm_case/manifest.json"
+        "tests/spectra/reference_parity/cases/overlay_role_workflow_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"

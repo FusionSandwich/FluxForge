@@ -69,7 +69,7 @@ The GUI must preserve the following behavior contracts:
 | 4.1-4.4 | Live-MCA device discovery, dashboard telemetry, and spectrogram surfaces | Deferred |
 | 5.1 | testing/writeup crosswalk review and parity-state visibility in modern Qt | In Progress (repo) |
 | 5.2 | spectrum-analysis parity execution controls (scope and fixture targeting) for parser/background/fit bundles in modern Qt | In Progress (repo) |
-| 5.3 | GUI/workflow parity closure for the audited testing catalog: plot-controller actions, role-aware overlays, ROI/detection-limit/shielding/archive workspaces, saved analyst context, and report/export behavior parity | Planned |
+| 5.3 | GUI/workflow parity closure for the audited testing catalog: plot-controller actions, role-aware overlays, ROI/detection-limit/shielding/archive workspaces, saved analyst context, and report/export behavior parity. Initial baseline now includes executable workflow fixtures (`overlay_role_workflow_case`, `roi_statistics_workflow_case`) and modern-shell workflow execution coverage. | In Progress (repo) |
 | 5.6 | Phase 5 GUI acceptance gate: source-linked traceability, Qt interaction tests, native probe evidence, browser-lane artifact review, and manual GUI sizing validation | Planned |
 
 ## 6. Source Behaviors to Preserve
