@@ -77,15 +77,27 @@ class Phase5ParityPanel(QWidget):
         )
         controls.addWidget(self.replay_filter_combo, 1, 1)
 
+        controls.addWidget(QLabel("Parity scope", self), 1, 2)
+        self.parity_scope_combo = QComboBox(self)
+        self.parity_scope_combo.setObjectName("Phase5ParityScopeCombo")
+        self.parity_scope_combo.addItems(["all", "algorithm", "workflow"])
+        controls.addWidget(self.parity_scope_combo, 1, 3)
+
+        controls.addWidget(QLabel("Fixture filter", self), 2, 0)
+        self.fixture_filter_edit = QLineEdit(self)
+        self.fixture_filter_edit.setObjectName("Phase5FixtureFilterEdit")
+        self.fixture_filter_edit.setPlaceholderText("optional fixture_id")
+        controls.addWidget(self.fixture_filter_edit, 2, 1)
+
         self.refresh_button = QPushButton("Refresh Crosswalk", self)
         self.refresh_button.setObjectName("Phase5RefreshButton")
         self.refresh_button.clicked.connect(self.refresh_crosswalk)
-        controls.addWidget(self.refresh_button, 1, 2)
+        controls.addWidget(self.refresh_button, 2, 2)
 
         self.run_parity_button = QPushButton("Run Parity Suite", self)
         self.run_parity_button.setObjectName("Phase5RunParityButton")
         self.run_parity_button.clicked.connect(self.run_parity_suite)
-        controls.addWidget(self.run_parity_button, 1, 3)
+        controls.addWidget(self.run_parity_button, 2, 3)
         layout.addLayout(controls)
 
         self.summary_label = QLabel("Crosswalk summary has not been loaded yet.", self)
@@ -196,11 +208,14 @@ class Phase5ParityPanel(QWidget):
         ]
 
     def run_parity_suite(self) -> dict[str, Any] | None:
+        scope = str(self.parity_scope_combo.currentText() or "all")
+        fixture_filter = str(self.fixture_filter_edit.text() or "").strip() or None
         try:
             payload = run_reference_parity_suite(
                 reference_root=Path("tests/spectra/reference_parity"),
                 activation_root=Path("tests/activation_inventory/fixtures"),
-                scope="all",
+                scope=scope,
+                fixture_id=fixture_filter,
                 include_activation=True,
             )
         except Exception as exc:  # pragma: no cover - defensive UI path
@@ -209,9 +224,11 @@ class Phase5ParityPanel(QWidget):
 
         summary = payload.get("summary") or {}
         self._last_parity_summary = dict(summary)
+        fixture_display = fixture_filter or "<all>"
         self.parity_label.setText(
             (
-                f"Parity suite: {summary.get('passed', 0)} passed, "
+                f"Parity suite ({scope}, fixture={fixture_display}): "
+                f"{summary.get('passed', 0)} passed, "
                 f"{summary.get('failed', 0)} failed, total={summary.get('total', 0)}"
             )
         )
@@ -221,6 +238,8 @@ class Phase5ParityPanel(QWidget):
         return {
             "crosswalk_path": str(self.crosswalk_path_edit.text() or ""),
             "replay_state_filter": str(self.replay_filter_combo.currentText() or "all"),
+            "parity_scope": str(self.parity_scope_combo.currentText() or "all"),
+            "fixture_filter": str(self.fixture_filter_edit.text() or ""),
         }
 
     def apply_workflow_state(self, payload: Mapping[str, Any] | None) -> None:
@@ -235,6 +254,13 @@ class Phase5ParityPanel(QWidget):
             if index >= 0:
                 self.replay_filter_combo.setCurrentIndex(index)
             self._refresh_table_only()
+        if "parity_scope" in payload:
+            parity_scope = str(payload.get("parity_scope") or "all")
+            index = self.parity_scope_combo.findText(parity_scope)
+            if index >= 0:
+                self.parity_scope_combo.setCurrentIndex(index)
+        if "fixture_filter" in payload:
+            self.fixture_filter_edit.setText(str(payload.get("fixture_filter") or ""))
 
 
 __all__ = ["Phase5ParityPanel"]

@@ -23,7 +23,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/actigamma_spectrum_bundle_case/manifest.json"
+        "tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py",
@@ -54,7 +54,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/becquerel_spectrum_bundle_case/manifest.json"
+        "tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -86,7 +86,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/curie_spectrum_bundle_case/manifest.json"
+        "tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py",
@@ -117,7 +117,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/gamma_spec_analysis_bundle_case/manifest.json"
+        "tests/spectra/reference_parity/cases/background_subtraction_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -405,7 +405,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/peakingduck_snip_case/manifest.json"
+        "tests/spectra/reference_parity/cases/peak_fit_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -436,7 +436,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/py_findpeaks_algorithm_case/manifest.json"
+        "tests/spectra/reference_parity/cases/peak_fit_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -468,7 +468,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/pygammaspec_bundle_case/manifest.json"
+        "tests/spectra/reference_parity/cases/peak_fit_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -601,7 +601,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/gsa_v4_roi_case/manifest.json"
+        "tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -633,7 +633,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/interspec_workflow_case/manifest.json"
+        "tests/spectra/reference_parity/cases/background_subtraction_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -698,7 +698,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/nasa_gamma_parser_case/manifest.json"
+        "tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"
@@ -758,7 +758,7 @@
         "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
       ],
       "fixture_paths": [
-        "tests/spectra/reference_parity/cases/gsa_v2_algorithm_case/manifest.json"
+        "tests/spectra/reference_parity/cases/peak_fit_algorithm_case/manifest.json"
       ],
       "test_paths": [
         "tests/test_phase5_crosswalk.py"

@@ -188,15 +188,25 @@ def main(argv: list[str] | None = None) -> int:
         app.processEvents()
     capture("02-adapter-required-filter")
 
+    parity_scope_index = panel.parity_scope_combo.findText("algorithm")
+    if parity_scope_index >= 0:
+      panel.parity_scope_combo.setCurrentIndex(parity_scope_index)
+      app.processEvents()
+    panel.fixture_filter_edit.setText("spectrum_io_normalization_algorithm_case")
+    app.processEvents()
+    capture("03-algorithm-fixture-filter")
+
     parity_payload = panel.run_parity_suite() or {}
     app.processEvents()
-    capture("03-parity-suite-summary")
+    capture("04-parity-suite-summary")
 
     summary = {
         "screenshots": len(screenshots),
         "crosswalk_rows": panel.table.rowCount(),
         "parity_total": (parity_payload.get("summary") or {}).get("total", 0),
         "parity_failed": (parity_payload.get("summary") or {}).get("failed", 0),
+        "parity_scope": panel.parity_scope_combo.currentText(),
+        "fixture_filter": panel.fixture_filter_edit.text(),
     }
 
     gallery = _write_review_gallery(output_dir, screenshots, summary)

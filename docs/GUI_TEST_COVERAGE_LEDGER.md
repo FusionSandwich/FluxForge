@@ -22,7 +22,7 @@ Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence 
     - `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`
     - `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
     - `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
-  - Results: `1 passed, 14 deselected`; native probe gallery generated; Playwright `1 audited, 0 failing`
+  - Results: `1 passed, 14 deselected`; native probe gallery generated with scope+fixture controls; Playwright `1 audited, 0 failing`
   - Persisted evidence:
     - `artifacts/gui_review/phase5_parity/index.html`
     - `artifacts/gui_review/phase5_parity/phase5_probe_report.json`
@@ -104,7 +104,7 @@ Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence 
 
 ### 2.10 Phase 5 Crosswalk and Parity Panel
 
-- Crosswalk review table, replay-state filter persistence, and parity-launch visibility
+- Crosswalk review table, replay-state filter persistence, parity scope/fixture targeting, and parity-launch visibility
   - Tests: `tests/test_modern_gui_shell.py`, `tests/test_cli_app.py`, `tests/test_phase5_crosswalk.py`
   - Probe gallery:
     - `artifacts/gui_review/phase5_parity/index.html`

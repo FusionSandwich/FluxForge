@@ -1,0 +1,46 @@
+{
+  "schema": "fluxforge.reference_parity.io.v1",
+  "record_count": 2,
+  "records": [
+    {
+      "label": "spe_eu_calib_7cm",
+      "path": "../../../../data/spectrum_io/examples/eu_calib_7cm.Spe",
+      "format": ".spe",
+      "channel_count": 16384,
+      "sum_counts": 4433622.0,
+      "max_counts": 80433.0,
+      "live_time_s": 2289.0,
+      "real_time_s": 2454.0,
+      "energy_probe_channels": [
+        0,
+        256,
+        512
+      ],
+      "energy_probe_keV": [
+        -0.136701,
+        46.69096,
+        93.518622
+      ]
+    },
+    {
+      "label": "csv_synthetic_small",
+      "path": "io_synthetic_counts.csv",
+      "format": ".csv",
+      "channel_count": 10,
+      "sum_counts": 255.0,
+      "max_counts": 51.0,
+      "live_time_s": 0.0,
+      "real_time_s": 0.0,
+      "energy_probe_channels": [
+        0,
+        4,
+        9
+      ],
+      "energy_probe_keV": [
+        0.0,
+        4.0,
+        9.0
+      ]
+    }
+  ]
+}

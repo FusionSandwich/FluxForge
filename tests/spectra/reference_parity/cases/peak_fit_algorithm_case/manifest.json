@@ -1,0 +1,33 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "peak_fit_algorithm_case",
+  "parity_scope": "algorithm",
+  "source_repo": "PyGammaSpec",
+  "source_ref": "main",
+  "source_paths": [
+    "reference/PyGammaSpec",
+    "reference/gamma_spec_analysis",
+    "reference/NASA-gamma",
+    "reference/peakingduck",
+    "reference/py-findpeaks"
+  ],
+  "source_case": "gaussian_roi_fit_regression_bundle",
+  "workflow": "peak-fit-roi",
+  "input_files": [
+    "peak_fit_input.json"
+  ],
+  "expected_outputs": [
+    "peak_fit_expected.json"
+  ],
+  "tolerances": {
+    "centroid_channel_abs": 1e-4,
+    "fwhm_channels_abs": 1e-4,
+    "area_counts_abs": 1e-3,
+    "chi_squared_abs": 1e-4,
+    "net_counts_abs": 1e-3
+  },
+  "provenance_notes": [
+    "Phase 5.2 Gaussian-fit parity fixture for ROI fitter stability.",
+    "Synthetic single-peak ROI supports deterministic centroid/FWHM/area regression checks."
+  ]
+}

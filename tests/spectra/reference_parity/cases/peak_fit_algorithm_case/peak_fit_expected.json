@@ -1,0 +1,12 @@
+{
+  "schema": "fluxforge.reference_parity.peak_fit.v1",
+  "fitter_key": "gaussian",
+  "background_model": "linear",
+  "centroid_channel": 116.086619,
+  "fwhm_channels": 12.354093,
+  "area_counts": 1929.758497,
+  "chi_squared": 0.134767,
+  "reduced_chi_squared": 0.013477,
+  "net_counts": 1929.758497,
+  "success": true
+}

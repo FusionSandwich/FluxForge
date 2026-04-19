@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "label": "spe_eu_calib_7cm",
+      "path": "../../../../data/spectrum_io/examples/eu_calib_7cm.Spe",
+      "probe_channels": [0, 256, 512]
+    },
+    {
+      "label": "csv_synthetic_small",
+      "path": "io_synthetic_counts.csv",
+      "probe_channels": [0, 4, 9]
+    }
+  ]
+}

@@ -89,7 +89,7 @@ the offline-parity module closes.
 | 4.3 | Live Digital Twin dashboard | Deferred | Telemetry-driven dashboard once live acquisition is present |
 | 4.4 | Live spectrogram panel | Deferred | Time-energy spectrogram after live acquisition lands |
 | 5.1 | testing/ catalog crosswalk closure | In Progress (repo) | Build and maintain a complete crosswalk from every `testing/writeup.md` repo section to FluxForge backend, CLI, modern Qt GUI, fixtures, parity tests, and probe evidence; include exact source script/data paths and replay classification (`replay-now`, `adapter-required`, `reference-only`). Initial implementation baseline now includes `.github/project-management/phase5_crosswalk.json`, backend report helpers in `src/fluxforge/validation/phase5_crosswalk.py`, CLI command `phase5-crosswalk-report`, and a modern-shell `Phase 5 Parity` tab in `src/fluxforge/gui/panels/phase5.py`. |
-| 5.2 | Spectrum IO and analysis parity closure | Planned | Close parser/calibration/background/peak-search/fit parity against `actigamma`, `becquerel`, `curie`, `gamma_spec_analysis`, `NASA-gamma`, `GSA-v2`, `GSA-v4`, `InterSpec`, `PyGammaSpec`, `peakingduck`, and `py-findpeaks`, with source-linked fixtures and algorithm/workflow golden checks |
+| 5.2 | Spectrum IO and analysis parity closure | In Progress (repo) | Close parser/calibration/background/peak-search/fit parity against `actigamma`, `becquerel`, `curie`, `gamma_spec_analysis`, `NASA-gamma`, `GSA-v2`, `GSA-v4`, `InterSpec`, `PyGammaSpec`, `peakingduck`, and `py-findpeaks`, with source-linked fixtures and algorithm/workflow golden checks. Initial executable bundle now lands `spectrum-io-normalization`, `background-subtraction`, and `peak-fit-roi` parity workflows plus source-linked manifests under `tests/spectra/reference_parity/cases/`. |
 | 5.3 | GUI and workflow parity closure | Planned | Close direct-manipulation and analyst-workflow parity (role-aware overlays, marker editing, ROI/statistics, detection-limit, shielding/source-fit, archive/file-query, multi-spectrum diagnostics, saved context, and report/export parity) using `InterSpec`, `GSA-v4`, `Gamma-MCA`, `hdtv`, `SpecKit`, and `NASA-gamma` behavior baselines |
 | 5.4 | Inventory, NAA, and activation parity closure | Planned | Close activity/inventory/time-evolution/k0/INAA/activation parity against `irrad_spectroscopy`, `radioactivedecay`, `activation`, `KayWinV410`, `INAA-INRIM 3.1`, `NAA-ANN-1`, and `npat`; include uncertainty-bearing exports and provenance-complete bundle outputs |
 | 5.5 | Inverse and covariance parity closure | Planned | Close unfolding and covariance-aware inverse-analysis parity against `Neutron-Unfolding`, `Neutron-Spectrometry`, `pyunfold`, `gmapy`, and `SpecKit`; include algorithm-level and workflow-level parity fixtures with explicit tolerances and divergence rationale |
@@ -479,6 +479,29 @@ as the baseline for `5.1` closure work:
   `tests/test_phase5_crosswalk.py`, `tests/test_cli_app.py`,
   `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py`, and
   `artifacts/gui_review/phase5_parity/` including Playwright audit reports.
+
+### 10.13 Current Phase 5.2 Baseline (2026-04-19)
+
+The first executable spectrum-analysis parity bundle for `5.2` is now landed
+in-repo:
+
+- Backend parity workflows added in `src/fluxforge/validation/reference_parity.py`:
+  - `spectrum-io-normalization`
+  - `background-subtraction`
+  - `peak-fit-roi`
+- Source-linked fixture manifests and expected outputs added under:
+  - `tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/`
+  - `tests/spectra/reference_parity/cases/background_subtraction_algorithm_case/`
+  - `tests/spectra/reference_parity/cases/peak_fit_algorithm_case/`
+- Crosswalk anchors for the 5.2 source-family bundle were updated in
+  `.github/project-management/phase5_crosswalk.json` so fixture paths now point
+  to executable manifests.
+- Modern Qt parity-review controls were expanded in
+  `src/fluxforge/gui/panels/phase5.py` with `parity_scope` and
+  `fixture_filter` execution knobs, covered by
+  `tests/test_modern_gui_shell.py` and refreshed evidence in
+  `tests/gui_phase5_parity_probe.py` plus
+  `artifacts/gui_review/phase5_parity/`.
 
 ## 11. Online-Informed Future Feature Candidates (Do Not Implement Yet)
 

@@ -176,7 +176,7 @@ following overlays were adopted additively and do not replace that map.
 | 4.3 | `pending` | `not-started` | Implement the live Digital Twin dashboard after HAL transport and device telemetry exist. |
 | 4.4 | `pending` | `not-started` | Implement the live spectrogram panel after time-energy acquisition lands. |
 | 5.1 | `pending` | `in-progress` | Build and maintain the full `testing/writeup.md` crosswalk in implementation trackers with source scripts/data anchors and replay-state labeling for all audited repos. Initial implementation now includes `.github/project-management/phase5_crosswalk.json`, report helpers in `src/fluxforge/validation/phase5_crosswalk.py`, CLI command `phase5-crosswalk-report`, shell integration via `src/fluxforge/gui/panels/phase5.py`, and coverage in `tests/test_phase5_crosswalk.py`, `tests/test_cli_app.py`, and `tests/test_modern_gui_shell.py`. |
-| 5.2 | `pending` | `not-started` | Close parser/calibration/background/peak-search/fit parity bundles for the audited spectrum-analysis source families with source-linked fixtures and algorithm/workflow checks. |
+| 5.2 | `pending` | `in-progress` | Close parser/calibration/background/peak-search/fit parity bundles for the audited spectrum-analysis source families with source-linked fixtures and algorithm/workflow checks. Initial executable bundle now includes `spectrum-io-normalization`, `background-subtraction`, and `peak-fit-roi` parity workflows in `src/fluxforge/validation/reference_parity.py` with fixture cases under `tests/spectra/reference_parity/cases/`. |
 | 5.3 | `pending` | `not-started` | Close GUI/workflow behavior parity bundles (plot-controller actions, role-aware overlays, ROI tools, detection-limit/shielding/archive workspaces, saved analyst context) with Qt tests and probe evidence. |
 | 5.4 | `pending` | `not-started` | Close inventory/NAA/activation/k0 parity bundles with uncertainty-bearing outputs and provenance-complete artifact contracts. |
 | 5.5 | `pending` | `not-started` | Close unfolding/covariance/inverse-analysis parity bundles with explicit tolerances, controlled-divergence rationale, and workflow-level parity suites. |
@@ -254,6 +254,21 @@ following overlays were adopted additively and do not replace that map.
   `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
   producing `artifacts/gui_review/phase5_parity/index.html` plus three screenshots and `phase5_probe_report.json`.
 - Phase 5.1 browser-lane review was validated with:
+  `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
+  (`1 audited page, 0 failing`).
+- Phase 5.2 spectrum-analysis parity bundle regression was validated on 2026-04-19 with:
+  `PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py`
+  (`8 passed`) and
+  `PYTHONPATH=src pytest -q tests/test_phase5_crosswalk.py tests/test_cli_app.py -k "phase5 or crosswalk or parity"`
+  (`6 passed, 76 deselected`).
+- Phase 5.2 CLI parity execution was validated with:
+  `PYTHONPATH=src python -m fluxforge.cli.app parity-check --scope algorithm --fixture-id spectrum_io_normalization_algorithm_case --output /tmp/phase5_2_parity_check.json`
+  (`1 passed, 0 failed`).
+- Phase 5.2 GUI parity controls (scope + fixture filter) were validated with:
+  `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`
+  (`1 passed, 14 deselected`) plus
+  `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
+  and Playwright audit rerun
   `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
   (`1 audited page, 0 failing`).
 - The optimization planning set now explicitly includes a required

@@ -1,0 +1,38 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "spectrum_io_normalization_algorithm_case",
+  "parity_scope": "algorithm",
+  "source_repo": "becquerel",
+  "source_ref": "main",
+  "source_paths": [
+    "reference/actigamma",
+    "reference/becquerel",
+    "reference/curie",
+    "reference/gamma_spec_analysis",
+    "reference/NASA-gamma",
+    "reference/GSA-v2",
+    "reference/GSA-v4",
+    "reference/InterSpec",
+    "reference/PyGammaSpec",
+    "reference/peakingduck",
+    "reference/py-findpeaks"
+  ],
+  "source_case": "spectrum_parser_and_calibration_normalization_bundle",
+  "workflow": "spectrum-io-normalization",
+  "input_files": [
+    "io_parity_input.json"
+  ],
+  "expected_outputs": [
+    "io_parity_expected.json"
+  ],
+  "tolerances": {
+    "sum_counts_rel": 1e-12,
+    "energy_probe_keV_abs": 1e-6,
+    "live_time_s_abs": 1e-6,
+    "real_time_s_abs": 1e-6
+  },
+  "provenance_notes": [
+    "Phase 5.2 parser/calibration parity bundle for writeup section families listed in source_paths.",
+    "SPE input uses the in-repo test corpus, and CSV input is synthetic but format-equivalent for normalization checks."
+  ]
+}

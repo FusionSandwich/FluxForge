@@ -211,6 +211,8 @@ def test_main_window_restores_saved_workflow_state_across_sessions():
     bottom.phase5_parity_panel.apply_workflow_state(
         {
             "replay_state_filter": "adapter-required",
+            "parity_scope": "algorithm",
+            "fixture_filter": "spectrum_io_normalization_algorithm_case",
         }
     )
     first.workflow_presets.save_workflow(
@@ -242,6 +244,11 @@ def test_main_window_restores_saved_workflow_state_across_sessions():
     assert restored_bottom.optimization_workspace_panel.target_nuclide_edit.text() == "Co-60"
     assert restored_bottom.second_irradiation_panel.target_weights_edit.text() == "Co-60:2.0"
     assert restored_bottom.phase5_parity_panel.replay_filter_combo.currentText() == "adapter-required"
+    assert restored_bottom.phase5_parity_panel.parity_scope_combo.currentText() == "algorithm"
+    assert (
+        restored_bottom.phase5_parity_panel.fixture_filter_edit.text()
+        == "spectrum_io_normalization_algorithm_case"
+    )
     second.close()
 
 

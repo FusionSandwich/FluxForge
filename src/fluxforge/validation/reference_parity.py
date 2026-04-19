@@ -12,13 +12,20 @@ from typing import Any, Iterable, Sequence
 import numpy as np
 
 from fluxforge.core.activity_review import review_spectrum_activation
-from fluxforge.core.analysis_workspace import PeakCandidate, detect_peak_candidates
+from fluxforge.core.analysis_workspace import (
+    PeakCandidate,
+    background_adjusted_spectrum,
+    detect_peak_candidates,
+    subtract_background_counts,
+)
 from fluxforge.core.inventory_timeline import (
     build_inventory_state_from_activity_review,
     build_inventory_state_from_payload,
     compute_inventory_time_evolution,
 )
+from fluxforge.core.peak_fitting import fit_roi_peak
 from fluxforge.data.efficiency import EfficiencyCurve
+from fluxforge.io.reader_factory import read_spectrum_any
 from fluxforge.io.spe import GammaSpectrum
 
 REFERENCE_MANIFEST_SCHEMA = "fluxforge.reference_parity_manifest.v1"
@@ -145,6 +152,12 @@ def _execute_reference_manifest(case_dir: Path, manifest: dict[str, Any]) -> dic
     workflow = str(manifest.get("workflow") or "").strip().lower()
     if workflow == "peak-search-only":
         return _run_peak_search_case(case_dir, manifest)
+    if workflow == "spectrum-io-normalization":
+        return _run_spectrum_io_case(case_dir, manifest)
+    if workflow == "background-subtraction":
+        return _run_background_subtraction_case(case_dir, manifest)
+    if workflow == "peak-fit-roi":
+        return _run_peak_fit_case(case_dir, manifest)
     if workflow in {
         "activity-review -> inventory-review",
         "peaks -> activity-review -> inventory-review",
@@ -182,6 +195,150 @@ def _run_peak_search_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str,
             "energies_keV": [round(value, 6) for value in energies],
             "channels": [round(value, 3) for value in channels],
             "first_peak_keV": round(energies[0], 6) if energies else None,
+        }
+    }
+
+
+def _run_spectrum_io_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    input_file = _first_input_file(case_dir, manifest)
+    payload = _load_json(input_file)
+    sources = payload.get("sources") or []
+    if not isinstance(sources, list) or not sources:
+        raise ValueError("Spectrum I/O parity input must define a non-empty sources list.")
+
+    records: list[dict[str, Any]] = []
+    for index, source in enumerate(sources, start=1):
+        if not isinstance(source, dict):
+            continue
+        rel_path = str(source.get("path") or "").strip()
+        if not rel_path:
+            continue
+        source_path = (case_dir / rel_path).resolve()
+        spectrum = read_spectrum_any(source_path)
+        counts = np.asarray(spectrum.counts, dtype=float)
+        probe_channels = [
+            int(value)
+            for value in (source.get("probe_channels") or [0, 1, 2])
+        ]
+        energy_probe = [
+            _round_float(spectrum.channel_to_energy(channel))
+            for channel in probe_channels
+        ]
+
+        records.append(
+            {
+                "label": str(source.get("label") or f"source_{index}"),
+                "path": rel_path,
+                "format": source_path.suffix.lower(),
+                "channel_count": int(counts.size),
+                "sum_counts": _round_float(float(np.sum(counts))),
+                "max_counts": _round_float(float(np.max(counts))) if counts.size else 0.0,
+                "live_time_s": _round_float(float(spectrum.live_time)),
+                "real_time_s": _round_float(float(spectrum.real_time)),
+                "energy_probe_channels": probe_channels,
+                "energy_probe_keV": energy_probe,
+            }
+        )
+
+    if not records:
+        raise ValueError("Spectrum I/O parity case did not produce any records.")
+
+    return {
+        "io_parity_expected.json": {
+            "schema": "fluxforge.reference_parity.io.v1",
+            "record_count": len(records),
+            "records": records,
+        }
+    }
+
+
+def _run_background_subtraction_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    input_file = _first_input_file(case_dir, manifest)
+    payload = _load_json(input_file)
+
+    foreground_payload = payload.get("foreground")
+    if not isinstance(foreground_payload, dict):
+        raise ValueError("Background parity input must define foreground spectrum payload.")
+    foreground = _spectrum_from_payload(foreground_payload)
+
+    background_payload = payload.get("background")
+    background = (
+        _spectrum_from_payload(background_payload)
+        if isinstance(background_payload, dict)
+        else None
+    )
+
+    mode = str(payload.get("mode") or "simple")
+    scale = float(payload.get("scale") or 1.0)
+
+    adjusted_counts = subtract_background_counts(
+        foreground,
+        background,
+        mode=mode,
+        scale=scale,
+    )
+    adjusted_spectrum = background_adjusted_spectrum(
+        foreground,
+        background,
+        mode=mode,
+        scale=scale,
+    )
+    meta = (adjusted_spectrum.metadata or {}).get("background_subtraction") or {}
+
+    return {
+        "background_subtraction_expected.json": {
+            "schema": "fluxforge.reference_parity.background.v1",
+            "mode": mode,
+            "requested_scale": _round_float(scale),
+            "effective_scale": _round_float(float(meta.get("scale") or 0.0)),
+            "channel_count": int(adjusted_counts.size),
+            "sum_counts": _round_float(float(np.sum(adjusted_counts))),
+            "max_counts": _round_float(float(np.max(adjusted_counts))) if adjusted_counts.size else 0.0,
+            "first_channels": [_round_float(value) for value in adjusted_counts[:8]],
+        }
+    }
+
+
+def _run_peak_fit_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    input_file = _first_input_file(case_dir, manifest)
+    payload = _load_json(input_file)
+
+    channels = np.asarray(payload.get("channels") or [], dtype=float)
+    counts = np.asarray(payload.get("counts") or [], dtype=float)
+    if channels.size == 0 or counts.size == 0:
+        raise ValueError("Peak-fit parity input must define non-empty channels and counts.")
+    if channels.size != counts.size:
+        raise ValueError("Peak-fit parity channels and counts must have the same length.")
+
+    roi = payload.get("roi_bounds") or [0.0, float(channels[-1])]
+    if not isinstance(roi, (list, tuple)) or len(roi) != 2:
+        raise ValueError("Peak-fit parity input must define roi_bounds with two values.")
+
+    result = fit_roi_peak(
+        channels,
+        counts,
+        (float(roi[0]), float(roi[1])),
+        fitter_key=str(payload.get("fitter_key") or "gaussian"),
+        background_model=str(payload.get("background_model") or "linear"),
+        prior_fwhm_channels=(
+            float(payload.get("prior_fwhm_channels"))
+            if payload.get("prior_fwhm_channels") is not None
+            else None
+        ),
+    )
+
+    return {
+        "peak_fit_expected.json": {
+            "schema": "fluxforge.reference_parity.peak_fit.v1",
+            "fitter_key": result.fitter_key,
+            "background_model": result.background_model,
+            "centroid_channel": _round_float(result.centroid_channel),
+            "fwhm_channels": _round_float(result.fwhm_channels),
+            "area_counts": _round_float(result.area_counts),
+            "chi_squared": _round_float(float(result.peak_result.chi_squared)),
+            "reduced_chi_squared": _round_float(float(result.peak_result.reduced_chi_squared)),
+            "net_counts": _round_float(float(result.peak_result.net_counts)),
+            "success": bool(result.peak_result.success),
         }
     }
 
@@ -669,6 +826,10 @@ def _is_number(value: Any) -> bool:
     except (TypeError, ValueError):
         return False
     return True
+
+
+def _round_float(value: float) -> float:
+    return round(float(value), 6)
 
 
 __all__ = [

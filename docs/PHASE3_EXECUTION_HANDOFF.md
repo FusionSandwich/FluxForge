@@ -767,3 +767,22 @@ Current Phase 5.1 baseline status (2026-04-19):
 	`PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`,
 	`PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`, and
 	`node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`.
+
+Current Phase 5.2 baseline status (2026-04-19):
+- `src/fluxforge/validation/reference_parity.py` now includes executable
+	`spectrum-io-normalization`, `background-subtraction`, and `peak-fit-roi`
+	parity workflows.
+- Source-linked fixtures now exist under:
+	`tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/`,
+	`tests/spectra/reference_parity/cases/background_subtraction_algorithm_case/`, and
+	`tests/spectra/reference_parity/cases/peak_fit_algorithm_case/`.
+- Phase 5 panel controls now include parity scope and fixture filters in
+	`src/fluxforge/gui/panels/phase5.py` with state persistence coverage in
+	`tests/test_modern_gui_shell.py`.
+- Verification commands for this slice were:
+	`PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py`,
+	`PYTHONPATH=src pytest -q tests/test_phase5_crosswalk.py tests/test_cli_app.py -k "phase5 or crosswalk or parity"`,
+	`PYTHONPATH=src python -m fluxforge.cli.app parity-check --scope algorithm --fixture-id spectrum_io_normalization_algorithm_case --output /tmp/phase5_2_parity_check.json`,
+	`PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`,
+	`PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`, and
+	`node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`.

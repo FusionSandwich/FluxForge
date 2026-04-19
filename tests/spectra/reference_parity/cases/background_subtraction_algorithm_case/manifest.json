@@ -1,0 +1,30 @@
+{
+  "schema": "fluxforge.reference_parity_manifest.v1",
+  "fixture_id": "background_subtraction_algorithm_case",
+  "parity_scope": "algorithm",
+  "source_repo": "InterSpec",
+  "source_ref": "main",
+  "source_paths": [
+    "reference/InterSpec/target/testing/analysis_tests",
+    "reference/gamma_spec_analysis/gs_analysis.py",
+    "reference/GSA-v4/ROI_Statistic"
+  ],
+  "source_case": "external_background_scaled_subtraction_bundle",
+  "workflow": "background-subtraction",
+  "input_files": [
+    "background_subtraction_input.json"
+  ],
+  "expected_outputs": [
+    "background_subtraction_expected.json"
+  ],
+  "tolerances": {
+    "sum_counts_abs": 1e-6,
+    "max_counts_abs": 1e-6,
+    "first_channels_abs": 1e-6,
+    "effective_scale_abs": 1e-6
+  },
+  "provenance_notes": [
+    "Phase 5.2 background-subtraction parity fixture for external-background workflows.",
+    "Foreground/background arrays are deterministic synthetic traces tuned for scaled subtraction checks."
+  ]
+}

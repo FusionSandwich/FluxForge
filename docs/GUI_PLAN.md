@@ -43,7 +43,7 @@ Use the GUI docs set in this order:
 | Reporting and batch | Report export dialog, batch queue, progress tracking, JSON/CSV outputs | Steps `3.13`, `3.14` |
 | Workflow persistence | Saved workflow/workspace presets, active-workflow restore across sessions, and built-in `quantumgold-workflow` plus `astm-ldrd-irradiation` presets | `src/fluxforge/gui/workflow_presets.py`, `src/fluxforge/gui/main_window.py`, `tests/test_modern_gui_shell.py` |
 | Phase 6 optimization surfaces | `Inventory / Time Evolution`, `Line Interference / Masking`, `Irradiation Optimizer`, and `Second Irradiation` tabs with `.ffexp` export from the optimizer workspace | `src/fluxforge/gui/panels/phase6.py`, `tests/test_analysis_workspace_qt.py`, `tests/gui_phase6_optimization_probe.py` |
-| Phase 5 crosswalk review surface | `Phase 5 Parity` tab for testing-catalog crosswalk inspection, replay-state filtering, and parity-suite execution with workflow-state persistence | `src/fluxforge/gui/panels/phase5.py`, `src/fluxforge/gui/panels/modern_shell.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py` |
+| Phase 5 crosswalk review surface | `Phase 5 Parity` tab for testing-catalog crosswalk inspection, replay-state filtering, parity scope + fixture filtering, and parity-suite execution with workflow-state persistence | `src/fluxforge/gui/panels/phase5.py`, `src/fluxforge/gui/panels/modern_shell.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py` |
 | Predictive extras | ROI ETA, dead-time forecasting, QA recalibration forecasting, saved lists, mixtures, log-scale and peak-label toggles | Steps `4P.1` through `4P.7` |
 
 ## 4. Interaction Contract
@@ -68,6 +68,7 @@ The GUI must preserve the following behavior contracts:
 | 3.27 | Native probes, artifact reviews, and release-blocking GUI acceptance for every new parity workspace | Complete (repo) |
 | 4.1-4.4 | Live-MCA device discovery, dashboard telemetry, and spectrogram surfaces | Deferred |
 | 5.1 | testing/writeup crosswalk review and parity-state visibility in modern Qt | In Progress (repo) |
+| 5.2 | spectrum-analysis parity execution controls (scope and fixture targeting) for parser/background/fit bundles in modern Qt | In Progress (repo) |
 | 5.3 | GUI/workflow parity closure for the audited testing catalog: plot-controller actions, role-aware overlays, ROI/detection-limit/shielding/archive workspaces, saved analyst context, and report/export behavior parity | Planned |
 | 5.6 | Phase 5 GUI acceptance gate: source-linked traceability, Qt interaction tests, native probe evidence, browser-lane artifact review, and manual GUI sizing validation | Planned |
 
