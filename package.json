@@ -1,0 +1,13 @@
+{
+  "name": "fluxforge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FluxForge Playwright tooling for GUI artifact audits.",
+  "scripts": {
+    "playwright:install": "playwright install chromium",
+    "playwright:audit": "node tests/gui_gallery_playwright_audit.js artifacts/gui_review artifacts/gui_review/playwright_audit"
+  },
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
+}

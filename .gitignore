@@ -5,6 +5,7 @@ __pycache__/
 *.rej
 .env
 .venv
+node_modules/
 
 # OpenMC statepoint files
 statepoint.*.h5
