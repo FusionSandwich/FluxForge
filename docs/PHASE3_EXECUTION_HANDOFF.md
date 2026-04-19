@@ -1,10 +1,23 @@
 # FluxForge Phase 3 LLM Execution Handoff
 
 Status: active reusable handoff
-Last Updated: 2026-04-17 (phase6 workflow persistence + handoff refresh)
+Last Updated: 2026-04-18 (phase6 ldrd worked-example cli/gui/test integration)
 Scope: complete remaining Phase 3 work in strict sequence with full backend, CLI, modern Qt GUI, and testing parity.
 
 This handoff is written so a new LLM session can start from this file and execute without guessing.
+
+Current execution update (2026-04-18):
+- Added a reusable workflow module for the real RAFM/LDRD Phase 6 worked example in `src/fluxforge/workflows/phase6_ldrd_worked_example.py` and converted the script wrapper `examples/RAFM_irradiation/run_phase6_ldrd_worked_example.py` to call that shared path.
+- Added a first-class CLI command `phase6-ldrd-worked-example` in `src/fluxforge/cli/app.py`.
+- Added a modern Qt GUI launch path for the same workflow in `src/fluxforge/gui/panels/phase6.py` (`Run LDRD Worked Example` with sample/output inputs and workflow-state persistence).
+- Added/updated tests for CLI and Qt GUI wiring:
+	- `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "phase6_ldrd_worked_example or second_irradiation_plan_writes_json_and_csv_outputs or optimization_sweep_builds_candidates_from_activity_review or ffexp_export_packages_phase6_products"` -> `5 passed, 71 deselected`
+	- `PYTHONPATH=src pytest -q tests/test_analysis_workspace_qt.py -k "optimization_workspace_panel_runs_ldrd_worked_example_action or masking_review_panel_runs_and_exports_tables or optimization_workspace_panel_runs_and_exports_phase6_bundle or optimization_workspace_panel_advanced_guard_and_second_irradiation_panel"` -> `4 passed, 29 deselected`
+- Executed the new CLI command end-to-end on real RAFM/LDRD-backed data:
+	- `PYTHONPATH=src python -m fluxforge.cli.app phase6-ldrd-worked-example --sample-id RAFM4-C_15dEOI --output-root /tmp/phase6_ldrd_cli_validation`
+- Refreshed the native Phase 6 GUI probe gallery with the worked-example action included:
+	- `PYTHONPATH=src /usr/bin/python tests/gui_phase6_optimization_probe.py artifacts/gui_review/phase6_optimization_probe`
+	- output summary reported `screenshots=6` and `worked_example_complete=true`.
 
 Current execution update (2026-04-17):
 - Phase 2 checkpoint review is complete through `2.23` and `2.24` in `docs/ROADMAP_EXECUTION_STATUS.md`.

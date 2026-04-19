@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shutil
 import sys
 
 
@@ -198,6 +199,13 @@ def main(argv: list[str] | None = None) -> int:
 
     output_dir = Path(args[0]).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
+    for stale in output_dir.glob("*.png"):
+      stale.unlink(missing_ok=True)
+    for stale_name in ("index.html", "phase6_probe.ffexp"):
+      (output_dir / stale_name).unlink(missing_ok=True)
+    stale_worked_example_dir = output_dir / "ldrd_worked_example_probe"
+    if stale_worked_example_dir.exists():
+      shutil.rmtree(stale_worked_example_dir)
 
     app = QApplication.instance() or QApplication([])
     window = FluxForgeMainWindow(
@@ -259,6 +267,13 @@ def main(argv: list[str] | None = None) -> int:
     app.processEvents()
     capture("04-optimizer-recommendation")
 
+    worked_example_root = output_dir / "ldrd_worked_example_probe"
+    optimization.ldrd_sample_id_edit.setText(DEFAULT_PHASE6_SAMPLE_ID)
+    optimization.ldrd_output_root_edit.setText(str(worked_example_root))
+    click(optimization.ldrd_worked_example_button)
+    app.processEvents()
+    capture("05-ldrd-worked-example")
+
     second = bottom_tabs.second_irradiation_panel
     second.flux_scales_edit.setText("1.0")
     second.duration_factors_edit.setText("1.0")
@@ -269,10 +284,11 @@ def main(argv: list[str] | None = None) -> int:
     bottom_tabs.setCurrentWidget(second)
     click(second.run_button)
     app.processEvents()
-    capture("05-second-irradiation")
+    capture("06-second-irradiation")
 
     ffexp_path = output_dir / "phase6_probe.ffexp"
     optimization.export_ffexp(ffexp_path)
+    worked_example_summary = worked_example_root / "WORKED_EXAMPLE_SUMMARY.md"
 
     source_paths = load_phase6_real_data_paths(DEFAULT_PHASE6_SAMPLE_ID)
     summary = {
@@ -283,6 +299,8 @@ def main(argv: list[str] | None = None) -> int:
         "optimization_rows": optimization.heatmap_table.rowCount(),
         "second_irradiation_rows": second.table.rowCount(),
         "ffexp_bundle": ffexp_path.name,
+        "worked_example_summary": worked_example_summary.name,
+        "worked_example_complete": worked_example_summary.exists(),
         "analysis_json": source_paths["analysis_json"].name,
         "schedule_metadata": source_paths["sample_schedules"].name,
         "neutron_unfold": source_paths["unfold_result"].name,

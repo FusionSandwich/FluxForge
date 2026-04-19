@@ -784,6 +784,47 @@ def test_optimization_workspace_panel_advanced_guard_and_second_irradiation_pane
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
+def test_optimization_workspace_panel_runs_ldrd_worked_example_action(monkeypatch, tmp_path):
+    _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    _qapp().processEvents()
+
+    panel = window.bottom_dock.widget().optimization_workspace_panel
+    output_root = tmp_path / "phase6_gui_worked_example"
+
+    def fake_run_phase6_ldrd_worked_example(*, sample_id, output_root):
+        assert sample_id == DEFAULT_PHASE6_SAMPLE_ID
+        target = Path(output_root)
+        target.mkdir(parents=True, exist_ok=True)
+        summary = target / "WORKED_EXAMPLE_SUMMARY.md"
+        summary.write_text("# probe\n", encoding="utf-8")
+        return summary
+
+    monkeypatch.setattr(
+        "fluxforge.gui.panels.phase6.run_phase6_ldrd_worked_example",
+        fake_run_phase6_ldrd_worked_example,
+    )
+
+    panel.ldrd_sample_id_edit.setText(DEFAULT_PHASE6_SAMPLE_ID)
+    panel.ldrd_output_root_edit.setText(str(output_root))
+    QTest.mouseClick(panel.ldrd_worked_example_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    summary = output_root / "WORKED_EXAMPLE_SUMMARY.md"
+    assert summary.exists()
+    assert panel._last_worked_example_summary_path == summary
+    assert "worked example completed" in panel.summary.text().lower()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt analysis workspace dependencies are unavailable.",
+)
 def test_astm_mode_locks_peak_identification_databases_to_standard_sources():
     _qapp()
     window = FluxForgeMainWindow(

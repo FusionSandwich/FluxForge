@@ -172,6 +172,11 @@ from fluxforge.workflows.irradiation_optimization import (
     plan_second_irradiation,
     serialize_second_irradiation_plan,
 )
+from fluxforge.workflows.phase6_ldrd_worked_example import (
+    DEFAULT_SAMPLE_ID as PHASE6_LDRD_DEFAULT_SAMPLE_ID,
+    default_output_root as phase6_ldrd_default_output_root,
+    run_phase6_ldrd_worked_example,
+)
 
 
 def _load_json(path: Path):
@@ -3528,6 +3533,23 @@ def cmd_rafm_compare_branches(args: argparse.Namespace) -> None:
     print(f"Median |rate rel err|: {summary.get('median_abs_rate_rel_error', 0.0):.6g}")
 
 
+def cmd_phase6_ldrd_worked_example(args: argparse.Namespace) -> None:
+    sample_id = str(
+        getattr(args, "sample_id", PHASE6_LDRD_DEFAULT_SAMPLE_ID)
+        or PHASE6_LDRD_DEFAULT_SAMPLE_ID
+    )
+    output_root = Path(
+        getattr(args, "output_root", None)
+        or phase6_ldrd_default_output_root(sample_id)
+    )
+    summary_path = run_phase6_ldrd_worked_example(
+        sample_id=sample_id,
+        output_root=output_root,
+    )
+    print(f"Wrote Phase 6 LDRD worked example artifacts to {output_root}")
+    print(f"Summary: {summary_path}")
+
+
 def cmd_response(args: argparse.Namespace) -> None:
     boundaries = [float(x) for x in _load_json(args.boundaries_file)]
     groups = EnergyGroupStructure(boundaries)
@@ -6647,6 +6669,24 @@ def build_parser() -> argparse.ArgumentParser:
     rafm_compare.add_argument("--qg-results-root", type=Path, required=True)
     rafm_compare.add_argument("--output-root", type=Path, default=None)
     rafm_compare.set_defaults(func=cmd_rafm_compare_branches)
+
+    phase6_ldrd_example = subparsers.add_parser(
+        "phase6-ldrd-worked-example",
+        help="Run the Phase 6 worked example on RAFM LDRD-backed irradiation data",
+    )
+    phase6_ldrd_example.add_argument(
+        "--sample-id",
+        type=str,
+        default=PHASE6_LDRD_DEFAULT_SAMPLE_ID,
+        help="Sample ID from examples/RAFM_irradiation/results/analysis_json",
+    )
+    phase6_ldrd_example.add_argument(
+        "--output-root",
+        type=Path,
+        default=None,
+        help="Optional output directory for worked-example artifacts",
+    )
+    phase6_ldrd_example.set_defaults(func=cmd_phase6_ldrd_worked_example)
 
     response = subparsers.add_parser(
         "response", help="Build response matrix from cross sections"

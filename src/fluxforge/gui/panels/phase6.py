@@ -78,6 +78,11 @@ from fluxforge.workflows.irradiation_optimization import (
     plan_second_irradiation,
     serialize_second_irradiation_plan,
 )
+from fluxforge.workflows.phase6_ldrd_worked_example import (
+    DEFAULT_SAMPLE_ID as PHASE6_LDRD_DEFAULT_SAMPLE_ID,
+    default_output_root as phase6_ldrd_default_output_root,
+    run_phase6_ldrd_worked_example,
+)
 
 
 ActivityReviewProvider = Callable[[], Optional[ActivityReviewResult]]
@@ -414,6 +419,7 @@ class OptimizationWorkspacePanel(QWidget):
         self._last_activity_payload: dict[str, Any] | None = None
         self._last_output_payload: dict[str, Any] | None = None
         self._last_support_artifacts: dict[str, Any] | None = None
+        self._last_worked_example_summary_path: Path | None = None
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
@@ -467,6 +473,19 @@ class OptimizationWorkspacePanel(QWidget):
         self.advanced_checkbox = QCheckBox("Enable advanced objectives", self)
         self.advanced_checkbox.setObjectName("OptimizationAdvancedCheck")
         controls.addWidget(self.advanced_checkbox, 2, 2, 1, 2)
+
+        controls.addWidget(QLabel("LDRD sample", self), 3, 0)
+        self.ldrd_sample_id_edit = QLineEdit(PHASE6_LDRD_DEFAULT_SAMPLE_ID, self)
+        self.ldrd_sample_id_edit.setObjectName("OptimizationLDRDSampleIdEdit")
+        controls.addWidget(self.ldrd_sample_id_edit, 3, 1)
+
+        controls.addWidget(QLabel("LDRD output root", self), 3, 2)
+        self.ldrd_output_root_edit = QLineEdit(
+            str(phase6_ldrd_default_output_root(PHASE6_LDRD_DEFAULT_SAMPLE_ID)),
+            self,
+        )
+        self.ldrd_output_root_edit.setObjectName("OptimizationLDRDOutputRootEdit")
+        controls.addWidget(self.ldrd_output_root_edit, 3, 3)
         layout.addLayout(controls)
 
         button_row = QHBoxLayout()
@@ -484,6 +503,11 @@ class OptimizationWorkspacePanel(QWidget):
         self.export_ffexp_button.setObjectName("OptimizationExportFFEXPButton")
         self.export_ffexp_button.clicked.connect(self._export_ffexp_default)
         button_row.addWidget(self.export_ffexp_button)
+
+        self.ldrd_worked_example_button = QPushButton("Run LDRD Worked Example", self)
+        self.ldrd_worked_example_button.setObjectName("OptimizationLDRDWorkedExampleButton")
+        self.ldrd_worked_example_button.clicked.connect(self.run_ldrd_worked_example)
+        button_row.addWidget(self.ldrd_worked_example_button)
         button_row.addStretch(1)
         layout.addLayout(button_row)
 
@@ -695,6 +719,30 @@ class OptimizationWorkspacePanel(QWidget):
     def _export_ffexp_default(self) -> None:
         self.export_ffexp(Path.cwd() / "phase6_bundle.ffexp")
 
+    def run_ldrd_worked_example(self) -> Path | None:
+        sample_id = self.ldrd_sample_id_edit.text().strip() or PHASE6_LDRD_DEFAULT_SAMPLE_ID
+        output_text = self.ldrd_output_root_edit.text().strip()
+        output_root = (
+            Path(output_text)
+            if output_text
+            else phase6_ldrd_default_output_root(sample_id)
+        )
+        self.ldrd_output_root_edit.setText(str(output_root))
+        try:
+            summary_path = run_phase6_ldrd_worked_example(
+                sample_id=sample_id,
+                output_root=output_root,
+            )
+        except Exception as exc:  # pragma: no cover - exercised via GUI error reporting
+            self.summary.setText(f"LDRD worked example failed: {exc}")
+            return None
+        self._last_worked_example_summary_path = summary_path
+        self.summary.setText(
+            "LDRD worked example completed for "
+            f"{sample_id}. Summary: {summary_path.name}"
+        )
+        return summary_path
+
     def workflow_state(self) -> dict[str, Any]:
         return {
             "objective": str(self.objective_combo.currentData() or "di-fom"),
@@ -703,6 +751,8 @@ class OptimizationWorkspacePanel(QWidget):
             "count_grid_s": self.count_grid_edit.text(),
             "target_nuclide": self.target_nuclide_edit.text(),
             "advanced_objectives": bool(self.advanced_checkbox.isChecked()),
+            "ldrd_sample_id": self.ldrd_sample_id_edit.text(),
+            "ldrd_output_root": self.ldrd_output_root_edit.text(),
             "current_tab": current_tab_label(self.tabs),
         }
 
@@ -721,6 +771,10 @@ class OptimizationWorkspacePanel(QWidget):
             self.target_nuclide_edit.setText(str(payload["target_nuclide"] or ""))
         if "advanced_objectives" in payload:
             self.advanced_checkbox.setChecked(bool(payload["advanced_objectives"]))
+        if "ldrd_sample_id" in payload:
+            self.ldrd_sample_id_edit.setText(str(payload["ldrd_sample_id"] or ""))
+        if "ldrd_output_root" in payload:
+            self.ldrd_output_root_edit.setText(str(payload["ldrd_output_root"] or ""))
         if "current_tab" in payload:
             set_tab_label(self.tabs, str(payload["current_tab"]))
 

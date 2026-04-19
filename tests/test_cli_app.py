@@ -63,6 +63,51 @@ def test_build_parser_gui_dry_run(capsys, tmp_path):
     assert "GUI dry run" in out
 
 
+def test_build_parser_phase6_ldrd_worked_example(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "phase6-ldrd-worked-example",
+            "--sample-id",
+            DEFAULT_PHASE6_SAMPLE_ID,
+            "--output-root",
+            str(tmp_path / "phase6_ldrd"),
+        ]
+    )
+    assert args.command == "phase6-ldrd-worked-example"
+    assert args.sample_id == DEFAULT_PHASE6_SAMPLE_ID
+    assert args.output_root == tmp_path / "phase6_ldrd"
+
+
+def test_cmd_phase6_ldrd_worked_example_invokes_workflow(monkeypatch, tmp_path, capsys):
+    called = {}
+
+    def fake_run_phase6_ldrd_worked_example(*, sample_id, output_root):
+        called["sample_id"] = sample_id
+        called["output_root"] = Path(output_root)
+        summary = Path(output_root) / "WORKED_EXAMPLE_SUMMARY.md"
+        summary.parent.mkdir(parents=True, exist_ok=True)
+        summary.write_text("# ok\n", encoding="utf-8")
+        return summary
+
+    monkeypatch.setattr(
+        app,
+        "run_phase6_ldrd_worked_example",
+        fake_run_phase6_ldrd_worked_example,
+    )
+
+    output_root = tmp_path / "phase6_cli"
+    app.cmd_phase6_ldrd_worked_example(
+        Namespace(sample_id=DEFAULT_PHASE6_SAMPLE_ID, output_root=output_root)
+    )
+
+    out = capsys.readouterr().out
+    assert "Wrote Phase 6 LDRD worked example artifacts" in out
+    assert "Summary:" in out
+    assert called["sample_id"] == DEFAULT_PHASE6_SAMPLE_ID
+    assert called["output_root"] == output_root
+
+
 def test_build_parser_k0_commands(tmp_path):
     parser = app.build_parser()
     args = parser.parse_args(

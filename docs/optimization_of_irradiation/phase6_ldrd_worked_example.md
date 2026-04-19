@@ -14,6 +14,13 @@ This worked example runs the full Phase 6 optimization workflow on the real RAFM
 From the `FluxForge` repository root:
 
 ```bash
+PYTHONPATH=src python -m fluxforge.cli.app phase6-ldrd-worked-example \
+  --sample-id RAFM4-C_15dEOI
+```
+
+Legacy script wrapper (same implementation path):
+
+```bash
 PYTHONPATH=src python examples/RAFM_irradiation/run_phase6_ldrd_worked_example.py \
   --sample-id RAFM4-C_15dEOI
 ```
@@ -57,6 +64,12 @@ This worked example explicitly exercises these Phase 6 CLI commands end-to-end:
 - `optimization-sweep` for objectives `di-fom`, `fim-d`, `mwdcs`, `bass-d`, and `stbd-mr`
 - `second-irradiation-plan`
 - `ffexp-export`
+
+## GUI Launcher
+
+The modern Qt `Irradiation Optimizer` panel now includes a `Run LDRD Worked Example`
+button with `LDRD sample` and `LDRD output root` inputs. It calls the same workflow
+engine as the CLI command and script wrapper.
 
 ## Notes
 

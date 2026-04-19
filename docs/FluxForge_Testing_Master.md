@@ -1,7 +1,7 @@
 # FluxForge Testing Master
 
 **Status:** active testing and validation source of truth  
-**Last Updated:** 2026-04-17  
+**Last Updated:** 2026-04-18  
 **Purpose:** consolidated testing contract for unit, integration, GUI, parity, and
 artifact-backed validation work.
 
@@ -63,6 +63,15 @@ Documented verification state:
 - Phase 6 Qt workflow regression after the modern-shell split:
   `PYTHONPATH=src pytest -q tests/test_analysis_workspace_qt.py -k "masking_review_panel_runs_and_exports_tables or optimization_workspace_panel_runs_and_exports_phase6_bundle or optimization_workspace_panel_advanced_guard_and_second_irradiation_panel"`
   with `3 passed, 29 deselected`.
+- Phase 6 worked-example CLI command + existing CLI/export checks:
+  `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "phase6_ldrd_worked_example or second_irradiation_plan_writes_json_and_csv_outputs or optimization_sweep_builds_candidates_from_activity_review or ffexp_export_packages_phase6_products"`
+  with `5 passed, 71 deselected`.
+- Phase 6 Qt workflow regression including the new worked-example panel action:
+  `PYTHONPATH=src pytest -q tests/test_analysis_workspace_qt.py -k "optimization_workspace_panel_runs_ldrd_worked_example_action or masking_review_panel_runs_and_exports_tables or optimization_workspace_panel_runs_and_exports_phase6_bundle or optimization_workspace_panel_advanced_guard_and_second_irradiation_panel"`
+  with `4 passed, 29 deselected`.
+- Direct CLI command execution on the real RAFM/LDRD corpus:
+  `PYTHONPATH=src python -m fluxforge.cli.app phase6-ldrd-worked-example --sample-id RAFM4-C_15dEOI --output-root /tmp/phase6_ldrd_cli_validation`
+  generated a complete artifact bundle and summary.
 - Broad Phase 3 regression slice:
   `pytest -q tests/test_unfolding_registry.py tests/test_unfolding_workflows.py tests/test_unfolding_workspace_qt.py tests/test_module3_backends.py tests/test_module3_workflows_qt.py tests/test_analysis_workspace_qt.py tests/test_calibration_workspace_qt.py tests/test_modern_gui_shell.py tests/test_cli_app.py`
   with `204 passed`.
@@ -75,6 +84,8 @@ Documented verification state:
 - The Phase 6 probe now drives masking/optimization/second-irradiation actions with
   `QTest.mouseClick(...)` before screenshot capture so browser artifact inspection
   can validate mouse-path behavior instead of method-only programmatic calls.
+- The Phase 6 probe also drives the new `Run LDRD Worked Example` GUI action and now
+  captures six screenshots, including the worked-example state.
 
 Use `docs/ROADMAP_EXECUTION_STATUS.md` for the live verification snapshot after this date.
 
