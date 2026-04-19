@@ -88,7 +88,7 @@ the offline-parity module closes.
 | 4.2 | Device discovery surfaces | Deferred | Device list, thumbnails, and discovery dialogs after HAL transport exists |
 | 4.3 | Live Digital Twin dashboard | Deferred | Telemetry-driven dashboard once live acquisition is present |
 | 4.4 | Live spectrogram panel | Deferred | Time-energy spectrogram after live acquisition lands |
-| 5.1 | testing/ catalog crosswalk closure | Planned | Build and maintain a complete crosswalk from every `testing/writeup.md` repo section to FluxForge backend, CLI, modern Qt GUI, fixtures, parity tests, and probe evidence; include exact source script/data paths and replay classification (`replay-now`, `adapter-required`, `reference-only`) |
+| 5.1 | testing/ catalog crosswalk closure | In Progress (repo) | Build and maintain a complete crosswalk from every `testing/writeup.md` repo section to FluxForge backend, CLI, modern Qt GUI, fixtures, parity tests, and probe evidence; include exact source script/data paths and replay classification (`replay-now`, `adapter-required`, `reference-only`). Initial implementation baseline now includes `.github/project-management/phase5_crosswalk.json`, backend report helpers in `src/fluxforge/validation/phase5_crosswalk.py`, CLI command `phase5-crosswalk-report`, and a modern-shell `Phase 5 Parity` tab in `src/fluxforge/gui/panels/phase5.py`. |
 | 5.2 | Spectrum IO and analysis parity closure | Planned | Close parser/calibration/background/peak-search/fit parity against `actigamma`, `becquerel`, `curie`, `gamma_spec_analysis`, `NASA-gamma`, `GSA-v2`, `GSA-v4`, `InterSpec`, `PyGammaSpec`, `peakingduck`, and `py-findpeaks`, with source-linked fixtures and algorithm/workflow golden checks |
 | 5.3 | GUI and workflow parity closure | Planned | Close direct-manipulation and analyst-workflow parity (role-aware overlays, marker editing, ROI/statistics, detection-limit, shielding/source-fit, archive/file-query, multi-spectrum diagnostics, saved context, and report/export parity) using `InterSpec`, `GSA-v4`, `Gamma-MCA`, `hdtv`, `SpecKit`, and `NASA-gamma` behavior baselines |
 | 5.4 | Inventory, NAA, and activation parity closure | Planned | Close activity/inventory/time-evolution/k0/INAA/activation parity against `irrad_spectroscopy`, `radioactivedecay`, `activation`, `KayWinV410`, `INAA-INRIM 3.1`, `NAA-ANN-1`, and `npat`; include uncertainty-bearing exports and provenance-complete bundle outputs |
@@ -458,6 +458,27 @@ audited source family based on `testing/writeup.md` replay guidance.
 
 Status rule: this table tracks planning-state targets, not implementation
 completion. Completion state is tracked in roadmap and parity fixture evidence.
+
+### 10.12 Current Phase 5.1 Baseline (2026-04-19)
+
+The first executable Phase 5 slice is now landed in-repo and should be treated
+as the baseline for `5.1` closure work:
+
+- Machine-readable crosswalk tracker: `.github/project-management/phase5_crosswalk.json`
+  with all 27 audited writeup source families and explicit replay-state labels.
+- Backend crosswalk loading/validation/reporting utilities:
+  `src/fluxforge/validation/phase5_crosswalk.py`.
+- CLI reporting surface:
+  `src/fluxforge/cli/app.py` command `phase5-crosswalk-report` supporting JSON,
+  markdown, and optional parity-summary integration.
+- Modern Qt review surface:
+  `src/fluxforge/gui/panels/phase5.py` `Phase5ParityPanel` wired into
+  `src/fluxforge/gui/panels/modern_shell.py` for crosswalk inspection and
+  parity-suite execution.
+- Verification and evidence assets:
+  `tests/test_phase5_crosswalk.py`, `tests/test_cli_app.py`,
+  `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py`, and
+  `artifacts/gui_review/phase5_parity/` including Playwright audit reports.
 
 ## 11. Online-Informed Future Feature Candidates (Do Not Implement Yet)
 

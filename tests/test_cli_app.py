@@ -108,6 +108,58 @@ def test_cmd_phase6_ldrd_worked_example_invokes_workflow(monkeypatch, tmp_path, 
     assert called["output_root"] == output_root
 
 
+def test_build_parser_phase6_ldrd_second_irradiation_repo(tmp_path):
+    parser = app.build_parser()
+    args = parser.parse_args(
+        [
+            "phase6-ldrd-second-irradiation-repo",
+            "--sample-id",
+            DEFAULT_PHASE6_SAMPLE_ID,
+            "--output-root",
+            str(tmp_path / "decision_repo"),
+            "--top-n",
+            "12",
+        ]
+    )
+    assert args.command == "phase6-ldrd-second-irradiation-repo"
+    assert args.sample_id == DEFAULT_PHASE6_SAMPLE_ID
+    assert args.output_root == tmp_path / "decision_repo"
+    assert args.top_n == 12
+
+
+def test_cmd_phase6_ldrd_second_irradiation_repo_invokes_workflow(
+    monkeypatch, tmp_path, capsys
+):
+    called = {}
+
+    def fake_run_phase6_ldrd_second_irradiation_decision_repo(*, sample_id, output_root, top_n):
+        called["sample_id"] = sample_id
+        called["output_root"] = Path(output_root)
+        called["top_n"] = top_n
+        report = Path(output_root) / "SECOND_IRRADIATION_DECISION_REPORT.md"
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text("# ok\n", encoding="utf-8")
+        return {"report": report}
+
+    monkeypatch.setattr(
+        app,
+        "run_phase6_ldrd_second_irradiation_decision_repo",
+        fake_run_phase6_ldrd_second_irradiation_decision_repo,
+    )
+
+    output_root = tmp_path / "decision_repo_cli"
+    app.cmd_phase6_ldrd_second_irradiation_repo(
+        Namespace(sample_id=DEFAULT_PHASE6_SAMPLE_ID, output_root=output_root, top_n=10)
+    )
+
+    out = capsys.readouterr().out
+    assert "Wrote RAFM second-irradiation decision repository" in out
+    assert "Report:" in out
+    assert called["sample_id"] == DEFAULT_PHASE6_SAMPLE_ID
+    assert called["output_root"] == output_root
+    assert called["top_n"] == 10
+
+
 def test_build_parser_k0_commands(tmp_path):
     parser = app.build_parser()
     args = parser.parse_args(
@@ -307,6 +359,43 @@ def test_build_parser_file_query_and_batch_compare_commands(tmp_path):
     )
     assert gui_acceptance_args.command == "gui-acceptance-check"
     assert gui_acceptance_args.checklist.name == "checklist.md"
+
+    crosswalk_args = parser.parse_args(
+        [
+            "phase5-crosswalk-report",
+            "--crosswalk",
+            str(tmp_path / "phase5_crosswalk.json"),
+            "--output",
+            str(tmp_path / "phase5_crosswalk_report.json"),
+        ]
+    )
+    assert crosswalk_args.command == "phase5-crosswalk-report"
+    assert crosswalk_args.crosswalk.name == "phase5_crosswalk.json"
+
+
+def test_cmd_phase5_crosswalk_report_writes_json_and_markdown(tmp_path):
+    crosswalk = ROOT / ".github" / "project-management" / "phase5_crosswalk.json"
+    output = tmp_path / "phase5_crosswalk_report.json"
+    markdown = tmp_path / "phase5_crosswalk_report.md"
+
+    app.cmd_phase5_crosswalk_report(
+        Namespace(
+            crosswalk=crosswalk,
+            output=output,
+            markdown_output=markdown,
+            include_parity_summary=False,
+            reference_root=ROOT / "tests" / "spectra" / "reference_parity",
+            activation_root=ROOT / "tests" / "activation_inventory" / "fixtures",
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.phase5.crosswalk.report.v1"
+    assert payload["summary"]["total_entries"] == 27
+
+    markdown_text = markdown.read_text(encoding="utf-8")
+    assert "# Phase 5 Crosswalk Report" in markdown_text
+    assert "| Section | Source family | Replay state | Backend | CLI | GUI |" in markdown_text
 
 
 def test_cmd_file_query_writes_rows(tmp_path):

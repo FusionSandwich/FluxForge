@@ -1,7 +1,7 @@
 # FluxForge Testing Master
 
 **Status:** active testing and validation source of truth  
-**Last Updated:** 2026-04-18  
+**Last Updated:** 2026-04-19  
 **Purpose:** consolidated testing contract for unit, integration, GUI, parity, and
 artifact-backed validation work.
 
@@ -10,9 +10,10 @@ artifact-backed validation work.
 Use the testing docs set in this order:
 
 1. `docs/ROADMAP_EXECUTION_STATUS.md` for live run status and latest completion notes
-2. `docs/FluxForge_Testing_Master.md` for testing policy and acceptance requirements
-3. `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` for feature scope
-4. `docs/GUI_PLAN.md` for GUI-specific interaction acceptance
+2. `docs/GUI_TEST_COVERAGE_LEDGER.md` for explicit GUI surface coverage tracking
+3. `docs/FluxForge_Testing_Master.md` for testing policy and acceptance requirements
+4. `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` for feature scope
+5. `docs/GUI_PLAN.md` for GUI-specific interaction acceptance
 
 ## 2. Test Contract
 
@@ -37,17 +38,19 @@ Additional rules:
 | File and schema IO | `tests/test_n42.py`, `tests/test_cnf_io.py`, `tests/test_csv_readers.py`, `tests/test_spectrum_io_parity.py` | spectrum import/export, calibration extraction, parity baselines |
 | Calibration and efficiency | `tests/test_calibration_workspace_qt.py`, `tests/test_pipeline_validation.py`, `tests/test_genie_overrides.py` | energy calibration, efficiency workflows, Qt calibration behavior |
 | Analysis workspace and peak workflows | `tests/test_analysis_workspace_qt.py`, `tests/test_roi_analysis_core.py`, `tests/test_peak_finder_methods.py` | peak search, ROI/background workflows, GUI peak review, library behavior |
+| Phase 5 crosswalk and parity review | `tests/test_phase5_crosswalk.py`, `tests/test_cli_app.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py`, `artifacts/gui_review/phase5_parity/` | machine-readable writeup crosswalk validation, CLI report contract, modern-shell state persistence, native GUI evidence, and browser-lane gallery audit |
 | Phase 6 optimization and saved workflows | `tests/test_cli_app.py`, `tests/test_analysis_workspace_qt.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase6_optimization_probe.py`, `tests/_phase6_real_data.py` | real RAFM/LDRD activity-review inputs, masking, optimization, second irradiation, `.ffexp`, GUI workflow/session persistence, and mouse-driven probe actions for Playwright artifact review |
 | Unfolding and inverse analysis | `tests/test_unfolding_registry.py`, `tests/test_unfolding_workflows.py`, `tests/test_unfolding_reference_parity.py`, validation scripts under `examples/validation/` | registry-backed unfolding, external parity, diagnostic outputs |
-| Standards and QA | `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_module3_backends.py`, `tests/test_module3_workflows_qt.py` | governed calculations, QA monitor, standards review, reporting |
+| Standards and QA | `tests/test_astm_e261.py`, `tests/test_astm_e262.py`, `tests/test_module3_backends.py`, `tests/test_module3_workflows_qt.py`, `tests/test_gui_dialogs_qt.py` | governed calculations, QA monitor, standards review, reporting, and direct dialog-level GUI checks |
 | Batch, reporting, and predictive GUI | `tests/test_cli_app.py`, `tests/test_predictive_features.py`, `tests/test_predictive_dashboard_qt.py` | CLI contract, offline predictive features, dashboard/status behavior |
 | Native GUI probes | `tests/gui_unfolding_workspace_probe.py`, `tests/gui_module3_workflows_probe.py`, `tests/gui_predictive_dashboard_probe.py`, `artifacts/gui_review/` | screenshot-backed inspection of interaction-heavy Qt surfaces |
+| Browser-lane gallery audit | `tests/gui_gallery_playwright_audit.js`, `artifacts/gui_review/playwright_audit/audit_report.json`, `artifacts/gui_review/playwright_audit/audit_report.md` | Playwright validation of gallery page load, section/card visibility, image health, viewport metadata, and responsive styling |
 
 ## 4. Verification Baseline
 
 Documented verification state:
 
-- Full-suite baseline in this workspace is `1279 passed, 2 skipped`.
+- Full-suite baseline in this workspace is `1286 passed, 2 skipped`.
 - Targeted parity/fixture/CLI verification:
   `pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py tests/test_cli_app.py -k "parity or fixture or manifest"`
   with `10 passed, 67 deselected`.
@@ -86,6 +89,44 @@ Documented verification state:
   can validate mouse-path behavior instead of method-only programmatic calls.
 - The Phase 6 probe also drives the new `Run LDRD Worked Example` GUI action and now
   captures six screenshots, including the worked-example state.
+- Optimization-helper dedup regression verification:
+  `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py`
+  with `22 passed`.
+- Modern-shell dedup guard verification:
+  `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "modern_shell_reuses_shared_demo_and_selection_helpers"`
+  with `1 passed, 14 deselected`.
+- Full-suite revalidation after cleanup/quality tooling updates:
+  `PYTHONPATH=src pytest -q`
+  with `1286 passed, 2 skipped`.
+- Phase 5.1 crosswalk targeted verification:
+  `PYTHONPATH=src pytest -q tests/test_phase5_crosswalk.py tests/test_cli_app.py -k "phase5 or crosswalk"`
+  with `4 passed, 78 deselected`.
+- Phase 5.1 shell-state regression verification:
+  `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`
+  with `1 passed, 14 deselected`.
+- Phase 5.1 native probe generation:
+  `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
+  producing `artifacts/gui_review/phase5_parity/index.html` and
+  `artifacts/gui_review/phase5_parity/phase5_probe_report.json`.
+- Phase 5.1 browser-lane audit:
+  `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
+  with `1 audited, 0 failing` and reports at
+  `artifacts/gui_review/phase5_parity/playwright_audit/audit_report.json` plus
+  `artifacts/gui_review/phase5_parity/playwright_audit/audit_report.md`.
+- Playwright gallery audit verification:
+  `NODE_PATH=/tmp/pw-audit/node_modules node tests/gui_gallery_playwright_audit.js artifacts/gui_review /tmp/gui_playwright_audit`
+  with `21 audited, 0 failing`; evidence copied to
+  `artifacts/gui_review/playwright_audit/audit_report.json` and
+  `artifacts/gui_review/playwright_audit/audit_report.md`.
+- Expanded GUI regression verification (dialogs + widgets + workspaces + shell):
+  `PYTHONPATH=src pytest -q tests/test_gui_dialogs_qt.py tests/test_gui_widgets_qt.py tests/test_analysis_workspace_qt.py tests/test_calibration_workspace_qt.py tests/test_module3_workflows_qt.py tests/test_predictive_dashboard_qt.py tests/test_unfolding_workspace_qt.py tests/test_modern_gui_shell.py`
+  with `91 passed, 9 warnings`.
+- Changed-file quality-gate validation (non-data Python files):
+  `ruff check --select I <changed files under src/fluxforge and tests>`
+  with local dry-run passing after import normalization.
+- Post-gate regression slice:
+  `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py tests/test_modern_gui_shell.py -k "modern_shell_reuses_shared_demo_and_selection_helpers or test_"`
+  with `37 passed`.
 
 Use `docs/ROADMAP_EXECUTION_STATUS.md` for the live verification snapshot after this date.
 

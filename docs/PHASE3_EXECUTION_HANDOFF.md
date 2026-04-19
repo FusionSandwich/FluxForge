@@ -1,10 +1,59 @@
 # FluxForge Phase 3 LLM Execution Handoff
 
 Status: active reusable handoff
-Last Updated: 2026-04-18 (phase6 ldrd worked-example cli/gui/test integration)
+Last Updated: 2026-04-19 (cleanup-wave ci/docs sync + full-suite revalidation)
 Scope: complete remaining Phase 3 work in strict sequence with full backend, CLI, modern Qt GUI, and testing parity.
 
 This handoff is written so a new LLM session can start from this file and execute without guessing.
+
+Current execution update (2026-04-19, continuation):
+- Expanded cleanup governance in `.github/workflows/quality-checks.yml`:
+	- added `pull_request` trigger coverage for Python and docs/workflow paths
+	- switched checkout to `fetch-depth: 0` for reliable diff-base comparisons
+	- added diff-based changed-file discovery for non-data Python files in
+	  `src/fluxforge` and `tests`
+	- added changed-file import gate: `ruff check --select I <changed-files>`
+- Kept stable incremental optimization gates in CI:
+	- `ruff check --select F,I` on optimization helper/refactor modules
+	- `isort --check-only` on the same optimization helper/refactor modules
+- Rollout issue encountered and resolved:
+	- conflict between Ruff and isort import ordering on
+	  `src/fluxforge/gui/panels/modern_shell.py` large import block
+	- changed-file gate now uses Ruff import checks as the single source of truth
+	  for changed-file import ordering, while isort remains on stable scope
+	- normalized modern-shell imports via Ruff import fix
+- Verification refresh for this continuation:
+	- local changed-file import gate dry-run passed
+	- local optimization isort gate dry-run passed
+	- `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py tests/test_modern_gui_shell.py -k "modern_shell_reuses_shared_demo_and_selection_helpers or test_"` -> `37 passed`
+	- full suite: `PYTHONPATH=src pytest -q` -> `1286 passed, 2 skipped`
+	- planning update: `docs/optimization_of_irradiation/irradiation_optimization_master_plan.md` now includes the required RAFM LDRD second-irradiation decision-repository workflow (`RAFM-G`) with explicit `24 h -> 2 weeks` and long-horizon isotope windows, source-data mapping to `../rafm_irradiation_ldrd`, and methodology-ordered execution/test/probe gates.
+	- targeted validation refresh during this plan update:
+	  - `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py` -> `22 passed`
+	  - `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "optimization_sweep_builds_candidates_from_activity_review or phase6_ldrd_worked_example"` -> `3 passed, 73 deselected`
+	- implementation update: added `src/fluxforge/workflows/phase6_ldrd_second_irradiation_decision_repo.py` and CLI command `phase6-ldrd-second-irradiation-repo` in `src/fluxforge/cli/app.py` to generate the LDRD second-irradiation decision-repository artifact bundle.
+	- verification refresh for the new command:
+	  - `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "phase6_ldrd_second_irradiation_repo or phase6_ldrd_worked_example"` -> `4 passed, 74 deselected`
+	  - `PYTHONPATH=src python -m fluxforge.cli.app phase6-ldrd-second-irradiation-repo --sample-id RAFM4-C_15dEOI --output-root /tmp/phase6_ldrd_second_repo_validation --top-n 8` -> generated all required decision-repository outputs and report.
+	- full browser-lane gallery audit now exists via `tests/gui_gallery_playwright_audit.js`:
+	  - initial strict run surfaced a responsiveness gap (20 gallery pages without explicit small-screen media-query rules; `artifacts/gui_review/current_linux/review_gallery/index.html` missing viewport metadata)
+	  - fixes applied to probe gallery templates (`tests/gui_*_probe.py`) and existing generated pages under `artifacts/gui_review/`
+	  - rerun result: `21 audited, 0 failing`
+	  - persisted evidence: `artifacts/gui_review/playwright_audit/audit_report.json` and `artifacts/gui_review/playwright_audit/audit_report.md`.
+
+Current execution update (2026-04-19):
+- Added incremental quality-gate wiring for CI optimization scope in `.github/workflows/quality-checks.yml`:
+	- `ruff check --select F,I` for optimization helper/refactor modules and regression tests
+	- `isort --check-only` for the same optimization helper/refactor modules and regression tests
+- Added contributor guidance for local quality execution in `CONTRIBUTING.md` (dev extras install, `pre-commit install`, and manual `ruff`/`isort`/`black` checks for non-data files).
+- Landed dedup cleanup support and regressions:
+	- shared optimization helpers in `src/fluxforge/analysis/optimization_common.py`
+	- dedup refactors in optimization modules and modern-shell helper reuse
+	- regression tests in `tests/test_optimization_common.py` and `tests/test_modern_gui_shell.py`
+- Verification refresh for this cleanup slice:
+	- `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py` -> `22 passed`
+	- `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "modern_shell_reuses_shared_demo_and_selection_helpers"` -> `1 passed, 14 deselected`
+	- full suite: `PYTHONPATH=src pytest -q` -> `1286 passed, 2 skipped`.
 
 Current execution update (2026-04-18):
 - Added a reusable workflow module for the real RAFM/LDRD Phase 6 worked example in `src/fluxforge/workflows/phase6_ldrd_worked_example.py` and converted the script wrapper `examples/RAFM_irradiation/run_phase6_ldrd_worked_example.py` to call that shared path.
@@ -101,7 +150,7 @@ Primary mission:
 Current baseline (already complete):
 - Step 3.18.1 (Unfolding and regularized inversion parity) is complete in-repo.
 - Step 3.19.1 (Flux-wire and activation analysis parity) is complete in-repo.
-- Full-suite baseline in this workspace has been validated at 1279 passed, 2 skipped.
+- Full-suite baseline in this workspace has been re-validated at 1286 passed, 2 skipped.
 
 Do not re-open completed steps unless a regression is found.
 
@@ -144,6 +193,7 @@ Read these in order at the start of every new chat:
 9. docs/FluxForge_Irradiation_Design_Literature_and_Handoff.md
 10. docs/REPO_CLEANUP_WORKSTREAM.md
 11. docs/optimization_of_irradiation/irradiation_optimization_master_plan.md
+12. ../testing/writeup.md (especially section 0 and section 0.7 methodology)
 
 If details appear missing in consolidated docs, mine additional guidance from:
 - docs/optimization_of_irradiation/
@@ -669,6 +719,12 @@ Always update, at minimum:
 - docs/FluxForge_Testing_Master.md (if testing contract/coverage changed)
 - docs/PHASE3_EXECUTION_HANDOFF.md (refresh branch state, blockers, and next concrete command sequence)
 
+When changes affect the audited testing-catalog parity scope:
+- keep `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` section `10` synchronized with
+	source-family coverage and traceability contracts
+- keep `docs/ROADMAP_EXECUTION_STATUS.md` and `docs/GUI_PLAN.md` synchronized
+	with the same Phase 5 step rows and acceptance-gate language
+
 If consolidated docs are too sparse for implementation detail:
 - Add pointers in this handoff or roadmap status to the exact supporting docs in docs/optimization_of_irradiation and docs/archive.
 
@@ -686,3 +742,28 @@ A step is done only when all are true:
 - Status docs updated with evidence and residual risk notes.
 
 If any item above is missing, the step is not complete and work must continue.
+
+## 15. Phase 5 Transition and Continuation Rule
+
+This handoff governs Phase 3 execution directly, but the same lifecycle
+discipline also governs the new Phase 5 testing-catalog closure work defined in
+`docs/FLUXFORGE_CONSOLIDATED_MASTER.md` section `10`.
+
+When Phase 5 slices are being implemented:
+- use the same strict delivery order: backend -> CLI -> modern Qt GUI -> tests
+	-> probes/browser-lane review -> manual GUI sizing -> status-doc updates
+- apply the `testing/writeup.md` section `0.7` evidence and code-traceability
+	rules as mandatory requirements
+- do not mark any Phase 5 slice complete without source-linked replay evidence,
+	provenance labels, and explicit replay-state labeling
+
+Current Phase 5.1 baseline status (2026-04-19):
+- `.github/project-management/phase5_crosswalk.json` now tracks all 27 audited
+	writeup source families with replay-state labels.
+- CLI and GUI entry points now exist via `phase5-crosswalk-report` and the
+	modern-shell `Phase 5 Parity` tab.
+- Verification commands for this slice were:
+	`PYTHONPATH=src pytest -q tests/test_phase5_crosswalk.py tests/test_cli_app.py -k "phase5 or crosswalk"`,
+	`PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`,
+	`PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`, and
+	`node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`.

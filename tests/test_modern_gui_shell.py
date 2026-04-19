@@ -1,18 +1,18 @@
 import ast
 import os
-from pathlib import Path
 import subprocess
 import sys
 import textwrap
+from pathlib import Path
 
 import pytest
 
 from fluxforge.gui import (
+    QT_AVAILABLE,
+    FluxForgeMainWindow,
     GUIMode,
     HierarchicalSpectrumBuffer,
-    FluxForgeMainWindow,
     ModeManager,
-    QT_AVAILABLE,
     SelectionBus,
     WorkflowPresetManager,
     describe_gui_scaffold,
@@ -208,6 +208,11 @@ def test_main_window_restores_saved_workflow_state_across_sessions():
             "target_weights": "Co-60:2.0",
         }
     )
+    bottom.phase5_parity_panel.apply_workflow_state(
+        {
+            "replay_state_filter": "adapter-required",
+        }
+    )
     first.workflow_presets.save_workflow(
         "session-restore-check",
         first._snapshot_current_workflow(),
@@ -236,6 +241,7 @@ def test_main_window_restores_saved_workflow_state_across_sessions():
     assert restored_bottom.masking_review_panel.energy_window_spin.value() == pytest.approx(9.5)
     assert restored_bottom.optimization_workspace_panel.target_nuclide_edit.text() == "Co-60"
     assert restored_bottom.second_irradiation_panel.target_weights_edit.text() == "Co-60:2.0"
+    assert restored_bottom.phase5_parity_panel.replay_filter_combo.currentText() == "adapter-required"
     second.close()
 
 
@@ -263,6 +269,31 @@ def test_hierarchical_buffer_builds_multiple_levels():
     assert buffer.levels[0].stride == 1
     assert buffer.levels[-1].stride == 16
     assert buffer.choose_level(pixel_width=20).sample_count <= 40
+
+
+def test_modern_shell_reuses_shared_demo_and_selection_helpers():
+    modern_shell_path = ROOT / "src" / "fluxforge" / "gui" / "panels" / "modern_shell.py"
+    parsed = ast.parse(modern_shell_path.read_text(encoding="utf-8"))
+    local_defs = {
+        node.name
+        for node in ast.walk(parsed)
+        if isinstance(node, ast.FunctionDef)
+    }
+    assert "_selection_summary" not in local_defs
+    assert "_format_duration" not in local_defs
+    assert "_demo_counts" not in local_defs
+
+    from fluxforge.gui.panels import modern_shell, modern_shell_shared
+
+    assert modern_shell.build_demo_spectrum is modern_shell_shared.build_demo_spectrum
+    assert (
+        modern_shell.build_demo_background_spectrum
+        is modern_shell_shared.build_demo_background_spectrum
+    )
+    assert (
+        modern_shell.build_demo_overlay_spectrum
+        is modern_shell_shared.build_demo_overlay_spectrum
+    )
 
 
 def test_register_builtin_render_backends_tracks_default_and_stub():

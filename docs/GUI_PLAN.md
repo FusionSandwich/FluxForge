@@ -1,7 +1,7 @@
 # FluxForge GUI Master Plan
 
 **Status:** active GUI source of truth  
-**Last Updated:** 2026-04-17  
+**Last Updated:** 2026-04-19  
 **Purpose:** consolidated GUI architecture, interaction, and workspace plan for the
 modern Qt shell.
 
@@ -16,6 +16,8 @@ Use the GUI docs set in this order:
 2. `docs/GUI_PLAN.md` for GUI direction and interaction rules
 3. `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` for product scope and feature roadmap
 4. `docs/FluxForge_Testing_Master.md` for GUI acceptance and parity requirements
+5. `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` section `10` for Phase 5 writeup-crosswalk implementation requirements
+6. `../testing/writeup.md` section `0.7` for replay-oriented evidence and traceability methodology
 
 ## 2. Core GUI Rules
 
@@ -41,6 +43,7 @@ Use the GUI docs set in this order:
 | Reporting and batch | Report export dialog, batch queue, progress tracking, JSON/CSV outputs | Steps `3.13`, `3.14` |
 | Workflow persistence | Saved workflow/workspace presets, active-workflow restore across sessions, and built-in `quantumgold-workflow` plus `astm-ldrd-irradiation` presets | `src/fluxforge/gui/workflow_presets.py`, `src/fluxforge/gui/main_window.py`, `tests/test_modern_gui_shell.py` |
 | Phase 6 optimization surfaces | `Inventory / Time Evolution`, `Line Interference / Masking`, `Irradiation Optimizer`, and `Second Irradiation` tabs with `.ffexp` export from the optimizer workspace | `src/fluxforge/gui/panels/phase6.py`, `tests/test_analysis_workspace_qt.py`, `tests/gui_phase6_optimization_probe.py` |
+| Phase 5 crosswalk review surface | `Phase 5 Parity` tab for testing-catalog crosswalk inspection, replay-state filtering, and parity-suite execution with workflow-state persistence | `src/fluxforge/gui/panels/phase5.py`, `src/fluxforge/gui/panels/modern_shell.py`, `tests/test_modern_gui_shell.py`, `tests/gui_phase5_parity_probe.py` |
 | Predictive extras | ROI ETA, dead-time forecasting, QA recalibration forecasting, saved lists, mixtures, log-scale and peak-label toggles | Steps `4P.1` through `4P.7` |
 
 ## 4. Interaction Contract
@@ -64,6 +67,9 @@ The GUI must preserve the following behavior contracts:
 | 3.26 | First-class dark mode, saved themes, stronger graph-table synchronization, and improved launch/discovery paths | Complete (repo) |
 | 3.27 | Native probes, artifact reviews, and release-blocking GUI acceptance for every new parity workspace | Complete (repo) |
 | 4.1-4.4 | Live-MCA device discovery, dashboard telemetry, and spectrogram surfaces | Deferred |
+| 5.1 | testing/writeup crosswalk review and parity-state visibility in modern Qt | In Progress (repo) |
+| 5.3 | GUI/workflow parity closure for the audited testing catalog: plot-controller actions, role-aware overlays, ROI/detection-limit/shielding/archive workspaces, saved analyst context, and report/export behavior parity | Planned |
+| 5.6 | Phase 5 GUI acceptance gate: source-linked traceability, Qt interaction tests, native probe evidence, browser-lane artifact review, and manual GUI sizing validation | Planned |
 
 ## 6. Source Behaviors to Preserve
 
@@ -101,7 +107,26 @@ Current repo implementation note (2026-04-17):
 - New parity work must land only in the Qt shell unless a deliberate archival/fallback reason is documented.
 - Theme, overlay-role, and standards-lock behavior are part of product behavior, not optional polish.
 
-## 8. Archived GUI Inputs
+## 8. Phase 5 GUI Traceability and Evidence Rules
+
+- Every Phase 5 GUI parity claim must cite at least one concrete local path in
+	`../testing/writeup.md` or the referenced source repository when such a path
+	exists.
+- Every GUI dataset or sample artifact cited for replay must be labeled as one
+	of: `bundled locally`, `downloaded dynamically`, `generated during runtime`,
+	or `docs-only / implied`.
+- GUI behavior extraction must be explicit for each source family and include:
+	plot-as-controller behavior, graph/table synchronization loops,
+	foreground/background/secondary role handling, manual override availability,
+	and saved theme/workspace/workflow state behavior.
+- Phase 5 GUI slices are not complete until both automated Qt workflow tests and
+	native probe artifacts are available, reviewed in the browser-lane artifact
+	flow, and backed by manual modern-GUI sizing/usability checks.
+- Classification guardrail remains in force for GUI library surfaces:
+	prompt capture and reaction-gamma references must not be presented as decay
+	emission-probability sources for activity calculations.
+
+## 9. Archived GUI Inputs
 
 The superseded GUI planning files now live in
 `docs/archive/planning_snapshot_2026-04-06/`:

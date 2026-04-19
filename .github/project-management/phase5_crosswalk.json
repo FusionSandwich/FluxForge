@@ -1,0 +1,868 @@
+{
+  "schema": "fluxforge.phase5.crosswalk.v1",
+  "version": 1,
+  "source_document": "../testing/writeup.md",
+  "generated_at": "2026-04-19T00:00:00Z",
+  "entries": [
+    {
+      "writeup_section": 1,
+      "source_family": "actigamma",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/actigamma/examples/plotlines.py",
+        "testing/actigamma/examples/identify.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/actigamma_spectrum_bundle_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_reference_parity_runner.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Deterministic line-engine and identification parity targets."
+    },
+    {
+      "writeup_section": 2,
+      "source_family": "becquerel",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/becquerel/tests/samples/",
+        "testing/becquerel/examples/fitting.ipynb"
+      ],
+      "backend_paths": [
+        "src/fluxforge/validation/reference_parity.py",
+        "src/fluxforge/core/peak_fitting.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/becquerel_spectrum_bundle_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Parser, fitting, and rebinning parity family."
+    },
+    {
+      "writeup_section": 3,
+      "source_family": "curie",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/curie/examples/spectroscopy_examples.py",
+        "testing/curie/examples/stack_examples.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/activity_review.py",
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::activity-review",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::ActivityResultsPanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/curie_spectrum_bundle_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_activity_inventory_parity.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Curie spectra/efficiency/stack workflow parity targets."
+    },
+    {
+      "writeup_section": 4,
+      "source_family": "gamma_spec_analysis",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/gamma_spec_analysis/test_data/",
+        "testing/gamma_spec_analysis/gs_analysis.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py",
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/gamma_spec_analysis_bundle_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Smoothing, background and Gaussian fitting parity family."
+    },
+    {
+      "writeup_section": 5,
+      "source_family": "Gamma-MCA",
+      "replay_state": "adapter-required",
+      "data_class": "docs-only / implied",
+      "source_paths": [
+        "testing/Gamma-MCA/README.md",
+        "testing/Gamma-MCA/source/"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/gamma_mca_adapter_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "GUI behavior baseline tracked pending adapter fixtures."
+    },
+    {
+      "writeup_section": 6,
+      "source_family": "gmapy",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/gmapy/tests/testdata/",
+        "testing/gmapy/tests/test_legacy_divergence.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/unfolding/",
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::unfold",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/gmapy_covariance_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_unfolding_reference_parity.py"
+      ],
+      "probe_paths": [
+        "tests/gui_unfolding_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Covariance-aware parity and controlled divergence tracking."
+    },
+    {
+      "writeup_section": 7,
+      "source_family": "hdtv",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/hdtv/tests/share/osiris_bg.spc",
+        "testing/hdtv/tests/plugins/test_calbin.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::roi-analyze",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/hdtv_roi_bundle_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_analysis_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Marker and ROI interaction parity family."
+    },
+    {
+      "writeup_section": 8,
+      "source_family": "irrad_spectroscopy",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/irrad_spectroscopy/tests/test_data/Eu152_point.txt",
+        "testing/irrad_spectroscopy/tests/test_spectroscopy.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/activity_review.py",
+        "src/fluxforge/core/inventory_timeline.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::activity-review",
+        "src/fluxforge/cli/app.py::inventory-review"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::InventoryTimelinePanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/irrad_spectroscopy_activity_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Calibration/activity/dose helper parity family."
+    },
+    {
+      "writeup_section": 9,
+      "source_family": "NAA-ANN-1",
+      "replay_state": "adapter-required",
+      "data_class": "downloaded dynamically",
+      "source_paths": [
+        "testing/NAA-ANN-1/RID_extracted/",
+        "testing/NAA-ANN-1/NAA1 2022-05-09 4e results.csv"
+      ],
+      "backend_paths": [
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/activation_inventory/fixtures/naa_ann_adapter_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "ANN preprocessing parity requires adapter and corpus reconstruction."
+    },
+    {
+      "writeup_section": 10,
+      "source_family": "Neutron-Spectrometry",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/Neutron-Spectrometry/unfolding/input/template_measurements.txt",
+        "testing/Neutron-Spectrometry/unfolding/input/template_unfold_spectrum.cfg"
+      ],
+      "backend_paths": [
+        "src/fluxforge/unfolding/",
+        "src/fluxforge/workflows/spectrum_unfolding.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::unfold",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/neutron_spectrometry_workflow_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_unfolding_workflows.py"
+      ],
+      "probe_paths": [
+        "tests/gui_unfolding_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Config-driven unfolding and trend workflow parity."
+    },
+    {
+      "writeup_section": 11,
+      "source_family": "Neutron-Unfolding",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/Neutron-Unfolding/unfolding_inputs/reduced_data.csv",
+        "testing/Neutron-Unfolding/final-results/"
+      ],
+      "backend_paths": [
+        "src/fluxforge/unfolding/gravel.py",
+        "src/fluxforge/unfolding/rmle.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::unfold",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/neutron_unfolding_bundle_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_unfolding_reference_parity.py"
+      ],
+      "probe_paths": [
+        "tests/gui_unfolding_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Compact GRAVEL/MLEM parity and output comparison family."
+    },
+    {
+      "writeup_section": 12,
+      "source_family": "npat",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/npat/examples/eu_calib_7cm.Spe",
+        "testing/npat/examples/test_stack.csv"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/activity_review.py",
+        "src/fluxforge/core/inventory_timeline.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::activity-review",
+        "src/fluxforge/cli/app.py::inventory-review"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::ActivityResultsPanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/activation_inventory/fixtures/npat_activation_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Multi-domain spectroscopy/activation parity with adapter extensions."
+    },
+    {
+      "writeup_section": 13,
+      "source_family": "peakingduck",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/peakingduck/reference/spectrum0.csv",
+        "testing/peakingduck/examples/py/snip.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::peaks",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::RoiToolsPanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/peakingduck_snip_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_analysis_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "SNIP and process-chain peak candidate parity family."
+    },
+    {
+      "writeup_section": 14,
+      "source_family": "py-findpeaks",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/py-findpeaks/tests/vector.py",
+        "testing/py-findpeaks/tests/scipy_signal_find_peaks.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::peaks",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/py_findpeaks_algorithm_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Algorithm benchmark parity family for peak and valley indices."
+    },
+    {
+      "writeup_section": 15,
+      "source_family": "PyGammaSpec",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/PyGammaSpec/docs/utils/calibration.txt",
+        "testing/PyGammaSpec/src/pygammaspec/data/gamma_data.csv"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py",
+        "src/fluxforge/core/activity_review.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::peaks",
+        "src/fluxforge/cli/app.py::activity-review"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::PeakTablePanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/pygammaspec_bundle_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Calibration/background/fit and daughter-overlay parity family."
+    },
+    {
+      "writeup_section": 16,
+      "source_family": "pyunfold",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/pyunfold/pyunfold/tests/test_data/example1_python3.hdf",
+        "testing/pyunfold/docs/source/notebooks/regularization.ipynb"
+      ],
+      "backend_paths": [
+        "src/fluxforge/unfolding/",
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::unfold",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/pyunfold_covariance_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_unfolding_reference_parity.py"
+      ],
+      "probe_paths": [
+        "tests/gui_unfolding_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Covariance-aware iterative unfolding parity family."
+    },
+    {
+      "writeup_section": 17,
+      "source_family": "radioactivedecay",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/radioactivedecay/tests/test_inventory.py",
+        "testing/radioactivedecay/tests/test_fileio.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/inventory_timeline.py",
+        "src/fluxforge/physics/decay_chain.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::inventory-review",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::InventoryTimelinePanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/activation_inventory/fixtures/radioactivedecay_inventory_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_inventory_timeline.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Inventory and daughter logic parity family."
+    },
+    {
+      "writeup_section": 18,
+      "source_family": "SpecKit",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/SpecKit/Example/Au-197_Au-198.txt",
+        "testing/SpecKit/benchmark/double_peak/"
+      ],
+      "backend_paths": [
+        "src/fluxforge/unfolding/",
+        "src/fluxforge/workflows/spectrum_unfolding.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::unfold",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/speckit_benchmark_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_unfolding_reference_parity.py"
+      ],
+      "probe_paths": [
+        "tests/gui_unfolding_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Response-matrix benchmark and uncertainty-band parity family."
+    },
+    {
+      "writeup_section": 19,
+      "source_family": "GSA-v4",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/GSA-v4/Spectrum/",
+        "testing/GSA-v4/ROI_Statistic/"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py",
+        "src/fluxforge/core/activity_review.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::batch-compare",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::RoiToolsPanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/gsa_v4_roi_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Desktop behavior and multi-spectrum ROI parity family."
+    },
+    {
+      "writeup_section": 20,
+      "source_family": "InterSpec",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/InterSpec/example_spectra/",
+        "testing/InterSpec/target/testing/analysis_tests/"
+      ],
+      "backend_paths": [
+        "src/fluxforge/io/n42.py",
+        "src/fluxforge/core/activity_review.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::file-query",
+        "src/fluxforge/cli/app.py::batch-compare"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/interspec_workflow_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_analysis_workspace_probe.py",
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Role-aware N42/activity/calculator/archive parity family."
+    },
+    {
+      "writeup_section": 21,
+      "source_family": "KayWinV410",
+      "replay_state": "adapter-required",
+      "data_class": "binary/workspace-derived",
+      "source_paths": [
+        "testing/KayWinV410/KayWinV4/Calibration CA6C final/",
+        "testing/KayWinV410/order/results/PT2020.RES"
+      ],
+      "backend_paths": [
+        "src/fluxforge/standards/k0.py",
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::k0-normalize",
+        "src/fluxforge/cli/app.py::k0-aggregate"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::ActivityResultsPanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/activation_inventory/fixtures/kaywin_adapter_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "k0 workspace/model parity tracked as adapter-required."
+    },
+    {
+      "writeup_section": 22,
+      "source_family": "NASA-gamma",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/NASA-gamma/examples/data/",
+        "testing/NASA-gamma/test_folder_diag/"
+      ],
+      "backend_paths": [
+        "src/fluxforge/io/reader_factory.py",
+        "src/fluxforge/core/analysis_workspace.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::peaks",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/nasa_gamma_parser_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Multi-format parser/calibration/fit diagnostics parity family."
+    },
+    {
+      "writeup_section": 23,
+      "source_family": "prospect_trial_installation",
+      "replay_state": "reference-only",
+      "data_class": "docs-only / implied",
+      "source_paths": [
+        "testing/prospect_trial_installation/ProSpect User's Manual.pdf",
+        "testing/prospect_trial_installation/readme first.txt"
+      ],
+      "backend_paths": [
+        "src/fluxforge/validation/reference_parity.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::phase5-crosswalk-report"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/prospect_reference_only_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Commercial workflow reference tracked without numeric replay."
+    },
+    {
+      "writeup_section": 24,
+      "source_family": "GSA-v2",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/GSA-v2/GSA.v2/example/",
+        "testing/GSA-v2/src/PeakSearch.java"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::peaks",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::PeakTablePanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/gsa_v2_algorithm_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Source-visible parser/peak/overlap and ID/activity parity family."
+    },
+    {
+      "writeup_section": 25,
+      "source_family": "activation",
+      "replay_state": "adapter-required",
+      "data_class": "docs-only / implied",
+      "source_paths": [
+        "testing/activation/cgi-bin/nact.py",
+        "testing/activation/endf/endf.py"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/activity_review.py",
+        "src/fluxforge/workflows/irradiation_optimization.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::activity-review",
+        "src/fluxforge/cli/app.py::inventory-review"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/phase6.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/activation_inventory/fixtures/activation_adapter_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Activation request-schema parity tracked with adapter status."
+    },
+    {
+      "writeup_section": 26,
+      "source_family": "gammaspectroscopy",
+      "replay_state": "replay-now",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/gammaspectroscopy/databasegamma.txt",
+        "testing/gammaspectroscopy/notebooks/"
+      ],
+      "backend_paths": [
+        "src/fluxforge/core/analysis_workspace.py",
+        "src/fluxforge/core/activity_review.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::peaks",
+        "src/fluxforge/cli/app.py::activity-review"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/spectra/reference_parity/cases/gammaspectroscopy_batch_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "Large measured corpus replay parity family."
+    },
+    {
+      "writeup_section": 27,
+      "source_family": "INAA-INRIM 3.1",
+      "replay_state": "adapter-required",
+      "data_class": "bundled locally",
+      "source_paths": [
+        "testing/INAA-INRIM 3.1/data/k0data/from_k0data.k0d",
+        "testing/INAA-INRIM 3.1/data/nuclear_data/nndc_nudat_data_export.nds"
+      ],
+      "backend_paths": [
+        "src/fluxforge/standards/k0.py",
+        "src/fluxforge/core/inventory_timeline.py"
+      ],
+      "cli_paths": [
+        "src/fluxforge/cli/app.py::k0-normalize",
+        "src/fluxforge/cli/app.py::parity-check"
+      ],
+      "gui_paths": [
+        "src/fluxforge/gui/panels/modern_shell.py::ActivityResultsPanel",
+        "src/fluxforge/gui/panels/phase5.py::Phase5ParityPanel"
+      ],
+      "fixture_paths": [
+        "tests/activation_inventory/fixtures/inaa_inrim_adapter_case/manifest.json"
+      ],
+      "test_paths": [
+        "tests/test_phase5_crosswalk.py"
+      ],
+      "probe_paths": [
+        "tests/gui_phase5_parity_probe.py"
+      ],
+      "notes": "k0 correction-chain parity tracked as adapter-required."
+    }
+  ]
+}

@@ -1,9 +1,10 @@
 # FluxForge Roadmap Execution Status
 
-**Date:** 2026-04-17  
+**Date:** 2026-04-19  
 **Controlling roadmap document:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md`  
 **Companion GUI document:** `docs/GUI_PLAN.md`  
 **Companion testing document:** `docs/FluxForge_Testing_Master.md`  
+**Companion Phase 5 planning section:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` section `10`  
 **Machine-readable tracker:** `.github/project-management/implementation_steps.json`
 
 ## Stepwise Execution Rule
@@ -23,6 +24,7 @@ officially in progress.
 |---|---|---|---|
 | 3.18 | `next` | `in-progress` | Identification / activity / reference parity is now in progress. The repo now includes bundled GSA-v4 edited plus natural libraries; NASA-gamma common-lab, natural, CapGam, IAEA capture, delayed-activation, Baghdad inelastic, and TALYS 14 MeV reference libraries; ENDF/B-VIII supplement; ICRP-107 plus Kayzero registrations; GUI/CLI user-library registration with reserved bundled names; and activity-review plus inventory views with uncertainty-bearing decay/Bateman outputs and GUI activity-unit selectors. |
 | 4.1 | `pending` | `not-started` | HAL driver work remains on the roadmap, but it is formally deferred until the new Phase 3B offline-parity module closes. |
+| 5.1 | `pending` | `in-progress` | testing-catalog crosswalk closure is now active with a machine-readable tracker at `.github/project-management/phase5_crosswalk.json`, backend reporting helpers in `src/fluxforge/validation/phase5_crosswalk.py`, a CLI report command `phase5-crosswalk-report`, and a new modern-shell `Phase 5 Parity` tab for crosswalk + parity review. |
 
 ## Additive Roadmap Overlays
 
@@ -61,6 +63,19 @@ following overlays were adopted additively and do not replace that map.
   while keeping the intentional carve-outs for QuantumGold parity, PeakEasy
   parity, governed standards workflows such as ASTM and k0-NAA, and RAFM
   irradiation-analysis paths.
+
+### Phase 5 testing-catalog closure overlay
+
+- The consolidated master now includes explicit Phase 5 closure steps (`5.1`
+  through `5.6`) that operationalize the audited `testing/writeup.md` catalog.
+- Phase 5 execution uses the same lifecycle discipline as active Phase 3 work:
+  backend -> CLI -> modern Qt GUI -> tests -> native probes -> browser-lane
+  review -> manual GUI sizing -> doc synchronization.
+- Every Phase 5 capability slice must include source-linked replay evidence,
+  data-class labels, provenance labels, and explicit replay-state declarations
+  (`replay-now`, `adapter-required`, `reference-only`).
+- The `testing/writeup.md` section `0.7` evidence and traceability methodology
+  is now a required planning and implementation contract, not optional guidance.
 
 ## Completed In Sequence
 
@@ -160,6 +175,12 @@ following overlays were adopted additively and do not replace that map.
 | 4.2 | `pending` | `not-started` | Implement device discovery and thumbnail/device-list surfaces once HAL transport exists. |
 | 4.3 | `pending` | `not-started` | Implement the live Digital Twin dashboard after HAL transport and device telemetry exist. |
 | 4.4 | `pending` | `not-started` | Implement the live spectrogram panel after time-energy acquisition lands. |
+| 5.1 | `pending` | `in-progress` | Build and maintain the full `testing/writeup.md` crosswalk in implementation trackers with source scripts/data anchors and replay-state labeling for all audited repos. Initial implementation now includes `.github/project-management/phase5_crosswalk.json`, report helpers in `src/fluxforge/validation/phase5_crosswalk.py`, CLI command `phase5-crosswalk-report`, shell integration via `src/fluxforge/gui/panels/phase5.py`, and coverage in `tests/test_phase5_crosswalk.py`, `tests/test_cli_app.py`, and `tests/test_modern_gui_shell.py`. |
+| 5.2 | `pending` | `not-started` | Close parser/calibration/background/peak-search/fit parity bundles for the audited spectrum-analysis source families with source-linked fixtures and algorithm/workflow checks. |
+| 5.3 | `pending` | `not-started` | Close GUI/workflow behavior parity bundles (plot-controller actions, role-aware overlays, ROI tools, detection-limit/shielding/archive workspaces, saved analyst context) with Qt tests and probe evidence. |
+| 5.4 | `pending` | `not-started` | Close inventory/NAA/activation/k0 parity bundles with uncertainty-bearing outputs and provenance-complete artifact contracts. |
+| 5.5 | `pending` | `not-started` | Close unfolding/covariance/inverse-analysis parity bundles with explicit tolerances, controlled-divergence rationale, and workflow-level parity suites. |
+| 5.6 | `pending` | `not-started` | Enforce the Phase 5 release gate requiring backend+CLI+GUI completion, fixture/traceability manifests, native and browser-lane GUI evidence, manual sizing validation, and synchronized status docs. |
 
 ## GUI Direction
 
@@ -178,7 +199,7 @@ following overlays were adopted additively and do not replace that map.
   registries, GUI scaffolding, and mock HAL device.
 - `pytest` was upgraded in the user environment to `8.4.2`.
 - The TensorFlow-specific tests were run explicitly in this round, and the only remaining skips are the CUDA library checks that are correct for this CPU-only workspace.
-- The full suite now passes in this workspace: `1279 passed, 2 skipped`.
+- The full suite now passes in this workspace: `1286 passed, 2 skipped`.
 - Latest continuation verification (2026-04-17) also passed:
   `10 passed, 67 deselected` for the parity/fixture/CLI slice,
   `49 passed` for targeted Qt workflow tests,
@@ -207,6 +228,79 @@ following overlays were adopted additively and do not replace that map.
   on 2026-04-17 via `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py`
   with `14 passed`, covering built-in/user preset persistence plus active-workflow
   restore across GUI sessions.
+- Cleanup-wave verification was refreshed on 2026-04-19:
+  `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py`
+  with `22 passed`, plus
+  `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "modern_shell_reuses_shared_demo_and_selection_helpers"`
+  with `1 passed, 14 deselected`.
+- CI cleanup governance was extended on 2026-04-19 with changed-file quality
+  gating in `.github/workflows/quality-checks.yml`:
+  pull-request triggers, diff-based changed-file discovery for non-data Python
+  files under `src/fluxforge` and `tests`, and a changed-file import-order gate
+  using `ruff check --select I`.
+- During rollout, a tooling conflict was observed on the large import block in
+  `src/fluxforge/gui/panels/modern_shell.py` (Ruff import ordering vs isort).
+  The changed-file gate now uses Ruff import checks as the single source of truth,
+  while isort remains enforced on the stable optimization cleanup scope.
+- Post-rollout regression slice passed:
+  `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py tests/test_modern_gui_shell.py -k "modern_shell_reuses_shared_demo_and_selection_helpers or test_"`
+  with `37 passed`.
+- Phase 5.1 crosswalk/parity regression was validated on 2026-04-19 with:
+  `PYTHONPATH=src pytest -q tests/test_phase5_crosswalk.py tests/test_cli_app.py -k "phase5 or crosswalk"`
+  (`4 passed, 78 deselected`) and
+  `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions"`
+  (`1 passed, 14 deselected`).
+- Phase 5.1 native GUI evidence was generated with:
+  `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
+  producing `artifacts/gui_review/phase5_parity/index.html` plus three screenshots and `phase5_probe_report.json`.
+- Phase 5.1 browser-lane review was validated with:
+  `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
+  (`1 audited page, 0 failing`).
+- The optimization planning set now explicitly includes a required
+  `RAFM-G LDRD Second-Irradiation Decision Repository Workflow` in
+  `docs/optimization_of_irradiation/irradiation_optimization_master_plan.md`,
+  including:
+  - data roots for `examples/RAFM_irradiation` and `../rafm_irradiation_ldrd`,
+  - mandatory objective windows (`24 h -> 2 weeks` plus long-horizon endpoints),
+  - isotope-of-interest workflow integration, and
+  - methodology-ordered lifecycle gates (backend -> CLI -> Qt -> tests/probes/docs).
+- Targeted regression checks after this planning update:
+  `PYTHONPATH=src pytest -q tests/test_optimization_common.py tests/test_optimization_difom.py tests/test_optimization_fim.py tests/test_optimization_mwdcs.py tests/test_optimization_bassd.py tests/test_optimization_stbdmr.py`
+  with `22 passed`, plus
+  `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "optimization_sweep_builds_candidates_from_activity_review or phase6_ldrd_worked_example"`
+  with `3 passed, 73 deselected`.
+- RAFM second-irradiation decision-repository baseline implementation is now live:
+  - workflow module: `src/fluxforge/workflows/phase6_ldrd_second_irradiation_decision_repo.py`
+  - CLI command: `phase6-ldrd-second-irradiation-repo`
+  - report graphics now generated and embedded for schedule, isotope-priority, and cooldown-contribution review:
+    - `graphics/schedule_overview.png`
+    - `graphics/isotope_priority_mid_long.png`
+    - `graphics/cooldown_contributors_heatmap.png`
+  - workflow graphics test: `PYTHONPATH=src pytest -q tests/test_phase6_ldrd_second_irradiation_decision_repo.py` with `1 passed`
+  - parser/command tests: `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "phase6_ldrd_second_irradiation_repo or phase6_ldrd_worked_example"` with `4 passed, 74 deselected`
+  - end-to-end command dry run generated all planned decision artifacts plus graphics at `/tmp/phase6_ldrd_second_repo_validation_graphics`.
+- Full browser-lane gallery audit now runs across every generated review page:
+  - audit runner: `tests/gui_gallery_playwright_audit.js`
+  - scope: all `artifacts/gui_review/**/index.html` pages (21 total)
+  - issue found: gallery responsiveness gap (no explicit small-screen media-query rules on 20 pages; `current_linux/review_gallery/index.html` also lacked viewport metadata)
+  - implemented fixes:
+    - added responsive media-query rules to probe gallery templates in
+      `tests/gui_analysis_workspace_probe.py`,
+      `tests/gui_calibration_workspace_probe.py`,
+      `tests/gui_phase6_optimization_probe.py`,
+      `tests/gui_module3_workflows_probe.py`,
+      `tests/gui_predictive_dashboard_probe.py`, and
+      `tests/gui_unfolding_workspace_probe.py`
+    - patched existing generated gallery pages under `artifacts/gui_review/` with viewport metadata and responsive media-query styling
+  - verification: Playwright rerun reports `21 audited, 0 failing`
+  - persisted evidence: `artifacts/gui_review/playwright_audit/audit_report.json` and `artifacts/gui_review/playwright_audit/audit_report.md`.
+- GUI coverage ledger now exists to track every tested GUI surface and remaining expansion targets:
+  - `docs/GUI_TEST_COVERAGE_LEDGER.md`
+  - latest GUI regression refresh in this round:
+    - added direct dialog tests in `tests/test_gui_dialogs_qt.py` for `QAHistoryDialog`, `ReportExportDialog`, `StandardsReviewDialog`, and `PuIsotopicsDialog`
+    - `PYTHONPATH=src pytest -q tests/test_gui_dialogs_qt.py tests/test_gui_widgets_qt.py tests/test_analysis_workspace_qt.py tests/test_calibration_workspace_qt.py tests/test_module3_workflows_qt.py tests/test_predictive_dashboard_qt.py tests/test_unfolding_workspace_qt.py tests/test_modern_gui_shell.py` -> `91 passed, 9 warnings`
+    - refreshed probe galleries under `artifacts/gui_review/*`
+    - Playwright audit rerun -> `21 audited, 0 failing`.
 - The redesigned Qt GUI was verified beyond unit tests in this round:
   mouse-driven peak picking in the calibration canvas, governed data-library
   selectors in the sidebar, library-assisted calibration-line assignment, and

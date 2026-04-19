@@ -164,7 +164,13 @@ from fluxforge.physics.activation import (
 from fluxforge.solvers.gls import gls_adjust
 from fluxforge.solvers.iterative import gravel, mlem
 from fluxforge.unfolding import GravelUnfolder, MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
-from fluxforge.validation import run_reference_parity_suite, spectrum_comparison_metrics
+from fluxforge.validation import (
+    load_phase5_crosswalk,
+    render_phase5_crosswalk_markdown,
+    run_reference_parity_suite,
+    spectrum_comparison_metrics,
+    summarize_phase5_crosswalk,
+)
 from fluxforge.plugins import PluginRegistries
 from fluxforge.workflows.irradiation_optimization import (
     build_phase6_support_artifacts,
@@ -176,6 +182,10 @@ from fluxforge.workflows.phase6_ldrd_worked_example import (
     DEFAULT_SAMPLE_ID as PHASE6_LDRD_DEFAULT_SAMPLE_ID,
     default_output_root as phase6_ldrd_default_output_root,
     run_phase6_ldrd_worked_example,
+)
+from fluxforge.workflows.phase6_ldrd_second_irradiation_decision_repo import (
+    default_output_root as phase6_ldrd_second_irradiation_repo_default_output_root,
+    run_phase6_ldrd_second_irradiation_decision_repo,
 )
 
 
@@ -2390,6 +2400,68 @@ def cmd_parity_check(args: argparse.Namespace) -> None:
     print(f"Wrote parity report to {output}")
 
 
+def cmd_phase5_crosswalk_report(args: argparse.Namespace) -> None:
+    crosswalk_path = Path(
+        getattr(
+            args,
+            "crosswalk",
+            Path(".github/project-management/phase5_crosswalk.json"),
+        )
+    )
+    output = Path(
+        getattr(args, "output", Path("phase5_crosswalk_report.json"))
+    )
+    markdown_output = Path(
+        getattr(args, "markdown_output", Path("phase5_crosswalk_report.md"))
+    )
+
+    payload = load_phase5_crosswalk(crosswalk_path)
+    summary = summarize_phase5_crosswalk(payload, workspace_root=Path.cwd())
+    report: Dict[str, Any] = {
+        "schema": "fluxforge.phase5.crosswalk.report.v1",
+        "generated_at": datetime.now(timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
+        "crosswalk_path": str(crosswalk_path),
+        "summary": summary,
+    }
+
+    if bool(getattr(args, "include_parity_summary", False)):
+        reference_root = Path(
+            getattr(args, "reference_root", Path("tests/spectra/reference_parity"))
+        )
+        activation_root = Path(
+            getattr(args, "activation_root", Path("tests/activation_inventory/fixtures"))
+        )
+        parity_payload = run_reference_parity_suite(
+            reference_root=reference_root,
+            activation_root=activation_root,
+            scope="all",
+            include_activation=True,
+        )
+        report["parity_summary"] = parity_payload.get("summary") or {}
+
+    _ensure_parent_dir(output)
+    output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    _ensure_parent_dir(markdown_output)
+    markdown_output.write_text(
+        render_phase5_crosswalk_markdown(payload, summary),
+        encoding="utf-8",
+    )
+
+    replay_summary = summary.get("by_replay_state") or {}
+    print(
+        "Phase 5 crosswalk report complete: "
+        f"{summary.get('total_entries', 0)} entries; "
+        f"replay-now={replay_summary.get('replay-now', 0)}, "
+        f"adapter-required={replay_summary.get('adapter-required', 0)}, "
+        f"reference-only={replay_summary.get('reference-only', 0)}"
+    )
+    print(f"Wrote crosswalk report to {output}")
+    print(f"Wrote markdown report to {markdown_output}")
+
+
 def cmd_gui_acceptance_checklist(args: argparse.Namespace) -> None:
     checklist = Path(
         getattr(
@@ -3548,6 +3620,29 @@ def cmd_phase6_ldrd_worked_example(args: argparse.Namespace) -> None:
     )
     print(f"Wrote Phase 6 LDRD worked example artifacts to {output_root}")
     print(f"Summary: {summary_path}")
+
+
+def cmd_phase6_ldrd_second_irradiation_repo(args: argparse.Namespace) -> None:
+    sample_id = str(
+        getattr(args, "sample_id", PHASE6_LDRD_DEFAULT_SAMPLE_ID)
+        or PHASE6_LDRD_DEFAULT_SAMPLE_ID
+    )
+    output_root = Path(
+        getattr(args, "output_root", None)
+        or phase6_ldrd_second_irradiation_repo_default_output_root(sample_id)
+    )
+    top_n = max(int(getattr(args, "top_n", 8) or 8), 1)
+    outputs = run_phase6_ldrd_second_irradiation_decision_repo(
+        sample_id=sample_id,
+        output_root=output_root,
+        top_n=top_n,
+    )
+    print(f"Wrote RAFM second-irradiation decision repository to {output_root}")
+    print(f"Report: {outputs['report']}")
+    for key in ("graphic_schedule", "graphic_isotopes", "graphic_cooldown"):
+        graphic = outputs.get(key)
+        if graphic is not None:
+            print(f"Graphic ({key}): {graphic}")
 
 
 def cmd_response(args: argparse.Namespace) -> None:
@@ -6054,6 +6149,48 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parity_check.set_defaults(func=cmd_parity_check)
 
+    phase5_crosswalk_report = subparsers.add_parser(
+        "phase5-crosswalk-report",
+        help=(
+            "Validate and summarize the machine-readable Phase 5 writeup crosswalk "
+            "tracker"
+        ),
+    )
+    phase5_crosswalk_report.add_argument(
+        "--crosswalk",
+        type=Path,
+        default=Path(".github/project-management/phase5_crosswalk.json"),
+        help="Path to the Phase 5 crosswalk tracker JSON file",
+    )
+    phase5_crosswalk_report.add_argument(
+        "--include-parity-summary",
+        action="store_true",
+        help="Include reference parity suite summary in the generated report",
+    )
+    phase5_crosswalk_report.add_argument(
+        "--reference-root",
+        type=Path,
+        default=Path("tests/spectra/reference_parity"),
+        help="Reference parity fixture root used when --include-parity-summary is set",
+    )
+    phase5_crosswalk_report.add_argument(
+        "--activation-root",
+        type=Path,
+        default=Path("tests/activation_inventory/fixtures"),
+        help="Activation fixture root used when --include-parity-summary is set",
+    )
+    phase5_crosswalk_report.add_argument(
+        "--output",
+        type=Path,
+        default=Path("phase5_crosswalk_report.json"),
+    )
+    phase5_crosswalk_report.add_argument(
+        "--markdown-output",
+        type=Path,
+        default=Path("phase5_crosswalk_report.md"),
+    )
+    phase5_crosswalk_report.set_defaults(func=cmd_phase5_crosswalk_report)
+
     gui_acceptance_check = subparsers.add_parser(
         "gui-acceptance-check",
         help="Validate 3.27 GUI release-checklist and probe artifact readiness",
@@ -6687,6 +6824,30 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional output directory for worked-example artifacts",
     )
     phase6_ldrd_example.set_defaults(func=cmd_phase6_ldrd_worked_example)
+
+    phase6_ldrd_second_repo = subparsers.add_parser(
+        "phase6-ldrd-second-irradiation-repo",
+        help="Build a reproducible RAFM LDRD second-irradiation decision repository bundle",
+    )
+    phase6_ldrd_second_repo.add_argument(
+        "--sample-id",
+        type=str,
+        default=PHASE6_LDRD_DEFAULT_SAMPLE_ID,
+        help="Anchor sample ID used to generate/reuse Phase 6 worked-example artifacts",
+    )
+    phase6_ldrd_second_repo.add_argument(
+        "--output-root",
+        type=Path,
+        default=None,
+        help="Optional output directory for decision-repository artifacts",
+    )
+    phase6_ldrd_second_repo.add_argument(
+        "--top-n",
+        type=int,
+        default=8,
+        help="Number of top data-driven isotopes to keep before appending literature seed isotopes",
+    )
+    phase6_ldrd_second_repo.set_defaults(func=cmd_phase6_ldrd_second_irradiation_repo)
 
     response = subparsers.add_parser(
         "response", help="Build response matrix from cross sections"
