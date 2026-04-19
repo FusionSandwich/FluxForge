@@ -91,7 +91,7 @@ the offline-parity module closes.
 | 5.1 | testing/ catalog crosswalk closure | In Progress (repo) | Build and maintain a complete crosswalk from every `testing/writeup.md` repo section to FluxForge backend, CLI, modern Qt GUI, fixtures, parity tests, and probe evidence; include exact source script/data paths and replay classification (`replay-now`, `adapter-required`, `reference-only`). Initial implementation baseline now includes `.github/project-management/phase5_crosswalk.json`, backend report helpers in `src/fluxforge/validation/phase5_crosswalk.py`, CLI command `phase5-crosswalk-report`, and a modern-shell `Phase 5 Parity` tab in `src/fluxforge/gui/panels/phase5.py`. |
 | 5.2 | Spectrum IO and analysis parity closure | In Progress (repo) | Close parser/calibration/background/peak-search/fit parity against `actigamma`, `becquerel`, `curie`, `gamma_spec_analysis`, `NASA-gamma`, `GSA-v2`, `GSA-v4`, `InterSpec`, `PyGammaSpec`, `peakingduck`, and `py-findpeaks`, with source-linked fixtures and algorithm/workflow golden checks. Initial executable bundle now lands `spectrum-io-normalization`, `background-subtraction`, and `peak-fit-roi` parity workflows plus source-linked manifests under `tests/spectra/reference_parity/cases/`. |
 | 5.3 | GUI and workflow parity closure | In Progress (repo) | Close direct-manipulation and analyst-workflow parity (role-aware overlays, marker editing, ROI/statistics, detection-limit, shielding/source-fit, archive/file-query, multi-spectrum diagnostics, saved context, and report/export parity) using `InterSpec`, `GSA-v4`, `Gamma-MCA`, `hdtv`, `SpecKit`, and `NASA-gamma` behavior baselines. Initial executable baseline now includes `overlay-role-workflow` and `roi-statistics-workflow` fixture bundles and modern-shell workflow execution coverage. |
-| 5.4 | Inventory, NAA, and activation parity closure | Planned | Close activity/inventory/time-evolution/k0/INAA/activation parity against `irrad_spectroscopy`, `radioactivedecay`, `activation`, `KayWinV410`, `INAA-INRIM 3.1`, `NAA-ANN-1`, and `npat`; include uncertainty-bearing exports and provenance-complete bundle outputs |
+| 5.4 | Inventory, NAA, and activation parity closure | In Progress (repo) | Close activity/inventory/time-evolution/k0/INAA/activation parity against `irrad_spectroscopy`, `radioactivedecay`, `activation`, `KayWinV410`, `INAA-INRIM 3.1`, `NAA-ANN-1`, and `npat`; include uncertainty-bearing exports and provenance-complete bundle outputs. Initial executable baseline now includes source-linked activation fixtures for `irrad_spectroscopy`, `npat`, and `radioactivedecay`. |
 | 5.5 | Inverse and covariance parity closure | Planned | Close unfolding and covariance-aware inverse-analysis parity against `Neutron-Unfolding`, `Neutron-Spectrometry`, `pyunfold`, `gmapy`, and `SpecKit`; include algorithm-level and workflow-level parity fixtures with explicit tolerances and divergence rationale |
 | 5.6 | Phase 5 acceptance and release gate | Planned | Require backend+CLI+GUI completion, source-linked fixture manifests, targeted and full-suite test pass, native Qt probes, browser-lane artifact review, manual GUI sizing check, and synchronized status docs before any Phase 5 step is marked complete |
 
@@ -518,6 +518,26 @@ The first GUI/workflow parity bundle for `5.3` is now landed in-repo:
   workflow fixtures for `Gamma-MCA`, `hdtv`, `GSA-v4`, and `InterSpec`.
 - Modern-shell parity execution coverage now includes workflow fixture execution
   in `tests/test_modern_gui_shell.py` and refreshed probe evidence via
+  `tests/gui_phase5_parity_probe.py` plus
+  `artifacts/gui_review/phase5_parity/`.
+
+### 10.15 Current Phase 5.4 Baseline (2026-04-19)
+
+The first inventory/NAA/activation parity bundle for `5.4` is now landed
+in-repo:
+
+- Source-linked activation fixture manifests and expected outputs added under:
+  - `tests/activation_inventory/fixtures/irrad_spectroscopy_activity_case/`
+  - `tests/activation_inventory/fixtures/npat_activation_case/`
+  - `tests/activation_inventory/fixtures/radioactivedecay_inventory_case/`
+- These fixtures execute through the existing activation parity workflows in
+  `src/fluxforge/validation/reference_parity.py` (`pure_decay_bateman`) and
+  produce validated `inventory_timeseries_expected.csv` and
+  `dominant_contributors_expected.csv` artifacts.
+- Crosswalk anchors now point `irrad_spectroscopy` to the executable activation
+  fixture path in `.github/project-management/phase5_crosswalk.json`.
+- Modern-shell parity panel coverage now includes activation fixture execution
+  in `tests/test_modern_gui_shell.py`, and refreshed GUI evidence in
   `tests/gui_phase5_parity_probe.py` plus
   `artifacts/gui_review/phase5_parity/`.
 

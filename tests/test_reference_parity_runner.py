@@ -21,7 +21,7 @@ def test_reference_parity_suite_runs_all_fixture_families() -> None:
     )
 
     assert payload["schema"] == "fluxforge.reference_parity.run.v1"
-    assert payload["summary"]["total"] >= 10
+    assert payload["summary"]["total"] >= 13
     assert payload["summary"]["failed"] == 0
 
 
@@ -85,6 +85,57 @@ def test_reference_parity_suite_runs_phase5_roi_statistics_workflow_bundle() -> 
     result = payload["results"][0]
     assert result["fixture_id"] == "roi_statistics_workflow_case"
     assert "roi_statistics_expected.json" in result["compared_outputs"]
+
+
+def test_reference_parity_suite_runs_phase5_radioactivedecay_inventory_bundle() -> None:
+    payload = run_reference_parity_suite(
+        reference_root=REFERENCE_ROOT,
+        activation_root=ACTIVATION_ROOT,
+        scope="workflow",
+        fixture_id="radioactivedecay_inventory_case",
+        include_activation=True,
+    )
+
+    assert payload["summary"]["total"] == 1
+    assert payload["summary"]["failed"] == 0
+    result = payload["results"][0]
+    assert result["fixture_id"] == "radioactivedecay_inventory_case"
+    assert "inventory_timeseries_expected.csv" in result["compared_outputs"]
+    assert "dominant_contributors_expected.csv" in result["compared_outputs"]
+
+
+def test_reference_parity_suite_runs_phase5_npat_activation_bundle() -> None:
+    payload = run_reference_parity_suite(
+        reference_root=REFERENCE_ROOT,
+        activation_root=ACTIVATION_ROOT,
+        scope="workflow",
+        fixture_id="npat_activation_case",
+        include_activation=True,
+    )
+
+    assert payload["summary"]["total"] == 1
+    assert payload["summary"]["failed"] == 0
+    result = payload["results"][0]
+    assert result["fixture_id"] == "npat_activation_case"
+    assert "inventory_timeseries_expected.csv" in result["compared_outputs"]
+    assert "dominant_contributors_expected.csv" in result["compared_outputs"]
+
+
+def test_reference_parity_suite_runs_phase5_irrad_spectroscopy_activation_bundle() -> None:
+    payload = run_reference_parity_suite(
+        reference_root=REFERENCE_ROOT,
+        activation_root=ACTIVATION_ROOT,
+        scope="workflow",
+        fixture_id="irrad_spectroscopy_activity_case",
+        include_activation=True,
+    )
+
+    assert payload["summary"]["total"] == 1
+    assert payload["summary"]["failed"] == 0
+    result = payload["results"][0]
+    assert result["fixture_id"] == "irrad_spectroscopy_activity_case"
+    assert "inventory_timeseries_expected.csv" in result["compared_outputs"]
+    assert "dominant_contributors_expected.csv" in result["compared_outputs"]
 
 
 def test_reference_parity_suite_rejects_invalid_scope() -> None:

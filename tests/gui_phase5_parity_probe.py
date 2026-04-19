@@ -192,7 +192,7 @@ def main(argv: list[str] | None = None) -> int:
     if parity_scope_index >= 0:
         panel.parity_scope_combo.setCurrentIndex(parity_scope_index)
         app.processEvents()
-    panel.fixture_filter_edit.setText("roi_statistics_workflow_case")
+    panel.fixture_filter_edit.setText("radioactivedecay_inventory_case")
     app.processEvents()
     capture("03-workflow-fixture-filter")
 

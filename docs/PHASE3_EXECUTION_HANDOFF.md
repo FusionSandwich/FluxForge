@@ -804,3 +804,25 @@ Current Phase 5.3 baseline status (2026-04-19):
 	`PYTHONPATH=src python -m fluxforge.cli.app phase5-crosswalk-report --include-parity-summary --output /tmp/phase5_crosswalk_report_phase53.json --markdown-output /tmp/phase5_crosswalk_report_phase53.md`,
 	`PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`, and
 	`node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`.
+
+Current Phase 5.4 baseline status (2026-04-19):
+- New executable activation/inventory fixtures now exist under:
+	`tests/activation_inventory/fixtures/irrad_spectroscopy_activity_case/`,
+	`tests/activation_inventory/fixtures/npat_activation_case/`, and
+	`tests/activation_inventory/fixtures/radioactivedecay_inventory_case/`.
+- Each fixture is source-linked and executes through the activation parity
+	workflow (`pure_decay_bateman`) in
+	`src/fluxforge/validation/reference_parity.py` with expected artifacts:
+	`inventory_timeseries_expected.csv` and
+	`dominant_contributors_expected.csv`.
+- Crosswalk mapping for `irrad_spectroscopy` now points to the executable
+	activation fixture path in `.github/project-management/phase5_crosswalk.json`.
+- Modern-shell Phase 5 panel coverage now includes activation fixture execution
+	via `tests/test_modern_gui_shell.py`.
+- Verification commands for this slice were:
+	`PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py tests/test_phase5_crosswalk.py tests/test_modern_gui_shell.py -k "phase5 or parity or manifest or main_window_restores_saved_workflow_state_across_sessions or phase5_parity_panel_runs_workflow_fixture_bundle or phase5_parity_panel_runs_activation_inventory_fixture_bundle"`,
+	`PYTHONPATH=src pytest -q tests/test_cli_app.py -k "parity_check or phase5_crosswalk_report"`,
+	`PYTHONPATH=src python -m fluxforge.cli.app parity-check --scope workflow --fixture-id radioactivedecay_inventory_case --output /tmp/phase5_4_parity_check.json`,
+	`PYTHONPATH=src python -m fluxforge.cli.app phase5-crosswalk-report --include-parity-summary --output /tmp/phase5_crosswalk_report_phase54.json --markdown-output /tmp/phase5_crosswalk_report_phase54.md`,
+	`PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`, and
+	`node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`.

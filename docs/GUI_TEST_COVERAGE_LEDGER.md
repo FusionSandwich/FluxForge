@@ -19,11 +19,10 @@ Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence 
     - `artifacts/gui_review/playwright_audit/audit_report.md`
 - Phase 5 parity panel targeted validation:
   - Commands:
-    - `PYTHONPATH=src pytest -q tests/test_modern_gui_shell.py -k "main_window_restores_saved_workflow_state_across_sessions or phase5_parity_panel_runs_workflow_fixture_bundle"`
-    - `PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py -k "phase5_overlay_role_workflow_bundle or phase5_roi_statistics_workflow_bundle"`
+    - `PYTHONPATH=src pytest -q tests/test_reference_parity_runner.py tests/test_parity_fixture_manifests.py tests/test_parity_phase3_scaffolding.py tests/test_phase5_crosswalk.py tests/test_modern_gui_shell.py -k "phase5 or parity or manifest or main_window_restores_saved_workflow_state_across_sessions or phase5_parity_panel_runs_workflow_fixture_bundle or phase5_parity_panel_runs_activation_inventory_fixture_bundle"`
     - `PYTHONPATH=src /usr/bin/python tests/gui_phase5_parity_probe.py artifacts/gui_review/phase5_parity`
     - `node tests/gui_gallery_playwright_audit.js artifacts/gui_review/phase5_parity artifacts/gui_review/phase5_parity/playwright_audit`
-  - Results: `2 passed, 14 deselected` (modern-shell Phase 5 checks), `2 passed, 4 deselected` (new workflow parity fixtures), native probe gallery generated with workflow scope+fixture controls; Playwright `1 audited, 0 failing`
+  - Results: `19 passed, 14 deselected` (combined Phase 5 parity/crosswalk/modern-shell slice including activation fixture execution), native probe gallery generated with workflow scope+activation fixture control; Playwright `1 audited, 0 failing`
   - Persisted evidence:
     - `artifacts/gui_review/phase5_parity/index.html`
     - `artifacts/gui_review/phase5_parity/phase5_probe_report.json`
@@ -105,7 +104,7 @@ Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence 
 
 ### 2.10 Phase 5 Crosswalk and Parity Panel
 
-- Crosswalk review table, replay-state filter persistence, parity scope/fixture targeting, parity-launch visibility, and workflow-fixture execution for overlay-role and ROI-statistics bundles
+- Crosswalk review table, replay-state filter persistence, parity scope/fixture targeting, parity-launch visibility, and workflow-fixture execution for spectrum, GUI, and activation/inventory bundles
   - Tests: `tests/test_modern_gui_shell.py`, `tests/test_cli_app.py`, `tests/test_phase5_crosswalk.py`, `tests/test_reference_parity_runner.py`
   - Probe gallery:
     - `artifacts/gui_review/phase5_parity/index.html`

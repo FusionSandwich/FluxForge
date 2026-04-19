@@ -1,0 +1,39 @@
+{
+  "spectrum_id": "npat_activation_seed",
+  "source_id": "fluxforge_bundled_gamma",
+  "cooling_time_s": 1800.0,
+  "live_time_s": 1200.0,
+  "time_origin": "eoi",
+  "relative_times_s": [0.0, 7200.0, 43200.0, 259200.0],
+  "distance_cm": 18.0,
+  "dominant_top_n": 4,
+  "isotope_summaries": [
+    {
+      "nuclide": "Co-60",
+      "line_count": 2,
+      "half_life_s": 166349520.0,
+      "count_time_activity_Bq": 910.0,
+      "count_time_activity_unc_Bq": 36.0,
+      "irradiation_time_activity_Bq": 925.0,
+      "irradiation_time_activity_unc_Bq": 38.0
+    },
+    {
+      "nuclide": "Mn-56",
+      "line_count": 1,
+      "half_life_s": 9288.0,
+      "count_time_activity_Bq": 520.0,
+      "count_time_activity_unc_Bq": 24.0,
+      "irradiation_time_activity_Bq": 610.0,
+      "irradiation_time_activity_unc_Bq": 28.0
+    },
+    {
+      "nuclide": "Ta-182",
+      "line_count": 1,
+      "half_life_s": 9906624.0,
+      "count_time_activity_Bq": 275.0,
+      "count_time_activity_unc_Bq": 16.0,
+      "irradiation_time_activity_Bq": 281.0,
+      "irradiation_time_activity_unc_Bq": 17.0
+    }
+  ]
+}

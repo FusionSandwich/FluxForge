@@ -1,0 +1,29 @@
+{
+  "schema": "fluxforge.activation_inventory_fixture.v1",
+  "fixture_id": "radioactivedecay_inventory_case",
+  "parity_scope": "workflow",
+  "source_repo": "radioactivedecay/radioactivedecay",
+  "source_ref": "phase5-activation-baseline-2026-04-19",
+  "source_paths": [
+    "testing/radioactivedecay/tests/test_inventory.py",
+    "testing/radioactivedecay/tests/test_fileio.py"
+  ],
+  "source_case": "inventory_decay_chain_time_series",
+  "workflow": "pure_decay_bateman",
+  "input_files": [
+    "inventory_seed.json"
+  ],
+  "expected_outputs": [
+    "inventory_timeseries_expected.csv",
+    "dominant_contributors_expected.csv"
+  ],
+  "tolerances": {
+    "activity_rel": 0.02,
+    "atoms_rel": 0.02,
+    "dose_rel": 0.05
+  },
+  "provenance_notes": [
+    "Phase 5.4 executable activation/inventory baseline for radioactivedecay source family.",
+    "Captures decay-chain timeseries and dominant-contributor snapshots under controlled fixture conditions."
+  ]
+}
