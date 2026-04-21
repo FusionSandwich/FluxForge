@@ -6,6 +6,8 @@ import argparse
 import copy
 import csv
 import json
+import os
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,6 +16,13 @@ import warnings
 
 import numpy as np
 
+from fluxforge.cli.command_catalog import (
+    COMMAND_FAMILIES,
+    build_command_catalog,
+    render_command_catalog_markdown,
+    render_command_catalog_text,
+    render_top_level_family_help,
+)
 from fluxforge.core.unfolding_inputs import require_nonnegative
 from fluxforge.analysis.segmented_detection import (
     SegmentedDetectionConfig,
@@ -183,10 +192,22 @@ from fluxforge.workflows.phase6_ldrd_worked_example import (
     default_output_root as phase6_ldrd_default_output_root,
     run_phase6_ldrd_worked_example,
 )
-from fluxforge.workflows.phase6_ldrd_second_irradiation_decision_repo import (
-    default_output_root as phase6_ldrd_second_irradiation_repo_default_output_root,
-    run_phase6_ldrd_second_irradiation_decision_repo,
-)
+try:
+    from fluxforge.workflows.phase6_ldrd_second_irradiation_decision_repo import (
+        default_output_root as phase6_ldrd_second_irradiation_repo_default_output_root,
+        run_phase6_ldrd_second_irradiation_decision_repo,
+    )
+except ModuleNotFoundError:  # pragma: no cover - optional workflow module
+    def phase6_ldrd_second_irradiation_repo_default_output_root() -> Path:
+        return Path(
+            "examples/RAFM_irradiation/results/phase6_ldrd_second_irradiation_repo"
+        )
+
+
+    def run_phase6_ldrd_second_irradiation_decision_repo(*args, **kwargs):
+        raise RuntimeError(
+            "phase6_ldrd_second_irradiation_decision_repo workflow is unavailable"
+        )
 
 
 def _load_json(path: Path):
@@ -203,6 +224,49 @@ def _load_structured_rows(path: Path) -> Any:
     raise ValueError(
         f"Unsupported structured input format for {path}. Use .json or .csv."
     )
+
+
+class FluxForgeArgumentParser(argparse.ArgumentParser):
+    """Argument parser with grouped top-level help for command discovery."""
+
+    def format_help(self) -> str:
+        catalog_builder = getattr(self, "_command_catalog_builder", None)
+        if catalog_builder is None:
+            return super().format_help()
+
+        formatter = self._get_formatter()
+        formatter.add_usage(self.usage, self._actions, self._mutually_exclusive_groups)
+        formatter.add_text(self.description)
+        formatter.start_section("Install Profiles")
+        formatter.add_text(
+            "CLI-only: `pip install -e .`\n"
+            "Full user install: `pip install -e '.[native-gui,reporting]'`\n"
+            "Developer extras: `pip install -e '.[dev,gui-test]'`"
+        )
+        formatter.end_section()
+        formatter.start_section("Command Families")
+        formatter.add_text(render_top_level_family_help(catalog_builder()))
+        formatter.end_section()
+
+        option_actions = []
+        for action in self._actions:
+            if isinstance(action, argparse._SubParsersAction):
+                continue
+            option_actions.append(action)
+        if option_actions:
+            formatter.start_section("options")
+            formatter.add_arguments(option_actions)
+            formatter.end_section()
+
+        formatter.start_section("Next Steps")
+        formatter.add_text(
+            "Run `fluxforge commands` for the full grouped catalog.\n"
+            "Run `fluxforge commands --family spectrum` to narrow to one workflow family.\n"
+            "Run `fluxforge <command> --help` for detailed flags.\n"
+            "Run `fluxforge gui --help` or `fluxforge-gui --help` for GUI launch guidance."
+        )
+        formatter.end_section()
+        return formatter.format_help()
 
 
 def _extract_structured_rows(payload: Any) -> List[Dict[str, Any]]:
@@ -227,6 +291,60 @@ def _extract_structured_rows(payload: Any) -> List[Dict[str, Any]]:
 
 def _ensure_parent_dir(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+
+
+def _collect_markdown_checklist_status(checklist: Path) -> dict[str, Any]:
+    checklist_exists = checklist.exists()
+    checklist_item_count = 0
+    checked_items = 0
+    unchecked_items: list[str] = []
+
+    if checklist_exists:
+        lines = checklist.read_text(encoding="utf-8").splitlines()
+        for line in lines:
+            token = line.strip()
+            if token.startswith("- [ ]") or token.startswith("- [x]") or token.startswith("- [X]"):
+                checklist_item_count += 1
+                if token.startswith("- [ ]"):
+                    unchecked_items.append(token[5:].strip())
+                else:
+                    checked_items += 1
+
+    return {
+        "path": str(checklist),
+        "exists": checklist_exists,
+        "item_count": checklist_item_count,
+        "checked_items": checked_items,
+        "unchecked_items": unchecked_items,
+        "ready": bool(
+            checklist_exists and checklist_item_count > 0 and not unchecked_items
+        ),
+    }
+
+
+def _phase5_gate_env() -> dict[str, str]:
+    env = os.environ.copy()
+    py_path = env.get("PYTHONPATH", "").strip()
+    env["PYTHONPATH"] = f"src:{py_path}" if py_path else "src"
+    return env
+
+
+def _run_phase5_gate_command(command: list[str], *, cwd: Path) -> dict[str, Any]:
+    completed = subprocess.run(
+        command,
+        cwd=cwd,
+        env=_phase5_gate_env(),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    combined_output = f"{completed.stdout or ''}\n{completed.stderr or ''}".lower()
+    return {
+        "command": " ".join(command),
+        "exit_code": int(completed.returncode),
+        "passed": completed.returncode == 0,
+        "no_deselection": "deselected" not in combined_output,
+    }
 
 
 def _peak_search_cli_choices() -> tuple[str, ...]:
@@ -2456,7 +2574,8 @@ def cmd_phase5_crosswalk_report(args: argparse.Namespace) -> None:
         f"{summary.get('total_entries', 0)} entries; "
         f"replay-now={replay_summary.get('replay-now', 0)}, "
         f"adapter-required={replay_summary.get('adapter-required', 0)}, "
-        f"reference-only={replay_summary.get('reference-only', 0)}"
+        f"reference-only={replay_summary.get('reference-only', 0)}, "
+        f"mixed={summary.get('mixed_replay_entries', 0)}"
     )
     print(f"Wrote crosswalk report to {output}")
     print(f"Wrote markdown report to {markdown_output}")
@@ -2484,17 +2603,7 @@ def cmd_gui_acceptance_checklist(args: argparse.Namespace) -> None:
         )
     ]
 
-    checklist_exists = checklist.exists()
-    checklist_item_count = 0
-    unchecked_items = []
-    if checklist_exists:
-        lines = checklist.read_text(encoding="utf-8").splitlines()
-        for line in lines:
-            token = line.strip()
-            if token.startswith("- [ ]") or token.startswith("- [x]") or token.startswith("- [X]"):
-                checklist_item_count += 1
-                if token.startswith("- [ ]"):
-                    unchecked_items.append(token[5:].strip())
+    checklist_status = _collect_markdown_checklist_status(checklist)
 
     artifact_status = []
     for directory in artifact_dirs:
@@ -2513,17 +2622,15 @@ def cmd_gui_acceptance_checklist(args: argparse.Namespace) -> None:
         .isoformat(timespec="seconds")
         .replace("+00:00", "Z"),
         "checklist": {
-            "path": str(checklist),
-            "exists": checklist_exists,
-            "item_count": checklist_item_count,
-            "unchecked_items": unchecked_items,
+            "path": checklist_status["path"],
+            "exists": checklist_status["exists"],
+            "item_count": checklist_status["item_count"],
+            "unchecked_items": checklist_status["unchecked_items"],
         },
         "artifacts": artifact_status,
     }
     payload["ready"] = bool(
-        checklist_exists
-        and checklist_item_count > 0
-        and not unchecked_items
+        bool(checklist_status["ready"])
         and all(item["gallery_exists"] for item in artifact_status)
     )
 
@@ -2534,6 +2641,286 @@ def cmd_gui_acceptance_checklist(args: argparse.Namespace) -> None:
         + ("READY" if payload["ready"] else "NOT READY")
     )
     print(f"Wrote GUI acceptance report to {output}")
+
+
+def cmd_phase5_release_gate(args: argparse.Namespace) -> None:
+    workspace_root = Path.cwd()
+    output = Path(getattr(args, "output", Path("phase5_release_gate.json")))
+    crosswalk_path = Path(
+        getattr(args, "crosswalk", Path(".github/project-management/phase5_crosswalk.json"))
+    )
+    reference_root = Path(
+        getattr(args, "reference_root", Path("tests/spectra/reference_parity"))
+    )
+    activation_root = Path(
+        getattr(args, "activation_root", Path("tests/activation_inventory/fixtures"))
+    )
+    probe_dir = Path(
+        getattr(args, "probe_dir", Path("artifacts/gui_review/phase5_parity"))
+    )
+    audit_report = Path(
+        getattr(
+            args,
+            "playwright_report",
+            Path("artifacts/gui_review/phase5_parity/playwright_audit/audit_report.json"),
+        )
+    )
+    checklist_path = Path(
+        getattr(args, "checklist", Path("docs/PHASE5_RELEASE_CHECKLIST.md"))
+    )
+    suite_script = Path(
+        getattr(args, "suite_script", Path("tools/qa/run_phase5_full_suite.sh"))
+    )
+
+    status_doc_args = getattr(args, "status_doc", None)
+    status_docs = (
+        [Path(item) for item in status_doc_args]
+        if status_doc_args
+        else [
+            Path("docs/ROADMAP_EXECUTION_STATUS.md"),
+            Path("docs/FLUXFORGE_CONSOLIDATED_MASTER.md"),
+            Path("docs/FluxForge_Testing_Master.md"),
+            Path("docs/GUI_TEST_COVERAGE_LEDGER.md"),
+            Path("docs/PHASE3_EXECUTION_HANDOFF.md"),
+        ]
+    )
+
+    run_targeted_tests = bool(getattr(args, "run_targeted_tests", True))
+    run_full_suite = bool(getattr(args, "run_full_suite", True))
+
+    targeted_test_files = [
+        "tests/test_phase5_crosswalk.py",
+        "tests/test_reference_parity_runner.py",
+        "tests/test_parity_fixture_manifests.py",
+        "tests/test_parity_phase3_scaffolding.py",
+        "tests/test_cli_app.py",
+        "tests/test_modern_gui_shell.py",
+    ]
+
+    crosswalk_payload = load_phase5_crosswalk(crosswalk_path)
+    crosswalk_summary = summarize_phase5_crosswalk(
+        crosswalk_payload,
+        workspace_root=workspace_root,
+    )
+
+    parity_payload = run_reference_parity_suite(
+        reference_root=reference_root,
+        activation_root=activation_root,
+        scope="all",
+        include_activation=True,
+    )
+    parity_summary = parity_payload.get("summary") or {}
+
+    manifest_paths = sorted((reference_root / "cases").glob("**/manifest.json"))
+    manifest_paths.extend(sorted(activation_root.glob("**/manifest.json")))
+    required_traceability_fields = (
+        "source_repo",
+        "source_ref",
+        "source_paths",
+        "source_case",
+        "provenance_notes",
+    )
+    traceability_gaps: list[dict[str, Any]] = []
+    for manifest_path in manifest_paths:
+        try:
+            manifest_payload = _load_json(manifest_path)
+        except Exception as exc:  # pragma: no cover - defensive report path
+            traceability_gaps.append(
+                {
+                    "manifest": str(manifest_path),
+                    "error": str(exc),
+                }
+            )
+            continue
+
+        missing_fields: list[str] = []
+        for field in required_traceability_fields:
+            value = manifest_payload.get(field)
+            if value is None:
+                missing_fields.append(field)
+                continue
+            if isinstance(value, str) and not value.strip():
+                missing_fields.append(field)
+                continue
+            if isinstance(value, list) and not value:
+                missing_fields.append(field)
+
+        if missing_fields:
+            traceability_gaps.append(
+                {
+                    "manifest": str(manifest_path),
+                    "missing_fields": missing_fields,
+                }
+            )
+
+    targeted_tests = {
+        "ran": False,
+        "command": "",
+        "exit_code": None,
+        "passed": False,
+        "no_deselection": False,
+    }
+    if run_targeted_tests:
+        targeted_tests = {
+            "ran": True,
+            **_run_phase5_gate_command(
+                ["pytest", "-q", *targeted_test_files],
+                cwd=workspace_root,
+            ),
+        }
+
+    full_suite = {
+        "ran": False,
+        "command": "",
+        "exit_code": None,
+        "passed": False,
+        "no_deselection": False,
+    }
+    if run_full_suite:
+        full_suite = {
+            "ran": True,
+            **_run_phase5_gate_command(
+                ["bash", str(suite_script)],
+                cwd=workspace_root,
+            ),
+        }
+
+    probe_report_path = probe_dir / "phase5_probe_report.json"
+    probe_gallery_path = probe_dir / "index.html"
+    probe_summary: dict[str, Any] = {}
+    if probe_report_path.exists():
+        probe_payload = _load_json(probe_report_path)
+        if isinstance(probe_payload, dict):
+            probe_summary = dict(probe_payload.get("summary") or {})
+
+    browser_summary: dict[str, Any] = {}
+    if audit_report.exists():
+        audit_payload = _load_json(audit_report)
+        if isinstance(audit_payload, dict):
+            browser_summary = {
+                "total_pages": int(audit_payload.get("total_pages", 0) or 0),
+                "failing_pages": int(audit_payload.get("failing_pages", 0) or 0),
+            }
+
+    checklist_status = _collect_markdown_checklist_status(checklist_path)
+
+    doc_status: list[dict[str, Any]] = []
+    for doc_path in status_docs:
+        exists = doc_path.exists()
+        has_phase56 = False
+        if exists:
+            content = doc_path.read_text(encoding="utf-8")
+            lowered = content.lower()
+            has_phase56 = "5.6" in content and "release gate" in lowered
+        doc_status.append(
+            {
+                "path": str(doc_path),
+                "exists": exists,
+                "mentions_phase56_release_gate": has_phase56,
+            }
+        )
+
+    required_surface_paths = {
+        "backend": Path("src/fluxforge/validation/reference_parity.py"),
+        "cli": Path("src/fluxforge/cli/app.py"),
+        "gui": Path("src/fluxforge/gui/panels/phase5.py"),
+    }
+    required_surfaces = {
+        name: {
+            "path": str(path),
+            "exists": path.exists(),
+        }
+        for name, path in required_surface_paths.items()
+    }
+
+    checks = {
+        "crosswalk": {
+            "path": str(crosswalk_path),
+            "total_entries": int(crosswalk_summary.get("total_entries", 0) or 0),
+            "by_replay_state": dict(crosswalk_summary.get("by_replay_state") or {}),
+            "ready": int(crosswalk_summary.get("total_entries", 0) or 0) > 0,
+        },
+        "parity": {
+            "summary": parity_summary,
+            "ready": bool(
+                int(parity_summary.get("total", 0) or 0) > 0
+                and int(parity_summary.get("failed", 0) or 0) == 0
+            ),
+        },
+        "traceability_manifests": {
+            "manifest_count": len(manifest_paths),
+            "gaps": traceability_gaps,
+            "ready": bool(manifest_paths and not traceability_gaps),
+        },
+        "tests": {
+            "targeted": targeted_tests,
+            "full_phase5_suite": full_suite,
+            "ready": bool(
+                run_targeted_tests
+                and run_full_suite
+                and bool(targeted_tests.get("passed"))
+                and bool(targeted_tests.get("no_deselection"))
+                and bool(full_suite.get("passed"))
+                and bool(full_suite.get("no_deselection"))
+            ),
+        },
+        "native_probe": {
+            "report_path": str(probe_report_path),
+            "gallery_path": str(probe_gallery_path),
+            "gallery_exists": probe_gallery_path.exists(),
+            "summary": probe_summary,
+            "ready": bool(
+                probe_gallery_path.exists()
+                and probe_report_path.exists()
+                and int(probe_summary.get("screenshots", 0) or 0) > 0
+                and int(probe_summary.get("parity_failed", 0) or 0) == 0
+            ),
+        },
+        "browser_lane": {
+            "report_path": str(audit_report),
+            "summary": browser_summary,
+            "ready": bool(
+                audit_report.exists()
+                and int(browser_summary.get("total_pages", 0) or 0) > 0
+                and int(browser_summary.get("failing_pages", 0) or 0) == 0
+            ),
+        },
+        "manual_sizing": checklist_status,
+        "status_docs": {
+            "docs": doc_status,
+            "ready": bool(
+                doc_status
+                and all(
+                    bool(item.get("exists"))
+                    and bool(item.get("mentions_phase56_release_gate"))
+                    for item in doc_status
+                )
+            ),
+        },
+        "required_surfaces": {
+            "surfaces": required_surfaces,
+            "ready": all(bool(item.get("exists")) for item in required_surfaces.values()),
+        },
+    }
+
+    ready = all(bool(item.get("ready")) for item in checks.values())
+    payload: dict[str, Any] = {
+        "schema": "fluxforge.phase5.release_gate.v1",
+        "generated_at": datetime.now(timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
+        "checks": checks,
+        "ready": ready,
+    }
+
+    _ensure_parent_dir(output)
+    output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    print("Phase 5 release gate: " + ("READY" if ready else "NOT READY"))
+    print(f"Wrote Phase 5 release-gate report to {output}")
+
+    if bool(getattr(args, "strict", False)) and not ready:
+        raise RuntimeError("Phase 5 release gate failed; see report for details.")
 
 
 def cmd_activity(args: argparse.Namespace) -> None:
@@ -5550,6 +5937,25 @@ def cmd_reactions(args: argparse.Namespace) -> None:
                     print(f"  {rxn_name} ({cat})")
 
 
+def cmd_commands(args: argparse.Namespace) -> None:
+    """Render the grouped FluxForge command catalog."""
+
+    parser = getattr(args, "_parser", None)
+    if parser is None:
+        parser = build_parser()
+    catalog = build_command_catalog(parser)
+    if args.format == "markdown":
+        rendered = render_command_catalog_markdown(catalog, family=args.family)
+    else:
+        rendered = render_command_catalog_text(catalog, family=args.family)
+    if args.output is not None:
+        _ensure_parent_dir(args.output)
+        args.output.write_text(rendered, encoding="utf-8")
+        print(f"Wrote command catalog to {args.output}")
+        return
+    print(rendered, end="")
+
+
 def cmd_gui(args: argparse.Namespace) -> None:
     """Launch FluxForge desktop GUI."""
     if args.dry_run:
@@ -5650,10 +6056,40 @@ def cmd_plots(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="UWNR Flux-Wire–Driven Neutron Spectrum Reconstruction Tool"
+    parser = FluxForgeArgumentParser(
+        prog="fluxforge",
+        usage="fluxforge <command> [options]",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=(
+            "FluxForge CLI for gamma spectroscopy, activation analysis, dosimetry, "
+            "spectrum unfolding, and irradiation-planning workflows."
+        ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    commands = subparsers.add_parser(
+        "commands",
+        help="List FluxForge CLI commands grouped by workflow family",
+    )
+    commands.add_argument(
+        "--family",
+        choices=[family.key for family in COMMAND_FAMILIES],
+        default=None,
+        help="Optional workflow family filter",
+    )
+    commands.add_argument(
+        "--format",
+        choices=["text", "markdown"],
+        default="text",
+        help="Choose terminal text output or Markdown reference output",
+    )
+    commands.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Optional file path for writing the rendered command catalog",
+    )
+    commands.set_defaults(func=cmd_commands)
 
     ingest = subparsers.add_parser(
         "ingest", help="Ingest spectrum files into schema artifacts"
@@ -6216,6 +6652,83 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("gui_acceptance_check.json"),
     )
     gui_acceptance_check.set_defaults(func=cmd_gui_acceptance_checklist)
+
+    phase5_release_gate = subparsers.add_parser(
+        "phase5-release-gate",
+        help=(
+            "Run the Phase 5.6 release-gate checklist across parity, fixtures, "
+            "tests, GUI evidence, and status-doc synchronization"
+        ),
+    )
+    phase5_release_gate.add_argument(
+        "--crosswalk",
+        type=Path,
+        default=Path(".github/project-management/phase5_crosswalk.json"),
+    )
+    phase5_release_gate.add_argument(
+        "--reference-root",
+        type=Path,
+        default=Path("tests/spectra/reference_parity"),
+    )
+    phase5_release_gate.add_argument(
+        "--activation-root",
+        type=Path,
+        default=Path("tests/activation_inventory/fixtures"),
+    )
+    phase5_release_gate.add_argument(
+        "--probe-dir",
+        type=Path,
+        default=Path("artifacts/gui_review/phase5_parity"),
+    )
+    phase5_release_gate.add_argument(
+        "--playwright-report",
+        type=Path,
+        default=Path("artifacts/gui_review/phase5_parity/playwright_audit/audit_report.json"),
+    )
+    phase5_release_gate.add_argument(
+        "--checklist",
+        type=Path,
+        default=Path("docs/PHASE5_RELEASE_CHECKLIST.md"),
+    )
+    phase5_release_gate.add_argument(
+        "--suite-script",
+        type=Path,
+        default=Path("tools/qa/run_phase5_full_suite.sh"),
+    )
+    phase5_release_gate.add_argument(
+        "--status-doc",
+        action="append",
+        default=None,
+        help=(
+            "Status docs that must explicitly mention Phase 5.6 release-gate status "
+            "(repeatable)"
+        ),
+    )
+    phase5_release_gate.add_argument(
+        "--skip-targeted-tests",
+        dest="run_targeted_tests",
+        action="store_false",
+        help="Skip running the targeted Phase 5 regression file set",
+    )
+    phase5_release_gate.add_argument(
+        "--skip-full-suite",
+        dest="run_full_suite",
+        action="store_false",
+        help="Skip running the strict no-deselection Phase 5 full-suite script",
+    )
+    phase5_release_gate.set_defaults(run_targeted_tests=True)
+    phase5_release_gate.set_defaults(run_full_suite=True)
+    phase5_release_gate.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit with a runtime error if the release gate is not ready",
+    )
+    phase5_release_gate.add_argument(
+        "--output",
+        type=Path,
+        default=Path("phase5_release_gate.json"),
+    )
+    phase5_release_gate.set_defaults(func=cmd_phase5_release_gate)
 
     library_list = subparsers.add_parser(
         "library-list",
@@ -7183,12 +7696,14 @@ def build_parser() -> argparse.ArgumentParser:
     _add_validate_option(plots)
     plots.set_defaults(func=cmd_plots)
 
+    parser._command_catalog_builder = lambda: build_command_catalog(parser)
     return parser
 
 
 def main(argv: Optional[list[str]] = None) -> None:
     parser = build_parser()
     args = parser.parse_args(argv)
+    setattr(args, "_parser", parser)
     if hasattr(args, "func"):
         args.func(args)
     else:

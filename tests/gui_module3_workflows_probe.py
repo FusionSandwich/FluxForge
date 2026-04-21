@@ -69,6 +69,15 @@ def _write_review_gallery(output_dir: Path, screenshots: list[Path]) -> Path:
       section {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 24px; }}
       .card {{ background: var(--card); border: 1px solid var(--edge); border-radius: 20px; padding: 16px; box-shadow: 0 18px 42px rgba(16,37,60,0.08); }}
       img {{ width: 100%; display: block; border-radius: 16px; border: 1px solid rgba(16,37,60,0.1); }}
+      @media (max-width: 960px) {{
+        main {{ padding: 24px 16px 44px; }}
+        section {{ grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }}
+      }}
+      @media (max-width: 640px) {{
+        header {{ padding: 18px; border-radius: 18px; }}
+        section {{ grid-template-columns: 1fr; gap: 14px; }}
+        .card {{ border-radius: 16px; }}
+      }}
     </style>
   </head>
   <body>

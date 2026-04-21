@@ -1,6 +1,16 @@
 # Unfolding Benchmark
 
-This directory contains benchmark data and code for validating FluxForge's GRAVEL and MLEM spectrum unfolding implementations against reference implementations from the [Neutron-Unfolding](../../testing/Neutron-Unfolding) repository.
+This directory contains benchmark data and code for validating FluxForge's
+GRAVEL and MLEM spectrum unfolding implementations against the included
+reference implementations in this folder.
+
+## Install Profile
+
+Use the CLI-only install:
+
+```bash
+pip install -e .
+```
 
 ## Data Files
 
@@ -20,7 +30,6 @@ This directory contains benchmark data and code for validating FluxForge's GRAVE
 ## Running the Benchmark
 
 ```bash
-cd FluxForge
 python examples/unfolding_benchmark/run_benchmark.py
 ```
 

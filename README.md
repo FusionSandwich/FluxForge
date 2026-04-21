@@ -1,102 +1,212 @@
 # FluxForge
 
-**HPGe-driven flux-wire / foil activation analysis • Neutron spectrum unfolding • Model validation • CLI & GUI Tools**
+FluxForge is an open-source toolkit for reproducible gamma spectroscopy,
+activation and inventory review, reactor dosimetry, neutron-spectrum
+unfolding, k0-NAA workflows, and irradiation-planning studies.
 
-FluxForge is a pure-Python package, dual CLI, and desktop GUI that converts HPGe-derived spectrum counts into activities, reaction rates, and infers neutron flux spectra with generalized least squares and Monte Carlo uncertainty propagation. It acts as an open-source, reproducible replacement for standard tools like STAYSL, PeakEasy, and QuantumGold, conforming directly to ASTM E3376, ASTM E261, and INL standard metrology practices.
+FluxForge has two primary user entrypoints:
 
-FluxForge is intentionally self-contained. It must install, package, and run without any dependency on sibling repositories or anything under `../testing`; that tree is for inspiration, audits, and optional developer-side comparisons only.
+- `fluxforge` for the command-line interface
+- `fluxforge gui` or `fluxforge-gui` for the desktop GUI
 
-FluxForge's primary redesign path is now a native `PySide6 + PyQtGraph` desktop shell under `src/fluxforge/gui/`. It does **not** require a browser, an embedded web runtime, or any internet connection for supported offline workflows.
+If you are new to the project, start with the installation steps below, then
+run `fluxforge commands` to see the grouped CLI surface.
 
-The Stage 0 roadmap governance layer now lives in the repository under
-`.github/project-management/`, `docs/adr/`, and `CONTRIBUTING.md`. The
-next-generation `PySide6 + PyQtGraph` shell is now the primary GUI target. That
-modern path now carries the completed core GUI roadmap plus the
-user-directed predictive dashboard slice, including calibration, analysis,
-unfolding, standards/QA, reporting, batch workflows, and direct sidebar ASTM
-review actions, without pulling archived Tk widgets back into the redesign.
+## What FluxForge Covers
 
-## Key Capabilities
-- **Full Workflow Parity**: Implements raw ASCII/IEC spectral processing, deterministic Peak Identification, Activity/Reaction rate generation matching Quantum Gold and PeakEasy.
-- **Standards Compliant**: Direct integration with ASTM E3376 two-stream analysis, FWHM-scaled Covell continuum subtraction, and ASTM E261 reactor dosimetry schemas.
-- **Spectrum Unfolding**: Multi-algorithm backend featuring Iterative GRAVEL, MLEM, and GLS with optional non-negativity enforcement and robust Monte Carlo uncertainty propagation.
-- **Nuclear Data Integrations**: Bundled access to ENDF/B-VIII.0, IRDFF-II test schemas, and custom user dosimetry libraries.
-- **Modern calibration workspace**: The Qt shell now includes a unified energy + FWHM calibration dialog with embedded spectrum review, residual-first plots, and ASTM E181 order locking.
-- **Interactive plot review**: Spectrum inspection defaults to log counts with isotope-colored peak markers, and Activity/Rates now include live zoomable plot panels alongside the existing unfold diagnostics.
-- **Rigorous Test Suite**: Backed by 1133 passing unit and integration tests in this workspace, spanning MCNP workflows, ASTM paths, unfolding parity, GUI logic, transport/IO integrations, and predictive Qt workflows.
+| Capability family | Typical use | Main entry points |
+|---|---|---|
+| Spectrum analysis | Ingest measured spectra, plot calibrated views, detect peaks, and analyze ROIs | `ingest`, `ingest-batch`, `spectrum-plot`, `peaks`, `roi-analyze`, `roi-statistics` |
+| Activity and inventory review | Convert peak outputs into line activity, isotope review, reaction rates, and time-propagated inventory views | `activity`, `activity-review`, `inventory-review`, `rates` |
+| Planning and optimization | Rank isotopes, review masking, optimize schedules, plan follow-on irradiation, and export bundles | `isotope-priority`, `masking-review`, `optimization-sweep`, `second-irradiation-plan`, `ffexp-export` |
+| Reactor dosimetry and unfolding | Build response matrices, run ASTM-style workflows, unfold spectra, compare results, and report | `astm-e2005`, `astm-e261`, `astm-e262`, `astm-e3376`, `response`, `unfold`, `compare`, `report`, `reactions` |
+| k0-NAA | Normalize peak observations, characterize detector and facility state, analyze, aggregate, QA/QC, and report | `k0-normalize`, `k0-detector`, `k0-facility`, `k0-analyze`, `k0-aggregate`, `k0-qaqc`, `k0-report`, `k0-import-kayzero` |
+| Validation and replay | Run parity, crosswalk, release-gate, and bundled RAFM replay workflows | `parity-check`, `phase5-crosswalk-report`, `phase5-release-gate`, `rafm-validate`, `phase6-ldrd-worked-example` |
+| Desktop GUI | Review spectra interactively, drag ROIs and peak centroids, and inspect linked analysis panels | `fluxforge gui`, `fluxforge-gui` |
 
-## Getting started
-The project maintains low external dependency overhead to ensure seamless offline, air-gapped lab execution. Install in editable mode and run the CLI or GUI:
+## Step-by-Step Setup
+
+Detailed setup instructions live in [docs/INSTALLATION.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/INSTALLATION.md:1). The shortest supported path is:
+
+### 1. Create and activate an environment
+
+Using `venv`:
 
 ```bash
-# Optional: reproducible dev environment
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+```
+
+Using Conda:
+
+```bash
 conda env create -f environment.yml
 conda activate fluxforge
-
-pip install -e .
-# Optional: developer lint/test extras
-pip install -e '.[dev]'
-
-# Optional: install the modern native GUI stack
-pip install -e '.[native-gui]'
-
-# Optional: enable Jinja2 + WeasyPrint report export support
-pip install -e '.[reporting]'
-
-# Optional: legacy Tk desktop automation coverage
-pip install -e '.[gui-test]'
-
-# Optional: enforce offline-only execution
-export FLUXFORGE_OFFLINE=1
-
-# Launch the modern interactive GUI
-python -m fluxforge.gui.app
-# or: fluxforge-gui
-
-# Launch the archived Tk GUI fallback
-python -m fluxforge_gui.app
-# or: fluxforge-gui-legacy
-
-# Or use the CLI
-python -m fluxforge.cli.app --help
-# or: fluxforge --help
+python -m pip install --upgrade pip
 ```
 
-For offline delivery and native packaging helpers, use the repo-local tooling:
+### 2. Choose an install profile
+
+| Profile | Command | Use when |
+|---|---|---|
+| CLI-only | `pip install -e .` | You want the command-line workflows and bundled examples |
+| Full user install | `pip install -e '.[native-gui,reporting]'` | You want the CLI plus the Qt GUI and reporting extras |
+| Developer/test extras | `pip install -e '.[dev,gui-test]'` | You are contributing, running QA probes, or extending the test surface |
+
+### 3. Verify the install
+
+Run these from the repository root after installation:
 
 ```bash
-# Build a wheelhouse for air-gapped installs
-python tools/build_offline_wheelhouse.py
-
-# Build native CLI/GUI bundles with PyInstaller
-python tools/build_native_bundle.py --target both
+fluxforge --help
+fluxforge commands
+fluxforge gui --help
 ```
 
-The legacy desktop regression path still includes a real interactive Tk run that opens the archived GUI, loads a spectrum, edits ROI/calibration controls, exports artifacts, runs the report plot suite, captures screenshots, and verifies copied CLI commands:
+If you installed the GUI extras, also verify:
 
 ```bash
-python -m pytest -q tests/test_gui_desktop_native.py
+fluxforge-gui --help
 ```
 
-For repeatable legacy GUI evidence capture, run the desktop driver directly:
+## The First 5 Commands to Run
+
+These five commands give most users the fastest path to the full surface:
 
 ```bash
-PYTHONPATH=src FLUXFORGE_OFFLINE=1 xvfb-run -a \
-  python tests/gui_desktop_driver.py artifacts/gui_review/current_linux
+fluxforge --help
+fluxforge commands
+fluxforge commands --family spectrum
+fluxforge gui --help
+fluxforge phase6-ldrd-worked-example --help
 ```
 
-The latest local native-review run writes screenshots such as `01-launch.png`, `03-roi-calibration.png`, and `06-report-plots.png` under `artifacts/gui_review/current_linux/` for manual inspection. The committed Linux screenshot baselines live under `tests/data/gui_review_baselines/linux/`.
+Use `fluxforge <command> --help` for flags. Use
+[docs/CLI_REFERENCE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/CLI_REFERENCE.md:1)
+for the full grouped reference.
 
-For the redesigned Qt calibration workspace, generate the native calibration review gallery with:
+## First CLI Workflow
+
+This is the shortest verified analysis chain using committed RAFM data:
 
 ```bash
-QT_QPA_PLATFORM=offscreen PYTHONPATH=src \
-  python tests/gui_calibration_workspace_probe.py \
-  artifacts/gui_review/calibration_workspace
+fluxforge ingest \
+  --input examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC \
+  --profile rafm_25cm \
+  --output /tmp/rafm4_b_ingest.json
+
+fluxforge peaks \
+  --spectrum-file /tmp/rafm4_b_ingest.json \
+  --output /tmp/rafm4_b_peaks.json
 ```
 
-To apply the roadmap tracker on GitHub after pushing planning changes, use the
-`Sync Project Planning` workflow. The repository stores the milestone, label, board,
-epic, and seed-issue definitions as code.
+What you get:
 
-Synthetic validation and inference routines expect JSON inputs; see `src/fluxforge/cli/app.py` for expected schemas. For dedicated ASTM workflows, explore `examples/astm_e261_plan.json` or run the testing parity scripts under `examples/RAFM_irradiation/`.
+- an ingested spectrum artifact
+- a peak-report artifact
+
+Use a maintained replay workflow such as `fluxforge rafm-validate ...` or
+`fluxforge phase6-ldrd-worked-example ...` when you want a fully populated
+activity/inventory/planning output chain backed by committed reference assets.
+
+## First GUI Workflow
+
+Install the full user profile first:
+
+```bash
+pip install -e '.[native-gui,reporting]'
+```
+
+Then launch the GUI:
+
+```bash
+fluxforge gui --project-dir .
+```
+
+Recommended first files:
+
+- foreground spectrum: `examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC`
+- background spectrum: `examples/RAFM_irradiation/background.ASC`
+
+Recommended first interactions:
+
+1. Load the foreground and background spectra.
+2. Zoom into a photopeak-rich region.
+3. Drag the ROI directly on the main canvas.
+4. Drag the sideband handles if you want ROI-sideband background estimation.
+5. Select a peak and drag its centroid to refine it.
+6. Right-click near a peak to use context actions such as select peak, use peak ROI, clear identification, delete peak, add manual peak, and assign foreground/background/overlay roles.
+
+If you prefer the direct GUI entrypoint, `fluxforge-gui --project-dir .` launches the same modern Qt shell when the `native-gui` extra is installed.
+
+Important:
+
+- use `fluxforge gui` or `fluxforge-gui` after installation
+- do not rely on `python -m fluxforge.gui.app` as the primary user path
+
+If you see `ModuleNotFoundError: No module named 'fluxforge.gui'`, the usual causes are:
+
+- FluxForge was not installed into the active environment
+- the active Python is older than the required Python 3.11+
+- the `native-gui` extra was not installed for a GUI workflow
+
+Fix it with:
+
+```bash
+python -m pip install --upgrade pip
+pip install -e '.[native-gui,reporting]'
+fluxforge gui --help
+```
+
+## Maintained Starter Examples
+
+These are the best first examples because they use committed inputs and have
+clear output targets:
+
+| Workflow | Command | Inputs | Typical outputs |
+|---|---|---|---|
+| RAFM validation | `fluxforge rafm-validate --example-root examples/RAFM_irradiation --results-root /tmp/rafm_validation --no-fail` | `examples/RAFM_irradiation/raw_gamma_spec/` and committed comparison assets | analysis JSON, comparison tables, validation summaries |
+| Manual peak inspection | `fluxforge spectrum-plot ... --manual-peaks-file examples/manual_peak_inspection/manual_flux_wire_ti_rafm_1a.csv` | RAFM flux-wire spectrum plus manual ROI CSV | plot PNG plus manual peak JSON |
+| Phase 6 worked example | `fluxforge phase6-ldrd-worked-example --sample-id RAFM4-C_15dEOI --output-root /tmp/phase6_ldrd_worked_example` | committed RAFM assets | activity/inventory review, masking review, optimization outputs, planning bundle |
+| Unfolding benchmark | `python examples/unfolding_benchmark/run_benchmark.py` | bundled benchmark response matrix, measurements, and truth spectrum | benchmark plots and JSON metrics |
+
+For the full example inventory, use
+[examples/README.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/README.md:1)
+and [examples/example_inventory.json](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/example_inventory.json:1).
+
+## Documentation Map
+
+Start here:
+
+- [docs/INSTALLATION.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/INSTALLATION.md:1)
+- [docs/CLI_REFERENCE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/CLI_REFERENCE.md:1)
+- [docs/USER_GUIDE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/USER_GUIDE.md:1)
+- [docs/EXAMPLE_WORKFLOWS.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/EXAMPLE_WORKFLOWS.md:1)
+- [examples/README.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/README.md:1)
+
+Workflow-specific references:
+
+- `docs/workflows/`
+- `docs/optimization_of_irradiation/`
+- `docs/ASTM_standards/`
+
+## Testing and QA
+
+Run the standard test suite:
+
+```bash
+pip install -e '.[dev,gui-test]'
+pytest -q
+```
+
+Run the heavier Phase 5 gate scripts when needed:
+
+```bash
+tools/qa/run_phase5_full_suite.sh
+tools/qa/run_phase5_release_gate.sh
+```
+
+## Contributing
+
+See `CONTRIBUTING.md` for development and verification expectations.

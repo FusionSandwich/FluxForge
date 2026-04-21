@@ -9,10 +9,10 @@ Do not use this example to replace the automatic RAFM or flux-wire validation pa
 ## Included examples
 - Flux wire example:
   - input: `examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC`
-  - ROI file: [manual_flux_wire_ti_rafm_1a.csv](/filespace/s/smandych/CAE/projects/ALARA/FluxForge/examples/manual_peak_inspection/manual_flux_wire_ti_rafm_1a.csv)
+  - ROI file: `examples/manual_peak_inspection/manual_flux_wire_ti_rafm_1a.csv`
 - RAFM sample example:
   - input: `examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC`
-  - ROI file: [manual_rafm4_b_15d.csv](/filespace/s/smandych/CAE/projects/ALARA/FluxForge/examples/manual_peak_inspection/manual_rafm4_b_15d.csv)
+  - ROI file: `examples/manual_peak_inspection/manual_rafm4_b_15d.csv`
 
 ## Manual ROI file format
 Supported columns:
@@ -23,12 +23,19 @@ Supported columns:
 
 The ROI bounds are only examples. Users should inspect the plotted spectrum and adjust them as needed.
 
+## Install profile
+
+Use the CLI-only install unless you also want the GUI:
+
+```bash
+pip install -e .
+```
+
 ## Save a calibrated plot with ROI overlays
 Flux-wire example:
 
 ```bash
-cd /filespace/s/smandych/CAE/projects/ALARA/FluxForge
-PYTHONPATH=src python -m fluxforge.cli.app spectrum-plot \
+fluxforge spectrum-plot \
   --input examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC \
   --profile rafm_25cm \
   --background-subtracted \
@@ -40,8 +47,7 @@ PYTHONPATH=src python -m fluxforge.cli.app spectrum-plot \
 RAFM sample example:
 
 ```bash
-cd /filespace/s/smandych/CAE/projects/ALARA/FluxForge
-PYTHONPATH=src python -m fluxforge.cli.app spectrum-plot \
+fluxforge spectrum-plot \
   --input examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC \
   --profile rafm_25cm \
   --background-subtracted \
@@ -52,8 +58,7 @@ PYTHONPATH=src python -m fluxforge.cli.app spectrum-plot \
 
 ## Create a manual peak report without plotting
 ```bash
-cd /filespace/s/smandych/CAE/projects/ALARA/FluxForge
-PYTHONPATH=src python -m fluxforge.cli.app peaks \
+fluxforge peaks \
   --spectrum-file examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC \
   --profile rafm_25cm \
   --background-subtracted \

@@ -1,0 +1,421 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "manual-peak-inspection",
+      "entry_path": "examples/manual_peak_inspection/README.md",
+      "title": "Manual peak inspection workflow",
+      "tier": "starter",
+      "install_profile": "cli",
+      "command": "fluxforge spectrum-plot --input examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC --profile rafm_25cm --background-subtracted --manual-peaks-file examples/manual_peak_inspection/manual_flux_wire_ti_rafm_1a.csv --output Ti-RAFM-1a_25cm_manual.png --save-peak-report Ti-RAFM-1a_25cm_manual_peaks.json",
+      "input_paths": [
+        "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC",
+        "examples/manual_peak_inspection/manual_flux_wire_ti_rafm_1a.csv",
+        "examples/manual_peak_inspection/manual_rafm4_b_15d.csv"
+      ],
+      "output_paths": [
+        "user-selected PNG spectrum plot",
+        "user-selected manual peak report JSON"
+      ],
+      "notes": "README-driven workflow for SSH-safe manual ROI inspection and manual peak export."
+    },
+    {
+      "id": "rafm-validation",
+      "entry_path": "examples/RAFM_irradiation/run_validation.py",
+      "title": "RAFM validation workflow",
+      "tier": "starter",
+      "install_profile": "cli",
+      "command": "fluxforge rafm-validate --example-root examples/RAFM_irradiation --results-root /tmp/rafm_validation --no-fail",
+      "script_command": "python examples/RAFM_irradiation/run_validation.py --no-fail",
+      "input_paths": [
+        "examples/RAFM_irradiation/raw_gamma_spec/",
+        "examples/RAFM_irradiation/results/"
+      ],
+      "output_paths": [
+        "analysis JSON bundles",
+        "comparison tables",
+        "validation summaries",
+        "report text under the selected results root"
+      ],
+      "notes": "Primary committed replay workflow for bundled RAFM gamma-spectroscopy assets."
+    },
+    {
+      "id": "phase6-worked-example",
+      "entry_path": "examples/RAFM_irradiation/run_phase6_ldrd_worked_example.py",
+      "title": "Phase 6 RAFM worked example",
+      "tier": "starter",
+      "install_profile": "cli",
+      "command": "fluxforge phase6-ldrd-worked-example --sample-id RAFM4-C_15dEOI --output-root /tmp/phase6_ldrd_worked_example",
+      "script_command": "python examples/RAFM_irradiation/run_phase6_ldrd_worked_example.py --sample-id RAFM4-C_15dEOI --output-root /tmp/phase6_ldrd_worked_example",
+      "input_paths": [
+        "examples/RAFM_irradiation/raw_gamma_spec/",
+        "examples/RAFM_irradiation/results/analysis_json/"
+      ],
+      "output_paths": [
+        "activity review",
+        "inventory review",
+        "masking review",
+        "optimization outputs",
+        "second-irradiation outputs",
+        "ffexp bundle"
+      ],
+      "notes": "Canonical planning-oriented worked example backed by committed RAFM assets."
+    },
+    {
+      "id": "unfolding-benchmark",
+      "entry_path": "examples/unfolding_benchmark/run_benchmark.py",
+      "title": "Unfolding benchmark",
+      "tier": "starter",
+      "install_profile": "cli",
+      "command": "python examples/unfolding_benchmark/run_benchmark.py",
+      "input_paths": [
+        "examples/unfolding_benchmark/response-matrix.txt",
+        "examples/unfolding_benchmark/reduced_data.csv",
+        "examples/unfolding_benchmark/energy-spectrum.txt"
+      ],
+      "output_paths": [
+        "examples_output/unfolding_benchmark_comparison.png",
+        "examples_output/unfolding_implementation_diff.png",
+        "examples_output/unfolding_benchmark_results.json"
+      ],
+      "notes": "Maintained benchmark comparing FluxForge GRAVEL and MLEM results against included reference implementations."
+    },
+    {
+      "id": "cadmium-cover-correction",
+      "entry_path": "examples/cadmium_cover_correction_example.py",
+      "title": "Cadmium cover correction demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/cadmium_cover_correction_example.py",
+      "input_paths": [
+        "built-in cover-correction models and constants"
+      ],
+      "output_paths": [
+        "stdout report",
+        "example parity tables",
+        "optional matplotlib figures when enabled by the script"
+      ],
+      "notes": "Demonstrates STAYSL-style cadmium cover correction calculations and parity reporting."
+    },
+    {
+      "id": "complete-flux-wire-workflow",
+      "entry_path": "examples/complete_flux_wire_workflow.py",
+      "title": "Complete flux-wire workflow demo",
+      "tier": "research-demo",
+      "install_profile": "cli",
+      "command": "python examples/complete_flux_wire_workflow.py",
+      "input_paths": [
+        "src/fluxforge/examples/flux_wire/",
+        "src/fluxforge/examples/fe_cd_rafm_1/"
+      ],
+      "output_paths": [
+        "examples_outputs/flux_wire_analysis/"
+      ],
+      "notes": "Legacy end-to-end research script that stitches together multiple analysis stages. It uses package-bundled example assets under src/fluxforge/examples rather than top-level example data."
+    },
+    {
+      "id": "complete-naa-workflow",
+      "entry_path": "examples/complete_naa_workflow.py",
+      "title": "Complete NAA workflow demo",
+      "tier": "research-demo",
+      "install_profile": "cli",
+      "command": "python examples/complete_naa_workflow.py",
+      "input_paths": [
+        "script-defined synthetic and illustrative k0-NAA parameters"
+      ],
+      "output_paths": [
+        "stdout walkthrough",
+        "matplotlib figures"
+      ],
+      "notes": "Research walkthrough combining flux characterization and k0-style concentration calculations."
+    },
+    {
+      "id": "endf-mf33-covariance-demo",
+      "entry_path": "examples/endf_mf33_covariance_demo.py",
+      "title": "ENDF MF33 covariance demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/endf_mf33_covariance_demo.py",
+      "input_paths": [
+        "synthetic temporary ENDF-like MF33 section created by the script"
+      ],
+      "output_paths": [
+        "stdout covariance validation summary"
+      ],
+      "notes": "Small self-contained demo for covariance parsing, validation, and SVD conditioning."
+    },
+    {
+      "id": "gamma-poisson-rmle-demo",
+      "entry_path": "examples/gamma_poisson_rmle_demo.py",
+      "title": "Poisson RMLE gamma unfolding demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/gamma_poisson_rmle_demo.py",
+      "input_paths": [
+        "synthetic block response and Poisson-sampled spectrum generated by the script"
+      ],
+      "output_paths": [
+        "stdout solver diagnostics and uncertainty summary"
+      ],
+      "notes": "Self-contained RMLE demo including response sampling for uncertainty propagation."
+    },
+    {
+      "id": "generate-flux-spectrum",
+      "entry_path": "examples/generate_flux_spectrum.py",
+      "title": "Generate flux spectrum demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/generate_flux_spectrum.py",
+      "input_paths": [
+        "src/fluxforge/examples/fe_cd_rafm_1/boundaries.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/cross_sections.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/number_densities.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/measurements.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/prior_flux.json"
+      ],
+      "output_paths": [
+        "unfold result artifact written by the script",
+        "stdout solver and reaction-rate summary"
+      ],
+      "notes": "Advanced unfolding demo driven by package-bundled Fe-Cd-RAFM-1 inputs."
+    },
+    {
+      "id": "generate-plots",
+      "entry_path": "examples/generate_plots.py",
+      "title": "Generate plots demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/generate_plots.py",
+      "input_paths": [
+        "src/fluxforge/examples/fe_cd_rafm_1/boundaries.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/cross_sections.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/number_densities.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/measurements.json",
+        "src/fluxforge/examples/fe_cd_rafm_1/prior_flux.json"
+      ],
+      "output_paths": [
+        "plot files produced under the script output directory"
+      ],
+      "notes": "Advanced plotting demo for publication-style unfolding and covariance visualizations."
+    },
+    {
+      "id": "njoy-processing-example",
+      "entry_path": "examples/njoy_processing_example.py",
+      "title": "NJOY processing pipeline demo",
+      "tier": "research-demo",
+      "install_profile": "cli",
+      "command": "python examples/njoy_processing_example.py",
+      "input_paths": [
+        "script-defined NJOY input specifications",
+        "external NJOY executable if the user wants to run the real processing pipeline"
+      ],
+      "output_paths": [
+        "stdout workflow and input-deck examples"
+      ],
+      "notes": "Demonstration of NJOY input generation and workflow specification. Real processing requires an external NJOY installation."
+    },
+    {
+      "id": "nuclear-data-interface-example",
+      "entry_path": "examples/nuclear_data_interface_example.py",
+      "title": "Unified nuclear data interface demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/nuclear_data_interface_example.py",
+      "input_paths": [
+        "script-defined synthetic cross-section grids and identifiers"
+      ],
+      "output_paths": [
+        "stdout data-interface summary"
+      ],
+      "notes": "Demonstrates the unified nuclear-data abstraction layer and temperature-aware data containers."
+    },
+    {
+      "id": "reactor-dosimetry-workflow",
+      "entry_path": "examples/reactor_dosimetry_workflow.py",
+      "title": "Reactor dosimetry workflow demo",
+      "tier": "research-demo",
+      "install_profile": "cli",
+      "command": "python examples/reactor_dosimetry_workflow.py",
+      "input_paths": [
+        "script-defined simulated HFIR-like spectrum and dosimetry setup"
+      ],
+      "output_paths": [
+        "stdout dosimetry workflow summary"
+      ],
+      "notes": "Large illustrative workflow following the INL flux-wire and spectrum-adjustment sequence."
+    },
+    {
+      "id": "sigphi-saturation-demo",
+      "entry_path": "examples/sigphi_saturation_demo.py",
+      "title": "SigPhi saturation-rate demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/sigphi_saturation_demo.py",
+      "input_paths": [
+        "script-defined irradiation history and monitor measurement"
+      ],
+      "output_paths": [
+        "stdout saturation-rate summary"
+      ],
+      "notes": "Small self-contained demonstration of saturation-rate and burnup corrections."
+    },
+    {
+      "id": "staysl-interop-demo",
+      "entry_path": "examples/staysl_interop_demo.py",
+      "title": "STAYSL interoperability demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/staysl_interop_demo.py",
+      "input_paths": [
+        "script-defined synthetic STAYSL import/export payloads"
+      ],
+      "output_paths": [
+        "examples/output/",
+        "stdout import/export summaries"
+      ],
+      "notes": "Creates CSV, matrix, and bundle interoperability artifacts for STAYSL-style workflows."
+    },
+    {
+      "id": "staysl-reporting-demo",
+      "entry_path": "examples/staysl_reporting_demo.py",
+      "title": "STAYSL reporting demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/staysl_reporting_demo.py",
+      "input_paths": [
+        "script-defined synthetic flux, covariance, and cross-section data"
+      ],
+      "output_paths": [
+        "stdout report fragments",
+        "optional plot files written by the script"
+      ],
+      "notes": "Demonstrates differential flux tables, correlation matrices, reporting helpers, and stepwise plotting."
+    },
+    {
+      "id": "triga-k0naa-workflow",
+      "entry_path": "examples/triga_k0naa_workflow.py",
+      "title": "TRIGA k0-NAA workflow demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/triga_k0naa_workflow.py",
+      "input_paths": [
+        "script-defined TRIGA reactor assumptions and illustrative k0 inputs"
+      ],
+      "output_paths": [
+        "stdout workflow summary",
+        "matplotlib figures"
+      ],
+      "notes": "Detailed worked example for TRIGA-specific Cd-ratio and k0-NAA concepts."
+    },
+    {
+      "id": "validation-attenuation-demo",
+      "entry_path": "examples/validation/attenuation_demo.py",
+      "title": "Validation attenuation demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/validation/attenuation_demo.py",
+      "input_paths": [
+        "built-in attenuation materials"
+      ],
+      "output_paths": [
+        "stdout transmission values"
+      ],
+      "notes": "Small validation-oriented attenuation demo using built-in XCOM-backed material helpers."
+    },
+    {
+      "id": "validation-calibration-fit-demo",
+      "entry_path": "examples/validation/calibration_fit_demo.py",
+      "title": "Validation calibration fit demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/validation/calibration_fit_demo.py",
+      "input_paths": [
+        "script-defined synthetic efficiency and resolution points"
+      ],
+      "output_paths": [
+        "stdout fitted calibration coefficients"
+      ],
+      "notes": "Small validation demo for detector efficiency and resolution fitting."
+    },
+    {
+      "id": "validation-cross-section-demo",
+      "entry_path": "examples/validation/cross_section_demo.py",
+      "title": "Validation cross-section demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/validation/cross_section_demo.py",
+      "input_paths": [
+        "built-in placeholder IRDFF library"
+      ],
+      "output_paths": [
+        "stdout cross-section lookup result"
+      ],
+      "notes": "Small validation demo for reaction search and cross-section evaluation."
+    },
+    {
+      "id": "validation-iec-read-demo",
+      "entry_path": "examples/validation/iec_read_demo.py",
+      "title": "Validation IEC reader demo",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/validation/iec_read_demo.py /path/to/file.iec",
+      "input_paths": [
+        "user-supplied IEC spectrum file"
+      ],
+      "output_paths": [
+        "stdout IEC spectrum summary"
+      ],
+      "notes": "Reader demo for a user-supplied IEC file; no bundled IEC sample is currently shipped."
+    },
+    {
+      "id": "speckit-benchmark-assets",
+      "entry_path": "examples/speckit_benchmark",
+      "title": "SpecKit benchmark assets",
+      "tier": "data-only-benchmark",
+      "install_profile": "none",
+      "command": "See examples/speckit_benchmark/README.md",
+      "input_paths": [
+        "examples/speckit_benchmark/double_peak/",
+        "examples/speckit_benchmark/quasi_single_peak/"
+      ],
+      "output_paths": [
+        "none; this directory currently ships benchmark source assets only"
+      ],
+      "notes": "Bundled benchmark inputs for future SpecKit-style comparison work. No direct runner script is shipped in this directory yet."
+    }
+  ],
+  "datasets": [
+    {
+      "path": "examples/RAFM_irradiation/raw_gamma_spec/",
+      "purpose": "Committed RAFM raw gamma spectra used by starter validation, GUI onboarding, and manual inspection workflows."
+    },
+    {
+      "path": "examples/RAFM_irradiation/results/",
+      "purpose": "Committed RAFM result bundles and comparison assets used for replay and validation."
+    },
+    {
+      "path": "examples/RAFM_irradiation/background.ASC",
+      "purpose": "Shared RAFM background spectrum for GUI and plotting workflows."
+    },
+    {
+      "path": "examples/manual_peak_inspection/",
+      "purpose": "Manual ROI overlay CSV files and the SSH-safe manual inspection walkthrough."
+    },
+    {
+      "path": "examples/spectroscopy_data/",
+      "purpose": "Small spectroscopy calibration, background, and sample assets for validation-style demos."
+    },
+    {
+      "path": "examples/unfolding_benchmark/",
+      "purpose": "Bundled response matrix, pulse-height measurements, and reference spectrum for the unfolding benchmark."
+    },
+    {
+      "path": "src/fluxforge/examples/fe_cd_rafm_1/",
+      "purpose": "Package-bundled Fe-Cd-RAFM-1 example inputs used by advanced unfolding and plotting demos."
+    },
+    {
+      "path": "src/fluxforge/examples/flux_wire/",
+      "purpose": "Package-bundled flux-wire spectra and timing inputs used by legacy research demos."
+    }
+  ]
+}

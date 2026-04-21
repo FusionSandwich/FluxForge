@@ -157,6 +157,16 @@ def _write_review_gallery(
         border-radius: 16px;
         border: 1px solid rgba(16,37,61,0.1);
       }}
+      @media (max-width: 960px) {{
+        main {{ padding: 24px 16px 44px; }}
+        section {{ grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }}
+      }}
+      @media (max-width: 640px) {{
+        header {{ padding: 18px; border-radius: 18px; }}
+        dl {{ grid-template-columns: 1fr; }}
+        section {{ grid-template-columns: 1fr; gap: 14px; }}
+        .card {{ border-radius: 16px; }}
+      }}
     </style>
   </head>
   <body>

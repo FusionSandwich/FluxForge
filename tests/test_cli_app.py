@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from argparse import Namespace
@@ -11,6 +12,10 @@ import numpy as np
 import pytest
 
 from fluxforge.cli import app
+from fluxforge.cli.command_catalog import (
+    build_command_catalog,
+    render_command_catalog_markdown,
+)
 from fluxforge.io.spe import GammaSpectrum
 from tests._phase6_real_data import (
     DEFAULT_PHASE6_SAMPLE_ID,
@@ -372,6 +377,22 @@ def test_build_parser_file_query_and_batch_compare_commands(tmp_path):
     assert crosswalk_args.command == "phase5-crosswalk-report"
     assert crosswalk_args.crosswalk.name == "phase5_crosswalk.json"
 
+    phase5_gate_args = parser.parse_args(
+        [
+            "phase5-release-gate",
+            "--checklist",
+            str(tmp_path / "phase5_checklist.md"),
+            "--output",
+            str(tmp_path / "phase5_release_gate.json"),
+            "--skip-targeted-tests",
+            "--skip-full-suite",
+        ]
+    )
+    assert phase5_gate_args.command == "phase5-release-gate"
+    assert phase5_gate_args.checklist.name == "phase5_checklist.md"
+    assert phase5_gate_args.run_targeted_tests is False
+    assert phase5_gate_args.run_full_suite is False
+
 
 def test_cmd_phase5_crosswalk_report_writes_json_and_markdown(tmp_path):
     crosswalk = ROOT / ".github" / "project-management" / "phase5_crosswalk.json"
@@ -395,7 +416,7 @@ def test_cmd_phase5_crosswalk_report_writes_json_and_markdown(tmp_path):
 
     markdown_text = markdown.read_text(encoding="utf-8")
     assert "# Phase 5 Crosswalk Report" in markdown_text
-    assert "| Section | Source family | Replay state | Backend | CLI | GUI |" in markdown_text
+    assert "| Section | Source family | Replay states | Provenance | Backend | CLI | GUI |" in markdown_text
 
 
 def test_cmd_file_query_writes_rows(tmp_path):
@@ -539,6 +560,96 @@ def test_cmd_gui_acceptance_checklist_writes_readiness_payload(tmp_path):
     assert payload["checklist"]["exists"] is True
     assert payload["checklist"]["unchecked_items"] == []
     assert payload["ready"] is True
+
+
+def test_cmd_phase5_release_gate_writes_ready_payload(monkeypatch, tmp_path):
+    checklist = tmp_path / "phase5_release_checklist.md"
+    checklist.write_text(
+        "\n".join(
+            [
+                "# Phase 5.6 Checklist",
+                "- [x] Targeted tests passed",
+                "- [x] Full no-deselection suite passed",
+                "- [x] Manual sizing checks completed",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    probe_dir = tmp_path / "phase5_parity"
+    probe_dir.mkdir(parents=True, exist_ok=True)
+    (probe_dir / "index.html").write_text("<html></html>\n", encoding="utf-8")
+    (probe_dir / "phase5_probe_report.json").write_text(
+        json.dumps(
+            {
+                "schema": "fluxforge.gui_phase5_probe.v1",
+                "summary": {
+                    "screenshots": 4,
+                    "parity_failed": 0,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    audit_report = tmp_path / "audit_report.json"
+    audit_report.write_text(
+        json.dumps({"total_pages": 1, "failing_pages": 0}),
+        encoding="utf-8",
+    )
+
+    status_doc = tmp_path / "status_doc.md"
+    status_doc.write_text(
+        "Phase 5.6 release gate evidence refreshed.\n",
+        encoding="utf-8",
+    )
+
+    def fake_run_reference_parity_suite(**kwargs):
+        return {
+            "summary": {
+                "total": 2,
+                "passed": 2,
+                "failed": 0,
+            }
+        }
+
+    monkeypatch.setattr(app, "run_reference_parity_suite", fake_run_reference_parity_suite)
+
+    class _FakeCompletedProcess:
+        def __init__(self):
+            self.returncode = 0
+            self.stdout = "118 passed\n"
+            self.stderr = ""
+
+    def fake_subprocess_run(command, cwd, env, capture_output, text, check):
+        return _FakeCompletedProcess()
+
+    monkeypatch.setattr(app.subprocess, "run", fake_subprocess_run)
+
+    output = tmp_path / "phase5_release_gate.json"
+    app.cmd_phase5_release_gate(
+        Namespace(
+            crosswalk=ROOT / ".github" / "project-management" / "phase5_crosswalk.json",
+            reference_root=ROOT / "tests" / "spectra" / "reference_parity",
+            activation_root=ROOT / "tests" / "activation_inventory" / "fixtures",
+            probe_dir=probe_dir,
+            playwright_report=audit_report,
+            checklist=checklist,
+            suite_script=ROOT / "tools" / "qa" / "run_phase5_full_suite.sh",
+            status_doc=[status_doc],
+            run_targeted_tests=True,
+            run_full_suite=True,
+            strict=False,
+            output=output,
+        )
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["schema"] == "fluxforge.phase5.release_gate.v1"
+    assert payload["ready"] is True
+    assert payload["checks"]["tests"]["targeted"]["passed"] is True
+    assert payload["checks"]["tests"]["full_phase5_suite"]["no_deselection"] is True
 
 
 def test_build_parser_activity_review_command(tmp_path):
@@ -3936,3 +4047,58 @@ def test_cmd_unfold_supports_mlem(monkeypatch, tmp_path):
     assert unfold_written["payload"]["diagnostics"]["measured_rates"] == [1.0]
     assert unfold_written["payload"]["diagnostics"]["predicted_rates"]
     assert unfold_written["payload"]["diagnostics"]["rate_pulls"]
+
+
+def test_root_help_groups_command_families(capsys):
+    parser = app.build_parser()
+    with pytest.raises(SystemExit) as excinfo:
+        parser.parse_args(["--help"])
+    assert excinfo.value.code == 0
+    out = capsys.readouterr().out
+    assert "Command Families:" in out
+    assert "Spectrum Analysis [spectrum]" in out
+    assert "Activation, Inventory, and Libraries [activation]" in out
+    assert "Run `fluxforge commands` for the full grouped catalog." in out
+
+
+def test_command_catalog_matches_registered_subcommands():
+    parser = app.build_parser()
+    catalog = build_command_catalog(parser)
+    subparsers = next(
+        action for action in parser._actions if isinstance(action, argparse._SubParsersAction)
+    )
+    parser_names = [choice.dest for choice in subparsers._choices_actions]
+    assert [entry.name for entry in catalog] == parser_names
+    assert len({entry.name for entry in catalog}) == len(catalog)
+
+
+def test_commands_subcommand_renders_family_filtered_text(capsys):
+    parser = app.build_parser()
+    args = parser.parse_args(["commands", "--family", "spectrum"])
+    setattr(args, "_parser", parser)
+    args.func(args)
+    out = capsys.readouterr().out
+    assert "Spectrum Analysis [spectrum]" in out
+    assert "ingest" in out
+    assert "peaks" in out
+    assert "Validation and Governance [validation]" not in out
+
+
+def test_commands_subcommand_renders_markdown(capsys):
+    parser = app.build_parser()
+    args = parser.parse_args(["commands", "--format", "markdown", "--family", "gui"])
+    setattr(args, "_parser", parser)
+    args.func(args)
+    out = capsys.readouterr().out
+    assert out.startswith("# FluxForge CLI Reference")
+    assert "## GUI and Visualization" in out
+    assert "### `gui`" in out
+    assert "### `plots`" in out
+    assert "## Spectrum Analysis" not in out
+
+
+def test_cli_reference_markdown_is_in_sync():
+    parser = app.build_parser()
+    expected = render_command_catalog_markdown(build_command_catalog(parser))
+    actual = (ROOT / "docs" / "CLI_REFERENCE.md").read_text(encoding="utf-8")
+    assert actual == expected
