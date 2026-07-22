@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
+from dataclasses import asdict
 
 from fluxforge.analysis.detector_calibration import EfficiencyPoint
 from fluxforge.core.analysis_workspace import (
@@ -14,6 +15,7 @@ from fluxforge.core.analysis_workspace import (
 from fluxforge.gui.mode_manager import ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.widgets import MethodSelectorWidget
+from fluxforge.io.flux_wire import EfficiencyCalibration
 from fluxforge.plugins import bootstrap_builtin_registries
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
@@ -21,8 +23,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QAbstractItemView,
         QDialog,
         QDialogButtonBox,
+        QDoubleSpinBox,
+        QGridLayout,
+        QGroupBox,
         QHeaderView,
         QLabel,
+        QLineEdit,
         QPushButton,
         QTableWidget,
         QTableWidgetItem,
@@ -38,9 +44,28 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         HEADERS = (
             "Energy keV",
             "Net Counts",
+            "Count Unc.",
             "Live Time s",
             "Activity Bq",
+            "Activity Rel. Unc.",
             "Gamma Intensity",
+            "Intensity Unc.",
+            "Geometry Factor",
+        )
+
+        DETECTOR_FIELDS = (
+            ("C1", "Efficiency C1", -1.0e6, 1.0e6),
+            ("C2", "Efficiency C2", -1.0e6, 1.0e6),
+            ("C3", "Efficiency C3", -1.0e6, 1.0e6),
+            ("C4", "Efficiency C4", -1.0e6, 1.0e6),
+            ("geometry_factor_A", "Geometry factor A", 0.0, 1.0e6),
+            ("al_window_T1_um", "Al window T1 (um)", 0.0, 1.0e6),
+            ("detector_thickness_DI_cm", "Detector thickness DI (cm)", 0.0, 1.0e4),
+            ("dead_layer_DL_um", "Dead layer DL (um)", 0.0, 1.0e6),
+            ("incident_angle_AI_deg", "Incident angle AI (deg)", -360.0, 360.0),
+            ("detector_diameter_cm", "Detector diameter (cm)", 0.0, 1.0e4),
+            ("source_distance_cm", "Source distance (cm)", 0.0, 1.0e6),
+            ("relative_uncertainty", "Relative uncertainty (fraction)", 0.0, 1.0),
         )
 
         def __init__(
@@ -48,17 +73,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             *,
             mode_manager: ModeManager,
             points: Sequence[EfficiencyPoint] | None = None,
+            detector_calibration: EfficiencyCalibration | None = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
             self.setWindowTitle("Efficiency Calibration")
-            self.resize(860, 520)
+            self.resize(1120, 760)
 
             registries = bootstrap_builtin_registries()
             if len(registries.calibration_models) == 0:
                 register_builtin_efficiency_models(registries)
             self._registry = registries.calibration_models
             self._fit_result: EfficiencyCalibrationFitResult | None = None
+            self._detector_calibration = detector_calibration or EfficiencyCalibration(
+                relative_uncertainty=0.05
+            )
 
             root = QVBoxLayout(self)
             root.setContentsMargins(18, 18, 18, 18)
@@ -82,6 +111,31 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             root.addWidget(self.method_selector)
+
+            detector_group = QGroupBox("HPGe detector parameters", self)
+            detector_group.setObjectName("HpgeDetectorParametersGroup")
+            detector_layout = QGridLayout(detector_group)
+            detector_layout.addWidget(QLabel("Detector ID", detector_group), 0, 0)
+            self.detector_id_edit = QLineEdit(detector_group)
+            self.detector_id_edit.setObjectName("HpgeDetectorIdEdit")
+            self.detector_id_edit.setText(self._detector_calibration.detector_id)
+            detector_layout.addWidget(self.detector_id_edit, 0, 1, 1, 3)
+
+            self.detector_fields: dict[str, QDoubleSpinBox] = {}
+            for index, (attribute, label, minimum, maximum) in enumerate(
+                self.DETECTOR_FIELDS
+            ):
+                row = 1 + index // 2
+                column = (index % 2) * 2
+                detector_layout.addWidget(QLabel(label, detector_group), row, column)
+                field = QDoubleSpinBox(detector_group)
+                field.setObjectName(f"Hpge{attribute}Spin")
+                field.setDecimals(8)
+                field.setRange(minimum, maximum)
+                field.setValue(float(getattr(self._detector_calibration, attribute)))
+                detector_layout.addWidget(field, row, column + 1)
+                self.detector_fields[attribute] = field
+            root.addWidget(detector_group)
 
             self.table = QTableWidget(0, len(self.HEADERS), self)
             self.table.setObjectName("EfficiencyCalibrationTable")
@@ -122,12 +176,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     (
                         point.energy_keV,
                         point.net_counts,
+                        (
+                            point.count_uncertainty
+                            if point.count_uncertainty is not None
+                            else max(math.sqrt(abs(point.net_counts)), 1.0)
+                        ),
                         point.live_time_s,
                         point.activity_bq,
+                        point.activity_rel_unc or 0.0,
                         point.emission_probability,
+                        point.probability_uncertainty or 0.0,
+                        point.geometry_factor,
                     )
                 ):
-                    self.table.setItem(row, column, QTableWidgetItem(f"{float(value):.6g}"))
+                    self.table.setItem(
+                        row, column, QTableWidgetItem(f"{float(value):.6g}")
+                    )
 
         def _seed_demo_points(self) -> None:
             self._seed_points(self._demo_points())
@@ -157,12 +221,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         EfficiencyPoint(
                             energy_keV=float(self.table.item(row, 0).text()),
                             net_counts=float(self.table.item(row, 1).text()),
-                            live_time_s=float(self.table.item(row, 2).text()),
-                            activity_bq=float(self.table.item(row, 3).text()),
-                            emission_probability=float(self.table.item(row, 4).text()),
                             count_uncertainty=max(
-                                math.sqrt(abs(float(self.table.item(row, 1).text()))),
-                                1.0,
+                                float(self.table.item(row, 2).text()), 0.0
+                            ),
+                            live_time_s=float(self.table.item(row, 3).text()),
+                            activity_bq=float(self.table.item(row, 4).text()),
+                            activity_rel_unc=max(
+                                float(self.table.item(row, 5).text()), 0.0
+                            ),
+                            emission_probability=float(self.table.item(row, 6).text()),
+                            probability_uncertainty=max(
+                                float(self.table.item(row, 7).text()), 0.0
+                            ),
+                            geometry_factor=max(
+                                float(self.table.item(row, 8).text()), 1.0e-12
                             ),
                         )
                     )
@@ -177,7 +249,28 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             self._fit_result = fit_efficiency_model(
                 points,
-                model_key=self.method_selector.current_key() or self._registry.default_key or "log_poly_2",
+                model_key=self.method_selector.current_key()
+                or self._registry.default_key
+                or "log_poly_2",
+            )
+            detector = self.detector_calibration()
+            self._detector_calibration = detector
+            self._fit_result.curve.detector_id = detector.detector_id
+            self._fit_result.curve.geometry = {
+                "geometry_factor_A": detector.geometry_factor_A,
+                "al_window_T1_um": detector.al_window_T1_um,
+                "detector_thickness_DI_cm": detector.detector_thickness_DI_cm,
+                "dead_layer_DL_um": detector.dead_layer_DL_um,
+                "incident_angle_AI_deg": detector.incident_angle_AI_deg,
+                "detector_diameter_cm": detector.detector_diameter_cm,
+                "source_distance_cm": detector.source_distance_cm,
+            }
+            self._fit_result.curve.uncertainty_model = {
+                "type": "constant",
+                "value": detector.relative_uncertainty,
+            }
+            self._fit_result.curve.parameters["detector_calibration"] = asdict(
+                detector
             )
             self.summary.setText(
                 (
@@ -189,6 +282,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def accepted_fit(self) -> EfficiencyCalibrationFitResult | None:
             return self._fit_result
 
+        def detector_calibration(self) -> EfficiencyCalibration:
+            return EfficiencyCalibration(
+                detector_id=self.detector_id_edit.text().strip(),
+                **{
+                    attribute: float(field.value())
+                    for attribute, field in self.detector_fields.items()
+                },
+            )
 
 else:
 
@@ -198,11 +299,18 @@ else:
             *,
             mode_manager: ModeManager,
             points: Sequence[EfficiencyPoint] | None = None,
+            detector_calibration: EfficiencyCalibration | None = None,
             parent=None,
         ) -> None:
             self.mode_manager = mode_manager
             self.points = tuple(points or ())
+            self._detector_calibration = detector_calibration or EfficiencyCalibration(
+                relative_uncertainty=0.05
+            )
             self.parent = parent
 
         def accepted_fit(self) -> EfficiencyCalibrationFitResult | None:
             return None
+
+        def detector_calibration(self) -> EfficiencyCalibration:
+            return self._detector_calibration

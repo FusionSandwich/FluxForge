@@ -1009,7 +1009,15 @@ def calculate_peak_activity(
         ),
     )
     activity_bq = measurement.activity_at_reference()
-    uncertainty_bq = activity_bq / math.sqrt(max(peak.net_counts, 1.0))
+    count_relative_uncertainty = 1.0 / math.sqrt(max(peak.net_counts, 1.0))
+    efficiency_relative_uncertainty = float(
+        np.asarray(
+            efficiency_curve.efficiency_uncertainty(peak.energy_keV), dtype=float
+        ).reshape(-1)[0]
+    )
+    uncertainty_bq = activity_bq * math.sqrt(
+        count_relative_uncertainty**2 + efficiency_relative_uncertainty**2
+    )
     age_corrected_activity = activity_bq * math.exp(
         math.log(2.0) * source_age_s / max(half_life_s, 1e-6)
     )

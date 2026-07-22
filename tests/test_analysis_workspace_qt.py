@@ -33,6 +33,7 @@ from fluxforge.gui.analysis_workspace import (  # noqa: E402
     AnalysisWorkspaceState,
     SpectrumSlot,
 )
+from fluxforge.io.flux_wire import EfficiencyCalibration  # noqa: E402
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QApplication  # noqa: E402
 from fluxforge.gui.selection_bus import SelectionBus  # noqa: E402
 from tests._phase6_real_data import (  # noqa: E402
@@ -162,6 +163,20 @@ def test_efficiency_models_and_activity_results_are_available():
     assert result.mda_bq > 0.0
     assert "Bateman correction" in result.chain_summary
 
+    fits["log_poly_2"].curve.uncertainty_model = {
+        "type": "constant",
+        "value": 0.25,
+    }
+    high_efficiency_uncertainty = calculate_peak_activity(
+        matched[1],
+        build_demo_spectrum(),
+        efficiency_curve=fits["log_poly_2"].curve,
+        gamma_intensity=1.0,
+        half_life_s=5.27 * 365.25 * 24.0 * 3600.0,
+        source_age_s=12.0 * 3600.0,
+    )
+    assert high_efficiency_uncertainty.uncertainty_bq > result.uncertainty_bq
+
 
 def test_line_match_browser_and_gamma_phenomena_estimates_are_available():
     controller = NuclideSearchController(SelectionBus())
@@ -195,6 +210,11 @@ def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
             active_spectrum_key="foreground",
         )
     )
+    controller.set_detector_efficiency(
+        EfficiencyCalibration(detector_id="South", source_distance_cm=25.0)
+    )
+    assert controller.state.detector_efficiency.detector_id == "South"
+    assert controller.describe()["detector_id"] == "South"
 
     sample_key = controller.register_loaded_spectrum(
         build_demo_spectrum(),

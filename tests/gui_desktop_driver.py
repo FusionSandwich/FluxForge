@@ -65,6 +65,46 @@ def _center_of(widget: tk.Misc) -> tuple[int, int]:
     )
 
 
+def _scroll_widget_into_view(root: tk.Tk, widget: tk.Misc) -> None:
+    """Reveal a control nested in a scrollable Tk canvas before screen clicks."""
+
+    root.update_idletasks()
+    ancestor = widget.master
+    while ancestor is not None and ancestor is not root:
+        if isinstance(ancestor, tk.Canvas):
+            scroll_region = ancestor.bbox("all")
+            if scroll_region is None:
+                return
+
+            canvas_top = ancestor.winfo_rooty()
+            canvas_bottom = canvas_top + ancestor.winfo_height()
+            widget_top = widget.winfo_rooty()
+            widget_bottom = widget_top + widget.winfo_height()
+            if widget_top >= canvas_top and widget_bottom <= canvas_bottom:
+                return
+
+            _, region_top, _, region_bottom = scroll_region
+            region_height = max(region_bottom - region_top, 1)
+            current_start, _ = ancestor.yview()
+            widget_center = (
+                widget_top
+                - canvas_top
+                + current_start * region_height
+                + widget.winfo_height() / 2
+            )
+            target_start = (
+                widget_center - ancestor.winfo_height() / 2 - region_top
+            ) / region_height
+            maximum_start = max(
+                0.0,
+                1.0 - ancestor.winfo_height() / region_height,
+            )
+            ancestor.yview_moveto(max(0.0, min(maximum_start, target_start)))
+            root.update_idletasks()
+            return
+        ancestor = ancestor.master
+
+
 def _tree_item_center(
     tree: tk.Misc, item_id: str, column: str = "#1"
 ) -> tuple[int, int]:
@@ -96,10 +136,12 @@ def _notebook_tab_center(notebook: tk.Misc, label: str) -> tuple[int, int] | Non
 
 class _LinuxBackend:
     def __init__(self) -> None:
+        from PIL import ImageGrab
         import pyautogui
 
         pyautogui.FAILSAFE = False
         pyautogui.PAUSE = 0.05
+        self._ImageGrab = ImageGrab
         self._pyautogui = pyautogui
 
     def click(self, x: int, y: int) -> None:
@@ -112,12 +154,41 @@ class _LinuxBackend:
         self._pyautogui.hotkey("ctrl", "a")
         self._pyautogui.press("backspace")
 
-    def screenshot(self, output_path: Path) -> None:
-        subprocess.run(
-            ["import", "-window", "root", str(output_path)],
-            check=True,
-            cwd=REPO_ROOT,
-        )
+    def screenshot(
+        self,
+        output_path: Path,
+        bbox: tuple[int, int, int, int] | None = None,
+    ) -> None:
+        try:
+            self._ImageGrab.grab(bbox=bbox).save(output_path)
+        except OSError:
+            if not Path("/proc/sys/fs/binfmt_misc/WSLInterop").exists():
+                raise
+            windows_path = subprocess.check_output(
+                ["wslpath", "-w", str(output_path)],
+                text=True,
+            ).strip()
+            escaped_path = windows_path.replace("'", "''")
+            script = (
+                "Add-Type -AssemblyName System.Drawing; "
+                "Add-Type -AssemblyName System.Windows.Forms; "
+                "$b=[System.Windows.Forms.SystemInformation]::VirtualScreen; "
+                "$i=New-Object System.Drawing.Bitmap($b.Width,$b.Height); "
+                "$g=[System.Drawing.Graphics]::FromImage($i); "
+                "$g.CopyFromScreen($b.Left,$b.Top,0,0,$i.Size); "
+                f"$i.Save('{escaped_path}'); "
+                "$g.Dispose(); $i.Dispose()"
+            )
+            subprocess.run(
+                [
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-Command",
+                    script,
+                ],
+                check=True,
+            )
 
 
 class _WindowsBackend:
@@ -138,8 +209,12 @@ class _WindowsBackend:
     def clear_entry(self) -> None:
         self._keyboard.send_keys("^a{BACKSPACE}", pause=0.02)
 
-    def screenshot(self, output_path: Path) -> None:
-        self._ImageGrab.grab().save(output_path)
+    def screenshot(
+        self,
+        output_path: Path,
+        bbox: tuple[int, int, int, int] | None = None,
+    ) -> None:
+        self._ImageGrab.grab(bbox=bbox).save(output_path)
 
 
 def _build_backend():
@@ -179,6 +254,7 @@ def _wait_for(
 
 
 def _click_widget(root: tk.Tk, backend, widget: tk.Misc) -> None:
+    _scroll_widget_into_view(root, widget)
     root.update_idletasks()
     local_x = max(int(widget.winfo_width() / 2), 1)
     local_y = max(int(widget.winfo_height() / 2), 1)
@@ -248,7 +324,11 @@ def _click_tree_item(root: tk.Tk, backend, tree: tk.Misc, item_id: str) -> None:
 def _take_screenshot(root: tk.Tk, backend, output_dir: Path, name: str) -> Path:
     root.update()
     output_path = output_dir / name
-    backend.screenshot(output_path)
+    left = max(root.winfo_rootx(), 0)
+    top = max(root.winfo_rooty(), 0)
+    right = min(left + root.winfo_width(), root.winfo_screenwidth())
+    bottom = min(top + root.winfo_height(), root.winfo_screenheight())
+    backend.screenshot(output_path, bbox=(left, top, right, bottom))
     return output_path
 
 

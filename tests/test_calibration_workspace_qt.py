@@ -29,6 +29,7 @@ from fluxforge.gui.panels.modern_shell import build_demo_spectrum  # noqa: E402
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QApplication  # noqa: E402
 from fluxforge.gui.selection_bus import SelectionBus  # noqa: E402
 from fluxforge.gui.widgets import MethodSelectorWidget  # noqa: E402
+from fluxforge.io.flux_wire import EfficiencyCalibration  # noqa: E402
 from fluxforge.plugins import PluginRegistries  # noqa: E402
 
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # noqa: E402
@@ -162,6 +163,18 @@ def test_efficiency_dialog_exposes_all_four_registered_models():
     _qapp()
     dialog = EfficiencyCalibrationDialog(
         mode_manager=ModeManager(),
+        detector_calibration=EfficiencyCalibration(
+            detector_id="South",
+            C1=-20.26,
+            C2=10.29,
+            C3=-1.655,
+            C4=0.0867,
+            geometry_factor_A=0.01,
+            detector_thickness_DI_cm=6.45,
+            detector_diameter_cm=6.0,
+            source_distance_cm=25.0,
+            relative_uncertainty=0.026,
+        ),
     )
     dialog.show()
     _qapp().processEvents()
@@ -176,6 +189,16 @@ def test_efficiency_dialog_exposes_all_four_registered_models():
         "gray_functional",
         "semi_empirical_hpge",
     }.issubset(keys)
+    assert dialog.table.columnCount() == 9
+    assert dialog.detector_id_edit.text() == "South"
+    assert dialog.detector_fields[
+        "detector_thickness_DI_cm"
+    ].value() == pytest.approx(6.45)
+
+    dialog.detector_id_edit.setText("South-updated")
+    dialog.detector_fields["source_distance_cm"].setValue(30.0)
+    dialog.detector_fields["relative_uncertainty"].setValue(0.075)
+    dialog.table.item(0, 8).setText("1.25")
 
     dialog.method_selector.set_current_key("semi_empirical_hpge")
     dialog._fit_model()
@@ -183,6 +206,16 @@ def test_efficiency_dialog_exposes_all_four_registered_models():
 
     assert dialog.accepted_fit() is not None
     assert dialog.accepted_fit().model_key == "semi_empirical_hpge"
+    assert dialog.detector_calibration().detector_id == "South-updated"
+    assert dialog.detector_calibration().source_distance_cm == pytest.approx(30.0)
+    assert dialog._read_points()[0].geometry_factor == pytest.approx(1.25)
+    assert dialog.accepted_fit().curve.detector_id == "South-updated"
+    assert dialog.accepted_fit().curve.geometry[
+        "source_distance_cm"
+    ] == pytest.approx(30.0)
+    assert dialog.accepted_fit().curve.efficiency_uncertainty(
+        661.657
+    ) == pytest.approx(0.075)
     dialog.close()
 
 

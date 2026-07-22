@@ -16,6 +16,7 @@ from fluxforge.core.analysis_workspace import (
     SurveyPoint,
 )
 from fluxforge.gui.qt_compat import QT_AVAILABLE
+from fluxforge.io.flux_wire import EfficiencyCalibration
 from fluxforge.io.spe import GammaSpectrum
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
@@ -62,6 +63,7 @@ class AnalysisWorkspaceState:
     background_scale: float = 1.0
     background_visible: bool = True
     efficiency_fit: EfficiencyCalibrationFitResult | None = None
+    detector_efficiency: EfficiencyCalibration | None = None
     activity_results: tuple[ActivityCalculationResult, ...] = ()
     roi_analysis: ROIAnalysisResult | None = None
     roi_statistics: ROIStatisticsResult | None = None
@@ -288,6 +290,12 @@ class AnalysisWorkspaceController:
     ) -> AnalysisWorkspaceState:
         return self.update(efficiency_fit=fit)
 
+    def set_detector_efficiency(
+        self,
+        calibration: EfficiencyCalibration | None,
+    ) -> AnalysisWorkspaceState:
+        return self.update(detector_efficiency=copy.deepcopy(calibration))
+
     def set_activity_results(
         self,
         results: Sequence[ActivityCalculationResult],
@@ -331,6 +339,11 @@ class AnalysisWorkspaceController:
             "roi_background_method": self._state.roi_background_method,
             "background_mode": self._state.background_mode,
             "background_visible": self._state.background_visible,
+            "detector_id": (
+                self._state.detector_efficiency.detector_id
+                if self._state.detector_efficiency is not None
+                else None
+            ),
             "activity_result_count": len(self._state.activity_results),
             "has_roi_analysis": self._state.roi_analysis is not None,
             "has_roi_statistics": self._state.roi_statistics is not None,

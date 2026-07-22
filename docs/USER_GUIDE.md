@@ -18,7 +18,7 @@ FluxForge supports both command-line and desktop-GUI use:
 
 ## 2. Installation and Command Discovery
 
-Use [docs/INSTALLATION.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/INSTALLATION.md:1)
+Use [INSTALLATION.md](INSTALLATION.md)
 for the full step-by-step setup guide.
 
 The short version is:
@@ -33,6 +33,10 @@ or, for the GUI and reporting extras:
 pip install -e '.[native-gui,reporting]'
 ```
 
+Use 64-bit Python 3.11 or 3.12. See
+[INSTALLATION.md](INSTALLATION.md) for platform-specific Windows and Linux
+prerequisites and copy-and-paste commands.
+
 After installation, the most important discovery commands are:
 
 ```bash
@@ -42,7 +46,7 @@ fluxforge commands --family spectrum
 fluxforge gui --help
 ```
 
-Use [docs/CLI_REFERENCE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/CLI_REFERENCE.md:1)
+Use [CLI_REFERENCE.md](CLI_REFERENCE.md)
 for the full grouped command list.
 
 ## 3. Capability Families and When to Use Them

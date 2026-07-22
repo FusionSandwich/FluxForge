@@ -93,6 +93,7 @@ from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
 from fluxforge.gui.widgets.method_selector import MethodSelectorWidget
+from fluxforge.io.flux_wire import EfficiencyCalibration
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.plots.activation import plot_decay_curves
 from fluxforge.plugins import bootstrap_builtin_registries
@@ -1122,6 +1123,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             dialog = EfficiencyCalibrationDialog(
                 mode_manager=self.mode_manager,
                 points=self._seed_efficiency_points(),
+                detector_calibration=(
+                    self.workspace_controller.state.detector_efficiency
+                    or EfficiencyCalibration(relative_uncertainty=0.05)
+                ),
                 parent=self,
             )
             if dialog.exec() != dialog.Accepted:
@@ -1131,6 +1136,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             self._last_activity_review = None
             self.workspace_controller.set_efficiency_fit(fit)
+            self.workspace_controller.set_detector_efficiency(
+                dialog.detector_calibration()
+            )
 
         def _seed_efficiency_points(self) -> tuple[EfficiencyPoint, ...]:
             peaks = self.workspace_controller.state.peaks

@@ -27,7 +27,7 @@ fluxforge gui --help
 ```
 
 If another machine reports `ModuleNotFoundError: No module named 'fluxforge.gui'`,
-the fix is usually to install FluxForge into the active Python 3.11+ environment
+the fix is usually to install FluxForge into an active Python 3.11 or 3.12 environment
 and launch it with `fluxforge gui` or `fluxforge-gui` rather than trying to run
 `python -m fluxforge.gui.app` directly.
 

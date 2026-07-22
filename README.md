@@ -24,50 +24,46 @@ run `fluxforge commands` to see the grouped CLI surface.
 | Validation and replay | Run parity, crosswalk, release-gate, and bundled RAFM replay workflows | `parity-check`, `phase5-crosswalk-report`, `phase5-release-gate`, `rafm-validate`, `phase6-ldrd-worked-example` |
 | Desktop GUI | Review spectra interactively, drag ROIs and peak centroids, and inspect linked analysis panels | `fluxforge gui`, `fluxforge-gui` |
 
-## Step-by-Step Setup
+## Quick GUI Setup
 
-Detailed setup instructions live in [docs/INSTALLATION.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/INSTALLATION.md:1). The shortest supported path is:
+Use 64-bit Python **3.11 or 3.12**. Python 3.13 is not currently supported
+because FluxForge uses NumPy 1.26. The complete prerequisite and
+troubleshooting guide is [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
-### 1. Create and activate an environment
+### Windows PowerShell
 
-Using `venv`:
+```powershell
+git clone https://github.com/FusionSandwich/FluxForge.git
+Set-Location FluxForge
+git switch optimization-workflows
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -e ".[native-gui,reporting]"
+.\.venv\Scripts\fluxforge.exe gui --project-dir .
+```
+
+### Linux
+
+Install the Qt runtime prerequisites first; the complete package list is in
+the [installation guide](docs/INSTALLATION.md#linux-copy-and-paste-setup).
 
 ```bash
-python3.11 -m venv .venv
+git clone https://github.com/FusionSandwich/FluxForge.git
+cd FluxForge
+git switch optimization-workflows
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
+python -m pip install -e '.[native-gui,reporting]'
+fluxforge gui --project-dir .
 ```
 
-Using Conda:
-
-```bash
-conda env create -f environment.yml
-conda activate fluxforge
-python -m pip install --upgrade pip
-```
-
-### 2. Choose an install profile
-
-| Profile | Command | Use when |
-|---|---|---|
-| CLI-only | `pip install -e .` | You want the command-line workflows and bundled examples |
-| Full user install | `pip install -e '.[native-gui,reporting]'` | You want the CLI plus the Qt GUI and reporting extras |
-| Developer/test extras | `pip install -e '.[dev,gui-test]'` | You are contributing, running QA probes, or extending the test surface |
-
-### 3. Verify the install
-
-Run these from the repository root after installation:
+Verify either installation with:
 
 ```bash
 fluxforge --help
-fluxforge commands
-fluxforge gui --help
-```
-
-If you installed the GUI extras, also verify:
-
-```bash
 fluxforge-gui --help
+python -c "from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR; assert QT_AVAILABLE, QT_IMPORT_ERROR; print('Qt GUI ready')"
 ```
 
 ## The First 5 Commands to Run
@@ -83,7 +79,7 @@ fluxforge phase6-ldrd-worked-example --help
 ```
 
 Use `fluxforge <command> --help` for flags. Use
-[docs/CLI_REFERENCE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/CLI_REFERENCE.md:1)
+[docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
 for the full grouped reference.
 
 ## First CLI Workflow
@@ -148,7 +144,7 @@ Important:
 If you see `ModuleNotFoundError: No module named 'fluxforge.gui'`, the usual causes are:
 
 - FluxForge was not installed into the active environment
-- the active Python is older than the required Python 3.11+
+- the active Python is not a supported 64-bit Python 3.11 or 3.12
 - the `native-gui` extra was not installed for a GUI workflow
 
 Fix it with:
@@ -172,18 +168,18 @@ clear output targets:
 | Unfolding benchmark | `python examples/unfolding_benchmark/run_benchmark.py` | bundled benchmark response matrix, measurements, and truth spectrum | benchmark plots and JSON metrics |
 
 For the full example inventory, use
-[examples/README.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/README.md:1)
-and [examples/example_inventory.json](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/example_inventory.json:1).
+[examples/README.md](examples/README.md)
+and [examples/example_inventory.json](examples/example_inventory.json).
 
 ## Documentation Map
 
 Start here:
 
-- [docs/INSTALLATION.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/INSTALLATION.md:1)
-- [docs/CLI_REFERENCE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/CLI_REFERENCE.md:1)
-- [docs/USER_GUIDE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/USER_GUIDE.md:1)
-- [docs/EXAMPLE_WORKFLOWS.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/EXAMPLE_WORKFLOWS.md:1)
-- [examples/README.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/README.md:1)
+- [docs/INSTALLATION.md](docs/INSTALLATION.md)
+- [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
+- [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+- [docs/EXAMPLE_WORKFLOWS.md](docs/EXAMPLE_WORKFLOWS.md)
+- [examples/README.md](examples/README.md)
 
 Workflow-specific references:
 

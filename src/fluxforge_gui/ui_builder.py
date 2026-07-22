@@ -572,7 +572,13 @@ class UiBuilderMixin:
         ).grid(row=11, column=1, sticky="w", pady=(0, 4))
 
         button_row = ttk.Frame(source_frame)
-        button_row.grid(row=12, column=1, sticky="w", pady=(6, 8))
+        button_row.grid(
+            row=12,
+            column=0,
+            columnspan=3,
+            sticky="w",
+            pady=(6, 8),
+        )
         ttk.Button(
             button_row, text="Load Preview", command=self._load_spectrum_preview
         ).grid(row=0, column=0, padx=(0, 8))
@@ -581,10 +587,10 @@ class UiBuilderMixin:
         ).grid(row=0, column=1, padx=(0, 8))
         ttk.Button(
             button_row, text="Save PNG", command=self._save_spectrum_preview_png
-        ).grid(row=0, column=2, padx=(0, 8))
+        ).grid(row=1, column=0, padx=(0, 8), pady=(6, 0))
         ttk.Button(
             button_row, text="Run CLI Plot Export", command=self._run_spectrum_plot
-        ).grid(row=0, column=3)
+        ).grid(row=1, column=1, pady=(6, 0))
 
         ttk.Label(
             source_frame,
@@ -1487,8 +1493,12 @@ class UiBuilderMixin:
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(0, weight=1)
 
-        controls = ttk.Frame(frame)
-        controls.grid(row=0, column=0, sticky="nsw", padx=(0, 12))
+        controls, self.unfold_controls_canvas = self._build_scrollable_controls_panel(
+            frame,
+            row=0,
+            column=0,
+            width=430,
+        )
         controls.columnconfigure(1, weight=1)
 
         self.unfold_rates = tk.StringVar(value=str(self.project_dir / "rates.json"))
@@ -1556,7 +1566,13 @@ class UiBuilderMixin:
             response_frame, 3, "Response artifact:", self.response_output, save=True
         )
         response_buttons = ttk.Frame(response_frame)
-        response_buttons.grid(row=4, column=1, sticky="w", pady=(4, 4))
+        response_buttons.grid(
+            row=4,
+            column=0,
+            columnspan=3,
+            sticky="w",
+            pady=(4, 4),
+        )
         ttk.Button(
             response_buttons, text="Build Response", command=self._run_response
         ).grid(row=0, column=0, padx=(0, 6))
@@ -1645,7 +1661,7 @@ class UiBuilderMixin:
             controls, text="Validate artifact schema", variable=self.unfold_validate
         ).grid(row=24, column=1, sticky="w", pady=(0, 8))
         unfold_buttons = ttk.Frame(controls)
-        unfold_buttons.grid(row=25, column=1, sticky="w")
+        unfold_buttons.grid(row=25, column=0, columnspan=3, sticky="w")
         ttk.Button(unfold_buttons, text="Run Unfold", command=self._run_unfold).grid(
             row=0, column=0, padx=(0, 6)
         )
