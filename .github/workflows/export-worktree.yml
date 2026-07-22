@@ -1,0 +1,29 @@
+name: Export worktree for GUI validation
+
+on:
+  pull_request:
+    branches:
+      - add_gui
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Create source archive
+        shell: bash
+        run: git archive --format=zip --output=FluxForge-add_gui.zip HEAD
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: FluxForge-add_gui-worktree
+          path: FluxForge-add_gui.zip
+          if-no-files-found: error
+          retention-days: 1
