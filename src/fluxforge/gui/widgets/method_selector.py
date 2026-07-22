@@ -32,6 +32,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             super().__init__(parent)
             self.registry = registry
             self.mode_manager = mode_manager
+            object_stem = "".join(
+                character for character in title.title() if character.isalnum()
+            )
+            self.setObjectName(f"{object_stem}MethodSelector")
 
             root = QVBoxLayout(self)
             root.setContentsMargins(0, 0, 0, 0)
@@ -49,7 +53,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             root.addLayout(title_row)
 
             self.combo = QComboBox(self)
-            self.combo.setObjectName("MethodSelectorCombo")
+            self.combo.setObjectName(f"{object_stem}MethodSelectorCombo")
             self.combo.currentIndexChanged.connect(self._sync_badge)
             root.addWidget(self.combo)
 
@@ -126,7 +130,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 badge = "Alternative"
             self.badge_label.setText(badge)
             self.detail_label.setText(entry.metadata.description)
-
 
 else:
 

@@ -120,6 +120,11 @@ Then launch the GUI:
 fluxforge gui --project-dir .
 ```
 
+FluxForge starts with an empty analyst workspace. Choose **File > Open
+Example** for the bundled deterministic HPGe example, or open your own spectrum
+with **File > Open Spectrum**. The equivalent one-command example launch is
+`fluxforge gui --project-dir . --open-example`.
+
 Recommended first files:
 
 - foreground spectrum: `examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC`
@@ -134,7 +139,10 @@ Recommended first interactions:
 5. Click **Reset View** to return to the full spectrum or **Clear ROI** to remove the boundaries.
 6. Use the spectrum tabs and background controls to compare foreground, background, and overlay spectra.
 
-If you prefer the direct GUI entrypoint, `fluxforge-gui --project-dir .` launches the same modern Qt shell when the `native-gui` extra is installed.
+If you prefer the direct GUI entrypoint, `fluxforge-gui --project-dir .`
+launches the same Qt application when the `native-gui` extra is installed.
+Developer-only diagnostics and prototype evidence surfaces require the explicit
+`--developer-tools` flag and are not part of the production workspace.
 
 Important:
 

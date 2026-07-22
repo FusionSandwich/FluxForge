@@ -39,8 +39,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             intro = QLabel(
                 (
-                    "Review detected peaks before they are added to the modern Qt peak "
-                    "table. Uncheck any peaks you do not want to keep."
+                    "Review detected peaks before adding them to the peak table. "
+                    "Uncheck any peaks you do not want to keep."
                 ),
                 self,
             )
@@ -93,7 +93,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 if item is not None and item.checkState() == Qt.Checked:
                     peaks.append(peak)
             return tuple(peaks)
-
 
 else:
 

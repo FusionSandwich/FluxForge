@@ -382,6 +382,440 @@
         "none; this directory currently ships benchmark source assets only"
       ],
       "notes": "Bundled benchmark inputs for future SpecKit-style comparison work. No direct runner script is shipped in this directory yet."
+    },
+    {
+      "id": "complete-flux-unfolding",
+      "entry_path": "examples/complete_flux_unfolding.py",
+      "title": "Complete flux-wire unfolding research script",
+      "tier": "external-data-research-demo",
+      "install_profile": "cli",
+      "command": "python examples/complete_flux_unfolding.py",
+      "input_paths": [
+        "external rafm_irradiation_ldrd processed and raw flux-wire directories hard-coded by the script",
+        "external model spectrum path hard-coded by the script"
+      ],
+      "output_paths": [
+        "external hard-coded flux_unfolding_results directory containing CSV spectra, reaction data, and a PNG comparison"
+      ],
+      "notes": "Historical research script. It is not portable as committed: users must provide the original external RAFM directory layout or adapt the path constants."
+    },
+    {
+      "id": "epic-features-demo",
+      "entry_path": "examples/epic_features_demo.py",
+      "title": "Cross-module feature tour",
+      "tier": "supported-advanced",
+      "install_profile": "cli",
+      "command": "python examples/epic_features_demo.py",
+      "input_paths": [
+        "script-defined synthetic calibration, covariance, reaction, and spectrum data"
+      ],
+      "output_paths": [
+        "stdout feature summary; serialization checks use temporary files that are removed automatically"
+      ],
+      "notes": "Self-contained tour of calibration, GLS, stacked-target, stopping-power, covariance, metastable-state, and regularized-unfolding APIs."
+    },
+    {
+      "id": "flux-wire-unfolding-comparison",
+      "entry_path": "examples/flux_wire_unfolding_comparison.py",
+      "title": "Flux-wire unfolding reference comparison",
+      "tier": "external-data-research-demo",
+      "install_profile": "cli",
+      "command": "python examples/flux_wire_unfolding_comparison.py",
+      "input_paths": [
+        "external RAFM flux-wire measurement tree expected beside the repository",
+        "external Neutron-Unfolding reference implementation expected in the ALARA testing tree"
+      ],
+      "output_paths": [
+        "examples/flux_wire_unfolding_results/ PNG comparison and uncertainty plots"
+      ],
+      "notes": "Cross-repository validation utility. It requires the historical sibling datasets and reference checkout and is not a standalone bundled-data example."
+    },
+    {
+      "id": "flux-wire-unfolding-demo",
+      "entry_path": "examples/flux_wire_unfolding_demo.py",
+      "title": "Flux-wire unfolding research demo",
+      "tier": "external-data-research-demo",
+      "install_profile": "cli",
+      "command": "python examples/flux_wire_unfolding_demo.py",
+      "input_paths": [
+        "external rafm_irradiation_ldrd processed and raw flux-wire directories hard-coded by the script",
+        "optional external model spectrum"
+      ],
+      "output_paths": [
+        "external hard-coded flux_unfolding_results directory containing unfolded_spectrum.csv and unfolded_spectrum_comparison.png"
+      ],
+      "notes": "Historical research script whose default paths are site-specific; use the maintained RAFM validation workflow for a portable bundled-data run."
+    },
+    {
+      "id": "naa-ann-comparison",
+      "entry_path": "examples/naa_ann_comparison.py",
+      "title": "NAA-ANN external reference comparison",
+      "tier": "external-data-research-demo",
+      "install_profile": "cli",
+      "command": "python examples/naa_ann_comparison.py",
+      "input_paths": [
+        "external NAA-ANN-1 RID dataset hard-coded by the script"
+      ],
+      "output_paths": [
+        "examples/output/naa_ann_comparison.png",
+        "examples/output/naa_ann1_published_results.png"
+      ],
+      "notes": "Requires the separately obtained NAA-ANN-1 dataset and optional machine-learning dependencies; no copy of that dataset is bundled."
+    },
+    {
+      "id": "comprehensive-capability-benchmark",
+      "entry_path": "examples/run_comprehensive_benchmark.py",
+      "title": "Comprehensive capability benchmark",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/run_comprehensive_benchmark.py",
+      "input_paths": [
+        "examples/unfolding_benchmark/",
+        "examples/spectroscopy_data/",
+        "optional reference implementations and data discovered by the script"
+      ],
+      "output_paths": [
+        "output/benchmark_results.txt"
+      ],
+      "notes": "Broad research benchmark. Missing optional reference assets are reported or skipped, so it is not part of the starter acceptance workflow."
+    },
+    {
+      "id": "full-capability-demo",
+      "entry_path": "examples/run_full_demo.py",
+      "title": "Historical full capability demonstration",
+      "tier": "external-data-research-demo",
+      "install_profile": "cli",
+      "command": "python examples/run_full_demo.py",
+      "input_paths": [
+        "external gamma-spectroscopy, MCNP, and MCNP-to-ALARA workflow directories hard-coded by the script"
+      ],
+      "output_paths": [
+        "external hard-coded examples_output directory containing JSON, ALARA input, and plot artifacts"
+      ],
+      "notes": "Site-specific historical demonstration. It is not portable without the original external data tree and edited path constants."
+    },
+    {
+      "id": "manual-flux-wire-validation",
+      "entry_path": "examples/test_flux_wire_analysis.py",
+      "title": "Manual flux-wire analysis validation",
+      "tier": "external-data-research-validation",
+      "install_profile": "cli",
+      "command": "python examples/test_flux_wire_analysis.py",
+      "input_paths": [
+        "external rafm_irradiation_ldrd raw and QuantaGraph-processed flux-wire directories referenced by the script"
+      ],
+      "output_paths": [
+        "stdout comparison and validation summary"
+      ],
+      "notes": "Manual validation program, explicitly excluded from pytest collection. Its default data paths are site-specific."
+    },
+    {
+      "id": "verify-real-data",
+      "entry_path": "examples/verify_real_data.py",
+      "title": "Historical real-spectrum verification",
+      "tier": "external-data-research-validation",
+      "install_profile": "cli",
+      "command": "python examples/verify_real_data.py",
+      "input_paths": [
+        "external gamma_spec_analysis Co-60, Y-88, and Ba-133 spectrum files hard-coded by the script"
+      ],
+      "output_paths": [
+        "stdout spectrum-I/O, peak-fit, and coincidence-correction checks"
+      ],
+      "notes": "Requires the historical external gamma_spec_analysis test-data checkout; the spectra are not bundled in this repository."
+    },
+    {
+      "id": "rafm-comparison-support",
+      "entry_path": "examples/RAFM_irradiation/_compare_common.py",
+      "title": "RAFM comparison support module",
+      "tier": "support-module",
+      "install_profile": "none",
+      "command": "Not standalone; imported by examples/RAFM_irradiation comparison scripts",
+      "input_paths": [
+        "caller script path and RAFM example directories"
+      ],
+      "output_paths": [
+        "none"
+      ],
+      "notes": "Import-only path bootstrap and file-pairing helpers. It is inventoried because the documentation coverage test discovers every Python file."
+    },
+    {
+      "id": "rafm-astm-e2005-qg-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_astm_e2005_to_qg.py",
+      "title": "ASTM E2005 versus QuantaGraph comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_astm_e2005_to_qg.py",
+      "input_paths": [
+        "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/",
+        "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/",
+        "examples/RAFM_irradiation/metadata/"
+      ],
+      "output_paths": [
+        "stdout sample-by-sample ASTM E2005 C/E comparison"
+      ],
+      "notes": "Bundled-data research comparison; it does not write durable artifacts."
+    },
+    {
+      "id": "rafm-astm-e262-qg-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_astm_e262_to_qg.py",
+      "title": "ASTM E262 versus QuantaGraph comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_astm_e262_to_qg.py --max-spectra 5",
+      "input_paths": [
+        "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/",
+        "examples/RAFM_irradiation/metadata/"
+      ],
+      "output_paths": [
+        "stdout sample-by-sample ASTM E262 comparison"
+      ],
+      "notes": "The --max-spectra limit is optional; omit it to process all paired bundled records."
+    },
+    {
+      "id": "rafm-astm-e3376-qg-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_astm_e3376_to_qg.py",
+      "title": "ASTM E3376 versus QuantaGraph comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_astm_e3376_to_qg.py",
+      "input_paths": [
+        "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/",
+        "examples/RAFM_irradiation/metadata/"
+      ],
+      "output_paths": [
+        "stdout ASTM E3376 measurement and transmutation-rate comparison"
+      ],
+      "notes": "Bundled-data standards comparison that emits its report to stdout only."
+    },
+    {
+      "id": "rafm-astm-e261-qg-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_astm_to_qg.py",
+      "title": "ASTM E261 versus QuantaGraph comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_astm_to_qg.py --max-spectra 5",
+      "input_paths": [
+        "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/",
+        "examples/RAFM_irradiation/metadata/"
+      ],
+      "output_paths": [
+        "stdout sample-by-sample ASTM E261 comparison"
+      ],
+      "notes": "The --max-spectra limit is optional; omit it to process all bundled records."
+    },
+    {
+      "id": "rafm-inl-workflow-qg-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_inl_workflow_to_qg.py",
+      "title": "INL dosimetry workflow versus QuantaGraph comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_inl_workflow_to_qg.py",
+      "input_paths": [
+        "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/",
+        "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/"
+      ],
+      "output_paths": [
+        "stdout peak-area comparison"
+      ],
+      "notes": "Runs the bundled-data INL-oriented workflow for its script-selected target and reports differences to stdout."
+    },
+    {
+      "id": "rafm-m1-m2-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_m1_m2_schedule_objectives.py",
+      "title": "RAFM DI-FOM and FIM-D schedule comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_m1_m2_schedule_objectives.py",
+      "input_paths": [
+        "examples/RAFM_irradiation/results/analysis_json/*.json"
+      ],
+      "output_paths": [
+        "examples/RAFM_irradiation/results/method_benchmark/m1_m2_schedule_comparison.csv",
+        "examples/RAFM_irradiation/results/method_benchmark/m1_m2_schedule_comparison.md"
+      ],
+      "notes": "Writes deterministic ranking and overlap evidence from committed RAFM analysis artifacts."
+    },
+    {
+      "id": "rafm-m1-m2-m3-legacy-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_m1_m2_m3_legacy_schedule_objectives.py",
+      "title": "RAFM M1/M2/M3 versus legacy schedule comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_m1_m2_m3_legacy_schedule_objectives.py",
+      "input_paths": [
+        "examples/RAFM_irradiation/results/analysis_json/*.json",
+        "legacy schedule objective module discovered in the historical sibling tree"
+      ],
+      "output_paths": [
+        "examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_legacy_schedule_comparison.csv",
+        "examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_legacy_schedule_comparison.md"
+      ],
+      "notes": "Requires the historical legacy scheduler module in addition to committed RAFM analysis artifacts."
+    },
+    {
+      "id": "rafm-m1-m2-m3-n1-n2-legacy-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_m1_m2_m3_n1_legacy_schedule_objectives.py",
+      "title": "RAFM M1/M2/M3/N1/N2 versus legacy schedule comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_m1_m2_m3_n1_legacy_schedule_objectives.py",
+      "input_paths": [
+        "examples/RAFM_irradiation/results/analysis_json/*.json",
+        "legacy schedule objective module discovered in the historical sibling tree"
+      ],
+      "output_paths": [
+        "examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.csv",
+        "examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.md"
+      ],
+      "notes": "Canonical full-method benchmark implementation; it requires the historical legacy scheduler module."
+    },
+    {
+      "id": "rafm-full-method-comparison-alias",
+      "entry_path": "examples/RAFM_irradiation/compare_m1_m2_m3_n1_n2_legacy_schedule_objectives.py",
+      "title": "RAFM full-method comparison canonical alias",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_m1_m2_m3_n1_n2_legacy_schedule_objectives.py",
+      "input_paths": [
+        "same inputs as compare_m1_m2_m3_n1_legacy_schedule_objectives.py"
+      ],
+      "output_paths": [
+        "same method_benchmark CSV and Markdown artifacts as the delegated implementation"
+      ],
+      "notes": "Thin canonical-name wrapper that delegates directly to the full M1/M2/M3/N1/N2 comparison implementation."
+    },
+    {
+      "id": "rafm-method-pairwise-similarity",
+      "entry_path": "examples/RAFM_irradiation/compare_method_rankings_pairwise.py",
+      "title": "RAFM pairwise method-ranking similarity",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_method_rankings_pairwise.py",
+      "input_paths": [
+        "examples/RAFM_irradiation/results/method_benchmark/m1_m2_m3_n1_n2_legacy_schedule_comparison.csv"
+      ],
+      "output_paths": [
+        "examples/RAFM_irradiation/results/method_benchmark/method_pairwise_similarity.csv",
+        "examples/RAFM_irradiation/results/method_benchmark/method_pairwise_similarity.md"
+      ],
+      "notes": "Post-processing step; run the full-method comparison first to create its required ranking CSV."
+    },
+    {
+      "id": "rafm-peak-count-method-comparison",
+      "entry_path": "examples/RAFM_irradiation/compare_peak_count_methods.py",
+      "title": "RAFM peak-counting method comparison",
+      "tier": "research-validation",
+      "install_profile": "cli",
+      "command": "python examples/RAFM_irradiation/compare_peak_count_methods.py --max-spectra 5",
+      "input_paths": [
+        "examples/RAFM_irradiation/raw_gamma_spec/",
+        "examples/RAFM_irradiation/QG_processed_gamma_data/",
+        "examples/RAFM_irradiation/metadata/"
+      ],
+      "output_paths": [
+        "examples/RAFM_irradiation/results/method_benchmark/line_comparison.csv",
+        "examples/RAFM_irradiation/results/method_benchmark/method_summary.csv",
+        "examples/RAFM_irradiation/results/method_benchmark/sample_method_summary.csv",
+        "examples/RAFM_irradiation/results/method_benchmark/method_summary.md"
+      ],
+      "notes": "The --max-spectra limit is optional and keeps the documented command bounded; --methods can select a subset."
+    },
+    {
+      "id": "rafm-empty-test-placeholder",
+      "entry_path": "examples/RAFM_irradiation/test_read_qg.py",
+      "title": "Empty historical QG test placeholder",
+      "tier": "non-runnable-placeholder",
+      "install_profile": "none",
+      "command": "Not runnable; examples/RAFM_irradiation/test_read_qg.py is an empty placeholder",
+      "input_paths": [
+        "none"
+      ],
+      "output_paths": [
+        "none"
+      ],
+      "notes": "Zero-byte historical placeholder. It is inventoried because the documentation coverage test discovers every Python file, but it must not be presented as a workflow."
+    },
+    {
+      "id": "validation-peakfinder-reference-comparison",
+      "entry_path": "examples/validation/compare_peakfinder_reference.py",
+      "title": "Peakfinder stored-reference comparison",
+      "tier": "fixture-dependent-validation",
+      "install_profile": "cli",
+      "command": "python examples/validation/compare_peakfinder_reference.py",
+      "input_paths": [
+        "FluxForge/artifacts/validation/peakfinder_reference/reference_vector_peaks.json",
+        "FluxForge/artifacts/validation/peakfinder_reference/fluxforge_vector_peaks.json"
+      ],
+      "output_paths": [
+        "FluxForge/artifacts/validation/peakfinder_reference/peakfinder_comparison.json when both inputs exist"
+      ],
+      "notes": "Legacy path-sensitive post-processor. It exits without output if either prerequisite artifact is absent."
+    },
+    {
+      "id": "validation-pra-peak-comparison",
+      "entry_path": "examples/validation/compare_pra_reference_peaks.py",
+      "title": "PRA stored-reference peak comparison",
+      "tier": "fixture-dependent-validation",
+      "install_profile": "cli",
+      "command": "python examples/validation/compare_pra_reference_peaks.py",
+      "input_paths": [
+        "FluxForge/artifacts/validation/pra_spectrum/reference_peaks.json",
+        "FluxForge/artifacts/validation/pra_spectrum/fluxforge_peaks.json"
+      ],
+      "output_paths": [
+        "FluxForge/artifacts/validation/pra_spectrum/pra_peak_comparison.csv when both inputs exist"
+      ],
+      "notes": "Legacy path-sensitive post-processor. It exits without output if either prerequisite artifact is absent."
+    },
+    {
+      "id": "validation-flux-unfolding-10bin-regression",
+      "entry_path": "examples/validation/flux_unfolding_10bin_regression.py",
+      "title": "Ten-bin flux-unfolding regression",
+      "tier": "external-data-research-validation",
+      "install_profile": "cli",
+      "command": "python examples/validation/flux_unfolding_10bin_regression.py --processed-dir /path/to/processed --raw-dir /path/to/raw --model-spectrum /path/to/spectrum.csv --output-dir /tmp/flux_unfolding_10bin",
+      "input_paths": [
+        "user-supplied processed flux-wire directory",
+        "user-supplied raw flux-wire directory",
+        "optional user-supplied model spectrum"
+      ],
+      "output_paths": [
+        "selected output directory containing processed/raw DISCRETE and GLS CSV files, summary.json, and unfolding_comparison.png"
+      ],
+      "notes": "Arguments are shown explicitly because the script defaults point to a historical sibling data tree that is not bundled."
+    },
+    {
+      "id": "validation-flux-wire-parity",
+      "entry_path": "examples/validation/flux_wire_parity.py",
+      "title": "Raw-versus-processed flux-wire parity validation",
+      "tier": "external-data-research-validation",
+      "install_profile": "cli",
+      "command": "python examples/validation/flux_wire_parity.py --processed-dir /path/to/processed --raw-dir /path/to/raw --output-dir /tmp/flux_wire_parity",
+      "input_paths": [
+        "user-supplied processed flux-wire directory",
+        "user-supplied raw flux-wire directory"
+      ],
+      "output_paths": [
+        "selected output directory containing raw_vs_processed_parity.csv and summary.json"
+      ],
+      "notes": "Arguments are shown explicitly because the script defaults point to a historical sibling data tree that is not bundled."
+    },
+    {
+      "id": "validation-spectrum-io-parity",
+      "entry_path": "examples/validation/spectrum_io_parity.py",
+      "title": "Spectrum-I/O stored-baseline parity validation",
+      "tier": "fixture-dependent-validation",
+      "install_profile": "cli",
+      "command": "python examples/validation/spectrum_io_parity.py",
+      "input_paths": [
+        "tests/data/parity_baselines/external_reference.json",
+        "tests/data/spectrum_io/"
+      ],
+      "output_paths": [
+        "artifacts/validation/spectrum_io/spectrum_io_parity.json"
+      ],
+      "notes": "Repository-fixture validation of SPE, CNF, IEC, and CHN readers against stored external-reference baselines."
     }
   ],
   "datasets": [

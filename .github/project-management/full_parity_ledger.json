@@ -1,0 +1,354 @@
+{
+  "schema": "fluxforge.full-parity-ledger.v1",
+  "version": 1,
+  "as_of": "2026-07-22",
+  "status_enum": [
+    "validated",
+    "implemented",
+    "prototype",
+    "scaffolded",
+    "planned",
+    "conditional-hardware",
+    "reference-only",
+    "not-applicable"
+  ],
+  "status_policy": {
+    "validated": "The implementation, interface, fixtures, tests, and platform evidence satisfy the published acceptance gate.",
+    "implemented": "The capability is present and tested, but one or more parity, native-platform, or scientific validation gates remain open.",
+    "prototype": "An executable path exists, but its scientific depth, workflow completeness, or evidence is not release-validating.",
+    "scaffolded": "Contracts, manifests, or test structure exist without a complete user workflow.",
+    "planned": "No executable capability is claimed.",
+    "conditional-hardware": "Completion requires named hardware, a licensed SDK, and hardware-in-loop evidence.",
+    "reference-only": "The item is a comparison source and is not an implemented FluxForge capability.",
+    "not-applicable": "This delivery layer is intentionally not applicable to the capability."
+  },
+  "sources": {
+    "fluxforge-roadmap": "https://github.com/FusionSandwich/FluxForge",
+    "interspec": "https://github.com/sandialabs/InterSpec",
+    "peakeasy": "https://peakeasysecure.lanl.gov/Home/About",
+    "gammavision": "https://www.ortec-online.com/products/software/gammavision",
+    "genie": "https://www.mirion.com/products/technologies/spectroscopy-scientific-analysis/gamma-spectroscopy/gamma-spectroscopy-software/lab-applications/genie-spectroscopy-software-suite",
+    "hyperlab": "https://hlabsoft.com/web/hl2023/productinfo.php",
+    "umg": "https://www.oecd-nea.org/tools/abstract/detail/nea-1665",
+    "staysl": "https://www.pnnl.gov/projects/staysl-pnnl-software-suite-reactor-dosimetry/get-staysl"
+  },
+  "coverage_contract": {
+    "roadmap_ranges": ["3.18-3.27", "3N.1-3N.16", "4.1-4.4", "5.1-5.6"],
+    "bgamma_carryovers": ["BG.1-BG.8"],
+    "required_layers": ["backend", "cli", "gui", "fixture", "test"]
+  },
+  "entries": [
+    {
+      "id": "3.18", "title": "Identification, activity, and reference parity", "roadmap": "Phase 3B", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy", "genie"],
+      "backend": "implemented", "cli": "implemented", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/core/activity_review.py", "src/fluxforge/data/nuclide_library.py", "src/fluxforge/cli/app.py", "src/fluxforge/gui/panels/modern_shell.py", "tests/test_activity_review.py"],
+      "notes": "Library registration and activity review exist; full relative-activity, source-age, decay-data, and competitor-workflow validation remain open."
+    },
+    {
+      "id": "3.19", "title": "Operational calculator parity", "roadmap": "Phase 3B", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "gammavision", "genie"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/workflows/irradiation_optimization.py", "src/fluxforge/cli/app.py", "src/fluxforge/gui/panels/phase6.py", "tests/test_optimization_difom.py"],
+      "notes": "Executable calculator and optimization paths are not evidence of validated dose, shielding, detection-limit, or irradiation-optimization parity."
+    },
+    {
+      "id": "3.20", "title": "Archive, batch, k0, and experimental-bundle workflows", "roadmap": "Phase 3B", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "hyperlab"],
+      "backend": "implemented", "cli": "implemented", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/core/batch_analysis.py", "src/fluxforge/cli/app.py", "src/fluxforge/gui/panels/phase6.py", "tests/test_cli_app.py"],
+      "notes": "File query, batch, and ffexp paths exist; archive depth, governed k0 parity, and complete report/bundle evidence remain open."
+    },
+    {
+      "id": "3.21", "title": "Repo-backed parity fixtures and manifests", "roadmap": "Phase 3B", "status": "scaffolded",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "not-applicable", "cli": "not-applicable", "gui": "not-applicable", "fixture": "scaffolded", "test": "implemented",
+      "evidence": ["tests/spectra/reference_parity/manifest.schema.json", "tests/activation_inventory/fixtures/manifest.schema.json", "tests/test_parity_fixture_manifests.py"],
+      "notes": "Manifests and initial cases exist; the complete licensed, source-linked parity corpus does not."
+    },
+    {
+      "id": "3.22", "title": "Algorithm-level parity tests", "roadmap": "Phase 3B", "status": "scaffolded",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "not-applicable", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/validation/reference_parity.py", "tests/test_reference_parity_runner.py", "tests/test_parity_phase3_scaffolding.py"],
+      "notes": "Initial parser, background, and peak-fit cases do not close all advertised algorithm families."
+    },
+    {
+      "id": "3.23", "title": "Workflow-level parity tests", "roadmap": "Phase 3B", "status": "scaffolded",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/validation/reference_parity.py", "tests/spectra/reference_parity/cases/roi_statistics_workflow_case/manifest.json", "tests/test_reference_parity_runner.py"],
+      "notes": "Initial executable workflow cases exist; same-input end-to-end competitor and UWNR golden suites remain open."
+    },
+    {
+      "id": "3.24", "title": "Direct-manipulation spectrum canvas", "roadmap": "Phase 3B", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy", "hyperlab"],
+      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/spectrum_canvas.py", "src/fluxforge/gui/backends/pyqtgraph_backend.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Canvas interaction code exists, but the complete peak/ROI/sideband command model and native Windows/Linux evidence are not yet validated."
+    },
+    {
+      "id": "3.25", "title": "Modern Qt parity workspaces", "roadmap": "Phase 3B", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "gammavision", "genie"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/panels/modern_shell.py", "src/fluxforge/gui/panels/phase6.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Several workspaces are executable; their presence does not close detection-limit, shielding, library, k0, or optimization scientific parity."
+    },
+    {
+      "id": "3.26", "title": "GUI polish, dark mode, and saved themes", "roadmap": "Phase 3B", "status": "implemented",
+      "source_urls": ["fluxforge-roadmap", "interspec"],
+      "backend": "not-applicable", "cli": "not-applicable", "gui": "implemented", "fixture": "not-applicable", "test": "implemented",
+      "evidence": ["src/fluxforge/gui/theme_manager.py", "src/fluxforge/gui/mode_manager.py", "tests/test_modern_gui_shell.py"],
+      "notes": "Implemented, with final cross-platform scaling, accessibility, and full production-copy release gates still open."
+    },
+    {
+      "id": "3.27", "title": "GUI verification and release acceptance", "roadmap": "Phase 3B", "status": "implemented",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "not-applicable", "cli": "implemented", "gui": "implemented", "fixture": "implemented", "test": "implemented",
+      "evidence": ["tests/gui_phase327_release_probe.py", "docs/PHASE3_27_RELEASE_CHECKLIST.md", "tests/test_modern_gui_shell.py"],
+      "notes": "The acceptance mechanism exists; full parity cannot be marked validated until all ledger entries and native-platform gates close."
+    },
+
+    {
+      "id": "3N.1", "title": "Irradiation schedule, inventory state, and time-evolution contracts", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/core/inventory_timeline.py", "src/fluxforge/physics/decay_inventory.py", "tests/test_inventory_timeline.py"],
+      "notes": "Inventory timelines exist, but the versioned physical campaign and covariance contract remains open."
+    },
+    {
+      "id": "3N.2", "title": "EOI back-calculation and irradiation activity export", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/core/activity_review.py", "src/fluxforge/cli/app.py", "tests/test_activity_review.py"],
+      "notes": "Basic decay back-calculation is executable; full chain-aware uncertainty and provenance validation remains open."
+    },
+    {
+      "id": "3N.3", "title": "Inventory and time-evolution workspace", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/core/inventory_timeline.py", "src/fluxforge/gui/panels/phase6.py", "tests/test_inventory_timeline.py"],
+      "notes": "The workspace displays timeline products but is not a validated arbitrary-segment campaign solver."
+    },
+    {
+      "id": "3N.4", "title": "Bateman and half-life plots with uncertainty", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/core/activity_review.py", "src/fluxforge/physics/decay_inventory.py", "tests/test_decay_inventory.py"],
+      "notes": "Decay curves exist; complete chains, uncertainty bands, linked plot interaction, and report evidence remain open."
+    },
+    {
+      "id": "3N.5", "title": "Dominant-contributor and FISPACT-style observables", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/core/inventory_timeline.py", "tests/activation_inventory/fixtures/radioactivedecay_inventory_case/manifest.json", "tests/test_inventory_timeline.py"],
+      "notes": "Contributor summaries exist; the complete observable suite and independent reference validation remain open."
+    },
+    {
+      "id": "3N.6", "title": "Nuclide-map and importance-diagram visualizations", "roadmap": "Activation/FISPACT overlay", "status": "planned",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "planned", "cli": "not-applicable", "gui": "planned", "fixture": "planned", "test": "planned",
+      "evidence": ["docs/FluxForge_NAA_Optimization_FISPACT_Addition.md"],
+      "notes": "Tables and labels must not be claimed as nuclide-map or importance-diagram visualizations."
+    },
+    {
+      "id": "3N.7", "title": "Masking and line-interference ranking", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/analysis/masking_review.py", "src/fluxforge/cli/app.py", "tests/test_masking_review.py"],
+      "notes": "A deterministic review path exists; response-aware uncertainty and reference-case validation remain open."
+    },
+    {
+      "id": "3N.8", "title": "Masking GUI and export", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/panels/phase6.py", "tests/gui_phase6_optimization_probe.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "The panel and CSV path exist; linked cooldown/line-choice plots and full native interaction evidence remain open."
+    },
+    {
+      "id": "3N.9", "title": "Comparator and relative NAA mass/concentration inference", "roadmap": "Activation/FISPACT overlay", "status": "planned",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "planned", "cli": "planned", "gui": "planned", "fixture": "planned", "test": "planned",
+      "evidence": ["docs/FluxForge_NAA_Optimization_FISPACT_Addition.md"],
+      "notes": "Activity review is not a validated comparator mass or concentration inference workflow."
+    },
+    {
+      "id": "3N.10", "title": "Absolute activation inference", "roadmap": "Activation/FISPACT overlay", "status": "planned",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "planned", "cli": "planned", "gui": "planned", "fixture": "planned", "test": "planned",
+      "evidence": ["docs/FluxForge_NAA_Optimization_FISPACT_Addition.md"],
+      "notes": "Absolute inference requires the shared physical forward model, detector corrections, covariance, and reference cases."
+    },
+    {
+      "id": "3N.11", "title": "Irradiation, cooldown, and count optimization", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/analysis/optimization_difom.py", "src/fluxforge/analysis/optimization_fim.py", "src/fluxforge/analysis/optimization_mwdcs.py", "tests/test_optimization_fim.py"],
+      "notes": "DI-FOM, FIM, and MWDCS code and unit tests exist, but the shared physical forward model, nuisance marginalization, covariance, exact oracles, and held-out validation remain open."
+    },
+    {
+      "id": "3N.12", "title": "Optimization heatmaps, Pareto plots, and schedule cards", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/panels/phase6.py", "tests/gui_phase6_optimization_probe.py"],
+      "notes": "Candidate tables are not heatmaps or Pareto plots; real linked interactive visualizations and exact nondominated sorting remain open."
+    },
+    {
+      "id": "3N.13", "title": "Second-irradiation planner and pulse timeline", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/workflows/irradiation_optimization.py", "tests/activation_inventory/fixtures/minimal_second_irradiation_case/manifest.json", "tests/test_optimization_schedule_builder.py"],
+      "notes": "A scoring and schedule path exists; posterior transfer, reaction-specific depletion, equal-resource comparison, information gain, and held-out RAFM validation remain open."
+    },
+    {
+      "id": "3N.14", "title": "Shutdown-to-100-year dose endpoints and reports", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/workflows/irradiation_optimization.py", "tests/test_inventory_timeline.py"],
+      "notes": "Endpoint rows are produced; validated dose physics, uncertainty, contributor plots, and complete reports remain open."
+    },
+    {
+      "id": "3N.15", "title": "Benchmark experimental ffexp bundle", "roadmap": "Activation/FISPACT overlay", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/panels/phase6.py", "src/fluxforge/cli/app.py", "tests/test_cli_app.py"],
+      "notes": "Bundle export exists; versioned schemas, migrations, complete plots, checksums, and reproducibility gates remain open."
+    },
+    {
+      "id": "3N.16", "title": "Activation-inventory regression fixtures and plot tests", "roadmap": "Activation/FISPACT overlay", "status": "scaffolded",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "not-applicable", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["tests/activation_inventory/fixtures/manifest.schema.json", "tests/test_parity_phase3_scaffolding.py", "tests/gui_phase6_optimization_probe.py"],
+      "notes": "Initial fixtures and smoke probes exist; scientific golden results and Windows/Linux native plot interaction remain open."
+    },
+
+    {
+      "id": "4.1", "title": "USB HID and Ethernet acquisition drivers", "roadmap": "Phase 4", "status": "conditional-hardware",
+      "source_urls": ["fluxforge-roadmap", "gammavision", "genie"],
+      "backend": "scaffolded", "cli": "planned", "gui": "planned", "fixture": "planned", "test": "scaffolded",
+      "evidence": ["src/fluxforge/hal/base.py"],
+      "notes": "Only generic HAL/mock foundations are claimed; vendor drivers require named hardware, SDK review, and hardware-in-loop evidence."
+    },
+    {
+      "id": "4.2", "title": "Device discovery and device-list surfaces", "roadmap": "Phase 4", "status": "conditional-hardware",
+      "source_urls": ["fluxforge-roadmap", "gammavision", "genie"],
+      "backend": "scaffolded", "cli": "planned", "gui": "scaffolded", "fixture": "planned", "test": "scaffolded",
+      "evidence": ["src/fluxforge/hal/base.py", "src/fluxforge/gui/widgets/hardware_led.py"],
+      "notes": "Discovery must first close against a deterministic simulator, then against each named physical device."
+    },
+    {
+      "id": "4.3", "title": "Digital Twin telemetry dashboard", "roadmap": "Phase 4", "status": "conditional-hardware",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "planned", "cli": "planned", "gui": "planned", "fixture": "planned", "test": "planned",
+      "evidence": ["docs/FLUXFORGE_CONSOLIDATED_MASTER.md"],
+      "notes": "Offline predictive panels are not live device telemetry."
+    },
+    {
+      "id": "4.4", "title": "Live time-energy spectrogram", "roadmap": "Phase 4", "status": "conditional-hardware",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "planned", "cli": "planned", "gui": "planned", "fixture": "planned", "test": "planned",
+      "evidence": ["docs/FLUXFORGE_CONSOLIDATED_MASTER.md"],
+      "notes": "No live time-energy stream or spectrogram is claimed; a deterministic list-mode simulator is the first acceptance target."
+    },
+
+    {
+      "id": "5.1", "title": "Testing-catalog crosswalk closure", "roadmap": "Phase 5", "status": "implemented",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "implemented", "cli": "implemented", "gui": "implemented", "fixture": "implemented", "test": "implemented",
+      "evidence": [".github/project-management/phase5_crosswalk.json", "src/fluxforge/validation/phase5_crosswalk.py", "tests/test_phase5_crosswalk.py"],
+      "notes": "The crosswalk mechanism is implemented; complete source-family closure is tracked by 5.2 through 5.6."
+    },
+    {
+      "id": "5.2", "title": "Spectrum IO and analysis parity closure", "roadmap": "Phase 5", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy", "hyperlab"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/validation/reference_parity.py", "tests/spectra/reference_parity/cases/spectrum_io_normalization_algorithm_case/manifest.json", "tests/test_reference_parity_runner.py"],
+      "notes": "Initial cases do not close the full parser, calibration, background, search, fit, and activity source-family matrix."
+    },
+    {
+      "id": "5.3", "title": "GUI and workflow parity closure", "roadmap": "Phase 5", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "gammavision", "genie", "hyperlab"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["tests/spectra/reference_parity/cases/overlay_role_workflow_case/manifest.json", "tests/spectra/reference_parity/cases/roi_statistics_workflow_case/manifest.json", "tests/test_modern_gui_shell.py"],
+      "notes": "Role and ROI cases exist; full direct manipulation, calculators, archive, multi-spectrum, report, and native-platform parity remain open."
+    },
+    {
+      "id": "5.4", "title": "Inventory, NAA, and activation parity closure", "roadmap": "Phase 5", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["tests/activation_inventory/fixtures/irrad_spectroscopy_activity_case/manifest.json", "tests/activation_inventory/fixtures/npat_activation_case/manifest.json", "tests/test_parity_phase3_scaffolding.py"],
+      "notes": "Initial inventory fixtures exist; uncertainty-bearing k0/INAA and full activation workflow parity remain open."
+    },
+    {
+      "id": "5.5", "title": "Inverse and covariance parity closure", "roadmap": "Phase 5", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "umg", "staysl"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/unfolding", "src/fluxforge/workflows/spectrum_unfolding.py", "tests/test_unfolding_reference_parity.py"],
+      "notes": "Multiple unfolding methods exist; measurement/response covariance, STAYSL-style adjustment, UMG integral/sensitivity outputs, and evaluated UWNR validation remain open."
+    },
+    {
+      "id": "5.6", "title": "Full parity acceptance and release gate", "roadmap": "Phase 5", "status": "planned",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "planned", "cli": "planned", "gui": "planned", "fixture": "planned", "test": "planned",
+      "evidence": ["docs/PHASE3_27_RELEASE_CHECKLIST.md"],
+      "notes": "This gate cannot validate until backend, CLI, GUI, fixtures, tests, native Windows/Linux probes, sizing, documentation, and status evidence all close."
+    },
+
+    {
+      "id": "BG.1", "title": "Energy-calibration residual-first diagnostics", "roadmap": "bGamma carryover", "status": "implemented",
+      "source_urls": ["fluxforge-roadmap"],
+      "backend": "implemented", "cli": "prototype", "gui": "implemented", "fixture": "prototype", "test": "implemented",
+      "evidence": ["src/fluxforge/core/calibration.py", "src/fluxforge/gui/dialogs/calibration_dialog.py", "tests/test_calibration_workspace_qt.py"],
+      "notes": "Measured-minus-fit residuals exist; final cross-platform visual-golden and report integration remain open."
+    },
+    {
+      "id": "BG.2", "title": "Efficiency curves, residuals, review band, and detector persistence", "roadmap": "bGamma carryover", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "gammavision", "genie"],
+      "backend": "implemented", "cli": "prototype", "gui": "prototype", "fixture": "prototype", "test": "prototype",
+      "evidence": ["src/fluxforge/analysis/efficiency_models.py", "src/fluxforge/gui/dialogs/efficiency_dialog.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Registered models exist; percentage residuals, the review band, covariance, full detector-profile persistence, and golden calibration cases remain open."
+    },
+    {
+      "id": "BG.3", "title": "Off, Compact, and Full peak-residual modes", "roadmap": "bGamma carryover", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "hyperlab"],
+      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/backends/pyqtgraph_backend.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Mini residual rendering exists; complete modes, linked ranges, per-channel severity, and persisted mode defaults remain open."
+    },
+    {
+      "id": "BG.4", "title": "Direct ROI, sideband, and peak manipulation with undo", "roadmap": "bGamma carryover", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "hyperlab"],
+      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/backends/pyqtgraph_backend.py", "src/fluxforge/gui/analysis_workspace.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Some direct manipulation and undo infrastructure exists; the complete renderer-independent intent/command contract and native mouse evidence remain open."
+    },
+    {
+      "id": "BG.5", "title": "Context actions, assignments, pins, tags, overlap edits, and spectrum roles", "roadmap": "bGamma carryover", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "hyperlab"],
+      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/panels/modern_shell.py", "src/fluxforge/gui/analysis_workspace.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Several actions exist; complete context-menu reachability, overlap split/merge, persistence, and undo coverage remain open."
+    },
+    {
+      "id": "BG.6", "title": "Graph-table synchronization and plot-driven edits", "roadmap": "bGamma carryover", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy"],
+      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "prototype", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/selection_bus.py", "src/fluxforge/gui/panels/modern_shell.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Selection synchronization exists; persisted ROI ownership and complete bidirectional edit propagation remain open."
+    },
+    {
+      "id": "BG.7", "title": "Canvas navigation, crosshair, export, and keyboard access", "roadmap": "bGamma carryover", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy"],
+      "backend": "not-applicable", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
+      "evidence": ["src/fluxforge/gui/spectrum_canvas.py", "src/fluxforge/gui/backends/pyqtgraph_backend.py", "tests/test_modern_gui_shell.py"],
+      "notes": "Zoom, pan, reset, and export foundations exist; all scientific plots still require consistent crosshair, keyboard, scaling, and native evidence."
+    },
+    {
+      "id": "BG.8", "title": "Self-contained analytical reports with plot diagnostics", "roadmap": "bGamma carryover", "status": "prototype",
+      "source_urls": ["fluxforge-roadmap", "gammavision", "genie", "hyperlab"],
+      "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "planned", "test": "prototype",
+      "evidence": ["src/fluxforge/reporting/engine.py", "src/fluxforge/reporting/templates", "tests/test_module3_backends.py"],
+      "notes": "HTML/PDF infrastructure exists; mandatory spectrum, calibration, efficiency, residual, unfolding, QA, provenance, and optimization graphics remain open."
+    }
+  ]
+}

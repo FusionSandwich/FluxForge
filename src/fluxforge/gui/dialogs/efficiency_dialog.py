@@ -39,7 +39,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
     class EfficiencyCalibrationDialog(QDialog):
-        """Fit and apply registered efficiency models from the modern Qt stack."""
+        """Fit and apply registered detector-efficiency models."""
 
         HEADERS = (
             "Energy keV",
@@ -143,10 +143,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.table.verticalHeader().setVisible(False)
             self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
             header = self.table.horizontalHeader()
-            header.setSectionResizeMode(QHeaderView.Stretch)
+            header.setSectionResizeMode(QHeaderView.ResizeToContents)
+            header.setStretchLastSection(False)
             root.addWidget(self.table, 1)
 
             seed_button = QPushButton("Seed demo points", self)
+            seed_button.setObjectName("SeedEfficiencyExamplePointsButton")
             seed_button.clicked.connect(self._seed_demo_points)
             root.addWidget(seed_button)
 
@@ -159,13 +161,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
                 parent=self,
             )
-            fit_button = buttons.addButton("Fit Model", QDialogButtonBox.ActionRole)
-            fit_button.clicked.connect(self._fit_model)
+            buttons.button(QDialogButtonBox.Ok).setObjectName(
+                "AcceptEfficiencyCalibrationButton"
+            )
+            buttons.button(QDialogButtonBox.Cancel).setObjectName(
+                "CancelEfficiencyCalibrationButton"
+            )
+            self.fit_button = buttons.addButton(
+                "Fit Model", QDialogButtonBox.ActionRole
+            )
+            self.fit_button.setObjectName("FitEfficiencyModelButton")
+            self.fit_button.clicked.connect(self._fit_model)
             buttons.accepted.connect(self.accept)
             buttons.rejected.connect(self.reject)
             root.addWidget(buttons)
 
-            self._seed_points(points or self._demo_points())
+            self._seed_points(points if points is not None else ())
 
         def _seed_points(self, points: Sequence[EfficiencyPoint]) -> None:
             self.table.setRowCount(0)
@@ -192,6 +203,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     self.table.setItem(
                         row, column, QTableWidgetItem(f"{float(value):.6g}")
                     )
+            self.fit_button.setEnabled(self.table.rowCount() > 0)
+            if self.table.rowCount() == 0:
+                self.summary.setText(
+                    "Add calibration points or choose Seed demo points explicitly."
+                )
 
         def _seed_demo_points(self) -> None:
             self._seed_points(self._demo_points())
@@ -269,9 +285,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "type": "constant",
                 "value": detector.relative_uncertainty,
             }
-            self._fit_result.curve.parameters["detector_calibration"] = asdict(
-                detector
-            )
+            self._fit_result.curve.parameters["detector_calibration"] = asdict(detector)
             self.summary.setText(
                 (
                     f"{self._fit_result.model_label} fit complete. "

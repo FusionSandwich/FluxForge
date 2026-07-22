@@ -17,6 +17,7 @@ from fluxforge.io import write_reaction_rates  # noqa: E402
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # noqa: E402
     from PySide6.QtCore import Qt  # noqa: E402
     from PySide6.QtTest import QTest  # noqa: E402
+    from PySide6.QtWidgets import QScrollArea  # noqa: E402
 
 
 def _qapp():
@@ -41,7 +42,10 @@ def test_unfolding_workspace_dialog_runs_maxed_and_surfaces_uncertainties():
     assert dialog.current_result.method_used == "MAXED"
     assert dialog.results_table.rowCount() == dialog.workspace_input.initial_flux.size
     assert dialog.results_table.item(0, 3).text() not in {"", "N/A"}
-    assert dialog.measurements_table.rowCount() == dialog.workspace_input.measured_rates.size
+    assert (
+        dialog.measurements_table.rowCount()
+        == dialog.workspace_input.measured_rates.size
+    )
     assert dialog.response_image.image is not None
     assert "uncertainties are visible" in dialog.summary_label.text().lower()
     assert dialog.show_uncertainty_bands_checkbox.isEnabled() is True
@@ -163,7 +167,9 @@ def test_unfolding_workspace_dialog_supports_ml_seed_selection_and_seeded_rmle()
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt unfolding workspace dependencies are unavailable.",
 )
-def test_unfolding_workspace_dialog_loads_analytical_response_and_updates_heatmap(tmp_path):
+def test_unfolding_workspace_dialog_loads_analytical_response_and_updates_heatmap(
+    tmp_path,
+):
     _qapp()
     dialog = UnfoldingWorkspaceDialog(mode_manager=ModeManager())
     dialog.show()
@@ -177,7 +183,42 @@ def test_unfolding_workspace_dialog_loads_analytical_response_and_updates_heatma
 
     assert dialog.workspace_input.label == "Analytical HPGe"
     assert dialog.response_image.image is not None
-    assert dialog.measurements_table.rowCount() == dialog.workspace_input.measured_rates.size
+    assert (
+        dialog.measurements_table.rowCount()
+        == dialog.workspace_input.measured_rates.size
+    )
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt unfolding workspace dependencies are unavailable.",
+)
+def test_unfolding_controls_fit_common_desktop_width_and_scroll_vertically():
+    _qapp()
+    dialog = UnfoldingWorkspaceDialog(mode_manager=ModeManager())
+    dialog.resize(1280, 700)
+    dialog.show()
+    _qapp().processEvents()
+
+    controls = dialog.findChild(QScrollArea, "UnfoldingControlsScrollArea")
+    assert controls is not None
+    assert dialog.minimumSizeHint().width() <= 1280
+    assert controls.horizontalScrollBar().maximum() == 0
+    assert controls.verticalScrollBar().maximum() >= 0
+    viewport = controls.viewport()
+    for widget in (
+        dialog.response_load_button,
+        dialog.rates_load_button,
+        dialog.log_energy_checkbox,
+        dialog.log_flux_checkbox,
+        dialog.reset_plots_button,
+        dialog.run_button,
+        dialog.compare_button,
+    ):
+        top_left = widget.mapTo(viewport, widget.rect().topLeft())
+        assert top_left.x() >= 0
+        assert top_left.x() + widget.width() <= viewport.width()
     dialog.close()
 
 
@@ -283,6 +324,7 @@ def test_main_window_opens_unfolding_workspace_dialog():
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window._open_unfolding_workspace()
     _qapp().processEvents()

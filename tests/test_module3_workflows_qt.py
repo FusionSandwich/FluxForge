@@ -27,7 +27,11 @@ def _qapp():
 )
 def test_main_window_opens_qa_history_and_exports_csv(tmp_path):
     _qapp()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+        load_example=True,
+    )
     window._open_qa_history()
     _qapp().processEvents()
 
@@ -49,7 +53,11 @@ def test_main_window_opens_qa_history_and_exports_csv(tmp_path):
 )
 def test_main_window_opens_report_export_and_writes_html(tmp_path):
     _qapp()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+        load_example=True,
+    )
     window._open_report_export()
     _qapp().processEvents()
 
@@ -71,7 +79,9 @@ def test_main_window_opens_report_export_and_writes_html(tmp_path):
 )
 def test_main_window_report_export_dialog_writes_pdf(tmp_path, monkeypatch):
     _qapp()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(), selection_bus=SelectionBus()
+    )
 
     def _fake_export_pdf(template_name, context, path):
         Path(path).write_bytes(b"%PDF-1.4\n% Qt dialog export\n")
@@ -102,7 +112,11 @@ def test_main_window_report_export_dialog_writes_pdf(tmp_path, monkeypatch):
 )
 def test_sidebar_buttons_open_qa_history_and_astm_review():
     _qapp()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+        load_example=True,
+    )
     window.show()
     _qapp().processEvents()
     sidebar = window.left_dock.widget()
@@ -131,7 +145,11 @@ def test_sidebar_buttons_open_qa_history_and_astm_review():
 def test_main_window_opens_pu_isotopics_wizard_outside_simple_mode():
     _qapp()
     manager = ModeManager()
-    window = FluxForgeMainWindow(mode_manager=manager, selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=manager,
+        selection_bus=SelectionBus(),
+        load_example=True,
+    )
 
     manager.set_mode(GUIMode.EXPERT)
     _qapp().processEvents()
@@ -157,7 +175,11 @@ def test_main_window_opens_pu_isotopics_wizard_outside_simple_mode():
 )
 def test_batch_queue_panel_runs_and_writes_outputs(tmp_path):
     _qapp()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+        load_example=True,
+    )
     panel = window.bottom_dock.widget().batch_queue_panel
     panel.output_dir.setText(str(tmp_path / "batch"))
 
@@ -179,7 +201,11 @@ def test_batch_queue_panel_runs_and_writes_outputs(tmp_path):
 )
 def test_hardware_led_click_opens_dashboard_tab():
     _qapp()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+        developer_tools=True,
+    )
     window.show()
     _qapp().processEvents()
 
@@ -198,7 +224,11 @@ def test_hardware_led_click_opens_dashboard_tab():
 def test_peak_table_ml_button_updates_summary_and_sidebar_shows_qa_locks():
     _qapp()
     manager = ModeManager()
-    window = FluxForgeMainWindow(mode_manager=manager, selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=manager,
+        selection_bus=SelectionBus(),
+        load_example=True,
+    )
     bottom = window.bottom_dock.widget()
     peak_panel = bottom.peak_table_panel
 
@@ -234,11 +264,15 @@ def test_peak_table_ml_button_updates_summary_and_sidebar_shows_qa_locks():
 )
 def test_workspace_menu_exposes_launch_and_discovery_actions():
     _qapp()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=SelectionBus())
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(), selection_bus=SelectionBus()
+    )
     window.show()
     _qapp().processEvents()
 
-    menu_titles = {action.text().replace("&", "") for action in window.menuBar().actions()}
+    menu_titles = {
+        action.text().replace("&", "") for action in window.menuBar().actions()
+    }
     assert "Workspaces" in menu_titles
 
     window._focus_workspace_dock()

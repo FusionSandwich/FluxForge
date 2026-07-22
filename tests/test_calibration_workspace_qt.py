@@ -21,7 +21,9 @@ from fluxforge.core.peak_fitting import (  # noqa: E402
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
 from fluxforge.gui.dialogs import CalibrationWorkspaceDialog  # noqa: E402
-from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog  # noqa: E402
+from fluxforge.gui.dialogs.efficiency_dialog import (
+    EfficiencyCalibrationDialog,
+)  # noqa: E402
 from fluxforge.gui.library_manager import DataLibraryManager  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState  # noqa: E402
@@ -179,6 +181,11 @@ def test_efficiency_dialog_exposes_all_four_registered_models():
     dialog.show()
     _qapp().processEvents()
 
+    seed_button = dialog.findChild(QPushButton, "SeedEfficiencyExamplePointsButton")
+    assert seed_button is not None
+    QTest.mouseClick(seed_button, Qt.LeftButton)
+    _qapp().processEvents()
+
     keys = {
         dialog.method_selector.combo.itemData(index)
         for index in range(dialog.method_selector.combo.count())
@@ -191,9 +198,9 @@ def test_efficiency_dialog_exposes_all_four_registered_models():
     }.issubset(keys)
     assert dialog.table.columnCount() == 9
     assert dialog.detector_id_edit.text() == "South"
-    assert dialog.detector_fields[
-        "detector_thickness_DI_cm"
-    ].value() == pytest.approx(6.45)
+    assert dialog.detector_fields["detector_thickness_DI_cm"].value() == pytest.approx(
+        6.45
+    )
 
     dialog.detector_id_edit.setText("South-updated")
     dialog.detector_fields["source_distance_cm"].setValue(30.0)
@@ -210,12 +217,12 @@ def test_efficiency_dialog_exposes_all_four_registered_models():
     assert dialog.detector_calibration().source_distance_cm == pytest.approx(30.0)
     assert dialog._read_points()[0].geometry_factor == pytest.approx(1.25)
     assert dialog.accepted_fit().curve.detector_id == "South-updated"
-    assert dialog.accepted_fit().curve.geometry[
-        "source_distance_cm"
-    ] == pytest.approx(30.0)
-    assert dialog.accepted_fit().curve.efficiency_uncertainty(
-        661.657
-    ) == pytest.approx(0.075)
+    assert dialog.accepted_fit().curve.geometry["source_distance_cm"] == pytest.approx(
+        30.0
+    )
+    assert dialog.accepted_fit().curve.efficiency_uncertainty(661.657) == pytest.approx(
+        0.075
+    )
     dialog.close()
 
 
@@ -256,7 +263,9 @@ def test_calibration_dialog_locks_astm_order_and_applies_to_workspace_spectrum()
 
     assert len(applied) == 1
     applied_spectrum, energy_fit, fwhm_fit = applied[0]
-    assert applied_spectrum.calibration["energy"] == pytest.approx(energy_fit.coefficients)
+    assert applied_spectrum.calibration["energy"] == pytest.approx(
+        energy_fit.coefficients
+    )
     assert isinstance(fwhm_fit.fitted_fwhm_keV, np.ndarray)
     assert bus.describe()["reference_lines_keV"]
     dialog.close()
@@ -271,14 +280,14 @@ def test_main_window_opens_calibration_workspace_dialog():
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window._open_energy_fwhm_workspace()
     _qapp().processEvents()
 
     assert window._calibration_dialog is not None
     assert (
-        window._calibration_dialog.windowTitle()
-        == "FluxForge — Calibration Workspace"
+        window._calibration_dialog.windowTitle() == "FluxForge — Calibration Workspace"
     )
     assert window._calibration_dialog.energy_table.rowCount() >= 3
 
@@ -305,7 +314,9 @@ def test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment
 
     dialog.energy_table.selectRow(0)
     click_point = _plot_click_point(dialog, 1173.0)
-    QTest.mouseClick(dialog.spectrum_plot.viewport(), Qt.LeftButton, Qt.NoModifier, click_point)
+    QTest.mouseClick(
+        dialog.spectrum_plot.viewport(), Qt.LeftButton, Qt.NoModifier, click_point
+    )
     _qapp().processEvents()
 
     channel = float(dialog.energy_table.item(0, 1).text())
@@ -340,7 +351,9 @@ def test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment
     _qapp().processEvents()
 
     assert "co" in dialog.energy_table.item(0, 0).text().lower()
-    assert float(dialog.energy_table.item(0, 3).text()) == pytest.approx(1173.228, abs=1.0)
+    assert float(dialog.energy_table.item(0, 3).text()) == pytest.approx(
+        1173.228, abs=1.0
+    )
     dialog.close()
 
 
@@ -353,6 +366,7 @@ def test_main_window_exposes_manual_and_standards_workflows_and_library_selector
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -368,9 +382,15 @@ def test_main_window_exposes_manual_and_standards_workflows_and_library_selector
     bottom_tabs = window.bottom_dock.widget()
     bottom_tabs.setCurrentIndex(1)
     _qapp().processEvents()
-    manual_button = bottom_tabs.findChild(QPushButton, "ManualCalibrationWorkflowButton")
-    quick_button = bottom_tabs.findChild(QPushButton, "QuickSliderCalibrationWorkflowButton")
-    standards_button = bottom_tabs.findChild(QPushButton, "StandardsCalibrationWorkflowButton")
+    manual_button = bottom_tabs.findChild(
+        QPushButton, "ManualCalibrationWorkflowButton"
+    )
+    quick_button = bottom_tabs.findChild(
+        QPushButton, "QuickSliderCalibrationWorkflowButton"
+    )
+    standards_button = bottom_tabs.findChild(
+        QPushButton, "StandardsCalibrationWorkflowButton"
+    )
     assert manual_button is not None
     assert quick_button is not None
     assert standards_button is not None
@@ -389,7 +409,10 @@ def test_main_window_exposes_manual_and_standards_workflows_and_library_selector
 
     QTest.mouseClick(quick_button, Qt.LeftButton)
     _qapp().processEvents()
-    assert window._calibration_dialog.advanced_tabs.currentWidget() is window._calibration_dialog.quick_slider_tab
+    assert (
+        window._calibration_dialog.advanced_tabs.currentWidget()
+        is window._calibration_dialog.quick_slider_tab
+    )
 
     window._calibration_dialog.close()
     window.close()
@@ -511,7 +534,10 @@ def test_calibration_dialog_supports_preserve_slots_fine_tune_and_nasa_seed():
 
     dialog.save_slot_button.click()
     _qapp().processEvents()
-    assert "Stored the current calibration in detector slot" in dialog.snapshot_summary.text()
+    assert (
+        "Stored the current calibration in detector slot"
+        in dialog.snapshot_summary.text()
+    )
     assert dialog.load_slot_button.isEnabled() is True
 
     dialog.energy_table.item(0, 1).setText("25.0")
@@ -537,7 +563,10 @@ def test_calibration_dialog_supports_preserve_slots_fine_tune_and_nasa_seed():
 
     dialog.nasa_smart_seed_button.click()
     _qapp().processEvents()
-    assert "NASA smart seed refreshed the calibration anchors" in dialog.snapshot_summary.text()
+    assert (
+        "NASA smart seed refreshed the calibration anchors"
+        in dialog.snapshot_summary.text()
+    )
     assert dialog.energy_table.rowCount() >= 3
     assert "Cs-137" in dialog.energy_table.item(0, 0).text()
     dialog.close()
@@ -577,7 +606,9 @@ def test_apply_workspace_results_persists_calibration_workspace_state_to_spectru
 
     dialog._apply_workspace_results()
 
-    assert spectrum.calibration["energy"] == pytest.approx(dialog._energy_fit.coefficients)
+    assert spectrum.calibration["energy"] == pytest.approx(
+        dialog._energy_fit.coefficients
+    )
     assert spectrum.calibration["deviation_pairs"]
     assert bus.state.roi_bounds_keV is not None
     assert spectrum.energies is not None
@@ -587,8 +618,12 @@ def test_apply_workspace_results_persists_calibration_workspace_state_to_spectru
 def test_data_library_manager_tracks_gui_library_categories():
     manager = DataLibraryManager()
 
-    gamma_ids = {record.source_id for record in manager.available_sources("gamma_identification")}
-    activation_ids = {record.source_id for record in manager.available_sources("activation")}
+    gamma_ids = {
+        record.source_id for record in manager.available_sources("gamma_identification")
+    }
+    activation_ids = {
+        record.source_id for record in manager.available_sources("activation")
+    }
     assert len(gamma_ids) >= 4
     assert {
         "decay_2012",
@@ -597,7 +632,10 @@ def test_data_library_manager_tracks_gui_library_categories():
         "nndc_offline_activation",
         "custom_gamma_file",
     }.issubset(gamma_ids)
-    assert manager.available_sources("calibration")[0].source_id == "calibration_standard_sources"
+    assert (
+        manager.available_sources("calibration")[0].source_id
+        == "calibration_standard_sources"
+    )
     assert manager.available_sources("naa_monitor")[0].source_id == "k0_naa_monitors"
     assert manager.available_sources("dosimetry")[0].source_id == "irdff_ii_dosimetry"
     assert "flux_wire_catalog" in activation_ids

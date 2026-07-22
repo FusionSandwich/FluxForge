@@ -1,4 +1,4 @@
-"""Modern panels for the next-generation GUI shell."""
+"""Analyst panels for the FluxForge desktop GUI."""
 
 from __future__ import annotations
 
@@ -151,12 +151,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     )
 
 
-MODERN_LOG_LINES = (
-    "Qt shell initialized",
-    "Renderer strategy: PyQtGraph first, Vispy additive",
-    "Mode-aware workflow locking ready",
-    "Tk GUI demoted to explicit legacy fallback",
-)
+MODERN_LOG_LINES = ("Developer tools enabled",)
 
 _ACTIVITY_UNIT_FACTORS = {
     "Bq": 1.0,
@@ -192,7 +187,10 @@ def _format_activity_value(
 ) -> str:
     scaled_value = float(value_bq) / _activity_unit_factor(unit)
     return f"{scaled_value:{precision}} {unit}"
+
+
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
+
     def _peak_status_dot(status: str) -> str:
         if status == "matched":
             return "●"
@@ -201,7 +199,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         if status == "review":
             return "◐"
         return "○"
-
 
     class PeakTablePanel(QWidget):
         """Peak table, review workflow, and Bayesian matching surface."""
@@ -239,10 +236,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.setSpacing(10)
 
             intro = QLabel(
-                (
-                    "Detected peaks, manual tags, and Bayesian library matches stay in one "
-                    "undoable table synchronized through the modern workspace state."
-                ),
+                ("Review detected peaks, assignments, confidence, and analyst tags."),
                 self,
             )
             intro.setObjectName("PanelBody")
@@ -263,6 +257,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             self.peak_search_selector.setObjectName("PeakSearchMethodSelector")
+            self.peak_search_selector.combo.setObjectName("PeakTableSearchMethodCombo")
             current_search_method = self.workspace_controller.state.peak_search_method
             if current_search_method in self.registries.peak_search_methods.keys():
                 self.peak_search_selector.set_current_key(current_search_method)
@@ -282,14 +277,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             action_row.addWidget(self.ml_button)
 
             self.pin_button = QPushButton("Pin Selected Nuclide", self)
+            self.pin_button.setObjectName("PeakTablePinNuclideButton")
             self.pin_button.clicked.connect(self._pin_selected_nuclide)
             action_row.addWidget(self.pin_button)
 
             self.tag_button = QPushButton("Tag Selected Peak", self)
+            self.tag_button.setObjectName("PeakTableTagPeakButton")
             self.tag_button.clicked.connect(self._tag_selected_peak)
             action_row.addWidget(self.tag_button)
 
             self.clear_button = QPushButton("Clear Peaks", self)
+            self.clear_button.setObjectName("PeakTableClearPeaksButton")
             self.clear_button.clicked.connect(self._clear_peaks)
             action_row.addWidget(self.clear_button)
             action_row.addStretch(1)
@@ -324,8 +322,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.workspace_controller.subscribe(self._sync_state)
             self.selection_bus.subscribe(self._sync_from_selection_bus)
-            self.library_manager.subscribe(lambda _state: self._sync_identification_sources())
-            self.mode_manager.subscribe(lambda _state: self._sync_identification_sources())
+            self.library_manager.subscribe(
+                lambda _state: self._sync_identification_sources()
+            )
+            self.mode_manager.subscribe(
+                lambda _state: self._sync_identification_sources()
+            )
             self._sync_identification_sources()
             self._sync_state(self.workspace_controller.state)
 
@@ -400,7 +402,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     f"Standards mode locks Bayesian and ML identification to {locked_record.label}."
                 )
             else:
-                bayesian_label = self.bayesian_source_combo.currentText() or "Unselected"
+                bayesian_label = (
+                    self.bayesian_source_combo.currentText() or "Unselected"
+                )
                 ml_label = self.ml_source_combo.currentText() or "Unselected"
                 self.id_source_summary.setText(
                     f"Bayesian DB: {bayesian_label} | ML DB: {ml_label}"
@@ -488,17 +492,23 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             action_row = QHBoxLayout()
             self.use_selected_peak_button = QPushButton("Use Selected Peak", group)
             self.use_selected_peak_button.setObjectName("PeakIdUseSelectedPeakButton")
-            self.use_selected_peak_button.clicked.connect(self._use_selected_peak_centroid)
+            self.use_selected_peak_button.clicked.connect(
+                self._use_selected_peak_centroid
+            )
             action_row.addWidget(self.use_selected_peak_button)
 
             self.assign_isotope_button = QPushButton("Assign Selected Isotope", group)
-            self.assign_isotope_button.setObjectName("PeakIdAssignSelectedIsotopeButton")
+            self.assign_isotope_button.setObjectName(
+                "PeakIdAssignSelectedIsotopeButton"
+            )
             self.assign_isotope_button.clicked.connect(self._assign_selected_isotope)
             action_row.addWidget(self.assign_isotope_button)
 
             self.clear_assignment_button = QPushButton("Clear Peak ID", group)
             self.clear_assignment_button.setObjectName("PeakIdClearAssignmentButton")
-            self.clear_assignment_button.clicked.connect(self._clear_selected_peak_assignment)
+            self.clear_assignment_button.clicked.connect(
+                self._clear_selected_peak_assignment
+            )
             action_row.addWidget(self.clear_assignment_button)
             action_row.addStretch(1)
             layout.addLayout(action_row)
@@ -513,7 +523,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.peak_id_phenomena.setObjectName("PeakIdPhenomenaList")
             layout.addWidget(self.peak_id_phenomena, 1)
 
-            self.peak_id_summary = QLabel("Select a peak or type a centroid to browse isotope lines.", group)
+            self.peak_id_summary = QLabel(
+                "Select a peak or type a centroid to browse isotope lines.", group
+            )
             self.peak_id_summary.setObjectName("PanelBody")
             self.peak_id_summary.setWordWrap(True)
             layout.addWidget(self.peak_id_summary)
@@ -521,7 +533,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.peak_id_energy.valueChanged.connect(self._refresh_peak_id_matches)
             self.peak_id_tolerance.valueChanged.connect(self._refresh_peak_id_matches)
             self.peak_id_filter.textChanged.connect(self._refresh_peak_id_matches)
-            self.peak_id_matches.itemSelectionChanged.connect(self._match_selection_changed)
+            self.peak_id_matches.itemSelectionChanged.connect(
+                self._match_selection_changed
+            )
             return group
 
         def run_auto_peak_search(self) -> None:
@@ -529,7 +543,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if spectrum is None:
                 self.summary.setText("No active spectrum is available for peak search.")
                 return
-            method = self.peak_search_selector.current_key() or self.workspace_controller.state.peak_search_method
+            method = (
+                self.peak_search_selector.current_key()
+                or self.workspace_controller.state.peak_search_method
+            )
             peaks = detect_peak_candidates(spectrum, method=method)
             dialog = AutoPeakReviewDialog(peaks, parent=self)
             if dialog.exec() != QDialog.Accepted:
@@ -776,10 +793,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 peak = self.workspace_controller.selected_peak()
                 self.selection_bus.publish(
                     SelectionState(
-                        peak_energy_keV=peak.energy_keV if peak is not None else energy_keV,
-                        roi_bounds_keV=peak.roi_bounds_keV if peak is not None else None,
+                        peak_energy_keV=(
+                            peak.energy_keV if peak is not None else energy_keV
+                        ),
+                        roi_bounds_keV=(
+                            peak.roi_bounds_keV if peak is not None else None
+                        ),
                         nuclide=peak.nuclide if peak is not None else None,
-                        reference_lines_keV=peak.reference_lines_keV if peak is not None else (),
+                        reference_lines_keV=(
+                            peak.reference_lines_keV if peak is not None else ()
+                        ),
                     )
                 )
 
@@ -794,10 +817,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     f"{phenomenon.label} · {phenomenon.energy_keV:.3f} keV",
                     self.peak_id_phenomena,
                 )
-            reference_lines = self.nuclide_controller.reference_lines_for_nuclide(match.nuclide)
+            reference_lines = self.nuclide_controller.reference_lines_for_nuclide(
+                match.nuclide
+            )
             self.selection_bus.publish(
                 SelectionState(
-                    peak_energy_keV=peak.energy_keV if peak is not None else float(self.peak_id_energy.value()),
+                    peak_energy_keV=(
+                        peak.energy_keV
+                        if peak is not None
+                        else float(self.peak_id_energy.value())
+                    ),
                     roi_bounds_keV=peak.roi_bounds_keV if peak is not None else None,
                     nuclide=match.nuclide,
                     reference_lines_keV=reference_lines,
@@ -810,7 +839,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             match = self._selected_match()
             if peak is None or match is None:
                 return
-            reference_lines = self.nuclide_controller.reference_lines_for_nuclide(match.nuclide)
+            reference_lines = self.nuclide_controller.reference_lines_for_nuclide(
+                match.nuclide
+            )
             updated_peak = replace(
                 peak,
                 status="manual",
@@ -874,7 +905,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._commit_state_change(
                 "Clear peaks",
                 state,
-                state.__class__(**{**state.__dict__, "peaks": (), "selected_peak_id": None}),
+                state.__class__(
+                    **{**state.__dict__, "peaks": (), "selected_peak_id": None}
+                ),
             )
 
         def _commit_state_change(self, description: str, before, after) -> None:
@@ -991,13 +1024,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             target_row = min(
                 range(len(peaks)),
-                key=lambda index: abs(float(peaks[index].energy_keV) - float(state.peak_energy_keV)),
+                key=lambda index: abs(
+                    float(peaks[index].energy_keV) - float(state.peak_energy_keV)
+                ),
             )
             target_peak = peaks[target_row]
             if abs(float(target_peak.energy_keV) - float(state.peak_energy_keV)) > 3.0:
                 return
             current_row = self.table.currentRow()
-            if current_row == target_row and self.workspace_controller.state.selected_peak_id == target_peak.peak_id:
+            if (
+                current_row == target_row
+                and self.workspace_controller.state.selected_peak_id
+                == target_peak.peak_id
+            ):
                 return
             self._selection_sync_guard = True
             try:
@@ -1005,7 +1044,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.workspace_controller.select_peak(target_peak.peak_id)
             finally:
                 self._selection_sync_guard = False
-
 
     class ActivityResultsPanel(QWidget):
         """Efficiency, activity, source age, and background workflow surface."""
@@ -1020,6 +1058,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             parent=None,
         ) -> None:
             super().__init__(parent)
+            self.setObjectName("ActivityResultsPanel")
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
@@ -1044,34 +1083,43 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             control_row = QHBoxLayout()
             self.fit_efficiency_button = QPushButton("Fit Efficiency", self)
+            self.fit_efficiency_button.setObjectName("FitEfficiencyButton")
             self.fit_efficiency_button.clicked.connect(self._fit_efficiency)
             control_row.addWidget(self.fit_efficiency_button)
 
             self.compute_activity_button = QPushButton("Compute Activity", self)
+            self.compute_activity_button.setObjectName("ComputeActivityButton")
             self.compute_activity_button.clicked.connect(self._compute_activity)
             control_row.addWidget(self.compute_activity_button)
 
             self.analyze_spectrum_button = QPushButton("Analyze Spectrum", self)
+            self.analyze_spectrum_button.setObjectName("AnalyzeSpectrumButton")
             self.analyze_spectrum_button.clicked.connect(self._analyze_spectrum)
             control_row.addWidget(self.analyze_spectrum_button)
 
             self.export_csv_button = QPushButton("Export CSV", self)
+            self.export_csv_button.setObjectName("ExportActivityCsvButton")
             self.export_csv_button.clicked.connect(self._export_activity_csv_dialog)
             control_row.addWidget(self.export_csv_button)
 
             self.export_decay_button = QPushButton("Save Decay Plot", self)
+            self.export_decay_button.setObjectName("SaveDecayPlotButton")
             self.export_decay_button.clicked.connect(self._export_decay_plot_dialog)
             control_row.addWidget(self.export_decay_button)
 
             self.export_bateman_button = QPushButton("Save Bateman Plot", self)
+            self.export_bateman_button.setObjectName("SaveBatemanPlotButton")
             self.export_bateman_button.clicked.connect(self._export_bateman_plot_dialog)
             control_row.addWidget(self.export_bateman_button)
 
             self.background_mode_combo = QComboBox(self)
+            self.background_mode_combo.setObjectName("ActivityBackgroundModeCombo")
             self.background_mode_combo.addItem("Simple", "simple")
             self.background_mode_combo.addItem("Scaled", "scaled")
             self.background_mode_combo.addItem("Statistical", "statistical")
-            self.background_mode_combo.currentIndexChanged.connect(self._background_mode_changed)
+            self.background_mode_combo.currentIndexChanged.connect(
+                self._background_mode_changed
+            )
             control_row.addWidget(self.background_mode_combo)
 
             self.background_scale = QDoubleSpinBox(self)
@@ -1084,6 +1132,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             control_row.addWidget(self.background_scale)
 
             self.background_visible = QCheckBox("Show background overlay", self)
+            self.background_visible.setObjectName("ActivityBackgroundVisibleCheck")
             self.background_visible.setChecked(True)
             self.background_visible.toggled.connect(self._background_visible_toggled)
             control_row.addWidget(self.background_visible)
@@ -1150,7 +1199,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     EfficiencyPoint(
                         energy_keV=peak.energy_keV,
                         net_counts=max(peak.net_counts, 1.0),
-                        live_time_s=max(float(self.workspace_controller.spectrum().live_time or 100.0), 1.0),
+                        live_time_s=max(
+                            float(
+                                self.workspace_controller.spectrum().live_time or 100.0
+                            ),
+                            1.0,
+                        ),
                         activity_bq=1e5,
                         emission_probability=1.0,
                         count_uncertainty=max(np.sqrt(max(peak.net_counts, 1.0)), 1.0),
@@ -1204,7 +1258,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     line_energy_keV=(
                         item.matched_line_energies_keV[0]
                         if item.matched_line_energies_keV
-                        else (item.peak_energies_keV[0] if item.peak_energies_keV else 0.0)
+                        else (
+                            item.peak_energies_keV[0] if item.peak_energies_keV else 0.0
+                        )
                     ),
                     activity_bq=item.count_time_activity_bq,
                     uncertainty_bq=item.count_time_uncertainty_bq,
@@ -1295,7 +1351,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def workflow_state(self) -> dict[str, object]:
             return {
-                "background_mode": str(self.background_mode_combo.currentData() or "simple"),
+                "background_mode": str(
+                    self.background_mode_combo.currentData() or "simple"
+                ),
                 "background_scale": float(self.background_scale.value()),
                 "background_visible": bool(self.background_visible.isChecked()),
                 "source_age_hours": float(self.source_age_hours.value()),
@@ -1432,6 +1490,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.workspace_controller.set_background_config(visible=checked)
 
         def _sync_state(self, state) -> None:
+            has_spectrum = self.workspace_controller.spectrum() is not None
+            has_peaks = has_spectrum and bool(state.peaks)
+            self.fit_efficiency_button.setEnabled(has_peaks)
+            self.analyze_spectrum_button.setEnabled(has_spectrum)
+            self.compute_activity_button.setEnabled(
+                has_peaks and state.efficiency_fit is not None
+            )
             index = self.background_mode_combo.findData(state.background_mode)
             if index >= 0:
                 self.background_mode_combo.blockSignals(True)
@@ -1496,13 +1561,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         )
                     lines.append(result.chain_summary)
                     blocks.append("\n".join(lines))
-                self.results.setPlainText(
-                    "\n\n".join(blocks)
-                )
+                self.results.setPlainText("\n\n".join(blocks))
             else:
                 self._last_activity_review = None
                 self.results.setPlainText("No activity result has been calculated yet.")
-
 
     class InventoryTimelinePanel(QWidget):
         """Inventory/time-evolution surface fed by the current activity review."""
@@ -1635,19 +1697,29 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mwdcs_window_count_spin.setValue(3)
             controls.addWidget(self.mwdcs_window_count_spin, 5, 3)
 
-            self.mwdcs_full_spectrum_checkbox = QCheckBox("MWDCS full-spectrum mode", self)
-            self.mwdcs_full_spectrum_checkbox.setObjectName("InventoryMWDCSFullSpectrumCheck")
+            self.mwdcs_full_spectrum_checkbox = QCheckBox(
+                "MWDCS full-spectrum mode", self
+            )
+            self.mwdcs_full_spectrum_checkbox.setObjectName(
+                "InventoryMWDCSFullSpectrumCheck"
+            )
             controls.addWidget(self.mwdcs_full_spectrum_checkbox, 6, 0, 1, 2)
 
-            self.advanced_objective_checkbox = QCheckBox("Enable advanced objectives", self)
-            self.advanced_objective_checkbox.setObjectName("InventoryAdvancedObjectiveCheck")
+            self.advanced_objective_checkbox = QCheckBox(
+                "Enable advanced objectives", self
+            )
+            self.advanced_objective_checkbox.setObjectName(
+                "InventoryAdvancedObjectiveCheck"
+            )
             controls.addWidget(self.advanced_objective_checkbox, 6, 2, 1, 2)
 
             self.stbdmr_differentiable_checkbox = QCheckBox(
                 "STBD-MR differentiable graph mode",
                 self,
             )
-            self.stbdmr_differentiable_checkbox.setObjectName("InventorySTBDMRDifferentiableCheck")
+            self.stbdmr_differentiable_checkbox.setObjectName(
+                "InventorySTBDMRDifferentiableCheck"
+            )
             controls.addWidget(self.stbdmr_differentiable_checkbox, 7, 0, 1, 2)
 
             button_row = QHBoxLayout()
@@ -1759,15 +1831,23 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(self.table, 2)
 
             self.workspace_controller.subscribe(self._sync_workspace_state)
-            self.nuclide_focus_combo.currentIndexChanged.connect(self._render_last_result)
+            self.nuclide_focus_combo.currentIndexChanged.connect(
+                self._render_last_result
+            )
             self.observable_combo.currentIndexChanged.connect(self._render_last_result)
-            self.activity_unit_combo.currentIndexChanged.connect(self._render_last_result)
-            self.fim_objective_combo.currentIndexChanged.connect(self._preview_fim_score)
+            self.activity_unit_combo.currentIndexChanged.connect(
+                self._render_last_result
+            )
+            self.fim_objective_combo.currentIndexChanged.connect(
+                self._preview_fim_score
+            )
             self.mwdcs_window_count_spin.valueChanged.connect(self._preview_mwdcs_score)
             self.mwdcs_full_spectrum_checkbox.toggled.connect(self._preview_mwdcs_score)
             self.advanced_objective_checkbox.toggled.connect(self._preview_bassd_score)
             self.advanced_objective_checkbox.toggled.connect(self._preview_stbdmr_score)
-            self.stbdmr_differentiable_checkbox.toggled.connect(self._preview_stbdmr_score)
+            self.stbdmr_differentiable_checkbox.toggled.connect(
+                self._preview_stbdmr_score
+            )
             self._sync_workspace_state(self.workspace_controller.state)
 
         def build_inventory_timeline(self):
@@ -1785,7 +1865,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             return str(self.activity_unit_combo.currentData() or "Bq")
 
         def _scale_activity_value(self, value_bq: float) -> float:
-            return float(value_bq) / _activity_unit_factor(self._current_activity_unit())
+            return float(value_bq) / _activity_unit_factor(
+                self._current_activity_unit()
+            )
 
         def _scale_activity_plot_data(
             self,
@@ -1807,7 +1889,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _inventory_state(self):
             spectrum = self.workspace_controller.spectrum()
             if spectrum is None:
-                self.summary.setText("No active spectrum is available for inventory evolution.")
+                self.summary.setText(
+                    "No active spectrum is available for inventory evolution."
+                )
                 return None
             activity_results = self.workspace_controller.state.activity_results
             if not activity_results:
@@ -2113,7 +2197,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _preview_stbdmr_score(self) -> None:
             self.preview_stbdmr_score()
 
-        def _selected_plot_data(self, result) -> dict[str, tuple[tuple[float, float, float], ...]]:
+        def _selected_plot_data(
+            self, result
+        ) -> dict[str, tuple[tuple[float, float, float], ...]]:
             observable = self._current_observable()
             focus = self._current_focus()
             if focus == "__all__":
@@ -2149,11 +2235,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 ]
                 focus = candidate_labels[0] if candidate_labels else "Total"
             self.family_browser.setPlainText(self._family_summary(result, focus))
-            rows = [
-                row
-                for row in result.time_series_rows()
-                if self._row_visible(row)
-            ]
+            rows = [row for row in result.time_series_rows() if self._row_visible(row)]
             activity_unit = self._current_activity_unit()
             self.table.setHorizontalHeaderLabels(
                 (
@@ -2203,7 +2285,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     half_life_s = row.get("half_life_s")
                     break
             parents = ", ".join(result.parents_by_nuclide.get(nuclide, ())) or "none"
-            daughters = ", ".join(result.daughters_by_nuclide.get(nuclide, ())) or "none"
+            daughters = (
+                ", ".join(result.daughters_by_nuclide.get(nuclide, ())) or "none"
+            )
             lines = [
                 f"Reference nuclide: {nuclide}",
                 f"Immediate parents: {parents}",
@@ -2423,9 +2507,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if "nuclide_focus" in payload:
                 set_combo_data(self.nuclide_focus_combo, payload["nuclide_focus"])
 
-
     class RoiToolsPanel(QWidget):
-        """Explicit ROI/background workflow surface for offline parity work."""
+        """ROI, background, and multi-spectrum statistics workspace."""
 
         def __init__(
             self,
@@ -2451,9 +2534,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             intro = QLabel(
                 (
-                    "Explicit ROI/background workspace for offline parity: choose a peak-search "
-                    "method, estimate continuum with sidebands or SNIP, decompose overlaps, and "
-                    "review the same ROI across many loaded spectra."
+                    "Set signal and background bounds, choose an analysis method, decompose "
+                    "overlaps, and compare the same ROI across loaded spectra."
                 ),
                 self,
             )
@@ -2491,6 +2573,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             self.peak_search_selector.setObjectName("RoiPeakSearchMethodSelector")
+            self.peak_search_selector.combo.setObjectName("RoiPeakSearchMethodCombo")
             selector_row.addWidget(self.peak_search_selector, 1)
             self.background_selector = MethodSelectorWidget(
                 self.registries.roi_background_models,
@@ -2548,7 +2631,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.component_table.verticalHeader().setVisible(False)
             self.component_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-            self.component_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            self.component_table.horizontalHeader().setSectionResizeMode(
+                QHeaderView.Stretch
+            )
             layout.addWidget(self.component_table, 1)
 
             layout.addWidget(QLabel("ROI statistics across loaded spectra", self))
@@ -2559,7 +2644,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.statistics_table.verticalHeader().setVisible(False)
             self.statistics_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-            self.statistics_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            self.statistics_table.horizontalHeader().setSectionResizeMode(
+                QHeaderView.Stretch
+            )
             layout.addWidget(self.statistics_table, 1)
 
             self.peak_search_selector.combo.currentIndexChanged.connect(
@@ -2596,7 +2683,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if method:
                 self.workspace_controller.set_roi_background_method(str(method))
 
-        def _active_foreground_with_background(self) -> tuple[GammaSpectrum | None, GammaSpectrum | None]:
+        def _active_foreground_with_background(
+            self,
+        ) -> tuple[GammaSpectrum | None, GammaSpectrum | None]:
             foreground = self.workspace_controller.spectrum()
             background = None
             if self.workspace_controller.state.active_spectrum_key != "background":
@@ -2606,12 +2695,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             return foreground, background
 
         def _roi_bounds(self) -> tuple[float, float]:
-            return tuple(sorted((float(self.roi_left.value()), float(self.roi_right.value()))))
+            return tuple(
+                sorted((float(self.roi_left.value()), float(self.roi_right.value())))
+            )
 
         def _analyze_roi(self) -> None:
             foreground, background = self._active_foreground_with_background()
             if foreground is None:
-                self.summary.setHtml("<p>No active spectrum available for ROI analysis.</p>")
+                self.summary.setHtml(
+                    "<p>No active spectrum available for ROI analysis.</p>"
+                )
                 return
             result = analyze_roi_region(
                 foreground,
@@ -2657,7 +2750,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _analyze_roi_statistics(self) -> None:
             inputs = self._statistics_inputs()
             if not inputs:
-                self.summary.setHtml("<p>No loaded spectra available for ROI statistics.</p>")
+                self.summary.setHtml(
+                    "<p>No loaded spectra available for ROI statistics.</p>"
+                )
                 return
             result = compute_roi_statistics(
                 inputs,
@@ -2741,7 +2836,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             )
 
-
     class SurveyMapPanel(QWidget):
         """Survey map summary for spectra carrying GPS metadata."""
 
@@ -2789,7 +2883,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.browser.setHtml(
                 "<h3>Survey Map Points</h3><ul>" + "".join(items) + "</ul>"
             )
-
 
     from fluxforge.gui.panels.modern_shell_center import CentralWorkspaceTabs
     from fluxforge.gui.panels.modern_shell_sidebar import SidebarPanel
@@ -2878,7 +2971,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         )
                     )
             else:
-                for index, slot in enumerate(self.workspace_controller.spectrum_slots()):
+                for index, slot in enumerate(
+                    self.workspace_controller.spectrum_slots()
+                ):
                     jobs.append(
                         BatchAnalysisJob(
                             job_id=f"slot-{slot.key}",
@@ -2888,7 +2983,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     )
             self.queued_jobs = tuple(jobs)
             self.progress_bar.setValue(0)
-            self.summary.setText(f"Queued {len(self.queued_jobs)} spectra for batch analysis.")
+            self.summary.setText(
+                f"Queued {len(self.queued_jobs)} spectra for batch analysis."
+            )
 
         def run_queue(self) -> None:
             if not self.queued_jobs:
@@ -2929,7 +3026,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 for column, value in enumerate(values):
                     item = QTableWidgetItem(
-                        value if isinstance(value, str) else f"{float(value):.4f}".rstrip("0").rstrip(".")
+                        value
+                        if isinstance(value, str)
+                        else f"{float(value):.4f}".rstrip("0").rstrip(".")
                     )
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                     self.table.setItem(row, column, item)
@@ -2938,9 +3037,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 f"Processed {len(self.results)} spectra. Aggregate CSV: {aggregate_path}"
             )
 
-
     class BottomWorkspaceTabs(QTabWidget):
-        """Bottom-zone tab set for tables, ROI tools, calibration, activity, batch, and logs."""
+        """Bottom-zone tab set for analyst workspaces."""
 
         def __init__(
             self,
@@ -2953,20 +3051,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             open_quick_slider_calibration_workspace: Callable[[], None] | None = None,
             open_manual_calibration_workspace: Callable[[], None] | None = None,
             open_standards_calibration_workspace: Callable[[], None] | None = None,
+            developer_tools: bool = False,
             parent=None,
         ) -> None:
             super().__init__(parent)
+            self.setObjectName("BottomWorkspaceTabs")
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager
             self.undo_stack = undo_stack
+            self.developer_tools = bool(developer_tools)
             self._open_calibration_workspace = open_calibration_workspace
             self._open_quick_slider_calibration_workspace = (
                 open_quick_slider_calibration_workspace
             )
             self._open_manual_calibration_workspace = open_manual_calibration_workspace
-            self._open_standards_calibration_workspace = open_standards_calibration_workspace
+            self._open_standards_calibration_workspace = (
+                open_standards_calibration_workspace
+            )
             self.peak_table_panel = PeakTablePanel(
                 mode_manager=self.mode_manager,
                 selection_bus=self.selection_bus,
@@ -3001,33 +3104,52 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 library_manager=self.library_manager,
                 parent=self,
             )
-            self.addTab(self.inventory_timeline_panel, "Inventory / Time Evolution")
             self.masking_review_panel = MaskingReviewPanel(
                 mode_manager=self.mode_manager,
                 activity_review_provider=self.activity_results_panel.current_activity_review,
                 activity_results_provider=lambda: self.workspace_controller.state.activity_results,
                 parent=self,
             )
-            self.addTab(self.masking_review_panel, "Line Interference / Masking")
             self.optimization_workspace_panel = OptimizationWorkspacePanel(
                 mode_manager=self.mode_manager,
                 activity_review_provider=self.activity_results_panel.current_activity_review,
                 activity_results_provider=lambda: self.workspace_controller.state.activity_results,
                 parent=self,
             )
-            self.addTab(self.optimization_workspace_panel, "Irradiation Optimizer")
             self.second_irradiation_panel = SecondIrradiationPlannerPanel(
                 mode_manager=self.mode_manager,
                 activity_review_provider=self.activity_results_panel.current_activity_review,
                 activity_results_provider=lambda: self.workspace_controller.state.activity_results,
                 parent=self,
             )
-            self.addTab(self.second_irradiation_panel, "Second Irradiation")
             self.phase5_parity_panel = Phase5ParityPanel(parent=self)
-            # This developer parity harness participates in saved workflow state,
-            # but it is not a user-facing analysis tab. A parented QWidget that
-            # is not added to the tab stack otherwise paints over the active tab.
-            self.phase5_parity_panel.hide()
+            if self.developer_tools:
+                self.addTab(
+                    self.inventory_timeline_panel,
+                    "Inventory Prototype",
+                )
+                self.addTab(
+                    self.masking_review_panel,
+                    "Masking Prototype",
+                )
+                self.addTab(
+                    self.optimization_workspace_panel,
+                    "Optimization Prototype",
+                )
+                self.addTab(
+                    self.second_irradiation_panel,
+                    "Second-Irradiation Prototype",
+                )
+                self.addTab(self.phase5_parity_panel, "Parity Evidence")
+            else:
+                for developer_panel in (
+                    self.inventory_timeline_panel,
+                    self.masking_review_panel,
+                    self.optimization_workspace_panel,
+                    self.second_irradiation_panel,
+                    self.phase5_parity_panel,
+                ):
+                    developer_panel.hide()
             self.batch_queue_panel = BatchQueuePanel(
                 workspace_controller=self.workspace_controller,
                 parent=self,
@@ -3038,7 +3160,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 parent=self,
             )
             self.addTab(self.survey_map_panel, "Survey Map")
-            self.addTab(self._log_panel(), "Log")
+            if self.developer_tools:
+                self.addTab(self._log_panel(), "Developer Log")
+            self.setProperty(
+                "fluxforgeTabIds",
+                {
+                    "Peak Table": "workspace.peaks.open",
+                    "ROI Tools": "workspace.roi.open",
+                    "Calibration": "workspace.calibration.open",
+                    "Activity Results": "workspace.activity.open",
+                    "Inventory Prototype": "developer.inventory.open",
+                    "Batch Queue": "workspace.batch.open",
+                    "Survey Map": "workspace.survey.open",
+                    "Masking Prototype": "developer.masking.open",
+                    "Optimization Prototype": "developer.optimization.open",
+                    "Second-Irradiation Prototype": "developer.second_irradiation.open",
+                    "Parity Evidence": "developer.parity.open",
+                    "Developer Log": "developer.log.open",
+                },
+            )
 
         def _text_panel(self, heading: str, body: str) -> QWidget:
             widget = QWidget(self)
@@ -3078,7 +3218,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(title)
 
             body = QLabel(
-                "Open the calibration workspace for energy, resolution, efficiency, ROI fitting, and detector profiles.",
+                "Open the calibration workspace for energy, FWHM resolution, "
+                "and ROI peak fitting.",
                 widget,
             )
             body.setObjectName("PanelBody")
@@ -3095,7 +3236,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             manual_button = QPushButton("Manual Workflow", widget)
             manual_button.setObjectName("ManualCalibrationWorkflowButton")
-            manual_button.setEnabled(self._open_manual_calibration_workspace is not None)
+            manual_button.setEnabled(
+                self._open_manual_calibration_workspace is not None
+            )
             if self._open_manual_calibration_workspace is not None:
                 manual_button.clicked.connect(self._open_manual_calibration_workspace)
             action_row.addWidget(manual_button)
@@ -3106,7 +3249,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._open_quick_slider_calibration_workspace is not None
             )
             if self._open_quick_slider_calibration_workspace is not None:
-                quick_button.clicked.connect(self._open_quick_slider_calibration_workspace)
+                quick_button.clicked.connect(
+                    self._open_quick_slider_calibration_workspace
+                )
             action_row.addWidget(quick_button)
 
             standards_button = QPushButton("Standards Workflow", widget)
@@ -3115,7 +3260,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._open_standards_calibration_workspace is not None
             )
             if self._open_standards_calibration_workspace is not None:
-                standards_button.clicked.connect(self._open_standards_calibration_workspace)
+                standards_button.clicked.connect(
+                    self._open_standards_calibration_workspace
+                )
             action_row.addWidget(standards_button)
 
             launch_button = QPushButton("Open Shared Workspace", widget)
@@ -3192,7 +3339,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if "current_tab" in payload:
                 set_tab_label(self, str(payload["current_tab"]))
 
-
     from fluxforge.gui.panels.modern_shell_context import ToolContextPanel
 
 else:
@@ -3213,7 +3359,6 @@ else:
 
         def current_spectrum(self):
             return self._current_spectrum
-
 
     class SidebarPanel:  # pragma: no cover - placeholder without Qt
         def __init__(
@@ -3236,7 +3381,6 @@ else:
             self._open_standards_review = open_standards_review
             self.parent = parent
 
-
     class BottomWorkspaceTabs:  # pragma: no cover - placeholder without Qt
         def __init__(
             self,
@@ -3249,6 +3393,7 @@ else:
             open_quick_slider_calibration_workspace: Callable[[], None] | None = None,
             open_manual_calibration_workspace: Callable[[], None] | None = None,
             open_standards_calibration_workspace: Callable[[], None] | None = None,
+            developer_tools: bool = False,
             parent=None,
         ) -> None:
             self.mode_manager = mode_manager
@@ -3256,12 +3401,16 @@ else:
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager
             self.undo_stack = undo_stack
+            self.developer_tools = bool(developer_tools)
             self.open_calibration_workspace = open_calibration_workspace
-            self.open_quick_slider_calibration_workspace = open_quick_slider_calibration_workspace
+            self.open_quick_slider_calibration_workspace = (
+                open_quick_slider_calibration_workspace
+            )
             self.open_manual_calibration_workspace = open_manual_calibration_workspace
-            self.open_standards_calibration_workspace = open_standards_calibration_workspace
+            self.open_standards_calibration_workspace = (
+                open_standards_calibration_workspace
+            )
             self.parent = parent
-
 
     class ToolContextPanel:  # pragma: no cover - placeholder without Qt
         def __init__(

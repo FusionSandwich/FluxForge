@@ -48,6 +48,7 @@ class QAMonitor:
 
     def __init__(self, db_path: str | Path | None = None) -> None:
         self.db_path = Path(db_path) if db_path is not None else _default_db_path()
+        self._demo_records: tuple[QARecord, ...] = ()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._initialize()
 
@@ -123,7 +124,7 @@ class QAMonitor:
                 ORDER BY timestamp ASC
                 """
             ).fetchall()
-        return tuple(
+        stored_records = tuple(
             QARecord(
                 timestamp=datetime.fromisoformat(row[0]),
                 nuclide=row[1],
@@ -138,6 +139,24 @@ class QAMonitor:
             )
             for row in rows
         )
+        # Early GUI prototypes wrote deterministic sample records to the normal
+        # user database.  They must never surface during production startup.
+        real_records = tuple(
+            record
+            for record in stored_records
+            if not self._is_seeded_demo_record(record)
+        )
+        return tuple(
+            sorted(real_records + self._demo_records, key=lambda item: item.timestamp)
+        )
+
+    @staticmethod
+    def _is_seeded_demo_record(record: QARecord) -> bool:
+        return record.spectrum_file in {
+            "demo_cs137_001.spe",
+            "demo_cs137_002.spe",
+            "demo_co60_002.spe",
+        }
 
     def grouped_history(self) -> dict[tuple[str, float], tuple[QARecord, ...]]:
         groups: dict[tuple[str, float], list[QARecord]] = {}
@@ -154,13 +173,19 @@ class QAMonitor:
             else:
                 baseline = series[0]
                 latest = series[-1]
-            centroid_drift = latest.measured_centroid_keV - baseline.measured_centroid_keV
-            fwhm_degradation = 100.0 * (
-                latest.measured_fwhm_keV - baseline.measured_fwhm_keV
-            ) / max(baseline.measured_fwhm_keV, 1e-12)
-            efficiency_deviation = 100.0 * (
-                latest.efficiency - baseline.efficiency
-            ) / max(abs(baseline.efficiency), 1e-12)
+            centroid_drift = (
+                latest.measured_centroid_keV - baseline.measured_centroid_keV
+            )
+            fwhm_degradation = (
+                100.0
+                * (latest.measured_fwhm_keV - baseline.measured_fwhm_keV)
+                / max(baseline.measured_fwhm_keV, 1e-12)
+            )
+            efficiency_deviation = (
+                100.0
+                * (latest.efficiency - baseline.efficiency)
+                / max(abs(baseline.efficiency), 1e-12)
+            )
             status = "green"
             if (
                 abs(centroid_drift) > 1.0
@@ -188,9 +213,9 @@ class QAMonitor:
         return tuple(sorted(statuses, key=lambda item: (item.nuclide, item.energy_keV)))
 
     def seed_demo_history(self) -> None:
-        """Populate a small deterministic demo history when the database is empty."""
+        """Expose deterministic example records without writing the user database."""
 
-        if self.history():
+        if self._demo_records:
             return
         anchor = datetime(2026, 3, 15, 14, 22)
         demo_points = (
@@ -231,8 +256,12 @@ class QAMonitor:
                 annotation="weekly QA",
             ),
         )
-        for record in demo_points:
-            self.record(record)
+        self._demo_records = demo_points
+
+    def clear_demo_history(self) -> None:
+        """Remove only the in-memory records added by :meth:`seed_demo_history`."""
+
+        self._demo_records = ()
 
 
 __all__ = ["QAMonitor", "QARecord", "QAStatus"]

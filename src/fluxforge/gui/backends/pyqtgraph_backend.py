@@ -26,6 +26,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         import pyqtgraph as pg
 
         from fluxforge.gui.qt_compat import (
+            QAction,
             QHBoxLayout,
             QLabel,
             QPushButton,
@@ -54,7 +55,20 @@ def pyqtgraph_backend_status() -> dict[str, object]:
     }
 
 
+def catalog_pyqtgraph_export_action(plot_widget, object_name: str) -> None:
+    """No-op unless the PyQtGraph backend is available."""
+
+    del plot_widget, object_name
+
+
 if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
+
+    def catalog_pyqtgraph_export_action(plot_widget, object_name: str) -> None:
+        """Give PyQtGraph's production context-menu export action a stable ID."""
+
+        for action in plot_widget.scene().findChildren(QAction):
+            if action.text() == "Export...":
+                action.setObjectName(f"Export{object_name}Action")
 
     class PyQtGraphSpectrumCanvas(QWidget, SpectrumCanvas):
         """Production-ready Qt spectrum canvas for the redesigned shell."""
@@ -62,7 +76,9 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
         backend_key = "pyqtgraph"
         capabilities = RendererCapabilities()
 
-        def __init__(self, selection_bus: SelectionBus | None = None, parent=None) -> None:
+        def __init__(
+            self, selection_bus: SelectionBus | None = None, parent=None
+        ) -> None:
             super().__init__(parent)
             self.selection_bus = selection_bus
             self.buffer = HierarchicalSpectrumBuffer.from_counts(())
@@ -113,7 +129,9 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.zoom_in_button = QPushButton("Zoom +", self)
             self.zoom_in_button.setObjectName("SpectrumZoomInButton")
-            self.zoom_in_button.setToolTip("Zoom into the center of the current spectrum view.")
+            self.zoom_in_button.setToolTip(
+                "Zoom into the center of the current spectrum view."
+            )
             self.zoom_in_button.clicked.connect(lambda: self._zoom_view(0.65))
             header.addWidget(self.zoom_in_button)
 
@@ -168,9 +186,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._roi_region.setZValue(20)
             self._roi_region.setVisible(False)
-            self._roi_region.sigRegionChangeFinished.connect(
-                self._publish_roi_region
-            )
+            self._roi_region.sigRegionChangeFinished.connect(self._publish_roi_region)
             self.plot_item.addItem(self._roi_region)
             shell.addWidget(self.plot, 1)
 
@@ -203,6 +219,11 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.residual_plots.append(residual_plot)
                 self.residual_curves.append(curve)
                 self.residual_zero_lines.append(zero)
+                catalog_pyqtgraph_export_action(
+                    residual_plot,
+                    f"SpectrumResidualPlot{index + 1}",
+                )
+            catalog_pyqtgraph_export_action(self.plot, "SpectrumPlot")
             self.residual_row.setVisible(False)
             shell.addWidget(self.residual_row)
 
@@ -226,9 +247,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
 
             self._current_traces = tuple(traces)
-            self._x_axis_is_energy = traces[0].x_axis_label.lower().startswith(
-                "energy"
-            )
+            self._x_axis_is_energy = traces[0].x_axis_label.lower().startswith("energy")
             self.plot.setLabel("bottom", traces[0].x_axis_label)
             for item in self._overlay_traces:
                 self.plot_item.removeItem(item)
@@ -244,7 +263,9 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 full_channels = tuple(float(index) for index in range(len(values)))
             channels = [
                 full_channels[index * level.stride]
-                for index in range(min(len(level.counts), len(full_channels[:: level.stride or 1])))
+                for index in range(
+                    min(len(level.counts), len(full_channels[:: level.stride or 1]))
+                )
             ]
             if len(channels) < len(level.counts):
                 channels = [index * level.stride for index in range(len(level.counts))]
@@ -347,15 +368,20 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 for peak in peaks
             ]
             y_values = [
-                self._display_value(
-                    float(
-                        self.buffer.full_resolution[
-                            min(int(round(peak.channel)), len(self.buffer.full_resolution) - 1)
-                        ]
+                (
+                    self._display_value(
+                        float(
+                            self.buffer.full_resolution[
+                                min(
+                                    int(round(peak.channel)),
+                                    len(self.buffer.full_resolution) - 1,
+                                )
+                            ]
+                        )
                     )
+                    if self.buffer.full_resolution
+                    else 0.0
                 )
-                if self.buffer.full_resolution
-                else 0.0
                 for peak in peaks
             ]
             brushes = [
@@ -387,7 +413,9 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             )
 
-        def set_peak_residuals(self, peaks: Sequence[PeakCandidate], *, visible: bool) -> None:
+        def set_peak_residuals(
+            self, peaks: Sequence[PeakCandidate], *, visible: bool
+        ) -> None:
             self._residual_visible = bool(visible)
             self.residual_row.setVisible(bool(visible and peaks))
             for index, curve in enumerate(self.residual_curves):
@@ -400,7 +428,9 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                     np.asarray(peak.residual_channels, dtype=float),
                     np.asarray(peak.normalized_residuals, dtype=float),
                 )
-                severity = max((abs(value) for value in peak.normalized_residuals), default=0.0)
+                severity = max(
+                    (abs(value) for value in peak.normalized_residuals), default=0.0
+                )
                 if severity >= 3.0:
                     color = "#ef4444"
                 elif severity >= 2.0:
@@ -409,7 +439,9 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                     color = "#10b981"
                 curve.setSymbolBrush(pg.mkBrush(color))
                 curve.setSymbolPen(pg.mkPen(color=color, width=1.0))
-                self.residual_zero_lines[index].setPen(pg.mkPen(color="#94a3b8", width=1))
+                self.residual_zero_lines[index].setPen(
+                    pg.mkPen(color="#94a3b8", width=1)
+                )
                 self.residual_plots[index].setTitle(
                     f"{peak.energy_keV:.1f} keV · max |z| {severity:.2f}"
                 )
@@ -546,16 +578,19 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return max(max_value, 1.0e-3)
             return max_value if max_value > 0.0 else 1.0
 
-
 else:
 
-    class PyQtGraphSpectrumCanvas(SpectrumCanvas):  # pragma: no cover - placeholder without optional deps
+    class PyQtGraphSpectrumCanvas(
+        SpectrumCanvas
+    ):  # pragma: no cover - placeholder without optional deps
         """Import-safe placeholder when Qt or PyQtGraph is unavailable."""
 
         backend_key = "pyqtgraph"
         capabilities = RendererCapabilities()
 
-        def __init__(self, selection_bus: SelectionBus | None = None, parent=None) -> None:
+        def __init__(
+            self, selection_bus: SelectionBus | None = None, parent=None
+        ) -> None:
             self.selection_bus = selection_bus
             self.parent = parent
 

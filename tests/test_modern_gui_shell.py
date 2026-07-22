@@ -104,7 +104,11 @@ def test_workflow_preset_manager_persists_builtin_and_user_presets():
         "lab-phase6-session",
         {
             "version": 1,
-            "mode_state": {"mode": "expert", "theme": "dark", "theme_profile": "night-lab"},
+            "mode_state": {
+                "mode": "expert",
+                "theme": "dark",
+                "theme_profile": "night-lab",
+            },
         },
         description="Local saved workflow",
     )
@@ -127,7 +131,9 @@ def test_workflow_preset_manager_mode_and_library_helpers_apply_payloads():
     applied = manager.apply_mode_and_library_state(
         name="astm-ldrd-irradiation",
         mode_state_applier=lambda payload: captured.setdefault("mode", dict(payload)),
-        library_state_applier=lambda payload: captured.setdefault("library", dict(payload)),
+        library_state_applier=lambda payload: captured.setdefault(
+            "library", dict(payload)
+        ),
     )
 
     assert applied is not None
@@ -144,7 +150,7 @@ def test_workflow_preset_manager_extract_mode_and_library_state_handles_missing_
 
 
 @pytest.mark.skipif(not QT_AVAILABLE, reason="Qt GUI dependencies are unavailable.")
-def test_main_window_restores_saved_workflow_state_across_sessions():
+def test_main_window_requires_explicit_action_to_restore_saved_workflow_state():
     _qapp()
     settings = FakeSettings()
 
@@ -240,17 +246,48 @@ def test_main_window_restores_saved_workflow_state_across_sessions():
     restored_bottom = second.bottom_dock.widget()
     assert second.workflow_presets.active_workflow_name() == "session-restore-check"
     assert second.workflow_combo.currentData() == "session-restore-check"
+    assert second.analysis_workspace.spectrum() is None
+    assert second._log_scale_action.isChecked() is False
+    assert restored_sidebar.nuclide_query.text() != "co"
+    assert restored_sidebar.saved_nuclides.count() == 0
+
+    second.load_workflow_button.click()
+    _qapp().processEvents()
+
     assert second._log_scale_action.isChecked() is True
     assert restored_sidebar.nuclide_query.text() == "co"
     assert restored_sidebar.saved_nuclides.count() == 1
-    assert restored_bottom.activity_results_panel.background_scale.value() == pytest.approx(1.25)
-    assert restored_bottom.activity_results_panel.background_visible.isChecked() is False
-    assert restored_bottom.inventory_timeline_panel.time_stop_hours.value() == pytest.approx(72.0)
-    assert restored_bottom.masking_review_panel.energy_window_spin.value() == pytest.approx(9.5)
-    assert restored_bottom.optimization_workspace_panel.target_nuclide_edit.text() == "Co-60"
-    assert restored_bottom.second_irradiation_panel.target_weights_edit.text() == "Co-60:2.0"
-    assert restored_bottom.phase5_parity_panel.replay_filter_combo.currentText() == "adapter-required"
-    assert restored_bottom.phase5_parity_panel.parity_scope_combo.currentText() == "algorithm"
+    assert (
+        restored_bottom.activity_results_panel.background_scale.value()
+        == pytest.approx(1.25)
+    )
+    assert (
+        restored_bottom.activity_results_panel.background_visible.isChecked() is False
+    )
+    assert (
+        restored_bottom.inventory_timeline_panel.time_stop_hours.value()
+        == pytest.approx(72.0)
+    )
+    assert (
+        restored_bottom.masking_review_panel.energy_window_spin.value()
+        == pytest.approx(9.5)
+    )
+    assert (
+        restored_bottom.optimization_workspace_panel.target_nuclide_edit.text()
+        == "Co-60"
+    )
+    assert (
+        restored_bottom.second_irradiation_panel.target_weights_edit.text()
+        == "Co-60:2.0"
+    )
+    assert (
+        restored_bottom.phase5_parity_panel.replay_filter_combo.currentText()
+        == "adapter-required"
+    )
+    assert (
+        restored_bottom.phase5_parity_panel.parity_scope_combo.currentText()
+        == "algorithm"
+    )
     assert (
         restored_bottom.phase5_parity_panel.fixture_filter_edit.text()
         == "spectrum_io_normalization_algorithm_case"
@@ -358,14 +395,21 @@ def test_spectrum_canvas_reset_and_draggable_roi_controls():
 
     canvas.plot_item.setXRange(400.0, 500.0, padding=0.0)
     app.processEvents()
-    before_zoom_width = canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0]
+    before_zoom_width = (
+        canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0]
+    )
     QTest.mouseClick(canvas.zoom_in_button, Qt.LeftButton)
     app.processEvents()
-    zoomed_width = canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0]
+    zoomed_width = (
+        canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0]
+    )
     assert zoomed_width < before_zoom_width
     QTest.mouseClick(canvas.zoom_out_button, Qt.LeftButton)
     app.processEvents()
-    assert canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0] > zoomed_width
+    assert (
+        canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0]
+        > zoomed_width
+    )
 
     canvas.plot_item.setXRange(300.0, 600.0, padding=0.0)
     app.processEvents()
@@ -458,7 +502,7 @@ def test_hidden_phase5_harness_does_not_cover_analysis_tabs():
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt spectrum renderer dependencies are unavailable.",
 )
-def test_modern_menu_actions_open_files_focus_search_and_explain_availability(
+def test_modern_menu_actions_open_files_focus_search_and_hide_unavailable_features(
     monkeypatch,
 ):
     from fluxforge.gui import main_window as main_window_module
@@ -519,9 +563,7 @@ def test_modern_menu_actions_open_files_focus_search_and_explain_availability(
         for action in window.findChildren(QAction)
         if "(not available)" in action.text()
     ]
-    assert unavailable
-    assert all(not action.isEnabled() for action in unavailable)
-    assert all(action.toolTip() for action in unavailable)
+    assert unavailable == []
     window.close()
 
 
@@ -533,9 +575,11 @@ def test_modern_help_and_full_canvas_actions_are_clickable(monkeypatch):
     from fluxforge.gui import main_window as main_window_module
 
     app = _qapp()
+    settings = FakeSettings()
     window = FluxForgeMainWindow(
-        mode_manager=ModeManager(),
+        mode_manager=ModeManager(settings=settings),
         selection_bus=SelectionBus(),
+        settings=settings,
     )
     window.show()
     app.processEvents()
@@ -573,13 +617,38 @@ def test_modern_help_and_full_canvas_actions_are_clickable(monkeypatch):
     window.close()
 
 
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt spectrum renderer dependencies are unavailable.",
+)
+def test_spectrum_context_export_action_is_registered_with_stable_id():
+    app = _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(settings=FakeSettings()),
+        selection_bus=SelectionBus(),
+        settings=FakeSettings(),
+        load_example=True,
+    )
+    window.show()
+    app.processEvents()
+
+    plot = window.central_tabs.canvas.plot
+    assert any(
+        action.objectName() == "ExportSpectrumPlotAction"
+        and action.text() == "Export..."
+        and action.isEnabled()
+        for action in plot.scene().contextMenu
+    )
+    window.close()
+
+
 def test_modern_shell_reuses_shared_demo_and_selection_helpers():
-    modern_shell_path = ROOT / "src" / "fluxforge" / "gui" / "panels" / "modern_shell.py"
+    modern_shell_path = (
+        ROOT / "src" / "fluxforge" / "gui" / "panels" / "modern_shell.py"
+    )
     parsed = ast.parse(modern_shell_path.read_text(encoding="utf-8"))
     local_defs = {
-        node.name
-        for node in ast.walk(parsed)
-        if isinstance(node, ast.FunctionDef)
+        node.name for node in ast.walk(parsed) if isinstance(node, ast.FunctionDef)
     }
     assert "_selection_summary" not in local_defs
     assert "_format_duration" not in local_defs
@@ -605,10 +674,11 @@ def test_register_builtin_render_backends_tracks_default_and_stub():
     assert registries.render_backends.keys() == ("pyqtgraph", "vispy")
 
 
-def test_modern_gui_unavailable_message_mentions_legacy_fallback():
+def test_modern_gui_unavailable_message_is_product_focused():
     message = modern_gui_unavailable_message()
 
-    assert "fluxforge-gui-legacy" in message
+    assert "FluxForge desktop GUI" in message
+    assert "legacy" not in message.lower()
 
 
 def test_gui_package_imports_without_reporting_extra():

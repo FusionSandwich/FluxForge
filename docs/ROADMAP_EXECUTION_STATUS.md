@@ -1,11 +1,12 @@
 # FluxForge Roadmap Execution Status
 
-**Date:** 2026-04-19  
-**Controlling roadmap document:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md`  
-**Companion GUI document:** `docs/GUI_PLAN.md`  
-**Companion testing document:** `docs/FluxForge_Testing_Master.md`  
-**Companion Phase 5 planning section:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` section `10`  
-**Machine-readable tracker:** `.github/project-management/implementation_steps.json`
+**Date:** 2026-07-22
+**Controlling roadmap document:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md`
+**Companion GUI document:** `docs/GUI_PLAN.md`
+**Companion testing document:** `docs/FluxForge_Testing_Master.md`
+**Companion Phase 5 planning section:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md` section `10`
+**Machine-readable trackers:** `.github/project-management/implementation_steps.json`
+and `.github/project-management/full_parity_ledger.json`
 
 ## Stepwise Execution Rule
 
@@ -25,6 +26,21 @@ officially in progress.
 | 3.18 | `next` | `in-progress` | Identification / activity / reference parity is now in progress. The repo now includes bundled GSA-v4 edited plus natural libraries; NASA-gamma common-lab, natural, CapGam, IAEA capture, delayed-activation, Baghdad inelastic, and TALYS 14 MeV reference libraries; ENDF/B-VIII supplement; ICRP-107 plus Kayzero registrations; GUI/CLI user-library registration with reserved bundled names; and activity-review plus inventory views with uncertainty-bearing decay/Bateman outputs and GUI activity-unit selectors. |
 | 4.1 | `pending` | `not-started` | HAL driver work remains on the roadmap, but it is formally deferred until the new Phase 3B offline-parity module closes. |
 | 5.1 | `pending` | `in-progress` | testing-catalog crosswalk closure is now active with a machine-readable tracker at `.github/project-management/phase5_crosswalk.json`, backend reporting helpers in `src/fluxforge/validation/phase5_crosswalk.py`, a CLI report command `phase5-crosswalk-report`, and a new modern-shell `Phase 5 Parity` tab for crosswalk + parity review. |
+
+## Scientific Maturity of Irradiation Optimization
+
+The executable DI-FOM, FIM, MWDCS, BASS-D, STBD-MR, optimization-sweep, and
+second-irradiation paths are **prototypes**, not scientifically validated
+implementations of the full optimization roadmap. Their current unit, CLI, Qt,
+and RAFM workflow smoke tests establish software reachability and deterministic
+artifact generation. Those smoke tests do not establish scientific validation,
+covariance-aware prediction, posterior-adaptive decision quality, or held-out
+RAFM performance.
+
+The full-parity ledger records this maturity independently for backend, CLI,
+GUI, fixture, and test layers. A method can be promoted from `prototype` only
+after its stated mathematical oracle, shared physical-forward-model,
+uncertainty/covariance, native-platform, and held-out-data gates pass.
 
 ## Additive Roadmap Overlays
 
@@ -162,13 +178,13 @@ following overlays were adopted additively and do not replace that map.
 | Step | Sequence Status | Repo Status | Meaning |
 |---|---|---|---|
 | 3.18 | `next` | `in-progress` | Implement the remaining identification/activity/reference parity work on top of the now-bundled GSA-v4 edited/natural, NASA-gamma common-lab/natural/capture/delayed-activation/inelastic families, ENDF/B-VIII supplement, ICRP-107 plus Kayzero source registrations, collision-safe GUI/CLI user-library registration, and GUI activity-unit selectors, then finish relative activity, source-age overlays, deeper decay-dataset consumption, and the remaining parity surfaces. |
-| 3.19 | `pending` | `in-progress` | Detection-limit/dose/shielding workspaces remain pending, but the Phase 6 irradiation-optimization slice is now active: CLI `masking-review`, `optimization-sweep`, `second-irradiation-plan`, `activity-review`, and `inventory-review` flows plus the shared support-artifact builder in `src/fluxforge/workflows/irradiation_optimization.py` now produce masking, inventory, optimization-grid, recommended-schedule, and long-term dose-endpoint outputs. |
+| 3.19 | `pending` | `in-progress` | Detection-limit/dose/shielding workspaces remain pending. Prototype CLI `masking-review`, `optimization-sweep`, `second-irradiation-plan`, `activity-review`, and `inventory-review` flows plus the support-artifact builder in `src/fluxforge/workflows/irradiation_optimization.py` produce review artifacts, but do not yet satisfy the shared physical-forward-model, covariance, mathematical-oracle, or held-out-validation gates. |
 | 3.20 | `pending` | `in-progress` | CLI now includes explicit `file-query` and `batch-compare` commands in `src/fluxforge/cli/app.py`, and the Phase 6 benchmark experimental-bundle track is now active via `ffexp-export` plus GUI `.ffexp` export in `src/fluxforge/gui/panels/phase6.py`; GUI workflow/workspace persistence is now also active through `src/fluxforge/gui/workflow_presets.py` + `src/fluxforge/gui/main_window.py` with built-in `quantumgold-workflow` and `astm-ldrd-irradiation` presets. ROI-statistics and k0 workflows remain active, and archive/workbench depth still needs broader GUI parity follow-through. |
 | 3.21 | `pending` | `in-progress` | Fixture-manifest scaffolding now includes expanded source-linked case placeholders under `tests/spectra/reference_parity/cases/` and `tests/activation_inventory/fixtures/` (including second-irradiation planning), with contract checks in `tests/test_parity_fixture_manifests.py` and `tests/test_parity_phase3_scaffolding.py`. |
 | 3.22 | `pending` | `in-progress` | Initial algorithm-level parity scaffolding is now present via `parity_scope=algorithm` manifests plus discovery checks in `tests/test_parity_phase3_scaffolding.py`; full parser/calibration/fit/activity/dose/k0 golden comparisons remain pending. |
 | 3.23 | `pending` | `in-progress` | Initial workflow-level parity scaffolding is now present via `parity_scope=workflow` manifests (including activity/inventory and second-irradiation placeholders) plus scaffold verification tests; source-linked end-to-end golden-result suites remain pending. |
 | 3.24 | `pending` | `not-started` | Add direct-manipulation canvas parity: peak add/delete/move, ROI dragging, background handles, and overlay-role actions. |
-| 3.25 | `pending` | `in-progress` | Add dedicated Qt workspaces for ROI statistics, detection limit, dose/shielding, relative activity, file query/batch compare, reference libraries, and k0 reporting. The first Phase 6 parity surfaces are now live in the modern shell via `Line Interference / Masking`, `Irradiation Optimizer`, and `Second Irradiation` tabs backed by `src/fluxforge/gui/panels/phase6.py`, and their state now round-trips through the saved-workflow system. |
+| 3.25 | `pending` | `in-progress` | Add dedicated Qt workspaces for ROI statistics, detection limit, dose/shielding, relative activity, file query/batch compare, reference libraries, and k0 reporting. Prototype `Line Interference / Masking`, `Irradiation Optimizer`, and `Second Irradiation` surfaces are executable and persist state, but must not be described as parity-complete or scientifically validated. |
 | 3.26 | `pending` | `complete` | GUI polish parity is now implemented via saved theme profiles (`src/fluxforge/gui/mode_manager.py` + `src/fluxforge/gui/widgets/mode_switcher.py`), stronger graph-table synchronization (`src/fluxforge/gui/backends/pyqtgraph_backend.py` + `src/fluxforge/gui/panels/modern_shell.py`), clearer launch/discovery actions (`src/fluxforge/gui/main_window.py`), and the maintainability split of the oversized shell into `modern_shell_center.py`, `modern_shell_sidebar.py`, `modern_shell_context.py`, and `modern_shell_shared.py`, with Qt coverage in `tests/test_analysis_workspace_qt.py`, `tests/test_module3_workflows_qt.py`, and `tests/test_modern_gui_shell.py`. |
 | 3.27 | `pending` | `complete` | GUI verification/release acceptance is now implemented with expanded Qt/CLI coverage (`tests/test_modern_gui_shell.py`, `tests/test_module3_workflows_qt.py`, `tests/test_cli_app.py`), native probe evidence (`tests/gui_phase327_release_probe.py` and `artifacts/gui_review/phase327_probe/index.html`), and a release-blocking checklist at `docs/PHASE3_27_RELEASE_CHECKLIST.md` plus CLI validation command `gui-acceptance-check`. |
 | 4.1 | `pending` | `not-started` | Implement the first real HAL drivers after the offline-parity module closes. |
@@ -210,7 +226,7 @@ following overlays were adopted additively and do not replace that map.
   `artifacts/gui_review/phase31x_unfolding_probe/`, and
   `artifacts/gui_review/phase327_probe/`, and the `gui-acceptance-check` CLI command wrote
   `artifacts/gui_review/phase327_probe/gui_acceptance_check.json`.
-- Phase 6 irradiation-optimization verification was refreshed on 2026-04-17
+- Phase 6 irradiation-optimization prototype smoke verification was refreshed on 2026-04-17
   against the real RAFM example corpus rather than synthetic activity-review
   payloads:
   `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "second_irradiation_plan_writes_json_and_csv_outputs or optimization_sweep_builds_candidates_from_activity_review or ffexp_export_packages_phase6_products"`
@@ -310,7 +326,7 @@ following overlays were adopted additively and do not replace that map.
   with `22 passed`, plus
   `PYTHONPATH=src pytest -q tests/test_cli_app.py -k "optimization_sweep_builds_candidates_from_activity_review or phase6_ldrd_worked_example"`
   with `3 passed, 73 deselected`.
-- RAFM second-irradiation decision-repository baseline implementation is now live:
+- The RAFM second-irradiation decision-repository prototype baseline is executable:
   - workflow module: `src/fluxforge/workflows/phase6_ldrd_second_irradiation_decision_repo.py`
   - CLI command: `phase6-ldrd-second-irradiation-repo`
   - report graphics now generated and embedded for schedule, isotope-priority, and cooldown-contribution review:
@@ -448,8 +464,11 @@ following overlays were adopted additively and do not replace that map.
 - Phase 3.18 remains the active sequence gate and is not yet complete.
 - Phase 3.19 through 3.24 remain open in sequence (in-progress/planned).
 - Phase 3.26 and 3.27 are implemented in-repo but remain sequence-pending until the earlier open Phase 3 gates are closed.
-- All final-plan GUI features except the deferred live MCA / HAL transport work in
-  Phase 4.1 through 4.4 are now implemented in the modern Qt shell.
+- The Qt shell contains substantial implemented workflows, but the full-parity
+  ledger remains authoritative for release maturity. Direct manipulation,
+  efficiency diagnostics and persistence, covariance-aware unfolding,
+  physics-grounded optimization, and acquisition work still include prototype,
+  scaffolded, planned, or conditional-hardware gaps.
 - The roadmap's currently active offline-parity tranche is Phase 3.18 through
   3.23, with 3.20 command surfaces and 3.21 through 3.23 scaffold fixtures/tests
   now in progress and pending golden-source expansion.

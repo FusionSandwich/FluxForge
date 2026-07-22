@@ -1,4 +1,4 @@
-"""Launcher and helpers for inspecting the next-generation GUI scaffold."""
+"""FluxForge desktop GUI launcher."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
 
 def describe_gui_scaffold() -> dict[str, object]:
-    """Return a small summary of the planned GUI shell."""
+    """Return a diagnostic summary of the desktop GUI."""
 
     scaffold = MainWindowScaffold()
     return {
@@ -35,8 +35,13 @@ def describe_gui_scaffold() -> dict[str, object]:
     }
 
 
-def launch_modern_gui(project_dir: str | Path | None = None) -> int:
-    """Launch the next-generation GUI shell if Qt is available."""
+def launch_modern_gui(
+    project_dir: str | Path | None = None,
+    *,
+    developer_tools: bool = False,
+    open_example: bool = False,
+) -> int:
+    """Launch the production desktop GUI if its native dependencies are available."""
 
     if not QT_AVAILABLE:
         raise RuntimeError(modern_gui_unavailable_message())
@@ -45,7 +50,11 @@ def launch_modern_gui(project_dir: str | Path | None = None) -> int:
     app.setOrganizationName("FluxForge")
     app.setApplicationName("FluxForgeNext")
 
-    window = FluxForgeMainWindow(selection_bus=SelectionBus.shared())
+    window = FluxForgeMainWindow(
+        selection_bus=SelectionBus.shared(),
+        developer_tools=developer_tools,
+        load_example=open_example,
+    )
     if project_dir is not None:
         window.file_label.setText(f"Project: {Path(project_dir)}")
     window.show()
@@ -53,17 +62,31 @@ def launch_modern_gui(project_dir: str | Path | None = None) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Console-script entrypoint for the additive modern GUI shell."""
+    """Console-script entrypoint for the FluxForge desktop GUI."""
 
     parser = argparse.ArgumentParser(prog="fluxforge-gui")
     parser.add_argument(
         "--project-dir",
         type=Path,
         default=None,
-        help="Optional project directory to surface in the modern shell status bar.",
+        help="Optional project directory to show in the status bar.",
+    )
+    parser.add_argument(
+        "--developer-tools",
+        action="store_true",
+        help="Show parity, diagnostics, and other developer-only workspaces.",
+    )
+    parser.add_argument(
+        "--open-example",
+        action="store_true",
+        help="Open the bundled HPGe example instead of an empty workspace.",
     )
     args = parser.parse_args(argv)
     if not QT_AVAILABLE:
         print(modern_gui_unavailable_message(), file=sys.stderr)
         return 1
-    return launch_modern_gui(project_dir=args.project_dir)
+    return launch_modern_gui(
+        project_dir=args.project_dir,
+        developer_tools=args.developer_tools,
+        open_example=args.open_example,
+    )

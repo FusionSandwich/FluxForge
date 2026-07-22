@@ -28,6 +28,7 @@ from fluxforge.core.peak_fitting import (
     fit_roi_peak,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE
+from fluxforge.gui.backends.pyqtgraph_backend import catalog_pyqtgraph_export_action
 from fluxforge.gui.library_manager import DataLibraryManager
 from fluxforge.gui.mode_manager import ModeManager
 from fluxforge.gui.nuclide_search import NuclideSearchController
@@ -38,10 +39,11 @@ from fluxforge.gui.widgets import MethodSelectorWidget
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.plugins import bootstrap_builtin_registries
 
-if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
+if (
+    QT_AVAILABLE and PYQTGRAPH_AVAILABLE
+):  # pragma: no cover - optional dependency branch
     import pyqtgraph as pg
 
-    from fluxforge.gui.panels.modern_shell import build_demo_spectrum
     from fluxforge.gui.qt_compat import (
         QAbstractItemView,
         QDialog,
@@ -94,7 +96,9 @@ class CalibrationSnapshot:
     deviation_pairs: tuple[EnergyDeviationPair, ...]
 
 
-if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
+if (
+    QT_AVAILABLE and PYQTGRAPH_AVAILABLE
+):  # pragma: no cover - optional dependency branch
 
     class CalibrationWorkspaceDialog(QDialog):
         """Modern calibration workspace with embedded plots and live diagnostics."""
@@ -123,10 +127,13 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             mode_manager: ModeManager,
             selection_bus: SelectionBus | None = None,
             library_manager: DataLibraryManager | None = None,
-            on_apply: Callable[
-                [GammaSpectrum, EnergyCalibrationFit, FWHMCalibrationFit | None], None
-            ]
-            | None = None,
+            on_apply: (
+                Callable[
+                    [GammaSpectrum, EnergyCalibrationFit, FWHMCalibrationFit | None],
+                    None,
+                ]
+                | None
+            ) = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -147,7 +154,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self._syncing_fwhm_table = False
             self._syncing_deviation_table = False
             self._syncing_quick_controls = False
-            self._spectrum = spectrum or build_demo_spectrum()
+            if spectrum is None:
+                raise ValueError("Calibration requires an explicitly loaded spectrum.")
+            self._spectrum = spectrum
             self._energy_fit: EnergyCalibrationFit | None = None
             self._fwhm_fit: FWHMCalibrationFit | None = None
             self._quick_fit = None
@@ -192,8 +201,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             subtitle = QLabel(
                 (
                     "Residuals stay visible while the spectrum, calibration points, "
-                    "and fit diagnostics update in one place. This dialog uses the "
-                    "new Qt calibration stack only."
+                    "and fit diagnostics update in one place."
                 ),
                 header,
             )
@@ -203,7 +211,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             kpi_row = QHBoxLayout()
             kpi_row.setSpacing(12)
-            self.spectrum_kpi = self._build_kpi_card("Spectrum", "Demo")
+            self.spectrum_kpi = self._build_kpi_card("Spectrum", "No spectrum")
             self.energy_kpi = self._build_kpi_card("Energy Fit", "Waiting")
             self.fwhm_kpi = self._build_kpi_card("Resolution Fit", "Waiting")
             kpi_row.addWidget(self.spectrum_kpi[0], 1)
@@ -221,7 +229,12 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             plots_layout.setContentsMargins(0, 0, 0, 0)
             plots_layout.setSpacing(12)
 
-            self.spectrum_plot = self._create_plot_widget("Spectrum canvas", "Channel", "Counts")
+            self.spectrum_plot = self._create_plot_widget(
+                "Spectrum canvas",
+                "Channel",
+                "Counts",
+                "CalibrationSpectrumPlot",
+            )
             self.spectrum_curve = self.spectrum_plot.plot(
                 pen=pg.mkPen(width=2),
                 fillLevel=0.0,
@@ -252,7 +265,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.spectrum_plot.addItem(self.roi_region)
             self.spectrum_plot.addItem(self.roi_centroid_line)
             self.roi_region.sigRegionChanged.connect(self._handle_roi_region_changed)
-            self.spectrum_plot.scene().sigMouseClicked.connect(self._handle_spectrum_click)
+            self.spectrum_plot.scene().sigMouseClicked.connect(
+                self._handle_spectrum_click
+            )
             plots_layout.addWidget(
                 self._wrap_plot_card(
                     "Embedded spectrum canvas",
@@ -273,6 +288,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 "Energy residuals",
                 "Reference energy (keV)",
                 "Residual (keV)",
+                "CalibrationEnergyResidualPlot",
             )
             self.energy_residual_in_spec = self.energy_residual_plot.plot(
                 pen=None,
@@ -320,6 +336,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 "FWHM resolution fit",
                 "Energy (keV)",
                 "FWHM (keV)",
+                "CalibrationFwhmPlot",
             )
             self.fwhm_measured_curve = self.fwhm_plot.plot(
                 pen=None,
@@ -341,6 +358,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 "ROI fit preview",
                 "Channel",
                 "Counts",
+                "CalibrationRoiFitPlot",
             )
             self.roi_detail_observed_curve = self.roi_detail_plot.plot(
                 pen=None,
@@ -357,6 +375,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 "ROI residuals",
                 "Channel",
                 "(data-model) / sqrt(model)",
+                "CalibrationRoiResidualPlot",
             )
             self.roi_residual_curve = self.roi_residual_plot.plot(
                 pen=None,
@@ -398,6 +417,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             order_label = QLabel("Polynomial order", energy_group)
             order_row.addWidget(order_label)
             self.energy_order = QSpinBox(energy_group)
+            self.energy_order.setObjectName("CalibrationEnergyPolynomialOrderSpin")
             self.energy_order.setRange(1, 4)
             self.energy_order.setValue(2)
             self.energy_order.valueChanged.connect(self._refresh_energy_fit)
@@ -410,19 +430,34 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             energy_button_row = QHBoxLayout()
             self.add_energy_point_button = QPushButton("Add point", energy_group)
+            self.add_energy_point_button.setObjectName(
+                "AddEnergyCalibrationPointButton"
+            )
             self.add_energy_point_button.clicked.connect(self._add_empty_energy_row)
             energy_button_row.addWidget(self.add_energy_point_button)
-            self.remove_energy_point_button = QPushButton("Remove selected", energy_group)
-            self.remove_energy_point_button.clicked.connect(self._remove_selected_energy_rows)
+            self.remove_energy_point_button = QPushButton(
+                "Remove selected", energy_group
+            )
+            self.remove_energy_point_button.setObjectName(
+                "RemoveEnergyCalibrationPointButton"
+            )
+            self.remove_energy_point_button.clicked.connect(
+                self._remove_selected_energy_rows
+            )
             energy_button_row.addWidget(self.remove_energy_point_button)
-            self.reset_energy_points_button = QPushButton("Reset seeded points", energy_group)
+            self.reset_energy_points_button = QPushButton(
+                "Reset seeded points", energy_group
+            )
+            self.reset_energy_points_button.setObjectName(
+                "ResetEnergyCalibrationPointsButton"
+            )
             self.reset_energy_points_button.clicked.connect(self._seed_energy_table)
             energy_button_row.addWidget(self.reset_energy_points_button)
             energy_button_row.addStretch(1)
             energy_layout.addLayout(energy_button_row)
 
             self.energy_table = QTableWidget(0, len(self.ENERGY_HEADERS), energy_group)
-            self.energy_table.setObjectName("CalibrationTable")
+            self.energy_table.setObjectName("CalibrationEnergyPointsTable")
             self.energy_table.setHorizontalHeaderLabels(self.ENERGY_HEADERS)
             self.energy_table.verticalHeader().setVisible(False)
             self.energy_table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -449,19 +484,30 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             fwhm_button_row = QHBoxLayout()
             self.add_fwhm_point_button = QPushButton("Add point", fwhm_group)
+            self.add_fwhm_point_button.setObjectName("AddFwhmCalibrationPointButton")
             self.add_fwhm_point_button.clicked.connect(self._add_empty_fwhm_row)
             fwhm_button_row.addWidget(self.add_fwhm_point_button)
             self.remove_fwhm_point_button = QPushButton("Remove selected", fwhm_group)
-            self.remove_fwhm_point_button.clicked.connect(self._remove_selected_fwhm_rows)
+            self.remove_fwhm_point_button.setObjectName(
+                "RemoveFwhmCalibrationPointButton"
+            )
+            self.remove_fwhm_point_button.clicked.connect(
+                self._remove_selected_fwhm_rows
+            )
             fwhm_button_row.addWidget(self.remove_fwhm_point_button)
-            self.reset_fwhm_points_button = QPushButton("Reset seeded points", fwhm_group)
+            self.reset_fwhm_points_button = QPushButton(
+                "Reset seeded points", fwhm_group
+            )
+            self.reset_fwhm_points_button.setObjectName(
+                "ResetFwhmCalibrationPointsButton"
+            )
             self.reset_fwhm_points_button.clicked.connect(self._seed_fwhm_table)
             fwhm_button_row.addWidget(self.reset_fwhm_points_button)
             fwhm_button_row.addStretch(1)
             fwhm_layout.addLayout(fwhm_button_row)
 
             self.fwhm_table = QTableWidget(0, len(self.FWHM_HEADERS), fwhm_group)
-            self.fwhm_table.setObjectName("CalibrationTable")
+            self.fwhm_table.setObjectName("CalibrationFwhmPointsTable")
             self.fwhm_table.setHorizontalHeaderLabels(self.FWHM_HEADERS)
             self.fwhm_table.verticalHeader().setVisible(False)
             self.fwhm_table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -481,7 +527,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             fwhm_layout.addWidget(self.fwhm_summary)
             controls_layout.addWidget(fwhm_group, 2)
 
-            library_group = QGroupBox("Library-assisted point assignment", controls_panel)
+            library_group = QGroupBox(
+                "Library-assisted point assignment", controls_panel
+            )
             library_group.setObjectName("CalibrationGroup")
             library_layout = QVBoxLayout(library_group)
             library_layout.setSpacing(10)
@@ -523,6 +571,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 "Assign line to selected row",
                 library_group,
             )
+            self.assign_line_button.setObjectName("AssignCalibrationLibraryLineButton")
             self.assign_line_button.clicked.connect(self._assign_selected_library_line)
             library_layout.addWidget(self.assign_line_button)
 
@@ -539,13 +588,24 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.advanced_tabs = QTabWidget(advanced_group)
             self.advanced_tabs.setObjectName("CalibrationAdvancedTabs")
             self.quick_slider_tab = self._build_quick_slider_tab(self.advanced_tabs)
-            self.deviation_pairs_tab = self._build_deviation_pairs_tab(self.advanced_tabs)
+            self.deviation_pairs_tab = self._build_deviation_pairs_tab(
+                self.advanced_tabs
+            )
             self.preserve_slots_tab = self._build_preserve_slots_tab(self.advanced_tabs)
             self.roi_fit_tab = self._build_roi_fit_tab(self.advanced_tabs)
             self.advanced_tabs.addTab(self.quick_slider_tab, "Quick Slider")
             self.advanced_tabs.addTab(self.deviation_pairs_tab, "Fine Tuning")
             self.advanced_tabs.addTab(self.preserve_slots_tab, "Preserve && Slots")
             self.advanced_tabs.addTab(self.roi_fit_tab, "ROI Fit")
+            self.advanced_tabs.setProperty(
+                "fluxforgeTabIds",
+                {
+                    "Quick Slider": "calibration.quick_slider.open",
+                    "Fine Tuning": "calibration.fine_tuning.open",
+                    "Preserve && Slots": "calibration.preserve_slots.open",
+                    "ROI Fit": "calibration.roi_fit.open",
+                },
+            )
             advanced_layout.addWidget(self.advanced_tabs)
             controls_layout.addWidget(advanced_group, 3)
 
@@ -565,11 +625,14 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             action_row = QHBoxLayout()
             action_row.addStretch(1)
-            self.apply_button = QPushButton("Apply calibration to spectrum", controls_panel)
-            self.apply_button.setObjectName("PrimaryAction")
+            self.apply_button = QPushButton(
+                "Apply calibration to spectrum", controls_panel
+            )
+            self.apply_button.setObjectName("ApplyCalibrationButton")
             self.apply_button.clicked.connect(self._apply_workspace_results)
             action_row.addWidget(self.apply_button)
             self.close_button = QPushButton("Close", controls_panel)
+            self.close_button.setObjectName("CloseCalibrationDialogButton")
             self.close_button.clicked.connect(self.close)
             action_row.addWidget(self.close_button)
             controls_layout.addLayout(action_row)
@@ -580,9 +643,13 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             splitter.setStretchFactor(1, 2)
 
             self.library_manager.subscribe(self._sync_library_state)
-            self.library_source_combo.currentIndexChanged.connect(self._library_source_changed)
+            self.library_source_combo.currentIndexChanged.connect(
+                self._library_source_changed
+            )
             self.library_search.textChanged.connect(self._refresh_library_results)
-            self.library_results.itemSelectionChanged.connect(self._library_result_selected)
+            self.library_results.itemSelectionChanged.connect(
+                self._library_result_selected
+            )
             self.library_lines.itemDoubleClicked.connect(
                 lambda _item: self._assign_selected_library_line()
             )
@@ -611,14 +678,19 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             form.setSpacing(8)
 
             self.quick_anchor_a_combo = QComboBox(widget)
+            self.quick_anchor_a_combo.setObjectName("CalibrationQuickAnchorALineCombo")
             self.quick_anchor_a_combo.currentIndexChanged.connect(
                 self._refresh_quick_slider_preview
             )
             form.addRow("Anchor A line", self.quick_anchor_a_combo)
 
             self.quick_anchor_a_slider = QSlider(Qt.Horizontal, widget)
-            self.quick_anchor_a_slider.setObjectName("QuickAnchorASlider")
-            self.quick_anchor_a_slider.valueChanged.connect(self._refresh_quick_slider_preview)
+            self.quick_anchor_a_slider.setObjectName(
+                "CalibrationQuickAnchorAChannelSlider"
+            )
+            self.quick_anchor_a_slider.valueChanged.connect(
+                self._refresh_quick_slider_preview
+            )
             form.addRow("Anchor A channel", self.quick_anchor_a_slider)
 
             self.quick_anchor_a_label = QLabel("--", widget)
@@ -626,14 +698,19 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             form.addRow("Anchor A preview", self.quick_anchor_a_label)
 
             self.quick_anchor_b_combo = QComboBox(widget)
+            self.quick_anchor_b_combo.setObjectName("CalibrationQuickAnchorBLineCombo")
             self.quick_anchor_b_combo.currentIndexChanged.connect(
                 self._refresh_quick_slider_preview
             )
             form.addRow("Anchor B line", self.quick_anchor_b_combo)
 
             self.quick_anchor_b_slider = QSlider(Qt.Horizontal, widget)
-            self.quick_anchor_b_slider.setObjectName("QuickAnchorBSlider")
-            self.quick_anchor_b_slider.valueChanged.connect(self._refresh_quick_slider_preview)
+            self.quick_anchor_b_slider.setObjectName(
+                "CalibrationQuickAnchorBChannelSlider"
+            )
+            self.quick_anchor_b_slider.valueChanged.connect(
+                self._refresh_quick_slider_preview
+            )
             form.addRow("Anchor B channel", self.quick_anchor_b_slider)
 
             self.quick_anchor_b_label = QLabel("--", widget)
@@ -644,9 +721,13 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             button_row = QHBoxLayout()
             button_row.setSpacing(8)
             self.quick_reset_button = QPushButton("Reset to seeded anchors", widget)
+            self.quick_reset_button.setObjectName("ResetCalibrationQuickAnchorsButton")
             self.quick_reset_button.clicked.connect(self._reset_quick_slider_anchors)
             button_row.addWidget(self.quick_reset_button)
             self.quick_promote_button = QPushButton("Promote anchors to table", widget)
+            self.quick_promote_button.setObjectName(
+                "PromoteCalibrationQuickAnchorsButton"
+            )
             self.quick_promote_button.clicked.connect(
                 self._promote_quick_slider_to_energy_rows
             )
@@ -682,33 +763,53 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             button_row = QHBoxLayout()
             button_row.setSpacing(8)
             self.add_deviation_pair_button = QPushButton("Add pair", widget)
-            self.add_deviation_pair_button.clicked.connect(self._add_empty_deviation_row)
+            self.add_deviation_pair_button.setObjectName(
+                "AddCalibrationDeviationPairButton"
+            )
+            self.add_deviation_pair_button.clicked.connect(
+                self._add_empty_deviation_row
+            )
             button_row.addWidget(self.add_deviation_pair_button)
             self.remove_deviation_pair_button = QPushButton("Remove selected", widget)
+            self.remove_deviation_pair_button.setObjectName(
+                "RemoveCalibrationDeviationPairButton"
+            )
             self.remove_deviation_pair_button.clicked.connect(
                 self._remove_selected_deviation_rows
             )
             button_row.addWidget(self.remove_deviation_pair_button)
-            self.seed_deviation_pairs_button = QPushButton("Seed from residuals", widget)
+            self.seed_deviation_pairs_button = QPushButton(
+                "Seed from residuals", widget
+            )
+            self.seed_deviation_pairs_button.setObjectName(
+                "SeedCalibrationDeviationPairsButton"
+            )
             self.seed_deviation_pairs_button.clicked.connect(
                 self._seed_deviation_pairs_from_residuals
             )
             button_row.addWidget(self.seed_deviation_pairs_button)
             self.clear_deviation_pairs_button = QPushButton("Clear", widget)
-            self.clear_deviation_pairs_button.clicked.connect(self._clear_deviation_pairs)
+            self.clear_deviation_pairs_button.setObjectName(
+                "ClearCalibrationDeviationPairsButton"
+            )
+            self.clear_deviation_pairs_button.clicked.connect(
+                self._clear_deviation_pairs
+            )
             button_row.addWidget(self.clear_deviation_pairs_button)
             button_row.addStretch(1)
             layout.addLayout(button_row)
 
             self.deviation_table = QTableWidget(0, 3, widget)
-            self.deviation_table.setObjectName("CalibrationTable")
+            self.deviation_table.setObjectName("CalibrationDeviationPairsTable")
             self.deviation_table.setHorizontalHeaderLabels(
                 ("Energy keV", "Correction keV", "Label")
             )
             self.deviation_table.verticalHeader().setVisible(False)
             self.deviation_table.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.deviation_table.setSelectionMode(QAbstractItemView.SingleSelection)
-            self.deviation_table.itemChanged.connect(self._handle_deviation_table_change)
+            self.deviation_table.itemChanged.connect(
+                self._handle_deviation_table_change
+            )
             deviation_header = self.deviation_table.horizontalHeader()
             deviation_header.setSectionResizeMode(QHeaderView.Stretch)
             deviation_header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
@@ -760,12 +861,16 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             self.preserve_current_button = QPushButton("Preserve current", widget)
             self.preserve_current_button.setObjectName("PreserveCalibrationButton")
-            self.preserve_current_button.clicked.connect(self._preserve_current_calibration)
+            self.preserve_current_button.clicked.connect(
+                self._preserve_current_calibration
+            )
             button_row.addWidget(self.preserve_current_button)
 
             self.fine_tune_preserved_button = QPushButton("Fine-tune preserved", widget)
             self.fine_tune_preserved_button.setObjectName("FineTunePreservedButton")
-            self.fine_tune_preserved_button.clicked.connect(self._fine_tune_from_preserved)
+            self.fine_tune_preserved_button.clicked.connect(
+                self._fine_tune_from_preserved
+            )
             button_row.addWidget(self.fine_tune_preserved_button)
 
             self.save_slot_button = QPushButton("Save to slot", widget)
@@ -817,6 +922,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 title="Peak fitter",
                 parent=widget,
             )
+            self.roi_method_selector.combo.setObjectName(
+                "CalibrationRoiPeakFitterCombo"
+            )
             self.roi_method_selector.combo.currentIndexChanged.connect(
                 self._handle_roi_fitter_changed
             )
@@ -826,6 +934,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             form.setContentsMargins(0, 0, 0, 0)
             form.setSpacing(8)
             self.roi_background_combo = QComboBox(widget)
+            self.roi_background_combo.setObjectName("CalibrationRoiBackgroundCombo")
             self.roi_background_combo.currentIndexChanged.connect(self._refresh_roi_fit)
             form.addRow("Background", self.roi_background_combo)
             layout.addLayout(form)
@@ -833,14 +942,23 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             button_row = QHBoxLayout()
             button_row.setSpacing(8)
             self.snap_roi_button = QPushButton("Snap ROI to selected point", widget)
+            self.snap_roi_button.setObjectName("SnapCalibrationRoiButton")
             self.snap_roi_button.clicked.connect(self._snap_roi_to_selected_energy_row)
             button_row.addWidget(self.snap_roi_button)
-            self.apply_roi_energy_button = QPushButton("Use centroid for energy row", widget)
+            self.apply_roi_energy_button = QPushButton(
+                "Use centroid for energy row", widget
+            )
+            self.apply_roi_energy_button.setObjectName(
+                "ApplyCalibrationRoiCentroidButton"
+            )
             self.apply_roi_energy_button.clicked.connect(
                 self._apply_roi_fit_to_selected_energy_row
             )
             button_row.addWidget(self.apply_roi_energy_button)
-            self.apply_roi_fwhm_button = QPushButton("Use FWHM for resolution row", widget)
+            self.apply_roi_fwhm_button = QPushButton(
+                "Use FWHM for resolution row", widget
+            )
+            self.apply_roi_fwhm_button.setObjectName("ApplyCalibrationRoiFwhmButton")
             self.apply_roi_fwhm_button.clicked.connect(
                 self._apply_roi_fit_to_selected_fwhm_row
             )
@@ -900,9 +1018,11 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             title: str,
             bottom_label: str,
             left_label: str,
+            object_name: str,
         ) -> pg.PlotWidget:
             widget = pg.PlotWidget(self)
-            widget.setObjectName("CalibrationPlot")
+            widget.setObjectName(object_name)
+            catalog_pyqtgraph_export_action(widget, object_name)
             widget.showGrid(x=True, y=True, alpha=0.12)
             widget.setMenuEnabled(False)
             widget.setMouseEnabled(x=True, y=True)
@@ -942,7 +1062,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.energy_order.setValue(resolved.order)
             self.energy_order.setEnabled(resolved.locked_by is None)
             self.energy_order.blockSignals(False)
-            self.energy_lock_label.setText(resolved.locked_by or "Expert-mode order selection is available.")
+            self.energy_lock_label.setText(
+                resolved.locked_by or "Expert-mode order selection is available."
+            )
             self.provenance_summary.setText(
                 self._format_provenance_summary(resolved.locked_by)
             )
@@ -978,7 +1100,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
         def _format_provenance_summary(self, locked_by: str | None) -> str:
             spectrum_name = self._spectrum.spectrum_id or "Untitled spectrum"
             mode_state = self.mode_manager.state
-            standard = mode_state.standard if mode_state.mode.value == "standards" else None
+            standard = (
+                mode_state.standard if mode_state.mode.value == "standards" else None
+            )
             calibration_library = self.library_manager.record_for_category(
                 "calibration",
                 standard=standard,
@@ -1057,7 +1181,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     target = float(fallback)
                 index = combo.findData(float(target))
                 if index < 0 and combo.count() > 0:
-                    index = 0 if combo is self.quick_anchor_a_combo else combo.count() - 1
+                    index = (
+                        0 if combo is self.quick_anchor_a_combo else combo.count() - 1
+                    )
                 if index >= 0:
                     combo.setCurrentIndex(index)
 
@@ -1181,7 +1307,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.spectrum_markers.setSymbolPen(pg.mkPen(color=accent_warm, width=1.5))
 
             self.energy_residual_in_spec.setSymbolBrush(pg.mkBrush(success))
-            self.energy_residual_in_spec.setSymbolPen(pg.mkPen(color=success, width=1.5))
+            self.energy_residual_in_spec.setSymbolPen(
+                pg.mkPen(color=success, width=1.5)
+            )
             self.energy_residual_out_spec.setSymbolBrush(pg.mkBrush(error))
             self.energy_residual_out_spec.setSymbolPen(pg.mkPen(color=error, width=1.5))
             self.energy_residual_zero.setPen(pg.mkPen(color=text, width=1))
@@ -1192,7 +1320,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 line.setPen(pg.mkPen(color=accent_warm, width=1))
 
             self.fwhm_measured_curve.setSymbolBrush(pg.mkBrush(accent_warm))
-            self.fwhm_measured_curve.setSymbolPen(pg.mkPen(color=accent_warm, width=1.5))
+            self.fwhm_measured_curve.setSymbolPen(
+                pg.mkPen(color=accent_warm, width=1.5)
+            )
             self.fwhm_fit_curve.setPen(pg.mkPen(color=accent, width=2))
             self.spectrum_roi_fit_curve.setPen(pg.mkPen(color=success, width=2))
             self.spectrum_roi_background_curve.setPen(
@@ -1225,16 +1355,25 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.quick_anchor_a_slider.setRange(0, max_channel)
             self.quick_anchor_b_slider.setRange(0, max_channel)
             anchor_a = float(points[0].channel) if len(points) >= 1 else 128.0
-            anchor_b = float(points[1].channel) if len(points) >= 2 else max_channel * 0.65
-            self.quick_anchor_a_slider.setValue(int(np.clip(round(anchor_a), 0, max_channel)))
-            self.quick_anchor_b_slider.setValue(int(np.clip(round(anchor_b), 0, max_channel)))
+            anchor_b = (
+                float(points[1].channel) if len(points) >= 2 else max_channel * 0.65
+            )
+            self.quick_anchor_a_slider.setValue(
+                int(np.clip(round(anchor_a), 0, max_channel))
+            )
+            self.quick_anchor_b_slider.setValue(
+                int(np.clip(round(anchor_b), 0, max_channel))
+            )
             self._syncing_quick_controls = False
             self._refresh_quick_slider_preview()
 
         def _refresh_quick_slider_preview(self, *_args) -> None:
             if self._syncing_quick_controls:
                 return
-            if self.quick_anchor_a_combo.count() == 0 or self.quick_anchor_b_combo.count() == 0:
+            if (
+                self.quick_anchor_a_combo.count() == 0
+                or self.quick_anchor_b_combo.count() == 0
+            ):
                 return
             anchor_channels = (
                 float(self.quick_anchor_a_slider.value()),
@@ -1259,7 +1398,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 return
 
             self.quick_promote_button.setEnabled(True)
-            predicted = self._quick_fit.evaluate(np.asarray(anchor_channels, dtype=float))
+            predicted = self._quick_fit.evaluate(
+                np.asarray(anchor_channels, dtype=float)
+            )
             self.quick_anchor_a_label.setText(
                 f"ch {anchor_channels[0]:.0f} -> {predicted[0]:.3f} keV"
             )
@@ -1268,9 +1409,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
             standards_note = ""
             if self.mode_manager.state.standard:
-                standards_note = (
-                    " Standards mode still requires the locked polynomial workflow on apply."
-                )
+                standards_note = " Standards mode still requires the locked polynomial workflow on apply."
             self.quick_preview_summary.setText(
                 (
                     f"Linear preview: E = {self._quick_fit.coefficients[0]:.4f} + "
@@ -1407,11 +1546,15 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             if message:
                 lines.append(message)
             self.snapshot_summary.setText("\n".join(lines))
-            self.fine_tune_preserved_button.setEnabled(self._preserved_snapshot is not None)
+            self.fine_tune_preserved_button.setEnabled(
+                self._preserved_snapshot is not None
+            )
             self.load_slot_button.setEnabled(slot_snapshot is not None)
 
         def _preserve_current_calibration(self) -> None:
-            self._preserved_snapshot = self._capture_current_snapshot("Current workspace")
+            self._preserved_snapshot = self._capture_current_snapshot(
+                "Current workspace"
+            )
             self._refresh_snapshot_summary(
                 message="Current calibration preserved for later fine-tuning."
             )
@@ -1493,7 +1636,8 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                         label=point.label,
                         energy_keV=float(point.energy_keV),
                         fwhm_keV=max(
-                            local_fwhm_channels * self._energy_scale_at_channel(snapped_channel),
+                            local_fwhm_channels
+                            * self._energy_scale_at_channel(snapped_channel),
                             0.05,
                         ),
                         uncertainty_keV=point.uncertainty_keV,
@@ -1559,7 +1703,8 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                         label=point.label,
                         energy_keV=float(point.reference_energy_keV),
                         fwhm_keV=max(
-                            local_fwhm_channels * self._energy_scale_at_channel(point.channel),
+                            local_fwhm_channels
+                            * self._energy_scale_at_channel(point.channel),
                             0.05,
                         ),
                         uncertainty_keV=0.05,
@@ -1602,7 +1747,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self._syncing_deviation_table = False
 
         def _set_deviation_cell(self, row: int, column: int, value) -> None:
-            item = QTableWidgetItem("" if value is None else self._format_table_value(value))
+            item = QTableWidgetItem(
+                "" if value is None else self._format_table_value(value)
+            )
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
             self.deviation_table.setItem(row, column, item)
 
@@ -1684,13 +1831,18 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.roi_background_combo.blockSignals(True)
             self.roi_background_combo.clear()
             for model in available_background_models(fitter_key):
-                self.roi_background_combo.addItem(model.replace("_", " ").title(), model)
+                self.roi_background_combo.addItem(
+                    model.replace("_", " ").title(), model
+                )
             self.roi_background_combo.blockSignals(False)
             if current is not None:
                 index = self.roi_background_combo.findData(current)
                 if index >= 0:
                     self.roi_background_combo.setCurrentIndex(index)
-            if self.roi_background_combo.currentIndex() < 0 and self.roi_background_combo.count():
+            if (
+                self.roi_background_combo.currentIndex() < 0
+                and self.roi_background_combo.count()
+            ):
                 self.roi_background_combo.setCurrentIndex(0)
 
         def _handle_roi_fitter_changed(self, *_args) -> None:
@@ -1708,13 +1860,19 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             if channel is None and self.selection_bus.state.peak_energy_keV is not None:
                 try:
                     channel = float(
-                        self._spectrum.energy_to_channel(self.selection_bus.state.peak_energy_keV)
+                        self._spectrum.energy_to_channel(
+                            self.selection_bus.state.peak_energy_keV
+                        )
                     )
                 except Exception:
                     channel = None
             if channel is None:
                 return
-            half_width = max(estimate_local_fwhm_channels(self._spectrum.counts, int(round(channel))) * 3.0, 10.0)
+            half_width = max(
+                estimate_local_fwhm_channels(self._spectrum.counts, int(round(channel)))
+                * 3.0,
+                10.0,
+            )
             self.roi_region.setRegion((channel - half_width, channel + half_width))
             self._refresh_roi_fit()
 
@@ -1738,18 +1896,28 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             if channels.size == 0:
                 channels = np.arange(len(counts), dtype=float)
             if counts.size < 5:
-                self._clear_roi_fit_visuals("Not enough channels are available for ROI fitting.")
+                self._clear_roi_fit_visuals(
+                    "Not enough channels are available for ROI fitting."
+                )
                 return
             roi_bounds = tuple(float(value) for value in self.roi_region.getRegion())
             try:
                 prior_fwhm_channels = None
                 if self._fwhm_fit is not None:
                     centroid_estimate = float(np.mean(roi_bounds))
-                    centroid_energy = float(self._spectrum.channel_to_energy(centroid_estimate))
-                    fwhm_keV = float(
-                        np.asarray(self._fwhm_fit.curve.fwhm(np.asarray([centroid_energy], dtype=float)))[0]
+                    centroid_energy = float(
+                        self._spectrum.channel_to_energy(centroid_estimate)
                     )
-                    scale_keV = max(self._energy_scale_at_channel(centroid_estimate), 1e-6)
+                    fwhm_keV = float(
+                        np.asarray(
+                            self._fwhm_fit.curve.fwhm(
+                                np.asarray([centroid_energy], dtype=float)
+                            )
+                        )[0]
+                    )
+                    scale_keV = max(
+                        self._energy_scale_at_channel(centroid_estimate), 1e-6
+                    )
                     prior_fwhm_channels = fwhm_keV / scale_keV
                 fit = fit_roi_peak(
                     channels,
@@ -1766,9 +1934,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 return
 
             self._roi_fit = fit
-            normalized_residuals = (
-                fit.observed_counts - fit.fit_counts
-            ) / np.sqrt(np.clip(fit.fit_counts, 1.0, None))
+            normalized_residuals = (fit.observed_counts - fit.fit_counts) / np.sqrt(
+                np.clip(fit.fit_counts, 1.0, None)
+            )
             self.spectrum_roi_fit_curve.setData(fit.channels, fit.fit_counts)
             self.spectrum_roi_background_curve.setData(
                 fit.channels,
@@ -1778,9 +1946,13 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.roi_centroid_line.setPos(fit.centroid_channel)
             self.roi_detail_observed_curve.setData(fit.channels, fit.observed_counts)
             self.roi_detail_fit_curve.setData(fit.channels, fit.fit_counts)
-            self.roi_detail_background_curve.setData(fit.channels, fit.background_counts)
+            self.roi_detail_background_curve.setData(
+                fit.channels, fit.background_counts
+            )
             self.roi_residual_curve.setData(fit.channels, normalized_residuals)
-            centroid_energy = float(self._spectrum.channel_to_energy(fit.centroid_channel))
+            centroid_energy = float(
+                self._spectrum.channel_to_energy(fit.centroid_channel)
+            )
             roi_energy_bounds = (
                 float(self._spectrum.channel_to_energy(min(fit.roi_bounds))),
                 float(self._spectrum.channel_to_energy(max(fit.roi_bounds))),
@@ -1817,9 +1989,13 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self._set_energy_cell(row, 1, channel)
             self._set_energy_cell(row, 2, observed_energy)
             if not self._table_text(self.energy_table, row, 3):
-                reference_lines = tuple(self.selection_bus.state.reference_lines_keV or ())
+                reference_lines = tuple(
+                    self.selection_bus.state.reference_lines_keV or ()
+                )
                 if reference_lines:
-                    nearest = min(reference_lines, key=lambda value: abs(value - observed_energy))
+                    nearest = min(
+                        reference_lines, key=lambda value: abs(value - observed_energy)
+                    )
                     self._set_energy_cell(row, 3, nearest)
             if not self._table_text(self.energy_table, row, 4):
                 self._set_energy_cell(row, 4, 0.12, editable=True)
@@ -1835,7 +2011,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 row = self.fwhm_table.currentRow()
             channel = float(self._roi_fit.centroid_channel)
             observed_energy = float(self._spectrum.channel_to_energy(channel))
-            fwhm_keV = max(self._roi_fit.fwhm_channels * self._energy_scale_at_channel(channel), 0.05)
+            fwhm_keV = max(
+                self._roi_fit.fwhm_channels * self._energy_scale_at_channel(channel),
+                0.05,
+            )
             self._set_fwhm_cell(row, 0, self._roi_fit.fitter_label)
             self._set_fwhm_cell(row, 1, observed_energy)
             self._set_fwhm_cell(row, 2, fwhm_keV)
@@ -1874,13 +2053,17 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             for index, (label, reference_energy) in enumerate(REFERENCE_LINES_KEV):
                 if use_calibration:
                     try:
-                        channel = float(self._spectrum.energy_to_channel(reference_energy))
+                        channel = float(
+                            self._spectrum.energy_to_channel(reference_energy)
+                        )
                     except Exception:
                         channel = float(reference_energy)
                 else:
                     channel = float(reference_energy)
                 snapped_channel = self._snap_channel_to_peak(channel)
-                observed_energy = float(self._spectrum.channel_to_energy(snapped_channel))
+                observed_energy = float(
+                    self._spectrum.channel_to_energy(snapped_channel)
+                )
                 points.append(
                     EnergyCalibrationPoint(
                         label=label,
@@ -1939,7 +2122,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 float(np.max(channels)) if channels.size else 2048.0,
                 padding=0.02,
             )
-            self.spectrum_kpi[1].setText(self._spectrum.spectrum_id or "Demo spectrum")
+            self.spectrum_kpi[1].setText(
+                self._spectrum.spectrum_id or "Loaded spectrum"
+            )
             self._refresh_spectrum_markers()
             self._refresh_quick_slider_preview()
             self._refresh_roi_fit()
@@ -1950,7 +2135,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             marker_x: list[float] = []
             marker_y: list[float] = []
             for point in points:
-                channel = int(np.clip(int(round(point.channel)), 0, max(len(counts) - 1, 0)))
+                channel = int(
+                    np.clip(int(round(point.channel)), 0, max(len(counts) - 1, 0))
+                )
                 if counts.size == 0:
                     continue
                 marker_x.append(point.channel)
@@ -1964,10 +2151,15 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             plot_point = self.spectrum_plot.plotItem.vb.mapSceneToView(scene_point)
             clicked_channel = self._snap_channel_to_peak(plot_point.x())
             half_width = max(
-                estimate_local_fwhm_channels(self._spectrum.counts, int(round(clicked_channel))) * 3.0,
+                estimate_local_fwhm_channels(
+                    self._spectrum.counts, int(round(clicked_channel))
+                )
+                * 3.0,
                 10.0,
             )
-            self.roi_region.setRegion((clicked_channel - half_width, clicked_channel + half_width))
+            self.roi_region.setRegion(
+                (clicked_channel - half_width, clicked_channel + half_width)
+            )
             row = self.energy_table.currentRow()
             if row < 0:
                 row = self.energy_table.rowCount()
@@ -1980,9 +2172,13 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 self._set_energy_cell(row, 0, f"Point {row + 1}", editable=True)
             reference_item = self.energy_table.item(row, 3)
             if reference_item is None or not reference_item.text().strip():
-                reference_lines = tuple(self.selection_bus.state.reference_lines_keV or ())
+                reference_lines = tuple(
+                    self.selection_bus.state.reference_lines_keV or ()
+                )
                 if reference_lines:
-                    nearest = min(reference_lines, key=lambda value: abs(value - observed_energy))
+                    nearest = min(
+                        reference_lines, key=lambda value: abs(value - observed_energy)
+                    )
                     self._set_energy_cell(row, 3, nearest)
             self.energy_table.selectRow(row)
             self.selection_bus.publish_peak(observed_energy)
@@ -2051,9 +2247,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 return
 
             self._energy_fit = fit
-            self.energy_kpi[1].setText(
-                f"Order {fit.order} | RMS {fit.rms_keV:.3f} keV"
-            )
+            self.energy_kpi[1].setText(f"Order {fit.order} | RMS {fit.rms_keV:.3f} keV")
             coefficients = ", ".join(f"{value:.6g}" for value in fit.coefficients)
             self.energy_summary.setText(
                 (
@@ -2097,9 +2291,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 return
 
             self._fwhm_fit = fit
-            self.fwhm_kpi[1].setText(
-                f"{fit.model} | RMS {fit.rms_keV:.3f} keV"
-            )
+            self.fwhm_kpi[1].setText(f"{fit.model} | RMS {fit.rms_keV:.3f} keV")
             coefficients = ", ".join(f"{value:.6g}" for value in fit.coefficients)
             self.fwhm_summary.setText(
                 (
@@ -2109,7 +2301,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
             energies = np.asarray([point.energy_keV for point in points], dtype=float)
             fitted = np.asarray(fit.fitted_fwhm_keV, dtype=float)
-            self.fwhm_measured_curve.setData(energies, [point.fwhm_keV for point in points])
+            self.fwhm_measured_curve.setData(
+                energies, [point.fwhm_keV for point in points]
+            )
             order = np.argsort(energies)
             self.fwhm_fit_curve.setData(energies[order], fitted[order])
             self._update_fwhm_table_diagnostics(fit)
@@ -2125,11 +2319,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 if fit is not None and row < len(fit.residuals_keV):
                     residual = float(fit.residuals_keV[row])
                     residual_text = f"{residual:.4f}"
-                    status_text = (
-                        "FAIL"
-                        if fit.out_of_tolerance[row]
-                        else "PASS"
-                    )
+                    status_text = "FAIL" if fit.out_of_tolerance[row] else "PASS"
                 self._set_energy_cell(row, 5, residual_text, editable=False)
                 self._set_energy_cell(row, 6, status_text, editable=False)
             self._syncing_energy_table = False
@@ -2165,7 +2355,8 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     roi_bounds_keV=self.selection_bus.state.roi_bounds_keV,
                     nuclide=self.selection_bus.state.nuclide,
                     reference_lines_keV=tuple(
-                        point.reference_energy_keV for point in self._read_energy_points()
+                        point.reference_energy_keV
+                        for point in self._read_energy_points()
                     ),
                 )
             )
@@ -2249,7 +2440,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             *,
             editable: bool = True,
         ) -> None:
-            item = QTableWidgetItem("" if value is None else self._format_table_value(value))
+            item = QTableWidgetItem(
+                "" if value is None else self._format_table_value(value)
+            )
             flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
             if editable:
                 flags |= Qt.ItemIsEditable
@@ -2264,7 +2457,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             *,
             editable: bool = True,
         ) -> None:
-            item = QTableWidgetItem("" if value is None else self._format_table_value(value))
+            item = QTableWidgetItem(
+                "" if value is None else self._format_table_value(value)
+            )
             flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
             if editable:
                 flags |= Qt.ItemIsEditable
@@ -2299,7 +2494,6 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 return float(text)
             except ValueError:
                 return None
-
 
 else:
 

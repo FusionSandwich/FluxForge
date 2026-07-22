@@ -71,6 +71,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             qa_monitor: QAMonitor | None = None,
             open_qa_history: Callable[[], None] | None = None,
             open_standards_review: Callable[[], None] | None = None,
+            standards_context_factory: (
+                Callable[[], StandardsEvaluationContext] | None
+            ) = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -83,7 +86,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.qa_monitor = qa_monitor or QAMonitor()
             self._open_qa_history = open_qa_history
             self._open_standards_review = open_standards_review
-            self.qa_monitor.seed_demo_history()
+            self._standards_context_factory = standards_context_factory
             self.registries = bootstrap_builtin_registries()
             register_builtin_standards_modules(self.registries)
             self.nuclide_controller = NuclideSearchController(
@@ -124,9 +127,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_note = QTextEdit(self)
             self.selection_note.setObjectName("SidebarNote")
             self.selection_note.setReadOnly(True)
-            self.selection_note.setPlainText(
-                "Selection sync\n\nNo active selection"
-            )
+            self.selection_note.setPlainText("Selection sync\n\nNo active selection")
             layout.addWidget(self.selection_note, 1)
 
             self.qa_note = QTextEdit(self)
@@ -141,6 +142,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             qa_actions.addWidget(self.qa_history_button)
             self.astm_check_button = QPushButton("Run ASTM Check", self)
             self.astm_check_button.setObjectName("RunAstmCheckButton")
+            self.astm_check_button.setEnabled(
+                self.workspace_controller.spectrum() is not None
+            )
             self.astm_check_button.clicked.connect(self._open_standards_review_clicked)
             qa_actions.addWidget(self.astm_check_button)
             layout.addLayout(qa_actions)
@@ -149,28 +153,46 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.library_manager.subscribe(self._sync_library_state)
             self.workspace_controller.subscribe(self._sync_workspace_state)
             self.mode_manager.subscribe(lambda _state: self._sync_qa_summary())
-            self.mode_manager.subscribe(lambda _state: self._sync_library_state(self.library_manager.state))
+            self.mode_manager.subscribe(
+                lambda _state: self._sync_library_state(self.library_manager.state)
+            )
             self.nuclide_query.textChanged.connect(self._refresh_nuclide_results)
             self.nuclides.itemSelectionChanged.connect(self._activate_selected_nuclide)
             self.nuclide_age_days.valueChanged.connect(self._refresh_nuclide_details)
-            self.save_selected_nuclide_button.clicked.connect(self._save_selected_nuclide)
+            self.save_selected_nuclide_button.clicked.connect(
+                self._save_selected_nuclide
+            )
             self.remove_saved_nuclide_button.clicked.connect(self._remove_saved_nuclide)
             self.clear_saved_nuclide_button.clicked.connect(self._clear_saved_nuclides)
-            self.apply_saved_overlay_button.clicked.connect(self._apply_saved_list_overlay)
-            self.add_selected_mixture_button.clicked.connect(self._add_selected_to_mixture)
-            self.remove_mixture_row_button.clicked.connect(self._remove_selected_mixture_row)
+            self.apply_saved_overlay_button.clicked.connect(
+                self._apply_saved_list_overlay
+            )
+            self.add_selected_mixture_button.clicked.connect(
+                self._add_selected_to_mixture
+            )
+            self.remove_mixture_row_button.clicked.connect(
+                self._remove_selected_mixture_row
+            )
             self.clear_mixture_button.clicked.connect(self._clear_mixture)
-            self.normalize_mixture_button.clicked.connect(self._normalize_mixture_weights)
-            self.apply_mixture_overlay_button.clicked.connect(self._apply_mixture_overlay)
+            self.normalize_mixture_button.clicked.connect(
+                self._normalize_mixture_weights
+            )
+            self.apply_mixture_overlay_button.clicked.connect(
+                self._apply_mixture_overlay
+            )
             self.mixture_table.itemChanged.connect(self._update_mixture_summary)
-            self.custom_gamma_path.editingFinished.connect(self._apply_custom_gamma_path)
+            self.custom_gamma_path.editingFinished.connect(
+                self._apply_custom_gamma_path
+            )
             self.register_custom_gamma_button.clicked.connect(
                 self._register_user_gamma_source
             )
             self.remove_registered_gamma_button.clicked.connect(
                 self._remove_registered_gamma_source
             )
-            self.gamma_source_combo.currentIndexChanged.connect(self._gamma_source_changed)
+            self.gamma_source_combo.currentIndexChanged.connect(
+                self._gamma_source_changed
+            )
             self.calibration_source_combo.currentIndexChanged.connect(
                 self._calibration_source_changed
             )
@@ -334,11 +356,18 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(self.nuclides, 1)
 
             action_row = QHBoxLayout()
-            self.pin_selected_nuclide_button = QPushButton("Pin Selected Nuclide", group)
+            self.pin_selected_nuclide_button = QPushButton(
+                "Pin Selected Nuclide", group
+            )
+            self.pin_selected_nuclide_button.setObjectName(
+                "SidebarPinSelectedNuclideButton"
+            )
             self.pin_selected_nuclide_button.clicked.connect(self._pin_selected_nuclide)
             action_row.addWidget(self.pin_selected_nuclide_button)
             self.save_selected_nuclide_button = QPushButton("Save To List", group)
-            self.save_selected_nuclide_button.setObjectName("SaveNuclideToUserListButton")
+            self.save_selected_nuclide_button.setObjectName(
+                "SaveNuclideToUserListButton"
+            )
             action_row.addWidget(self.save_selected_nuclide_button)
             self.add_selected_mixture_button = QPushButton("Add To Mixture", group)
             self.add_selected_mixture_button.setObjectName("AddNuclideToMixtureButton")
@@ -372,10 +401,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.nuclide_line_table = QTableWidget(0, 3, details_tab)
             self.nuclide_line_table.setObjectName("NuclideLineTable")
-            self.nuclide_line_table.setHorizontalHeaderLabels(("Energy (keV)", "Yield", "Age Adj."))
+            self.nuclide_line_table.setHorizontalHeaderLabels(
+                ("Energy (keV)", "Yield", "Age Adj.")
+            )
             self.nuclide_line_table.verticalHeader().setVisible(False)
             self.nuclide_line_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-            self.nuclide_line_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            self.nuclide_line_table.horizontalHeader().setSectionResizeMode(
+                QHeaderView.Stretch
+            )
             details_layout.addWidget(self.nuclide_line_table, 1)
 
             details_layout.addWidget(QLabel("Pinned nuclides", details_tab))
@@ -402,7 +435,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.clear_saved_nuclide_button.setObjectName("ClearSavedNuclideButton")
             saved_actions.addWidget(self.clear_saved_nuclide_button)
             self.apply_saved_overlay_button = QPushButton("Apply Overlay", saved_tab)
-            self.apply_saved_overlay_button.setObjectName("ApplySavedNuclideOverlayButton")
+            self.apply_saved_overlay_button.setObjectName(
+                "ApplySavedNuclideOverlayButton"
+            )
             saved_actions.addWidget(self.apply_saved_overlay_button)
             saved_actions.addStretch(1)
             saved_layout.addLayout(saved_actions)
@@ -422,8 +457,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mixture_table.setObjectName("NuclideMixtureTable")
             self.mixture_table.setHorizontalHeaderLabels(("Nuclide", "Weight"))
             self.mixture_table.verticalHeader().setVisible(False)
-            self.mixture_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-            self.mixture_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+            self.mixture_table.horizontalHeader().setSectionResizeMode(
+                0, QHeaderView.Stretch
+            )
+            self.mixture_table.horizontalHeader().setSectionResizeMode(
+                1, QHeaderView.ResizeToContents
+            )
             mixture_layout.addWidget(self.mixture_table, 1)
 
             mixture_actions = QHBoxLayout()
@@ -436,7 +475,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.normalize_mixture_button = QPushButton("Normalize", mixture_tab)
             self.normalize_mixture_button.setObjectName("NormalizeMixtureButton")
             mixture_actions.addWidget(self.normalize_mixture_button)
-            self.apply_mixture_overlay_button = QPushButton("Apply Mixture Overlay", mixture_tab)
+            self.apply_mixture_overlay_button = QPushButton(
+                "Apply Mixture Overlay", mixture_tab
+            )
             self.apply_mixture_overlay_button.setObjectName("ApplyMixtureOverlayButton")
             mixture_actions.addWidget(self.apply_mixture_overlay_button)
             mixture_actions.addStretch(1)
@@ -447,6 +488,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             mixture_layout.addWidget(self.mixture_summary, 1)
 
             self.reference_tabs.addTab(mixture_tab, "Mixtures")
+            self.reference_tabs.setProperty(
+                "fluxforgeTabIds",
+                {
+                    "Details": "nuclide.details.open",
+                    "User List": "nuclide.user_list.open",
+                    "Mixtures": "nuclide.mixtures.open",
+                },
+            )
             return group
 
         def _populate_library_combos(self) -> None:
@@ -464,11 +513,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._populate_combo(
                 self.calibration_source_combo,
-                self.library_manager.available_sources("calibration", standard=standard),
+                self.library_manager.available_sources(
+                    "calibration", standard=standard
+                ),
             )
             self._populate_combo(
                 self.naa_source_combo,
-                self.library_manager.available_sources("naa_monitor", standard=standard),
+                self.library_manager.available_sources(
+                    "naa_monitor", standard=standard
+                ),
             )
             self._populate_combo(
                 self.dosimetry_source_combo,
@@ -506,8 +559,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.calibration_source_combo,
                 resolved_state.calibration_source_id,
             )
-            self._set_combo_value(self.naa_source_combo, resolved_state.naa_monitor_source_id)
-            self._set_combo_value(self.dosimetry_source_combo, resolved_state.dosimetry_source_id)
+            self._set_combo_value(
+                self.naa_source_combo, resolved_state.naa_monitor_source_id
+            )
+            self._set_combo_value(
+                self.dosimetry_source_combo, resolved_state.dosimetry_source_id
+            )
             self._set_combo_value(
                 self.activation_source_combo,
                 resolved_state.activation_catalog_source_id,
@@ -614,7 +671,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 combo.setCurrentIndex(index)
                 combo.blockSignals(False)
 
-        def _populate_spectrum_role_combo(self, combo: QComboBox, state, slot_key: str) -> None:
+        def _populate_spectrum_role_combo(
+            self, combo: QComboBox, state, slot_key: str
+        ) -> None:
             current_slot = next(
                 (slot for slot in state.spectra if slot.key == slot_key),
                 None,
@@ -629,7 +688,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     combo.setCurrentIndex(index)
             combo.blockSignals(False)
 
-        def _assign_selected_spectrum_role(self, combo: QComboBox, slot_key: str) -> None:
+        def _assign_selected_spectrum_role(
+            self, combo: QComboBox, slot_key: str
+        ) -> None:
             loaded_key = combo.currentData()
             if not loaded_key:
                 return
@@ -639,10 +700,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _foreground_spectrum_changed(self) -> None:
-            self._assign_selected_spectrum_role(self.foreground_spectrum_combo, "foreground")
+            self._assign_selected_spectrum_role(
+                self.foreground_spectrum_combo, "foreground"
+            )
 
         def _background_spectrum_changed(self) -> None:
-            self._assign_selected_spectrum_role(self.background_spectrum_combo, "background")
+            self._assign_selected_spectrum_role(
+                self.background_spectrum_combo, "background"
+            )
 
         def _overlay_spectrum_changed(self) -> None:
             self._assign_selected_spectrum_role(self.overlay_spectrum_combo, "overlay")
@@ -725,7 +790,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 if hit.strongest_lines_keV:
                     label += (
                         " · "
-                        + " / ".join(f"{energy:.3f}" for energy in hit.strongest_lines_keV)
+                        + " / ".join(
+                            f"{energy:.3f}" for energy in hit.strongest_lines_keV
+                        )
                         + " keV"
                     )
                 item = QListWidgetItem(label, self.nuclides)
@@ -901,8 +968,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             items = []
             for nuclide in saved:
                 details = self.nuclide_controller.nuclide_details(nuclide, limit=3)
-                lines = ", ".join(f"{line.energy_keV:.3f}" for line in details.gamma_lines[:3]) or "None"
-                items.append(f"<li><strong>{details.display_name}</strong>: {lines} keV</li>")
+                lines = (
+                    ", ".join(
+                        f"{line.energy_keV:.3f}" for line in details.gamma_lines[:3]
+                    )
+                    or "None"
+                )
+                items.append(
+                    f"<li><strong>{details.display_name}</strong>: {lines} keV</li>"
+                )
             self.saved_nuclide_summary.setHtml(
                 "<h3>User Define List</h3><ul>" + "".join(items) + "</ul>"
             )
@@ -946,7 +1020,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mixture_table.blockSignals(True)
             for row, (_nuclide, weight) in enumerate(entries):
                 normalized = weight / total
-                self.mixture_table.setItem(row, 1, QTableWidgetItem(f"{normalized:.6f}"))
+                self.mixture_table.setItem(
+                    row, 1, QTableWidgetItem(f"{normalized:.6f}")
+                )
             self.mixture_table.blockSignals(False)
             self._update_mixture_summary()
 
@@ -969,7 +1045,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 if not nuclide:
                     continue
                 try:
-                    weight = float(weight_item.text()) if weight_item is not None else 0.0
+                    weight = (
+                        float(weight_item.text()) if weight_item is not None else 0.0
+                    )
                 except (TypeError, ValueError):
                     weight = 0.0
                 entries.append((str(nuclide), float(weight)))
@@ -1006,7 +1084,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     age_s=float(self.nuclide_age_days.value()) * 86400.0,
                     limit=self.nuclide_controller.overlay_limit,
                 )
-                for line in details.gamma_lines[: self.nuclide_controller.overlay_limit]:
+                for line in details.gamma_lines[
+                    : self.nuclide_controller.overlay_limit
+                ]:
                     reference_lines.append(float(line.energy_keV))
                     annotation_lines.append(
                         ReferenceLine(
@@ -1107,6 +1187,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.pinned_nuclides.clear()
             for nuclide in state.pinned_nuclides:
                 QListWidgetItem(nuclide, self.pinned_nuclides)
+            self.astm_check_button.setEnabled(
+                self.workspace_controller.spectrum() is not None
+            )
             self._sync_qa_summary()
 
         def _sync_qa_summary(self) -> None:
@@ -1123,48 +1206,45 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             history_spectra = tuple(record.spectrum for record in records) or (
                 (active_spectrum,) if active_spectrum is not None else ()
             )
-            context = StandardsEvaluationContext(
-                calibration_order=2,
-                max_residual_keV=0.18,
-                efficiency_uncertainty_pct=2.6,
-                fwhm_at_413_keV=1.08,
-                qa_centroid_drift_keV=(
-                    latest_status.centroid_drift_keV if latest_status else 0.0
-                ),
-                qa_fwhm_degradation_pct=(
-                    latest_status.fwhm_degradation_pct if latest_status else 0.0
-                ),
-                before_calibration=(
-                    latest_status.last_check if latest_status is not None else None
-                ),
-                measured_at=(
-                    latest_status.last_check if latest_status is not None else None
-                ),
-                after_calibration=(
-                    latest_status.last_check if latest_status is not None else None
-                ),
-                net_counts={"primary": 1200.0, "Pu-240 160.3": 1205.0},
-            )
-            summary_bits = []
-            for key in (
-                "ASTM E181",
-                "ASTM E1297",
-                "ASTM E1218",
-                "ASTM C1232",
-                "ASTM C1030",
-            ):
-                module = self.registries.standards_modules.get(key)
-                evaluation = module.evaluate(context)
-                dot = {"green": "●", "amber": "◐", "red": "◆"}.get(
-                    evaluation.overall_status,
-                    "○",
-                )
-                summary_bits.append(f"{module.display_name} [{dot}]")
-
             lines = ["<h3>QA &amp; Standards</h3>"]
-            lines.append(
-                "<p><strong>ASTM Status:</strong> " + "  ".join(summary_bits) + "</p>"
-            )
+            if active_spectrum is None and latest_status is None:
+                lines.append(
+                    "<p>No QA or standards result is available. Load a spectrum "
+                    "and run the applicable check.</p>"
+                )
+                self.qa_note.setHtml("".join(lines))
+                return
+            if (
+                active_spectrum is not None
+                and latest_status is not None
+                and callable(self._standards_context_factory)
+            ):
+                context = self._standards_context_factory()
+                summary_bits = []
+                for key in (
+                    "ASTM E181",
+                    "ASTM E1297",
+                    "ASTM E1218",
+                    "ASTM C1232",
+                    "ASTM C1030",
+                ):
+                    module = self.registries.standards_modules.get(key)
+                    evaluation = module.evaluate(context)
+                    dot = {"green": "●", "amber": "◐", "red": "◆"}.get(
+                        evaluation.overall_status,
+                        "○",
+                    )
+                    summary_bits.append(f"{module.display_name} [{dot}]")
+                lines.append(
+                    "<p><strong>ASTM Status:</strong> "
+                    + "  ".join(summary_bits)
+                    + "</p>"
+                )
+            elif active_spectrum is not None:
+                lines.append(
+                    "<p><strong>ASTM Status:</strong> Run a QA or standards check "
+                    "to calculate status.</p>"
+                )
             if latest_status is not None:
                 lines.append(
                     "<p><strong>QA Monitor:</strong> "
@@ -1215,10 +1295,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             active_standard = self.mode_manager.state.standard
             if active_standard and active_standard in self.registries.standards_modules:
                 module = self.registries.standards_modules.get(active_standard)
-                locks = "<br/>".join(
-                    f"[locked] {setting.field_id}: {setting.value} ({setting.standard_section})"
-                    for setting in module.locked_settings()
-                ) or "No workflow locks."
+                locks = (
+                    "<br/>".join(
+                        f"[locked] {setting.field_id}: {setting.value} ({setting.standard_section})"
+                        for setting in module.locked_settings()
+                    )
+                    or "No workflow locks."
+                )
                 lines.append(
                     f"<p><strong>Active standard:</strong> {active_standard}<br/>{locks}</p>"
                 )
@@ -1229,12 +1312,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._open_qa_history()
 
         def _open_standards_review_clicked(self) -> None:
+            if self.workspace_controller.spectrum() is None:
+                return
             if callable(self._open_standards_review):
                 self._open_standards_review()
 
         def _display_name_for_nuclide(self, nuclide: str) -> str:
             try:
-                return self.nuclide_controller.nuclide_details(nuclide, limit=1).display_name
+                return self.nuclide_controller.nuclide_details(
+                    nuclide, limit=1
+                ).display_name
             except Exception:
                 return str(nuclide)
 
@@ -1285,10 +1372,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     weight = float(entry.get("weight") or 0.0)
                     row = self.mixture_table.rowCount()
                     self.mixture_table.insertRow(row)
-                    name_item = QTableWidgetItem(self._display_name_for_nuclide(nuclide))
+                    name_item = QTableWidgetItem(
+                        self._display_name_for_nuclide(nuclide)
+                    )
                     name_item.setData(0x0100, nuclide)
                     self.mixture_table.setItem(row, 0, name_item)
-                    self.mixture_table.setItem(row, 1, QTableWidgetItem(f"{weight:.6g}"))
+                    self.mixture_table.setItem(
+                        row, 1, QTableWidgetItem(f"{weight:.6g}")
+                    )
                 self.mixture_table.blockSignals(False)
                 self._update_mixture_summary()
 
