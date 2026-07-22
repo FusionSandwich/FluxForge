@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Callable, Union
 
 from fluxforge.io.cnf import read_cnf_file
+from fluxforge.io.genie import read_genie_spectrum
 from fluxforge.io.hpge import read_chn_file
 from fluxforge.io.n42 import read_n42_spectrum
 from fluxforge.io.spc import read_spc_file
@@ -73,6 +74,7 @@ def create_reader_factory() -> SpectrumReaderFactory:
     factory.register(".chn", _chn_to_gamma)
     factory.register(".spc", read_spc_file)
     factory.register(".cnf", read_cnf_file)
+    factory.register(".asc", read_genie_spectrum)
     factory.register(".spe", read_spe_file)
     factory.register(".csv", read_spectrum_csv)
     return factory

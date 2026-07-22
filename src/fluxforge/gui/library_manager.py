@@ -78,8 +78,10 @@ class DataLibraryManager:
         settings=None,
     ) -> None:
         self._settings = settings
-        self._state = initial_state or self._load_state()
+        self._state = self._validated_state(initial_state or self._load_state())
         self._listeners: list[LibraryListener] = []
+        if self._settings is not None:
+            self._save_state(self._state)
 
     @property
     def state(self) -> DataLibraryState:
@@ -131,6 +133,26 @@ class DataLibraryManager:
                 self._settings_value(self.CUSTOM_GAMMA_PATH_KEY, None)
             ),
         )
+
+    def _validated_state(self, state: DataLibraryState) -> DataLibraryState:
+        """Recover from removed or unavailable user gamma-library selections."""
+
+        custom_paths = [state.custom_gamma_path] if state.custom_gamma_path else ()
+        try:
+            get_nuclear_data_source(
+                state.gamma_identification_source_id,
+                custom_paths=custom_paths,
+            )
+        except (KeyError, OSError, ValueError):
+            return DataLibraryState(
+                gamma_identification_source_id="fluxforge_bundled_gamma",
+                calibration_source_id=state.calibration_source_id,
+                naa_monitor_source_id=state.naa_monitor_source_id,
+                dosimetry_source_id=state.dosimetry_source_id,
+                activation_catalog_source_id=state.activation_catalog_source_id,
+                custom_gamma_path=None,
+            )
+        return state
 
     def _save_state(self, state: DataLibraryState) -> None:
         if self._settings is None:

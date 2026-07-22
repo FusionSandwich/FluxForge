@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -11,6 +12,7 @@ from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import ModeManager  # noqa: E402
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QApplication  # noqa: E402
 from fluxforge.gui.selection_bus import SelectionBus  # noqa: E402
+from fluxforge.io import write_reaction_rates  # noqa: E402
 
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # noqa: E402
     from PySide6.QtCore import Qt  # noqa: E402
@@ -42,7 +44,7 @@ def test_unfolding_workspace_dialog_runs_maxed_and_surfaces_uncertainties():
     assert dialog.measurements_table.rowCount() == dialog.workspace_input.measured_rates.size
     assert dialog.response_image.image is not None
     assert "uncertainties are visible" in dialog.summary_label.text().lower()
-    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is False
+    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is True
     dialog.close()
 
 
@@ -183,6 +185,99 @@ def test_unfolding_workspace_dialog_loads_analytical_response_and_updates_heatma
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt unfolding workspace dependencies are unavailable.",
 )
+def test_unfolding_workspace_loads_real_rate_artifact_and_preserves_rates(tmp_path):
+    _qapp()
+    dialog = UnfoldingWorkspaceDialog(mode_manager=ModeManager())
+    rates_path = tmp_path / "rates.json"
+    expected = [float(index + 2) for index in range(8)]
+    write_reaction_rates(
+        rates_path,
+        rates=[
+            {
+                "reaction_id": f"wire-{index + 1}",
+                "rate": value,
+                "uncertainty": value * 0.05,
+            }
+            for index, value in enumerate(expected)
+        ],
+    )
+    dialog.rates_path_input.setText(str(rates_path))
+    QTest.mouseClick(dialog.rates_load_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    assert dialog.workspace_input.measured_rates.tolist() == expected
+    assert dialog.measurements_table.item(0, 0).text() == "wire-1"
+
+    dialog.response_source_combo.setCurrentIndex(
+        dialog.response_source_combo.findData("analytical_hpge")
+    )
+    QTest.mouseClick(dialog.response_load_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert dialog.workspace_input.measured_rates.tolist() == expected
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt unfolding workspace dependencies are unavailable.",
+)
+def test_unfolding_workspace_runs_bundled_uwnr_rafm_rate_csv():
+    _qapp()
+    dialog = UnfoldingWorkspaceDialog(mode_manager=ModeManager())
+    rates_path = (
+        Path(__file__).resolve().parents[1]
+        / "examples"
+        / "RAFM_irradiation"
+        / "results"
+        / "tables"
+        / "flux_wire_reaction_rates.csv"
+    )
+
+    dialog.rates_path_input.setText(str(rates_path))
+    QTest.mouseClick(dialog.rates_load_button, Qt.LeftButton)
+    _qapp().processEvents()
+
+    assert dialog.workspace_input.label == "UWNR RAFM Simplified Flux-Wire Response"
+    assert dialog.workspace_input.measured_rates.size == 18
+    assert dialog.workspace_input.response_matrix.shape == (18, 20)
+    assert dialog.results_table.rowCount() == 20
+    assert dialog.current_result is not None
+    assert "completed" in dialog.summary_label.text().lower()
+    assert dialog.response_image.image is not None
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt unfolding workspace dependencies are unavailable.",
+)
+def test_unfolding_workspace_uses_physical_energy_centers_and_plot_controls():
+    _qapp()
+    dialog = UnfoldingWorkspaceDialog(mode_manager=ModeManager())
+    result_curve = next(
+        item
+        for item in dialog.flux_plot.listDataItems()
+        if item.name() == dialog.current_result.method_used
+    )
+    expected_centers = np.sqrt(
+        dialog.workspace_input.energy_edges[:-1]
+        * dialog.workspace_input.energy_edges[1:]
+    )
+    np.testing.assert_allclose(result_curve.xData, expected_centers)
+
+    dialog.log_energy_checkbox.setChecked(True)
+    dialog.log_flux_checkbox.setChecked(True)
+    QTest.mouseClick(dialog.reset_plots_button, Qt.LeftButton)
+    _qapp().processEvents()
+    assert dialog.flux_plot.getPlotItem().ctrl.logXCheck.isChecked()
+    assert dialog.flux_plot.getPlotItem().ctrl.logYCheck.isChecked()
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt unfolding workspace dependencies are unavailable.",
+)
 def test_main_window_opens_unfolding_workspace_dialog():
     _qapp()
     window = FluxForgeMainWindow(
@@ -193,7 +288,7 @@ def test_main_window_opens_unfolding_workspace_dialog():
     _qapp().processEvents()
 
     assert window._unfolding_dialog is not None
-    assert window._unfolding_dialog.windowTitle() == "FluxForge Next - Unfolding Workspace"
+    assert window._unfolding_dialog.windowTitle() == "FluxForge — Unfolding Workspace"
     assert window._unfolding_dialog.method_selector.combo.count() >= 4
 
     window._unfolding_dialog.close()

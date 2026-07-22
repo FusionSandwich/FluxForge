@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 
+from fluxforge.analysis.flux_unfold import _make_response_row
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE
 from fluxforge.gui.mode_manager import ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
+from fluxforge.io import read_reaction_rates
 from fluxforge.plugins import bootstrap_builtin_registries
 from fluxforge.unfolding import register_builtin_unfolders
 from fluxforge.unfolding.base import UnfoldingResult
@@ -52,6 +56,8 @@ class UnfoldingWorkspaceInput:
     response_matrix: np.ndarray
     energy_edges: np.ndarray
     initial_flux: np.ndarray
+    measurement_labels: tuple[str, ...] = ()
+    energy_unit: str = "MeV"
 
 
 def build_demo_unfolding_workspace_input() -> UnfoldingWorkspaceInput:
@@ -82,6 +88,7 @@ def build_demo_unfolding_workspace_input() -> UnfoldingWorkspaceInput:
         response_matrix=response_matrix,
         energy_edges=energy_edges,
         initial_flux=initial_flux,
+        measurement_labels=tuple(f"M{index + 1}" for index in range(measured_rates.size)),
     )
 
 
@@ -98,7 +105,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             parent=None,
         ) -> None:
             super().__init__(parent)
-            self.setWindowTitle("FluxForge Next - Unfolding Workspace")
+            self.setWindowTitle("FluxForge — Unfolding Workspace")
             self.resize(1420, 940)
 
             self.mode_manager = mode_manager or ModeManager()
@@ -115,18 +122,6 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             root.setContentsMargins(16, 16, 16, 16)
             root.setSpacing(12)
 
-            intro = QLabel(
-                (
-                    "Run registry-backed unfolding methods against the active response matrix, "
-                    "overlay the resulting flux spectra, inspect convergence, and keep the "
-                    "response matrix visible while reviewing flux values and uncertainties."
-                ),
-                self,
-            )
-            intro.setObjectName("PanelBody")
-            intro.setWordWrap(True)
-            root.addWidget(intro)
-
             root.addLayout(self._build_controls())
 
             splitter = QSplitter(Qt.Horizontal, self)
@@ -140,7 +135,12 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.results_table = QTableWidget(0, 4, self)
             self.results_table.setObjectName("UnfoldingResultsTable")
             self.results_table.setHorizontalHeaderLabels(
-                ("Group", "Energy Range", "Flux", "Uncertainty")
+                (
+                    "Group",
+                    f"Energy Range ({self.workspace_input.energy_unit})",
+                    "Flux",
+                    "Uncertainty",
+                )
             )
             self.results_table.verticalHeader().setVisible(False)
             root.addWidget(self.results_table)
@@ -167,6 +167,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.rmle_lambda_spin.valueChanged.connect(self._sync_lambda_slider)
             self.rmle_lambda_slider.valueChanged.connect(self._sync_lambda_spin)
             self.show_uncertainty_bands_checkbox.toggled.connect(self._refresh_plots)
+            self.log_energy_checkbox.toggled.connect(self._apply_plot_modes)
+            self.log_flux_checkbox.toggled.connect(self._apply_plot_modes)
+            self.reset_plots_button.clicked.connect(self._reset_plot_views)
             self.run_button.clicked.connect(self._run_selected_method)
             self.compare_button.clicked.connect(self._run_comparison)
             self._populate_measurement_table()
@@ -206,6 +209,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.response_source_combo.addItem("User CSV", "user_csv")
             self.response_source_combo.addItem("MCNP / GEANT4 Table", "mcnp_geant4")
             self.response_source_combo.addItem("Analytical HPGe", "analytical_hpge")
+            self.response_source_combo.addItem(
+                "UWNR RAFM Simplified Response",
+                "uwnr_flux_wires",
+            )
             response_layout.addWidget(self.response_source_combo, 0, 1)
             response_layout.addWidget(QLabel("Path / note", response_group), 1, 0)
             self.response_path_input = QLineEdit(response_group)
@@ -218,6 +225,17 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.response_load_button.setObjectName("LoadResponseMatrixButton")
             self.response_load_button.clicked.connect(self._load_selected_response_matrix)
             response_layout.addWidget(self.response_load_button, 2, 0, 1, 2)
+            response_layout.addWidget(QLabel("Measured rates", response_group), 3, 0)
+            self.rates_path_input = QLineEdit(response_group)
+            self.rates_path_input.setObjectName("ReactionRatesPathInput")
+            self.rates_path_input.setPlaceholderText(
+                "FluxForge reaction-rates JSON or RAFM CSV"
+            )
+            response_layout.addWidget(self.rates_path_input, 3, 1)
+            self.rates_load_button = QPushButton("Load Measured Rates", response_group)
+            self.rates_load_button.setObjectName("LoadMeasuredRatesButton")
+            self.rates_load_button.clicked.connect(self._load_measured_rates)
+            response_layout.addWidget(self.rates_load_button, 4, 0, 1, 2)
             row.addWidget(response_group)
 
             maxed_group = QGroupBox("MAXED Controls", self)
@@ -294,9 +312,21 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
             self.show_uncertainty_bands_checkbox.setChecked(True)
             self.show_uncertainty_bands_checkbox.setToolTip(
-                "RMLE-only uncertainty bands derived from the current uncertainty estimate."
+                "Show the one-sigma uncertainty estimate returned by each method."
             )
             row.addWidget(self.show_uncertainty_bands_checkbox)
+
+            self.log_energy_checkbox = QCheckBox("Log energy", self)
+            self.log_energy_checkbox.setObjectName("UnfoldingLogEnergyCheck")
+            row.addWidget(self.log_energy_checkbox)
+
+            self.log_flux_checkbox = QCheckBox("Log flux", self)
+            self.log_flux_checkbox.setObjectName("UnfoldingLogFluxCheck")
+            row.addWidget(self.log_flux_checkbox)
+
+            self.reset_plots_button = QPushButton("Reset Plot Views", self)
+            self.reset_plots_button.setObjectName("ResetUnfoldingPlotsButton")
+            row.addWidget(self.reset_plots_button)
 
             self.run_button = QPushButton("Run Selected", self)
             self.run_button.setObjectName("RunSelectedUnfoldingButton")
@@ -348,7 +378,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.flux_plot.setObjectName("UnfoldingFluxPlot")
             self.flux_plot.setBackground("#0f172a")
             self.flux_plot.showGrid(x=True, y=True, alpha=0.12)
-            self.flux_plot.setLabel("bottom", "Energy Bin")
+            self.flux_plot.setLabel("bottom", "Energy", units=self.workspace_input.energy_unit)
             self.flux_plot.setLabel("left", "Flux")
             layout.addWidget(self.flux_plot, 2)
 
@@ -401,7 +431,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 uses_ml_seed
                 or (uses_gravel_or_rmle and self.use_ml_seed_checkbox.isChecked())
             )
-            self.show_uncertainty_bands_checkbox.setEnabled(uses_rmle)
+            self.show_uncertainty_bands_checkbox.setEnabled(True)
             self.compare_button.setEnabled(compare_enabled)
 
         @staticmethod
@@ -449,13 +479,14 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
         def _populate_measurement_table(self) -> None:
             measured = self.workspace_input.measured_rates
             sigma = self.workspace_input.measurement_uncertainty
+            labels = self.workspace_input.measurement_labels
             self.measurements_table.setRowCount(len(measured))
             for row, (value, uncertainty) in enumerate(zip(measured, sigma)):
                 self._set_table_item(
                     self.measurements_table,
                     row,
                     0,
-                    f"M{row + 1}",
+                    labels[row] if row < len(labels) else f"M{row + 1}",
                 )
                 self._set_table_item(self.measurements_table, row, 1, value)
                 self._set_table_item(self.measurements_table, row, 2, uncertainty)
@@ -463,35 +494,164 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
         def _update_response_matrix_view(self) -> None:
             image = np.asarray(self.workspace_input.response_matrix, dtype=float).T
             self.response_image.setImage(image)
+            rows, columns = self.workspace_input.response_matrix.shape
             self.response_plot.setTitle(
-                f"{self.workspace_input.label} ({self.workspace_input.response_matrix.shape[0]}×{self.workspace_input.response_matrix.shape[1]})"
+                f"{self.workspace_input.label} ({rows}×{columns})"
             )
 
-        def _load_selected_response_matrix(self) -> None:
-            source_key = str(self.response_source_combo.currentData() or "demo")
-            if source_key == "demo":
-                self.workspace_input = build_demo_unfolding_workspace_input()
-            elif source_key == "analytical_hpge":
-                loaded = build_analytical_hpge_response(
-                    n_channels=int(self.workspace_input.measured_rates.size),
-                    energy_edges=self.workspace_input.energy_edges,
+        def _load_measured_rates(self) -> None:
+            path = self.rates_path_input.text().strip()
+            if not path:
+                self.summary_label.setText(
+                    "Choose a FluxForge reaction-rates JSON or RAFM CSV file first."
                 )
-                self.workspace_input = self._workspace_input_from_loaded_response(loaded)
-            else:
-                path = self.response_path_input.text().strip()
-                if not path:
-                    return
-                loaded = load_response_matrix(
-                    path,
-                    source_format=(
-                        "mcnp_geant4_table" if source_key == "mcnp_geant4" else "user_csv"
-                    ),
-                    energy_edges=self.workspace_input.energy_edges,
+                return
+            try:
+                source_path = Path(path)
+                is_rafm_csv = source_path.suffix.lower() == ".csv"
+                if is_rafm_csv:
+                    with source_path.open("r", encoding="utf-8", newline="") as handle:
+                        rows = [
+                            row
+                            for row in csv.DictReader(handle)
+                            if not str(row.get("reaction_id", "")).startswith("Unknown(")
+                        ]
+                    rate_key = "reaction_rate"
+                    uncertainty_key = "reaction_rate_unc"
+                else:
+                    payload = read_reaction_rates(source_path)
+                    rows = list(payload.get("rates", []))
+                    rate_key = "rate"
+                    uncertainty_key = "uncertainty"
+                rates = np.asarray(
+                    [float(row[rate_key]) for row in rows],
+                    dtype=float,
                 )
-                self.workspace_input = self._workspace_input_from_loaded_response(loaded)
+                uncertainties = np.asarray(
+                    [float(row.get(uncertainty_key, 0.0)) for row in rows],
+                    dtype=float,
+                )
+                if rates.size == 0:
+                    raise ValueError("reaction-rates artifact contains no rates")
+                if np.any(rates < 0.0) or np.any(uncertainties < 0.0):
+                    raise ValueError("rates and uncertainties must be non-negative")
+                labels = tuple(
+                    str(
+                        row.get("reaction_id")
+                        or row.get("reaction")
+                        or f"M{index + 1}"
+                    )
+                    for index, row in enumerate(rows)
+                )
+                if is_rafm_csv:
+                    self.response_source_combo.setCurrentIndex(
+                        self.response_source_combo.findData("uwnr_flux_wires")
+                    )
+                    self.workspace_input = self._uwnr_flux_wire_input(
+                        rates,
+                        uncertainties,
+                        labels,
+                    )
+                else:
+                    if rates.size != self.workspace_input.response_matrix.shape[0]:
+                        raise ValueError(
+                            f"rate count {rates.size} does not match response rows "
+                            f"{self.workspace_input.response_matrix.shape[0]}"
+                        )
+                    self.workspace_input = UnfoldingWorkspaceInput(
+                        label=self.workspace_input.label,
+                        measured_rates=rates,
+                        measurement_uncertainty=uncertainties,
+                        response_matrix=self.workspace_input.response_matrix,
+                        energy_edges=self.workspace_input.energy_edges,
+                        initial_flux=self.workspace_input.initial_flux,
+                        measurement_labels=labels,
+                        energy_unit=self.workspace_input.energy_unit,
+                    )
+            except (OSError, KeyError, TypeError, ValueError) as exc:
+                self.summary_label.setText(f"Measured rates were not loaded: {exc}")
+                return
             self._populate_measurement_table()
             self._update_response_matrix_view()
             self._run_selected_method()
+
+        def _load_selected_response_matrix(self) -> None:
+            try:
+                source_key = str(self.response_source_combo.currentData() or "demo")
+                if source_key == "demo":
+                    self.workspace_input = build_demo_unfolding_workspace_input()
+                elif source_key == "analytical_hpge":
+                    loaded = build_analytical_hpge_response(
+                        n_channels=int(self.workspace_input.measured_rates.size),
+                        energy_edges=self.workspace_input.energy_edges,
+                    )
+                    self.workspace_input = self._workspace_input_from_loaded_response(loaded)
+                elif source_key == "uwnr_flux_wires":
+                    if not self.workspace_input.measurement_labels or all(
+                        label.startswith("M")
+                        for label in self.workspace_input.measurement_labels
+                    ):
+                        raise ValueError(
+                            "Load the UWNR RAFM reaction-rate CSV before selecting its response."
+                        )
+                    self.workspace_input = self._uwnr_flux_wire_input(
+                        self.workspace_input.measured_rates,
+                        self.workspace_input.measurement_uncertainty,
+                        self.workspace_input.measurement_labels,
+                    )
+                else:
+                    path = self.response_path_input.text().strip()
+                    if not path:
+                        self.summary_label.setText("Choose a response-matrix file first.")
+                        return
+                    loaded = load_response_matrix(
+                        path,
+                        source_format=(
+                            "mcnp_geant4_table" if source_key == "mcnp_geant4" else "user_csv"
+                        ),
+                        energy_edges=self.workspace_input.energy_edges,
+                    )
+                    self.workspace_input = self._workspace_input_from_loaded_response(loaded)
+            except (OSError, TypeError, ValueError) as exc:
+                self.summary_label.setText(f"Response matrix was not loaded: {exc}")
+                return
+            self._populate_measurement_table()
+            self._update_response_matrix_view()
+            self._run_selected_method()
+
+        def _uwnr_flux_wire_input(
+            self,
+            rates: np.ndarray,
+            uncertainties: np.ndarray,
+            labels: tuple[str, ...],
+        ) -> UnfoldingWorkspaceInput:
+            # Match the 20-group structure and simplified response curves used by
+            # the repository's committed UWNR RAFM unfolding artifacts.  This
+            # path is deliberately labelled as simplified: production work can
+            # still load an evaluated IRDFF response matrix through User CSV.
+            energy_edges = np.logspace(np.log10(0.0253), np.log10(20.0e6), 21)
+            matrix = np.asarray(
+                [
+                    _make_response_row(label, energy_edges, energy_edges.size - 1)
+                    for label in labels
+                ],
+                dtype=float,
+            )
+            response_scale = max(float(np.mean(matrix)), np.finfo(float).tiny)
+            initial_level = max(
+                float(np.mean(rates)) / response_scale / matrix.shape[1],
+                np.finfo(float).tiny,
+            )
+            return UnfoldingWorkspaceInput(
+                label="UWNR RAFM Simplified Flux-Wire Response",
+                measured_rates=np.asarray(rates, dtype=float),
+                measurement_uncertainty=np.asarray(uncertainties, dtype=float),
+                response_matrix=np.asarray(matrix, dtype=float),
+                energy_edges=np.asarray(energy_edges, dtype=float),
+                initial_flux=np.full(matrix.shape[1], initial_level, dtype=float),
+                measurement_labels=labels,
+                energy_unit="eV",
+            )
 
         def _workspace_input_from_loaded_response(self, loaded) -> UnfoldingWorkspaceInput:
             matrix = np.asarray(loaded.matrix, dtype=float)
@@ -503,8 +663,15 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     float(np.mean(self.workspace_input.initial_flux)),
                     dtype=float,
                 )
-            measured_rates = matrix @ initial_flux
-            measurement_uncertainty = np.sqrt(np.maximum(measured_rates, 1.0))
+            measured_rates = np.asarray(self.workspace_input.measured_rates, dtype=float)
+            measurement_uncertainty = np.asarray(
+                self.workspace_input.measurement_uncertainty, dtype=float
+            )
+            if measured_rates.size != matrix.shape[0]:
+                raise ValueError(
+                    f"response rows {matrix.shape[0]} do not match the active "
+                    f"measured-rate count {measured_rates.size}"
+                )
             return UnfoldingWorkspaceInput(
                 label=loaded.source_label,
                 measured_rates=measured_rates,
@@ -512,6 +679,8 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 response_matrix=matrix,
                 energy_edges=energy_edges,
                 initial_flux=initial_flux,
+                measurement_labels=self.workspace_input.measurement_labels,
+                energy_unit=self.workspace_input.energy_unit,
             )
 
         def _run_selected_method(self) -> None:
@@ -614,6 +783,19 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
         def _refresh_results_table(self, result: UnfoldingResult) -> None:
             energy_edges = np.asarray(self.workspace_input.energy_edges, dtype=float)
+            self.results_table.setHorizontalHeaderLabels(
+                (
+                    "Group",
+                    f"Energy Range ({self.workspace_input.energy_unit})",
+                    "Flux",
+                    "Uncertainty",
+                )
+            )
+            self.flux_plot.setLabel(
+                "bottom",
+                "Energy",
+                units=self.workspace_input.energy_unit,
+            )
             self.results_table.setRowCount(len(result.flux))
             for row, flux_value in enumerate(result.flux):
                 band = f"{energy_edges[row]:.3f}-{energy_edges[row + 1]:.3f}"
@@ -628,7 +810,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 self._set_table_item(self.results_table, row, 3, uncertainty)
 
         def _refresh_plots(self) -> None:
-            centers = np.arange(len(self.workspace_input.initial_flux), dtype=float)
+            edges = np.asarray(self.workspace_input.energy_edges, dtype=float)
+            centers = 0.5 * (edges[:-1] + edges[1:])
+            positive = (edges[:-1] > 0.0) & (edges[1:] > 0.0)
+            centers[positive] = np.sqrt(edges[:-1][positive] * edges[1:][positive])
             self.flux_plot.clear()
             self.flux_plot.addLegend(offset=(10, 10))
             self.convergence_plot.clear()
@@ -688,6 +873,21 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                         pen=pg.mkPen(color=color, width=1.8),
                         name=result.method_used,
                     )
+            self._apply_plot_modes()
+
+        def _apply_plot_modes(self, *_args) -> None:
+            self.flux_plot.setLogMode(
+                x=self.log_energy_checkbox.isChecked(),
+                y=self.log_flux_checkbox.isChecked(),
+            )
+            self.convergence_plot.setLogMode(
+                x=False,
+                y=self.log_flux_checkbox.isChecked(),
+            )
+
+        def _reset_plot_views(self) -> None:
+            for plot in (self.flux_plot, self.convergence_plot, self.response_plot):
+                plot.enableAutoRange()
 
         def _set_table_item(self, table: QTableWidget, row: int, column: int, value) -> None:
             if isinstance(value, str):

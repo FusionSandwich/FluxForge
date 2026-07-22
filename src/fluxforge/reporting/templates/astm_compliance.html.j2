@@ -15,7 +15,7 @@
     <section><h2>QA Status Snapshot</h2><div>{{ qa_status_snapshot }}</div></section>
     <section><h2>Peak Table</h2><div>{{ peak_table }}</div></section>
     <section><h2>Activity Table</h2><div>{{ activity_table }}</div></section>
-    <section><h2>Residuals Grid</h2><div>{{ residuals_grid }}</div></section>
+    {% if residuals_grid %}<section><h2>Residuals Grid</h2><div>{{ residuals_grid }}</div></section>{% endif %}
     <section><h2>Provenance</h2><pre>{{ provenance }}</pre></section>
   </body>
 </html>

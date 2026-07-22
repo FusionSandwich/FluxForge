@@ -13,14 +13,16 @@
   </head>
   <body>
     <h1>{{ title }}</h1>
-    <section><h2>Spectrum</h2><div>{{ spectrum_image }}</div></section>
+    {% if spectrum_image %}<section><h2>Spectrum</h2><div>{{ spectrum_image }}</div></section>{% endif %}
+    {% if calibration_curve or calibration_residuals or efficiency_curve or efficiency_residuals %}
     <section class="grid">
-      <div><h2>Calibration Curve</h2><div>{{ calibration_curve }}</div></div>
-      <div><h2>Calibration Residuals</h2><div>{{ calibration_residuals }}</div></div>
-      <div><h2>Efficiency Curve</h2><div>{{ efficiency_curve }}</div></div>
-      <div><h2>Efficiency Residuals</h2><div>{{ efficiency_residuals }}</div></div>
+      {% if calibration_curve %}<div><h2>Calibration Curve</h2><div>{{ calibration_curve }}</div></div>{% endif %}
+      {% if calibration_residuals %}<div><h2>Calibration Residuals</h2><div>{{ calibration_residuals }}</div></div>{% endif %}
+      {% if efficiency_curve %}<div><h2>Efficiency Curve</h2><div>{{ efficiency_curve }}</div></div>{% endif %}
+      {% if efficiency_residuals %}<div><h2>Efficiency Residuals</h2><div>{{ efficiency_residuals }}</div></div>{% endif %}
     </section>
-    <section><h2>Residuals Grid</h2><div>{{ residuals_grid }}</div></section>
+    {% endif %}
+    {% if residuals_grid %}<section><h2>Residuals Grid</h2><div>{{ residuals_grid }}</div></section>{% endif %}
     <section><h2>Peak Table</h2><div>{{ peak_table }}</div></section>
     <section><h2>Activity Table</h2><div>{{ activity_table }}</div></section>
     <section><h2>ASTM Status</h2><div>{{ astm_status_table }}</div></section>

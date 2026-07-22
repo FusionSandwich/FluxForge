@@ -46,6 +46,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QListWidgetItem,
         QPlainTextEdit,
         QPushButton,
+        QScrollArea,
         QTableWidget,
         QTableWidgetItem,
         QTabWidget,
@@ -58,7 +59,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         Qt,
     )
 
-    class SidebarPanel(QWidget):
+    class SidebarPanel(QScrollArea):
         """Left-side shell for files, devices, libraries, results, and QA."""
 
         def __init__(
@@ -73,6 +74,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             parent=None,
         ) -> None:
             super().__init__(parent)
+            self.setMinimumWidth(360)
+            self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
@@ -88,7 +91,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 library_manager=self.library_manager,
             )
 
-            layout = QVBoxLayout(self)
+            content = QWidget(self)
+            content.setObjectName("SidebarScrollContent")
+            self.setWidgetResizable(True)
+            self.setWidget(content)
+
+            layout = QVBoxLayout(content)
             layout.setContentsMargins(12, 12, 12, 12)
             layout.setSpacing(12)
 
@@ -102,11 +110,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             layout.addWidget(self._build_library_panel(), 2)
 
-            devices = QListWidget(self)
-            devices.setObjectName("SidebarList")
-            for text in ("Mock MCA · Offline", "Dashboard reserved", "Spectrogram planned"):
-                QListWidgetItem(text, devices)
-            layout.addWidget(devices, 1)
+            self.acquisition_status = QLabel(
+                "Acquisition: offline file analysis · no live MCA connected",
+                self,
+            )
+            self.acquisition_status.setObjectName("PanelBody")
+            self.acquisition_status.setWordWrap(True)
+            layout.addWidget(self.acquisition_status)
 
             layout.addWidget(self._build_reference_workbench_panel(), 3)
             self._refresh_nuclide_results("cs")
@@ -194,9 +204,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             intro = QLabel(
                 (
-                    "Open or drag spectra into the modern Qt shell, then assign them to the "
-                    "foreground, background, or overlay lanes here. Background subtraction and "
-                    "overlay plotting update directly from these selectors."
+                    "Assign loaded spectra as foreground, background, or overlay. "
+                    "Subtraction and plot overlays update immediately."
                 ),
                 group,
             )
@@ -233,10 +242,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.setSpacing(10)
 
             intro = QLabel(
-                (
-                    "The modern Qt shell reads from the governed library registry. "
-                    "Manual and standards workflows use these selectors instead of legacy Tk state."
-                ),
+                "Choose the reference sources used for identification, calibration, standards, and activation analysis.",
                 group,
             )
             intro.setObjectName("PanelBody")
@@ -309,9 +315,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             intro = QLabel(
                 (
-                    "PeakEasy-style reference workbench: search isotopes, review half-life and "
-                    "line details, save analyst lists, build mixtures, and publish overlays "
-                    "without leaving the modern Qt shell."
+                    "Search nuclides, review line and half-life data, save lists, "
+                    "build mixtures, and overlay reference lines."
                 ),
                 group,
             )

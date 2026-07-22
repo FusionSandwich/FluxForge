@@ -36,7 +36,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # noqa: E402
     import pyqtgraph as pg  # noqa: E402
     from PySide6.QtCore import Qt  # noqa: E402
     from PySide6.QtTest import QTest  # noqa: E402
-    from PySide6.QtWidgets import QPushButton  # noqa: E402
+    from PySide6.QtWidgets import QPushButton, QWidget  # noqa: E402
 
 
 def _qapp():
@@ -278,7 +278,7 @@ def test_main_window_opens_calibration_workspace_dialog():
     assert window._calibration_dialog is not None
     assert (
         window._calibration_dialog.windowTitle()
-        == "FluxForge Next - Unified Calibration Workspace"
+        == "FluxForge — Calibration Workspace"
     )
     assert window._calibration_dialog.energy_table.rowCount() >= 3
 
@@ -461,6 +461,30 @@ def test_calibration_dialog_exposes_advanced_tools_and_roi_fitting():
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt calibration workspace dependencies are unavailable.",
 )
+def test_calibration_controls_scroll_to_roi_fit_actions():
+    _qapp()
+    dialog = CalibrationWorkspaceDialog(
+        spectrum=build_demo_spectrum(),
+        mode_manager=ModeManager(),
+    )
+    dialog.resize(1100, 720)
+    dialog.show()
+    _qapp().processEvents()
+
+    scroll = dialog.findChild(QWidget, "CalibrationControlsScrollArea")
+    assert scroll is not None
+    dialog.set_active_advanced_tab("roi_fit")
+    scroll.ensureWidgetVisible(dialog.apply_roi_fwhm_button)
+    _qapp().processEvents()
+    assert dialog.apply_roi_energy_button.isVisible()
+    assert dialog.apply_roi_fwhm_button.isVisible()
+    dialog.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt calibration workspace dependencies are unavailable.",
+)
 def test_calibration_dialog_supports_preserve_slots_fine_tune_and_nasa_seed():
     _qapp()
     dialog = CalibrationWorkspaceDialog(
@@ -578,6 +602,34 @@ def test_data_library_manager_tracks_gui_library_categories():
     assert manager.available_sources("dosimetry")[0].source_id == "irdff_ii_dosimetry"
     assert "flux_wire_catalog" in activation_ids
     assert "nasa_capture_iaea" in activation_ids
+
+
+def test_data_library_manager_recovers_removed_persisted_gamma_source():
+    class StaleSettings:
+        def __init__(self):
+            self.values = {
+                DataLibraryManager.GAMMA_SOURCE_KEY: "removed_user_gamma_source",
+                DataLibraryManager.CUSTOM_GAMMA_PATH_KEY: "missing-gamma-library.csv",
+            }
+
+        def value(self, key, default=None):
+            return self.values.get(key, default)
+
+        def setValue(self, key, value):
+            self.values[key] = value
+
+        def sync(self):
+            return None
+
+    settings = StaleSettings()
+    manager = DataLibraryManager(settings=settings)
+
+    assert manager.state.gamma_identification_source_id == "fluxforge_bundled_gamma"
+    assert manager.state.custom_gamma_path is None
+    assert (
+        settings.values[DataLibraryManager.GAMMA_SOURCE_KEY]
+        == "fluxforge_bundled_gamma"
+    )
 
 
 def test_data_library_manager_registers_and_removes_user_sources(monkeypatch, tmp_path):

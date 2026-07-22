@@ -34,7 +34,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             parent=None,
         ) -> None:
             super().__init__(parent)
-            self.setWindowTitle("FluxForge Next - Export Report")
+            self.setWindowTitle("FluxForge — Export Report")
             self.resize(1080, 840)
             self.engine = engine or ReportingEngine()
             self.context_factory = context_factory or (lambda _name: {})

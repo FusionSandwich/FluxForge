@@ -30,6 +30,7 @@ class SpectrumTrace:
     channels: tuple[float, ...]
     color: str = "#72d6ff"
     visible: bool = True
+    x_axis_label: str = "Channel"
 
 
 @dataclass(frozen=True)

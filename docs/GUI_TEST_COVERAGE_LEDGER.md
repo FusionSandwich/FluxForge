@@ -1,10 +1,39 @@
 # GUI Test Coverage Ledger
 
 Status: active
-Last Updated: 2026-04-19
+Last Updated: 2026-07-22
 Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence links and remaining coverage targets.
 
 ## 1. Latest Validation Snapshot
+
+- UWNR/RAFM raw-data smoke validation:
+  - 30 committed `.ASC` files ingested and peak-processed on Windows: 30/30,
+    zero command failures.
+  - 30 calibrated log-scale spectrum plots rendered: 30/30, zero failures.
+- Modern spectrum interaction:
+  - `.ASC` is registered in the shared reader factory.
+  - The main canvas displays calibrated energy where available and exposes
+    draggable ROI limits, clear/reset buttons, mouse pan, and wheel zoom.
+- Unfolding data-integrity checks:
+  - Measured reaction-rate artifacts can be loaded explicitly.
+  - A response-matrix row mismatch is rejected instead of synthesizing rates.
+  - Physical energy centers, log controls, reset controls, and uncertainty
+    bands are covered in `tests/test_unfolding_workspace_qt.py`.
+- Scope note:
+  - The Phase 6 GUI probe reuses committed processed activity/optimization
+    artifacts. It is not evidence of a fresh raw UWNR spectrum reduction or
+    a covariance-complete STAYSL-style adjustment.
+- 2026-07-22 focused Windows regression:
+  - 46 passed: modern shell, unfolding, peak background, and foundation.
+  - 20 passed: calibration workspace, including scroll access to ROI-fit actions.
+  - 23 passed: Module 3 dialogs/backends, including graceful PDF unavailability
+    when WeasyPrint native libraries are absent.
+  - 1 passed: predictive dashboard.
+- 2026-07-22 Linux/WSLg native checks:
+  - 7/7 native surfaces, 19/19 calibration, 17/17 focused
+    ASC/ROI/log/background/unfolding/plot checks, and 1/1 legacy desktop driver.
+  - The legacy control workflow reached activity, reaction rates, GLS unfolding,
+    comparison, reports, and six plots.
 
 - Broad Qt GUI regression:
   - Command:

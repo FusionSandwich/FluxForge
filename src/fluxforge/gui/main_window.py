@@ -54,6 +54,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QByteArray,
         QComboBox,
         QDockWidget,
+        QFileDialog,
         QInputDialog,
         QKeySequence,
         QLabel,
@@ -66,6 +67,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QUndoStack,
         Qt,
     )
+    from PySide6.QtWidgets import QMessageBox
     from fluxforge.gui.theme_manager import load_stylesheet, resolve_theme
     from fluxforge.gui.widgets import HardwareLedWidget, ModeSwitcherWidget
 
@@ -134,7 +136,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         ) -> None:
             super().__init__(parent)
             self.setObjectName("FluxForgeMainWindow")
-            self.setWindowTitle("FluxForge Next")
+            self.setWindowTitle("FluxForge — HPGe Analysis")
             self.resize(1560, 980)
 
             self.settings = settings or QSettings(self.ORGANIZATION, self.APPLICATION)
@@ -234,8 +236,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _build_menu_bar(self) -> None:
             file_menu = self.menuBar().addMenu("&File")
-            file_menu.addAction(self._action("Open Spectrum...", "Ctrl+O"))
-            file_menu.addAction(self._action("Open Session...", "Ctrl+Shift+O"))
+            file_menu.addAction(
+                self._action(
+                    "Open Spectrum...",
+                    "Ctrl+O",
+                    enabled=True,
+                    handler=self._open_spectrum_dialog,
+                )
+            )
+            file_menu.addAction(
+                self._action(
+                    "Open Session...",
+                    "Ctrl+Shift+O",
+                    enabled=True,
+                    handler=self._open_session_dialog,
+                )
+            )
             file_menu.addSeparator()
             self._report_export_action = self._action(
                 "Export Report...",
@@ -244,7 +260,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 handler=self._open_report_export,
             )
             file_menu.addAction(self._report_export_action)
-            file_menu.addAction(self._action("Export ANSI N42.42...", "Ctrl+Shift+E"))
+            file_menu.addAction(
+                self._unavailable_action(
+                    "Export ANSI N42.42...",
+                    "ANSI N42.42 export is not implemented in the modern GUI yet.",
+                    shortcut="Ctrl+Shift+E",
+                )
+            )
 
             edit_menu = self.menuBar().addMenu("&Edit")
             undo_action = self.undo_stack.createUndoAction(self, "Undo")
@@ -255,8 +277,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             edit_menu.addAction(redo_action)
 
             view_menu = self.menuBar().addMenu("&View")
-            view_menu.addAction(self._action("Toggle Full Canvas", "F11"))
-            view_menu.addAction(self._action("Restore Default Layout"))
+            view_menu.addAction(
+                self._action(
+                    "Toggle Full Canvas",
+                    "F11",
+                    enabled=True,
+                    handler=self._toggle_full_canvas,
+                )
+            )
+            view_menu.addAction(
+                self._action(
+                    "Restore Default Layout",
+                    enabled=True,
+                    handler=self._restore_default_layout,
+                )
+            )
             self._log_scale_action = self._action(
                 "Log Scale",
                 "Ctrl+L",
@@ -281,7 +316,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 label = backend["display_name"]
                 if backend["recommended"]:
                     label += " ★"
-                renderer_menu.addAction(self._action(label))
+                availability = "available" if backend["available"] else "unavailable"
+                renderer_menu.addAction(
+                    self._unavailable_action(
+                        f"{label} ({availability})",
+                        "Runtime renderer switching is not implemented; "
+                        "PyQtGraph remains active.",
+                    )
+                )
 
             analysis_menu = self.menuBar().addMenu("&Analysis")
             analysis_menu.addAction(
@@ -292,7 +334,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     handler=self._run_auto_peak_search,
                 )
             )
-            analysis_menu.addAction(self._action("Nuclide Search"))
+            analysis_menu.addAction(
+                self._action(
+                    "Nuclide Search",
+                    enabled=True,
+                    handler=self._focus_nuclide_search,
+                )
+            )
             analysis_menu.addAction(
                 self._action(
                     "Run ASTM Check",
@@ -351,7 +399,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 handler=self._open_qa_history,
             )
             tools_menu.addAction(self._qa_history_action)
-            tools_menu.addAction(self._action("Hardware Dashboard"))
+            tools_menu.addAction(
+                self._unavailable_action(
+                    "Hardware Dashboard",
+                    "Live hardware acquisition is not implemented in this GUI build.",
+                )
+            )
 
             workspace_menu = self.menuBar().addMenu("&Workspaces")
             workspace_menu.addAction(
@@ -428,12 +481,26 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
             help_menu = self.menuBar().addMenu("&Help")
-            help_menu.addAction(self._action("Shortcut Reference", "F1"))
-            help_menu.addAction(self._action("About FluxForge Next"))
+            help_menu.addAction(
+                self._action(
+                    "Shortcut Reference",
+                    "F1",
+                    enabled=True,
+                    handler=self._show_shortcut_reference,
+                )
+            )
+            help_menu.addAction(
+                self._action(
+                    "About FluxForge",
+                    enabled=True,
+                    handler=self._show_about,
+                )
+            )
 
         def _build_toolbar(self) -> None:
             toolbar = QToolBar("Primary", self)
             toolbar.setObjectName("PrimaryToolbar")
+            self.primary_toolbar = toolbar
             toolbar.setMovable(False)
             toolbar.addWidget(ModeSwitcherWidget(self.mode_manager, toolbar))
             toolbar.addSeparator()
@@ -583,6 +650,131 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if handler is not None:
                 action.triggered.connect(handler)
             return action
+
+        def _unavailable_action(
+            self,
+            text: str,
+            reason: str,
+            *,
+            shortcut: str | None = None,
+        ) -> QAction:
+            """Create an honest disabled menu item with a discoverable explanation."""
+
+            action = self._action(f"{text} (not available)", shortcut)
+            action.setToolTip(reason)
+            action.setStatusTip(reason)
+            return action
+
+        def _open_spectrum_dialog(self) -> None:
+            filename, _selected_filter = QFileDialog.getOpenFileName(
+                self,
+                "Open HPGe spectrum",
+                self.recent_files.files()[0] if self.recent_files.files() else "",
+                (
+                    "Spectrum files (*.asc *.ASC *.cnf *.CNF *.chn *.CHN *.spc *.SPC "
+                    "*.spe *.SPE *.n42 *.N42 *.xml *.XML *.csv *.CSV);;All files (*)"
+                ),
+            )
+            if filename:
+                self._open_dialog_path(filename)
+
+        def _open_session_dialog(self) -> None:
+            filename, _selected_filter = QFileDialog.getOpenFileName(
+                self,
+                "Open FluxForge session",
+                self.recent_files.files()[0] if self.recent_files.files() else "",
+                "FluxForge sessions (*.ffs);;All files (*)",
+            )
+            if filename:
+                self._open_dialog_path(filename)
+
+        def _open_dialog_path(self, filename: str) -> None:
+            try:
+                self.open_path(filename)
+            except Exception as exc:
+                QMessageBox.critical(
+                    self,
+                    "Could not open file",
+                    f"FluxForge could not open {filename}.\n\n{exc}",
+                )
+
+        def _toggle_full_canvas(self) -> None:
+            if getattr(self, "_full_canvas_active", False):
+                self.showNormal()
+                for widget, was_visible in self._full_canvas_visibility:
+                    widget.setVisible(was_visible)
+                self._full_canvas_active = False
+                self.statusBar().showMessage("Full-canvas view disabled", 3000)
+            else:
+                self._full_canvas_visibility = tuple(
+                    (widget, widget.isVisible())
+                    for widget in (
+                        self.left_dock,
+                        self.bottom_dock,
+                        self.right_dock,
+                        self.primary_toolbar,
+                        self.statusBar(),
+                    )
+                )
+                for widget, _was_visible in self._full_canvas_visibility:
+                    widget.hide()
+                self._full_canvas_active = True
+                self.showFullScreen()
+                self.statusBar().showMessage(
+                    "Full-canvas view enabled; press F11 to exit",
+                    3000,
+                )
+
+        def _restore_default_layout(self) -> None:
+            self.left_dock.show()
+            self.bottom_dock.show()
+            self.right_dock.show()
+            self.addDockWidget(Qt.LeftDockWidgetArea, self.left_dock)
+            self.addDockWidget(Qt.BottomDockWidgetArea, self.bottom_dock)
+            self.addDockWidget(Qt.RightDockWidgetArea, self.right_dock)
+            self.resize(1560, 980)
+            self.statusBar().showMessage("Default workspace layout restored", 3000)
+
+        def _focus_nuclide_search(self) -> None:
+            self._focus_workspace_dock()
+            sidebar = self.left_dock.widget()
+            query = getattr(sidebar, "nuclide_query", None)
+            if query is None:
+                return
+            if hasattr(sidebar, "ensureWidgetVisible"):
+                sidebar.ensureWidgetVisible(query)
+            query.setFocus()
+            query.selectAll()
+            self.statusBar().showMessage("Nuclide search ready", 3000)
+
+        def _show_shortcut_reference(self) -> None:
+            QMessageBox.information(
+                self,
+                "FluxForge shortcuts",
+                "\n".join(
+                    (
+                        "Ctrl+O — Open spectrum",
+                        "Ctrl+Shift+O — Open FluxForge session",
+                        "Ctrl+E — Export report",
+                        "Ctrl+Z / Ctrl+Shift+Z — Undo / redo",
+                        "Ctrl+L — Toggle logarithmic spectrum scale",
+                        "F11 — Toggle full-canvas view",
+                        "F1 — Show this shortcut reference",
+                    )
+                ),
+            )
+
+        def _show_about(self) -> None:
+            QMessageBox.information(
+                self,
+                "About FluxForge",
+                (
+                    "FluxForge HPGe Analysis\n\n"
+                    "Cross-platform gamma spectroscopy, calibration, activity "
+                    "analysis, "
+                    "response processing, and spectrum unfolding."
+                ),
+            )
 
         def _toggle_log_scale(self, enabled: bool) -> None:
             if hasattr(self, "central_tabs") and hasattr(self.central_tabs, "set_log_scale"):
@@ -913,12 +1105,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     aggregate_csv = (panel.last_output_dir / "aggregate.csv").read_text(encoding="utf-8") if panel.last_output_dir and (panel.last_output_dir / "aggregate.csv").exists() else ""
             payload = {
                 "title": "FluxForge Module 3 Report",
-                "spectrum_image": "Modern Qt spectrum canvas snapshot",
-                "calibration_curve": "Embedded calibration curve placeholder",
-                "calibration_residuals": "Embedded calibration residuals placeholder",
-                "efficiency_curve": "Embedded efficiency curve placeholder",
-                "efficiency_residuals": "Embedded efficiency residuals placeholder",
-                "residuals_grid": "Embedded residual thumbnails placeholder",
+                "spectrum_image": "",
+                "calibration_curve": "",
+                "calibration_residuals": "",
+                "efficiency_curve": "",
+                "efficiency_residuals": "",
+                "residuals_grid": "",
                 "peak_table": peak_table,
                 "activity_table": activity_table,
                 "astm_status_table": astm_status_table,

@@ -19,13 +19,19 @@ from fluxforge.gui import (
     modern_gui_unavailable_message,
     register_builtin_render_backends,
 )
+from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, PyQtGraphSpectrumCanvas
 from fluxforge.gui.qt_compat import QApplication
-from fluxforge.gui.spectrum_canvas import ReferenceLine
+from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
 from fluxforge.plugins import PluginRegistries
 
 ROOT = Path(__file__).resolve().parents[1]
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtGui import QAction
+    from PySide6.QtTest import QTest
 
 
 class FakeSettings:
@@ -326,6 +332,245 @@ def test_hierarchical_buffer_builds_multiple_levels():
     assert buffer.levels[0].stride == 1
     assert buffer.levels[-1].stride == 16
     assert buffer.choose_level(pixel_width=20).sample_count <= 40
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt spectrum renderer dependencies are unavailable.",
+)
+def test_spectrum_canvas_reset_and_draggable_roi_controls():
+    app = _qapp()
+    selection_bus = SelectionBus()
+    canvas = PyQtGraphSpectrumCanvas(selection_bus=selection_bus)
+    canvas.resize(1000, 640)
+    canvas.show()
+    canvas.set_traces(
+        (
+            SpectrumTrace(
+                label="UWNR HPGe",
+                counts=tuple(float((index % 50) + 1) for index in range(1001)),
+                channels=tuple(float(index) for index in range(1001)),
+                x_axis_label="Energy (keV)",
+            ),
+        )
+    )
+    app.processEvents()
+
+    canvas.plot_item.setXRange(400.0, 500.0, padding=0.0)
+    app.processEvents()
+    before_zoom_width = canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0]
+    QTest.mouseClick(canvas.zoom_in_button, Qt.LeftButton)
+    app.processEvents()
+    zoomed_width = canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0]
+    assert zoomed_width < before_zoom_width
+    QTest.mouseClick(canvas.zoom_out_button, Qt.LeftButton)
+    app.processEvents()
+    assert canvas.plot_item.viewRange()[0][1] - canvas.plot_item.viewRange()[0][0] > zoomed_width
+
+    canvas.plot_item.setXRange(300.0, 600.0, padding=0.0)
+    app.processEvents()
+    before_pan = tuple(canvas.plot_item.viewRange()[0])
+    viewport = canvas.plot.viewport()
+    start = QPoint(viewport.width() // 2, viewport.height() // 2)
+    finish = QPoint(start.x() + 100, start.y())
+    QTest.mousePress(viewport, Qt.LeftButton, pos=start)
+    QTest.mouseMove(viewport, finish, delay=30)
+    QTest.mouseRelease(viewport, Qt.LeftButton, pos=finish)
+    app.processEvents()
+    after_pan = tuple(canvas.plot_item.viewRange()[0])
+    assert after_pan != pytest.approx(before_pan)
+
+    QTest.mouseClick(canvas.reset_view_button, Qt.LeftButton)
+    app.processEvents()
+    reset_range = canvas.plot_item.viewRange()[0]
+    assert reset_range[0] <= 0.0
+    assert reset_range[1] >= 1000.0
+
+    QTest.mouseClick(canvas.roi_button, Qt.LeftButton)
+    app.processEvents()
+    assert canvas._roi_region.isVisible()
+    canvas._roi_region.setRegion((640.0, 680.0))
+    canvas._roi_region.sigRegionChangeFinished.emit(canvas._roi_region)
+    app.processEvents()
+    assert selection_bus.state.roi_bounds_keV == pytest.approx((640.0, 680.0))
+
+    QTest.mouseClick(canvas.clear_roi_button, Qt.LeftButton)
+    app.processEvents()
+    assert selection_bus.state.roi_bounds_keV is None
+    assert not canvas._roi_region.isVisible()
+    canvas.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt spectrum renderer dependencies are unavailable.",
+)
+def test_modern_main_window_opens_bundled_uwnr_genie_asc():
+    app = _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    asc_path = (
+        ROOT
+        / "examples"
+        / "RAFM_irradiation"
+        / "raw_gamma_spec"
+        / "flux_wires"
+        / "Ti-RAFM-1a_25cm.ASC"
+    )
+
+    window.open_path(asc_path)
+    app.processEvents()
+
+    spectrum = window.analysis_workspace.spectrum()
+    assert spectrum is not None
+    assert len(spectrum.counts) == 8192
+    assert window.central_tabs.canvas._x_axis_is_energy is True
+    assert (
+        window.central_tabs.canvas.plot.getPlotItem().getAxis("bottom").labelText
+        == "Energy (keV)"
+    )
+    assert asc_path.name in window.file_label.text()
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt spectrum renderer dependencies are unavailable.",
+)
+def test_hidden_phase5_harness_does_not_cover_analysis_tabs():
+    app = _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    app.processEvents()
+
+    analysis_tabs = window.bottom_dock.widget()
+    assert not analysis_tabs.phase5_parity_panel.isVisible()
+    assert analysis_tabs.currentWidget() is analysis_tabs.peak_table_panel
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt spectrum renderer dependencies are unavailable.",
+)
+def test_modern_menu_actions_open_files_focus_search_and_explain_availability(
+    monkeypatch,
+):
+    from fluxforge.gui import main_window as main_window_module
+
+    app = _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    app.processEvents()
+    actions = {action.text(): action for action in window.findChildren(QAction)}
+
+    asc_path = (
+        ROOT
+        / "examples"
+        / "RAFM_irradiation"
+        / "raw_gamma_spec"
+        / "flux_wires"
+        / "Ti-RAFM-1a_25cm.ASC"
+    )
+    monkeypatch.setattr(
+        main_window_module.QFileDialog,
+        "getOpenFileName",
+        lambda *_args, **_kwargs: (str(asc_path), ""),
+    )
+    assert actions["Open Spectrum..."].isEnabled()
+    actions["Open Spectrum..."].trigger()
+    app.processEvents()
+    assert window.analysis_workspace.spectrum() is not None
+    assert asc_path.name in window.file_label.text()
+
+    opened_sessions = []
+    monkeypatch.setattr(window, "_open_dialog_path", opened_sessions.append)
+    session_path = str(ROOT / "tests" / "spectra" / "example.ffs")
+    monkeypatch.setattr(
+        main_window_module.QFileDialog,
+        "getOpenFileName",
+        lambda *_args, **_kwargs: (session_path, ""),
+    )
+    assert actions["Open Session..."].isEnabled()
+    actions["Open Session..."].trigger()
+    assert opened_sessions == [session_path]
+
+    assert actions["Nuclide Search"].isEnabled()
+    actions["Nuclide Search"].trigger()
+    app.processEvents()
+    assert window.left_dock.widget().nuclide_query.hasFocus()
+
+    assert actions["Restore Default Layout"].isEnabled()
+    window.left_dock.hide()
+    actions["Restore Default Layout"].trigger()
+    app.processEvents()
+    assert window.left_dock.isVisible()
+
+    unavailable = [
+        action
+        for action in window.findChildren(QAction)
+        if "(not available)" in action.text()
+    ]
+    assert unavailable
+    assert all(not action.isEnabled() for action in unavailable)
+    assert all(action.toolTip() for action in unavailable)
+    window.close()
+
+
+@pytest.mark.skipif(
+    not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
+    reason="Qt spectrum renderer dependencies are unavailable.",
+)
+def test_modern_help_and_full_canvas_actions_are_clickable(monkeypatch):
+    from fluxforge.gui import main_window as main_window_module
+
+    app = _qapp()
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(),
+        selection_bus=SelectionBus(),
+    )
+    window.show()
+    app.processEvents()
+    actions = {action.text(): action for action in window.findChildren(QAction)}
+    messages = []
+    monkeypatch.setattr(
+        main_window_module.QMessageBox,
+        "information",
+        lambda _parent, title, body: messages.append((title, body)),
+    )
+
+    actions["Shortcut Reference"].trigger()
+    actions["About FluxForge"].trigger()
+    assert [title for title, _body in messages] == [
+        "FluxForge shortcuts",
+        "About FluxForge",
+    ]
+    assert "Ctrl+O" in messages[0][1]
+
+    assert not window.isFullScreen()
+    actions["Toggle Full Canvas"].trigger()
+    app.processEvents()
+    assert window.isFullScreen()
+    assert not window.left_dock.isVisible()
+    assert not window.bottom_dock.isVisible()
+    assert not window.right_dock.isVisible()
+    assert not window.primary_toolbar.isVisible()
+    actions["Toggle Full Canvas"].trigger()
+    app.processEvents()
+    assert not window.isFullScreen()
+    assert window.left_dock.isVisible()
+    assert window.bottom_dock.isVisible()
+    assert window.right_dock.isVisible()
+    assert window.primary_toolbar.isVisible()
+    window.close()
 
 
 def test_modern_shell_reuses_shared_demo_and_selection_helpers():

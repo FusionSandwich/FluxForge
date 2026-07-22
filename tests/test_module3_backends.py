@@ -274,6 +274,18 @@ def test_reporting_engine_reports_pdf_unavailable_without_weasyprint(monkeypatch
     assert engine.can_export_pdf() is False
 
 
+def test_reporting_engine_reports_pdf_unavailable_when_native_library_is_missing(
+    monkeypatch,
+):
+    engine = ReportingEngine()
+    monkeypatch.setattr(
+        "fluxforge.reporting.engine.import_module",
+        lambda _name: (_ for _ in ()).throw(OSError("missing libgobject")),
+    )
+
+    assert engine.can_export_pdf() is False
+
+
 def test_reporting_engine_imports_without_jinja2_backend(monkeypatch):
     monkeypatch.setattr("fluxforge.reporting.engine._JINJA2_IMPORT_ERROR", ImportError("missing"))
     monkeypatch.setattr("fluxforge.reporting.engine.Environment", None)

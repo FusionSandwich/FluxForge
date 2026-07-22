@@ -72,6 +72,7 @@ def test_ffs_session_round_trip_preserves_hal_and_gps_fields(tmp_path):
 def test_reader_factory_supports_core_extensions():
     factory = create_reader_factory()
     assert factory.supported_extensions() == (
+        ".asc",
         ".chn",
         ".cnf",
         ".csv",
@@ -106,6 +107,25 @@ def test_reader_factory_reads_csv_and_spc_samples(tmp_path):
     assert csv_spectrum.counts.tolist() == [10.0, 22.0, 35.0]
     assert spc_spectrum.energy_calibration == (0.0, 0.5, 0.0)
     assert spc_spectrum.live_time == 120.0
+
+
+def test_reader_factory_reads_bundled_genie_asc():
+    asc_path = (
+        Path(__file__).resolve().parents[1]
+        / "examples"
+        / "RAFM_irradiation"
+        / "raw_gamma_spec"
+        / "flux_wires"
+        / "Ti-RAFM-1a_25cm.ASC"
+    )
+
+    spectrum = create_reader_factory().read(asc_path)
+
+    assert len(spectrum.counts) == 8192
+    assert spectrum.live_time > 0.0
+    assert spectrum.real_time >= spectrum.live_time
+    assert spectrum.energy_calibration[1] > 0.0
+    assert spectrum.metadata["format"] == "genie2000"
 
 
 def test_write_n42_file_validates_against_bundled_schema(tmp_path):
@@ -195,9 +215,10 @@ def test_recent_files_manager_and_drop_normalization():
     manager.record("/tmp/b.n42")
     files = manager.record_many(["/tmp/c.n42", "/tmp/a.n42", "/tmp/c.n42"])
 
-    assert files == ("/tmp/c.n42", "/tmp/a.n42", "/tmp/b.n42")
-    assert settings.sync_count >= 3
-    assert normalize_dropped_paths(["/tmp/a.n42", "/tmp/a.n42", Path("/tmp/b.n42")]) == (
-        "/tmp/a.n42",
-        "/tmp/b.n42",
+    assert files == tuple(
+        str(Path(path)) for path in ("/tmp/c.n42", "/tmp/a.n42", "/tmp/b.n42")
     )
+    assert settings.sync_count >= 3
+    assert normalize_dropped_paths(
+        ["/tmp/a.n42", "/tmp/a.n42", Path("/tmp/b.n42")]
+    ) == tuple(str(Path(path)) for path in ("/tmp/a.n42", "/tmp/b.n42"))

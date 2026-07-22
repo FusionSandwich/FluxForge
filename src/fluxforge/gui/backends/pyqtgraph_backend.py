@@ -25,7 +25,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     try:
         import pyqtgraph as pg
 
-        from fluxforge.gui.qt_compat import QHBoxLayout, QLabel, QVBoxLayout, QWidget
+        from fluxforge.gui.qt_compat import (
+            QHBoxLayout,
+            QLabel,
+            QPushButton,
+            QVBoxLayout,
+            QWidget,
+        )
 
         PYQTGRAPH_AVAILABLE = True
         PYQTGRAPH_IMPORT_ERROR = None
@@ -71,6 +77,8 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._residual_visible = False
             self._log_scale = False
             self._peak_labels_visible = True
+            self._x_axis_is_energy = False
+            self._syncing_roi_region = False
 
             shell = QVBoxLayout(self)
             shell.setContentsMargins(0, 0, 0, 0)
@@ -88,6 +96,42 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.status_label = QLabel("No spectrum loaded", self)
             self.status_label.setObjectName("CanvasMeta")
             header.addWidget(self.status_label)
+
+            self.roi_button = QPushButton("Select ROI", self)
+            self.roi_button.setObjectName("SpectrumSelectRoiButton")
+            self.roi_button.setCheckable(True)
+            self.roi_button.setToolTip(
+                "Show draggable ROI boundaries. Drag either handle to set the analysis limits."
+            )
+            self.roi_button.toggled.connect(self._set_roi_visible)
+            header.addWidget(self.roi_button)
+
+            self.clear_roi_button = QPushButton("Clear ROI", self)
+            self.clear_roi_button.setObjectName("SpectrumClearRoiButton")
+            self.clear_roi_button.clicked.connect(self._clear_roi)
+            header.addWidget(self.clear_roi_button)
+
+            self.zoom_in_button = QPushButton("Zoom +", self)
+            self.zoom_in_button.setObjectName("SpectrumZoomInButton")
+            self.zoom_in_button.setToolTip("Zoom into the center of the current spectrum view.")
+            self.zoom_in_button.clicked.connect(lambda: self._zoom_view(0.65))
+            header.addWidget(self.zoom_in_button)
+
+            self.zoom_out_button = QPushButton("Zoom −", self)
+            self.zoom_out_button.setObjectName("SpectrumZoomOutButton")
+            self.zoom_out_button.setToolTip(
+                "Zoom out from the center of the current spectrum view."
+            )
+            self.zoom_out_button.clicked.connect(lambda: self._zoom_view(1.5))
+            header.addWidget(self.zoom_out_button)
+
+            self.reset_view_button = QPushButton("Reset View", self)
+            self.reset_view_button.setObjectName("SpectrumResetViewButton")
+            self.reset_view_button.setToolTip(
+                "Fit the full spectrum. Use the mouse wheel to zoom and left-drag to pan."
+            )
+            self.reset_view_button.clicked.connect(self.reset_view)
+            header.addWidget(self.reset_view_button)
 
             shell.addLayout(header)
 
@@ -114,6 +158,20 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._peak_scatter.sigClicked.connect(self._peak_scatter_clicked)
             self.plot_item.addItem(self._peak_scatter)
+            self._roi_region = pg.LinearRegionItem(
+                values=(0.0, 1.0),
+                orientation="vertical",
+                movable=True,
+                brush=pg.mkBrush(15, 118, 110, 48),
+                pen=pg.mkPen(color="#2dd4bf", width=1.5),
+                hoverPen=pg.mkPen(color="#f8fafc", width=2.0),
+            )
+            self._roi_region.setZValue(20)
+            self._roi_region.setVisible(False)
+            self._roi_region.sigRegionChangeFinished.connect(
+                self._publish_roi_region
+            )
+            self.plot_item.addItem(self._roi_region)
             shell.addWidget(self.plot, 1)
 
             self.residual_row = QWidget(self)
@@ -168,6 +226,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
 
             self._current_traces = tuple(traces)
+            self._x_axis_is_energy = traces[0].x_axis_label.lower().startswith(
+                "energy"
+            )
+            self.plot.setLabel("bottom", traces[0].x_axis_label)
             for item in self._overlay_traces:
                 self.plot_item.removeItem(item)
             self._overlay_traces.clear()
@@ -280,7 +342,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._peak_candidates_by_id = {
                 str(peak.peak_id): peak for peak in peaks if peak.peak_id
             }
-            x_values = [float(peak.channel) for peak in peaks]
+            x_values = [
+                float(peak.energy_keV if self._x_axis_is_energy else peak.channel)
+                for peak in peaks
+            ]
             y_values = [
                 self._display_value(
                     float(
@@ -359,6 +424,60 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.set_peak_candidates(())
             self.set_peak_residuals((), visible=False)
             self.status_label.setText("No spectrum loaded")
+            self._roi_region.setVisible(False)
+            self.roi_button.setChecked(False)
+
+        def reset_view(self) -> None:
+            """Fit all visible traces while retaining mouse pan and wheel zoom."""
+
+            self.plot_item.enableAutoRange(x=True, y=True)
+            self.plot_item.autoRange()
+
+        def _zoom_view(self, factor: float) -> None:
+            """Apply a centered zoom while keeping free mouse pan/zoom enabled."""
+
+            self.plot_item.disableAutoRange()
+            self.plot_item.getViewBox().scaleBy((float(factor), float(factor)))
+
+        def _set_roi_visible(self, visible: bool) -> None:
+            bounds = (
+                self.selection_bus.state.roi_bounds_keV
+                if visible and self.selection_bus is not None
+                else None
+            )
+            if visible and bounds is None:
+                x_range = self.plot_item.viewRange()[0]
+                width = max(float(x_range[1] - x_range[0]), 1.0)
+                bounds = (
+                    float(x_range[0] + 0.4 * width),
+                    float(x_range[0] + 0.6 * width),
+                )
+            if bounds is not None:
+                self._syncing_roi_region = True
+                self._roi_region.setRegion(bounds)
+                self._syncing_roi_region = False
+            self._roi_region.setVisible(bool(visible))
+
+        def _publish_roi_region(self) -> None:
+            if self._syncing_roi_region or self.selection_bus is None:
+                return
+            lower, upper = self._roi_region.getRegion()
+            self.selection_bus.publish_roi(float(lower), float(upper))
+
+        def _clear_roi(self) -> None:
+            self.roi_button.setChecked(False)
+            if self.selection_bus is None:
+                return
+            state = self.selection_bus.state
+            self.selection_bus.publish(
+                SelectionState(
+                    peak_energy_keV=state.peak_energy_keV,
+                    roi_bounds_keV=None,
+                    nuclide=state.nuclide,
+                    reference_lines_keV=state.reference_lines_keV,
+                    annotation_lines=state.annotation_lines,
+                )
+            )
 
         def set_log_scale(self, enabled: bool) -> None:
             self._log_scale = bool(enabled)
@@ -371,6 +490,19 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.set_annotation_lines(self._annotation_specs)
 
         def _on_selection_changed(self, state: SelectionState) -> None:
+            if state.roi_bounds_keV is not None:
+                self._syncing_roi_region = True
+                self._roi_region.setRegion(state.roi_bounds_keV)
+                self._syncing_roi_region = False
+                self._roi_region.setVisible(True)
+                self.roi_button.blockSignals(True)
+                self.roi_button.setChecked(True)
+                self.roi_button.blockSignals(False)
+            else:
+                self._roi_region.setVisible(False)
+                self.roi_button.blockSignals(True)
+                self.roi_button.setChecked(False)
+                self.roi_button.blockSignals(False)
             if state.reference_lines_keV or state.annotation_lines:
                 annotations = list(state.annotation_lines)
                 if not annotations:

@@ -153,9 +153,19 @@ Then verify that you can:
    geometry, window thickness, detector dimensions, dead layer, angle,
    source distance, and relative uncertainty;
 4. fit and accept the efficiency curve;
-5. run activity, inventory, masking, and optimization views.
+5. run activity, inventory, masking, and optimization views once the required
+   peak-identification and calibration inputs are populated.
 
-The maintained CLI replay checks the same committed RAFM assets:
+The unfolding workspace accepts a FluxForge `reaction_rates` JSON artifact
+and a response matrix. Load the measured-rate artifact first, then load a
+response matrix with the same number of rows. FluxForge rejects a mismatch;
+it does not replace measured rates with synthetic values. The flux plot uses
+the response energy boundaries and provides log-energy, log-flux, uncertainty,
+mouse zoom/pan, and **Reset Plot Views** controls.
+
+The maintained planning replay uses committed, processed RAFM reference
+artifacts. It is useful for checking the activity/inventory/optimization UI,
+but it is not a substitute for a new raw-spectrum-to-reaction-rate reduction:
 
 ```bash
 fluxforge phase6-ldrd-worked-example \

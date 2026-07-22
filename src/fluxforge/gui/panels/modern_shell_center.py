@@ -32,9 +32,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         import pyqtgraph as pg
 
     from fluxforge.gui.backends import PyQtGraphSpectrumCanvas
-    from fluxforge.gui.panels.modern_shell_shared import card as _card
     from fluxforge.gui.qt_compat import (
-        QFrame,
         QDoubleSpinBox,
         QGridLayout,
         QHBoxLayout,
@@ -66,18 +64,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout = QVBoxLayout(self)
             layout.setContentsMargins(16, 16, 16, 16)
             layout.setSpacing(12)
-
-            intro = QLabel(
-                (
-                    "Predictive analytics use the current ROI, loaded-spectrum history, "
-                    "and QA trend data to estimate target-count timing, dead-time saturation, "
-                    "and recalibration risk without requiring live MCA acquisition."
-                ),
-                self,
-            )
-            intro.setObjectName("PanelBody")
-            intro.setWordWrap(True)
-            layout.addWidget(intro)
 
             controls = QHBoxLayout()
             controls.addWidget(QLabel("Target ROI counts", self))
@@ -295,94 +281,35 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _build_spectrum_tab(self) -> QWidget:
             widget = QWidget(self)
             layout = QVBoxLayout(widget)
-            layout.setContentsMargins(24, 24, 24, 24)
-            layout.setSpacing(18)
+            layout.setContentsMargins(14, 14, 14, 14)
+            layout.setSpacing(10)
 
             self.standards_banner = QLabel(widget)
             self.standards_banner.setObjectName("StandardsBanner")
             self.standards_banner.setVisible(False)
             layout.addWidget(self.standards_banner)
 
-            hero = QFrame(widget)
-            hero.setObjectName("HeroCanvas")
-            hero_layout = QVBoxLayout(hero)
-            hero_layout.setContentsMargins(28, 28, 28, 28)
-            hero_layout.setSpacing(10)
-
-            eyebrow = QLabel("FluxForge Next", hero)
-            eyebrow.setObjectName("HeroEyebrow")
-            hero_layout.addWidget(eyebrow)
-
-            title = QLabel("Native, dockable HPGe workspace", hero)
-            title.setObjectName("HeroHeader")
-            hero_layout.addWidget(title)
-
-            subtitle = QLabel(
-                (
-                    "PySide6 shell with a PyQtGraph-first spectrum canvas, standards-aware "
-                    "workflow modes, and a clearly separated legacy fallback."
-                ),
-                hero,
-            )
-            subtitle.setWordWrap(True)
-            subtitle.setObjectName("HeroSubhead")
-            hero_layout.addWidget(subtitle)
-            layout.addWidget(hero)
-
             self.spectrum_slot_tabs = QTabBar(widget)
             self.spectrum_slot_tabs.setObjectName("CanvasSpectrumTabs")
             self.spectrum_slot_tabs.currentChanged.connect(self._slot_tab_changed)
             layout.addWidget(self.spectrum_slot_tabs)
-
-            body = QHBoxLayout()
-            body.setSpacing(18)
-            layout.addLayout(body, 1)
 
             if PYQTGRAPH_AVAILABLE:
                 self.canvas = PyQtGraphSpectrumCanvas(
                     selection_bus=self.selection_bus,
                     parent=widget,
                 )
-                body.addWidget(self.canvas, 3)
+                layout.addWidget(self.canvas, 1)
             else:
                 status = pyqtgraph_backend_status()
                 reason = status["reason"] or "Install the native GUI extras."
-                body.addWidget(
-                    _card(
-                        "Renderer pending optional extras",
-                        "The production canvas is wired, but this local environment does not have PySide6 + PyQtGraph installed.",
-                        f"Import status: {reason}",
-                    ),
-                    3,
+                renderer_status = QLabel(
+                    f"Spectrum renderer unavailable: {reason}",
+                    widget,
                 )
-
-            rail = QWidget(widget)
-            rail_layout = QVBoxLayout(rail)
-            rail_layout.setContentsMargins(0, 0, 0, 0)
-            rail_layout.setSpacing(18)
-            rail_layout.addWidget(
-                _card(
-                    "Visual Feedback First",
-                    "Peak fits, calibration, results, and standards context stay visible around the canvas instead of hiding behind modal-only flows.",
-                    "Design target: bGamma polish with InterSpec-grade canvas interaction.",
-                )
-            )
-            rail_layout.addWidget(
-                _card(
-                    "Shared Analytical State",
-                    "SelectionBus synchronizes the peak table, sidebar, and tool inspector around the same active ROI or nuclide.",
-                    "Current shell wiring already reflects cross-panel selection state.",
-                )
-            )
-            rail_layout.addWidget(
-                _card(
-                    "Offline-First Reporting",
-                    "Session provenance, native exports, and report templates stay local and reproducible.",
-                    "Roadmap target: Jinja2 templates with residuals embedded by default.",
-                )
-            )
-            rail_layout.addStretch(1)
-            body.addWidget(rail, 2)
+                renderer_status.setObjectName("PanelBody")
+                renderer_status.setWordWrap(True)
+                layout.addWidget(renderer_status, 1)
 
             return widget
 
@@ -437,28 +364,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.setContentsMargins(24, 24, 24, 24)
             layout.setSpacing(18)
 
-            title = QLabel("Digital twin hardware dashboard", widget)
+            title = QLabel("Acquisition and Prediction", widget)
             title.setObjectName("HeroHeader")
             layout.addWidget(title)
 
-            subtitle = QLabel(
-                "Reserved for MCA device discovery, status telemetry, live acquisition, and the future spectrogram surface.",
-                widget,
-            )
+            subtitle = QLabel("Forecasts derived from the active spectrum and QA history.", widget)
             subtitle.setWordWrap(True)
             subtitle.setObjectName("HeroSubhead")
             layout.addWidget(subtitle)
-
-            predictive_note = QLabel(
-                (
-                    "Live MCA transport remains deferred, but the predictive subset from the "
-                    "GUI plan is now active here using offline spectra and QA history."
-                ),
-                widget,
-            )
-            predictive_note.setObjectName("HeroCardAccent")
-            predictive_note.setWordWrap(True)
-            layout.addWidget(predictive_note)
 
             self.predictive_dashboard = PredictiveDashboardPanel(
                 selection_bus=self.selection_bus,
@@ -513,8 +426,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                             else "Foreground"
                         ),
                         counts=tuple(float(value) for value in primary_counts),
-                        channels=tuple(float(value) for value in np.asarray(foreground.channels, dtype=float)),
+                        channels=tuple(
+                            float(value)
+                            for value in np.asarray(
+                                foreground.energies
+                                if foreground.energies is not None
+                                else foreground.channels,
+                                dtype=float,
+                            )
+                        ),
                         color="#72d6ff",
+                        x_axis_label=(
+                            "Energy (keV)"
+                            if foreground.energies is not None
+                            else "Channel"
+                        ),
                     )
                 )
             if background is not None and state.background_visible:
@@ -526,8 +452,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                             else "Background"
                         ),
                         counts=tuple(float(value) for value in np.asarray(background.counts, dtype=float)),
-                        channels=tuple(float(value) for value in np.asarray(background.channels, dtype=float)),
+                        channels=tuple(
+                            float(value)
+                            for value in np.asarray(
+                                background.energies
+                                if background.energies is not None
+                                else background.channels,
+                                dtype=float,
+                            )
+                        ),
                         color="#f59e0b",
+                        x_axis_label=(
+                            "Energy (keV)"
+                            if background.energies is not None
+                            else "Channel"
+                        ),
                     )
                 )
             if overlay is not None:
@@ -539,8 +478,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                             else "Secondary Overlay"
                         ),
                         counts=tuple(float(value) for value in np.asarray(overlay.counts, dtype=float)),
-                        channels=tuple(float(value) for value in np.asarray(overlay.channels, dtype=float)),
+                        channels=tuple(
+                            float(value)
+                            for value in np.asarray(
+                                overlay.energies
+                                if overlay.energies is not None
+                                else overlay.channels,
+                                dtype=float,
+                            )
+                        ),
                         color="#10b981",
+                        x_axis_label=(
+                            "Energy (keV)"
+                            if overlay.energies is not None
+                            else "Channel"
+                        ),
                     )
                 )
             self.canvas.set_traces(traces)

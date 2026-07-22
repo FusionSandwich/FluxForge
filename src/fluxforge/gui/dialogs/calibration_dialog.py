@@ -57,6 +57,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
         QListWidgetItem,
         QPushButton,
         QComboBox,
+        QScrollArea,
         QSlider,
         QSpinBox,
         QSplitter,
@@ -130,7 +131,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
         ) -> None:
             super().__init__(parent)
             self.setObjectName("CalibrationWorkspaceDialog")
-            self.setWindowTitle("FluxForge Next - Unified Calibration Workspace")
+            self.setWindowTitle("FluxForge — Calibration Workspace")
             self.resize(1540, 960)
             self.setModal(False)
 
@@ -379,6 +380,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
 
             controls_panel = QWidget(splitter)
+            controls_scroll = QScrollArea(splitter)
+            controls_scroll.setObjectName("CalibrationControlsScrollArea")
+            controls_scroll.setWidgetResizable(True)
+            controls_scroll.setWidget(controls_panel)
             controls_layout = QVBoxLayout(controls_panel)
             controls_layout.setContentsMargins(0, 0, 0, 0)
             controls_layout.setSpacing(12)
@@ -570,7 +575,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             controls_layout.addLayout(action_row)
 
             splitter.addWidget(plots_panel)
-            splitter.addWidget(controls_panel)
+            splitter.addWidget(controls_scroll)
             splitter.setStretchFactor(0, 3)
             splitter.setStretchFactor(1, 2)
 

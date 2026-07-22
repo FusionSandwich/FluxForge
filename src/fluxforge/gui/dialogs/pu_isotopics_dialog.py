@@ -67,7 +67,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             parent=None,
         ) -> None:
             super().__init__(parent)
-            self.setWindowTitle("FluxForge Next - Pu Isotopics Wizard")
+            self.setWindowTitle("FluxForge — Pu Isotopics")
             self.resize(980, 760)
             self._observations = _build_observations_from_peaks(peaks)
             self._efficiency_uncertainty_pct = efficiency_uncertainty_pct

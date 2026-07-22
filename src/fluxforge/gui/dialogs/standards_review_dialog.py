@@ -31,7 +31,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             parent=None,
         ) -> None:
             super().__init__(parent)
-            self.setWindowTitle("FluxForge Next - ASTM Standards Review")
+            self.setWindowTitle("FluxForge — ASTM Standards Review")
             self.resize(1180, 880)
             self.evaluation_factory = evaluation_factory
             self.evaluations: tuple[StandardsEvaluation, ...] = ()

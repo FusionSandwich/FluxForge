@@ -26,9 +26,9 @@ def _load_weasyprint_html():
 
     try:
         module = import_module("weasyprint")
-    except ImportError as exc:  # pragma: no cover - optional dependency branch
+    except Exception as exc:  # pragma: no cover - optional/native dependency branch
         raise RuntimeError(
-            "PDF export requires the optional reporting extra (`WeasyPrint`)."
+            "PDF export requires a working WeasyPrint installation and its native libraries."
         ) from exc
     return module.HTML
 

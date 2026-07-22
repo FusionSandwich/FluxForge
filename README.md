@@ -22,7 +22,7 @@ run `fluxforge commands` to see the grouped CLI surface.
 | Reactor dosimetry and unfolding | Build response matrices, run ASTM-style workflows, unfold spectra, compare results, and report | `astm-e2005`, `astm-e261`, `astm-e262`, `astm-e3376`, `response`, `unfold`, `compare`, `report`, `reactions` |
 | k0-NAA | Normalize peak observations, characterize detector and facility state, analyze, aggregate, QA/QC, and report | `k0-normalize`, `k0-detector`, `k0-facility`, `k0-analyze`, `k0-aggregate`, `k0-qaqc`, `k0-report`, `k0-import-kayzero` |
 | Validation and replay | Run parity, crosswalk, release-gate, and bundled RAFM replay workflows | `parity-check`, `phase5-crosswalk-report`, `phase5-release-gate`, `rafm-validate`, `phase6-ldrd-worked-example` |
-| Desktop GUI | Review spectra interactively, drag ROIs and peak centroids, and inspect linked analysis panels | `fluxforge gui`, `fluxforge-gui` |
+| Desktop GUI | Review spectra interactively, zoom/pan, set ROI boundaries, and inspect linked analysis panels | `fluxforge gui`, `fluxforge-gui` |
 
 ## Quick GUI Setup
 
@@ -127,12 +127,12 @@ Recommended first files:
 
 Recommended first interactions:
 
-1. Load the foreground and background spectra.
-2. Zoom into a photopeak-rich region.
-3. Drag the ROI directly on the main canvas.
-4. Drag the sideband handles if you want ROI-sideband background estimation.
-5. Select a peak and drag its centroid to refine it.
-6. Right-click near a peak to use context actions such as select peak, use peak ROI, clear identification, delete peak, add manual peak, and assign foreground/background/overlay roles.
+1. Use **File > Open Spectrum** to load the foreground `.ASC` file.
+2. Use the mouse wheel to zoom and left-drag to pan the calibrated energy axis.
+3. Click **Select ROI**, then drag either boundary on the main canvas.
+4. Open **ROI Tools** to choose the background model and run the bounded analysis.
+5. Click **Reset View** to return to the full spectrum or **Clear ROI** to remove the boundaries.
+6. Use the spectrum tabs and background controls to compare foreground, background, and overlay spectra.
 
 If you prefer the direct GUI entrypoint, `fluxforge-gui --project-dir .` launches the same modern Qt shell when the `native-gui` extra is installed.
 

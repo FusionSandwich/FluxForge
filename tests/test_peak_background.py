@@ -3,7 +3,11 @@ import pytest
 np = pytest.importorskip("numpy")
 pytest.importorskip("scipy")
 
-from fluxforge.analysis.peakfit import estimate_background, five_point_smooth
+from fluxforge.analysis.peakfit import (
+    estimate_background,
+    fit_single_peak,
+    five_point_smooth,
+)
 
 
 def test_five_point_smooth_constant():
@@ -23,3 +27,14 @@ def test_snip_background_constant():
         np.arange(len(counts)), counts, method="snip", iterations=10
     )
     assert np.allclose(background, counts, atol=1e-6)
+
+
+def test_single_peak_fit_accepts_negative_background_subtracted_bins():
+    channels = np.arange(101, dtype=float)
+    counts = 80.0 * np.exp(-0.5 * ((channels - 50.0) / 3.0) ** 2) - 2.0
+
+    with np.errstate(invalid="raise"):
+        result = fit_single_peak(channels, counts, peak_channel=50.0, fit_width=12)
+
+    assert np.isfinite(result.peak.centroid)
+    assert np.isfinite(result.peak.area)

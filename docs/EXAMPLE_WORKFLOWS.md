@@ -102,12 +102,12 @@ Recommended first files:
 
 Recommended first interactions:
 
-1. Load the foreground and background spectra.
-2. Zoom into a photopeak region.
-3. Drag the ROI directly on the plot.
-4. Drag the ROI sidebands if you want sideband background estimation.
-5. Drag a selected peak centroid to refine the fit anchor.
-6. Use the right-click menu for manual peak insertion, deletion, line-ID clearing, and foreground/background/overlay role changes.
+1. Use **File > Open Spectrum** to load the foreground `.ASC` file.
+2. Use the mouse wheel to zoom and left-drag to pan the calibrated energy axis.
+3. Click **Select ROI**, then drag either boundary on the plot.
+4. Open **ROI Tools** to select the background method and run the bounded analysis.
+5. Click **Reset View** to show the full spectrum or **Clear ROI** to remove the selection.
+6. Use the spectrum tabs and background controls to compare foreground, background, and overlay spectra.
 
 ### D. Manual Peak Inspection
 

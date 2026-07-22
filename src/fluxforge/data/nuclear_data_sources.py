@@ -269,6 +269,12 @@ def _normalize_source_locator(locator: str | Path) -> str:
     return text
 
 
+def _is_windows_local_path(locator: str) -> bool:
+    """Return whether a locator starts with a Windows drive-qualified path."""
+
+    return re.match(r"^[A-Za-z]:[\\/]", locator) is not None
+
+
 def _user_library_registry_path() -> Path:
     override = str(os.getenv(_USER_LIBRARY_REGISTRY_ENV, "")).strip()
     if override:
@@ -585,8 +591,12 @@ def register_user_gamma_source(
         raise ValueError("A non-empty alias is required for user libraries.")
     resolved_locator = _normalize_source_locator(locator)
     parsed = urlparse(resolved_locator)
-    if parsed.scheme in {"", "file"}:
-        local_path = Path(parsed.path if parsed.scheme == "file" else resolved_locator)
+    if parsed.scheme in {"", "file"} or _is_windows_local_path(resolved_locator):
+        local_path = Path(
+            parsed.path
+            if parsed.scheme == "file" and not _is_windows_local_path(resolved_locator)
+            else resolved_locator
+        )
         if not local_path.exists():
             raise FileNotFoundError(f"User library path does not exist: {local_path}")
     if parsed.scheme == "sqlite":
@@ -701,8 +711,10 @@ def _load_custom_gamma_source_from_locator(locator: str | Path) -> GammaDatabase
     parsed = urlparse(source)
     scheme = parsed.scheme.lower()
 
-    if scheme in {"", "file"}:
-        local_path = Path(parsed.path if scheme == "file" else source)
+    if scheme in {"", "file"} or _is_windows_local_path(source):
+        local_path = Path(
+            parsed.path if scheme == "file" and not _is_windows_local_path(source) else source
+        )
         if local_path.suffix.lower() in {".yaml", ".yml"}:
             try:
                 import yaml  # type: ignore

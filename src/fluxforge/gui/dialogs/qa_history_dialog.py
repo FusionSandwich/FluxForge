@@ -31,7 +31,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional GUI bran
 
         def __init__(self, qa_monitor: QAMonitor, parent=None) -> None:
             super().__init__(parent)
-            self.setWindowTitle("FluxForge Next - QA History")
+            self.setWindowTitle("FluxForge — QA History")
             self.resize(1180, 900)
             self.qa_monitor = qa_monitor
 

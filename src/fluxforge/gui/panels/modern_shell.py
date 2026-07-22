@@ -3024,19 +3024,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.addTab(self.second_irradiation_panel, "Second Irradiation")
             self.phase5_parity_panel = Phase5ParityPanel(parent=self)
-            self.addTab(self.phase5_parity_panel, "Phase 5 Parity")
+            # This developer parity harness participates in saved workflow state,
+            # but it is not a user-facing analysis tab. A parented QWidget that
+            # is not added to the tab stack otherwise paints over the active tab.
+            self.phase5_parity_panel.hide()
             self.batch_queue_panel = BatchQueuePanel(
                 workspace_controller=self.workspace_controller,
                 parent=self,
             )
             self.addTab(self.batch_queue_panel, "Batch Queue")
-            self.addTab(
-                self._text_panel(
-                    "Spectrogram",
-                    "Reserved for the future time-energy color-map view and interim multi-spectrum history heatmap.",
-                ),
-                "Spectrogram",
-            )
             self.survey_map_panel = SurveyMapPanel(
                 workspace_controller=self.workspace_controller,
                 parent=self,
@@ -3082,10 +3078,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(title)
 
             body = QLabel(
-                (
-                    "Calibration now uses the dedicated Qt workspace rather "
-                    "than expanding the old bottom-tab editor."
-                ),
+                "Open the calibration workspace for energy, resolution, efficiency, ROI fitting, and detector profiles.",
                 widget,
             )
             body.setObjectName("PanelBody")

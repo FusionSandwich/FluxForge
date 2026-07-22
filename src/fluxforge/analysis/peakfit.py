@@ -1340,7 +1340,10 @@ def fit_single_peak(
     y = counts[ch_lo:ch_hi].astype(float)
 
     # Weights for chi-squared (Poisson uncertainty)
-    weights = 1.0 / np.maximum(np.sqrt(y), 1.0)
+    # Background subtraction can legitimately leave negative bins. Poisson
+    # variance is undefined there, so use a zero-count floor instead of taking
+    # sqrt of a negative value and silently producing NaN fit weights.
+    weights = 1.0 / np.maximum(np.sqrt(np.clip(y, 0.0, None)), 1.0)
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()

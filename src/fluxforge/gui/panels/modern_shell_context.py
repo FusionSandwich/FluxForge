@@ -8,14 +8,11 @@ from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
-    from fluxforge.gui.panels.modern_shell_shared import (
-        card as _card,
-        selection_summary as _selection_summary,
-    )
+    from fluxforge.gui.panels.modern_shell_shared import selection_summary as _selection_summary
     from fluxforge.gui.qt_compat import QLabel, QVBoxLayout, QWidget
 
     class ToolContextPanel(QWidget):
-        """Right-side contextual tool panel placeholder."""
+        """Right-side live analysis context."""
 
         def __init__(
             self,
@@ -52,20 +49,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.workspace_summary.setObjectName("PanelBody")
             layout.addWidget(self.workspace_summary)
 
-            layout.addWidget(
-                _card(
-                    "Current focus",
-                    "ROI bounds, calibration points, peak model settings, and standards locks will appear here.",
-                    "This panel stays contextual instead of burying settings in modal-only flows.",
-                )
-            )
-            layout.addWidget(
-                _card(
-                    "Recommended defaults",
-                    "Expert mode keeps all defensible methods available while still surfacing a documented recommended path.",
-                    "Standards mode replaces recommendations with locked requirements.",
-                )
-            )
+            self.analysis_summary = QLabel(self)
+            self.analysis_summary.setWordWrap(True)
+            self.analysis_summary.setObjectName("PanelBody")
+            layout.addWidget(self.analysis_summary)
             layout.addStretch(1)
 
             self.mode_manager.subscribe(self._sync_mode)
@@ -120,6 +107,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     f"Pinned nuclides: {', '.join(state.pinned_nuclides) or 'none'}\n"
                     f"Background: {state.background_mode} "
                     f"({'visible' if state.background_visible else 'hidden'})"
+                )
+            )
+            roi = state.roi_analysis
+            efficiency = state.efficiency_fit
+            self.analysis_summary.setText(
+                (
+                    f"Efficiency calibration: {'ready' if efficiency is not None else 'not fitted'}\n"
+                    f"Activity results: {len(state.activity_results)}\n"
+                    f"ROI analysis: "
+                    f"{f'{roi.roi_bounds_keV[0]:.2f}-{roi.roi_bounds_keV[1]:.2f} keV' if roi is not None else 'not run'}"
                 )
             )
 
