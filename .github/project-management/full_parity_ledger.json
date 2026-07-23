@@ -81,11 +81,11 @@
       "notes": "Initial executable workflow cases exist; same-input end-to-end competitor and UWNR golden suites remain open."
     },
     {
-      "id": "3.24", "title": "Direct-manipulation spectrum canvas", "roadmap": "Phase 3B", "status": "prototype",
+      "id": "3.24", "title": "Direct-manipulation spectrum canvas", "roadmap": "Phase 3B", "status": "implemented",
       "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy", "hyperlab"],
-      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
-      "evidence": ["src/fluxforge/gui/spectrum_canvas.py", "src/fluxforge/gui/backends/pyqtgraph_backend.py", "src/fluxforge/gui/canvas_intents.py", "src/fluxforge/gui/workspace_undo.py", "tests/test_canvas_intents.py", "tests/test_workspace_undo.py", "tests/test_analysis_workspace_qt.py"],
-      "notes": "Renderer-independent intents, focused undo commands, and persisted viewports are implemented with Windows/Linux tests. Direct peak/ROI/sideband mouse manipulation and native desktop automation remain for gui/02, so this stays prototype."
+      "backend": "implemented", "cli": "not-applicable", "gui": "implemented", "fixture": "not-applicable", "test": "implemented",
+      "evidence": ["src/fluxforge/gui/spectrum_canvas.py", "src/fluxforge/gui/backends/pyqtgraph_backend.py", "src/fluxforge/gui/canvas_intents.py", "src/fluxforge/gui/canvas_controller.py", "src/fluxforge/gui/workspace_undo.py", "tests/test_pyqtgraph_direct_interactions.py", "tests/test_bgamma_canvas_integration_qt.py", "tests/test_canvas_intent_dispatcher.py", "tests/test_workspace_undo.py", "docs/BRANCH02_DIRECT_MANIPULATION_EVIDENCE.md"],
+      "notes": "Shift-drag ROI creation, signal and sideband handles, exact peak selection and centroid dragging, context actions, spectrum roles, table/plot synchronization, focused undo/redo, viewport persistence, and stale-analysis invalidation are implemented. Real Qt mouse tests pass on Windows and Linux/X11; final release-level Wayland, scaling, and accessibility coverage remains tracked by 3.27."
     },
     {
       "id": "3.25", "title": "Modern Qt parity workspaces", "roadmap": "Phase 3B", "status": "prototype",
@@ -316,32 +316,32 @@
       "notes": "Mini residual rendering exists; complete modes, linked ranges, per-channel severity, and persisted mode defaults remain open."
     },
     {
-      "id": "BG.4", "title": "Direct ROI, sideband, and peak manipulation with undo", "roadmap": "bGamma carryover", "status": "prototype",
+      "id": "BG.4", "title": "Direct ROI, sideband, and peak manipulation with undo", "roadmap": "bGamma carryover", "status": "implemented",
       "source_urls": ["fluxforge-roadmap", "interspec", "hyperlab"],
-      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
-      "evidence": ["src/fluxforge/gui/backends/pyqtgraph_backend.py", "src/fluxforge/gui/analysis_workspace.py", "tests/test_analysis_workspace_qt.py"],
-      "notes": "Some direct manipulation and undo infrastructure exists; the complete renderer-independent intent/command contract and native mouse evidence remain open."
+      "backend": "implemented", "cli": "not-applicable", "gui": "implemented", "fixture": "not-applicable", "test": "implemented",
+      "evidence": ["src/fluxforge/gui/backends/pyqtgraph_backend.py", "src/fluxforge/gui/canvas_controller.py", "src/fluxforge/gui/analysis_workspace.py", "tests/test_pyqtgraph_direct_interactions.py", "tests/test_bgamma_canvas_integration_qt.py", "docs/BRANCH02_DIRECT_MANIPULATION_EVIDENCE.md"],
+      "notes": "Canonical ROI signal/sideband and peak-centroid edits are emitted as renderer-independent intents, committed once per completed drag, persisted in WorkspaceDocument v2, and covered by exact undo/redo and native Windows/Linux mouse tests."
     },
     {
-      "id": "BG.5", "title": "Context actions, assignments, pins, tags, overlap edits, and spectrum roles", "roadmap": "bGamma carryover", "status": "prototype",
+      "id": "BG.5", "title": "Context actions, assignments, pins, tags, overlap edits, and spectrum roles", "roadmap": "bGamma carryover", "status": "implemented",
       "source_urls": ["fluxforge-roadmap", "interspec", "hyperlab"],
-      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
-      "evidence": ["src/fluxforge/gui/panels/modern_shell.py", "src/fluxforge/gui/analysis_workspace.py", "tests/test_analysis_workspace_qt.py"],
-      "notes": "Several actions exist; complete context-menu reachability, overlap split/merge, persistence, and undo coverage remain open."
+      "backend": "implemented", "cli": "not-applicable", "gui": "implemented", "fixture": "not-applicable", "test": "implemented",
+      "evidence": ["src/fluxforge/gui/backends/pyqtgraph_backend.py", "src/fluxforge/gui/canvas_controller.py", "src/fluxforge/gui/analysis_workspace.py", "tests/test_pyqtgraph_direct_interactions.py", "tests/test_canvas_intent_dispatcher.py"],
+      "notes": "The spectrum context menu exposes stable-ID add/select/move/delete, assignment, pin, tag, component add/split/merge, ROI, viewport, crosshair, export, and foreground/background/secondary role actions with persistence and focused undo coverage."
     },
     {
-      "id": "BG.6", "title": "Graph-table synchronization and plot-driven edits", "roadmap": "bGamma carryover", "status": "prototype",
+      "id": "BG.6", "title": "Graph-table synchronization and plot-driven edits", "roadmap": "bGamma carryover", "status": "implemented",
       "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy"],
-      "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "prototype", "test": "prototype",
-      "evidence": ["src/fluxforge/gui/selection_bus.py", "src/fluxforge/gui/panels/modern_shell.py", "tests/test_analysis_workspace_qt.py"],
-      "notes": "Selection synchronization exists; persisted ROI ownership and complete bidirectional edit propagation remain open."
+      "backend": "implemented", "cli": "not-applicable", "gui": "implemented", "fixture": "not-applicable", "test": "implemented",
+      "evidence": ["src/fluxforge/gui/selection_bus.py", "src/fluxforge/gui/panels/modern_shell.py", "src/fluxforge/gui/panels/modern_shell_center.py", "tests/test_bgamma_canvas_integration_qt.py"],
+      "notes": "Exact spectrum, ROI, and peak IDs drive bidirectional table/plot selection, including duplicate-energy peaks; table selection zooms to the canonical ROI, plot edits refresh tables and clear stale derived results, and save/reload preserves the edits."
     },
     {
       "id": "BG.7", "title": "Canvas navigation, crosshair, export, and keyboard access", "roadmap": "bGamma carryover", "status": "prototype",
       "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy"],
       "backend": "not-applicable", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
       "evidence": ["src/fluxforge/gui/spectrum_canvas.py", "src/fluxforge/gui/backends/pyqtgraph_backend.py", "tests/test_modern_gui_shell.py"],
-      "notes": "Zoom, pan, reset, and export foundations exist; all scientific plots still require consistent crosshair, keyboard, scaling, and native evidence."
+      "notes": "The primary spectrum canvas now has zoom, pan, reset, crosshair/readout, persisted viewport state, and an export action with native Windows/Linux interaction evidence. This carryover remains prototype until the same navigation and keyboard contract is applied to every scientific plot."
     },
     {
       "id": "BG.8", "title": "Self-contained analytical reports with plot diagnostics", "roadmap": "bGamma carryover", "status": "prototype",

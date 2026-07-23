@@ -10,8 +10,8 @@ that share one explicit drag token into a single undo-stack entry.
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import dataclass
-from typing import Protocol, Sequence, TypeAlias
+from dataclasses import dataclass, replace
+from typing import Any, Mapping, Protocol, Sequence, TypeAlias
 
 from fluxforge.core.workspace_document import (
     AnalysisROI,
@@ -45,6 +45,59 @@ else:  # pragma: no cover - import-safe fallback for non-GUI installations
 
 
 CalibrationLeaf: TypeAlias = CalibrationModel | DetectorProfile | None
+
+
+def _copy_workflow_leaf(value: Any) -> Any:
+    """Copy immutable JSON-like workflow leaves, including mapping proxies."""
+
+    if isinstance(value, Mapping):
+        return {str(key): _copy_workflow_leaf(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_copy_workflow_leaf(item) for item in value)
+    if isinstance(value, list):
+        return [_copy_workflow_leaf(item) for item in value]
+    return deepcopy(value)
+
+
+def _invalidated_diagnostic(
+    diagnostic: FitDiagnostics,
+    reason: str,
+) -> FitDiagnostics:
+    """Return an explicit invalid state without obsolete fit arrays."""
+
+    return replace(
+        diagnostic,
+        status="invalid",
+        x=(),
+        observed=(),
+        model=(),
+        uncertainty=(),
+        normalized_residuals=(),
+        goodness_of_fit={},
+        warning_flags=tuple(
+            dict.fromkeys((*diagnostic.warning_flags, "analysis-edit-invalidated"))
+        ),
+        provenance={
+            **dict(diagnostic.provenance),
+            "invalidated_by": reason,
+        },
+    )
+
+
+def _invalidated_peak(peak: PeakModel, reason: str) -> PeakModel:
+    """Return a peak leaf with no displayable residuals from an obsolete fit."""
+
+    return replace(
+        peak,
+        status="invalidated",
+        fit_quality=0.0,
+        normalized_residuals=(),
+        residual_channels=(),
+        provenance={
+            **dict(peak.provenance),
+            "fit_invalidated_by": reason,
+        },
+    )
 
 
 @dataclass(frozen=True)
@@ -97,6 +150,10 @@ class WorkspaceLeafController(Protocol):
 
     def upsert_fit_diagnostic(self, diagnostic: FitDiagnostics) -> object: ...
 
+    def set_fit_diagnostics(self, diagnostics: Sequence[FitDiagnostics]) -> object: ...
+
+    def set_workflow_state(self, workflow_state: Mapping[str, Any]) -> object: ...
+
     def assign_spectrum_role(
         self, role: str, spectrum_ids: str | Sequence[str] | None
     ) -> object: ...
@@ -110,6 +167,8 @@ class WorkspaceLeafController(Protocol):
     def delete_viewport(self, viewport_id: str) -> object: ...
 
     def set_pinned_nuclides(self, pinned_nuclides: Sequence[str]) -> object: ...
+
+    def set_nuclide_tags(self, nuclide_tags: Mapping[str, Sequence[str]]) -> object: ...
 
     def apply_calibration(
         self, spectrum_id: str, calibration_state: CalibrationLeaf
@@ -208,6 +267,7 @@ class UpdatePeakCommand(_WorkspaceLeafCommand):
         *,
         before: PeakModel | None,
         after: PeakModel,
+        invalidate_diagnostics: bool = False,
         description: str = "Update peak",
     ) -> None:
         super().__init__(controller, description)
@@ -220,15 +280,56 @@ class UpdatePeakCommand(_WorkspaceLeafCommand):
         self.peak_id = after.peak_id
         self.before = before
         self.after = after
+        document = _controller_document(controller)
+        self.related_diagnostics = (
+            tuple(
+                item
+                for item in document.fit_diagnostics
+                if item.spectrum_id == after.spectrum_id
+                and (
+                    item.peak_id == after.peak_id
+                    or (after.roi_id is not None and item.roi_id == after.roi_id)
+                )
+            )
+            if invalidate_diagnostics and document is not None
+            else ()
+        )
+        self.invalid_diagnostics = tuple(
+            _invalidated_diagnostic(item, description)
+            for item in self.related_diagnostics
+        )
+        self.related_roi_peaks = (
+            tuple(
+                item
+                for item in document.peaks
+                if item.spectrum_id == after.spectrum_id
+                and after.roi_id is not None
+                and item.roi_id == after.roi_id
+                and item.peak_id != after.peak_id
+            )
+            if invalidate_diagnostics and document is not None
+            else ()
+        )
+        self.invalid_roi_peaks = tuple(
+            _invalidated_peak(item, description) for item in self.related_roi_peaks
+        )
 
     def undo(self) -> None:
         if self.before is None:
             self.controller.delete_peak_model(self.spectrum_id, self.peak_id)
         else:
             self.controller.upsert_peak_model(self.before)
+        for peak in self.related_roi_peaks:
+            self.controller.upsert_peak_model(peak)
+        for diagnostic in self.related_diagnostics:
+            self.controller.upsert_fit_diagnostic(diagnostic)
 
     def redo(self) -> None:
         self.controller.upsert_peak_model(self.after)
+        for peak in self.invalid_roi_peaks:
+            self.controller.upsert_peak_model(peak)
+        for diagnostic in self.invalid_diagnostics:
+            self.controller.upsert_fit_diagnostic(diagnostic)
 
 
 class DeletePeakCommand(_WorkspaceLeafCommand):
@@ -343,6 +444,50 @@ class TogglePinnedNuclideCommand(_WorkspaceLeafCommand):
 
     def redo(self) -> None:
         self.controller.set_pinned_nuclides(self.after)
+
+
+class UpdateNuclideTagsCommand(_WorkspaceLeafCommand):
+    """Replace the small persisted map of analyst tags by nuclide."""
+
+    def __init__(
+        self,
+        controller: WorkspaceLeafController,
+        *,
+        before: Mapping[str, Sequence[str]],
+        after: Mapping[str, Sequence[str]],
+        description: str = "Tag nuclide",
+    ) -> None:
+        super().__init__(controller, description)
+        self.before = {key: tuple(value) for key, value in before.items()}
+        self.after = {key: tuple(value) for key, value in after.items()}
+
+    def undo(self) -> None:
+        self.controller.set_nuclide_tags(self.before)
+
+    def redo(self) -> None:
+        self.controller.set_nuclide_tags(self.after)
+
+
+class UpdateWorkflowStateCommand(_WorkspaceLeafCommand):
+    """Replace derived workflow state so scientific edits cannot leave stale output."""
+
+    def __init__(
+        self,
+        controller: WorkspaceLeafController,
+        *,
+        before: Mapping[str, Any],
+        after: Mapping[str, Any],
+        description: str = "Invalidate derived analysis",
+    ) -> None:
+        super().__init__(controller, description)
+        self.before = _copy_workflow_leaf(before)
+        self.after = _copy_workflow_leaf(after)
+
+    def undo(self) -> None:
+        self.controller.set_workflow_state(self.before)
+
+    def redo(self) -> None:
+        self.controller.set_workflow_state(self.after)
 
 
 class UpsertROICommand(_WorkspaceLeafCommand):
@@ -480,6 +625,34 @@ class MoveROIBoundsCommand(_WorkspaceLeafCommand):
         self.drag_token = drag_token
         self.before = before
         self.after = after
+        document = _controller_document(controller)
+        self.related_peaks = (
+            tuple(
+                item
+                for item in document.peaks
+                if item.spectrum_id == before.spectrum_id
+                and item.roi_id == before.roi_id
+            )
+            if document is not None
+            else ()
+        )
+        self.invalid_peaks = tuple(
+            _invalidated_peak(item, description) for item in self.related_peaks
+        )
+        self.related_diagnostics = (
+            tuple(
+                item
+                for item in document.fit_diagnostics
+                if item.spectrum_id == before.spectrum_id
+                and item.roi_id == before.roi_id
+            )
+            if document is not None
+            else ()
+        )
+        self.invalid_diagnostics = tuple(
+            _invalidated_diagnostic(item, description)
+            for item in self.related_diagnostics
+        )
 
     def id(self) -> int:
         return self.COMMAND_ID
@@ -499,9 +672,17 @@ class MoveROIBoundsCommand(_WorkspaceLeafCommand):
 
     def undo(self) -> None:
         self.controller.upsert_roi(self.before)
+        for peak in self.related_peaks:
+            self.controller.upsert_peak_model(peak)
+        for diagnostic in self.related_diagnostics:
+            self.controller.upsert_fit_diagnostic(diagnostic)
 
     def redo(self) -> None:
         self.controller.upsert_roi(self.after)
+        for peak in self.invalid_peaks:
+            self.controller.upsert_peak_model(peak)
+        for diagnostic in self.invalid_diagnostics:
+            self.controller.upsert_fit_diagnostic(diagnostic)
 
 
 class AssignSpectrumRoleCommand(_WorkspaceLeafCommand):
@@ -644,8 +825,10 @@ __all__ = [
     "TogglePinnedNuclideCommand",
     "UpdateCanvasViewportCommand",
     "UpdateDetectorProfileCommand",
+    "UpdateNuclideTagsCommand",
     "UpdatePeakAssignmentCommand",
     "UpdatePeakCommand",
+    "UpdateWorkflowStateCommand",
     "UpsertROICommand",
     "WorkspaceLeafController",
 ]

@@ -656,11 +656,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 selection_bus=self.selection_bus,
                 workspace_controller=self.analysis_workspace,
                 qa_monitor=self.qa_monitor,
+                undo_stack=self.undo_stack,
                 parent=self,
             )
             self.setCentralWidget(self.central_tabs)
-            self._toggle_log_scale(self._log_scale_action.isChecked())
-            self._toggle_peak_labels(self._peak_labels_action.isChecked())
+            if hasattr(self.central_tabs, "canvas"):
+                self.central_tabs.canvas.set_log_scale(
+                    self._log_scale_action.isChecked()
+                )
+                self.central_tabs.canvas.set_peak_labels_visible(
+                    self._peak_labels_action.isChecked()
+                )
 
         def _wrap_dock(self, title: str, widget, area) -> QDockWidget:
             dock = QDockWidget(title, self)
@@ -1173,7 +1179,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 if viewport is not None and viewport.selected_roi_id:
                     roi = session.document.roi_by_id(viewport.selected_roi_id)
                     if roi is not None:
-                        self.selection_bus.publish_roi(*roi.signal_range)
+                        self.selection_bus.publish(
+                            SelectionState(
+                                spectrum_id=roi.spectrum_id,
+                                roi_id=roi.roi_id,
+                                roi_bounds_keV=roi.signal_range,
+                            )
+                        )
                 self.recent_files.record_many((source, *session.recent_files))
                 self._document_dirty = False
                 self.setWindowModified(False)
@@ -1198,7 +1210,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._document_dirty = False
                 self.setWindowModified(False)
 
-        def _on_workspace_document_changed(self, _document) -> None:
+        def _on_workspace_document_changed(self, document) -> None:
+            viewport = document.viewport_by_id("primary-spectrum")
+            log_y = viewport.log_y if viewport is not None else False
+            labels_visible = viewport.labels_visible if viewport is not None else True
+            for action, checked in (
+                (self._log_scale_action, log_y),
+                (self._peak_labels_action, labels_visible),
+            ):
+                action.blockSignals(True)
+                action.setChecked(bool(checked))
+                action.blockSignals(False)
             self._document_dirty = True
             self.setWindowModified(True)
 

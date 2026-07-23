@@ -12,11 +12,15 @@ from fluxforge.gui.spectrum_canvas import ReferenceLine
 class SelectionState:
     """Shared selection state between coordinated GUI surfaces."""
 
+    spectrum_id: str | None = None
+    peak_id: str | None = None
+    roi_id: str | None = None
     peak_energy_keV: float | None = None
     roi_bounds_keV: tuple[float, float] | None = None
     nuclide: str | None = None
     reference_lines_keV: tuple[float, ...] = ()
     annotation_lines: tuple[ReferenceLine, ...] = ()
+    zoom_requested: bool = False
 
 
 SelectionListener = Callable[[SelectionState], None]
@@ -67,11 +71,15 @@ class SelectionBus:
 
         return self.publish(
             SelectionState(
+                spectrum_id=self._state.spectrum_id,
+                peak_id=self._state.peak_id,
+                roi_id=self._state.roi_id,
                 peak_energy_keV=float(peak_energy_keV),
                 roi_bounds_keV=self._state.roi_bounds_keV,
                 nuclide=nuclide or self._state.nuclide,
                 reference_lines_keV=self._state.reference_lines_keV,
                 annotation_lines=self._state.annotation_lines,
+                zoom_requested=False,
             )
         )
 
@@ -81,11 +89,15 @@ class SelectionBus:
         lower, upper = sorted((float(start_keV), float(end_keV)))
         return self.publish(
             SelectionState(
+                spectrum_id=self._state.spectrum_id,
+                peak_id=self._state.peak_id,
+                roi_id=self._state.roi_id,
                 peak_energy_keV=self._state.peak_energy_keV,
                 roi_bounds_keV=(lower, upper),
                 nuclide=self._state.nuclide,
                 reference_lines_keV=self._state.reference_lines_keV,
                 annotation_lines=self._state.annotation_lines,
+                zoom_requested=False,
             )
         )
 
@@ -100,11 +112,15 @@ class SelectionBus:
 
         return self.publish(
             SelectionState(
+                spectrum_id=self._state.spectrum_id,
+                peak_id=self._state.peak_id,
+                roi_id=self._state.roi_id,
                 peak_energy_keV=self._state.peak_energy_keV,
                 roi_bounds_keV=self._state.roi_bounds_keV,
                 nuclide=nuclide,
                 reference_lines_keV=reference_lines_keV,
                 annotation_lines=annotation_lines,
+                zoom_requested=False,
             )
         )
 
@@ -117,10 +133,14 @@ class SelectionBus:
         """Return a small serializable description of the current selection."""
 
         return {
+            "spectrum_id": self._state.spectrum_id,
+            "peak_id": self._state.peak_id,
+            "roi_id": self._state.roi_id,
             "peak_energy_keV": self._state.peak_energy_keV,
             "roi_bounds_keV": self._state.roi_bounds_keV,
             "nuclide": self._state.nuclide,
             "reference_lines_keV": self._state.reference_lines_keV,
             "annotation_line_count": len(self._state.annotation_lines),
+            "zoom_requested": self._state.zoom_requested,
             "listener_count": len(self._listeners),
         }

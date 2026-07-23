@@ -795,8 +795,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     )
                 )
                 peak = self.workspace_controller.selected_peak()
+                current_selection = self.selection_bus.state
                 self.selection_bus.publish(
                     SelectionState(
+                        spectrum_id=current_selection.spectrum_id,
+                        peak_id=current_selection.peak_id,
+                        roi_id=current_selection.roi_id,
                         peak_energy_keV=(
                             peak.energy_keV if peak is not None else energy_keV
                         ),
@@ -807,6 +811,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         reference_lines_keV=(
                             peak.reference_lines_keV if peak is not None else ()
                         ),
+                        zoom_requested=current_selection.zoom_requested,
                     )
                 )
 
@@ -824,8 +829,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             reference_lines = self.nuclide_controller.reference_lines_for_nuclide(
                 match.nuclide
             )
+            current_selection = self.selection_bus.state
             self.selection_bus.publish(
                 SelectionState(
+                    spectrum_id=current_selection.spectrum_id,
+                    peak_id=current_selection.peak_id,
+                    roi_id=current_selection.roi_id,
                     peak_energy_keV=(
                         peak.energy_keV
                         if peak is not None
@@ -835,6 +844,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     nuclide=match.nuclide,
                     reference_lines_keV=reference_lines,
                     annotation_lines=self._peak_annotations_for_match(match),
+                    zoom_requested=current_selection.zoom_requested,
                 )
             )
 
@@ -865,13 +875,18 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 state,
                 state.__class__(**{**state.__dict__, "peaks": tuple(peaks)}),
             )
+            current_selection = self.selection_bus.state
             self.selection_bus.publish(
                 SelectionState(
+                    spectrum_id=current_selection.spectrum_id,
+                    peak_id=updated_peak.peak_id,
+                    roi_id=current_selection.roi_id,
                     peak_energy_keV=updated_peak.energy_keV,
                     roi_bounds_keV=updated_peak.roi_bounds_keV,
                     nuclide=updated_peak.nuclide,
                     reference_lines_keV=updated_peak.reference_lines_keV,
                     annotation_lines=self._peak_annotations_for_match(match),
+                    zoom_requested=current_selection.zoom_requested,
                 )
             )
 
@@ -895,12 +910,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 state,
                 state.__class__(**{**state.__dict__, "peaks": tuple(peaks)}),
             )
+            current_selection = self.selection_bus.state
             self.selection_bus.publish(
                 SelectionState(
+                    spectrum_id=current_selection.spectrum_id,
+                    peak_id=updated_peak.peak_id,
+                    roi_id=current_selection.roi_id,
                     peak_energy_keV=updated_peak.energy_keV,
                     roi_bounds_keV=updated_peak.roi_bounds_keV,
                     nuclide=None,
                     reference_lines_keV=(),
+                    zoom_requested=current_selection.zoom_requested,
                 )
             )
 
@@ -1075,6 +1095,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             peak = self.workspace_controller.state.peaks[row]
             self.workspace_controller.select_peak(peak.peak_id)
+            spectrum_id = self.workspace_controller.document.active_spectrum_id
+            peak_model = (
+                self.workspace_controller.document.peak_by_id(spectrum_id, peak.peak_id)
+                if spectrum_id is not None
+                else None
+            )
+            canonical_roi = (
+                self.workspace_controller.document.roi_by_id(peak_model.roi_id)
+                if peak_model is not None and peak_model.roi_id is not None
+                else None
+            )
             annotation_lines = ()
             if peak.nuclide and peak.reference_lines_keV:
                 annotation_lines = tuple(
@@ -1086,30 +1117,54 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
             self.selection_bus.publish(
                 SelectionState(
+                    spectrum_id=spectrum_id,
+                    peak_id=peak.peak_id,
+                    roi_id=peak_model.roi_id if peak_model is not None else None,
                     peak_energy_keV=peak.energy_keV,
-                    roi_bounds_keV=peak.roi_bounds_keV,
+                    roi_bounds_keV=(
+                        canonical_roi.signal_range
+                        if canonical_roi is not None
+                        else peak.roi_bounds_keV
+                    ),
                     nuclide=peak.nuclide,
                     reference_lines_keV=peak.reference_lines_keV,
                     annotation_lines=annotation_lines,
+                    zoom_requested=True,
                 )
             )
 
         def _sync_from_selection_bus(self, state: SelectionState) -> None:
             if self._selection_sync_guard:
                 return
-            if state.peak_energy_keV is None:
-                return
             peaks = self.workspace_controller.state.peaks
             if not peaks:
                 return
-            target_row = min(
-                range(len(peaks)),
-                key=lambda index: abs(
-                    float(peaks[index].energy_keV) - float(state.peak_energy_keV)
-                ),
-            )
+            if state.peak_id is not None:
+                target_row = next(
+                    (
+                        index
+                        for index, peak in enumerate(peaks)
+                        if peak.peak_id == state.peak_id
+                    ),
+                    -1,
+                )
+                if target_row < 0:
+                    return
+            else:
+                if state.peak_energy_keV is None:
+                    return
+                target_row = min(
+                    range(len(peaks)),
+                    key=lambda index: abs(
+                        float(peaks[index].energy_keV) - float(state.peak_energy_keV)
+                    ),
+                )
             target_peak = peaks[target_row]
-            if abs(float(target_peak.energy_keV) - float(state.peak_energy_keV)) > 3.0:
+            if (
+                state.peak_id is None
+                and abs(float(target_peak.energy_keV) - float(state.peak_energy_keV))
+                > 3.0
+            ):
                 return
             current_row = self.table.currentRow()
             if (
@@ -2736,7 +2791,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._background_method_changed
             )
             self.workspace_controller.subscribe(self._sync_state)
+            self.selection_bus.subscribe(self._sync_selection)
             self._sync_state(self.workspace_controller.state)
+
+        def _sync_selection(self, state: SelectionState) -> None:
+            if state.roi_bounds_keV is None:
+                return
+            self.roi_left.blockSignals(True)
+            self.roi_right.blockSignals(True)
+            try:
+                self.roi_left.setValue(float(state.roi_bounds_keV[0]))
+                self.roi_right.setValue(float(state.roi_bounds_keV[1]))
+            finally:
+                self.roi_left.blockSignals(False)
+                self.roi_right.blockSignals(False)
 
         def _use_selected_peak_roi(self) -> None:
             peak = self.workspace_controller.selected_peak()
@@ -2744,12 +2812,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             self.roi_left.setValue(float(peak.roi_bounds_keV[0]))
             self.roi_right.setValue(float(peak.roi_bounds_keV[1]))
+            current_selection = self.selection_bus.state
             self.selection_bus.publish(
                 SelectionState(
+                    spectrum_id=current_selection.spectrum_id,
+                    peak_id=peak.peak_id,
+                    roi_id=current_selection.roi_id,
                     peak_energy_keV=peak.energy_keV,
                     roi_bounds_keV=peak.roi_bounds_keV,
                     nuclide=peak.nuclide,
                     reference_lines_keV=peak.reference_lines_keV,
+                    zoom_requested=True,
                 )
             )
 

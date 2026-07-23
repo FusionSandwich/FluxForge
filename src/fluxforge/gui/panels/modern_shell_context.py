@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from fluxforge.gui.analysis_workspace import AnalysisWorkspaceController
 from fluxforge.gui.mode_manager import ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
-    from fluxforge.gui.panels.modern_shell_shared import selection_summary as _selection_summary
+    from fluxforge.gui.panels.modern_shell_shared import (
+        selection_summary as _selection_summary,
+    )
     from fluxforge.gui.qt_compat import QLabel, QVBoxLayout, QWidget
 
     class ToolContextPanel(QWidget):
@@ -111,12 +115,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             roi = state.roi_analysis
             efficiency = state.efficiency_fit
+            invalidation = self.workspace_controller.document.workflow_state.get(
+                "analysis_invalidation"
+            )
+            invalidation_line = ""
+            if isinstance(invalidation, Mapping) and invalidation.get(
+                "requires_reanalysis"
+            ):
+                reason = str(invalidation.get("reason") or "scientific edit")
+                invalidation_line = f"\nAnalysis status: re-run required ({reason})"
             self.analysis_summary.setText(
                 (
                     f"Efficiency calibration: {'ready' if efficiency is not None else 'not fitted'}\n"
                     f"Activity results: {len(state.activity_results)}\n"
                     f"ROI analysis: "
                     f"{f'{roi.roi_bounds_keV[0]:.2f}-{roi.roi_bounds_keV[1]:.2f} keV' if roi is not None else 'not run'}"
+                    f"{invalidation_line}"
                 )
             )
 

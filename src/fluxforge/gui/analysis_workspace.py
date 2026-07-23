@@ -297,7 +297,17 @@ class AnalysisWorkspaceController:
         )
 
     def select_spectrum(self, key: str) -> AnalysisWorkspaceState:
-        return self.update(active_spectrum_key=key)
+        role = next(
+            (item for item in self._document.spectrum_roles if item.role == key),
+            None,
+        )
+        spectrum_id = (
+            role.spectrum_ids[0] if role is not None and role.spectrum_ids else key
+        )
+        if self._document.spectrum_by_id(spectrum_id) is None:
+            raise KeyError(f"Unknown spectrum role or ID: {key!r}")
+        self._replace_document(active_spectrum_id=spectrum_id)
+        return self._state
 
     def replace_peaks(self, peaks: Sequence[PeakCandidate]) -> AnalysisWorkspaceState:
         selected = self._state.selected_peak_id
@@ -383,7 +393,11 @@ class AnalysisWorkspaceController:
         )
         diagnostics = tuple(
             (
-                replace(item, peak_id=None)
+                _invalid_fit_diagnostic(
+                    item,
+                    reason="peak set replaced",
+                    peak_id=None,
+                )
                 if item.spectrum_id == target
                 and item.peak_id is not None
                 and item.peak_id not in valid_peak_ids
@@ -439,7 +453,11 @@ class AnalysisWorkspaceController:
         )
         diagnostics = tuple(
             (
-                replace(item, peak_id=None)
+                _invalid_fit_diagnostic(
+                    item,
+                    reason="peak deleted",
+                    peak_id=None,
+                )
                 if item.spectrum_id == spectrum_id and item.peak_id == peak_id
                 else item
             )
@@ -469,11 +487,23 @@ class AnalysisWorkspaceController:
     def delete_roi(self, roi_id: str) -> WorkspaceDocument:
         rois = tuple(item for item in self._document.rois if item.roi_id != roi_id)
         peaks = tuple(
-            replace(item, roi_id=None) if item.roi_id == roi_id else item
+            (
+                _invalid_peak_model_fit(item, reason="ROI deleted", roi_id=None)
+                if item.roi_id == roi_id
+                else item
+            )
             for item in self._document.peaks
         )
         diagnostics = tuple(
-            replace(item, roi_id=None) if item.roi_id == roi_id else item
+            (
+                _invalid_fit_diagnostic(
+                    item,
+                    reason="ROI deleted",
+                    roi_id=None,
+                )
+                if item.roi_id == roi_id
+                else item
+            )
             for item in self._document.fit_diagnostics
         )
         viewports = tuple(
@@ -500,6 +530,20 @@ class AnalysisWorkspaceController:
         else:
             items.append(diagnostic)
         return self._replace_document(fit_diagnostics=tuple(items))
+
+    def set_fit_diagnostics(
+        self, diagnostics: Sequence[FitDiagnostics]
+    ) -> WorkspaceDocument:
+        """Replace canonical fit diagnostics without retaining spectrum arrays."""
+
+        return self._replace_document(fit_diagnostics=tuple(diagnostics))
+
+    def set_workflow_state(
+        self, workflow_state: Mapping[str, Any]
+    ) -> WorkspaceDocument:
+        """Replace the persisted workflow leaf without touching spectrum arrays."""
+
+        return self._replace_document(workflow_state=_json_safe(workflow_state))
 
     def assign_spectrum_role(
         self,
@@ -699,6 +743,23 @@ class AnalysisWorkspaceController:
                 deduped.append(nuclide)
         return self.update(pinned_nuclides=tuple(deduped))
 
+    def set_nuclide_tags(
+        self, nuclide_tags: Mapping[str, Sequence[str]]
+    ) -> WorkspaceDocument:
+        """Replace persisted analyst tags keyed by nuclide identifier."""
+
+        normalized: dict[str, tuple[str, ...]] = {}
+        for raw_nuclide, raw_tags in nuclide_tags.items():
+            nuclide = str(raw_nuclide).strip()
+            if not nuclide:
+                raise ValueError("nuclide tag keys must be non-empty")
+            tags = tuple(
+                dict.fromkeys(str(tag).strip() for tag in raw_tags if str(tag).strip())
+            )
+            if tags:
+                normalized[nuclide] = tags
+        return self._replace_document(nuclide_tags=normalized)
+
     def toggle_pinned_nuclide(self, nuclide: str) -> AnalysisWorkspaceState:
         current = list(self._state.pinned_nuclides)
         if nuclide in current:
@@ -759,19 +820,32 @@ class AnalysisWorkspaceController:
         self,
         results: Sequence[ActivityCalculationResult],
     ) -> AnalysisWorkspaceState:
-        return self.update(activity_results=tuple(results))
+        self.update(activity_results=tuple(results))
+        self._clear_analysis_invalidation()
+        return self.state
 
     def set_roi_analysis(
         self,
         result: ROIAnalysisResult | None,
     ) -> AnalysisWorkspaceState:
-        return self.update(roi_analysis=result)
+        self.update(roi_analysis=result)
+        self._clear_analysis_invalidation()
+        return self.state
 
     def set_roi_statistics(
         self,
         result: ROIStatisticsResult | None,
     ) -> AnalysisWorkspaceState:
-        return self.update(roi_statistics=result)
+        self.update(roi_statistics=result)
+        self._clear_analysis_invalidation()
+        return self.state
+
+    def _clear_analysis_invalidation(self) -> None:
+        workflow = dict(self._document.workflow_state)
+        if "analysis_invalidation" not in workflow:
+            return
+        workflow.pop("analysis_invalidation", None)
+        self.set_workflow_state(workflow)
 
     def set_survey_points(
         self, survey_points: Sequence[SurveyPoint]
@@ -1034,7 +1108,7 @@ class AnalysisWorkspaceController:
                 active_key = role.role
                 break
         peaks = tuple(
-            self._candidate_from_peak_model(item)
+            self._candidate_from_peak_model(item, document=document)
             for item in document.peaks
             if item.spectrum_id == document.active_spectrum_id
         )
@@ -1061,18 +1135,26 @@ class AnalysisWorkspaceController:
     ) -> PeakModel:
         assignments: tuple[NuclideAssignment, ...] = ()
         if candidate.nuclide:
-            line_energy = (
-                candidate.reference_lines_keV[0]
-                if candidate.reference_lines_keV
-                else candidate.energy_keV
-            )
-            assignments = (
-                NuclideAssignment(
-                    nuclide=candidate.nuclide,
-                    line_energy_keV=float(line_energy),
-                    manual=True,
-                ),
-            )
+            if (
+                prior is not None
+                and prior.assignments
+                and prior.assignments[0].nuclide == candidate.nuclide
+            ):
+                assignments = prior.assignments
+            else:
+                line_energy = (
+                    candidate.reference_lines_keV[0]
+                    if candidate.reference_lines_keV
+                    else candidate.energy_keV
+                )
+                assignments = (
+                    NuclideAssignment(
+                        nuclide=candidate.nuclide,
+                        line_energy_keV=float(line_energy),
+                        manual=True,
+                        provenance={"source": "legacy_peak_editor"},
+                    ),
+                )
         overrides = dict(prior.manual_overrides if prior else {})
         overrides["roi_bounds_keV"] = [
             float(candidate.roi_bounds_keV[0]),
@@ -1102,10 +1184,18 @@ class AnalysisWorkspaceController:
             residual_channels=candidate.residual_channels,
         )
 
-    @staticmethod
-    def _candidate_from_peak_model(peak: PeakModel) -> PeakCandidate:
+    def _candidate_from_peak_model(
+        self,
+        peak: PeakModel,
+        *,
+        document: WorkspaceDocument | None = None,
+    ) -> PeakCandidate:
+        source = document or self._document
+        roi = source.roi_by_id(peak.roi_id or "")
         raw_bounds = peak.manual_overrides.get("roi_bounds_keV")
-        if isinstance(raw_bounds, (list, tuple)) and len(raw_bounds) == 2:
+        if roi is not None and roi.spectrum_id == peak.spectrum_id:
+            roi_bounds = roi.signal_range
+        elif isinstance(raw_bounds, (list, tuple)) and len(raw_bounds) == 2:
             roi_bounds = (float(raw_bounds[0]), float(raw_bounds[1]))
         else:
             roi_bounds = (
@@ -1250,6 +1340,59 @@ def _loaded_records_equivalent(
         and a.spectrum is b.spectrum
         and a.source_path == b.source_path
         for a, b in zip(left, right)
+    )
+
+
+def _invalid_fit_diagnostic(
+    diagnostic: FitDiagnostics,
+    *,
+    reason: str,
+    **changes: Any,
+) -> FitDiagnostics:
+    """Return an explicit invalid state with no displayable stale residuals."""
+
+    flags = tuple(
+        dict.fromkeys((*diagnostic.warning_flags, "analysis-edit-invalidated"))
+    )
+    provenance = {
+        **dict(diagnostic.provenance),
+        "invalidated_by": reason,
+    }
+    return replace(
+        diagnostic,
+        status="invalid",
+        x=(),
+        observed=(),
+        model=(),
+        uncertainty=(),
+        normalized_residuals=(),
+        goodness_of_fit={},
+        warning_flags=flags,
+        provenance=provenance,
+        **changes,
+    )
+
+
+def _invalid_peak_model_fit(
+    peak: PeakModel,
+    *,
+    reason: str,
+    **changes: Any,
+) -> PeakModel:
+    """Return a peak leaf that cannot expose residuals from an obsolete fit."""
+
+    provenance = {
+        **dict(peak.provenance),
+        "fit_invalidated_by": reason,
+    }
+    return replace(
+        peak,
+        status="invalidated",
+        fit_quality=0.0,
+        normalized_residuals=(),
+        residual_channels=(),
+        provenance=provenance,
+        **changes,
     )
 
 

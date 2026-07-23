@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Callable, Sequence
 
 from fluxforge.core.analysis_workspace import PeakCandidate
 from fluxforge.core.workspace_document import CanvasViewport
+from fluxforge.gui.canvas_intents import CanvasIntent
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,38 @@ class ReferenceLine:
     energy_keV: float
     label: str = ""
     color: str = "#f59e0b"
+
+
+@dataclass(frozen=True)
+class CanvasROIOverlay:
+    """Renderer-neutral description of one persisted analysis ROI."""
+
+    roi_id: str
+    spectrum_id: str
+    signal_range: tuple[float, float]
+    left_background_range: tuple[float, float]
+    right_background_range: tuple[float, float]
+    color: str = "#2dd4bf"
+    selected: bool = False
+
+
+@dataclass(frozen=True)
+class CanvasPeakOverlay:
+    """Renderer-neutral description of one exact peak or component handle."""
+
+    peak_id: str
+    spectrum_id: str
+    position: float
+    y_value: float = 0.0
+    component_ids: tuple[str, ...] = ()
+    nuclide: str | None = None
+    tags: tuple[str, ...] = ()
+    nuclide_tags: tuple[str, ...] = ()
+    pinned: bool = False
+    selected: bool = False
+
+
+CanvasIntentListener = Callable[[CanvasIntent], None]
 
 
 @dataclass(frozen=True)
@@ -109,6 +142,39 @@ class SpectrumCanvas:
     backend_key: str
     capabilities: RendererCapabilities
 
+    def set_intent_sink(self, listener: CanvasIntentListener | None) -> None:
+        """Replace the renderer-intent subscribers with one optional sink."""
+
+        self._canvas_intent_listeners = []
+        if listener is not None:
+            self._canvas_intent_listeners.append(listener)
+
+    def subscribe_intents(self, listener: CanvasIntentListener) -> None:
+        """Subscribe to validated, renderer-independent interaction commits."""
+
+        listeners = self._intent_listeners()
+        if listener not in listeners:
+            listeners.append(listener)
+
+    def unsubscribe_intents(self, listener: CanvasIntentListener) -> None:
+        """Remove a previously registered interaction subscriber."""
+
+        listeners = self._intent_listeners()
+        if listener in listeners:
+            listeners.remove(listener)
+
+    def _intent_listeners(self) -> list[CanvasIntentListener]:
+        listeners = getattr(self, "_canvas_intent_listeners", None)
+        if listeners is None:
+            listeners = []
+            self._canvas_intent_listeners = listeners
+        return listeners
+
+    def _emit_canvas_intent(self, intent: CanvasIntent) -> None:
+        intent.validate()
+        for listener in tuple(self._intent_listeners()):
+            listener(intent)
+
     def set_spectrum(self, counts: Sequence[float]) -> None:
         """Load the primary spectrum."""
         raise NotImplementedError
@@ -138,6 +204,35 @@ class SpectrumCanvas:
         """Optional bulk update for detected peak overlays."""
 
         del peaks
+
+    def set_interaction_context(self, spectrum_id: str | None) -> None:
+        """Set the exact spectrum identity used by newly emitted intents."""
+
+        del spectrum_id
+
+    def set_analysis_overlays(
+        self,
+        rois: Sequence[CanvasROIOverlay],
+        peaks: Sequence[CanvasPeakOverlay],
+        *,
+        selected_roi_id: str | None = None,
+        selected_peak_id: str | None = None,
+    ) -> None:
+        """Render canonical ROI and peak leaves without mutating them."""
+
+        del rois, peaks, selected_roi_id, selected_peak_id
+
+    def zoom_to_range(
+        self,
+        lower: float,
+        upper: float,
+        *,
+        padding_fraction: float = 0.12,
+    ) -> None:
+        """Zoom to an increasing x range with proportional visual padding."""
+
+        del lower, upper, padding_fraction
+        raise NotImplementedError
 
     def set_cascade_sum_lines(self, energies_keV: Sequence[float]) -> None:
         """Optional bulk update for cascade-sum overlays."""

@@ -176,11 +176,17 @@ Recommended first actions:
 2. Use the foreground/background/overlay selectors to assign spectrum roles.
 3. Use the mouse wheel or **Zoom + / Zoom -** to inspect a peak-rich region;
    left-drag pans and **Reset View** restores the complete spectrum.
-4. Choose **Select ROI** and drag the displayed ROI bounds, then run the ROI
-   analysis or statistics action in the bottom workspace.
-5. Run **Auto Find Peaks**, review the proposal dialog, and use the peak table
-   for selection, isotope assignment, tags, and pinned nuclides.
-6. Choose **File > Save Session** (`Ctrl+S`) to write the complete analysis as
+4. Hold **Shift** and drag across the spectrum to create a persisted signal ROI
+   with left and right background sidebands. Drag any of the three regions to
+   revise its bounds; the complete drag is recorded as one undo step.
+5. Run **Auto Find Peaks**, review the proposals, then select a peak-table row
+   to zoom to its exact ROI. Right-click the canvas for peak add/move/delete,
+   isotope assignment, tag, pin/unpin, overlap-component, ROI, and spectrum-role
+   actions. The crosshair reports the current energy and count coordinates.
+6. Re-run any analysis marked stale after a scientific plot edit. FluxForge
+   clears prior ROI/activity results instead of allowing old results to be
+   exported against changed bounds or peaks.
+7. Choose **File > Save Session** (`Ctrl+S`) to write the complete analysis as
    a versioned `.ffs` file. **Save Session As** uses `Ctrl+Shift+S`; opening a
    session replaces the current workspace after validation.
 

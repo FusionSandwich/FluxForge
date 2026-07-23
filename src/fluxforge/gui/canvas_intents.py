@@ -45,10 +45,13 @@ class CanvasIntentKind(str, Enum):
     MOVE_ROI = "roi.move"
     MOVE_BACKGROUND = "roi.background.move"
     ADD_PEAK = "peak.add"
+    SELECT_PEAK = "peak.select"
     MOVE_PEAK = "peak.move"
     DELETE_PEAK = "peak.delete"
+    ADD_COMPONENT = "peak.component.add"
     SPLIT_PEAK = "peak.split"
     MERGE_PEAKS = "peak.merge"
+    TAG_PEAK = "peak.tag"
     ASSIGN_NUCLIDE = "nuclide.assign"
     CLEAR_NUCLIDE = "nuclide.clear"
     PIN_NUCLIDE = "nuclide.pin"
@@ -68,9 +71,12 @@ _ROI_ID_KINDS = {
     CanvasIntentKind.MOVE_BACKGROUND,
 }
 _PEAK_ID_KINDS = {
+    CanvasIntentKind.SELECT_PEAK,
     CanvasIntentKind.MOVE_PEAK,
     CanvasIntentKind.DELETE_PEAK,
+    CanvasIntentKind.ADD_COMPONENT,
     CanvasIntentKind.SPLIT_PEAK,
+    CanvasIntentKind.TAG_PEAK,
     CanvasIntentKind.ASSIGN_NUCLIDE,
     CanvasIntentKind.CLEAR_NUCLIDE,
 }
@@ -127,6 +133,7 @@ class CanvasIntent:
             CanvasIntentKind.PIN_NUCLIDE,
             CanvasIntentKind.UNPIN_NUCLIDE,
             CanvasIntentKind.TAG_NUCLIDE,
+            *tuple(_ENABLED_KINDS),
         } and not _text(self.spectrum_id):
             raise ValueError(f"{self.kind.value} requires spectrum_id.")
         if self.kind in _ROI_ID_KINDS and not _text(self.roi_id):
@@ -135,6 +142,13 @@ class CanvasIntent:
             raise ValueError(f"{self.kind.value} requires peak_id.")
         if self.kind in _BOUNDS_KINDS:
             _validate_range(self.bounds, "bounds")
+        if self.kind is CanvasIntentKind.CREATE_ROI:
+            if self.left_background is None or self.right_background is None:
+                raise ValueError(
+                    "roi.create requires left and right background ranges."
+                )
+            _validate_range(self.left_background, "left_background")
+            _validate_range(self.right_background, "right_background")
         if self.kind is CanvasIntentKind.MOVE_BACKGROUND:
             if self.left_background is None and self.right_background is None:
                 raise ValueError("roi.background.move requires a background range.")
@@ -149,7 +163,11 @@ class CanvasIntent:
                 or not isfinite(float(self.position))
             ):
                 raise ValueError(f"{self.kind.value} requires a finite position.")
+        if self.kind is CanvasIntentKind.ADD_COMPONENT and self.position is not None:
+            _finite_number(self.position, "position")
         if self.kind is CanvasIntentKind.MERGE_PEAKS:
+            if any(not _text(value) for value in self.component_ids):
+                raise ValueError("peak.merge component IDs must be non-empty strings.")
             if len(set(self.component_ids)) < 2:
                 raise ValueError(
                     "peak.merge requires at least two unique component IDs."
@@ -164,6 +182,8 @@ class CanvasIntent:
             raise ValueError(f"{self.kind.value} requires nuclide.")
         if self.kind is CanvasIntentKind.TAG_NUCLIDE and not _text(self.tag):
             raise ValueError("nuclide.tag requires tag.")
+        if self.kind is CanvasIntentKind.TAG_PEAK and not _text(self.tag):
+            raise ValueError("peak.tag requires tag.")
         if self.kind is CanvasIntentKind.ASSIGN_SPECTRUM_ROLE and not _text(self.role):
             raise ValueError("spectrum.role.assign requires role.")
         if self.kind is CanvasIntentKind.CHANGE_VIEWPORT:
@@ -246,6 +266,8 @@ class CanvasIntent:
         component_ids = payload.get("component_ids", ())
         if not isinstance(component_ids, (list, tuple)):
             raise ValueError("component_ids must be an array.")
+        if any(not isinstance(value, str) for value in component_ids):
+            raise ValueError("component_ids must contain only strings.")
         raw_enabled = payload.get("enabled")
         if raw_enabled is not None and not isinstance(raw_enabled, bool):
             raise ValueError("enabled must be a boolean.")
@@ -254,7 +276,7 @@ class CanvasIntent:
             spectrum_id=_optional_text(payload.get("spectrum_id")),
             roi_id=_optional_text(payload.get("roi_id")),
             peak_id=_optional_text(payload.get("peak_id")),
-            component_ids=tuple(str(value) for value in component_ids),
+            component_ids=tuple(component_ids),
             bounds=pair("bounds"),
             left_background=pair("left_background"),
             right_background=pair("right_background"),
@@ -271,16 +293,20 @@ class CanvasIntent:
             y_range=pair("y_range"),
             enabled=raw_enabled,
             drag_token=_optional_text(payload.get("drag_token")),
-            schema=str(payload.get("schema") or ""),
+            schema=(
+                payload.get("schema") if isinstance(payload.get("schema"), str) else ""
+            ),
             version=version,
         )
 
 
 def _text(value: object) -> str:
-    return str(value or "").strip()
+    return value.strip() if isinstance(value, str) else ""
 
 
 def _optional_text(value: object) -> str | None:
+    if value is not None and not isinstance(value, str):
+        raise ValueError("text fields must be strings or null.")
     text = _text(value)
     return text or None
 

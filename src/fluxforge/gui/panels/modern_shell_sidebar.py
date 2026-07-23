@@ -122,7 +122,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.addWidget(self.acquisition_status)
 
             layout.addWidget(self._build_reference_workbench_panel(), 3)
-            self._refresh_nuclide_results("cs")
+            self._refresh_nuclide_results("")
 
             self.selection_note = QTextEdit(self)
             self.selection_note.setObjectName("SidebarNote")
@@ -783,9 +783,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._sync_qa_summary()
 
         def _refresh_nuclide_results(self, query: str) -> None:
+            query = str(query).strip()
             previous = self._selected_nuclide_name()
             self.nuclides.clear()
-            for hit in self.nuclide_controller.search(query or "c"):
+            if not query:
+                self._refresh_nuclide_details()
+                return
+            for hit in self.nuclide_controller.search(query):
                 label = hit.display_name
                 if hit.strongest_lines_keV:
                     label += (
