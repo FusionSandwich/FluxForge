@@ -189,7 +189,7 @@ def test_astm_review_enables_only_after_data_load_and_uses_workspace_values(tmp_
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt spectrum renderer dependencies are unavailable.",
 )
-def test_polluted_active_workflow_cannot_restore_spectrum_path_until_load(tmp_path):
+def test_workflow_templates_never_persist_or_restore_spectrum_paths(tmp_path):
     app = _qapp()
     settings = MemorySettings()
     spectrum_path = (
@@ -216,6 +216,9 @@ def test_polluted_active_workflow_cannot_restore_spectrum_path_until_load(tmp_pa
     )
     first.close()
 
+    saved = settings.value("gui/workflow_presets")
+    assert str(spectrum_path) not in str(saved)
+
     second = FluxForgeMainWindow(
         mode_manager=ModeManager(settings=settings),
         selection_bus=SelectionBus(),
@@ -234,11 +237,8 @@ def test_polluted_active_workflow_cannot_restore_spectrum_path_until_load(tmp_pa
     second.load_workflow_button.click()
     app.processEvents()
 
-    assert second.analysis_workspace.spectrum() is not None
-    assert len(second.analysis_workspace.state.loaded_spectra) == 1
-    assert second.analysis_workspace.state.loaded_spectra[0].source_path == str(
-        spectrum_path
-    )
+    assert second.analysis_workspace.spectrum() is None
+    assert second.analysis_workspace.state.loaded_spectra == ()
     second.close()
 
 

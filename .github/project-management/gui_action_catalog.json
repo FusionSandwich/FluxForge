@@ -11,8 +11,8 @@
     },
     {
       "surface": "main-window.files-and-examples",
-      "test_ids": ["tests/test_production_gui_mode.py", "tests/test_gui_app.py"],
-      "object_names": ["OpenExampleAction", "OpenSessionAction", "OpenSpectrumAction"]
+      "test_ids": ["tests/test_production_gui_mode.py", "tests/test_gui_app.py", "tests/test_workspace_session_qt.py"],
+      "object_names": ["OpenExampleAction", "OpenSessionAction", "OpenSpectrumAction", "SaveSessionAction", "SaveSessionAsAction"]
     },
     {
       "surface": "main-window.analysis",

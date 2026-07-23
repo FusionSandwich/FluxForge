@@ -90,6 +90,10 @@ from fluxforge.io.reader_factory import (
 )
 from fluxforge.io.session import (
     FluxForgeSession,
+    SESSION_FORMAT,
+    SESSION_FORMAT_VERSION,
+    SessionFormatError,
+    migrate_session_payload,
     read_ffs_session,
     session_from_spectra,
     write_ffs_session,
@@ -220,6 +224,10 @@ __all__ = [
     "write_n42_file",
     # Session I/O
     "FluxForgeSession",
+    "SESSION_FORMAT",
+    "SESSION_FORMAT_VERSION",
+    "SessionFormatError",
+    "migrate_session_payload",
     "read_ffs_session",
     "session_from_spectra",
     "write_ffs_session",

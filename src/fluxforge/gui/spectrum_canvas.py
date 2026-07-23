@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from fluxforge.core.analysis_workspace import PeakCandidate
+from fluxforge.core.workspace_document import CanvasViewport
 
 
 @dataclass(frozen=True)
@@ -143,11 +144,29 @@ class SpectrumCanvas:
 
         del energies_keV
 
-    def set_peak_residuals(self, peaks: Sequence[PeakCandidate], *, visible: bool) -> None:
+    def set_peak_residuals(
+        self, peaks: Sequence[PeakCandidate], *, visible: bool
+    ) -> None:
         """Optional update for mini residual subplots."""
 
         del peaks
         del visible
+
+    def viewport_state(
+        self,
+        *,
+        viewport_id: str = "primary-spectrum",
+        spectrum_id: str | None = None,
+        selected_roi_id: str | None = None,
+    ) -> CanvasViewport:
+        """Return renderer-independent persisted view state."""
+
+        raise NotImplementedError
+
+    def apply_viewport_state(self, viewport: CanvasViewport) -> None:
+        """Restore renderer-independent persisted view state."""
+
+        raise NotImplementedError
 
 
 def _downsample_counts(counts: Sequence[float], *, factor: int) -> tuple[float, ...]:

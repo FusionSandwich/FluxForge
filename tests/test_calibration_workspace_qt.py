@@ -576,15 +576,21 @@ def test_calibration_dialog_supports_preserve_slots_fine_tune_and_nasa_seed():
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt calibration workspace dependencies are unavailable.",
 )
-def test_apply_workspace_results_persists_calibration_workspace_state_to_spectrum():
+def test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation():
     _qapp()
     spectrum = build_demo_spectrum()
+    original_calibration = dict(spectrum.calibration)
+    original_counts = spectrum.counts
+    applied = []
     bus = SelectionBus()
     dialog = CalibrationWorkspaceDialog(
         spectrum=spectrum,
         mode_manager=ModeManager(),
         selection_bus=bus,
         library_manager=DataLibraryManager(),
+        on_apply=lambda updated, energy_fit, fwhm_fit: applied.append(
+            (updated, energy_fit, fwhm_fit)
+        ),
     )
     dialog.show()
     _qapp().processEvents()
@@ -606,12 +612,18 @@ def test_apply_workspace_results_persists_calibration_workspace_state_to_spectru
 
     dialog._apply_workspace_results()
 
-    assert spectrum.calibration["energy"] == pytest.approx(
+    assert len(applied) == 1
+    updated_spectrum, applied_energy_fit, _applied_fwhm_fit = applied[0]
+    assert updated_spectrum is not spectrum
+    assert updated_spectrum.counts is original_counts
+    assert spectrum.calibration == original_calibration
+    assert updated_spectrum.calibration["energy"] == pytest.approx(
         dialog._energy_fit.coefficients
     )
-    assert spectrum.calibration["deviation_pairs"]
+    assert applied_energy_fit is dialog._energy_fit
+    assert updated_spectrum.calibration["deviation_pairs"]
     assert bus.state.roi_bounds_keV is not None
-    assert spectrum.energies is not None
+    assert updated_spectrum.energies is not None
     dialog.close()
 
 

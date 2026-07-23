@@ -7,6 +7,7 @@ from typing import Sequence
 import numpy as np
 
 from fluxforge.core.analysis_workspace import PeakCandidate
+from fluxforge.core.workspace_document import CanvasViewport
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
 from fluxforge.gui.spectrum_canvas import (
@@ -90,7 +91,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._cascade_sum_lines: list[object] = []
             self._overlay_traces: list[object] = []
             self._peak_scatter = None
+            self._residual_peaks: tuple[PeakCandidate, ...] = ()
             self._residual_visible = False
+            self._residual_mode = "off"
+            self._crosshair_enabled = False
             self._log_scale = False
             self._peak_labels_visible = True
             self._x_axis_is_energy = False
@@ -188,6 +192,22 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._roi_region.setVisible(False)
             self._roi_region.sigRegionChangeFinished.connect(self._publish_roi_region)
             self.plot_item.addItem(self._roi_region)
+
+            self._crosshair_vertical = pg.InfiniteLine(
+                angle=90,
+                movable=False,
+                pen=pg.mkPen(color="#94a3b8", width=1, style=pg.QtCore.Qt.DashLine),
+            )
+            self._crosshair_horizontal = pg.InfiniteLine(
+                angle=0,
+                movable=False,
+                pen=pg.mkPen(color="#94a3b8", width=1, style=pg.QtCore.Qt.DashLine),
+            )
+            for line in (self._crosshair_vertical, self._crosshair_horizontal):
+                line.setZValue(30)
+                line.setVisible(False)
+                self.plot_item.addItem(line, ignoreBounds=True)
+            self.plot.scene().sigMouseMoved.connect(self._move_crosshair)
             shell.addWidget(self.plot, 1)
 
             self.residual_row = QWidget(self)
@@ -416,10 +436,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
         def set_peak_residuals(
             self, peaks: Sequence[PeakCandidate], *, visible: bool
         ) -> None:
-            self._residual_visible = bool(visible)
-            self.residual_row.setVisible(bool(visible and peaks))
+            self._residual_peaks = tuple(peaks)
+            self._residual_mode = "compact" if visible else "off"
             for index, curve in enumerate(self.residual_curves):
-                if not visible or index >= len(peaks):
+                if index >= len(peaks):
                     curve.setData([], [])
                     self.residual_plots[index].setTitle("Residuals")
                     continue
@@ -445,6 +465,41 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.residual_plots[index].setTitle(
                     f"{peak.energy_keV:.1f} keV · max |z| {severity:.2f}"
                 )
+            self._apply_residual_visibility()
+
+        def set_residual_mode(self, mode: str) -> None:
+            """Show or hide the already-rendered residual diagnostics."""
+
+            if mode not in {"off", "compact", "full"}:
+                raise ValueError("Residual mode must be off, compact, or full")
+            self._residual_mode = mode
+            self._apply_residual_visibility()
+
+        def _apply_residual_visibility(self) -> None:
+            self._residual_visible = self._residual_mode != "off"
+            self.residual_row.setVisible(
+                bool(self._residual_visible and self._residual_peaks)
+            )
+
+        def set_crosshair_enabled(self, enabled: bool) -> None:
+            """Toggle the plot crosshair without changing the current viewport."""
+
+            self._crosshair_enabled = bool(enabled)
+            if self._crosshair_enabled:
+                x_range, y_range = self.plot_item.viewRange()
+                self._crosshair_vertical.setPos((x_range[0] + x_range[1]) / 2.0)
+                self._crosshair_horizontal.setPos((y_range[0] + y_range[1]) / 2.0)
+            self._crosshair_vertical.setVisible(self._crosshair_enabled)
+            self._crosshair_horizontal.setVisible(self._crosshair_enabled)
+
+        def _move_crosshair(self, scene_position) -> None:
+            if not self._crosshair_enabled:
+                return
+            if not self.plot.sceneBoundingRect().contains(scene_position):
+                return
+            data_position = self.plot_item.getViewBox().mapSceneToView(scene_position)
+            self._crosshair_vertical.setPos(float(data_position.x()))
+            self._crosshair_horizontal.setPos(float(data_position.y()))
 
         def clear(self) -> None:
             self.buffer = HierarchicalSpectrumBuffer.from_counts(())
@@ -520,6 +575,60 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
         def set_peak_labels_visible(self, visible: bool) -> None:
             self._peak_labels_visible = bool(visible)
             self.set_annotation_lines(self._annotation_specs)
+
+        def viewport_state(
+            self,
+            *,
+            viewport_id: str = "primary-spectrum",
+            spectrum_id: str | None = None,
+            selected_roi_id: str | None = None,
+        ) -> CanvasViewport:
+            """Capture the current pan/zoom and display toggles without Qt types."""
+
+            x_range, y_range = self.plot_item.viewRange()
+            viewport = CanvasViewport(
+                viewport_id=viewport_id,
+                spectrum_id=spectrum_id,
+                x_range=(float(x_range[0]), float(x_range[1])),
+                y_range=(float(y_range[0]), float(y_range[1])),
+                x_unit="energy_keV" if self._x_axis_is_energy else "channel",
+                y_unit="counts",
+                log_y=self._log_scale,
+                overlays=tuple(
+                    name
+                    for name, enabled in (
+                        ("peak-labels", self._peak_labels_visible),
+                        ("roi", self._roi_region.isVisible()),
+                    )
+                    if enabled
+                ),
+                residual_mode=self._residual_mode,
+                selected_roi_id=selected_roi_id,
+                crosshair_enabled=self._crosshair_enabled,
+                labels_visible=self._peak_labels_visible,
+            )
+            viewport.validate("viewport")
+            return viewport
+
+        def apply_viewport_state(self, viewport: CanvasViewport) -> None:
+            """Restore a validated view after spectrum data has been loaded."""
+
+            viewport.validate("viewport")
+            self.set_log_scale(viewport.log_y)
+            self.set_peak_labels_visible(viewport.labels_visible)
+            roi_visible = "roi" in viewport.overlays
+            self.roi_button.blockSignals(True)
+            self.roi_button.setChecked(roi_visible)
+            self.roi_button.blockSignals(False)
+            self._set_roi_visible(roi_visible)
+            self.set_residual_mode(viewport.residual_mode)
+            if viewport.x_range is not None or viewport.y_range is not None:
+                self.plot_item.disableAutoRange()
+            if viewport.x_range is not None:
+                self.plot_item.setXRange(*viewport.x_range, padding=0.0)
+            if viewport.y_range is not None:
+                self.plot_item.setYRange(*viewport.y_range, padding=0.0)
+            self.set_crosshair_enabled(viewport.crosshair_enabled)
 
         def _on_selection_changed(self, state: SelectionState) -> None:
             if state.roi_bounds_keV is not None:
@@ -613,6 +722,24 @@ else:
             )
 
         def clear(self) -> None:
+            raise RuntimeError(
+                "PyQtGraph renderer is unavailable. Install the `native-gui` extra."
+            )
+
+        def viewport_state(
+            self,
+            *,
+            viewport_id: str = "primary-spectrum",
+            spectrum_id: str | None = None,
+            selected_roi_id: str | None = None,
+        ) -> CanvasViewport:
+            del viewport_id, spectrum_id, selected_roi_id
+            raise RuntimeError(
+                "PyQtGraph renderer is unavailable. Install the `native-gui` extra."
+            )
+
+        def apply_viewport_state(self, viewport: CanvasViewport) -> None:
+            del viewport
             raise RuntimeError(
                 "PyQtGraph renderer is unavailable. Install the `native-gui` extra."
             )

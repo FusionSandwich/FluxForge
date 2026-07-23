@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Callable
 
 import numpy as np
@@ -2339,8 +2339,9 @@ if (
         def _apply_workspace_results(self) -> None:
             if self._energy_fit is None:
                 return
-            self._spectrum.calibration["energy"] = list(self._energy_fit.coefficients)
-            self._spectrum.calibration["deviation_pairs"] = [
+            calibration = dict(self._spectrum.calibration)
+            calibration["energy"] = list(self._energy_fit.coefficients)
+            calibration["deviation_pairs"] = [
                 {
                     "energy_keV": pair.energy_keV,
                     "correction_keV": pair.correction_keV,
@@ -2348,7 +2349,20 @@ if (
                 }
                 for pair in self._energy_fit.deviation_pairs
             ]
-            self._spectrum.energies = self._spectrum.calibrate_channels()
+            if self._fwhm_fit is not None:
+                calibration["fwhm"] = {
+                    "model": self._fwhm_fit.model,
+                    "coefficients": list(self._fwhm_fit.coefficients),
+                }
+            # GammaSpectrum is mutable for parser compatibility, so applying a
+            # calibration must create a new spectrum value.  ``replace`` keeps
+            # the large count/channel arrays by identity while ``__post_init__``
+            # derives a fresh energy axis from the new calibration mapping.
+            updated_spectrum = replace(
+                self._spectrum,
+                calibration=calibration,
+                energies=None,
+            )
             self.selection_bus.publish(
                 self.selection_bus.state.__class__(
                     peak_energy_keV=self.selection_bus.state.peak_energy_keV,
@@ -2361,7 +2375,8 @@ if (
                 )
             )
             if self.on_apply is not None:
-                self.on_apply(self._spectrum, self._energy_fit, self._fwhm_fit)
+                self.on_apply(updated_spectrum, self._energy_fit, self._fwhm_fit)
+            self._spectrum = updated_spectrum
             self.energy_summary.setText(
                 self.energy_summary.text()
                 + "\nApplied to the workspace spectrum and broadcast to the shell."

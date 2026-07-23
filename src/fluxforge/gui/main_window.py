@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from copy import deepcopy
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from pathlib import Path
 
@@ -18,11 +19,18 @@ from fluxforge.gui.analysis_workspace import (
 )
 from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
-from fluxforge.io import read_ffs_session, read_spectrum_any
+from fluxforge.gui.workspace_undo import ApplyCalibrationCommand
+from fluxforge.io import (
+    FluxForgeSession,
+    read_ffs_session,
+    read_spectrum_any,
+    write_ffs_session,
+)
 from fluxforge.core.predictive import (
     estimate_count_target_forecast,
     estimate_recalibration_forecast,
 )
+from fluxforge.core.workspace_document import CalibrationModel, DetectorProfile
 from fluxforge.reporting.engine import ReportingEngine
 from fluxforge.standards import (
     QAMonitor,
@@ -166,6 +174,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.analysis_workspace = AnalysisWorkspaceController(
                 self._build_initial_workspace_state(include_example=load_example)
             )
+            self._session_path: Path | None = None
+            self._session_device_snapshot: list[dict] = []
+            self._session_metadata: dict = {}
+            self._session_created_at: str | None = None
+            self._session_recent_files: tuple[str, ...] = ()
+            self._document_dirty = False
             self._calibration_dialog = None
             self._unfolding_dialog = None
             self._qa_history_dialog = None
@@ -192,6 +206,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.mode_manager.subscribe(self._on_mode_state_changed)
             self.selection_bus.subscribe(self._on_selection_changed)
             self.analysis_workspace.subscribe(self._on_workspace_state_changed)
+            self.analysis_workspace.subscribe_document(
+                self._on_workspace_document_changed
+            )
             self._on_mode_state_changed(self.mode_manager.state)
             self._on_workspace_state_changed(self.analysis_workspace.state)
 
@@ -279,6 +296,23 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     enabled=True,
                     handler=self._open_session_dialog,
                     object_name="OpenSessionAction",
+                )
+            )
+            self._save_session_action = self._action(
+                "Save Session",
+                "Ctrl+S",
+                enabled=True,
+                handler=self.save_session,
+                object_name="SaveSessionAction",
+            )
+            file_menu.addAction(self._save_session_action)
+            file_menu.addAction(
+                self._action(
+                    "Save Session As...",
+                    "Ctrl+Shift+S",
+                    enabled=True,
+                    handler=self._save_session_as_dialog,
+                    object_name="SaveSessionAsAction",
                 )
             )
             file_menu.addAction(
@@ -790,13 +824,95 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if filename:
                 self._open_dialog_path(filename)
 
+        def _save_session_as_dialog(self) -> bool:
+            initial = str(
+                self._session_path
+                or (
+                    Path(self.recent_files.files()[0]).with_suffix(".ffs")
+                    if self.recent_files.files()
+                    else Path("fluxforge-analysis.ffs")
+                )
+            )
+            filename, _selected_filter = QFileDialog.getSaveFileName(
+                self,
+                "Save FluxForge session",
+                initial,
+                "FluxForge sessions (*.ffs);;All files (*)",
+            )
+            if not filename:
+                return False
+            return self.save_session(filename)
+
+        def save_session(self, path: str | Path | None = None) -> bool:
+            """Atomically save the complete canonical analysis document."""
+
+            if isinstance(path, bool):
+                # QAction.triggered supplies its checked state.
+                path = None
+            target = Path(path) if path is not None else self._session_path
+            if target is None:
+                return self._save_session_as_dialog()
+            if target.suffix.lower() != ".ffs":
+                target = target.with_suffix(".ffs")
+
+            viewport = (
+                self.central_tabs.viewport_state()
+                if hasattr(self.central_tabs, "viewport_state")
+                else None
+            )
+            if viewport is not None:
+                self.analysis_workspace.upsert_viewport(viewport)
+            recent_files = tuple(
+                dict.fromkeys(
+                    (
+                        str(target),
+                        *self._session_recent_files,
+                        *self.recent_files.files(),
+                    )
+                )
+            )
+            session = FluxForgeSession(
+                document=self.analysis_workspace.document,
+                recent_files=recent_files,
+                device_snapshot=deepcopy(self._session_device_snapshot),
+                metadata=deepcopy(self._session_metadata),
+                created_at=self._session_created_at,
+            )
+            try:
+                write_ffs_session(target, session)
+            except Exception as exc:
+                QMessageBox.critical(
+                    self,
+                    "Could not save session",
+                    f"FluxForge could not save {target}.\n\n{exc}",
+                )
+                return False
+            self._session_path = target.resolve()
+            self._session_created_at = session.created_at
+            self._session_recent_files = tuple(session.recent_files)
+            self.recent_files.record(target)
+            self._document_dirty = False
+            self.undo_stack.setClean()
+            self.setWindowModified(False)
+            self.file_label.setText(f"File: {target.name}")
+            self.statusBar().showMessage(f"Session saved: {target.name}", 4000)
+            return True
+
         def _load_example_workspace(self) -> None:
             """Load the bundled deterministic HPGe example on explicit request."""
 
             self.qa_monitor.seed_demo_history()
-            self.analysis_workspace.set_state(
-                self._build_initial_workspace_state(include_example=True)
+            self.analysis_workspace.set_document(
+                AnalysisWorkspaceController(
+                    self._build_initial_workspace_state(include_example=True)
+                ).document
             )
+            self._session_path = None
+            self._session_device_snapshot = []
+            self._session_metadata = {}
+            self._session_created_at = None
+            self._session_recent_files = ()
+            self.undo_stack.clear()
             self._refresh_analysis_workspace_derivatives()
             self.file_label.setText("File: bundled HPGe example")
             self.statusBar().showMessage("Bundled HPGe example loaded", 4000)
@@ -872,6 +988,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     (
                         "Ctrl+O — Open spectrum",
                         "Ctrl+Shift+O — Open FluxForge session",
+                        "Ctrl+S — Save FluxForge session",
+                        "Ctrl+Shift+S — Save FluxForge session as",
                         "Ctrl+E — Export report",
                         "Ctrl+Z / Ctrl+Shift+Z — Undo / redo",
                         "Ctrl+L — Toggle logarithmic spectrum scale",
@@ -1037,40 +1155,28 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             source = Path(path)
             if source.suffix.lower() == ".ffs":
                 session = read_ffs_session(source)
-                loaded_keys: list[str] = []
-                for index, spectrum in enumerate(session.spectra):
-                    session_source = (
-                        session.source_files[index]
-                        if index < len(session.source_files)
-                        else None
-                    )
-                    label = (
-                        Path(session_source).name
-                        if session_source
-                        else (
-                            spectrum.spectrum_id
-                            or f"{source.stem} spectrum {index + 1}"
-                        )
-                    )
-                    loaded_keys.append(
-                        self.analysis_workspace.register_loaded_spectrum(
-                            spectrum,
-                            label=label,
-                            source_path=session_source,
-                        )
-                    )
-                if loaded_keys:
-                    active_index = min(
-                        max(session.active_spectrum_index, 0),
-                        len(loaded_keys) - 1,
-                    )
-                    active_key = loaded_keys[active_index]
-                    slot_key = self.analysis_workspace.state.active_spectrum_key
-                    self.analysis_workspace.assign_loaded_spectrum_to_slot(
-                        active_key,
-                        slot_key,
-                    )
-                self.recent_files.record_many(session.recent_files or [source])
+                self.analysis_workspace.set_document(session.document)
+                self._session_path = source.resolve()
+                self._session_device_snapshot = deepcopy(session.device_snapshot)
+                self._session_metadata = deepcopy(session.metadata)
+                self._session_created_at = session.created_at
+                self._session_recent_files = tuple(session.recent_files)
+                self.undo_stack.clear()
+                self.undo_stack.setClean()
+                viewport = session.document.viewport_by_id("primary-spectrum")
+                if viewport is not None and hasattr(
+                    self.central_tabs, "apply_viewport_state"
+                ):
+                    self.central_tabs.apply_viewport_state(viewport)
+                    self._log_scale_action.setChecked(viewport.log_y)
+                    self._peak_labels_action.setChecked(viewport.labels_visible)
+                if viewport is not None and viewport.selected_roi_id:
+                    roi = session.document.roi_by_id(viewport.selected_roi_id)
+                    if roi is not None:
+                        self.selection_bus.publish_roi(*roi.signal_range)
+                self.recent_files.record_many((source, *session.recent_files))
+                self._document_dirty = False
+                self.setWindowModified(False)
             else:
                 spectrum = read_spectrum_any(source)
                 loaded_key = self.analysis_workspace.register_loaded_spectrum(
@@ -1088,6 +1194,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.recent_files.record(source)
             self.file_label.setText(f"File: {source.name}")
             self._refresh_analysis_workspace_derivatives()
+            if source.suffix.lower() == ".ffs":
+                self._document_dirty = False
+                self.setWindowModified(False)
+
+        def _on_workspace_document_changed(self, _document) -> None:
+            self._document_dirty = True
+            self.setWindowModified(True)
 
         def dragEnterEvent(self, event) -> None:
             mime_data = event.mimeData()
@@ -1491,26 +1604,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _snapshot_current_workflow(self) -> dict[str, object]:
             state = self.analysis_workspace.state
-            loaded_spectra = []
-            seen_paths: set[str] = set()
-            for record in state.loaded_spectra:
-                source_path = str(record.source_path or "").strip()
-                if not source_path or source_path in seen_paths:
-                    continue
-                seen_paths.add(source_path)
-                loaded_spectra.append(
-                    {
-                        "source_path": source_path,
-                        "label": record.label,
-                    }
-                )
-            slot_assignments = {
-                slot.key: str(slot.source_path)
-                for slot in state.spectra
-                if slot.source_path
-            }
             workspace_payload = {
-                "active_spectrum_key": state.active_spectrum_key,
                 "peak_search_method": state.peak_search_method,
                 "bayesian_source_id": state.bayesian_source_id,
                 "ml_source_id": state.ml_source_id,
@@ -1518,12 +1612,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "background_mode": state.background_mode,
                 "background_scale": float(state.background_scale),
                 "background_visible": bool(state.background_visible),
-                "pinned_nuclides": list(state.pinned_nuclides),
-                "loaded_spectra": loaded_spectra,
-                "slot_assignments": slot_assignments,
             }
             payload = {
-                "version": 1,
+                "version": 2,
                 "mode_state": self.mode_manager.describe(),
                 "library_state": self.library_manager.describe(),
                 "view_state": {
@@ -1635,54 +1726,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.selection_bus.publish(SelectionState())
 
-        def _restore_loaded_spectra_from_payload(
-            self,
-            payload: dict[str, object],
-        ) -> list[str]:
-            loaded_entries = payload.get("loaded_spectra")
-            if not isinstance(loaded_entries, list) or not loaded_entries:
-                return []
-
-            self._reset_analysis_workspace()
-            loaded_key_by_path: dict[str, str] = {}
-            missing_paths: list[str] = []
-            for entry in loaded_entries:
-                if not isinstance(entry, dict):
-                    continue
-                source_path = str(entry.get("source_path") or "").strip()
-                if not source_path:
-                    continue
-                path = Path(source_path)
-                if not path.exists():
-                    missing_paths.append(source_path)
-                    continue
-                spectrum = read_spectrum_any(path)
-                loaded_key = self.analysis_workspace.register_loaded_spectrum(
-                    spectrum,
-                    label=str(entry.get("label") or path.name),
-                    source_path=str(path),
-                )
-                loaded_key_by_path[str(path)] = loaded_key
-
-            slot_assignments = payload.get("slot_assignments")
-            if isinstance(slot_assignments, dict):
-                for slot_key, source_path in slot_assignments.items():
-                    resolved_path = str(source_path or "").strip()
-                    loaded_key = loaded_key_by_path.get(resolved_path)
-                    if loaded_key:
-                        self.analysis_workspace.assign_loaded_spectrum_to_slot(
-                            loaded_key,
-                            str(slot_key),
-                        )
-
-            if loaded_key_by_path and not slot_assignments:
-                first_key = next(iter(loaded_key_by_path.values()))
-                self.analysis_workspace.assign_loaded_spectrum_to_slot(
-                    first_key,
-                    "foreground",
-                )
-            return missing_paths
-
         def _apply_workflow_payload(self, payload: dict[str, object]) -> None:
             mode_payload, library_payload = (
                 self.workflow_presets.extract_mode_and_library_state(payload)
@@ -1693,11 +1736,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.library_manager.apply_state(library_payload)
 
             workspace_payload = payload.get("workspace_state")
-            missing_paths: list[str] = []
             if isinstance(workspace_payload, dict):
-                missing_paths = self._restore_loaded_spectra_from_payload(
-                    workspace_payload
-                )
                 config_payload = {
                     key: workspace_payload.get(key)
                     for key in (
@@ -1743,15 +1782,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         else None
                     ),
                 )
-                pinned = workspace_payload.get("pinned_nuclides")
-                if isinstance(pinned, list):
-                    self.analysis_workspace.set_pinned_nuclides(
-                        [str(item) for item in pinned]
-                    )
-                active_spectrum_key = workspace_payload.get("active_spectrum_key")
-                if active_spectrum_key:
-                    self.analysis_workspace.select_spectrum(str(active_spectrum_key))
-
             view_payload = payload.get("view_state")
             if isinstance(view_payload, dict):
                 if "log_scale" in view_payload:
@@ -1787,12 +1817,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 bottom_widget.apply_workflow_state(bottom_payload)
 
             self._refresh_analysis_workspace_derivatives()
-            if missing_paths:
-                self.statusBar().showMessage(
-                    "Workflow restored with missing spectrum files: "
-                    + ", ".join(Path(path).name for path in missing_paths),
-                    8000,
-                )
 
         def _open_pu_isotopics_wizard(self) -> None:
             if self.mode_manager.state.mode is GUIMode.SIMPLE:
@@ -1816,8 +1840,101 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             energy_fit,
             fwhm_fit,
         ) -> None:
-            if hasattr(self.central_tabs, "load_spectrum"):
-                self.central_tabs.load_spectrum(spectrum)
+            spectrum_id = self.analysis_workspace.document.active_spectrum_id
+            workspace_spectrum = (
+                self.analysis_workspace.document.spectrum_by_id(spectrum_id)
+                if spectrum_id is not None
+                else None
+            )
+            if spectrum_id is None or workspace_spectrum is None:
+                return
+            existing_profile = (
+                self.analysis_workspace.document.detector_profile_by_id(
+                    workspace_spectrum.detector_profile_id
+                )
+                if workspace_spectrum.detector_profile_id
+                else None
+            )
+            profile_base = existing_profile or DetectorProfile(
+                detector_profile_id=f"{spectrum_id}-detector-profile",
+                detector_id=str(workspace_spectrum.spectrum.detector_id or ""),
+            )
+            prior_leaf = existing_profile
+            if prior_leaf is None:
+                prior_coefficients = tuple(
+                    float(value)
+                    for value in workspace_spectrum.spectrum.calibration.get(
+                        "energy", ()
+                    )
+                )
+                raw_deviation_pairs = workspace_spectrum.spectrum.calibration.get(
+                    "deviation_pairs", ()
+                )
+                prior_deviation_pairs = tuple(
+                    (
+                        float(item.get("energy_keV", 0.0)),
+                        float(item.get("correction_keV", 0.0)),
+                    )
+                    for item in raw_deviation_pairs
+                    if isinstance(item, dict)
+                )
+                prior_leaf = replace(
+                    profile_base,
+                    energy_calibration=(
+                        CalibrationModel(
+                            model_key="legacy-polynomial",
+                            coefficients=prior_coefficients,
+                            deviation_pairs=prior_deviation_pairs,
+                        )
+                        if prior_coefficients
+                        else None
+                    ),
+                )
+            energy_model = CalibrationModel(
+                model_key=f"polynomial-{energy_fit.order}",
+                coefficients=tuple(float(value) for value in energy_fit.coefficients),
+                deviation_pairs=tuple(
+                    (float(pair.energy_keV), float(pair.correction_keV))
+                    for pair in energy_fit.deviation_pairs
+                ),
+                provenance={
+                    "chi_squared": float(energy_fit.chi_squared),
+                    "reduced_chi_squared": float(energy_fit.reduced_chi_squared),
+                    "rms_keV": float(energy_fit.rms_keV),
+                },
+            )
+            fwhm_model = (
+                CalibrationModel(
+                    model_key=str(fwhm_fit.model),
+                    coefficients=tuple(float(value) for value in fwhm_fit.coefficients),
+                    provenance={
+                        "chi_squared": float(fwhm_fit.chi_squared),
+                        "reduced_chi_squared": float(fwhm_fit.reduced_chi_squared),
+                        "rms_keV": float(fwhm_fit.rms_keV),
+                    },
+                )
+                if fwhm_fit is not None
+                else (
+                    existing_profile.fwhm_calibration
+                    if existing_profile is not None
+                    else None
+                )
+            )
+            profile = replace(
+                profile_base,
+                energy_calibration=energy_model,
+                fwhm_calibration=fwhm_model,
+            )
+            command = ApplyCalibrationCommand(
+                self.analysis_workspace,
+                spectrum_id=spectrum_id,
+                before=prior_leaf,
+                after=profile,
+            )
+            if self.undo_stack is not None:
+                self.undo_stack.push(command)
+            else:
+                command.redo()
             self._refresh_analysis_workspace_derivatives()
             self.file_label.setText(
                 f"File: {spectrum.spectrum_id or 'workspace spectrum'}"

@@ -23,7 +23,7 @@ WorkflowPresetListener = Callable[[tuple[WorkflowPreset, ...], Optional[str]], N
 
 def _default_quantumgold_payload() -> dict[str, Any]:
     return {
-        "version": 1,
+        "version": 2,
         "mode_state": {
             "mode": "expert",
             "standard": None,
@@ -46,7 +46,6 @@ def _default_quantumgold_payload() -> dict[str, Any]:
             "current_tab": "Spectrum",
         },
         "workspace_state": {
-            "active_spectrum_key": "foreground",
             "peak_search_method": "mariscotti",
             "bayesian_source_id": "fluxforge_bundled_gamma",
             "ml_source_id": "fluxforge_bundled_gamma",
@@ -54,9 +53,6 @@ def _default_quantumgold_payload() -> dict[str, Any]:
             "background_mode": "simple",
             "background_scale": 1.0,
             "background_visible": True,
-            "pinned_nuclides": [],
-            "loaded_spectra": [],
-            "slot_assignments": {},
         },
         "sidebar_state": {
             "nuclide_query": "cs",
@@ -119,7 +115,7 @@ def _default_quantumgold_payload() -> dict[str, Any]:
 
 def _default_astm_ldrd_payload() -> dict[str, Any]:
     return {
-        "version": 1,
+        "version": 2,
         "mode_state": {
             "mode": "standards",
             "standard": "ASTM E261",
@@ -142,7 +138,6 @@ def _default_astm_ldrd_payload() -> dict[str, Any]:
             "current_tab": "Spectrum",
         },
         "workspace_state": {
-            "active_spectrum_key": "foreground",
             "peak_search_method": "mariscotti",
             "bayesian_source_id": "decay_2012",
             "ml_source_id": "decay_2012",
@@ -150,9 +145,6 @@ def _default_astm_ldrd_payload() -> dict[str, Any]:
             "background_mode": "scaled",
             "background_scale": 1.0,
             "background_visible": True,
-            "pinned_nuclides": [],
-            "loaded_spectra": [],
-            "slot_assignments": {},
         },
         "sidebar_state": {
             "nuclide_query": "co",

@@ -48,13 +48,23 @@ Use these first files:
 
 Recommended first interactions:
 
-1. Load the foreground and background spectra.
-2. Zoom into a photopeak region.
-3. Drag the ROI directly on the main canvas.
-4. Drag the sideband handles if you want ROI-sideband background handling.
-5. Select a peak and drag its centroid to refine it.
-6. Right-click near a peak to use context actions such as select peak, use peak ROI, clear ID, delete peak, add manual peak, and assign the current source role.
-7. Watch the linked peak table, ROI panel, and other shell panels update as you change the selection.
+1. Choose **File > Open Example**, or load the foreground and background
+   spectra above and assign their roles in the left sidebar.
+2. Use the mouse wheel or **Zoom + / Zoom -** to inspect a photopeak region;
+   left-drag pans and **Reset View** restores the full range.
+3. Choose **Select ROI** and drag the displayed ROI bounds.
+4. Choose the sideband or SNIP method in the ROI tools when you want a
+   background model, then run ROI analysis or ROI statistics.
+5. Run **Auto Find Peaks**, accept the reviewed proposals, and select a row to
+   synchronize the plot, peak tools, and nuclide browser.
+6. Use the peak-table controls to assign or clear an isotope, add a tag, or pin
+   a nuclide.
+7. Choose **File > Save Session** (`Ctrl+S`) to persist spectra, roles, ROIs,
+   peaks, detector state, and plot ranges in a validated `.ffs` file.
+
+Direct plot-sideband handles, centroid dragging, and peak context menus are not
+part of the current production workflow. They remain tracked direct-manipulation
+work rather than being presented as working controls.
 
 ## 3. First CLI Session
 

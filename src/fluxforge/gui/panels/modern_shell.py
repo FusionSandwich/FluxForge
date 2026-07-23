@@ -69,7 +69,11 @@ from fluxforge.data.nuclear_data_sources import list_nuclear_data_sources_by_cap
 from fluxforge.gui.analysis_workspace import (
     AnalysisWorkspaceController,
     SpectrumSlot,
-    WorkspaceStateCommand,
+)
+from fluxforge.gui.workspace_undo import (
+    ReplacePeakSetCommand,
+    TogglePinnedNuclideCommand,
+    UpdatePeakCommand,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
 from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog
@@ -911,16 +915,92 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _commit_state_change(self, description: str, before, after) -> None:
-            if self.undo_stack is not None:
-                self.undo_stack.push(
-                    WorkspaceStateCommand(
+            if self.undo_stack is None:
+                self.workspace_controller.set_state(after)
+                return
+
+            if before.peaks != after.peaks:
+                spectrum_id = self.workspace_controller.document.active_spectrum_id
+                if spectrum_id is None:
+                    self.workspace_controller.set_state(after)
+                    return
+                existing = {
+                    peak.peak_id: peak
+                    for peak in self.workspace_controller.document.peaks
+                    if peak.spectrum_id == spectrum_id
+                }
+                before_models = tuple(
+                    self.workspace_controller._peak_model_from_candidate(
+                        peak, spectrum_id, existing.get(peak.peak_id)
+                    )
+                    for peak in before.peaks
+                )
+                before_by_id = {peak.peak_id: peak for peak in before_models}
+                after_models = tuple(
+                    self.workspace_controller._peak_model_from_candidate(
+                        peak, spectrum_id, before_by_id.get(peak.peak_id)
+                    )
+                    for peak in after.peaks
+                )
+                changed_before = {
+                    peak.peak_id: peak
+                    for peak in before_models
+                    if next(
+                        (item for item in after_models if item.peak_id == peak.peak_id),
+                        None,
+                    )
+                    != peak
+                }
+                changed_after = {
+                    peak.peak_id: peak
+                    for peak in after_models
+                    if before_by_id.get(peak.peak_id) != peak
+                }
+                if (
+                    len(changed_before) == 1
+                    and len(changed_after) == 1
+                    and set(changed_before) == set(changed_after)
+                ):
+                    peak_id = next(iter(changed_after))
+                    command = UpdatePeakCommand(
                         self.workspace_controller,
+                        before=changed_before[peak_id],
+                        after=changed_after[peak_id],
                         description=description,
-                        before=before,
-                        after=after,
+                    )
+                else:
+                    command = ReplacePeakSetCommand(
+                        self.workspace_controller,
+                        spectrum_id=spectrum_id,
+                        before=before_models,
+                        after=after_models,
+                        description=description,
+                    )
+                self.undo_stack.push(command)
+                if before.peak_search_method != after.peak_search_method:
+                    self.workspace_controller.set_peak_search_method(
+                        after.peak_search_method
+                    )
+                if before.selected_peak_id != after.selected_peak_id:
+                    self.workspace_controller.select_peak(after.selected_peak_id)
+                return
+
+            if before.pinned_nuclides != after.pinned_nuclides:
+                self.undo_stack.push(
+                    TogglePinnedNuclideCommand(
+                        self.workspace_controller,
+                        before=before.pinned_nuclides,
+                        after=after.pinned_nuclides,
+                        description=description,
                     )
                 )
+                if before.cascade_sum_lines_keV != after.cascade_sum_lines_keV:
+                    self.workspace_controller.set_cascade_sum_lines(
+                        after.cascade_sum_lines_keV
+                    )
                 return
+
+            # Non-persisted derived values do not warrant a full-document copy.
             self.workspace_controller.set_state(after)
 
         def _sync_state(self, state) -> None:

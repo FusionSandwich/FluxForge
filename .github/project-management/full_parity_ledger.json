@@ -84,15 +84,15 @@
       "id": "3.24", "title": "Direct-manipulation spectrum canvas", "roadmap": "Phase 3B", "status": "prototype",
       "source_urls": ["fluxforge-roadmap", "interspec", "peakeasy", "hyperlab"],
       "backend": "prototype", "cli": "not-applicable", "gui": "prototype", "fixture": "planned", "test": "prototype",
-      "evidence": ["src/fluxforge/gui/spectrum_canvas.py", "src/fluxforge/gui/backends/pyqtgraph_backend.py", "tests/test_analysis_workspace_qt.py"],
-      "notes": "Canvas interaction code exists, but the complete peak/ROI/sideband command model and native Windows/Linux evidence are not yet validated."
+      "evidence": ["src/fluxforge/gui/spectrum_canvas.py", "src/fluxforge/gui/backends/pyqtgraph_backend.py", "src/fluxforge/gui/canvas_intents.py", "src/fluxforge/gui/workspace_undo.py", "tests/test_canvas_intents.py", "tests/test_workspace_undo.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "Renderer-independent intents, focused undo commands, and persisted viewports are implemented with Windows/Linux tests. Direct peak/ROI/sideband mouse manipulation and native desktop automation remain for gui/02, so this stays prototype."
     },
     {
       "id": "3.25", "title": "Modern Qt parity workspaces", "roadmap": "Phase 3B", "status": "prototype",
       "source_urls": ["fluxforge-roadmap", "interspec", "gammavision", "genie"],
       "backend": "prototype", "cli": "prototype", "gui": "prototype", "fixture": "scaffolded", "test": "prototype",
-      "evidence": ["src/fluxforge/gui/panels/modern_shell.py", "src/fluxforge/gui/panels/phase6.py", "tests/test_analysis_workspace_qt.py"],
-      "notes": "Several workspaces are executable; their presence does not close detection-limit, shielding, library, k0, or optimization scientific parity."
+      "evidence": ["src/fluxforge/core/workspace_document.py", "src/fluxforge/io/session.py", "src/fluxforge/io/atomic.py", "src/fluxforge/gui/analysis_workspace.py", "src/fluxforge/gui/main_window.py", "src/fluxforge/gui/panels/modern_shell.py", "src/fluxforge/gui/panels/phase6.py", "tests/test_workspace_document_v2.py", "tests/test_session_v2_migration.py", "tests/test_workspace_session_qt.py", "tests/test_analysis_workspace_qt.py"],
+      "notes": "WorkspaceDocument v2, v1 migration, atomic sessions, and Save/Open replacement are implemented with Windows/Linux tests. Scientific workspace parity for detection limits, shielding, libraries, k0, and optimization remains open, so this stays prototype."
     },
     {
       "id": "3.26", "title": "GUI polish, dark mode, and saved themes", "roadmap": "Phase 3B", "status": "implemented",

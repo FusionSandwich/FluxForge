@@ -7,6 +7,7 @@ from datetime import datetime
 import numpy as np
 
 from fluxforge.core.analysis_workspace import subtract_background_counts
+from fluxforge.core.workspace_document import CanvasViewport
 from fluxforge.core.predictive import (
     estimate_count_target_forecast,
     estimate_dead_time_forecast,
@@ -378,6 +379,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 and hasattr(self.canvas, "set_peak_labels_visible")
             ):
                 self.canvas.set_peak_labels_visible(bool(visible))
+
+        def viewport_state(self) -> CanvasViewport | None:
+            if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
+                return None
+            document = self.workspace_controller.document
+            current = document.viewport_by_id("primary-spectrum")
+            selected_roi_id = current.selected_roi_id if current is not None else None
+            return self.canvas.viewport_state(
+                viewport_id="primary-spectrum",
+                spectrum_id=document.active_spectrum_id,
+                selected_roi_id=selected_roi_id,
+            )
+
+        def apply_viewport_state(self, viewport: CanvasViewport) -> None:
+            if PYQTGRAPH_AVAILABLE and hasattr(self, "canvas"):
+                self.canvas.apply_viewport_state(viewport)
 
         def _slot_tab_changed(self, index: int) -> None:
             if index < 0 or index >= len(self.workspace_controller.state.spectra):
