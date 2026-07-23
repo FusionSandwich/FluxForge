@@ -1,4 +1,4 @@
-"""Main window shell for the next-generation FluxForge GUI."""
+"""Main window for the FluxForge desktop GUI."""
 
 from __future__ import annotations
 
@@ -24,7 +24,11 @@ from fluxforge.core.predictive import (
     estimate_recalibration_forecast,
 )
 from fluxforge.reporting.engine import ReportingEngine
-from fluxforge.standards import QAMonitor, StandardsEvaluationContext, register_builtin_standards_modules
+from fluxforge.standards import (
+    QAMonitor,
+    StandardsEvaluationContext,
+    register_builtin_standards_modules,
+)
 from fluxforge.plugins import bootstrap_builtin_registries
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
@@ -74,7 +78,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
 @dataclass(frozen=True)
 class DockZone:
-    """Logical dock zone in the next-generation main window."""
+    """Logical dock zone in the desktop workspace."""
 
     code: str
     title: str
@@ -84,8 +88,12 @@ class DockZone:
 DEFAULT_DOCK_ZONES = (
     DockZone("A", "Menu / Toolbar", "Global actions, workflow mode, and shortcuts."),
     DockZone("B", "Left Sidebar", "Files, nuclides, results, and QA surfaces."),
-    DockZone("C", "Central Canvas", "Primary spectrum and shared analytical workspace."),
-    DockZone("D", "Bottom Panels", "Peak table, calibration, activity, batch, and log."),
+    DockZone(
+        "C", "Central Canvas", "Primary spectrum and shared analytical workspace."
+    ),
+    DockZone(
+        "D", "Bottom Panels", "Peak table, calibration, activity, batch, and log."
+    ),
     DockZone("E", "Right Sidebar", "Context-sensitive tool parameters."),
     DockZone("F", "Status Bar", "Cursor readout, hardware LED, and task progress."),
 )
@@ -93,7 +101,7 @@ DEFAULT_DOCK_ZONES = (
 
 @dataclass
 class MainWindowScaffold:
-    """Lightweight representation of the planned main-window layout."""
+    """Lightweight representation of the main-window layout."""
 
     zones: tuple[DockZone, ...] = field(default_factory=lambda: DEFAULT_DOCK_ZONES)
 
@@ -112,17 +120,16 @@ def modern_gui_unavailable_message() -> str:
         else "Qt extras are unavailable."
     )
     return (
-        "The next-generation FluxForge GUI requires the optional native GUI extras "
+        "The FluxForge desktop GUI requires the optional native GUI extras "
         "(`PySide6` and `pyqtgraph`). "
-        f"Current import status: {reason} "
-        "Use the legacy Tk shell via `fluxforge-gui-legacy` if you need the archived interface."
+        f"Current import status: {reason}"
     )
 
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
     class FluxForgeMainWindow(QMainWindow):
-        """Modern dockable shell for the roadmap GUI."""
+        """Dockable analyst workspace for HPGe and neutron-spectrum workflows."""
 
         ORGANIZATION = "FluxForge"
         APPLICATION = "FluxForgeNext"
@@ -132,6 +139,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             mode_manager: ModeManager | None = None,
             selection_bus: SelectionBus | None = None,
             settings=None,
+            qa_monitor: QAMonitor | None = None,
+            developer_tools: bool = False,
+            load_example: bool = False,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -140,19 +150,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.resize(1560, 980)
 
             self.settings = settings or QSettings(self.ORGANIZATION, self.APPLICATION)
+            self.developer_tools = bool(developer_tools)
             self.mode_manager = mode_manager or ModeManager(settings=self.settings)
             self.selection_bus = selection_bus or SelectionBus.shared()
             self.library_manager = DataLibraryManager(settings=self.settings)
             self.workflow_presets = WorkflowPresetManager(settings=self.settings)
             self.recent_files = RecentFilesManager(self.settings)
-            self.qa_monitor = QAMonitor()
-            self.qa_monitor.seed_demo_history()
+            self.qa_monitor = qa_monitor or QAMonitor()
+            if load_example:
+                self.qa_monitor.seed_demo_history()
             self.reporting_engine = ReportingEngine()
             self.registries = bootstrap_builtin_registries()
             register_builtin_standards_modules(self.registries)
             self.undo_stack = QUndoStack(self)
             self.analysis_workspace = AnalysisWorkspaceController(
-                self._build_initial_workspace_state()
+                self._build_initial_workspace_state(include_example=load_example)
             )
             self._calibration_dialog = None
             self._unfolding_dialog = None
@@ -176,7 +188,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._refresh_analysis_workspace_derivatives()
             self.workflow_presets.subscribe(self._on_workflow_presets_changed)
             self._refresh_workflow_controls()
-            self._restore_active_workflow()
 
             self.mode_manager.subscribe(self._on_mode_state_changed)
             self.selection_bus.subscribe(self._on_selection_changed)
@@ -184,7 +195,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._on_mode_state_changed(self.mode_manager.state)
             self._on_workspace_state_changed(self.analysis_workspace.state)
 
-        def _build_initial_workspace_state(self) -> AnalysisWorkspaceState:
+        def _build_initial_workspace_state(
+            self,
+            *,
+            include_example: bool = False,
+        ) -> AnalysisWorkspaceState:
+            if not include_example:
+                return AnalysisWorkspaceState()
             foreground = build_demo_spectrum()
             background = build_demo_background_spectrum()
             overlay = build_demo_overlay_spectrum()
@@ -234,14 +251,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 active_spectrum_key="foreground",
             )
 
+        def _workspace_contains_bundled_example(self) -> bool:
+            return any(
+                str(slot.source_key or "").startswith("demo-")
+                for slot in self.analysis_workspace.state.spectra
+            )
+
         def _build_menu_bar(self) -> None:
+            self._requires_spectrum_actions: list[QAction] = []
+            self._requires_example_actions: list[QAction] = []
             file_menu = self.menuBar().addMenu("&File")
+            file_menu.setObjectName("FileMenu")
+            file_menu.menuAction().setObjectName("OpenFileMenuAction")
             file_menu.addAction(
                 self._action(
                     "Open Spectrum...",
                     "Ctrl+O",
                     enabled=True,
                     handler=self._open_spectrum_dialog,
+                    object_name="OpenSpectrumAction",
                 )
             )
             file_menu.addAction(
@@ -250,6 +278,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Ctrl+Shift+O",
                     enabled=True,
                     handler=self._open_session_dialog,
+                    object_name="OpenSessionAction",
+                )
+            )
+            file_menu.addAction(
+                self._action(
+                    "Open Example",
+                    enabled=True,
+                    handler=self._load_example_workspace,
+                    object_name="OpenExampleAction",
                 )
             )
             file_menu.addSeparator()
@@ -258,31 +295,40 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Ctrl+E",
                 enabled=self.reporting_engine.template_backend_available(),
                 handler=self._open_report_export,
+                object_name="ExportReportAction",
             )
             file_menu.addAction(self._report_export_action)
-            file_menu.addAction(
-                self._unavailable_action(
-                    "Export ANSI N42.42...",
-                    "ANSI N42.42 export is not implemented in the modern GUI yet.",
-                    shortcut="Ctrl+Shift+E",
+            if self.developer_tools:
+                file_menu.addAction(
+                    self._unavailable_action(
+                        "Export ANSI N42.42...",
+                        "ANSI N42.42 export is not implemented in this build.",
+                        shortcut="Ctrl+Shift+E",
+                    )
                 )
-            )
 
             edit_menu = self.menuBar().addMenu("&Edit")
+            edit_menu.setObjectName("EditMenu")
+            edit_menu.menuAction().setObjectName("OpenEditMenuAction")
             undo_action = self.undo_stack.createUndoAction(self, "Undo")
+            undo_action.setObjectName("UndoAction")
             undo_action.setShortcut(QKeySequence("Ctrl+Z"))
             edit_menu.addAction(undo_action)
             redo_action = self.undo_stack.createRedoAction(self, "Redo")
+            redo_action.setObjectName("RedoAction")
             redo_action.setShortcut(QKeySequence("Ctrl+Shift+Z"))
             edit_menu.addAction(redo_action)
 
             view_menu = self.menuBar().addMenu("&View")
+            view_menu.setObjectName("ViewMenu")
+            view_menu.menuAction().setObjectName("OpenViewMenuAction")
             view_menu.addAction(
                 self._action(
                     "Toggle Full Canvas",
                     "F11",
                     enabled=True,
                     handler=self._toggle_full_canvas,
+                    object_name="ToggleFullCanvasAction",
                 )
             )
             view_menu.addAction(
@@ -290,6 +336,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Restore Default Layout",
                     enabled=True,
                     handler=self._restore_default_layout,
+                    object_name="RestoreDefaultLayoutAction",
                 )
             )
             self._log_scale_action = self._action(
@@ -311,107 +358,130 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 object_name="TogglePeakLabelsAction",
             )
             view_menu.addAction(self._peak_labels_action)
-            renderer_menu = view_menu.addMenu("Renderer")
-            for backend in available_renderer_status():
-                label = backend["display_name"]
-                if backend["recommended"]:
-                    label += " ★"
-                availability = "available" if backend["available"] else "unavailable"
-                renderer_menu.addAction(
-                    self._unavailable_action(
-                        f"{label} ({availability})",
-                        "Runtime renderer switching is not implemented; "
-                        "PyQtGraph remains active.",
-                    )
+            if self.developer_tools:
+                renderer_menu = view_menu.addMenu("Renderer Diagnostics")
+                renderer_menu.setObjectName("RendererDiagnosticsMenu")
+                renderer_menu.menuAction().setObjectName(
+                    "OpenRendererDiagnosticsMenuAction"
                 )
+                for backend in available_renderer_status():
+                    label = backend["display_name"]
+                    if backend["recommended"]:
+                        label += " ★"
+                    availability = (
+                        "available" if backend["available"] else "unavailable"
+                    )
+                    renderer_menu.addAction(
+                        self._unavailable_action(
+                            f"{label} ({availability})",
+                            "Runtime renderer switching is unavailable.",
+                        )
+                    )
 
             analysis_menu = self.menuBar().addMenu("&Analysis")
-            analysis_menu.addAction(
-                self._action(
-                    "Auto Find Peaks",
-                    "Ctrl+A",
-                    enabled=True,
-                    handler=self._run_auto_peak_search,
-                )
+            analysis_menu.setObjectName("AnalysisMenu")
+            analysis_menu.menuAction().setObjectName("OpenAnalysisMenuAction")
+            self._auto_peak_action = self._action(
+                "Auto Find Peaks",
+                "Ctrl+A",
+                enabled=self.analysis_workspace.spectrum() is not None,
+                handler=self._run_auto_peak_search,
+                object_name="AutoFindPeaksAction",
             )
+            analysis_menu.addAction(self._auto_peak_action)
+            self._requires_spectrum_actions.append(self._auto_peak_action)
             analysis_menu.addAction(
                 self._action(
                     "Nuclide Search",
                     enabled=True,
                     handler=self._focus_nuclide_search,
+                    object_name="FocusNuclideSearchAction",
                 )
             )
-            analysis_menu.addAction(
-                self._action(
-                    "Run ASTM Check",
-                    enabled=True,
-                    handler=self._open_standards_review,
-                )
+            self._run_astm_check_action = self._action(
+                "Run ASTM Check",
+                enabled=self.analysis_workspace.spectrum() is not None,
+                handler=self._open_standards_review,
+                object_name="RunAstmCheckAction",
             )
-            analysis_menu.addAction(
-                self._action(
-                    "Spectrum Unfolding Workspace",
-                    enabled=True,
-                    handler=self._open_unfolding_workspace,
-                )
+            analysis_menu.addAction(self._run_astm_check_action)
+            self._requires_spectrum_actions.append(self._run_astm_check_action)
+            self._unfolding_action = self._action(
+                "Spectrum Unfolding Workspace",
+                enabled=self._workspace_contains_bundled_example(),
+                handler=self._open_unfolding_workspace,
+                object_name="OpenSpectrumUnfoldingAction",
             )
+            analysis_menu.addAction(self._unfolding_action)
+            self._requires_example_actions.append(self._unfolding_action)
             self._pu_isotopics_action = self._action(
                 "Pu Isotopics Wizard...",
-                enabled=True,
+                enabled=self.analysis_workspace.spectrum() is not None,
                 handler=self._open_pu_isotopics_wizard,
+                object_name="OpenPuIsotopicsAction",
             )
             analysis_menu.addAction(self._pu_isotopics_action)
+            self._requires_spectrum_actions.append(self._pu_isotopics_action)
 
             calibration_menu = self.menuBar().addMenu("&Calibration")
-            calibration_menu.addAction(
+            calibration_menu.setObjectName("CalibrationMenu")
+            calibration_menu.menuAction().setObjectName("OpenCalibrationMenuAction")
+            for calibration_action in (
                 self._action(
                     "Manual Workflow",
-                    enabled=True,
+                    enabled=self.analysis_workspace.spectrum() is not None,
                     handler=self._open_manual_calibration_workflow,
-                )
-            )
-            calibration_menu.addAction(
+                    object_name="OpenManualCalibrationAction",
+                ),
                 self._action(
                     "Standards Workflow",
-                    enabled=True,
+                    enabled=self.analysis_workspace.spectrum() is not None,
                     handler=self._open_standards_calibration_workflow,
-                )
-            )
-            calibration_menu.addAction(
+                    object_name="OpenStandardsCalibrationAction",
+                ),
                 self._action(
                     "Energy + FWHM Workspace",
-                    enabled=True,
+                    enabled=self.analysis_workspace.spectrum() is not None,
                     handler=self._open_energy_fwhm_workspace,
-                )
-            )
-            calibration_menu.addAction(
+                    object_name="OpenEnergyFwhmCalibrationAction",
+                ),
                 self._action(
                     "Quick Slider Mode",
-                    enabled=True,
+                    enabled=self.analysis_workspace.spectrum() is not None,
                     handler=self._open_quick_slider_calibration_mode,
-                )
-            )
+                    object_name="OpenQuickSliderCalibrationAction",
+                ),
+            ):
+                calibration_menu.addAction(calibration_action)
+                self._requires_spectrum_actions.append(calibration_action)
 
             tools_menu = self.menuBar().addMenu("&Tools")
+            tools_menu.setObjectName("ToolsMenu")
+            tools_menu.menuAction().setObjectName("OpenToolsMenuAction")
             self._qa_history_action = self._action(
                 "QA History",
                 enabled=True,
                 handler=self._open_qa_history,
+                object_name="OpenQaHistoryAction",
             )
             tools_menu.addAction(self._qa_history_action)
-            tools_menu.addAction(
-                self._unavailable_action(
-                    "Hardware Dashboard",
-                    "Live hardware acquisition is not implemented in this GUI build.",
+            if self.developer_tools:
+                tools_menu.addAction(
+                    self._unavailable_action(
+                        "Hardware Diagnostics",
+                        "Hardware acquisition is unavailable in this build.",
+                    )
                 )
-            )
 
             workspace_menu = self.menuBar().addMenu("&Workspaces")
+            workspace_menu.setObjectName("WorkspacesMenu")
+            workspace_menu.menuAction().setObjectName("OpenWorkspacesMenuAction")
             workspace_menu.addAction(
                 self._action(
                     "Analysis Surface",
                     enabled=True,
                     handler=self._focus_analysis_surface_dock,
+                    object_name="FocusAnalysisSurfaceAction",
                 )
             )
             workspace_menu.addAction(
@@ -419,6 +489,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Workspace Sidebar",
                     enabled=True,
                     handler=self._focus_workspace_dock,
+                    object_name="FocusWorkspaceSidebarAction",
                 )
             )
             workspace_menu.addAction(
@@ -426,6 +497,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Tool Inspector",
                     enabled=True,
                     handler=self._focus_inspector_dock,
+                    object_name="FocusToolInspectorAction",
                 )
             )
             workspace_menu.addSeparator()
@@ -434,35 +506,42 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Open QA History",
                     enabled=True,
                     handler=self._open_qa_history,
+                    object_name="WorkspaceOpenQaHistoryAction",
                 )
             )
-            workspace_menu.addAction(
-                self._action(
-                    "Open Standards Review",
-                    enabled=True,
-                    handler=self._open_standards_review,
-                )
+            self._workspace_standards_review_action = self._action(
+                "Open Standards Review",
+                enabled=self.analysis_workspace.spectrum() is not None,
+                handler=self._open_standards_review,
+                object_name="WorkspaceOpenStandardsReviewAction",
+            )
+            workspace_menu.addAction(self._workspace_standards_review_action)
+            self._requires_spectrum_actions.append(
+                self._workspace_standards_review_action
             )
             workspace_menu.addAction(
                 self._action(
                     "Open Report Export",
                     enabled=True,
                     handler=self._open_report_export,
+                    object_name="WorkspaceOpenReportExportAction",
                 )
             )
-            workspace_menu.addAction(
-                self._action(
-                    "Open Unfolding Workspace",
-                    enabled=True,
-                    handler=self._open_unfolding_workspace,
-                )
+            self._workspace_unfolding_action = self._action(
+                "Open Unfolding Workspace",
+                enabled=self._workspace_contains_bundled_example(),
+                handler=self._open_unfolding_workspace,
+                object_name="WorkspaceOpenUnfoldingAction",
             )
+            workspace_menu.addAction(self._workspace_unfolding_action)
+            self._requires_example_actions.append(self._workspace_unfolding_action)
             workspace_menu.addSeparator()
             workspace_menu.addAction(
                 self._action(
                     "Load Saved Workflow",
                     enabled=True,
                     handler=self._load_selected_workflow,
+                    object_name="LoadSavedWorkflowAction",
                 )
             )
             workspace_menu.addAction(
@@ -470,6 +549,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Save Current Workflow...",
                     enabled=True,
                     handler=self._save_current_workflow_dialog,
+                    object_name="SaveCurrentWorkflowAction",
                 )
             )
             workspace_menu.addAction(
@@ -477,16 +557,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Delete Saved Workflow",
                     enabled=True,
                     handler=self._delete_selected_workflow,
+                    object_name="DeleteSavedWorkflowAction",
                 )
             )
 
             help_menu = self.menuBar().addMenu("&Help")
+            help_menu.setObjectName("HelpMenu")
+            help_menu.menuAction().setObjectName("OpenHelpMenuAction")
             help_menu.addAction(
                 self._action(
                     "Shortcut Reference",
                     "F1",
                     enabled=True,
                     handler=self._show_shortcut_reference,
+                    object_name="ShowShortcutReferenceAction",
                 )
             )
             help_menu.addAction(
@@ -494,12 +578,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "About FluxForge",
                     enabled=True,
                     handler=self._show_about,
+                    object_name="ShowAboutFluxForgeAction",
                 )
             )
 
         def _build_toolbar(self) -> None:
             toolbar = QToolBar("Primary", self)
             toolbar.setObjectName("PrimaryToolbar")
+            toolbar.toggleViewAction().setObjectName("TogglePrimaryToolbarAction")
             self.primary_toolbar = toolbar
             toolbar.setMovable(False)
             toolbar.addWidget(ModeSwitcherWidget(self.mode_manager, toolbar))
@@ -517,7 +603,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             toolbar.addWidget(self.load_workflow_button)
             self.save_workflow_button = QPushButton("Save", toolbar)
             self.save_workflow_button.setObjectName("SaveWorkflowPresetButton")
-            self.save_workflow_button.clicked.connect(self._save_current_workflow_dialog)
+            self.save_workflow_button.clicked.connect(
+                self._save_current_workflow_dialog
+            )
             toolbar.addWidget(self.save_workflow_button)
             self.delete_workflow_button = QPushButton("Delete", toolbar)
             self.delete_workflow_button.setObjectName("DeleteWorkflowPresetButton")
@@ -543,11 +631,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _wrap_dock(self, title: str, widget, area) -> QDockWidget:
             dock = QDockWidget(title, self)
             dock.setObjectName(f"{title.replace(' ', '')}Dock")
+            dock.toggleViewAction().setObjectName(
+                f"Toggle{title.replace(' ', '')}DockAction"
+            )
             dock.setWidget(widget)
             dock.setAllowedAreas(
-                Qt.LeftDockWidgetArea
-                | Qt.RightDockWidgetArea
-                | Qt.BottomDockWidgetArea
+                Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.BottomDockWidgetArea
             )
             self.addDockWidget(area, dock)
             return dock
@@ -563,6 +652,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     qa_monitor=self.qa_monitor,
                     open_qa_history=self._open_qa_history,
                     open_standards_review=self._open_standards_review,
+                    standards_context_factory=self._build_standards_context,
                     parent=self,
                 ),
                 Qt.LeftDockWidgetArea,
@@ -579,6 +669,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     open_quick_slider_calibration_workspace=self._open_quick_slider_calibration_mode,
                     open_manual_calibration_workspace=self._open_manual_calibration_workflow,
                     open_standards_calibration_workspace=self._open_standards_calibration_workflow,
+                    developer_tools=self.developer_tools,
                     parent=self,
                 ),
                 Qt.BottomDockWidgetArea,
@@ -609,18 +700,24 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.progress.setObjectName("StatusProgress")
             self.progress.setMaximumWidth(180)
             self.progress.setRange(0, 100)
-            self.progress.setValue(12)
-            self.progress.setFormat("Shell 12%")
+            self.progress.setValue(0)
+            self.progress.setFormat("%p%")
+            self.progress.setVisible(False)
             self.hardware_led = HardwareLedWidget(self)
+            if not self.developer_tools:
+                self.renderer_label.hide()
+                self.hardware_led.hide()
 
             status.addWidget(self.cursor_label, 1)
             status.addWidget(self.file_label, 1)
             status.addPermanentWidget(self.mode_label)
             status.addPermanentWidget(self.library_label)
-            status.addPermanentWidget(self.renderer_label)
+            if self.developer_tools:
+                status.addPermanentWidget(self.renderer_label)
             status.addPermanentWidget(self.predictive_label)
             status.addPermanentWidget(self.progress)
-            status.addPermanentWidget(self.hardware_led)
+            if self.developer_tools:
+                status.addPermanentWidget(self.hardware_led)
             self.hardware_led.set_status("offline", "NO DEVICE")
             self.hardware_led.set_click_handler(self._open_dashboard_tab)
             self.library_manager.subscribe(self._on_library_state_changed)
@@ -639,8 +736,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             object_name: str | None = None,
         ) -> QAction:
             action = QAction(text, self)
-            if object_name:
-                action.setObjectName(object_name)
+            resolved_object_name = object_name
+            if not resolved_object_name:
+                stem = "".join(
+                    character for character in text.title() if character.isalnum()
+                )
+                resolved_object_name = f"{stem}Action"
+            action.setObjectName(resolved_object_name)
             if shortcut:
                 action.setShortcut(QKeySequence(shortcut))
             action.setEnabled(enabled)
@@ -688,6 +790,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             if filename:
                 self._open_dialog_path(filename)
 
+        def _load_example_workspace(self) -> None:
+            """Load the bundled deterministic HPGe example on explicit request."""
+
+            self.qa_monitor.seed_demo_history()
+            self.analysis_workspace.set_state(
+                self._build_initial_workspace_state(include_example=True)
+            )
+            self._refresh_analysis_workspace_derivatives()
+            self.file_label.setText("File: bundled HPGe example")
+            self.statusBar().showMessage("Bundled HPGe example loaded", 4000)
+
         def _open_dialog_path(self, filename: str) -> None:
             try:
                 self.open_path(filename)
@@ -707,7 +820,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.statusBar().showMessage("Full-canvas view disabled", 3000)
             else:
                 self._full_canvas_visibility = tuple(
-                    (widget, widget.isVisible())
+                    # ``isVisible()`` includes transient native-window mapping
+                    # state and can report false for a shown toolbar under the
+                    # Linux offscreen/Wayland backends.  ``isHidden()`` records
+                    # the explicit analyst layout choice that must be restored.
+                    (widget, not widget.isHidden())
                     for widget in (
                         self.left_dock,
                         self.bottom_dock,
@@ -777,7 +894,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _toggle_log_scale(self, enabled: bool) -> None:
-            if hasattr(self, "central_tabs") and hasattr(self.central_tabs, "set_log_scale"):
+            if hasattr(self, "central_tabs") and hasattr(
+                self.central_tabs, "set_log_scale"
+            ):
                 self.central_tabs.set_log_scale(bool(enabled))
             self.statusBar().showMessage(
                 f"Canvas scale: {'log' if enabled else 'linear'}",
@@ -785,7 +904,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _toggle_peak_labels(self, visible: bool) -> None:
-            if hasattr(self, "central_tabs") and hasattr(self.central_tabs, "set_peak_labels_visible"):
+            if hasattr(self, "central_tabs") and hasattr(
+                self.central_tabs, "set_peak_labels_visible"
+            ):
                 self.central_tabs.set_peak_labels_visible(bool(visible))
             self.statusBar().showMessage(
                 f"Peak labels {'enabled' if visible else 'hidden'}",
@@ -818,7 +939,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 f"Renderer: PyQtGraph-first | Theme {state.theme} ({profile})"
             )
             if hasattr(self, "_pu_isotopics_action"):
-                self._pu_isotopics_action.setEnabled(state.mode is not GUIMode.SIMPLE)
+                self._pu_isotopics_action.setEnabled(
+                    state.mode is not GUIMode.SIMPLE
+                    and self.analysis_workspace.spectrum() is not None
+                )
 
         def _on_selection_changed(self, state: SelectionState) -> None:
             cursor_parts = []
@@ -849,13 +973,29 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _on_workspace_state_changed(self, state) -> None:
             active_slot = next(
-                (slot for slot in state.spectra if slot.key == state.active_spectrum_key),
+                (
+                    slot
+                    for slot in state.spectra
+                    if slot.key == state.active_spectrum_key
+                ),
                 None,
             )
             if active_slot is not None:
                 self.file_label.setText(
                     f"File: {active_slot.source_label or active_slot.spectrum.spectrum_id or active_slot.label}"
                 )
+            else:
+                self.file_label.setText("File: none")
+            has_spectrum = active_slot is not None
+            for action in getattr(self, "_requires_spectrum_actions", ()):
+                action.setEnabled(has_spectrum)
+            if hasattr(self, "_pu_isotopics_action"):
+                self._pu_isotopics_action.setEnabled(
+                    has_spectrum and self.mode_manager.state.mode is not GUIMode.SIMPLE
+                )
+            has_example = self._workspace_contains_bundled_example()
+            for action in getattr(self, "_requires_example_actions", ()):
+                action.setEnabled(has_example)
             self._update_predictive_status()
 
         def _update_predictive_status(self) -> None:
@@ -907,7 +1047,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     label = (
                         Path(session_source).name
                         if session_source
-                        else (spectrum.spectrum_id or f"{source.stem} spectrum {index + 1}")
+                        else (
+                            spectrum.spectrum_id
+                            or f"{source.stem} spectrum {index + 1}"
+                        )
                     )
                     loaded_keys.append(
                         self.analysis_workspace.register_loaded_spectrum(
@@ -976,7 +1119,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             event.acceptProposedAction()
 
         def _open_energy_fwhm_workspace(self, advanced_tab: str | None = None) -> None:
-            if self._calibration_dialog is not None and self._calibration_dialog.isVisible():
+            if (
+                self._calibration_dialog is not None
+                and self._calibration_dialog.isVisible()
+            ):
                 if advanced_tab is not None:
                     self._calibration_dialog.set_active_advanced_tab(advanced_tab)
                 self._calibration_dialog.raise_()
@@ -986,6 +1132,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             current_spectrum = None
             if hasattr(self.central_tabs, "current_spectrum"):
                 current_spectrum = self.central_tabs.current_spectrum()
+            if current_spectrum is None:
+                self.statusBar().showMessage(
+                    "Load a spectrum before opening calibration.",
+                    5000,
+                )
+                return
 
             self._calibration_dialog = CalibrationWorkspaceDialog(
                 spectrum=current_spectrum,
@@ -1019,9 +1171,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 bottom_widget.run_auto_peak_search()
 
         def _open_unfolding_workspace(self) -> None:
-            if self._unfolding_dialog is not None and self._unfolding_dialog.isVisible():
+            if (
+                self._unfolding_dialog is not None
+                and self._unfolding_dialog.isVisible()
+            ):
                 self._unfolding_dialog.raise_()
                 self._unfolding_dialog.activateWindow()
+                return
+
+            if not self._workspace_contains_bundled_example():
+                self.statusBar().showMessage(
+                    "Open the bundled example to inspect the current unfolding "
+                    "workspace.",
+                    5000,
+                )
                 return
 
             self._unfolding_dialog = UnfoldingWorkspaceDialog(
@@ -1031,60 +1194,137 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._unfolding_dialog.show()
 
         def _build_standards_context(self) -> StandardsEvaluationContext:
+            spectrum = self.analysis_workspace.spectrum()
+            if spectrum is None:
+                raise RuntimeError("Load a spectrum before evaluating ASTM standards.")
+
+            state = self.analysis_workspace.state
             latest = next(iter(self.qa_monitor.status_snapshot()), None)
+            calibration = dict(spectrum.calibration or {})
+            metadata = dict(spectrum.metadata or {})
+
+            energy_coefficients = calibration.get("energy")
+            calibration_order = None
+            if isinstance(energy_coefficients, (list, tuple)):
+                calibration_order = max(len(energy_coefficients) - 1, 0)
+
+            def optional_float(*keys: str) -> float | None:
+                for source in (calibration, metadata):
+                    for key in keys:
+                        value = source.get(key)
+                        if value is None:
+                            continue
+                        try:
+                            return float(value)
+                        except (TypeError, ValueError):
+                            continue
+                return None
+
+            net_counts: dict[str, float] = {}
+            if state.peaks:
+                primary = max(state.peaks, key=lambda peak: peak.net_counts)
+                net_counts["primary"] = float(primary.net_counts)
+            for peak in state.peaks:
+                net_counts[peak.peak_id] = float(peak.net_counts)
+                if peak.nuclide:
+                    key = f"{peak.nuclide} {peak.energy_keV:.1f}"
+                    net_counts[key] = float(peak.net_counts)
+
+            efficiency_uncertainty = optional_float(
+                "efficiency_uncertainty_pct",
+                "efficiency_uncertainty_percent",
+            )
             return StandardsEvaluationContext(
-                calibration_order=2,
-                max_residual_keV=0.18,
-                efficiency_uncertainty_pct=2.6,
-                fwhm_at_413_keV=1.08,
-                qa_centroid_drift_keV=(latest.centroid_drift_keV if latest else 0.0),
+                calibration_order=calibration_order,
+                calibration_rms_keV=optional_float(
+                    "calibration_rms_keV",
+                    "energy_rms_keV",
+                ),
+                max_residual_keV=optional_float(
+                    "max_residual_keV",
+                    "energy_max_residual_keV",
+                ),
+                efficiency_uncertainty_pct=efficiency_uncertainty,
+                fwhm_at_413_keV=optional_float(
+                    "fwhm_at_413_keV",
+                    "fwhm_413_keV",
+                ),
+                qa_centroid_drift_keV=(latest.centroid_drift_keV if latest else None),
                 qa_fwhm_degradation_pct=(
-                    latest.fwhm_degradation_pct if latest else 0.0
+                    latest.fwhm_degradation_pct if latest else None
                 ),
                 before_calibration=(latest.last_check if latest else None),
-                measured_at=(latest.last_check if latest else None),
+                measured_at=spectrum.start_time,
                 after_calibration=(latest.last_check if latest else None),
-                net_counts={"primary": 1200.0, "Pu-240 160.3": 1205.0},
-                line_observations={"c1030": ()},
+                net_counts=net_counts,
+                line_observations={},
+                extra={
+                    "spectrum_id": spectrum.spectrum_id,
+                    "detector_id": spectrum.detector_id,
+                    "live_time_s": float(spectrum.live_time),
+                },
             )
 
         def _build_report_context(self, template_name: str) -> dict[str, object]:
             state = self.analysis_workspace.state
-            peak_rows = "".join(
-                f"<tr><td>{peak.energy_keV:.3f}</td><td>{peak.nuclide or 'Unassigned'}</td><td>{peak.net_counts:.1f}</td></tr>"
-                for peak in state.peaks
-            ) or "<tr><td colspan='3'>No peaks</td></tr>"
+            peak_rows = (
+                "".join(
+                    f"<tr><td>{peak.energy_keV:.3f}</td><td>{peak.nuclide or 'Unassigned'}</td><td>{peak.net_counts:.1f}</td></tr>"
+                    for peak in state.peaks
+                )
+                or "<tr><td colspan='3'>No peaks</td></tr>"
+            )
             peak_table = (
                 "<table><tr><th>Energy</th><th>Nuclide</th><th>Net Counts</th></tr>"
                 + peak_rows
                 + "</table>"
             )
-            activity_rows = "".join(
-                f"<tr><td>{result.nuclide}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
-                for result in state.activity_results
-            ) or "<tr><td colspan='4'>No activity results</td></tr>"
+            activity_rows = (
+                "".join(
+                    f"<tr><td>{result.nuclide}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
+                    for result in state.activity_results
+                )
+                or "<tr><td colspan='4'>No activity results</td></tr>"
+            )
             activity_table = (
                 "<table><tr><th>Nuclide</th><th>Line</th><th>Activity</th><th>σ</th></tr>"
                 + activity_rows
                 + "</table>"
             )
             standards_rows = []
-            context = self._build_standards_context()
-            for key in ("ASTM E181", "ASTM E1297", "ASTM E1218", "ASTM C1232", "ASTM C1030"):
-                module = self.registries.standards_modules.get(key)
-                evaluation = module.evaluate(context)
+            if self.analysis_workspace.spectrum() is not None:
+                context = self._build_standards_context()
+                for key in (
+                    "ASTM E181",
+                    "ASTM E1297",
+                    "ASTM E1218",
+                    "ASTM C1232",
+                    "ASTM C1030",
+                ):
+                    module = self.registries.standards_modules.get(key)
+                    evaluation = module.evaluate(context)
+                    standards_rows.append(
+                        f"<tr><td>{module.display_name}</td>"
+                        f"<td>{evaluation.overall_status}</td>"
+                        f"<td>{evaluation.summary}</td></tr>"
+                    )
+            else:
                 standards_rows.append(
-                    f"<tr><td>{module.display_name}</td><td>{evaluation.overall_status}</td><td>{evaluation.summary}</td></tr>"
+                    "<tr><td colspan='3'>Load a spectrum to run standards "
+                    "checks.</td></tr>"
                 )
             astm_status_table = (
                 "<table><tr><th>Standard</th><th>Status</th><th>Summary</th></tr>"
                 + "".join(standards_rows)
                 + "</table>"
             )
-            qa_status_snapshot = "<br/>".join(
-                f"{item.nuclide} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
-                for item in self.qa_monitor.status_snapshot()
-            ) or "No QA snapshot available."
+            qa_status_snapshot = (
+                "<br/>".join(
+                    f"{item.nuclide} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
+                    for item in self.qa_monitor.status_snapshot()
+                )
+                or "No QA snapshot available."
+            )
             provenance = (
                 f"mode={self.mode_manager.state.mode.value}\n"
                 f"standard={self.mode_manager.state.standard}\n"
@@ -1102,7 +1342,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         f"{result.label}: {result.peak_count} peaks, {result.backend}"
                         for result in panel.results
                     )
-                    aggregate_csv = (panel.last_output_dir / "aggregate.csv").read_text(encoding="utf-8") if panel.last_output_dir and (panel.last_output_dir / "aggregate.csv").exists() else ""
+                    aggregate_csv = (
+                        (panel.last_output_dir / "aggregate.csv").read_text(
+                            encoding="utf-8"
+                        )
+                        if panel.last_output_dir
+                        and (panel.last_output_dir / "aggregate.csv").exists()
+                        else ""
+                    )
             payload = {
                 "title": "FluxForge Module 3 Report",
                 "spectrum_image": "",
@@ -1124,7 +1371,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _build_standards_evaluations(self):
             context = self._build_standards_context()
             evaluations = []
-            for key in ("ASTM E181", "ASTM E1297", "ASTM E1218", "ASTM C1232", "ASTM C1030"):
+            for key in (
+                "ASTM E181",
+                "ASTM E1297",
+                "ASTM E1218",
+                "ASTM C1232",
+                "ASTM C1030",
+            ):
                 module = self.registries.standards_modules.get(key)
                 evaluations.append(module.evaluate(context))
             return tuple(evaluations)
@@ -1148,6 +1401,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._report_dialog.show()
 
         def _open_standards_review(self) -> None:
+            if self.analysis_workspace.spectrum() is None:
+                self.statusBar().showMessage(
+                    "Load a spectrum before running an ASTM review.",
+                    5000,
+                )
+                return
             if (
                 self._standards_review_dialog is not None
                 and self._standards_review_dialog.isVisible()
@@ -1163,7 +1422,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._standards_review_dialog.show()
 
         def _open_qa_history(self) -> None:
-            if self._qa_history_dialog is not None and self._qa_history_dialog.isVisible():
+            if (
+                self._qa_history_dialog is not None
+                and self._qa_history_dialog.isVisible()
+            ):
                 self._qa_history_dialog.raise_()
                 self._qa_history_dialog.activateWindow()
                 return
@@ -1200,7 +1462,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 label = f"{preset.name}{suffix}"
                 self.workflow_combo.addItem(label, preset.name)
                 index = self.workflow_combo.count() - 1
-                self.workflow_combo.setItemData(index, preset.description, Qt.ToolTipRole)
+                self.workflow_combo.setItemData(
+                    index, preset.description, Qt.ToolTipRole
+                )
             if active_name:
                 active_index = self.workflow_combo.findData(active_name)
                 if active_index >= 0:
@@ -1286,7 +1550,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             return payload
 
         def _save_current_workflow_dialog(self) -> None:
-            current_name = self.workflow_presets.active_workflow_name() or "custom-workflow"
+            current_name = (
+                self.workflow_presets.active_workflow_name() or "custom-workflow"
+            )
             name, accepted = QInputDialog.getText(
                 self,
                 "Save Workflow",
@@ -1303,7 +1569,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.workflow_presets.save_workflow(
                     workflow_name,
                     self._snapshot_current_workflow(),
-                    description=f"Saved from the modern Qt shell at {datetime.now().isoformat(timespec='minutes')}",
+                    description=(
+                        "Saved from FluxForge at "
+                        f"{datetime.now().isoformat(timespec='minutes')}"
+                    ),
                 )
             except Exception as exc:
                 self.statusBar().showMessage(str(exc), 6000)
@@ -1359,18 +1628,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 5000,
             )
 
-        def _restore_active_workflow(self) -> None:
-            preset = self.workflow_presets.active_workflow()
-            if preset is None:
-                return
-            self._apply_workflow_payload(preset.payload)
-            self.statusBar().showMessage(
-                f"Restored workflow preset: {preset.name}",
-                5000,
-            )
-
         def _reset_analysis_workspace(self) -> None:
-            self.analysis_workspace.set_state(self._build_initial_workspace_state())
+            self.qa_monitor.clear_demo_history()
+            self.analysis_workspace.set_state(
+                self._build_initial_workspace_state(include_example=False)
+            )
+            self.selection_bus.publish(SelectionState())
 
         def _restore_loaded_spectra_from_payload(
             self,
@@ -1421,8 +1684,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             return missing_paths
 
         def _apply_workflow_payload(self, payload: dict[str, object]) -> None:
-            mode_payload, library_payload = self.workflow_presets.extract_mode_and_library_state(
-                payload
+            mode_payload, library_payload = (
+                self.workflow_presets.extract_mode_and_library_state(payload)
             )
             if mode_payload:
                 self.mode_manager.apply_state(mode_payload)
@@ -1432,7 +1695,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             workspace_payload = payload.get("workspace_state")
             missing_paths: list[str] = []
             if isinstance(workspace_payload, dict):
-                missing_paths = self._restore_loaded_spectra_from_payload(workspace_payload)
+                missing_paths = self._restore_loaded_spectra_from_payload(
+                    workspace_payload
+                )
                 config_payload = {
                     key: workspace_payload.get(key)
                     for key in (
@@ -1493,7 +1758,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     self._log_scale_action.setChecked(bool(view_payload["log_scale"]))
                     self._toggle_log_scale(bool(view_payload["log_scale"]))
                 if "peak_labels" in view_payload:
-                    self._peak_labels_action.setChecked(bool(view_payload["peak_labels"]))
+                    self._peak_labels_action.setChecked(
+                        bool(view_payload["peak_labels"])
+                    )
                     self._toggle_peak_labels(bool(view_payload["peak_labels"]))
 
             central_payload = payload.get("central_state")
@@ -1530,7 +1797,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _open_pu_isotopics_wizard(self) -> None:
             if self.mode_manager.state.mode is GUIMode.SIMPLE:
                 return
-            if self._pu_isotopics_dialog is not None and self._pu_isotopics_dialog.isVisible():
+            if (
+                self._pu_isotopics_dialog is not None
+                and self._pu_isotopics_dialog.isVisible()
+            ):
                 self._pu_isotopics_dialog.raise_()
                 self._pu_isotopics_dialog.activateWindow()
                 return
@@ -1563,7 +1833,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.progress.setFormat("Calibration applied")
 
         def _refresh_analysis_workspace_derivatives(self) -> None:
-            from fluxforge.core.analysis_workspace import compute_cascade_sum_lines, extract_survey_points
+            from fluxforge.core.analysis_workspace import (
+                compute_cascade_sum_lines,
+                extract_survey_points,
+            )
 
             spectra = [
                 (slot.key, slot.spectrum)
@@ -1587,7 +1860,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def closeEvent(self, event) -> None:
             self._save_layout()
             super().closeEvent(event)
-
 
 else:
 

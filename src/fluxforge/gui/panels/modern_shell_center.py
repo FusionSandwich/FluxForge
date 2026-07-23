@@ -14,9 +14,9 @@ from fluxforge.core.predictive import (
 )
 from fluxforge.gui.analysis_workspace import AnalysisWorkspaceController
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
+from fluxforge.gui.backends.pyqtgraph_backend import catalog_pyqtgraph_export_action
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
 from fluxforge.gui.panels.modern_shell_shared import (
-    build_demo_spectrum,
     current_tab_label,
     format_duration as _format_duration,
     format_percent as _format_percent,
@@ -87,6 +87,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.count_rate_plot.setBackground("#0f172a")
                 self.count_rate_plot.setLabel("left", "ROI cps")
                 self.count_rate_plot.setLabel("bottom", "History Index")
+                catalog_pyqtgraph_export_action(
+                    self.count_rate_plot,
+                    "PredictiveCountRatePlot",
+                )
                 layout.addWidget(self.count_rate_plot, 1)
 
                 self.dead_time_plot = pg.PlotWidget(self)
@@ -94,6 +98,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.dead_time_plot.setBackground("#0f172a")
                 self.dead_time_plot.setLabel("left", "Dead Time (%)")
                 self.dead_time_plot.setLabel("bottom", "History Index")
+                catalog_pyqtgraph_export_action(
+                    self.dead_time_plot,
+                    "PredictiveDeadTimePlot",
+                )
                 layout.addWidget(self.dead_time_plot, 1)
 
             self.summary_browser = QTextBrowser(self)
@@ -147,7 +155,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.qa_monitor.history()
             )
 
-            input_rate = float(active.metadata.get("input_count_rate_cps", active.count_rate))
+            input_rate = float(
+                active.metadata.get("input_count_rate_cps", active.count_rate)
+            )
             metrics_lines = [
                 "<h3>Predictive Dashboard</h3>",
                 (
@@ -179,7 +189,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 ),
             ]
             if count_forecast.eta_uncertainty_seconds is not None:
-                summary_lines[-1] += (
+                summary_lines[
+                    -1
+                ] += (
                     f" ± {_format_duration(count_forecast.eta_uncertainty_seconds)}</p>"
                 )
             else:
@@ -207,13 +219,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         f"trigger {recalibration_forecast.trigger_metric} | "
                         f"target date "
                         + (
-                            recalibration_forecast.predicted_recalibration_at.strftime("%Y-%m-%d")
-                            if recalibration_forecast.predicted_recalibration_at is not None
+                            recalibration_forecast.predicted_recalibration_at.strftime(
+                                "%Y-%m-%d"
+                            )
+                            if recalibration_forecast.predicted_recalibration_at
+                            is not None
                             else "stable"
                         )
                         + (
                             f" ({recalibration_forecast.days_until_recalibration:.1f} d)"
-                            if recalibration_forecast.days_until_recalibration is not None
+                            if recalibration_forecast.days_until_recalibration
+                            is not None
                             else ""
                         )
                         + "</p>"
@@ -251,9 +267,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     symbolBrush=pg.mkBrush("#f59e0b"),
                 )
 
-
     class CentralWorkspaceTabs(QTabWidget):
-        """Center-zone tab stack with the modern spectrum and survey surfaces."""
+        """Center-zone spectrum and forecasting workspaces."""
 
         def __init__(
             self,
@@ -268,10 +283,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.qa_monitor = qa_monitor
-            self._current_spectrum = workspace_controller.spectrum() or build_demo_spectrum()
+            self._current_spectrum = workspace_controller.spectrum()
             self.setObjectName("CentralWorkspaceTabs")
             self.addTab(self._build_spectrum_tab(), "Spectrum")
-            self.addTab(self._build_dashboard_tab(), "Dashboard")
+            self.addTab(self._build_dashboard_tab(), "Forecasts")
+            self.setProperty(
+                "fluxforgeTabIds",
+                {
+                    "Spectrum": "canvas.spectrum.open",
+                    "Forecasts": "workspace.forecasts.open",
+                },
+            )
             self.mode_manager.subscribe(self._sync_mode_banner)
             self.mode_manager.subscribe(self._sync_workspace_mode)
             self.workspace_controller.subscribe(self._sync_workspace_state)
@@ -325,7 +347,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             """Load a GammaSpectrum-like object into the primary canvas."""
 
             self._current_spectrum = spectrum
-            target_slot = slot_key or self.workspace_controller.state.active_spectrum_key
+            target_slot = (
+                slot_key or self.workspace_controller.state.active_spectrum_key
+            )
             self.workspace_controller.replace_spectrum_slot(
                 target_slot,
                 spectrum,
@@ -337,10 +361,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def current_spectrum(self):
             """Return the current spectrum object shown in the central workspace."""
 
-            return self.workspace_controller.spectrum() or self._current_spectrum
+            return self.workspace_controller.spectrum()
 
         def set_log_scale(self, enabled: bool) -> None:
-            if PYQTGRAPH_AVAILABLE and hasattr(self, "canvas") and hasattr(self.canvas, "set_log_scale"):
+            if (
+                PYQTGRAPH_AVAILABLE
+                and hasattr(self, "canvas")
+                and hasattr(self.canvas, "set_log_scale")
+            ):
                 self.canvas.set_log_scale(bool(enabled))
 
         def set_peak_labels_visible(self, visible: bool) -> None:
@@ -364,11 +392,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.setContentsMargins(24, 24, 24, 24)
             layout.setSpacing(18)
 
-            title = QLabel("Acquisition and Prediction", widget)
+            title = QLabel("Count and QA Forecasts", widget)
             title.setObjectName("HeroHeader")
             layout.addWidget(title)
 
-            subtitle = QLabel("Forecasts derived from the active spectrum and QA history.", widget)
+            subtitle = QLabel(
+                "Forecasts derived from the active spectrum and recorded QA history.",
+                widget,
+            )
             subtitle.setWordWrap(True)
             subtitle.setObjectName("HeroSubhead")
             layout.addWidget(subtitle)
@@ -384,7 +415,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             return widget
 
         def _sync_workspace_state(self, state) -> None:
-            self._current_spectrum = self.workspace_controller.spectrum() or self._current_spectrum
+            self._current_spectrum = self.workspace_controller.spectrum()
             self._sync_slot_tabs(state)
             if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
                 return
@@ -400,9 +431,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 elif slot.key == "overlay":
                     overlay_slot = slot
             foreground = (
-                foreground_slot.spectrum if foreground_slot is not None else self._current_spectrum
+                foreground_slot.spectrum if foreground_slot is not None else None
             )
-            background = background_slot.spectrum if background_slot is not None else None
+            background = (
+                background_slot.spectrum if background_slot is not None else None
+            )
             overlay = overlay_slot.spectrum if overlay_slot is not None else None
             traces: list[SpectrumTrace] = []
             if foreground is not None:
@@ -422,16 +455,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     SpectrumTrace(
                         label=(
                             foreground_slot.source_label
-                            if foreground_slot is not None and foreground_slot.source_label
+                            if foreground_slot is not None
+                            and foreground_slot.source_label
                             else "Foreground"
                         ),
                         counts=tuple(float(value) for value in primary_counts),
                         channels=tuple(
                             float(value)
                             for value in np.asarray(
-                                foreground.energies
-                                if foreground.energies is not None
-                                else foreground.channels,
+                                (
+                                    foreground.energies
+                                    if foreground.energies is not None
+                                    else foreground.channels
+                                ),
                                 dtype=float,
                             )
                         ),
@@ -448,16 +484,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     SpectrumTrace(
                         label=(
                             background_slot.source_label
-                            if background_slot is not None and background_slot.source_label
+                            if background_slot is not None
+                            and background_slot.source_label
                             else "Background"
                         ),
-                        counts=tuple(float(value) for value in np.asarray(background.counts, dtype=float)),
+                        counts=tuple(
+                            float(value)
+                            for value in np.asarray(background.counts, dtype=float)
+                        ),
                         channels=tuple(
                             float(value)
                             for value in np.asarray(
-                                background.energies
-                                if background.energies is not None
-                                else background.channels,
+                                (
+                                    background.energies
+                                    if background.energies is not None
+                                    else background.channels
+                                ),
                                 dtype=float,
                             )
                         ),
@@ -477,13 +519,18 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                             if overlay_slot is not None and overlay_slot.source_label
                             else "Secondary Overlay"
                         ),
-                        counts=tuple(float(value) for value in np.asarray(overlay.counts, dtype=float)),
+                        counts=tuple(
+                            float(value)
+                            for value in np.asarray(overlay.counts, dtype=float)
+                        ),
                         channels=tuple(
                             float(value)
                             for value in np.asarray(
-                                overlay.energies
-                                if overlay.energies is not None
-                                else overlay.channels,
+                                (
+                                    overlay.energies
+                                    if overlay.energies is not None
+                                    else overlay.channels
+                                ),
                                 dtype=float,
                             )
                         ),
@@ -504,7 +551,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             if state.peaks and state.selected_peak_id:
                 selected_peak = next(
-                    (peak for peak in state.peaks if peak.peak_id == state.selected_peak_id),
+                    (
+                        peak
+                        for peak in state.peaks
+                        if peak.peak_id == state.selected_peak_id
+                    ),
                     None,
                 )
                 if selected_peak is not None:

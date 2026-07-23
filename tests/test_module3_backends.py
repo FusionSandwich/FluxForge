@@ -12,7 +12,10 @@ from fluxforge.core.batch_analysis import (
     run_batch_analysis_queue,
     write_batch_outputs,
 )
-from fluxforge.core.analysis_workspace import PeakCandidate, register_builtin_nuclide_id_engines
+from fluxforge.core.analysis_workspace import (
+    PeakCandidate,
+    register_builtin_nuclide_id_engines,
+)
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.ml import MLPeakAnalysisEngine
 from fluxforge.plugins import PluginRegistries
@@ -97,7 +100,9 @@ def test_c1030_isotopics_classifies_plutonium_vector():
 def test_qa_monitor_records_history_and_computes_status(tmp_path):
     monitor = QAMonitor(tmp_path / "qa_history.db")
     baseline = QARecord(
-        timestamp=np.datetime64("2026-03-15T14:22").astype("datetime64[s]").astype(object),
+        timestamp=np.datetime64("2026-03-15T14:22")
+        .astype("datetime64[s]")
+        .astype(object),
         nuclide="Cs-137",
         energy_keV=661.66,
         measured_centroid_keV=661.64,
@@ -108,7 +113,9 @@ def test_qa_monitor_records_history_and_computes_status(tmp_path):
         spectrum_file="baseline.spe",
     )
     followup = QARecord(
-        timestamp=np.datetime64("2026-03-22T14:22").astype("datetime64[s]").astype(object),
+        timestamp=np.datetime64("2026-03-22T14:22")
+        .astype("datetime64[s]")
+        .astype(object),
         nuclide="Cs-137",
         energy_keV=661.66,
         measured_centroid_keV=661.70,
@@ -128,6 +135,23 @@ def test_qa_monitor_records_history_and_computes_status(tmp_path):
     assert len(history) == 2
     assert len(snapshot) == 1
     assert snapshot[0].status in {"green", "amber", "red"}
+
+
+def test_qa_demo_history_is_ephemeral_and_not_reopened(tmp_path):
+    database = tmp_path / "qa_history.db"
+    monitor = QAMonitor(database)
+    monitor.seed_demo_history()
+
+    assert len(monitor.history()) == 3
+    assert database.exists()
+
+    reopened = QAMonitor(database)
+    assert reopened.history() == ()
+
+    reopened.seed_demo_history()
+    assert len(reopened.history()) == 3
+    reopened.clear_demo_history()
+    assert reopened.history() == ()
 
 
 def test_reporting_engine_renders_bundled_templates(tmp_path):
@@ -241,9 +265,7 @@ def test_ml_peak_engine_registers_and_returns_predictions():
 def test_batch_analysis_queue_writes_json_and_aggregate_outputs(tmp_path):
     progress_events: list[tuple[int, int]] = []
     result_rows = run_batch_analysis_queue(
-        (
-            BatchAnalysisJob("job-1", "Demo", _demo_spectrum()),
-        ),
+        (BatchAnalysisJob("job-1", "Demo", _demo_spectrum()),),
         max_workers=1,
         prefer_gpu=False,
         progress_callback=lambda completed, total: progress_events.append(
@@ -264,9 +286,11 @@ def test_batch_analysis_queue_writes_json_and_aggregate_outputs(tmp_path):
 def test_reporting_engine_reports_pdf_unavailable_without_weasyprint(monkeypatch):
     monkeypatch.setattr(
         "fluxforge.reporting.engine.import_module",
-        lambda name: (_ for _ in ()).throw(ImportError("missing"))
-        if name == "weasyprint"
-        else __import__(name),
+        lambda name: (
+            (_ for _ in ()).throw(ImportError("missing"))
+            if name == "weasyprint"
+            else __import__(name)
+        ),
     )
 
     engine = ReportingEngine()
@@ -287,7 +311,9 @@ def test_reporting_engine_reports_pdf_unavailable_when_native_library_is_missing
 
 
 def test_reporting_engine_imports_without_jinja2_backend(monkeypatch):
-    monkeypatch.setattr("fluxforge.reporting.engine._JINJA2_IMPORT_ERROR", ImportError("missing"))
+    monkeypatch.setattr(
+        "fluxforge.reporting.engine._JINJA2_IMPORT_ERROR", ImportError("missing")
+    )
     monkeypatch.setattr("fluxforge.reporting.engine.Environment", None)
     monkeypatch.setattr("fluxforge.reporting.engine.FileSystemLoader", None)
     monkeypatch.setattr("fluxforge.reporting.engine.select_autoescape", None)

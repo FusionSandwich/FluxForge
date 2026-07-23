@@ -139,6 +139,16 @@ The direct modern-GUI launcher is equivalent:
 fluxforge-gui --project-dir .
 ```
 
+Both launchers open an empty production workspace. Use **File > Open Example**
+to load the bundled deterministic HPGe example, or start it directly with:
+
+```text
+fluxforge gui --project-dir . --open-example
+```
+
+The `--developer-tools` flag exposes diagnostics and prototype evidence panels
+for developers. It is intentionally omitted from normal analyst startup.
+
 For a first GUI workflow, load the committed files below; no external data
 download is required:
 
@@ -153,8 +163,11 @@ Then verify that you can:
    geometry, window thickness, detector dimensions, dead layer, angle,
    source distance, and relative uncertainty;
 4. fit and accept the efficiency curve;
-5. run activity, inventory, masking, and optimization views once the required
-   peak-identification and calibration inputs are populated.
+5. run the production activity, QA, batch, and reporting workflows
+   once the required peak-identification and calibration inputs are populated.
+
+Masking and irradiation-optimization screens remain developer-only prototypes
+until their mathematical and held-out-data release gates pass.
 
 The unfolding workspace accepts a FluxForge `reaction_rates` JSON artifact
 and a response matrix. Load the measured-rate artifact first, then load a
@@ -194,10 +207,11 @@ In PowerShell, use a Windows output directory:
 | `fluxforge` | Main CLI and command discovery |
 | `fluxforge gui` | Recommended modern Qt GUI launch path |
 | `fluxforge-gui` | Direct modern Qt GUI launcher |
-| `fluxforge-gui-legacy` | Legacy Tk GUI for compatibility testing |
+| `fluxforge-gui-legacy` | Archived Tk interface for explicit migration testing |
 
-The modern Qt GUI is the supported default. The legacy launcher remains
-available for regression and compatibility workflows.
+The Qt GUI is the supported default. FluxForge never falls back to the archived
+Tk interface automatically; its launcher remains available only for explicit
+migration and regression workflows.
 
 ## Troubleshooting
 

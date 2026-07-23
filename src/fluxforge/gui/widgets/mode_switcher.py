@@ -49,7 +49,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 ("Standards", GUIMode.STANDARDS),
             ):
                 button = QToolButton(self)
-                button.setObjectName("ModeButton")
+                button.setObjectName(f"{label}ModeButton")
                 button.setText(label)
                 button.setCheckable(True)
                 button.clicked.connect(
@@ -167,7 +167,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.theme_profile_combo.clear()
             for profile_name in self.mode_manager.available_theme_profiles():
                 profile_theme = self.mode_manager.theme_for_profile(profile_name)
-                self.theme_profile_combo.addItem(f"{profile_name} ({profile_theme})", profile_name)
+                self.theme_profile_combo.addItem(
+                    f"{profile_name} ({profile_theme})", profile_name
+                )
             if state.theme_profile:
                 profile_index = self.theme_profile_combo.findData(state.theme_profile)
                 if profile_index >= 0:

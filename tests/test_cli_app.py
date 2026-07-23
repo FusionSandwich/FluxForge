@@ -137,7 +137,9 @@ def test_cmd_phase6_ldrd_second_irradiation_repo_invokes_workflow(
 ):
     called = {}
 
-    def fake_run_phase6_ldrd_second_irradiation_decision_repo(*, sample_id, output_root, top_n):
+    def fake_run_phase6_ldrd_second_irradiation_decision_repo(
+        *, sample_id, output_root, top_n
+    ):
         called["sample_id"] = sample_id
         called["output_root"] = Path(output_root)
         called["top_n"] = top_n
@@ -203,43 +205,47 @@ def test_cmd_gui_launches_module(monkeypatch, tmp_path):
     modern_module = types.ModuleType("fluxforge.gui.app")
     qt_module = types.ModuleType("fluxforge.gui.qt_compat")
 
-    def fake_launch_gui(project_dir):
+    def fake_launch_gui(project_dir, *, developer_tools, open_example):
         called["project_dir"] = Path(project_dir)
+        called["developer_tools"] = developer_tools
+        called["open_example"] = open_example
 
     modern_module.launch_modern_gui = fake_launch_gui
     qt_module.QT_AVAILABLE = True
     monkeypatch.setitem(sys.modules, "fluxforge.gui.app", modern_module)
     monkeypatch.setitem(sys.modules, "fluxforge.gui.qt_compat", qt_module)
 
-    app.cmd_gui(Namespace(project_dir=tmp_path, dry_run=False))
+    app.cmd_gui(
+        Namespace(
+            project_dir=tmp_path,
+            dry_run=False,
+            developer_tools=True,
+            open_example=True,
+        )
+    )
     assert called["project_dir"] == tmp_path
+    assert called["developer_tools"] is True
+    assert called["open_example"] is True
 
 
-def test_cmd_gui_falls_back_to_legacy_when_qt_is_unavailable(monkeypatch, tmp_path):
+def test_cmd_gui_requires_native_gui_when_qt_is_unavailable(monkeypatch, tmp_path):
     called = {}
 
     modern_module = types.ModuleType("fluxforge.gui.app")
     qt_module = types.ModuleType("fluxforge.gui.qt_compat")
-    legacy_module = types.ModuleType("fluxforge_gui.app")
 
-    def fake_modern_launch(project_dir):
+    def fake_modern_launch(project_dir, *, developer_tools, open_example):
         called["modern_project_dir"] = Path(project_dir)
-
-    def fake_legacy_launch(project_dir):
-        called["legacy_project_dir"] = Path(project_dir)
 
     modern_module.launch_modern_gui = fake_modern_launch
     qt_module.QT_AVAILABLE = False
-    legacy_module.launch_gui = fake_legacy_launch
 
     monkeypatch.setitem(sys.modules, "fluxforge.gui.app", modern_module)
     monkeypatch.setitem(sys.modules, "fluxforge.gui.qt_compat", qt_module)
-    monkeypatch.setitem(sys.modules, "fluxforge_gui.app", legacy_module)
-
-    app.cmd_gui(Namespace(project_dir=tmp_path, dry_run=False))
+    with pytest.raises(RuntimeError, match="native-gui"):
+        app.cmd_gui(Namespace(project_dir=tmp_path, dry_run=False))
 
     assert "modern_project_dir" not in called
-    assert called["legacy_project_dir"] == tmp_path
 
 
 def test_build_parser_plots_dry_run(capsys, tmp_path):
@@ -416,7 +422,10 @@ def test_cmd_phase5_crosswalk_report_writes_json_and_markdown(tmp_path):
 
     markdown_text = markdown.read_text(encoding="utf-8")
     assert "# Phase 5 Crosswalk Report" in markdown_text
-    assert "| Section | Source family | Replay states | Provenance | Backend | CLI | GUI |" in markdown_text
+    assert (
+        "| Section | Source family | Replay state | Backend | CLI | GUI |"
+        in markdown_text
+    )
 
 
 def test_cmd_file_query_writes_rows(tmp_path):
@@ -614,7 +623,9 @@ def test_cmd_phase5_release_gate_writes_ready_payload(monkeypatch, tmp_path):
             }
         }
 
-    monkeypatch.setattr(app, "run_reference_parity_suite", fake_run_reference_parity_suite)
+    monkeypatch.setattr(
+        app, "run_reference_parity_suite", fake_run_reference_parity_suite
+    )
 
     class _FakeCompletedProcess:
         def __init__(self):
@@ -1108,9 +1119,9 @@ def test_cmd_activity_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp
     assert (tmp_path / "activity_review_lines.csv").exists()
     assert (tmp_path / "activity_review_decay.png").exists()
     assert (tmp_path / "activity_review_bateman.png").exists()
-    assert "irradiation_time_activity_Bq" in (tmp_path / "activity_review_isotopes.csv").read_text(
-        encoding="utf-8"
-    )
+    assert "irradiation_time_activity_Bq" in (
+        tmp_path / "activity_review_isotopes.csv"
+    ).read_text(encoding="utf-8")
 
 
 def test_cmd_activity_review_can_export_reaction_rate_csv(monkeypatch, tmp_path):
@@ -1258,9 +1269,9 @@ def test_cmd_inventory_review_writes_json_csv_and_plot_artifacts(monkeypatch, tm
     assert (tmp_path / "inventory_review_activities_at_count_start.csv").exists()
     assert (tmp_path / "inventory_review_activities_at_count_end.csv").exists()
     assert (tmp_path / "inventory_review_activity.png").exists()
-    assert "dose_rate_uSv_h" in (tmp_path / "inventory_review_timeseries.csv").read_text(
-        encoding="utf-8"
-    )
+    assert "dose_rate_uSv_h" in (
+        tmp_path / "inventory_review_timeseries.csv"
+    ).read_text(encoding="utf-8")
 
 
 def test_cmd_second_irradiation_plan_writes_json_and_csv_outputs(tmp_path):
@@ -1283,7 +1294,9 @@ def test_cmd_second_irradiation_plan_writes_json_and_csv_outputs(tmp_path):
 
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload["schema"] == "fluxforge.second_irradiation_plan.v1"
-    assert payload["selected_candidate"]["label"].startswith(f"{DEFAULT_PHASE6_SAMPLE_ID}_window_")
+    assert payload["selected_candidate"]["label"].startswith(
+        f"{DEFAULT_PHASE6_SAMPLE_ID}_window_"
+    )
     assert payload["selected_inventory_rows"]
     assert csv_path.exists()
     assert "weighted_activity" in csv_path.read_text(encoding="utf-8")
@@ -1490,7 +1503,10 @@ def test_cmd_optimization_sweep_writes_json_and_csv_outputs(tmp_path):
     assert payload["schema"] == "fluxforge.optimization_sweep.difom.v1"
     assert payload["objective"] == "di-fom"
     assert len(payload["ranked_candidates"]) == 2
-    assert payload["ranked_candidates"][0]["difom_score"] >= payload["ranked_candidates"][1]["difom_score"]
+    assert (
+        payload["ranked_candidates"][0]["difom_score"]
+        >= payload["ranked_candidates"][1]["difom_score"]
+    )
     assert csv_path.exists()
     assert "difom_score" in csv_path.read_text(encoding="utf-8")
 
@@ -1500,8 +1516,7 @@ def test_cmd_optimization_sweep_builds_candidates_from_activity_review(tmp_path)
     activity_review_path = _write_phase6_real_activity_review(tmp_path)
     grids = load_phase6_real_optimization_grids()
     isotopes_of_interest = ",".join(
-        row["nuclide"]
-        for row in activity_review_payload["isotope_summaries"][:3]
+        row["nuclide"] for row in activity_review_payload["isotope_summaries"][:3]
     )
 
     output_path = tmp_path / "optimization_sweep.json"
@@ -2181,7 +2196,10 @@ def test_cmd_optimization_sweep_compares_difom_and_fim_on_shared_fixture(tmp_pat
     assert mwdcs_payload["schema"] == "fluxforge.optimization_sweep.mwdcs.v1"
     assert bassd_payload["schema"] == "fluxforge.optimization_sweep.bassd.v1"
     assert stbdmr_payload["schema"] == "fluxforge.optimization_sweep.stbdmr.v1"
-    assert difom_payload["ranked_candidates"][0]["label"] != fim_payload["ranked_candidates"][0]["label"]
+    assert (
+        difom_payload["ranked_candidates"][0]["label"]
+        != fim_payload["ranked_candidates"][0]["label"]
+    )
     assert len(mwdcs_payload["ranked_candidates"]) == 2
     assert "window_scores" in mwdcs_payload["ranked_candidates"][0]
     assert len(bassd_payload["ranked_candidates"]) == 2
@@ -2275,7 +2293,9 @@ def test_cmd_library_register_list_and_remove(monkeypatch, tmp_path, capsys):
     register_out = capsys.readouterr().out
     assert "user_gamma_lab_ref" in register_out
 
-    app.cmd_library_list(Namespace(capability="peak-identification", kind=None, json=True))
+    app.cmd_library_list(
+        Namespace(capability="peak-identification", kind=None, json=True)
+    )
     payload = json.loads(capsys.readouterr().out)
     assert any(item["source_id"] == "user_gamma_lab_ref" for item in payload)
 
@@ -3520,7 +3540,9 @@ def test_cmd_report_includes_masking_review_tables(monkeypatch, tmp_path):
     assert summary["dominant_masking_isotope"] == "Sc-46"
     assert "masking_line_results" in report_written["payload"]["tables"]["items"]
     assert "masking_isotope_ranking" in report_written["payload"]["tables"]["items"]
-    assert "alternate_line_recommendations" in report_written["payload"]["tables"]["items"]
+    assert (
+        "alternate_line_recommendations" in report_written["payload"]["tables"]["items"]
+    )
 
     report_text = (tmp_path / "report.txt").read_text(encoding="utf-8")
     assert "Masking Review Summary" in report_text
@@ -4065,7 +4087,9 @@ def test_command_catalog_matches_registered_subcommands():
     parser = app.build_parser()
     catalog = build_command_catalog(parser)
     subparsers = next(
-        action for action in parser._actions if isinstance(action, argparse._SubParsersAction)
+        action
+        for action in parser._actions
+        if isinstance(action, argparse._SubParsersAction)
     )
     parser_names = [choice.dest for choice in subparsers._choices_actions]
     assert [entry.name for entry in catalog] == parser_names

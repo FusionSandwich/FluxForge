@@ -172,7 +172,12 @@ from fluxforge.physics.activation import (
 )
 from fluxforge.solvers.gls import gls_adjust
 from fluxforge.solvers.iterative import gravel, mlem
-from fluxforge.unfolding import GravelUnfolder, MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
+from fluxforge.unfolding import (
+    GravelUnfolder,
+    MLSeedUnfolder,
+    MaxedUnfolder,
+    RMLEUnfolder,
+)
 from fluxforge.validation import (
     load_phase5_crosswalk,
     render_phase5_crosswalk_markdown,
@@ -192,17 +197,18 @@ from fluxforge.workflows.phase6_ldrd_worked_example import (
     default_output_root as phase6_ldrd_default_output_root,
     run_phase6_ldrd_worked_example,
 )
+
 try:
     from fluxforge.workflows.phase6_ldrd_second_irradiation_decision_repo import (
         default_output_root as phase6_ldrd_second_irradiation_repo_default_output_root,
         run_phase6_ldrd_second_irradiation_decision_repo,
     )
 except ModuleNotFoundError:  # pragma: no cover - optional workflow module
+
     def phase6_ldrd_second_irradiation_repo_default_output_root() -> Path:
         return Path(
             "examples/RAFM_irradiation/results/phase6_ldrd_second_irradiation_repo"
         )
-
 
     def run_phase6_ldrd_second_irradiation_decision_repo(*args, **kwargs):
         raise RuntimeError(
@@ -303,7 +309,11 @@ def _collect_markdown_checklist_status(checklist: Path) -> dict[str, Any]:
         lines = checklist.read_text(encoding="utf-8").splitlines()
         for line in lines:
             token = line.strip()
-            if token.startswith("- [ ]") or token.startswith("- [x]") or token.startswith("- [X]"):
+            if (
+                token.startswith("- [ ]")
+                or token.startswith("- [x]")
+                or token.startswith("- [X]")
+            ):
                 checklist_item_count += 1
                 if token.startswith("- [ ]"):
                     unchecked_items.append(token[5:].strip())
@@ -665,14 +675,7 @@ def _recommendation_from_optimization_payload(
 
 
 def _normalize_nuclide_label(label: str) -> str:
-    return (
-        str(label)
-        .strip()
-        .lower()
-        .replace("-", "")
-        .replace("_", "")
-        .replace(" ", "")
-    )
+    return str(label).strip().lower().replace("-", "").replace("_", "").replace(" ", "")
 
 
 def _extract_line_nuclide(item: Any) -> str:
@@ -737,7 +740,11 @@ def _filter_optimization_payload_by_isotopes(
     before_candidates = len(candidates_raw)
     before_lines = sum(_count_candidate_lines(item) for item in candidates_raw)
 
-    requested = tuple(dict.fromkeys(str(item).strip() for item in isotopes_of_interest if str(item).strip()))
+    requested = tuple(
+        dict.fromkeys(
+            str(item).strip() for item in isotopes_of_interest if str(item).strip()
+        )
+    )
     if len(requested) == 0:
         return filtered_payload, {
             "requested_isotopes": [],
@@ -775,9 +782,13 @@ def _filter_optimization_payload_by_isotopes(
                     window_copy["lines"] = [
                         line
                         for line in window_lines
-                        if _normalize_nuclide_label(_extract_line_nuclide(line)) in allowed
+                        if _normalize_nuclide_label(_extract_line_nuclide(line))
+                        in allowed
                     ]
-                if isinstance(window_copy.get("lines"), list) and len(window_copy["lines"]) > 0:
+                if (
+                    isinstance(window_copy.get("lines"), list)
+                    and len(window_copy["lines"]) > 0
+                ):
                     filtered_windows.append(window_copy)
             candidate_copy["windows"] = filtered_windows
 
@@ -793,9 +804,13 @@ def _filter_optimization_payload_by_isotopes(
                     action_copy["lines"] = [
                         line
                         for line in action_lines
-                        if _normalize_nuclide_label(_extract_line_nuclide(line)) in allowed
+                        if _normalize_nuclide_label(_extract_line_nuclide(line))
+                        in allowed
                     ]
-                if isinstance(action_copy.get("lines"), list) and len(action_copy["lines"]) > 0:
+                if (
+                    isinstance(action_copy.get("lines"), list)
+                    and len(action_copy["lines"]) > 0
+                ):
                     filtered_actions.append(action_copy)
             candidate_copy["actions"] = filtered_actions
 
@@ -838,7 +853,9 @@ def _write_phase6_support_artifacts(
     )
 
     outputs = {
-        "optimization_grid": _phase6_artifact_path(output_path, "_optimization_grid.csv"),
+        "optimization_grid": _phase6_artifact_path(
+            output_path, "_optimization_grid.csv"
+        ),
         "recommended_schedules": _phase6_artifact_path(
             output_path, "_recommended_schedules.csv"
         ),
@@ -861,7 +878,9 @@ def _write_phase6_support_artifacts(
     )
     _write_dict_rows(outputs["dose_endpoints"], support["dose_endpoints_rows"])
     _write_dict_rows(outputs["masking_candidates"], support["masking_candidates_rows"])
-    _write_dict_rows(outputs["inventory_timeseries"], support["inventory_timeseries_rows"])
+    _write_dict_rows(
+        outputs["inventory_timeseries"], support["inventory_timeseries_rows"]
+    )
     _write_dict_rows(
         outputs["activities_at_irradiation"],
         support["activities_at_irradiation_rows"],
@@ -958,7 +977,9 @@ def _serialize_nuclear_data_source(record) -> dict[str, Any]:
     }
 
 
-def _build_activity_review_efficiency_curve(args: argparse.Namespace) -> EfficiencyCurve:
+def _build_activity_review_efficiency_curve(
+    args: argparse.Namespace,
+) -> EfficiencyCurve:
     rel_uncertainty = max(float(getattr(args, "efficiency_uncertainty", 0.05)), 0.0)
     polynomial = _parse_csv_floats(getattr(args, "efficiency_polynomial", None))
     if polynomial:
@@ -1447,7 +1468,9 @@ def _resolve_spectral_feature_photopeak(
     if isotope:
         target_line = getattr(args, "feature_line_keV", None)
         min_intensity = max(float(getattr(args, "feature_min_intensity", 0.02)), 0.0)
-        lines = list_nuclide_lines(isotope, line_type="gamma", min_intensity=min_intensity)
+        lines = list_nuclide_lines(
+            isotope, line_type="gamma", min_intensity=min_intensity
+        )
         if not lines:
             raise ValueError(
                 f"No gamma lines found for isotope '{isotope}' at min intensity {min_intensity:.3f}."
@@ -1455,7 +1478,9 @@ def _resolve_spectral_feature_photopeak(
         if target_line is None:
             selected = lines[0]
         else:
-            selected = min(lines, key=lambda line: abs(line.energy_keV - float(target_line)))
+            selected = min(
+                lines, key=lambda line: abs(line.energy_keV - float(target_line))
+            )
         return float(selected.energy_keV), f"{selected.nuclide} library line", None
 
     manual_line = getattr(args, "feature_line_keV", None)
@@ -1916,11 +1941,13 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
             detector_material = str(
                 getattr(args, "feature_detector_material", "hpge") or "hpge"
             )
-            feature_annotations, feature_report_payload = _build_spectral_feature_payload(
-                spectrum_for_plot,
-                photopeak_energy_keV=line_energy_keV,
-                source_label=source_label,
-                detector_material=detector_material,
+            feature_annotations, feature_report_payload = (
+                _build_spectral_feature_payload(
+                    spectrum_for_plot,
+                    photopeak_energy_keV=line_energy_keV,
+                    source_label=source_label,
+                    detector_material=detector_material,
+                )
             )
             if auto_estimate is not None:
                 feature_report_payload["auto_driver"] = {
@@ -1985,7 +2012,9 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
         plt.close(fig)
         print(f"Wrote spectrum plot to {args.output}")
 
-        feature_report_output: Optional[Path] = getattr(args, "save_feature_report", None)
+        feature_report_output: Optional[Path] = getattr(
+            args, "save_feature_report", None
+        )
         if feature_report_output is not None:
             if feature_report_payload is None:
                 raise ValueError(
@@ -2203,7 +2232,9 @@ def cmd_roi_analyze(args: argparse.Namespace) -> None:
         result = analyze_roi_region(
             raw_spectrum,
             roi_bounds_keV=roi_bounds,
-            label=str(getattr(args, "label", None) or raw_spectrum.spectrum_id or "ROI"),
+            label=str(
+                getattr(args, "label", None) or raw_spectrum.spectrum_id or "ROI"
+            ),
             background_method=str(getattr(args, "background_method", "roi_sideband")),
             peak_search_method=str(getattr(args, "peak_search_method", "mariscotti")),
             sideband_width_keV=getattr(args, "sideband_width_keV", None),
@@ -2213,7 +2244,9 @@ def cmd_roi_analyze(args: argparse.Namespace) -> None:
                 "live": "statistical",
                 "real": "statistical",
             }.get(str(getattr(args, "background_scale_mode", "live")), "statistical"),
-            background_scale=float(getattr(args, "background_scale_factor", 1.0) or 1.0),
+            background_scale=float(
+                getattr(args, "background_scale_factor", 1.0) or 1.0
+            ),
             decompose_overlaps=bool(getattr(args, "decompose_overlaps", False)),
             max_components=int(getattr(args, "max_components", 3)),
         )
@@ -2287,7 +2320,9 @@ def cmd_file_query(args: argparse.Namespace) -> None:
             "**/*.txt",
         )
     contains = str(getattr(args, "contains", "") or "").strip().lower()
-    suffixes = {value.lower() for value in _parse_csv_strings(getattr(args, "suffixes", None))}
+    suffixes = {
+        value.lower() for value in _parse_csv_strings(getattr(args, "suffixes", None))
+    }
     min_size = int(getattr(args, "min_size_bytes", 0) or 0)
     max_size = getattr(args, "max_size_bytes", None)
     limit = max(int(getattr(args, "limit", 2000) or 0), 0)
@@ -2421,12 +2456,16 @@ def cmd_batch_compare(args: argparse.Namespace) -> None:
 
     comparisons: List[Dict[str, Any]] = []
     field_abs_deltas: Dict[str, List[float]] = {field: [] for field in numeric_fields}
-    field_abs_rel_deltas: Dict[str, List[float]] = {field: [] for field in numeric_fields}
+    field_abs_rel_deltas: Dict[str, List[float]] = {
+        field: [] for field in numeric_fields
+    }
 
     for key in matched_keys:
         base_row = baseline_by_key[key]
         cand_row = candidate_by_key[key]
-        record: Dict[str, Any] = {field: key[idx] for idx, field in enumerate(key_fields)}
+        record: Dict[str, Any] = {
+            field: key[idx] for idx, field in enumerate(key_fields)
+        }
         for field in numeric_fields:
             base_value = _to_float(base_row.get(field))
             cand_value = _to_float(cand_row.get(field))
@@ -2494,7 +2533,9 @@ def cmd_batch_compare(args: argparse.Namespace) -> None:
 
 
 def cmd_parity_check(args: argparse.Namespace) -> None:
-    reference_root = Path(getattr(args, "reference_root", Path("tests/spectra/reference_parity")))
+    reference_root = Path(
+        getattr(args, "reference_root", Path("tests/spectra/reference_parity"))
+    )
     activation_root_arg = getattr(args, "activation_root", None)
     activation_root = Path(activation_root_arg) if activation_root_arg else None
     output = Path(getattr(args, "output", Path("parity_check.json")))
@@ -2526,9 +2567,7 @@ def cmd_phase5_crosswalk_report(args: argparse.Namespace) -> None:
             Path(".github/project-management/phase5_crosswalk.json"),
         )
     )
-    output = Path(
-        getattr(args, "output", Path("phase5_crosswalk_report.json"))
-    )
+    output = Path(getattr(args, "output", Path("phase5_crosswalk_report.json")))
     markdown_output = Path(
         getattr(args, "markdown_output", Path("phase5_crosswalk_report.md"))
     )
@@ -2549,7 +2588,9 @@ def cmd_phase5_crosswalk_report(args: argparse.Namespace) -> None:
             getattr(args, "reference_root", Path("tests/spectra/reference_parity"))
         )
         activation_root = Path(
-            getattr(args, "activation_root", Path("tests/activation_inventory/fixtures"))
+            getattr(
+                args, "activation_root", Path("tests/activation_inventory/fixtures")
+            )
         )
         parity_payload = run_reference_parity_suite(
             reference_root=reference_root,
@@ -2636,10 +2677,7 @@ def cmd_gui_acceptance_checklist(args: argparse.Namespace) -> None:
 
     _ensure_parent_dir(output)
     output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    print(
-        "GUI acceptance checklist: "
-        + ("READY" if payload["ready"] else "NOT READY")
-    )
+    print("GUI acceptance checklist: " + ("READY" if payload["ready"] else "NOT READY"))
     print(f"Wrote GUI acceptance report to {output}")
 
 
@@ -2647,7 +2685,9 @@ def cmd_phase5_release_gate(args: argparse.Namespace) -> None:
     workspace_root = Path.cwd()
     output = Path(getattr(args, "output", Path("phase5_release_gate.json")))
     crosswalk_path = Path(
-        getattr(args, "crosswalk", Path(".github/project-management/phase5_crosswalk.json"))
+        getattr(
+            args, "crosswalk", Path(".github/project-management/phase5_crosswalk.json")
+        )
     )
     reference_root = Path(
         getattr(args, "reference_root", Path("tests/spectra/reference_parity"))
@@ -2662,7 +2702,9 @@ def cmd_phase5_release_gate(args: argparse.Namespace) -> None:
         getattr(
             args,
             "playwright_report",
-            Path("artifacts/gui_review/phase5_parity/playwright_audit/audit_report.json"),
+            Path(
+                "artifacts/gui_review/phase5_parity/playwright_audit/audit_report.json"
+            ),
         )
     )
     checklist_path = Path(
@@ -2899,7 +2941,9 @@ def cmd_phase5_release_gate(args: argparse.Namespace) -> None:
         },
         "required_surfaces": {
             "surfaces": required_surfaces,
-            "ready": all(bool(item.get("exists")) for item in required_surfaces.values()),
+            "ready": all(
+                bool(item.get("exists")) for item in required_surfaces.values()
+            ),
         },
     }
 
@@ -2991,7 +3035,9 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
         net_counts = float(
             peak.get("area") or peak.get("raw_counts") or peak.get("amplitude") or 0.0
         )
-        isotope = str(peak.get("report_isotope") or peak.get("isotope") or "").strip() or None
+        isotope = (
+            str(peak.get("report_isotope") or peak.get("isotope") or "").strip() or None
+        )
         peaks.append(
             PeakCandidate(
                 peak_id=str(peak.get("peak_id") or f"peak-{index + 1}"),
@@ -3004,9 +3050,7 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
                 ),
                 net_counts=net_counts,
                 fit_quality=float(
-                    peak.get("reduced_chi_squared")
-                    or peak.get("fit_quality")
-                    or 1.0
+                    peak.get("reduced_chi_squared") or peak.get("fit_quality") or 1.0
                 ),
                 status="matched" if isotope else "candidate",
                 nuclide=isotope,
@@ -3020,7 +3064,9 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
         cooling_time_s=float(args.cooling_time_s),
         source_id=str(args.source_id),
         custom_gamma_path=(
-            str(args.custom_gamma_path) if getattr(args, "custom_gamma_path", None) else None
+            str(args.custom_gamma_path)
+            if getattr(args, "custom_gamma_path", None)
+            else None
         ),
         energy_tolerance_keV=float(args.energy_tolerance_keV),
         dead_time_fraction=float(getattr(args, "dead_time_fraction", 0.0) or 0.0),
@@ -3028,7 +3074,9 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
     )
 
     output_path = Path(args.output)
-    export_mode = str(getattr(args, "eoi_export", "activities") or "activities").strip().lower()
+    export_mode = (
+        str(getattr(args, "eoi_export", "activities") or "activities").strip().lower()
+    )
     if export_mode not in {"activities", "reaction-rates", "both"}:
         raise ValueError(
             "--eoi-export must be one of: activities, reaction-rates, both"
@@ -3055,7 +3103,9 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
         or _activity_review_artifact_path(output_path, "_reaction_rates.csv")
     )
 
-    isotope_rows = review.isotope_rows(sample_mass_g=getattr(args, "sample_mass_g", None))
+    isotope_rows = review.isotope_rows(
+        sample_mass_g=getattr(args, "sample_mass_g", None)
+    )
     line_rows = review.line_rows(sample_mass_g=getattr(args, "sample_mass_g", None))
 
     isotope_artifact = None
@@ -3074,9 +3124,7 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
             if isinstance(raw_segments, dict):
                 raw_segments = raw_segments.get("segments")
         segments = _coerce_irradiation_segments(
-            irradiation_time_s=float(
-                getattr(args, "irradiation_time_s", 0.0) or 0.0
-            ),
+            irradiation_time_s=float(getattr(args, "irradiation_time_s", 0.0) or 0.0),
             segments_payload=raw_segments,
         )
         reaction_rate_rows = _build_reaction_rate_rows_from_activity_review(
@@ -3169,9 +3217,7 @@ def cmd_inventory_review(args: argparse.Namespace) -> None:
         decay_source_id=str(args.decay_source_id),
     )
 
-    relative_times_s = _parse_relative_time_points(
-        getattr(args, "time_points_s", None)
-    )
+    relative_times_s = _parse_relative_time_points(getattr(args, "time_points_s", None))
     if not relative_times_s:
         relative_times_s = build_time_grid(
             start_s=float(args.time_start_s),
@@ -3194,11 +3240,15 @@ def cmd_inventory_review(args: argparse.Namespace) -> None:
     )
     eoi_csv = Path(
         getattr(args, "eoi_csv_output", None)
-        or _inventory_review_artifact_path(output_path, "_activities_at_irradiation.csv")
+        or _inventory_review_artifact_path(
+            output_path, "_activities_at_irradiation.csv"
+        )
     )
     count_start_csv = Path(
         getattr(args, "count_start_csv_output", None)
-        or _inventory_review_artifact_path(output_path, "_activities_at_count_start.csv")
+        or _inventory_review_artifact_path(
+            output_path, "_activities_at_count_start.csv"
+        )
     )
     count_end_csv = Path(
         getattr(args, "count_end_csv_output", None)
@@ -3231,7 +3281,9 @@ def cmd_inventory_review(args: argparse.Namespace) -> None:
         "dose": "Dose Rate (uSv/h)",
     }[str(args.observable)]
     fig, _ax = plot_decay_curves(
-        result.plot_data(str(args.observable), top_n=int(args.top_n), include_total=True),
+        result.plot_data(
+            str(args.observable), top_n=int(args.top_n), include_total=True
+        ),
         title=f"Inventory Time Evolution ({str(args.observable).title()})",
         xlabel=f"Time Since {str(args.time_origin).replace('_', ' ').title()} (s)",
         ylabel=ylabel,
@@ -3256,23 +3308,19 @@ def cmd_inventory_review(args: argparse.Namespace) -> None:
         "distance_cm": float(args.distance_cm),
         "notes": list(result.notes),
         "reference_states": {
-            name: list(rows)
-            for name, rows in result.reference_rows_by_name.items()
+            name: list(rows) for name, rows in result.reference_rows_by_name.items()
         },
         "time_series_rows": result.time_series_rows(),
         "artifacts": {
             "timeseries_csv": (
-                time_series_artifact
-                or {"path": time_series_csv.name, "format": "csv"}
+                time_series_artifact or {"path": time_series_csv.name, "format": "csv"}
             ),
             "eoi_csv": eoi_artifact or {"path": eoi_csv.name, "format": "csv"},
             "count_start_csv": (
-                count_start_artifact
-                or {"path": count_start_csv.name, "format": "csv"}
+                count_start_artifact or {"path": count_start_csv.name, "format": "csv"}
             ),
             "count_end_csv": (
-                count_end_artifact
-                or {"path": count_end_csv.name, "format": "csv"}
+                count_end_artifact or {"path": count_end_csv.name, "format": "csv"}
             ),
             "plot": {"path": plot_output.name, "format": "png"},
         },
@@ -3324,7 +3372,9 @@ def cmd_isotope_priority(args: argparse.Namespace) -> None:
 
     csv_output = getattr(args, "csv_output", None)
     if csv_output is not None:
-        _write_dict_rows(Path(csv_output), list(output_payload.get("ranked_isotopes") or []))
+        _write_dict_rows(
+            Path(csv_output), list(output_payload.get("ranked_isotopes") or [])
+        )
 
     print(f"Wrote isotope-priority ranking to {output_path}")
 
@@ -3410,12 +3460,18 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
         irradiation_grid_s = _parse_csv_floats(
             getattr(args, "irradiation_grid_s", None)
         ) or [1800.0, 3600.0, 7200.0, 14400.0]
-        cooldown_grid_s = _parse_csv_floats(
-            getattr(args, "cooldown_grid_s", None)
-        ) or [0.0, 1800.0, 7200.0, 21600.0]
-        count_grid_s = _parse_csv_floats(
-            getattr(args, "count_grid_s", None)
-        ) or [300.0, 600.0, 900.0, 1800.0]
+        cooldown_grid_s = _parse_csv_floats(getattr(args, "cooldown_grid_s", None)) or [
+            0.0,
+            1800.0,
+            7200.0,
+            21600.0,
+        ]
+        count_grid_s = _parse_csv_floats(getattr(args, "count_grid_s", None)) or [
+            300.0,
+            600.0,
+            900.0,
+            1800.0,
+        ]
 
         unfold_payload = None
         unfold_file = getattr(args, "unfold_file", None)
@@ -3596,7 +3652,9 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
     output_payload["input"] = None if input_path is None else str(input_path)
     output_payload["candidate_source"] = payload_source
     if payload_source == "activity-review":
-        output_payload["activity_review_file"] = str(getattr(args, "activity_review_file"))
+        output_payload["activity_review_file"] = str(
+            getattr(args, "activity_review_file")
+        )
         output_payload["candidate_generation"] = {
             "irradiation_grid_s": _parse_csv_floats(
                 getattr(args, "irradiation_grid_s", None)
@@ -3615,7 +3673,9 @@ def cmd_optimization_sweep(args: argparse.Namespace) -> None:
     output_payload["isotope_weights"] = isotope_weights
     output_payload["isotopes_of_interest"] = list(isotopes_of_interest)
     output_payload["isotope_filter_summary"] = isotope_filter_summary
-    output_payload["generated_at"] = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    output_payload["generated_at"] = (
+        datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    )
 
     output_path = Path(args.output)
     _ensure_parent_dir(output_path)
@@ -3707,17 +3767,20 @@ def cmd_second_irradiation_plan(args: argparse.Namespace) -> None:
         schedule_source=str(args.schedule_file),
         candidates_source=str(args.candidates_file),
     )
-    output_payload["generated_at"] = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    output_payload["generated_at"] = (
+        datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    )
 
     output_path = Path(args.output)
     _ensure_parent_dir(output_path)
     output_path.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
 
-    selected_csv_output = (
-        getattr(args, "csv_output", None)
-        or _phase6_artifact_path(output_path, "_selected_inventory.csv")
+    selected_csv_output = getattr(args, "csv_output", None) or _phase6_artifact_path(
+        output_path, "_selected_inventory.csv"
     )
-    _write_dict_rows(Path(selected_csv_output), output_payload["selected_inventory_rows"])
+    _write_dict_rows(
+        Path(selected_csv_output), output_payload["selected_inventory_rows"]
+    )
     ranked_csv_output = _phase6_artifact_path(output_path, "_ranked_candidates.csv")
     _write_dict_rows(Path(ranked_csv_output), output_payload["ranked_candidates"])
     output_payload["support_artifacts"] = {
@@ -3762,7 +3825,9 @@ def cmd_ffexp_export(args: argparse.Namespace) -> None:
             optimization_payload,
             isotopes_of_interest=tuple(
                 str(item)
-                for item in ((optimization_payload or {}).get("isotopes_of_interest") or [])
+                for item in (
+                    (optimization_payload or {}).get("isotopes_of_interest") or []
+                )
             ),
         )
 
@@ -3770,9 +3835,15 @@ def cmd_ffexp_export(args: argparse.Namespace) -> None:
         inventory_payload = {
             "schema": "fluxforge.inventory_time_evolution.v1",
             "time_series_rows": support_artifacts["inventory_timeseries_rows"],
-            "activities_at_irradiation": support_artifacts["activities_at_irradiation_rows"],
-            "activities_at_count_start": support_artifacts["activities_at_count_start_rows"],
-            "activities_at_count_end": support_artifacts["activities_at_count_end_rows"],
+            "activities_at_irradiation": support_artifacts[
+                "activities_at_irradiation_rows"
+            ],
+            "activities_at_count_start": support_artifacts[
+                "activities_at_count_start_rows"
+            ],
+            "activities_at_count_end": support_artifacts[
+                "activities_at_count_end_rows"
+            ],
             "dose_endpoints": support_artifacts["dose_endpoints_rows"],
         }
 
@@ -3801,16 +3872,24 @@ def cmd_ffexp_export(args: argparse.Namespace) -> None:
     metadata = {
         "generated_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
         "activity_review_file": (
-            None if getattr(args, "activity_review_file", None) is None else str(args.activity_review_file)
+            None
+            if getattr(args, "activity_review_file", None) is None
+            else str(args.activity_review_file)
         ),
         "inventory_review_file": (
-            None if getattr(args, "inventory_review_file", None) is None else str(args.inventory_review_file)
+            None
+            if getattr(args, "inventory_review_file", None) is None
+            else str(args.inventory_review_file)
         ),
         "masking_file": (
-            None if getattr(args, "masking_file", None) is None else str(args.masking_file)
+            None
+            if getattr(args, "masking_file", None) is None
+            else str(args.masking_file)
         ),
         "optimization_file": (
-            None if getattr(args, "optimization_file", None) is None else str(args.optimization_file)
+            None
+            if getattr(args, "optimization_file", None) is None
+            else str(args.optimization_file)
         ),
         "second_irradiation_file": (
             None
@@ -3998,8 +4077,7 @@ def cmd_phase6_ldrd_worked_example(args: argparse.Namespace) -> None:
         or PHASE6_LDRD_DEFAULT_SAMPLE_ID
     )
     output_root = Path(
-        getattr(args, "output_root", None)
-        or phase6_ldrd_default_output_root(sample_id)
+        getattr(args, "output_root", None) or phase6_ldrd_default_output_root(sample_id)
     )
     summary_path = run_phase6_ldrd_worked_example(
         sample_id=sample_id,
@@ -4333,31 +4411,47 @@ def cmd_unfold(args: argparse.Namespace) -> None:
     rates_payload = read_reaction_rates(args.rates_file)
     if args.validate:
         validate_or_raise(rates_payload)
-    measured_rates = require_nonnegative(
-        "measurements",
-        [float(rx["rate"]) for rx in rates_payload["rates"]],
-    ).astype(float).tolist()
-    rate_uncertainties = require_nonnegative(
-        "measurement_uncertainty",
-        [float(rx["uncertainty"]) for rx in rates_payload["rates"]],
-    ).astype(float).tolist()
+    measured_rates = (
+        require_nonnegative(
+            "measurements",
+            [float(rx["rate"]) for rx in rates_payload["rates"]],
+        )
+        .astype(float)
+        .tolist()
+    )
+    rate_uncertainties = (
+        require_nonnegative(
+            "measurement_uncertainty",
+            [float(rx["uncertainty"]) for rx in rates_payload["rates"]],
+        )
+        .astype(float)
+        .tolist()
+    )
 
     if args.prior_flux_file:
-        prior_flux = require_nonnegative(
-            "prior_flux",
-            [float(v) for v in _load_json(args.prior_flux_file)],
-        ).astype(float).tolist()
+        prior_flux = (
+            require_nonnegative(
+                "prior_flux",
+                [float(v) for v in _load_json(args.prior_flux_file)],
+            )
+            .astype(float)
+            .tolist()
+        )
     else:
         avg_response = sum(sum(row) for row in response_matrix) / max(
             len(response_matrix) * len(response_matrix[0]), 1
         )
-        prior_flux = require_nonnegative(
-            "prior_flux",
-            [
-                sum(measured_rates) / max(avg_response, 1e-12)
-                for _ in range(groups.group_count)
-            ],
-        ).astype(float).tolist()
+        prior_flux = (
+            require_nonnegative(
+                "prior_flux",
+                [
+                    sum(measured_rates) / max(avg_response, 1e-12)
+                    for _ in range(groups.group_count)
+                ],
+            )
+            .astype(float)
+            .tolist()
+        )
 
     # Prior covariance model (K8)
     cov_model = PriorCovarianceModel(
@@ -5391,7 +5485,9 @@ def cmd_report(args: argparse.Namespace) -> None:
         ]
         masking_recommendation_rows = [
             item
-            for item in (masking_payload.get("alternate_line_recommendations", []) or [])
+            for item in (
+                masking_payload.get("alternate_line_recommendations", []) or []
+            )
             if isinstance(item, dict)
         ]
         summary["masking_line_interactions"] = len(masking_line_rows)
@@ -5401,9 +5497,7 @@ def cmd_report(args: argparse.Namespace) -> None:
                 "masking_nuclide"
             )
         if masking_recommendation_rows:
-            summary["alternate_line_recommendations"] = len(
-                masking_recommendation_rows
-            )
+            summary["alternate_line_recommendations"] = len(masking_recommendation_rows)
     optimization_file = getattr(args, "optimization_file", None)
     if optimization_file:
         optimization_file_path = Path(optimization_file)
@@ -5415,9 +5509,7 @@ def cmd_report(args: argparse.Namespace) -> None:
                 optimization_file=optimization_file_path,
             )
         )
-        summary["optimization_objective"] = optimization_recommendation.get(
-            "objective"
-        )
+        summary["optimization_objective"] = optimization_recommendation.get("objective")
         summary["recommended_schedule_label"] = optimization_recommendation.get(
             "recommended_label"
         )
@@ -5433,8 +5525,8 @@ def cmd_report(args: argparse.Namespace) -> None:
         summary["recommended_mask_isotope"] = optimization_recommendation.get(
             "recommended_mask_isotope"
         )
-        summary["recommended_isotope_of_interest"] = (
-            optimization_recommendation.get("recommended_isotope_of_interest")
+        summary["recommended_isotope_of_interest"] = optimization_recommendation.get(
+            "recommended_isotope_of_interest"
         )
         if "recommended_expected_dose_uSv" in optimization_recommendation:
             summary["recommended_expected_dose_uSv"] = optimization_recommendation.get(
@@ -5518,9 +5610,7 @@ def cmd_report(args: argparse.Namespace) -> None:
         if masking_isotope_table is not None:
             table_items["masking_isotope_ranking"] = masking_isotope_table
         if masking_recommendation_table is not None:
-            table_items[
-                "alternate_line_recommendations"
-            ] = masking_recommendation_table
+            table_items["alternate_line_recommendations"] = masking_recommendation_table
     if optimization_payload is not None:
         recommendation_rows = []
         if optimization_recommendation:
@@ -5959,7 +6049,12 @@ def cmd_commands(args: argparse.Namespace) -> None:
 def cmd_gui(args: argparse.Namespace) -> None:
     """Launch FluxForge desktop GUI."""
     if args.dry_run:
-        print(f"GUI dry run: project_dir={args.project_dir}")
+        print(
+            "GUI dry run: "
+            f"project_dir={args.project_dir}, "
+            f"developer_tools={getattr(args, 'developer_tools', False)}, "
+            f"open_example={getattr(args, 'open_example', False)}"
+        )
         return
 
     try:
@@ -5970,23 +6065,18 @@ def cmd_gui(args: argparse.Namespace) -> None:
         QT_AVAILABLE = False
 
     if QT_AVAILABLE and launch_modern_gui is not None:
-        launch_modern_gui(project_dir=args.project_dir)
+        launch_modern_gui(
+            project_dir=args.project_dir,
+            developer_tools=getattr(args, "developer_tools", False),
+            open_example=getattr(args, "open_example", False),
+        )
         return
-
-    try:
-        from fluxforge_gui.app import launch_gui
-    except Exception as exc:  # pragma: no cover - import/runtime environment specific
-        raise RuntimeError(
-            "Unable to start FluxForge GUI. The modern Qt shell is unavailable and "
-            "the archived Tk fallback could not be imported either."
-        ) from exc
-
-    print(
-        "Modern Qt GUI extras are unavailable in this environment; launching the "
-        "archived Tk fallback.",
-        file=sys.stderr,
+    raise RuntimeError(
+        "Unable to start the FluxForge desktop GUI. Install the 'native-gui' "
+        "extra and rerun this command. The archived compatibility interface, "
+        "when required for migration testing, must be launched explicitly with "
+        "'fluxforge-gui-legacy'."
     )
-    launch_gui(project_dir=args.project_dir)
 
 
 def cmd_plots(args: argparse.Namespace) -> None:
@@ -6683,7 +6773,9 @@ def build_parser() -> argparse.ArgumentParser:
     phase5_release_gate.add_argument(
         "--playwright-report",
         type=Path,
-        default=Path("artifacts/gui_review/phase5_parity/playwright_audit/audit_report.json"),
+        default=Path(
+            "artifacts/gui_review/phase5_parity/playwright_audit/audit_report.json"
+        ),
     )
     phase5_release_gate.add_argument(
         "--checklist",
@@ -7637,6 +7729,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--dry-run",
         action="store_true",
         help="Validate CLI parsing for GUI launch without opening a window",
+    )
+    gui.add_argument(
+        "--developer-tools",
+        action="store_true",
+        help="Show parity, diagnostics, and other developer-only workspaces",
+    )
+    gui.add_argument(
+        "--open-example",
+        action="store_true",
+        help="Open the bundled HPGe example instead of an empty workspace",
     )
     gui.set_defaults(func=cmd_gui)
 

@@ -10,6 +10,7 @@ import numpy as np
 
 from fluxforge.analysis.flux_unfold import _make_response_row
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE
+from fluxforge.gui.backends.pyqtgraph_backend import catalog_pyqtgraph_export_action
 from fluxforge.gui.mode_manager import ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.io import read_reaction_rates
@@ -21,7 +22,9 @@ from fluxforge.unfolding.response_matrix import (
     load_response_matrix,
 )
 
-if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
+if (
+    QT_AVAILABLE and PYQTGRAPH_AVAILABLE
+):  # pragma: no cover - optional dependency branch
     import pyqtgraph as pg
 
     from fluxforge.gui.qt_compat import (
@@ -35,6 +38,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
         QLabel,
         QLineEdit,
         QPushButton,
+        QScrollArea,
         QSlider,
         QSplitter,
         QTableWidget,
@@ -88,11 +92,15 @@ def build_demo_unfolding_workspace_input() -> UnfoldingWorkspaceInput:
         response_matrix=response_matrix,
         energy_edges=energy_edges,
         initial_flux=initial_flux,
-        measurement_labels=tuple(f"M{index + 1}" for index in range(measured_rates.size)),
+        measurement_labels=tuple(
+            f"M{index + 1}" for index in range(measured_rates.size)
+        ),
     )
 
 
-if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
+if (
+    QT_AVAILABLE and PYQTGRAPH_AVAILABLE
+):  # pragma: no cover - optional dependency branch
 
     class UnfoldingWorkspaceDialog(QDialog):
         """Qt unfolding workspace with method comparison and response-matrix review."""
@@ -109,7 +117,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.resize(1420, 940)
 
             self.mode_manager = mode_manager or ModeManager()
-            self.workspace_input = workspace_input or build_demo_unfolding_workspace_input()
+            self.workspace_input = (
+                workspace_input or build_demo_unfolding_workspace_input()
+            )
             self.registries = bootstrap_builtin_registries()
             register_builtin_unfolders(self.registries)
 
@@ -122,7 +132,22 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             root.setContentsMargins(16, 16, 16, 16)
             root.setSpacing(12)
 
-            root.addLayout(self._build_controls())
+            controls_panel = QWidget(self)
+            controls_panel.setObjectName("UnfoldingControlsPanel")
+            controls_panel.setLayout(self._build_controls())
+            controls_scroll = QScrollArea(self)
+            controls_scroll.setObjectName("UnfoldingControlsScrollArea")
+            controls_scroll.setWidgetResizable(True)
+            # The controls use a responsive grid and must shrink to the viewport.
+            # Leaving the horizontal policy as ``AsNeeded`` creates a feedback
+            # loop on some themes: the vertical bar reduces the viewport just
+            # enough to summon a second, unnecessary horizontal bar.
+            controls_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            controls_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            controls_scroll.setMinimumHeight(190)
+            controls_scroll.setMaximumHeight(520)
+            controls_scroll.setWidget(controls_panel)
+            root.addWidget(controls_scroll)
 
             splitter = QSplitter(Qt.Horizontal, self)
             splitter.setChildrenCollapsible(False)
@@ -178,9 +203,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self._run_selected_method()
 
         def _build_controls(self):
-            row = QHBoxLayout()
-            row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(12)
+            grid = QGridLayout()
+            grid.setContentsMargins(0, 0, 0, 0)
+            grid.setHorizontalSpacing(12)
+            grid.setVerticalSpacing(8)
 
             self.method_selector = MethodSelectorWidget(
                 self.registries.unfolders,
@@ -188,7 +214,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 title="Method A",
                 parent=self,
             )
-            row.addWidget(self.method_selector, 1)
+            grid.addWidget(self.method_selector, 0, 0)
 
             self.compare_selector = MethodSelectorWidget(
                 self.registries.unfolders,
@@ -198,13 +224,17 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
             if self.compare_selector.combo.count() > 1:
                 self.compare_selector.combo.setCurrentIndex(1)
-            row.addWidget(self.compare_selector, 1)
+            grid.addWidget(self.compare_selector, 0, 1)
 
             response_group = QGroupBox("Response Matrix", self)
             response_layout = QGridLayout(response_group)
             response_layout.addWidget(QLabel("Source", response_group), 0, 0)
             self.response_source_combo = QComboBox(response_group)
             self.response_source_combo.setObjectName("ResponseSourceCombo")
+            self.response_source_combo.setSizeAdjustPolicy(
+                QComboBox.AdjustToMinimumContentsLengthWithIcon
+            )
+            self.response_source_combo.setMinimumContentsLength(14)
             self.response_source_combo.addItem("Demo Response", "demo")
             self.response_source_combo.addItem("User CSV", "user_csv")
             self.response_source_combo.addItem("MCNP / GEANT4 Table", "mcnp_geant4")
@@ -223,7 +253,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             response_layout.addWidget(self.response_path_input, 1, 1)
             self.response_load_button = QPushButton("Load Response", response_group)
             self.response_load_button.setObjectName("LoadResponseMatrixButton")
-            self.response_load_button.clicked.connect(self._load_selected_response_matrix)
+            self.response_load_button.clicked.connect(
+                self._load_selected_response_matrix
+            )
             response_layout.addWidget(self.response_load_button, 2, 0, 1, 2)
             response_layout.addWidget(QLabel("Measured rates", response_group), 3, 0)
             self.rates_path_input = QLineEdit(response_group)
@@ -236,7 +268,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.rates_load_button.setObjectName("LoadMeasuredRatesButton")
             self.rates_load_button.clicked.connect(self._load_measured_rates)
             response_layout.addWidget(self.rates_load_button, 4, 0, 1, 2)
-            row.addWidget(response_group)
+            grid.addWidget(response_group, 1, 0, 1, 2)
 
             maxed_group = QGroupBox("MAXED Controls", self)
             maxed_layout = QGridLayout(maxed_group)
@@ -248,7 +280,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.entropy_weight_spin.setSingleStep(0.05)
             self.entropy_weight_spin.setValue(0.02)
             maxed_layout.addWidget(self.entropy_weight_spin, 0, 1)
-            row.addWidget(maxed_group)
+            grid.addWidget(maxed_group, 2, 0)
 
             rmle_group = QGroupBox("RMLE Controls", self)
             rmle_layout = QGridLayout(rmle_group)
@@ -279,7 +311,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.rmle_penalty_combo.addItem("1st derivative", "first_derivative")
             self.rmle_penalty_combo.addItem("L2", "l2")
             rmle_layout.addWidget(self.rmle_penalty_combo, 3, 1)
-            row.addWidget(rmle_group)
+            grid.addWidget(rmle_group, 2, 1)
 
             ml_seed_group = QGroupBox("ML Seed Controls", self)
             ml_seed_layout = QGridLayout(ml_seed_group)
@@ -289,7 +321,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
             self.use_ml_seed_checkbox.setObjectName("UseMlSeedCheck")
             ml_seed_layout.addWidget(self.use_ml_seed_checkbox, 0, 0, 1, 2)
-            ml_seed_layout.addWidget(QLabel("Confidence Threshold", ml_seed_group), 1, 0)
+            ml_seed_layout.addWidget(
+                QLabel("Confidence Threshold", ml_seed_group), 1, 0
+            )
             self.ml_seed_threshold_spin = QDoubleSpinBox(ml_seed_group)
             self.ml_seed_threshold_spin.setObjectName("MlSeedThresholdSpin")
             self.ml_seed_threshold_spin.setDecimals(2)
@@ -297,11 +331,16 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.ml_seed_threshold_spin.setSingleStep(0.05)
             self.ml_seed_threshold_spin.setValue(0.6)
             ml_seed_layout.addWidget(self.ml_seed_threshold_spin, 1, 1)
-            row.addWidget(ml_seed_group)
+            grid.addWidget(ml_seed_group, 3, 0, 1, 2)
+
+            action_grid = QGridLayout()
+            action_grid.setContentsMargins(0, 0, 0, 0)
+            action_grid.setHorizontalSpacing(12)
+            action_grid.setVerticalSpacing(6)
 
             self.compare_mode_checkbox = QCheckBox("Algorithm comparison mode", self)
             self.compare_mode_checkbox.setObjectName("UnfoldingCompareModeCheck")
-            row.addWidget(self.compare_mode_checkbox)
+            action_grid.addWidget(self.compare_mode_checkbox, 0, 0)
 
             self.show_uncertainty_bands_checkbox = QCheckBox(
                 "Show uncertainty bands",
@@ -314,29 +353,32 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.show_uncertainty_bands_checkbox.setToolTip(
                 "Show the one-sigma uncertainty estimate returned by each method."
             )
-            row.addWidget(self.show_uncertainty_bands_checkbox)
+            action_grid.addWidget(self.show_uncertainty_bands_checkbox, 0, 1)
 
             self.log_energy_checkbox = QCheckBox("Log energy", self)
             self.log_energy_checkbox.setObjectName("UnfoldingLogEnergyCheck")
-            row.addWidget(self.log_energy_checkbox)
+            action_grid.addWidget(self.log_energy_checkbox, 0, 2)
 
             self.log_flux_checkbox = QCheckBox("Log flux", self)
             self.log_flux_checkbox.setObjectName("UnfoldingLogFluxCheck")
-            row.addWidget(self.log_flux_checkbox)
+            action_grid.addWidget(self.log_flux_checkbox, 0, 3)
 
             self.reset_plots_button = QPushButton("Reset Plot Views", self)
             self.reset_plots_button.setObjectName("ResetUnfoldingPlotsButton")
-            row.addWidget(self.reset_plots_button)
+            action_grid.addWidget(self.reset_plots_button, 1, 1)
 
             self.run_button = QPushButton("Run Selected", self)
             self.run_button.setObjectName("RunSelectedUnfoldingButton")
-            row.addWidget(self.run_button)
+            action_grid.addWidget(self.run_button, 1, 2)
 
             self.compare_button = QPushButton("Run Comparison", self)
             self.compare_button.setObjectName("RunComparisonUnfoldingButton")
-            row.addWidget(self.compare_button)
+            action_grid.addWidget(self.compare_button, 1, 3)
 
-            return row
+            grid.addLayout(action_grid, 4, 0, 1, 2)
+            grid.setColumnStretch(0, 1)
+            grid.setColumnStretch(1, 1)
+            return grid
 
         def _build_left_column(self) -> QWidget:
             panel = QWidget(self)
@@ -376,14 +418,21 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             self.flux_plot = pg.PlotWidget(panel)
             self.flux_plot.setObjectName("UnfoldingFluxPlot")
+            catalog_pyqtgraph_export_action(self.flux_plot, "UnfoldingFluxPlot")
             self.flux_plot.setBackground("#0f172a")
             self.flux_plot.showGrid(x=True, y=True, alpha=0.12)
-            self.flux_plot.setLabel("bottom", "Energy", units=self.workspace_input.energy_unit)
+            self.flux_plot.setLabel(
+                "bottom", "Energy", units=self.workspace_input.energy_unit
+            )
             self.flux_plot.setLabel("left", "Flux")
             layout.addWidget(self.flux_plot, 2)
 
             self.convergence_plot = pg.PlotWidget(panel)
             self.convergence_plot.setObjectName("UnfoldingConvergencePlot")
+            catalog_pyqtgraph_export_action(
+                self.convergence_plot,
+                "UnfoldingConvergencePlot",
+            )
             self.convergence_plot.setBackground("#0f172a")
             self.convergence_plot.showGrid(x=True, y=True, alpha=0.12)
             self.convergence_plot.setLabel("bottom", "Iteration")
@@ -392,6 +441,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
 
             self.response_plot = pg.PlotWidget(panel)
             self.response_plot.setObjectName("UnfoldingResponseMatrixPlot")
+            catalog_pyqtgraph_export_action(
+                self.response_plot,
+                "UnfoldingResponseMatrixPlot",
+            )
             self.response_plot.setBackground("#0f172a")
             self.response_plot.setLabel("bottom", "Measurement")
             self.response_plot.setLabel("left", "Energy Group")
@@ -408,15 +461,22 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             )
             uses_maxed = self.method_selector.current_key() == "maxed"
             uses_rmle = self.method_selector.current_key() == "rmle"
-            uses_gravel_or_rmle = self.method_selector.current_key() in {"gravel", "rmle"}
+            uses_gravel_or_rmle = self.method_selector.current_key() in {
+                "gravel",
+                "rmle",
+            }
             uses_ml_seed = self.method_selector.current_key() == "ml_seed"
             if compare_enabled:
-                uses_maxed = uses_maxed or self.compare_selector.current_key() == "maxed"
+                uses_maxed = (
+                    uses_maxed or self.compare_selector.current_key() == "maxed"
+                )
                 uses_rmle = uses_rmle or self.compare_selector.current_key() == "rmle"
                 uses_gravel_or_rmle = uses_gravel_or_rmle or (
                     self.compare_selector.current_key() in {"gravel", "rmle"}
                 )
-                uses_ml_seed = uses_ml_seed or self.compare_selector.current_key() == "ml_seed"
+                uses_ml_seed = (
+                    uses_ml_seed or self.compare_selector.current_key() == "ml_seed"
+                )
             self.entropy_weight_spin.setEnabled(uses_maxed)
             self.rmle_auto_checkbox.setEnabled(uses_rmle)
             self.rmle_penalty_combo.setEnabled(uses_rmle)
@@ -467,7 +527,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             self.rmle_lambda_spin.blockSignals(False)
 
         def _selected_method_keys(self) -> tuple[str, ...]:
-            primary = self.method_selector.current_key() or self.registries.unfolders.default_key
+            primary = (
+                self.method_selector.current_key()
+                or self.registries.unfolders.default_key
+            )
             assert primary is not None
             if not self.compare_mode_checkbox.isChecked():
                 return (primary,)
@@ -514,7 +577,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                         rows = [
                             row
                             for row in csv.DictReader(handle)
-                            if not str(row.get("reaction_id", "")).startswith("Unknown(")
+                            if not str(row.get("reaction_id", "")).startswith(
+                                "Unknown("
+                            )
                         ]
                     rate_key = "reaction_rate"
                     uncertainty_key = "reaction_rate_unc"
@@ -537,9 +602,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     raise ValueError("rates and uncertainties must be non-negative")
                 labels = tuple(
                     str(
-                        row.get("reaction_id")
-                        or row.get("reaction")
-                        or f"M{index + 1}"
+                        row.get("reaction_id") or row.get("reaction") or f"M{index + 1}"
                     )
                     for index, row in enumerate(rows)
                 )
@@ -585,7 +648,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                         n_channels=int(self.workspace_input.measured_rates.size),
                         energy_edges=self.workspace_input.energy_edges,
                     )
-                    self.workspace_input = self._workspace_input_from_loaded_response(loaded)
+                    self.workspace_input = self._workspace_input_from_loaded_response(
+                        loaded
+                    )
                 elif source_key == "uwnr_flux_wires":
                     if not self.workspace_input.measurement_labels or all(
                         label.startswith("M")
@@ -602,16 +667,22 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 else:
                     path = self.response_path_input.text().strip()
                     if not path:
-                        self.summary_label.setText("Choose a response-matrix file first.")
+                        self.summary_label.setText(
+                            "Choose a response-matrix file first."
+                        )
                         return
                     loaded = load_response_matrix(
                         path,
                         source_format=(
-                            "mcnp_geant4_table" if source_key == "mcnp_geant4" else "user_csv"
+                            "mcnp_geant4_table"
+                            if source_key == "mcnp_geant4"
+                            else "user_csv"
                         ),
                         energy_edges=self.workspace_input.energy_edges,
                     )
-                    self.workspace_input = self._workspace_input_from_loaded_response(loaded)
+                    self.workspace_input = self._workspace_input_from_loaded_response(
+                        loaded
+                    )
             except (OSError, TypeError, ValueError) as exc:
                 self.summary_label.setText(f"Response matrix was not loaded: {exc}")
                 return
@@ -653,7 +724,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                 energy_unit="eV",
             )
 
-        def _workspace_input_from_loaded_response(self, loaded) -> UnfoldingWorkspaceInput:
+        def _workspace_input_from_loaded_response(
+            self, loaded
+        ) -> UnfoldingWorkspaceInput:
             matrix = np.asarray(loaded.matrix, dtype=float)
             energy_edges = np.asarray(loaded.energy_edges, dtype=float)
             initial_flux = np.asarray(self.workspace_input.initial_flux, dtype=float)
@@ -663,7 +736,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     float(np.mean(self.workspace_input.initial_flux)),
                     dtype=float,
                 )
-            measured_rates = np.asarray(self.workspace_input.measured_rates, dtype=float)
+            measured_rates = np.asarray(
+                self.workspace_input.measured_rates, dtype=float
+            )
             measurement_uncertainty = np.asarray(
                 self.workspace_input.measurement_uncertainty, dtype=float
             )
@@ -713,7 +788,10 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     self.rmle_penalty_combo.currentData() or "second_derivative"
                 )
                 kwargs["auto_regularization"] = self.rmle_auto_checkbox.isChecked()
-            if method_key in {"gravel", "rmle"} and self.use_ml_seed_checkbox.isChecked():
+            if (
+                method_key in {"gravel", "rmle"}
+                and self.use_ml_seed_checkbox.isChecked()
+            ):
                 kwargs["seed_with_ml"] = True
                 kwargs["confidence_threshold"] = self.ml_seed_threshold_spin.value()
             if method_key == "ml_seed":
@@ -743,9 +821,7 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
                     )
                 confidence_note = ""
                 if seed_confidence is not None:
-                    confidence_note = (
-                        f" Seed confidence {float(seed_confidence):.2f}."
-                    )
+                    confidence_note = f" Seed confidence {float(seed_confidence):.2f}."
                 self.summary_label.setText(
                     f"{self.current_result.method_used} completed in "
                     f"{self.current_result.iterations} iterations with "
@@ -889,7 +965,9 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             for plot in (self.flux_plot, self.convergence_plot, self.response_plot):
                 plot.enableAutoRange()
 
-        def _set_table_item(self, table: QTableWidget, row: int, column: int, value) -> None:
+        def _set_table_item(
+            self, table: QTableWidget, row: int, column: int, value
+        ) -> None:
             if isinstance(value, str):
                 text = value
             elif isinstance(value, (int, np.integer)):
@@ -899,7 +977,6 @@ if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependen
             item = QTableWidgetItem(text)
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             table.setItem(row, column, item)
-
 
 else:
 

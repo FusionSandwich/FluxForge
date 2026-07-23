@@ -1,0 +1,167 @@
+{
+  "schema": "fluxforge.gui_action_catalog",
+  "version": 1,
+  "scope": "production",
+  "policy": "Every production-owned QAction, interactive control, fixed tab, and renderer intent must have a stable ID and a behavioral test suite. Qt-internal chrome and read-only output widgets are excluded.",
+  "action_groups": [
+    {
+      "surface": "main-window.menus",
+      "test_ids": ["tests/test_modern_gui_shell.py"],
+      "object_names": ["OpenAnalysisMenuAction", "OpenCalibrationMenuAction", "OpenEditMenuAction", "OpenFileMenuAction", "OpenHelpMenuAction", "OpenToolsMenuAction", "OpenViewMenuAction", "OpenWorkspacesMenuAction"]
+    },
+    {
+      "surface": "main-window.files-and-examples",
+      "test_ids": ["tests/test_production_gui_mode.py", "tests/test_gui_app.py"],
+      "object_names": ["OpenExampleAction", "OpenSessionAction", "OpenSpectrumAction"]
+    },
+    {
+      "surface": "main-window.analysis",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_module3_workflows_qt.py"],
+      "object_names": ["AutoFindPeaksAction", "FocusNuclideSearchAction", "OpenPuIsotopicsAction", "RunAstmCheckAction"]
+    },
+    {
+      "surface": "main-window.calibration",
+      "test_ids": ["tests/test_calibration_workspace_qt.py"],
+      "object_names": ["OpenEnergyFwhmCalibrationAction", "OpenManualCalibrationAction", "OpenQuickSliderCalibrationAction", "OpenStandardsCalibrationAction"]
+    },
+    {
+      "surface": "main-window.unfolding",
+      "test_ids": ["tests/test_unfolding_workspace_qt.py"],
+      "object_names": ["OpenSpectrumUnfoldingAction", "WorkspaceOpenUnfoldingAction"]
+    },
+    {
+      "surface": "main-window.reports-and-qa",
+      "test_ids": ["tests/test_module3_workflows_qt.py"],
+      "object_names": ["ExportReportAction", "OpenQaHistoryAction", "WorkspaceOpenQaHistoryAction", "WorkspaceOpenReportExportAction", "WorkspaceOpenStandardsReviewAction"]
+    },
+    {
+      "surface": "main-window.layout",
+      "test_ids": ["tests/test_modern_gui_shell.py", "tests/test_module3_workflows_qt.py"],
+      "object_names": ["FocusAnalysisSurfaceAction", "FocusToolInspectorAction", "FocusWorkspaceSidebarAction", "RestoreDefaultLayoutAction", "ToggleAnalysisSurfaceDockAction", "ToggleFullCanvasAction", "ToggleInspectorDockAction", "TogglePrimaryToolbarAction", "ToggleWorkspaceDockAction"]
+    },
+    {
+      "surface": "main-window.canvas",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_modern_gui_shell.py"],
+      "object_names": ["ToggleLogScaleAction", "TogglePeakLabelsAction"]
+    },
+    {
+      "surface": "main-window.undo",
+      "test_ids": ["tests/test_analysis_workspace_qt.py"],
+      "object_names": ["RedoAction", "UndoAction"]
+    },
+    {
+      "surface": "main-window.workflow-presets",
+      "test_ids": ["tests/test_modern_gui_shell.py"],
+      "object_names": ["DeleteSavedWorkflowAction", "LoadSavedWorkflowAction", "SaveCurrentWorkflowAction"]
+    },
+    {
+      "surface": "main-window.help",
+      "test_ids": ["tests/test_modern_gui_shell.py"],
+      "object_names": ["ShowAboutFluxForgeAction", "ShowShortcutReferenceAction"]
+    },
+    {
+      "surface": "renderer.context-export",
+      "test_ids": ["tests/test_modern_gui_shell.py"],
+      "object_names": ["ExportPredictiveCountRatePlotAction", "ExportPredictiveDeadTimePlotAction", "ExportSpectrumPlotAction", "ExportSpectrumResidualPlot1Action", "ExportSpectrumResidualPlot2Action", "ExportSpectrumResidualPlot3Action"]
+    },
+    {
+      "surface": "calibration-dialog.context-export",
+      "test_ids": ["tests/test_calibration_workspace_qt.py"],
+      "object_names": ["ExportCalibrationEnergyResidualPlotAction", "ExportCalibrationFwhmPlotAction", "ExportCalibrationRoiFitPlotAction", "ExportCalibrationRoiResidualPlotAction", "ExportCalibrationSpectrumPlotAction"]
+    },
+    {
+      "surface": "unfolding-dialog.context-export",
+      "test_ids": ["tests/test_unfolding_workspace_qt.py"],
+      "object_names": ["ExportUnfoldingConvergencePlotAction", "ExportUnfoldingFluxPlotAction", "ExportUnfoldingResponseMatrixPlotAction"]
+    }
+  ],
+  "control_surfaces": [
+    {
+      "surface": "activity-results",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_calibration_workspace_qt.py"],
+      "object_names": ["ActivityBackgroundModeCombo", "ActivityBackgroundVisibleCheck", "ActivityResultsUnitCombo", "AnalyzeSpectrumButton", "BackgroundScaleSpin", "ComputeActivityButton", "ExportActivityCsvButton", "FitEfficiencyButton", "SaveBatemanPlotButton", "SaveDecayPlotButton", "SourceAgeHoursSpin"]
+    },
+    {
+      "surface": "batch-queue",
+      "test_ids": ["tests/test_module3_workflows_qt.py"],
+      "object_names": ["BatchOutputDirectoryInput", "BatchPreferGpuCheck", "QueueLoadedSpectraButton", "RunBatchQueueButton"]
+    },
+    {
+      "surface": "calibration-launchers",
+      "test_ids": ["tests/test_calibration_workspace_qt.py"],
+      "object_names": ["ManualCalibrationWorkflowButton", "QuickSliderCalibrationWorkflowButton", "SharedCalibrationWorkspaceButton", "StandardsCalibrationWorkflowButton"]
+    },
+    {
+      "surface": "forecast-controls",
+      "test_ids": ["tests/test_predictive_dashboard_qt.py"],
+      "object_names": ["PredictiveTargetCountsSpin"]
+    },
+    {
+      "surface": "workflow-toolbar",
+      "test_ids": ["tests/test_modern_gui_shell.py"],
+      "object_names": ["DeleteWorkflowPresetButton", "LoadWorkflowPresetButton", "SaveWorkflowPresetButton", "WorkflowPresetCombo"]
+    },
+    {
+      "surface": "mode-and-theme",
+      "test_ids": ["tests/test_modern_gui_shell.py"],
+      "object_names": ["ExpertModeButton", "SaveThemeProfileButton", "SimpleModeButton", "StandardCombo", "StandardsModeButton", "ThemeCombo", "ThemeProfileCombo"]
+    },
+    {
+      "surface": "peak-table",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_module3_workflows_qt.py"],
+      "object_names": ["AutoFindPeaksButton", "BayesianLibraryCombo", "BayesianMatchPeaksButton", "MlPeakAnalysisButton", "MlPeakLibraryCombo", "PeakIdAssignSelectedIsotopeButton", "PeakIdCentroidSpin", "PeakIdClearAssignmentButton", "PeakIdFilterInput", "PeakIdToleranceSpin", "PeakIdUseSelectedPeakButton", "PeakTableClearPeaksButton", "PeakTablePinNuclideButton", "PeakTableSearchMethodCombo", "PeakTableTagPeakButton"]
+    },
+    {
+      "surface": "spectrum-canvas",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_modern_gui_shell.py"],
+      "object_names": ["SpectrumClearRoiButton", "SpectrumResetViewButton", "SpectrumSelectRoiButton", "SpectrumZoomInButton", "SpectrumZoomOutButton"]
+    },
+    {
+      "surface": "roi-tools",
+      "test_ids": ["tests/test_analysis_workspace_qt.py"],
+      "object_names": ["AnalyzeRoiButton", "AnalyzeRoiStatisticsButton", "RoiBackgroundMethodSelectorCombo", "RoiDecomposeOverlapsCheck", "RoiLeftBoundSpin", "RoiMaxComponentsSpin", "RoiPeakSearchMethodCombo", "RoiRightBoundSpin", "RoiSidebandWidthSpin", "RoiUseSelectedPeakButton"]
+    },
+    {
+      "surface": "sidebar",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_module3_workflows_qt.py"],
+      "object_names": ["ActivationLibraryCombo", "AddNuclideToMixtureButton", "ApplyMixtureOverlayButton", "ApplySavedNuclideOverlayButton", "BackgroundSpectrumSelector", "CalibrationLibraryCombo", "ClearMixtureButton", "ClearSavedNuclideButton", "CustomGammaAliasInput", "CustomGammaPathInput", "DosimetryLibraryCombo", "ForegroundSpectrumSelector", "GammaLibraryCombo", "NaaMonitorLibraryCombo", "NormalizeMixtureButton", "NuclideAgeDaysSpin", "NuclideSearchInput", "OverlaySpectrumSelector", "QaHistoryShortcutButton", "RegisterCustomGammaButton", "RemoveMixtureRowButton", "RemoveRegisteredGammaButton", "RemoveSavedNuclideButton", "RunAstmCheckButton", "SaveNuclideToUserListButton", "SidebarPinSelectedNuclideButton"]
+    },
+    {
+      "surface": "calibration-dialog",
+      "test_ids": ["tests/test_calibration_workspace_qt.py"],
+      "object_names": ["AddCalibrationDeviationPairButton", "AddEnergyCalibrationPointButton", "AddFwhmCalibrationPointButton", "ApplyCalibrationButton", "ApplyCalibrationRoiCentroidButton", "ApplyCalibrationRoiFwhmButton", "AssignCalibrationLibraryLineButton", "CalibrationDetectorSlotCombo", "CalibrationEnergyPolynomialOrderSpin", "CalibrationLibrarySearchInput", "CalibrationLibrarySourceCombo", "CalibrationQuickAnchorAChannelSlider", "CalibrationQuickAnchorALineCombo", "CalibrationQuickAnchorBChannelSlider", "CalibrationQuickAnchorBLineCombo", "CalibrationRoiBackgroundCombo", "CalibrationRoiPeakFitterCombo", "ClearCalibrationDeviationPairsButton", "CloseCalibrationDialogButton", "FineTunePreservedButton", "LoadDetectorSlotButton", "NasaSmartSeedButton", "PreserveCalibrationButton", "PromoteCalibrationQuickAnchorsButton", "RemoveCalibrationDeviationPairButton", "RemoveEnergyCalibrationPointButton", "RemoveFwhmCalibrationPointButton", "ResetCalibrationQuickAnchorsButton", "ResetEnergyCalibrationPointsButton", "ResetFwhmCalibrationPointsButton", "SaveDetectorSlotButton", "SeedCalibrationDeviationPairsButton", "SnapCalibrationRoiButton"]
+    },
+    {
+      "surface": "efficiency-dialog",
+      "test_ids": ["tests/test_calibration_workspace_qt.py"],
+      "object_names": ["AcceptEfficiencyCalibrationButton", "CancelEfficiencyCalibrationButton", "EfficiencyModelMethodSelectorCombo", "FitEfficiencyModelButton", "HpgeC1Spin", "HpgeC2Spin", "HpgeC3Spin", "HpgeC4Spin", "HpgeDetectorIdEdit", "Hpgeal_window_T1_umSpin", "Hpgedetector_diameter_cmSpin", "Hpgedetector_thickness_DI_cmSpin", "Hpgedead_layer_DL_umSpin", "Hpgegeometry_factor_ASpin", "Hpgeincident_angle_AI_degSpin", "Hpgerelative_uncertaintySpin", "Hpgesource_distance_cmSpin", "SeedEfficiencyExamplePointsButton"]
+    },
+    {
+      "surface": "unfolding-dialog",
+      "test_ids": ["tests/test_unfolding_workspace_qt.py"],
+      "object_names": ["LoadMeasuredRatesButton", "LoadResponseMatrixButton", "MaxedEntropyWeightSpin", "MethodAMethodSelectorCombo", "MethodBMethodSelectorCombo", "MlSeedThresholdSpin", "ReactionRatesPathInput", "ResetUnfoldingPlotsButton", "ResponsePathInput", "ResponseSourceCombo", "RmleAutoLambdaCheck", "RmleLambdaSlider", "RmlePenaltyCombo", "RmleRegularizationSpin", "RunComparisonUnfoldingButton", "RunSelectedUnfoldingButton", "UnfoldingCompareModeCheck", "UnfoldingLogEnergyCheck", "UnfoldingLogFluxCheck", "UnfoldingUncertaintyBandsCheck", "UseMlSeedCheck"]
+    }
+  ],
+  "tabs": [
+    {"action_id": "canvas.spectrum.open", "test_ids": ["tests/test_modern_gui_shell.py"]},
+    {"action_id": "workspace.forecasts.open", "test_ids": ["tests/test_predictive_dashboard_qt.py"]},
+    {"action_id": "nuclide.details.open", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "nuclide.user_list.open", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "nuclide.mixtures.open", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "workspace.peaks.open", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "workspace.roi.open", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "workspace.calibration.open", "test_ids": ["tests/test_calibration_workspace_qt.py"]},
+    {"action_id": "workspace.activity.open", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "workspace.batch.open", "test_ids": ["tests/test_module3_workflows_qt.py"]},
+    {"action_id": "workspace.survey.open", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "calibration.quick_slider.open", "test_ids": ["tests/test_calibration_workspace_qt.py"]},
+    {"action_id": "calibration.fine_tuning.open", "test_ids": ["tests/test_calibration_workspace_qt.py"]},
+    {"action_id": "calibration.preserve_slots.open", "test_ids": ["tests/test_calibration_workspace_qt.py"]},
+    {"action_id": "calibration.roi_fit.open", "test_ids": ["tests/test_calibration_workspace_qt.py"]}
+  ],
+  "renderer_intents": [
+    {"action_id": "canvas.spectrum.wheel_zoom", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "canvas.spectrum.drag_pan", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
+    {"action_id": "canvas.spectrum.roi_handles", "test_ids": ["tests/test_analysis_workspace_qt.py"]}
+  ]
+}

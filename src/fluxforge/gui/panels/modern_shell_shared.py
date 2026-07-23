@@ -11,12 +11,7 @@ from fluxforge.gui.selection_bus import SelectionState
 from fluxforge.io.spe import GammaSpectrum
 
 
-MODERN_LOG_LINES = (
-    "Qt shell initialized",
-    "Renderer strategy: PyQtGraph first, Vispy additive",
-    "Mode-aware workflow locking ready",
-    "Tk GUI demoted to explicit legacy fallback",
-)
+MODERN_LOG_LINES = ("Developer tools enabled",)
 
 
 def selection_summary(state: SelectionState) -> str:
@@ -134,7 +129,13 @@ def build_demo_overlay_spectrum() -> GammaSpectrum:
 
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
-    from fluxforge.gui.qt_compat import QComboBox, QFrame, QLabel, QTabWidget, QVBoxLayout
+    from fluxforge.gui.qt_compat import (
+        QComboBox,
+        QFrame,
+        QLabel,
+        QTabWidget,
+        QVBoxLayout,
+    )
 
     def card(title: str, body: str, accent: str | None = None) -> QFrame:
         frame = QFrame()
