@@ -45,6 +45,11 @@
       "object_names": ["ToggleLogScaleAction", "TogglePeakLabelsAction"]
     },
     {
+      "surface": "renderer.direct-manipulation-context",
+      "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"],
+      "object_names": ["CanvasContextAddComponentAction", "CanvasContextAddPeakAction", "CanvasContextAssignNuclideAction", "CanvasContextBackgroundRoleAction", "CanvasContextClearNuclideAction", "CanvasContextCreateRoiAction", "CanvasContextCrosshairAction", "CanvasContextDeletePeakAction", "CanvasContextDeleteRoiAction", "CanvasContextForegroundRoleAction", "CanvasContextMergePeaksAction", "CanvasContextMovePeakAction", "CanvasContextPinNuclideAction", "CanvasContextResetViewAction", "CanvasContextSecondaryRoleAction", "CanvasContextSelectPeakAction", "CanvasContextSelectRoiAction", "CanvasContextSplitPeakAction", "CanvasContextTagNuclideAction", "CanvasContextTagPeakAction", "CanvasContextUnpinNuclideAction", "OpenCanvasContextSpectrumRoleMenuAction", "OpenSpectrumContextMenuAction"]
+    },
+    {
       "surface": "main-window.undo",
       "test_ids": ["tests/test_analysis_workspace_qt.py"],
       "object_names": ["RedoAction", "UndoAction"]
@@ -114,7 +119,7 @@
     {
       "surface": "spectrum-canvas",
       "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_modern_gui_shell.py"],
-      "object_names": ["SpectrumClearRoiButton", "SpectrumResetViewButton", "SpectrumSelectRoiButton", "SpectrumZoomInButton", "SpectrumZoomOutButton"]
+      "object_names": ["SpectrumClearRoiButton", "SpectrumCrosshairButton", "SpectrumResetViewButton", "SpectrumSelectRoiButton", "SpectrumZoomInButton", "SpectrumZoomOutButton"]
     },
     {
       "surface": "roi-tools",
@@ -162,6 +167,15 @@
   "renderer_intents": [
     {"action_id": "canvas.spectrum.wheel_zoom", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
     {"action_id": "canvas.spectrum.drag_pan", "test_ids": ["tests/test_analysis_workspace_qt.py"]},
-    {"action_id": "canvas.spectrum.roi_handles", "test_ids": ["tests/test_analysis_workspace_qt.py"]}
+    {"action_id": "canvas.spectrum.shift_drag_roi", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]},
+    {"action_id": "canvas.spectrum.roi_handles", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]},
+    {"action_id": "canvas.spectrum.background_handles", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]},
+    {"action_id": "canvas.spectrum.peak_exact_select", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py", "tests/test_bgamma_canvas_integration_qt.py"]},
+    {"action_id": "canvas.spectrum.peak_centroid_drag", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]},
+    {"action_id": "canvas.spectrum.table_exact_zoom", "test_ids": ["tests/test_bgamma_canvas_integration_qt.py"]},
+    {"action_id": "canvas.spectrum.context_peak_roi", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]},
+    {"action_id": "canvas.spectrum.context_roles", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]},
+    {"action_id": "canvas.spectrum.crosshair", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]},
+    {"action_id": "canvas.spectrum.export", "test_ids": ["tests/test_pyqtgraph_direct_interactions.py"]}
   ]
 }

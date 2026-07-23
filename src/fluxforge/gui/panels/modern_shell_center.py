@@ -7,13 +7,15 @@ from datetime import datetime
 import numpy as np
 
 from fluxforge.core.analysis_workspace import subtract_background_counts
-from fluxforge.core.workspace_document import CanvasViewport
+from fluxforge.core.workspace_document import CanvasViewport, WorkspaceValidationError
 from fluxforge.core.predictive import (
     estimate_count_target_forecast,
     estimate_dead_time_forecast,
     estimate_recalibration_forecast,
 )
 from fluxforge.gui.analysis_workspace import AnalysisWorkspaceController
+from fluxforge.gui.canvas_controller import CanvasIntentDispatcher
+from fluxforge.gui.canvas_intents import CanvasIntent, CanvasIntentKind
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
 from fluxforge.gui.backends.pyqtgraph_backend import catalog_pyqtgraph_export_action
 from fluxforge.gui.mode_manager import GUIMode, ModeManager
@@ -25,7 +27,11 @@ from fluxforge.gui.panels.modern_shell_shared import (
 )
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
-from fluxforge.gui.spectrum_canvas import SpectrumTrace
+from fluxforge.gui.spectrum_canvas import (
+    CanvasPeakOverlay,
+    CanvasROIOverlay,
+    SpectrumTrace,
+)
 from fluxforge.standards import QAMonitor
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
@@ -277,6 +283,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             selection_bus: SelectionBus,
             workspace_controller: AnalysisWorkspaceController,
             qa_monitor: QAMonitor,
+            undo_stack=None,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -284,6 +291,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.qa_monitor = qa_monitor
+            self.undo_stack = undo_stack
+            self.canvas_intent_dispatcher = CanvasIntentDispatcher(
+                self.workspace_controller,
+                self.selection_bus,
+                undo_stack=self.undo_stack,
+            )
+            self._last_canvas_viewport: CanvasViewport | None | object = object()
+            self._last_canvas_spectrum_id: str | None | object = object()
             self._current_spectrum = workspace_controller.spectrum()
             self.setObjectName("CentralWorkspaceTabs")
             self.addTab(self._build_spectrum_tab(), "Spectrum")
@@ -297,6 +312,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.mode_manager.subscribe(self._sync_mode_banner)
             self.mode_manager.subscribe(self._sync_workspace_mode)
+            self.selection_bus.subscribe(self._sync_canvas_selection)
             self.workspace_controller.subscribe(self._sync_workspace_state)
             self._sync_mode_banner(self.mode_manager.state)
             self._sync_workspace_state(self.workspace_controller.state)
@@ -322,6 +338,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     selection_bus=self.selection_bus,
                     parent=widget,
                 )
+                if hasattr(self.canvas, "set_intent_sink"):
+                    self.canvas.set_intent_sink(self._dispatch_canvas_intent)
+                elif hasattr(self.canvas, "subscribe_intents"):
+                    self.canvas.subscribe_intents(self._dispatch_canvas_intent)
                 layout.addWidget(self.canvas, 1)
             else:
                 status = pyqtgraph_backend_status()
@@ -370,7 +390,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 and hasattr(self, "canvas")
                 and hasattr(self.canvas, "set_log_scale")
             ):
-                self.canvas.set_log_scale(bool(enabled))
+                spectrum_id = self.workspace_controller.document.active_spectrum_id
+                self._dispatch_canvas_intent(
+                    CanvasIntent(
+                        CanvasIntentKind.SET_LOG_SCALE,
+                        spectrum_id=spectrum_id,
+                        viewport_id="primary-spectrum",
+                        enabled=bool(enabled),
+                    )
+                )
 
         def set_peak_labels_visible(self, visible: bool) -> None:
             if (
@@ -378,7 +406,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 and hasattr(self, "canvas")
                 and hasattr(self.canvas, "set_peak_labels_visible")
             ):
-                self.canvas.set_peak_labels_visible(bool(visible))
+                spectrum_id = self.workspace_controller.document.active_spectrum_id
+                self._dispatch_canvas_intent(
+                    CanvasIntent(
+                        CanvasIntentKind.SET_LABELS_VISIBLE,
+                        spectrum_id=spectrum_id,
+                        viewport_id="primary-spectrum",
+                        enabled=bool(visible),
+                    )
+                )
+
+        def _dispatch_canvas_intent(self, intent: CanvasIntent) -> None:
+            """Apply one canvas edit and restore the canonical view if rejected."""
+
+            try:
+                self.canvas_intent_dispatcher.handle(intent)
+            except (WorkspaceValidationError, ValueError, KeyError) as exc:
+                self._sync_analysis_overlays(self.selection_bus.state)
+                if hasattr(self.canvas, "show_interaction_error"):
+                    self.canvas.show_interaction_error(str(exc))
 
         def viewport_state(self) -> CanvasViewport | None:
             if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
@@ -395,6 +441,97 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def apply_viewport_state(self, viewport: CanvasViewport) -> None:
             if PYQTGRAPH_AVAILABLE and hasattr(self, "canvas"):
                 self.canvas.apply_viewport_state(viewport)
+
+        def _sync_canvas_selection(self, selection: SelectionState) -> None:
+            if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
+                return
+            roi = (
+                self.workspace_controller.document.roi_by_id(selection.roi_id)
+                if selection.roi_id is not None
+                else None
+            )
+            bounds = roi.signal_range if roi is not None else selection.roi_bounds_keV
+            if (
+                selection.zoom_requested
+                and bounds is not None
+                and hasattr(self.canvas, "zoom_to_range")
+            ):
+                self.canvas.zoom_to_range(float(bounds[0]), float(bounds[1]))
+            self._sync_analysis_overlays(selection)
+
+        def _sync_analysis_overlays(
+            self, selection: SelectionState | None = None
+        ) -> None:
+            if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
+                return
+            document = self.workspace_controller.document
+            spectrum_id = document.active_spectrum_id
+            if hasattr(self.canvas, "set_interaction_context"):
+                self.canvas.set_interaction_context(spectrum_id)
+            if not hasattr(self.canvas, "set_analysis_overlays"):
+                return
+            selection = selection or self.selection_bus.state
+            viewport = document.viewport_by_id("primary-spectrum")
+            selected_roi_id = (
+                selection.roi_id
+                if document.roi_by_id(selection.roi_id or "") is not None
+                else None
+            ) or (viewport.selected_roi_id if viewport is not None else None)
+            requested_peak_id = (
+                selection.peak_id or self.workspace_controller.state.selected_peak_id
+            )
+            selected_peak_id = (
+                requested_peak_id
+                if requested_peak_id is not None
+                and document.peak_by_id(spectrum_id, requested_peak_id) is not None
+                else None
+            )
+            rois = tuple(
+                CanvasROIOverlay(
+                    roi_id=roi.roi_id,
+                    spectrum_id=roi.spectrum_id,
+                    signal_range=roi.signal_range,
+                    left_background_range=roi.left_background_range,
+                    right_background_range=roi.right_background_range,
+                    color=roi.color,
+                    selected=roi.roi_id == selected_roi_id,
+                )
+                for roi in document.rois
+                if roi.spectrum_id == spectrum_id
+            )
+            pinned = set(document.pinned_nuclides)
+            peaks = tuple(
+                CanvasPeakOverlay(
+                    peak_id=peak.peak_id,
+                    spectrum_id=peak.spectrum_id,
+                    position=peak.centroid_energy_keV,
+                    y_value=max(float(peak.net_counts), 0.0),
+                    component_ids=tuple(
+                        component.component_id for component in peak.components
+                    ),
+                    nuclide=(peak.assignments[0].nuclide if peak.assignments else None),
+                    tags=peak.tags,
+                    nuclide_tags=(
+                        tuple(
+                            document.nuclide_tags.get(peak.assignments[0].nuclide, ())
+                        )
+                        if peak.assignments
+                        else ()
+                    ),
+                    pinned=any(
+                        assignment.nuclide in pinned for assignment in peak.assignments
+                    ),
+                    selected=peak.peak_id == selected_peak_id,
+                )
+                for peak in document.peaks
+                if peak.spectrum_id == spectrum_id
+            )
+            self.canvas.set_analysis_overlays(
+                rois,
+                peaks,
+                selected_roi_id=selected_roi_id,
+                selected_peak_id=selected_peak_id,
+            )
 
         def _slot_tab_changed(self, index: int) -> None:
             if index < 0 or index >= len(self.workspace_controller.state.spectra):
@@ -433,6 +570,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _sync_workspace_state(self, state) -> None:
             self._current_spectrum = self.workspace_controller.spectrum()
+            self._reconcile_selection_with_document()
             self._sync_slot_tabs(state)
             if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
                 return
@@ -445,7 +583,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     foreground_slot = slot
                 elif slot.key == "background":
                     background_slot = slot
-                elif slot.key == "overlay":
+                elif slot.key in {"overlay", "secondary"}:
                     overlay_slot = slot
             foreground = (
                 foreground_slot.spectrum if foreground_slot is not None else None
@@ -560,7 +698,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     )
                 )
             self.canvas.set_traces(traces)
+            self._apply_document_viewport()
             self.canvas.set_peak_candidates(state.peaks)
+            self._sync_analysis_overlays()
             self.canvas.set_cascade_sum_lines(state.cascade_sum_lines_keV)
             self.canvas.set_peak_residuals(
                 state.peaks[:3],
@@ -578,12 +718,110 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 if selected_peak is not None:
                     self.selection_bus.publish(
                         SelectionState(
+                            spectrum_id=(
+                                self.workspace_controller.document.active_spectrum_id
+                            ),
+                            peak_id=selected_peak.peak_id,
                             peak_energy_keV=selected_peak.energy_keV,
                             roi_bounds_keV=selected_peak.roi_bounds_keV,
                             nuclide=selected_peak.nuclide,
                             reference_lines_keV=selected_peak.reference_lines_keV,
                         )
                     )
+
+        def _reconcile_selection_with_document(self) -> None:
+            """Remove exact IDs that no longer exist after undo or session load."""
+
+            document = self.workspace_controller.document
+            state = self.selection_bus.state
+            spectrum_exists = state.spectrum_id is None or (
+                state.spectrum_id == document.active_spectrum_id
+                and document.spectrum_by_id(state.spectrum_id) is not None
+            )
+            peak_exists = state.peak_id is None or (
+                spectrum_exists
+                and document.peak_by_id(
+                    state.spectrum_id or document.active_spectrum_id,
+                    state.peak_id,
+                )
+                is not None
+            )
+            selected_roi = (
+                document.roi_by_id(state.roi_id) if state.roi_id is not None else None
+            )
+            roi_exists = state.roi_id is None or (
+                selected_roi is not None
+                and selected_roi.spectrum_id == document.active_spectrum_id
+            )
+            if spectrum_exists and peak_exists and roi_exists:
+                return
+            reconciled = SelectionState(
+                spectrum_id=state.spectrum_id if spectrum_exists else None,
+                peak_id=state.peak_id if peak_exists else None,
+                roi_id=state.roi_id if roi_exists else None,
+                peak_energy_keV=(state.peak_energy_keV if peak_exists else None),
+                roi_bounds_keV=(state.roi_bounds_keV if roi_exists else None),
+                nuclide=state.nuclide if peak_exists else None,
+                reference_lines_keV=(state.reference_lines_keV if peak_exists else ()),
+                annotation_lines=state.annotation_lines if peak_exists else (),
+                zoom_requested=False,
+            )
+            self.selection_bus.publish(reconciled)
+
+        def _apply_document_viewport(self) -> None:
+            """Reapply canonical viewport changes, including undo to no viewport."""
+
+            if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
+                return
+            document = self.workspace_controller.document
+            active_spectrum_id = document.active_spectrum_id
+            persisted_viewport = document.viewport_by_id("primary-spectrum")
+            viewport = (
+                persisted_viewport
+                if persisted_viewport is None
+                or persisted_viewport.spectrum_id in {None, active_spectrum_id}
+                else None
+            )
+            if (
+                viewport == self._last_canvas_viewport
+                and active_spectrum_id == self._last_canvas_spectrum_id
+            ):
+                return
+            previous = self._last_canvas_viewport
+            self._last_canvas_viewport = viewport
+            spectrum_changed = active_spectrum_id != self._last_canvas_spectrum_id
+            self._last_canvas_spectrum_id = active_spectrum_id
+            if viewport is not None:
+                self.canvas.apply_viewport_state(viewport)
+            elif isinstance(previous, CanvasViewport) or spectrum_changed:
+                if hasattr(self.canvas, "reset_persisted_viewport_state"):
+                    self.canvas.reset_persisted_viewport_state()
+            previous_roi_id = (
+                previous.selected_roi_id
+                if isinstance(previous, CanvasViewport)
+                else None
+            )
+            selected_roi_id = viewport.selected_roi_id if viewport is not None else None
+            if selected_roi_id != previous_roi_id:
+                state = self.selection_bus.state
+                roi = (
+                    document.roi_by_id(selected_roi_id)
+                    if selected_roi_id is not None
+                    else None
+                )
+                self.selection_bus.publish(
+                    SelectionState(
+                        spectrum_id=state.spectrum_id or document.active_spectrum_id,
+                        peak_id=state.peak_id,
+                        roi_id=roi.roi_id if roi is not None else None,
+                        peak_energy_keV=state.peak_energy_keV,
+                        roi_bounds_keV=(roi.signal_range if roi is not None else None),
+                        nuclide=state.nuclide,
+                        reference_lines_keV=state.reference_lines_keV,
+                        annotation_lines=state.annotation_lines,
+                        zoom_requested=False,
+                    )
+                )
 
         def _sync_slot_tabs(self, state) -> None:
             self.spectrum_slot_tabs.blockSignals(True)

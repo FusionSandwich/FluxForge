@@ -97,6 +97,9 @@ def test_production_startup_is_empty_and_examples_are_explicit(tmp_path):
     assert window.analysis_workspace.spectrum() is None
     assert window.file_label.text() == "File: none"
     assert window.qa_monitor.history() == ()
+    assert window.selection_bus.state == window.selection_bus.state.__class__()
+    assert window.left_dock.widget().nuclides.count() == 0
+    assert window.central_tabs.canvas.header_label.text() == "Live spectrum canvas"
     assert (
         "No QA or standards result" in window.left_dock.widget().qa_note.toPlainText()
     )

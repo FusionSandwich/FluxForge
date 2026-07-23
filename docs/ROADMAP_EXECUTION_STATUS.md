@@ -183,7 +183,7 @@ following overlays were adopted additively and do not replace that map.
 | 3.21 | `pending` | `in-progress` | Fixture-manifest scaffolding now includes expanded source-linked case placeholders under `tests/spectra/reference_parity/cases/` and `tests/activation_inventory/fixtures/` (including second-irradiation planning), with contract checks in `tests/test_parity_fixture_manifests.py` and `tests/test_parity_phase3_scaffolding.py`. |
 | 3.22 | `pending` | `in-progress` | Initial algorithm-level parity scaffolding is now present via `parity_scope=algorithm` manifests plus discovery checks in `tests/test_parity_phase3_scaffolding.py`; full parser/calibration/fit/activity/dose/k0 golden comparisons remain pending. |
 | 3.23 | `pending` | `in-progress` | Initial workflow-level parity scaffolding is now present via `parity_scope=workflow` manifests (including activity/inventory and second-irradiation placeholders) plus scaffold verification tests; source-linked end-to-end golden-result suites remain pending. |
-| 3.24 | `pending` | `not-started` | Add direct-manipulation canvas parity: peak add/delete/move, ROI dragging, background handles, and overlay-role actions. |
+| 3.24 | `pending` | `complete` | Direct-manipulation canvas parity is implemented through renderer-independent intents and focused undo commands: shift-drag ROI creation, signal/sideband handles, exact peak selection and centroid dragging, peak/assignment/pin/tag/overlap/ROI/role context actions, bidirectional table/plot synchronization, stale-result invalidation, session persistence, and native Windows/Linux Qt mouse evidence. This remains sequence-pending until earlier Phase 3B gates close. |
 | 3.25 | `pending` | `in-progress` | Add dedicated Qt workspaces for ROI statistics, detection limit, dose/shielding, relative activity, file query/batch compare, reference libraries, and k0 reporting. Prototype `Line Interference / Masking`, `Irradiation Optimizer`, and `Second Irradiation` surfaces are executable and persist state, but must not be described as parity-complete or scientifically validated. |
 | 3.26 | `pending` | `complete` | GUI polish parity is now implemented via saved theme profiles (`src/fluxforge/gui/mode_manager.py` + `src/fluxforge/gui/widgets/mode_switcher.py`), stronger graph-table synchronization (`src/fluxforge/gui/backends/pyqtgraph_backend.py` + `src/fluxforge/gui/panels/modern_shell.py`), clearer launch/discovery actions (`src/fluxforge/gui/main_window.py`), and the maintainability split of the oversized shell into `modern_shell_center.py`, `modern_shell_sidebar.py`, `modern_shell_context.py`, and `modern_shell_shared.py`, with Qt coverage in `tests/test_analysis_workspace_qt.py`, `tests/test_module3_workflows_qt.py`, and `tests/test_modern_gui_shell.py`. |
 | 3.27 | `pending` | `complete` | GUI verification/release acceptance is now implemented with expanded Qt/CLI coverage (`tests/test_modern_gui_shell.py`, `tests/test_module3_workflows_qt.py`, `tests/test_cli_app.py`), native probe evidence (`tests/gui_phase327_release_probe.py` and `artifacts/gui_review/phase327_probe/index.html`), and a release-blocking checklist at `docs/PHASE3_27_RELEASE_CHECKLIST.md` plus CLI validation command `gui-acceptance-check`. |
@@ -462,11 +462,13 @@ following overlays were adopted additively and do not replace that map.
 - Phase 3.16 is now complete in the repository and formally complete in sequence.
 - Phase 3.17 is now complete in the repository and formally complete in sequence.
 - Phase 3.18 remains the active sequence gate and is not yet complete.
-- Phase 3.19 through 3.24 remain open in sequence (in-progress/planned).
+- Phase 3.19 through 3.23 remain open in sequence (in-progress/planned).
+- Phase 3.24 is implemented in-repo but remains sequence-pending until the earlier
+  open Phase 3B gates are closed.
 - Phase 3.26 and 3.27 are implemented in-repo but remain sequence-pending until the earlier open Phase 3 gates are closed.
 - The Qt shell contains substantial implemented workflows, but the full-parity
-  ledger remains authoritative for release maturity. Direct manipulation,
-  efficiency diagnostics and persistence, covariance-aware unfolding,
+  ledger remains authoritative for release maturity. Efficiency diagnostics and
+  persistence, covariance-aware unfolding,
   physics-grounded optimization, and acquisition work still include prototype,
   scaffolded, planned, or conditional-hardware gaps.
 - The roadmap's currently active offline-parity tranche is Phase 3.18 through

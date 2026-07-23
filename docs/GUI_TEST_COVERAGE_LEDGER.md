@@ -34,6 +34,21 @@ Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence 
     ASC/ROI/log/background/unfolding/plot checks, and 1/1 legacy desktop driver.
   - The legacy control workflow reached activity, reaction rates, GLS unfolding,
     comparison, reports, and six plots.
+- 2026-07-22 bGamma direct-manipulation gate:
+  - Windows: 15/15 native Qt direct/integration tests (including 9 real
+    PyQtGraph mouse-interaction tests), 68/68 offscreen focused
+    interaction/state/session tests, 9/9 production-shell tests, and 23/23
+    modern-shell tests. Native pytest reports a post-summary COM teardown
+    diagnostic despite exit code 0; the standalone application exits cleanly.
+  - Linux WSLg/X11: 15/15 native direct/integration tests on the final source
+    (including 9 real renderer-interaction tests); 68/68 offscreen
+    interaction/state/session tests.
+  - Direct Wayland initialization was unavailable in this WSLg environment and
+    remains a release-level platform qualification gate.
+  - Stable-ID context actions, ROI signal/sideband handles, centroid dragging,
+    table/plot synchronization, stale-result invalidation, persistence, undo/redo,
+    crosshair, and viewport commits are covered. See
+    `docs/BRANCH02_DIRECT_MANIPULATION_EVIDENCE.md`.
 
 - Broad Qt GUI regression:
   - Command:
@@ -138,6 +153,17 @@ Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence 
   - Probe gallery:
     - `artifacts/gui_review/phase5_parity/index.html`
 
+### 2.11 Direct Spectrum Manipulation
+
+- Shift-drag ROI creation; signal and left/right sideband handle dragging; exact
+  peak selection and centroid dragging; stable-ID context actions; spectrum role
+  assignment; crosshair; zoom/pan/reset; debounced viewport persistence; exact
+  table/plot synchronization; session save/reload; and focused undo/redo.
+  - Tests: `tests/test_pyqtgraph_direct_interactions.py`,
+    `tests/test_bgamma_canvas_integration_qt.py`,
+    `tests/test_canvas_intent_dispatcher.py`, `tests/test_workspace_undo.py`
+  - Platform evidence: `docs/BRANCH02_DIRECT_MANIPULATION_EVIDENCE.md`
+
 ## 3. Browser-Lane Coverage Status
 
 - All generated GUI review galleries under `artifacts/gui_review/**/index.html` pass current Playwright checks:
@@ -154,8 +180,9 @@ The items below are tracked as direct-expansion targets to approach full GUI-par
 - Add focused panel-construction/behavior tests for:
   - `src/fluxforge/gui/panels/phase6.py` panel classes
   - `src/fluxforge/gui/panels/modern_shell.py` panel classes where only integrated coverage exists today
-- Add explicit backend-canvas coverage for:
-  - `src/fluxforge/gui/backends/pyqtgraph_backend.py` (`PyQtGraphSpectrumCanvas`)
+- Extend the direct backend-canvas contract to every remaining scientific plot,
+  including consistent keyboard navigation, high-DPI behavior, and visual-golden
+  coverage under Windows, X11, and Wayland.
 
 ## 5. Operating Rule for Future Runs
 

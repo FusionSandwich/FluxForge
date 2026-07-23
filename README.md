@@ -134,10 +134,15 @@ Recommended first interactions:
 
 1. Use **File > Open Spectrum** to load the foreground `.ASC` file.
 2. Use the mouse wheel to zoom and left-drag to pan the calibrated energy axis.
-3. Click **Select ROI**, then drag either boundary on the main canvas.
-4. Open **ROI Tools** to choose the background model and run the bounded analysis.
-5. Click **Reset View** to return to the full spectrum or **Clear ROI** to remove the boundaries.
-6. Use the spectrum tabs and background controls to compare foreground, background, and overlay spectra.
+3. Hold **Shift** and drag to create a signal ROI with two background sidebands;
+   drag a region to revise it and use **Ctrl+Z** to undo the completed edit.
+4. Right-click a peak or ROI for exact-ID peak, assignment, overlap, pin/tag,
+   ROI, and spectrum-role actions.
+5. Select a peak-table row to zoom and highlight its exact ROI; use the
+   crosshair for energy/count readout.
+6. Open **ROI Tools** to choose the background model and run the bounded analysis.
+7. Click **Reset View** to return to the full spectrum or **Clear ROI** to remove the boundaries.
+8. Use the spectrum tabs and background controls to compare foreground, background, and overlay spectra.
 
 If you prefer the direct GUI entrypoint, `fluxforge-gui --project-dir .`
 launches the same Qt application when the `native-gui` extra is installed.

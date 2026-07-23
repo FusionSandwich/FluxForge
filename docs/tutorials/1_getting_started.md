@@ -52,19 +52,21 @@ Recommended first interactions:
    spectra above and assign their roles in the left sidebar.
 2. Use the mouse wheel or **Zoom + / Zoom -** to inspect a photopeak region;
    left-drag pans and **Reset View** restores the full range.
-3. Choose **Select ROI** and drag the displayed ROI bounds.
+3. Hold **Shift** and drag across the plot to create a signal ROI and its two
+   background sidebands. Drag the signal or either sideband to revise it.
 4. Choose the sideband or SNIP method in the ROI tools when you want a
    background model, then run ROI analysis or ROI statistics.
 5. Run **Auto Find Peaks**, accept the reviewed proposals, and select a row to
-   synchronize the plot, peak tools, and nuclide browser.
-6. Use the peak-table controls to assign or clear an isotope, add a tag, or pin
-   a nuclide.
+   zoom and highlight its exact ROI on the plot.
+6. Right-click a peak or ROI to add, move, delete, assign, tag, pin/unpin, edit
+   overlap components, or set a spectrum role. Use **Ctrl+Z** and
+   **Ctrl+Shift+Z** to undo and redo completed edits.
 7. Choose **File > Save Session** (`Ctrl+S`) to persist spectra, roles, ROIs,
    peaks, detector state, and plot ranges in a validated `.ffs` file.
 
-Direct plot-sideband handles, centroid dragging, and peak context menus are not
-part of the current production workflow. They remain tracked direct-manipulation
-work rather than being presented as working controls.
+Scientific plot edits invalidate dependent ROI/activity output. Re-run the
+affected calculation before reporting or export; the interface never presents
+the superseded values as current.
 
 ## 3. First CLI Session
 

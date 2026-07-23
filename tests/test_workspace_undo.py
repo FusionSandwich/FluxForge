@@ -36,6 +36,7 @@ from fluxforge.gui.workspace_undo import (
     UpdateDetectorProfileCommand,
     UpdatePeakAssignmentCommand,
     UpdatePeakCommand,
+    UpdateWorkflowStateCommand,
     UpsertROICommand,
 )
 from fluxforge.io.spe import GammaSpectrum
@@ -50,6 +51,7 @@ class FakeLeafController:
         self.viewports: dict[str, CanvasViewport] = {}
         self.diagnostics: dict[str, FitDiagnostics] = {}
         self.pinned: tuple[str, ...] = ()
+        self.workflow_state: dict = {}
         self.calibrations: dict[str, CalibrationModel | DetectorProfile | None] = {}
 
     def replace_peak_models(self, peaks, *, spectrum_id=None):
@@ -115,6 +117,9 @@ class FakeLeafController:
 
     def set_pinned_nuclides(self, pinned_nuclides):
         self.pinned = tuple(pinned_nuclides)
+
+    def set_workflow_state(self, workflow_state):
+        self.workflow_state = dict(workflow_state)
 
     def apply_calibration(self, spectrum_id, calibration_state):
         self.calibrations[spectrum_id] = calibration_state
@@ -343,6 +348,16 @@ def test_assignment_pin_roi_role_profile_viewport_and_calibration_commands():
     pin.undo()
     assert controller.pinned == ("Co-60",)
 
+    workflow = UpdateWorkflowStateCommand(
+        controller,
+        before={"analysis": {"status": "valid"}},
+        after={"analysis": {"status": "invalid"}},
+    )
+    workflow.redo()
+    assert controller.workflow_state == {"analysis": {"status": "invalid"}}
+    workflow.undo()
+    assert controller.workflow_state == {"analysis": {"status": "valid"}}
+
     roi = _roi()
     upsert_roi = UpsertROICommand(controller, before=None, after=roi)
     upsert_roi.redo()
@@ -455,6 +470,7 @@ def test_commands_never_retain_documents_legacy_states_or_spectrum_arrays():
         DeletePeakCommand(controller, peak=peak),
         UpdatePeakAssignmentCommand(controller, before=peak, after=peak),
         TogglePinnedNuclideCommand(controller, before=(), after=("Cs-137",)),
+        UpdateWorkflowStateCommand(controller, before={}, after={"invalid": True}),
         UpsertROICommand(controller, before=None, after=roi),
         DeleteROICommand(controller, roi=roi),
         MoveROIBoundsCommand(controller, before=roi, after=roi, drag_token="drag-1"),
