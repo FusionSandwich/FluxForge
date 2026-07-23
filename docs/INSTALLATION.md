@@ -149,6 +149,11 @@ fluxforge gui --project-dir . --open-example
 The `--developer-tools` flag exposes diagnostics and prototype evidence panels
 for developers. It is intentionally omitted from normal analyst startup.
 
+Use **File > Save Session** for reproducible scientific state. Named workflow
+presets store interface preferences only and never reopen spectrum paths. The
+versioned `.ffs` contract and recovery behavior are documented in
+[`SESSION_FORMAT.md`](SESSION_FORMAT.md).
+
 For a first GUI workflow, load the committed files below; no external data
 download is required:
 

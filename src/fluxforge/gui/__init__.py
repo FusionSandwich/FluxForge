@@ -30,6 +30,7 @@ from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_pa
 from fluxforge.gui.nuclide_search import NuclideSearchController
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.gui.selection_bus import SelectionBus, SelectionState
+from fluxforge.gui.canvas_intents import CanvasIntent, CanvasIntentKind
 from fluxforge.gui.workflow_presets import (
     DEFAULT_WORKFLOW_PRESETS,
     WorkflowPreset,
@@ -48,6 +49,8 @@ from fluxforge.gui.widgets import MethodSelectorWidget
 __all__ = [
     "DEFAULT_DOCK_ZONES",
     "CalibrationWorkspaceDialog",
+    "CanvasIntent",
+    "CanvasIntentKind",
     "DockZone",
     "FluxForgeMainWindow",
     "HierarchicalSpectrumBuffer",

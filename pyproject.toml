@@ -68,6 +68,7 @@ fluxforge = [
     "gui/themes/*.qss",
     "reporting/templates/*.j2",
     "resources/schemas/*.xsd",
+    "resources/schemas/*.json",
 ]
 
 [tool.black]

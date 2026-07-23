@@ -19,10 +19,15 @@ from fluxforge.core.analysis_workspace import (  # noqa: E402
     subtract_background_counts,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE  # noqa: E402
-from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog  # noqa: E402
+from fluxforge.gui.dialogs.auto_peak_review_dialog import (
+    AutoPeakReviewDialog,
+)  # noqa: E402
 from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import GUIMode, ModeManager, ModeState  # noqa: E402
-from fluxforge.gui.nuclide_search import GammaLineMatchResult, NuclideSearchController  # noqa: E402
+from fluxforge.gui.nuclide_search import (
+    GammaLineMatchResult,
+    NuclideSearchController,
+)  # noqa: E402
 from fluxforge.gui.panels.modern_shell import (  # noqa: E402
     build_demo_background_spectrum,
     build_demo_overlay_spectrum,
@@ -98,11 +103,14 @@ def _make_efficiency_points():
         ),
     )
 
+
 def _seed_phase6_real_workspace(window: FluxForgeMainWindow) -> dict[str, str]:
     review = load_phase6_real_activity_review(DEFAULT_PHASE6_SAMPLE_ID)
     results = load_phase6_real_activity_results(DEFAULT_PHASE6_SAMPLE_ID)
     window.analysis_workspace.set_activity_results(results)
-    window.bottom_dock.widget().activity_results_panel._last_activity_review = review  # noqa: SLF001
+    window.bottom_dock.widget().activity_results_panel._last_activity_review = (
+        review  # noqa: SLF001
+    )
     return load_phase6_real_optimization_grids(DEFAULT_PHASE6_SAMPLE_ID)
 
 
@@ -142,15 +150,24 @@ def test_analysis_core_helpers_cover_workspace_surfaces():
 def test_efficiency_models_and_activity_results_are_available():
     fits = {
         model_key: fit_efficiency_model(_make_efficiency_points(), model_key=model_key)
-        for model_key in ("log_poly_2", "log_poly_3", "gray_functional", "semi_empirical_hpge")
+        for model_key in (
+            "log_poly_2",
+            "log_poly_3",
+            "gray_functional",
+            "semi_empirical_hpge",
+        )
     }
 
     for fit in fits.values():
         assert fit.points_used == 5
-        efficiency = np.asarray(fit.curve.efficiency([661.657]), dtype=float).reshape(-1)[0]
+        efficiency = np.asarray(fit.curve.efficiency([661.657]), dtype=float).reshape(
+            -1
+        )[0]
         assert 0.0 < efficiency < 1.0
 
-    matched = bayesian_match_peak_candidates(detect_peak_candidates(build_demo_spectrum()))
+    matched = bayesian_match_peak_candidates(
+        detect_peak_candidates(build_demo_spectrum())
+    )
     result = calculate_peak_activity(
         matched[1],
         build_demo_spectrum(),
@@ -188,7 +205,13 @@ def test_line_match_browser_and_gamma_phenomena_estimates_are_available():
 
     phenomena = estimate_spectral_phenomena(1332.492)
     kinds = {item.kind for item in phenomena}
-    assert {"compton_edge", "backscatter", "single_escape", "double_escape", "annihilation"} <= kinds
+    assert {
+        "compton_edge",
+        "backscatter",
+        "single_escape",
+        "double_escape",
+        "annihilation",
+    } <= kinds
     assert all(item.energy_keV > 0.0 for item in phenomena)
 
 
@@ -241,7 +264,10 @@ def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
 
 def _write_spectrum_csv(path: Path, spectrum) -> None:
     lines = ["channel,counts"]
-    for channel, count in zip(np.asarray(spectrum.channels, dtype=float), np.asarray(spectrum.counts, dtype=float)):
+    for channel, count in zip(
+        np.asarray(spectrum.channels, dtype=float),
+        np.asarray(spectrum.counts, dtype=float),
+    ):
         lines.append(f"{int(round(float(channel)))},{float(count):.6f}")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -250,11 +276,14 @@ def _write_spectrum_csv(path: Path, spectrum) -> None:
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monkeypatch):
+def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(
+    monkeypatch,
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -294,7 +323,9 @@ def test_main_window_peak_workflow_supports_undo_pin_tag_and_selection_sync(monk
     assert "Co60" in window.analysis_workspace.state.pinned_nuclides
     assert len(window.analysis_workspace.state.cascade_sum_lines_keV) >= 1
 
-    monkeypatch.setattr(QInputDialog, "getText", lambda *args, **kwargs: ("qa-check", True))
+    monkeypatch.setattr(
+        QInputDialog, "getText", lambda *args, **kwargs: ("qa-check", True)
+    )
     QTest.mouseClick(peak_panel.tag_button, Qt.LeftButton)
     _qapp().processEvents()
     assert "qa-check" in peak_panel.table.item(co60_row, 5).text()
@@ -318,6 +349,7 @@ def test_peak_table_follows_selection_bus_peak_energy_updates():
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -345,11 +377,14 @@ def test_peak_table_follows_selection_bus_peak_energy_updates():
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_peak_panel_exposes_full_search_surface_and_method_specific_databases(monkeypatch):
+def test_peak_panel_exposes_full_search_surface_and_method_specific_databases(
+    monkeypatch,
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -413,6 +448,7 @@ def test_inventory_timeline_panel_builds_and_exports_timeseries(tmp_path):
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
     window.analysis_workspace.set_activity_results(
@@ -694,7 +730,10 @@ def test_masking_review_panel_runs_and_exports_tables(tmp_path):
     assert result is not None
     assert panel.line_table.rowCount() > 0
     assert panel.isotope_table.rowCount() > 0
-    assert "alternate-line" in panel.summary.text().lower() or "recommendation" in panel.summary.text().lower()
+    assert (
+        "alternate-line" in panel.summary.text().lower()
+        or "recommendation" in panel.summary.text().lower()
+    )
 
     lines_csv = tmp_path / "masking_lines.csv"
     isotopes_csv = tmp_path / "masking_isotopes.csv"
@@ -749,7 +788,9 @@ def test_optimization_workspace_panel_runs_and_exports_phase6_bundle(tmp_path):
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_optimization_workspace_panel_advanced_guard_and_second_irradiation_panel(tmp_path):
+def test_optimization_workspace_panel_advanced_guard_and_second_irradiation_panel(
+    tmp_path,
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -804,7 +845,9 @@ def test_optimization_workspace_panel_advanced_guard_and_second_irradiation_pane
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_optimization_workspace_panel_runs_ldrd_worked_example_action(monkeypatch, tmp_path):
+def test_optimization_workspace_panel_runs_ldrd_worked_example_action(
+    monkeypatch, tmp_path
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -874,7 +917,9 @@ def test_astm_mode_locks_peak_identification_databases_to_standard_sources():
     assert sidebar.gamma_source_combo.currentData() == "decay_2012"
     assert sidebar.gamma_source_combo.isEnabled() is False
     assert sidebar.calibration_source_combo.count() == 1
-    assert sidebar.calibration_source_combo.currentData() == "calibration_standard_sources"
+    assert (
+        sidebar.calibration_source_combo.currentData() == "calibration_standard_sources"
+    )
     assert sidebar.calibration_source_combo.isEnabled() is False
     window.close()
 
@@ -907,7 +952,9 @@ def test_astm_mode_peak_matching_workflows_use_locked_gamma_source(monkeypatch):
     peak_panel = window.bottom_dock.widget().peak_table_panel
     captured: dict[str, str] = {}
 
-    def _fake_bayesian_match(peaks_arg, *, source_id="fluxforge_bundled_gamma", custom_path=None):
+    def _fake_bayesian_match(
+        peaks_arg, *, source_id="fluxforge_bundled_gamma", custom_path=None
+    ):
         del custom_path
         captured["bayesian_source_id"] = str(source_id)
         return tuple(peaks_arg)
@@ -970,7 +1017,9 @@ def test_astm_mode_reference_overlays_use_locked_gamma_source(monkeypatch):
     peak_panel = window.bottom_dock.widget().peak_table_panel
     captured: dict[str, str] = {}
 
-    def _fake_cascade_lines(pinned, *, source_id="fluxforge_bundled_gamma", custom_path=None):
+    def _fake_cascade_lines(
+        pinned, *, source_id="fluxforge_bundled_gamma", custom_path=None
+    ):
         del pinned, custom_path
         captured["source_id"] = str(source_id)
         return (2505.72,)
@@ -992,6 +1041,7 @@ def _prepare_reassignable_peak_assignment(monkeypatch):
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -1029,13 +1079,17 @@ def _prepare_reassignable_peak_assignment(monkeypatch):
             min_intensity: float = 0.0,
         ):
             del tolerance_keV, min_intensity
-            token = "".join(character for character in query.lower() if character.isalnum())
+            token = "".join(
+                character for character in query.lower() if character.isalnum()
+            )
             matches = [
                 GammaLineMatchResult(
                     nuclide=primary_nuclide,
                     display_name=primary_nuclide,
                     line_energy_keV=float(original_peak.energy_keV),
-                    delta_keV=round(float(original_peak.energy_keV) - float(energy_keV), 3),
+                    delta_keV=round(
+                        float(original_peak.energy_keV) - float(energy_keV), 3
+                    ),
                     intensity=0.9,
                     half_life_s=1.0,
                 ),
@@ -1052,12 +1106,21 @@ def _prepare_reassignable_peak_assignment(monkeypatch):
                 matches = [
                     match
                     for match in matches
-                    if token in "".join(character for character in f"{match.nuclide} {match.display_name}".lower() if character.isalnum())
+                    if token
+                    in "".join(
+                        character
+                        for character in f"{match.nuclide} {match.display_name}".lower()
+                        if character.isalnum()
+                    )
                 ]
             return matches[:limit]
 
         def _fake_reference_lines_for_nuclide(nuclide: str, *, limit=None):
-            anchor = float(original_peak.energy_keV) if nuclide == primary_nuclide else alternate_energy
+            anchor = (
+                float(original_peak.energy_keV)
+                if nuclide == primary_nuclide
+                else alternate_energy
+            )
             lines = (round(anchor, 3), round(anchor + 31.0, 3), round(anchor + 63.0, 3))
             if limit is None:
                 return lines
@@ -1089,10 +1152,17 @@ def _prepare_reassignable_peak_assignment(monkeypatch):
             peak_panel.peak_id_matches.setCurrentRow(alternate_row)
             peak_panel._match_selection_changed()
             _qapp().processEvents()
-            return window, peak_panel, original_peak, peak_panel._current_match_results[alternate_row]
+            return (
+                window,
+                peak_panel,
+                original_peak,
+                peak_panel._current_match_results[alternate_row],
+            )
 
     window.close()
-    pytest.fail("Expected at least one reassignable peak in the demo analysis workspace.")
+    pytest.fail(
+        "Expected at least one reassignable peak in the demo analysis workspace."
+    )
 
 
 @pytest.mark.skipif(
@@ -1100,7 +1170,9 @@ def _prepare_reassignable_peak_assignment(monkeypatch):
     reason="Qt analysis workspace dependencies are unavailable.",
 )
 def test_peak_id_browser_supports_manual_isotope_reassignment(monkeypatch):
-    window, peak_panel, original_peak, reassigned = _prepare_reassignable_peak_assignment(monkeypatch)
+    window, peak_panel, original_peak, reassigned = (
+        _prepare_reassignable_peak_assignment(monkeypatch)
+    )
 
     assert peak_panel.peak_id_energy.value() == pytest.approx(
         original_peak.energy_keV,
@@ -1115,7 +1187,10 @@ def test_peak_id_browser_supports_manual_isotope_reassignment(monkeypatch):
     assert updated_peak is not None
     assert updated_peak.status == "manual"
     assert updated_peak.nuclide == reassigned.nuclide
-    assert updated_peak.nuclide != original_peak.nuclide or peak_panel.peak_id_tolerance.value() > 2.0
+    assert (
+        updated_peak.nuclide != original_peak.nuclide
+        or peak_panel.peak_id_tolerance.value() > 2.0
+    )
     window.close()
 
 
@@ -1124,7 +1199,9 @@ def test_peak_id_browser_supports_manual_isotope_reassignment(monkeypatch):
     reason="Qt analysis workspace dependencies are unavailable.",
 )
 def test_peak_id_browser_supports_clearing_manual_assignment(monkeypatch):
-    window, peak_panel, _original_peak, _reassigned = _prepare_reassignable_peak_assignment(monkeypatch)
+    window, peak_panel, _original_peak, _reassigned = (
+        _prepare_reassignable_peak_assignment(monkeypatch)
+    )
 
     peak_panel._assign_selected_isotope()
     _qapp().processEvents()
@@ -1196,6 +1273,7 @@ def test_peak_id_browser_use_selected_peak_button_restores_peak_centroid(monkeyp
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -1349,6 +1427,7 @@ def test_main_window_activity_background_and_survey_map_workflows(monkeypatch):
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -1405,6 +1484,7 @@ def test_main_window_activity_review_exports_csv_and_plots(monkeypatch, tmp_path
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -1447,11 +1527,14 @@ def test_main_window_activity_review_exports_csv_and_plots(monkeypatch, tmp_path
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_main_window_activity_unit_selector_rescales_activity_review_plot(monkeypatch, tmp_path):
+def test_main_window_activity_unit_selector_rescales_activity_review_plot(
+    monkeypatch, tmp_path
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
@@ -1511,6 +1594,7 @@ def test_main_window_inventory_panel_activity_unit_selector_updates_headers_and_
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.library_manager.set_gamma_identification_source("nasa_common_lab_sources")
     window.analysis_workspace.set_activity_results(
@@ -1585,12 +1669,18 @@ def test_main_window_sidebar_registers_and_removes_user_library(monkeypatch, tmp
     _qapp().processEvents()
 
     assert sidebar.gamma_source_combo.findData("user_gamma_lab_ref") >= 0
-    assert window.library_manager.state.gamma_identification_source_id == "user_gamma_lab_ref"
+    assert (
+        window.library_manager.state.gamma_identification_source_id
+        == "user_gamma_lab_ref"
+    )
 
     QTest.mouseClick(sidebar.remove_registered_gamma_button, Qt.LeftButton)
     _qapp().processEvents()
 
-    assert window.library_manager.state.gamma_identification_source_id == "fluxforge_bundled_gamma"
+    assert (
+        window.library_manager.state.gamma_identification_source_id
+        == "fluxforge_bundled_gamma"
+    )
     window.close()
 
 
@@ -1598,7 +1688,9 @@ def test_main_window_sidebar_registers_and_removes_user_library(monkeypatch, tmp
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt analysis workspace dependencies are unavailable.",
 )
-def test_main_window_background_selector_updates_subtracted_foreground_and_overlay(tmp_path):
+def test_main_window_background_selector_updates_subtracted_foreground_and_overlay(
+    tmp_path,
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -1656,7 +1748,9 @@ def test_main_window_background_selector_updates_subtracted_foreground_and_overl
     assert "overlay.csv" in status
 
     assigned_roles = {
-        sidebar.files.topLevelItem(index).text(0): sidebar.files.topLevelItem(index).text(1)
+        sidebar.files.topLevelItem(index)
+        .text(0): sidebar.files.topLevelItem(index)
+        .text(1)
         for index in range(sidebar.files.topLevelItemCount())
     }
     assert "Foreground" in assigned_roles["sample.csv"]
@@ -1674,6 +1768,7 @@ def test_roi_tools_panel_supports_mouse_driven_roi_analysis_and_statistics(monke
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()

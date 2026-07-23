@@ -171,12 +171,23 @@ Recommended first files:
 
 Recommended first actions:
 
-1. Load the foreground and background spectra.
-2. Zoom into a peak-rich region.
-3. Drag the ROI directly on the main canvas.
-4. Drag the background sidebands if you want sideband-style ROI analysis.
-5. Drag a selected peak centroid to refine the fit anchor.
-6. Use the right-click menu for manual peak insertion, deletion, line-ID clearing, and source-role assignment.
+1. Choose **File > Open Example** for the bundled deterministic workspace, or
+   load the foreground and background files above.
+2. Use the foreground/background/overlay selectors to assign spectrum roles.
+3. Use the mouse wheel or **Zoom + / Zoom -** to inspect a peak-rich region;
+   left-drag pans and **Reset View** restores the complete spectrum.
+4. Choose **Select ROI** and drag the displayed ROI bounds, then run the ROI
+   analysis or statistics action in the bottom workspace.
+5. Run **Auto Find Peaks**, review the proposal dialog, and use the peak table
+   for selection, isotope assignment, tags, and pinned nuclides.
+6. Choose **File > Save Session** (`Ctrl+S`) to write the complete analysis as
+   a versioned `.ffs` file. **Save Session As** uses `Ctrl+Shift+S`; opening a
+   session replaces the current workspace after validation.
+
+Workflow presets are reusable interface settings and never reopen scientific
+data. Use a session—not a workflow preset—when spectra, roles, ROIs, peaks,
+detector calibration, plot ranges, and provenance must be reproducible. See
+[SESSION_FORMAT.md](SESSION_FORMAT.md) for migration and recovery details.
 
 ### Path C: Maintained Replay Workflow
 
@@ -205,14 +216,14 @@ The most important bundled user-facing data locations are:
 ## 6. Where to Find More Detail
 
 - Setup and environment troubleshooting:
-  [docs/INSTALLATION.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/INSTALLATION.md:1)
+  [INSTALLATION.md](INSTALLATION.md)
 - Full CLI catalog:
-  [docs/CLI_REFERENCE.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/CLI_REFERENCE.md:1)
+  [CLI_REFERENCE.md](CLI_REFERENCE.md)
 - Maintained cookbook workflows:
-  [docs/EXAMPLE_WORKFLOWS.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/EXAMPLE_WORKFLOWS.md:1)
+  [EXAMPLE_WORKFLOWS.md](EXAMPLE_WORKFLOWS.md)
 - Full example inventory:
-  [examples/README.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/examples/README.md:1)
+  [examples/README.md](../examples/README.md)
 - Quick onboarding:
-  [docs/tutorials/0_quick_start.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/tutorials/0_quick_start.md:1)
+  [tutorials/0_quick_start.md](tutorials/0_quick_start.md)
 - Guided first session:
-  [docs/tutorials/1_getting_started.md](/groupspace/cnerg/users/smandych/projects/ALARA/FluxForge/docs/tutorials/1_getting_started.md:1)
+  [tutorials/1_getting_started.md](tutorials/1_getting_started.md)

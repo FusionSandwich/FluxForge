@@ -1,5 +1,7 @@
 """Core data structures and utilities."""
 
+from importlib import import_module
+
 from fluxforge.core.calibration import (
     ASTM_E181_ENERGY_LIMIT_KEV,
     ASTM_E181_LOCKED_ORDER,
@@ -89,4 +91,35 @@ __all__ = [
     "calculate_ce_table",
     "calculate_closure_metrics",
     "create_validation_bundle",
+    # Loaded lazily so fluxforge.io.spe can import calibration without a
+    # core -> workspace_document -> io package cycle.
+    "WORKSPACE_DOCUMENT_SCHEMA",
+    "WORKSPACE_DOCUMENT_VERSION",
+    "AnalysisROI",
+    "CalibrationModel",
+    "CanvasViewport",
+    "CorrectionSettings",
+    "DetectorGeometry",
+    "DetectorProfile",
+    "EfficiencyModelState",
+    "FitDiagnostics",
+    "NuclideAssignment",
+    "PeakComponent",
+    "PeakModel",
+    "SpectrumRoleAssignment",
+    "WorkspaceDocument",
+    "WorkspaceSpectrum",
+    "WorkspaceValidationError",
 ]
+
+
+_WORKSPACE_DOCUMENT_EXPORTS = frozenset(__all__[-17:])
+
+
+def __getattr__(name: str):
+    if name not in _WORKSPACE_DOCUMENT_EXPORTS:
+        raise AttributeError(name)
+    module = import_module("fluxforge.core.workspace_document")
+    value = getattr(module, name)
+    globals()[name] = value
+    return value
