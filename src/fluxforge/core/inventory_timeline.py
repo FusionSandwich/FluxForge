@@ -32,14 +32,38 @@ class IrradiationSchedule:
 
     cooling_time_s: float
     count_live_time_s: float
+    count_real_time_s: float | None = None
+
+    def __post_init__(self) -> None:
+        cooling_time = float(self.cooling_time_s)
+        live_time = float(self.count_live_time_s)
+        real_time = (
+            float(self.count_real_time_s)
+            if self.count_real_time_s is not None
+            else None
+        )
+        if not math.isfinite(cooling_time) or cooling_time < 0.0:
+            raise ValueError("Cooling time must be finite and non-negative.")
+        if not math.isfinite(live_time) or live_time < 0.0:
+            raise ValueError("Count live time must be finite and non-negative.")
+        if real_time is not None:
+            if not math.isfinite(real_time) or real_time < 0.0:
+                raise ValueError("Count real time must be finite and non-negative.")
+            if live_time > real_time:
+                raise ValueError("Count live time cannot exceed count real time.")
 
     @property
     def count_start_time_s(self) -> float:
-        return max(float(self.cooling_time_s), 0.0)
+        return float(self.cooling_time_s)
 
     @property
     def count_end_time_s(self) -> float:
-        return self.count_start_time_s + max(float(self.count_live_time_s), 0.0)
+        duration = (
+            float(self.count_real_time_s)
+            if self.count_real_time_s is not None
+            else float(self.count_live_time_s)
+        )
+        return self.count_start_time_s + duration
 
 
 @dataclass(frozen=True)
@@ -195,6 +219,9 @@ def build_inventory_state_from_activity_review(
         schedule=IrradiationSchedule(
             cooling_time_s=float(review.cooling_time_s),
             count_live_time_s=float(review.live_time_s),
+            count_real_time_s=(
+                float(review.real_time_s) if review.real_time_s is not None else None
+            ),
         ),
         seeds=seeds,
         decay_source_id=str(decay_source_id),
@@ -209,6 +236,7 @@ def build_inventory_state_from_activity_results(
     custom_gamma_path: str | None = None,
     sample_id: str = "",
     decay_source_id: str = DEFAULT_DECAY_SOURCE_ID,
+    real_time_s: float | None = None,
 ) -> InventoryState:
     cooling_time_s = max(
         (
@@ -245,7 +273,10 @@ def build_inventory_state_from_activity_results(
         custom_gamma_path=custom_gamma_path,
         schedule=IrradiationSchedule(
             cooling_time_s=cooling_time_s,
-            count_live_time_s=max(float(live_time_s), 0.0),
+            count_live_time_s=float(live_time_s),
+            count_real_time_s=(
+                float(real_time_s) if real_time_s is not None else None
+            ),
         ),
         seeds=seeds,
         decay_source_id=str(decay_source_id),
@@ -291,6 +322,11 @@ def build_inventory_state_from_payload(
         schedule=IrradiationSchedule(
             cooling_time_s=float(payload.get("cooling_time_s", 0.0) or 0.0),
             count_live_time_s=float(payload.get("live_time_s", 0.0) or 0.0),
+            count_real_time_s=(
+                float(payload["real_time_s"])
+                if payload.get("real_time_s") is not None
+                else None
+            ),
         ),
         seeds=tuple(seeds),
         decay_source_id=str(decay_source_id),
@@ -842,6 +878,7 @@ def _snapshot_rows(
                 "absolute_time_s": float(absolute_time_s),
                 "count_start_time_s": inventory_state.schedule.count_start_time_s,
                 "count_live_time_s": inventory_state.schedule.count_live_time_s,
+                "count_real_time_s": inventory_state.schedule.count_real_time_s,
                 "gamma_source_id": inventory_state.gamma_source_id,
                 "decay_source_id": decay_source_id,
                 "nuclide": label,

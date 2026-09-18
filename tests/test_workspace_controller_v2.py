@@ -54,6 +54,7 @@ def _candidate(
         significance=6.5,
         roi_bounds_keV=(100.5, 103.5),
         net_counts=13.0,
+        net_counts_uncertainty=2.5,
         fit_quality=1.2,
         nuclide=nuclide,
         candidate_nuclides=("Cs-137", "Ba-137m"),
@@ -70,6 +71,7 @@ def _peak(spectrum_id: str = "sample", peak_id: str = "peak-1") -> PeakModel:
         centroid_channel=2.0,
         centroid_energy_keV=102.0,
         net_counts=13.0,
+        net_counts_uncertainty=2.5,
         significance=6.5,
         fit_quality=1.2,
         manual_overrides={"roi_bounds_keV": [100.5, 103.5]},
@@ -153,6 +155,7 @@ def test_legacy_state_is_adapted_to_canonical_document_without_copying_arrays():
     assert model is not None
     assert model.assignments[0].nuclide == "Cs-137"
     assert model.manual_overrides["roi_bounds_keV"] == (100.5, 103.5)
+    assert model.net_counts_uncertainty == pytest.approx(2.5)
 
 
 def test_source_key_maps_slot_role_to_registered_spectrum_identity():
@@ -201,6 +204,7 @@ def test_document_constructor_and_set_document_rebuild_compatibility_projection(
         is document.spectra[0].spectrum.counts
     )
     assert controller.state.peaks[0].roi_bounds_keV == (100.5, 103.5)
+    assert controller.state.peaks[0].net_counts_uncertainty == pytest.approx(2.5)
     assert controller.state.pinned_nuclides == ("Co-60",)
     assert state_events == [controller.state]
     assert document_events == [replacement]

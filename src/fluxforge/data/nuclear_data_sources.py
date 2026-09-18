@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 from urllib.parse import parse_qs, urlparse
-from urllib.request import urlopen
+from urllib.request import urlopen, url2pathname
 
 from fluxforge.core.runtime import (
     is_remote_locator,
@@ -600,9 +600,16 @@ def register_user_gamma_source(
         if not local_path.exists():
             raise FileNotFoundError(f"User library path does not exist: {local_path}")
     if parsed.scheme == "sqlite":
-        db_path = Path(parsed.path)
+        db_path = Path(url2pathname(parsed.path))
         if not db_path.exists():
             raise FileNotFoundError(f"SQLite gamma source does not exist: {db_path}")
+    if (
+        parsed.scheme in {"", "file", "sqlite"}
+        or _is_windows_local_path(resolved_locator)
+    ):
+        # Parse local sources before the registry is changed.  This keeps a
+        # malformed file from becoming a selectable, persisted source.
+        _load_custom_gamma_source_from_locator(resolved_locator)
 
     source_id = _slugify_user_gamma_alias(resolved_alias)
     builtin_records = _builtin_nuclear_data_sources()
@@ -755,11 +762,11 @@ def _load_custom_gamma_source_from_locator(locator: str | Path) -> GammaDatabase
         return _build_gamma_database_from_rows(rows or [])
 
     if scheme == "sqlite":
-        db_path = Path(parsed.path)
+        db_path = Path(url2pathname(parsed.path))
         params = parse_qs(parsed.query)
         table = params.get("table", ["gamma_lines"])[0]
         query = params.get("query", [""])[0]
-        with sqlite3.connect(db_path) as connection:
+        with sqlite3.connect(db_path.resolve().as_uri() + "?mode=ro", uri=True) as connection:
             connection.row_factory = sqlite3.Row
             sql = query or _build_sqlite_gamma_query(connection, table)
             rows = [dict(row) for row in connection.execute(sql)]

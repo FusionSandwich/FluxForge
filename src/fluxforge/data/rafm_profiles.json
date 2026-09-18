@@ -2,6 +2,7 @@
   "rafm_25cm": {
     "description": "Shared RAFM irradiation detector profile for 25 cm counting geometry.",
     "background_relative_path": "examples/RAFM_irradiation/background.ASC",
+    "background_resource": "rafm_background.ASC",
     "energy_calibration": [
       -1.694,
       0.4996,
@@ -30,6 +31,7 @@
   "astm_inl_dosimetry": {
     "description": "ASTM/INL reactor dosimetry profile for the RAFM 25 cm counting geometry.",
     "background_relative_path": "examples/RAFM_irradiation/background.ASC",
+    "background_resource": "rafm_background.ASC",
     "energy_calibration": [
       -1.694,
       0.4996,
@@ -58,6 +60,7 @@
   "us_astm_reactor_dosimetry": {
     "description": "US ASTM reactor dosimetry profile for the RAFM 25 cm counting geometry.",
     "background_relative_path": "examples/RAFM_irradiation/background.ASC",
+    "background_resource": "rafm_background.ASC",
     "energy_calibration": [
       -1.694,
       0.4996,

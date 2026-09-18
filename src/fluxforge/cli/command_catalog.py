@@ -263,10 +263,11 @@ COMMAND_METADATA: "OrderedDict[str, CommandMetadata]" = OrderedDict(
             "activity",
             CommandMetadata(
                 family="activation",
-                use_case="Convert a peak report into line-level activities for one isotope or reaction.",
+                use_case="Convert net peak areas with explicit calibration inputs; the example uses synthetic values and reports count-start activity.",
                 example=(
-                    "fluxforge activity --peaks-file rafm4_b_peaks.json "
-                    "--live-time-s 3600 --output activities.json"
+                    "fluxforge activity --peaks-file synthetic_peaks.json "
+                    "--efficiency 0.01 --emission-probability 0.5 --half-life-s 1000 "
+                    "--output activities.json"
                 ),
             ),
         ),

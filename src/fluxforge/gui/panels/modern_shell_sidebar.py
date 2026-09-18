@@ -649,6 +649,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     standard=standard,
                 ),
             ]
+            if self.library_manager.recovery_message:
+                sections.insert(
+                    0,
+                    "Library Recovery\n" + self.library_manager.recovery_message,
+                )
             registered = self.library_manager.registered_user_gamma_sources()
             if registered:
                 sections.append(

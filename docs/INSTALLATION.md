@@ -1,6 +1,9 @@
 # Install the FluxForge GUI on Windows or Linux
 
 This is the canonical source-install guide for the modern FluxForge Qt GUI.
+The recovered local installation and its exact launcher are recorded in
+[the Windows validation receipt](WINDOWS_VALIDATION_20260916.md). Its local
+changes are not yet present in a generic upstream clone.
 The supported Python versions are **3.11 and 3.12 (64-bit)**. Python 3.13 is
 not currently supported because FluxForge pins NumPy below 2.0.
 
@@ -35,7 +38,7 @@ git switch optimization-workflows
 
 py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -e ".[native-gui,reporting]"
+.\.venv\Scripts\python.exe -m pip install ".[native-gui,reporting]"
 
 .\.venv\Scripts\fluxforge.exe --help
 .\.venv\Scripts\fluxforge.exe commands
@@ -48,14 +51,14 @@ PATH problems. If you prefer activation, run:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-fluxforge gui --project-dir .
+fluxforge-gui --project-dir .
 ```
 
 If activation is blocked, do not change the machine policy just for
 FluxForge. Launch directly instead:
 
 ```powershell
-.\.venv\Scripts\fluxforge.exe gui --project-dir .
+.\.venv\Scripts\fluxforge-gui.exe --project-dir .
 ```
 
 ## Linux: copy-and-paste setup
@@ -97,7 +100,7 @@ git switch optimization-workflows
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e '.[native-gui,reporting]'
+python -m pip install '.[native-gui,reporting]'
 
 fluxforge --help
 fluxforge commands
@@ -203,20 +206,20 @@ In PowerShell, use a Windows output directory:
 
 | Profile | Command | Use it for |
 |---|---|---|
-| CLI only | `python -m pip install -e .` | Scripted workflows and bundled examples |
-| Full user | `python -m pip install -e '.[native-gui,reporting]'` | Modern Qt GUI, CLI, and reports |
+| CLI only | `python -m pip install .` | Scripted workflows and bundled examples |
+| Full user | `python -m pip install '.[native-gui,reporting]'` | Modern Qt GUI, CLI, and reports |
 | Developer/QA | `python -m pip install -e '.[dev,native-gui,gui-test,reporting]'` | Tests, formatting, and desktop automation |
 
 | Entrypoint | Purpose |
 |---|---|
 | `fluxforge` | Main CLI and command discovery |
-| `fluxforge gui` | Recommended modern Qt GUI launch path |
-| `fluxforge-gui` | Direct modern Qt GUI launcher |
-| `fluxforge-gui-legacy` | Archived Tk interface for explicit migration testing |
+| `fluxforge-gui` | Recommended modern Qt GUI launcher |
+| `fluxforge gui` | CLI alias for the same modern Qt implementation |
 
-The Qt GUI is the supported default. FluxForge never falls back to the archived
-Tk interface automatically; its launcher remains available only for explicit
-migration and regression workflows.
+The Qt GUI is the supported desktop implementation. FluxForge never falls back
+to Tk. The legacy package and launcher are excluded from normal installations;
+see [legacy recovery instructions](LEGACY_GUI_RECOVERY.md) for the preserved source
+and tested archive. Use a separate historical environment for migration checks.
 
 ## Troubleshooting
 
@@ -232,7 +235,7 @@ python -c "import sys; print(sys.executable)"
 On Windows, the no-activation launch always works when installation succeeded:
 
 ```powershell
-.\.venv\Scripts\fluxforge.exe gui --project-dir .
+.\.venv\Scripts\fluxforge-gui.exe --project-dir .
 ```
 
 ### Pip tries to build NumPy or spends a long time resolving it
@@ -245,7 +248,7 @@ force a NumPy 1.26 source build under Python 3.13.
 Install the GUI extra with the same interpreter used to launch FluxForge:
 
 ```bash
-python -m pip install -e '.[native-gui,reporting]'
+python -m pip install '.[native-gui,reporting]'
 python -c "from fluxforge.gui.qt_compat import QT_AVAILABLE, QT_IMPORT_ERROR; print(QT_AVAILABLE, QT_IMPORT_ERROR)"
 ```
 

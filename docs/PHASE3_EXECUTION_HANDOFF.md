@@ -1,10 +1,10 @@
-# FluxForge Phase 3 LLM Execution Handoff
+# FluxForge Phase 3 Execution Handoff
 
 Status: active reusable handoff
 Last Updated: 2026-04-19 (cleanup-wave ci/docs sync + full-suite revalidation)
 Scope: complete remaining Phase 3 work in strict sequence with full backend, CLI, modern Qt GUI, and testing parity.
 
-This handoff is written so a new LLM session can start from this file and execute without guessing.
+This handoff records the context and checks needed to continue the work.
 
 Current execution update (2026-04-19, continuation):
 - Expanded cleanup governance in `.github/workflows/quality-checks.yml`:
@@ -203,7 +203,7 @@ If details appear missing in consolidated docs, mine additional guidance from:
 
 Important: older archived docs can add missing detail but do not override newer consolidated policy.
 
-## 4. Start-Here Checklist for a New LLM Session
+## 4. Continuation Checklist
 
 Run this sequence every time:
 
@@ -472,7 +472,7 @@ Primary source docs for this pack:
 - `docs/GUI_PLAN.md`
 - `docs/FluxForge_Testing_Master.md`
 
-#### 10A.0 Current repo status for the next LLM (authoritative as of 2026-04-17)
+#### 10A.0 Repository status recorded on 2026-04-17
 
 Implemented Phase 6 code paths already present:
 - `src/fluxforge/workflows/irradiation_optimization.py` builds masking, inventory, optimization-grid, recommended-schedule, dose-endpoint, and second-irradiation support artifacts from measured activity-review inputs.
@@ -630,7 +630,7 @@ Current targeted-green evidence in this workspace:
 Current status note:
 - The implemented Phase 6 slice satisfies the targeted acceptance gate above for the currently landed deterministic workflows, saved-workflow recall, and `.ffexp` export path. Broader sequence closure is still blocked by the remaining roadmap parity gates outside this slice.
 
-#### 10A.8 Remaining continuation tasks for the next LLM
+#### 10A.8 Remaining continuation tasks
 
 1. Keep the current deterministic Phase 6 path stable while `3.18` through `3.25` parity work continues.
 - Do not regress `activity-review` -> `inventory-review` -> `masking-review` / `optimization-sweep` / `second-irradiation-plan` -> `.ffexp`.

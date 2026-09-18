@@ -128,7 +128,7 @@ def test_subtract_measured_background_negative_policy_and_clipping_warning():
     assert corrected_clip.counts[0] == 0.0
 
 
-def test_subtract_measured_background_resamples_background_to_sample_energy_grid():
+def test_subtract_measured_background_rejects_incompatible_energy_grid():
     sample = GammaSpectrum(
         counts=np.array([100.0, 100.0, 100.0]),
         channels=np.array([0, 1, 2]),
@@ -146,10 +146,11 @@ def test_subtract_measured_background_resamples_background_to_sample_energy_grid
         calibration={"energy": [1.0, 1.0]},
     )
 
-    corrected = subtract_measured_background(sample, background, mode="live")
-
-    assert np.allclose(corrected.counts, [100.0, 90.0, 80.0])
-    assert corrected.metadata["background_subtraction"]["energy_aligned"] is True
+    with pytest.raises(
+        ValueError,
+        match="identical energy grids.*covariance propagation is not supported",
+    ):
+        subtract_measured_background(sample, background, mode="live")
 
 
 def test_nonnegative_counts_for_algorithm_warns_on_negative_bins():

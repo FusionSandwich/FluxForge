@@ -8,7 +8,10 @@ from typing import Any, Sequence
 
 import numpy as np
 
-from fluxforge.core.analysis_workspace import PeakCandidate
+from fluxforge.core.analysis_workspace import (
+    PeakCandidate,
+    resolve_peak_net_counts_uncertainty,
+)
 from fluxforge.data.efficiency import EfficiencyCurve
 from fluxforge.data.gamma_database import FLUXFORGE_GAMMA_DATA, DecayData, GammaDatabase, GammaLine
 from fluxforge.data.isotope_names import format_isotope_name, parse_nndc_isotope_name
@@ -38,6 +41,10 @@ class ActivityReviewLineResult:
     irradiation_time_activity_bq: float
     irradiation_time_uncertainty_bq: float
     cooling_time_s: float
+    counting_uncertainty_bq: float = 0.0
+    efficiency_uncertainty_bq: float = 0.0
+    emission_probability_uncertainty_bq: float = 0.0
+    net_counts_uncertainty_source: str = "unknown"
 
     def to_row(self, *, sample_mass_g: float | None = None) -> dict[str, Any]:
         row = {
@@ -58,6 +65,12 @@ class ActivityReviewLineResult:
             "count_time_activity_unc_Bq": self.count_time_uncertainty_bq,
             "irradiation_time_activity_Bq": self.irradiation_time_activity_bq,
             "irradiation_time_activity_unc_Bq": self.irradiation_time_uncertainty_bq,
+            "irradiation_time_uncertainty_components_Bq": {
+                "net_counts": self.counting_uncertainty_bq,
+                "efficiency_shared": self.efficiency_uncertainty_bq,
+                "emission_probability": self.emission_probability_uncertainty_bq,
+            },
+            "net_counts_uncertainty_source": self.net_counts_uncertainty_source,
         }
         row.update(
             activation_study_metrics(
@@ -87,6 +100,10 @@ class ActivityReviewIsotopeSummary:
     irradiation_time_uncertainty_bq: float
     cooling_time_s: float
     chain_summary: str
+    count_time_independent_uncertainty_bq: float = 0.0
+    count_time_shared_efficiency_uncertainty_bq: float = 0.0
+    irradiation_time_independent_uncertainty_bq: float = 0.0
+    irradiation_time_shared_efficiency_uncertainty_bq: float = 0.0
 
     def to_row(self, *, sample_mass_g: float | None = None) -> dict[str, Any]:
         row = {
@@ -103,9 +120,17 @@ class ActivityReviewIsotopeSummary:
             "count_time_activity_unc_Bq": self.count_time_uncertainty_bq,
             "irradiation_time_activity_Bq": self.irradiation_time_activity_bq,
             "irradiation_time_activity_unc_Bq": self.irradiation_time_uncertainty_bq,
+            "count_time_uncertainty_components_Bq": {
+                "independent": self.count_time_independent_uncertainty_bq,
+                "efficiency_shared": self.count_time_shared_efficiency_uncertainty_bq,
+            },
+            "irradiation_time_uncertainty_components_Bq": {
+                "independent": self.irradiation_time_independent_uncertainty_bq,
+                "efficiency_shared": self.irradiation_time_shared_efficiency_uncertainty_bq,
+            },
             "relative_uncertainty": (
                 self.irradiation_time_uncertainty_bq
-                / max(self.irradiation_time_activity_bq, 1e-30)
+                / max(abs(self.irradiation_time_activity_bq), 1e-30)
             ),
             "chain_summary": self.chain_summary,
         }
@@ -136,6 +161,7 @@ class ActivityReviewResult:
     bateman_plot_data: dict[str, tuple[tuple[float, float, float], ...]]
     half_lives_s: dict[str, float]
     bateman_half_lives_s: dict[str, float]
+    real_time_s: float | None = None
 
     def line_rows(self, *, sample_mass_g: float | None = None) -> list[dict[str, Any]]:
         return [item.to_row(sample_mass_g=sample_mass_g) for item in self.line_results]
@@ -149,12 +175,15 @@ class ActivityReviewResult:
             "source_id": self.source_id,
             "custom_gamma_path": self.custom_gamma_path,
             "live_time_s": self.live_time_s,
+            "real_time_s": self.real_time_s,
             "cooling_time_s": self.cooling_time_s,
             "irradiation_reference": "end_of_irradiation",
             "plot_horizon_s": self.plot_horizon_s,
             "notes": [
                 "Irradiation-time activity rows are back-corrected to end of irradiation.",
-                "Uncertainties include counting statistics, efficiency relative uncertainty, and emission-probability uncertainty when available.",
+                "Uncertainties include the provided net-area uncertainty, efficiency relative uncertainty, and emission-probability uncertainty when available.",
+                "Efficiency uncertainty is treated as shared across lines of the same nuclide and is not reduced by line averaging.",
+                "Dead time uses a uniform live-fraction approximation over the real counting interval; time-varying losses require event- or interval-resolved timing.",
                 "Bateman daughter curves are still simple parent-to-daughter EOI-equivalent inventory series; bundled decay-network and half-life-uncertainty libraries now exist separately, but this workflow does not consume them yet.",
             ],
             "line_results": self.line_rows(sample_mass_g=sample_mass_g),
@@ -171,21 +200,38 @@ def review_spectrum_activation(
     source_id: str = "fluxforge_bundled_gamma",
     custom_gamma_path: str | None = None,
     energy_tolerance_keV: float = 2.0,
-    dead_time_fraction: float = 0.0,
+    dead_time_fraction: float | None = None,
+    real_time_s: float | None = None,
     sample_mass_g: float | None = None,
 ) -> ActivityReviewResult:
     """Resolve assigned peaks to isotope activities at count time and EOI."""
 
     database = _load_gamma_database(source_id, custom_gamma_path=custom_gamma_path)
-    live_time = max(float(live_time_s), 1e-9)
-    cooling_time = max(float(cooling_time_s), 0.0)
-    dead_time = max(float(dead_time_fraction), 0.0)
+    live_time = float(live_time_s)
+    cooling_time = float(cooling_time_s)
+    real_time = float(real_time_s) if real_time_s is not None else None
+    dead_time = (
+        float(dead_time_fraction) if dead_time_fraction is not None else None
+    )
+    if not math.isfinite(live_time) or live_time <= 0.0:
+        raise ValueError("Live time must be finite and positive.")
+    if not math.isfinite(cooling_time) or cooling_time < 0.0:
+        raise ValueError("Cooling time must be finite and non-negative.")
+    resolved_real_time, _live_fraction = GammaLineMeasurement(
+        net_counts=0.0,
+        live_time_s=live_time,
+        efficiency=1.0,
+        gamma_intensity=1.0,
+        half_life_s=1.0,
+        dead_time_fraction=dead_time,
+        real_time_s=real_time,
+    ).resolved_count_timing()
 
     line_results: list[ActivityReviewLineResult] = []
     grouped: dict[str, list[ActivityReviewLineResult]] = {}
 
     for peak in peaks:
-        if not peak.nuclide or peak.net_counts <= 0.0:
+        if not peak.nuclide:
             continue
         resolved = _resolve_decay_record(database, peak.nuclide)
         if resolved is None:
@@ -197,19 +243,26 @@ def review_spectrum_activation(
         if matched_line is None:
             continue
 
-        efficiency = max(_as_float(efficiency_curve.efficiency(peak.energy_keV)), 1e-12)
-        efficiency_rel_unc = max(
-            _as_float(efficiency_curve.efficiency_uncertainty(peak.energy_keV)),
-            0.0,
+        efficiency = _as_float(efficiency_curve.efficiency(peak.energy_keV))
+        efficiency_rel_unc = _as_float(
+            efficiency_curve.efficiency_uncertainty(peak.energy_keV)
         )
-        emission_probability = max(
-            float(matched_line.intensity * matched_line.norm),
-            1e-12,
-        )
+        emission_probability = float(matched_line.intensity * matched_line.norm)
         emission_probability_unc = _effective_probability_uncertainty(matched_line)
-        half_life_s = max(float(decay.halflife), 1e-12)
-        net_counts = max(float(peak.net_counts), 0.0)
-        net_counts_unc = math.sqrt(max(net_counts, 1.0))
+        half_life_s = float(decay.halflife)
+        net_counts = float(peak.net_counts)
+        net_counts_unc, net_counts_unc_source = resolve_peak_net_counts_uncertainty(peak)
+        for label, value in (
+            ("efficiency", efficiency),
+            ("emission probability", emission_probability),
+            ("half-life", half_life_s),
+        ):
+            if not math.isfinite(value) or value <= 0.0:
+                raise ValueError(f"Resolved {label} must be finite and positive.")
+        if not math.isfinite(efficiency_rel_unc) or efficiency_rel_unc < 0.0:
+            raise ValueError("Efficiency relative uncertainty must be finite and non-negative.")
+        if not math.isfinite(net_counts):
+            raise ValueError("Net counts must be finite.")
 
         measurement = GammaLineMeasurement(
             net_counts=net_counts,
@@ -219,17 +272,22 @@ def review_spectrum_activation(
             half_life_s=half_life_s,
             cooling_time_s=cooling_time,
             dead_time_fraction=dead_time,
+            real_time_s=resolved_real_time,
         )
         irradiation_activity = measurement.activity_at_reference()
         decay_constant = math.log(2.0) / half_life_s
-        count_time_activity = irradiation_activity * math.exp(-decay_constant * cooling_time)
+        cooling_factor = math.exp(-decay_constant * cooling_time)
+        count_time_activity = irradiation_activity * cooling_factor
 
-        rel_count_unc = net_counts_unc / max(net_counts, 1.0)
-        rel_emission_unc = emission_probability_unc / max(emission_probability, 1e-12)
-        combined_rel_unc = math.sqrt(
-            rel_count_unc * rel_count_unc
-            + efficiency_rel_unc * efficiency_rel_unc
-            + rel_emission_unc * rel_emission_unc
+        activity_per_count = measurement.activity_per_net_count_at_reference()
+        counting_uncertainty = net_counts_unc * activity_per_count
+        efficiency_uncertainty = abs(irradiation_activity) * efficiency_rel_unc
+        emission_rel_unc = emission_probability_unc / emission_probability
+        emission_uncertainty = abs(irradiation_activity) * emission_rel_unc
+        combined_uncertainty = math.sqrt(
+            counting_uncertainty * counting_uncertainty
+            + efficiency_uncertainty * efficiency_uncertainty
+            + emission_uncertainty * emission_uncertainty
         )
 
         result = ActivityReviewLineResult(
@@ -246,10 +304,14 @@ def review_spectrum_activation(
             emission_probability_uncertainty=float(emission_probability_unc),
             half_life_s=float(half_life_s),
             count_time_activity_bq=float(count_time_activity),
-            count_time_uncertainty_bq=float(count_time_activity * combined_rel_unc),
+            count_time_uncertainty_bq=float(combined_uncertainty * cooling_factor),
             irradiation_time_activity_bq=float(irradiation_activity),
-            irradiation_time_uncertainty_bq=float(irradiation_activity * combined_rel_unc),
+            irradiation_time_uncertainty_bq=float(combined_uncertainty),
             cooling_time_s=float(cooling_time),
+            counting_uncertainty_bq=float(counting_uncertainty),
+            efficiency_uncertainty_bq=float(efficiency_uncertainty),
+            emission_probability_uncertainty_bq=float(emission_uncertainty),
+            net_counts_uncertainty_source=net_counts_unc_source,
         )
         line_results.append(result)
         grouped.setdefault(resolved_name, []).append(result)
@@ -264,13 +326,51 @@ def review_spectrum_activation(
 
     for nuclide in sorted(grouped):
         nuclide_lines = grouped[nuclide]
-        count_time_activity, count_time_unc = _weighted_mean_and_uncertainty(
+        (
+            count_time_activity,
+            count_time_unc,
+            count_time_independent_unc,
+            count_time_shared_efficiency_unc,
+        ) = _weighted_mean_with_shared_efficiency(
             [item.count_time_activity_bq for item in nuclide_lines],
-            [item.count_time_uncertainty_bq for item in nuclide_lines],
+            [
+                math.hypot(
+                    item.counting_uncertainty_bq,
+                    item.emission_probability_uncertainty_bq,
+                )
+                * math.exp(-(math.log(2.0) / item.half_life_s) * cooling_time)
+                for item in nuclide_lines
+            ],
+            [
+                math.copysign(
+                    item.efficiency_uncertainty_bq,
+                    item.count_time_activity_bq,
+                )
+                * math.exp(-(math.log(2.0) / item.half_life_s) * cooling_time)
+                for item in nuclide_lines
+            ],
         )
-        irradiation_activity, irradiation_unc = _weighted_mean_and_uncertainty(
+        (
+            irradiation_activity,
+            irradiation_unc,
+            irradiation_independent_unc,
+            irradiation_shared_efficiency_unc,
+        ) = _weighted_mean_with_shared_efficiency(
             [item.irradiation_time_activity_bq for item in nuclide_lines],
-            [item.irradiation_time_uncertainty_bq for item in nuclide_lines],
+            [
+                math.hypot(
+                    item.counting_uncertainty_bq,
+                    item.emission_probability_uncertainty_bq,
+                )
+                for item in nuclide_lines
+            ],
+            [
+                math.copysign(
+                    item.efficiency_uncertainty_bq,
+                    item.irradiation_time_activity_bq,
+                )
+                for item in nuclide_lines
+            ],
         )
         half_life_s = max(
             max((item.half_life_s for item in nuclide_lines), default=0.0),
@@ -298,6 +398,18 @@ def review_spectrum_activation(
                     nuclide,
                     half_life_s=half_life_s,
                     cooling_time_s=cooling_time,
+                ),
+                count_time_independent_uncertainty_bq=float(
+                    count_time_independent_unc
+                ),
+                count_time_shared_efficiency_uncertainty_bq=float(
+                    count_time_shared_efficiency_unc
+                ),
+                irradiation_time_independent_uncertainty_bq=float(
+                    irradiation_independent_unc
+                ),
+                irradiation_time_shared_efficiency_uncertainty_bq=float(
+                    irradiation_shared_efficiency_unc
                 ),
             )
         )
@@ -349,6 +461,7 @@ def review_spectrum_activation(
         bateman_plot_data=bateman_plot_data,
         half_lives_s=half_lives_s,
         bateman_half_lives_s=bateman_half_lives,
+        real_time_s=float(resolved_real_time),
     )
 
 
@@ -518,29 +631,55 @@ def _simple_bateman_series(
     return parent_series, daughter_series
 
 
-def _weighted_mean_and_uncertainty(
+def _weighted_mean_with_shared_efficiency(
     values: Sequence[float],
-    uncertainties: Sequence[float],
-) -> tuple[float, float]:
-    valid_pairs = [
-        (float(value), float(uncertainty))
-        for value, uncertainty in zip(values, uncertainties)
-        if float(uncertainty) > 0.0
+    independent_uncertainties: Sequence[float],
+    shared_efficiency_uncertainties: Sequence[float],
+) -> tuple[float, float, float, float]:
+    """Combine lines while retaining fully correlated efficiency uncertainty."""
+
+    triples = [
+        (float(value), float(independent), float(shared))
+        for value, independent, shared in zip(
+            values,
+            independent_uncertainties,
+            shared_efficiency_uncertainties,
+        )
     ]
-    if valid_pairs:
-        weights = [1.0 / (uncertainty * uncertainty) for _, uncertainty in valid_pairs]
-        weighted = sum(
-            value * weight for (value, _), weight in zip(valid_pairs, weights)
-        ) / max(sum(weights), 1e-30)
-        return float(weighted), float(math.sqrt(1.0 / max(sum(weights), 1e-30)))
-    values_array = np.asarray(values, dtype=float)
-    if values_array.size == 0:
-        return 0.0, 0.0
-    mean_value = float(np.mean(values_array))
-    if values_array.size == 1:
-        return mean_value, float(max(float(uncertainties[0]) if uncertainties else 0.0, 0.0))
-    spread = float(np.std(values_array, ddof=0) / max(math.sqrt(values_array.size), 1.0))
-    return mean_value, spread
+    if not triples:
+        raise ValueError("At least one line is required for an isotope summary.")
+    if any(
+        not math.isfinite(value)
+        or not math.isfinite(independent)
+        or not math.isfinite(shared)
+        or independent <= 0.0
+        for value, independent, shared in triples
+    ):
+        raise ValueError("Line activities and uncertainty components must be finite.")
+
+    weights = [1.0 / (independent * independent) for _, independent, _ in triples]
+    weight_sum = sum(weights)
+    normalized_weights = [weight / weight_sum for weight in weights]
+    mean_value = sum(
+        weight * value
+        for weight, (value, _independent, _shared) in zip(normalized_weights, triples)
+    )
+    independent_uncertainty = math.sqrt(1.0 / weight_sum)
+    shared_efficiency_sensitivity = sum(
+        weight * shared
+        for weight, (_value, _independent, shared) in zip(normalized_weights, triples)
+    )
+    shared_efficiency_uncertainty = abs(shared_efficiency_sensitivity)
+    total_uncertainty = math.hypot(
+        independent_uncertainty,
+        shared_efficiency_uncertainty,
+    )
+    return (
+        float(mean_value),
+        float(total_uncertainty),
+        float(independent_uncertainty),
+        float(shared_efficiency_uncertainty),
+    )
 
 
 def _as_float(value: Any) -> float:

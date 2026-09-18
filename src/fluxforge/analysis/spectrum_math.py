@@ -46,54 +46,46 @@ def _resample_background_to_sample_energy(
     rtol: float = 1.0e-6,
 ) -> Tuple[GammaSpectrum, bool]:
     """
-    Resample a background spectrum onto the sample energy grid when needed.
+    Validate that background and sample use the same energy/channel grid.
 
-    Returns the possibly resampled background and a flag indicating whether
-    energy-grid alignment was applied.
+    General histogram rebinning can introduce covariance between output bins,
+    which ``GammaSpectrum`` cannot represent.  Reject mismatched grids rather
+    than silently applying point interpolation or padding counts.
     """
     sample_energies = _spectrum_energies(sample)
     background_energies = _spectrum_energies(background)
-    if sample_energies is None or background_energies is None:
+    sample_channels = np.asarray(sample.channels, dtype=float)
+    background_channels = np.asarray(background.channels, dtype=float)
+
+    if sample_energies is None and background_energies is None:
+        if sample_channels.shape != background_channels.shape or not np.allclose(
+            sample_channels, background_channels, atol=0.0, rtol=rtol
+        ):
+            raise ValueError(
+                "Background subtraction requires identical channel grids when "
+                "energy calibration is unavailable."
+            )
         return background, False
 
-    n_min = min(len(sample_energies), len(background_energies))
-    if len(sample_energies) == len(background_energies) and np.allclose(
-        sample_energies[:n_min], background_energies[:n_min], atol=atol_keV, rtol=rtol
+    if sample_energies is None or background_energies is None:
+        raise ValueError(
+            "Background subtraction requires energy calibration for both spectra "
+            "or neither spectrum."
+        )
+
+    if not np.all(np.isfinite(sample_energies)) or not np.all(
+        np.isfinite(background_energies)
+    ):
+        raise ValueError("Background subtraction energy grids must be finite.")
+
+    if sample_energies.shape == background_energies.shape and np.allclose(
+        sample_energies, background_energies, atol=atol_keV, rtol=rtol
     ):
         return background, False
 
-    background_counts = np.asarray(background.counts, dtype=float)
-    background_unc = np.asarray(background.counts_uncertainty, dtype=float)
-    resampled_counts = np.interp(
-        sample_energies, background_energies, background_counts, left=0.0, right=0.0
-    )
-    resampled_variance = np.interp(
-        sample_energies,
-        background_energies,
-        background_unc**2,
-        left=0.0,
-        right=0.0,
-    )
-    metadata = dict(background.metadata)
-    metadata["energy_resampled_to_sample_grid"] = True
-    metadata["resampled_from_energy_calibration"] = list(
-        background.calibration.get("energy", [])
-    )
-    return (
-        GammaSpectrum(
-            counts=resampled_counts,
-            counts_uncertainty=np.sqrt(np.maximum(resampled_variance, 0.0)),
-            channels=np.asarray(sample.channels).copy(),
-            energies=np.asarray(sample_energies, dtype=float).copy(),
-            live_time=float(background.live_time),
-            real_time=float(background.real_time),
-            start_time=background.start_time,
-            spectrum_id=background.spectrum_id,
-            detector_id=background.detector_id,
-            calibration=dict(sample.calibration),
-            metadata=metadata,
-        ),
-        True,
+    raise ValueError(
+        "Background subtraction requires identical energy grids; conservative "
+        "rebinning with covariance propagation is not supported."
     )
 
 
@@ -234,32 +226,34 @@ def _resolve_scale_factor(
     manual_scale: Optional[float],
 ) -> float:
     mode = mode.lower()
-    if mode == "live":
-        denom = float(background.live_time)
-        if denom <= 0.0:
-            warnings.warn(
-                "Background live time is non-positive; using scale factor 1.0.",
-                RuntimeWarning,
-                stacklevel=3,
+    if mode in {"live", "real"}:
+        times = []
+        for label, spectrum in (("sample", sample), ("background", background)):
+            try:
+                duration = float(getattr(spectrum, f"{mode}_time"))
+            except (TypeError, ValueError):
+                duration = float("nan")
+            if not np.isfinite(duration) or duration <= 0.0:
+                raise ValueError(
+                    f"Background subtraction {label} {mode} time must be finite "
+                    "and positive; supply a valid count time or choose an "
+                    "explicit manual scale."
+                )
+            times.append(duration)
+        scale_factor = times[0] / times[1]
+        if not np.isfinite(scale_factor) or scale_factor <= 0.0:
+            raise ValueError(
+                "Background subtraction scale factor must be finite and positive."
             )
-            return 1.0
-        return float(sample.live_time) / denom
-
-    if mode == "real":
-        denom = float(background.real_time)
-        if denom <= 0.0:
-            warnings.warn(
-                "Background real time is non-positive; using scale factor 1.0.",
-                RuntimeWarning,
-                stacklevel=3,
-            )
-            return 1.0
-        return float(sample.real_time) / denom
+        return scale_factor
 
     if mode == "manual":
         if manual_scale is None:
             raise ValueError("manual_scale must be provided when mode='manual'.")
-        return float(manual_scale)
+        scale_factor = float(manual_scale)
+        if not np.isfinite(scale_factor) or scale_factor < 0.0:
+            raise ValueError("manual_scale must be finite and non-negative.")
+        return scale_factor
 
     raise ValueError(f"Unknown background scale mode: {mode}")
 
@@ -282,7 +276,8 @@ def subtract_measured_background(
     background : GammaSpectrum or None
         Measured background spectrum. If None, sample is returned unchanged.
     mode : {'live', 'real', 'manual'}
-        Normalization mode for background scaling factor.
+        Normalization mode for background scaling factor. Automatic modes
+        require finite, positive times for both spectra.
     manual_scale : float, optional
         Explicit scale factor for mode='manual'.
     negative_policy : {'hybrid', 'clip', 'preserve'}
@@ -302,7 +297,7 @@ def subtract_measured_background(
             counts_uncertainty=np.asarray(
                 sample.counts_uncertainty, dtype=float
             ).copy(),
-            channels=np.asarray(sample.channels, dtype=int).copy(),
+            channels=np.asarray(sample.channels).copy(),
             energies=(
                 np.asarray(sample.energies, dtype=float).copy()
                 if sample.energies is not None
@@ -314,6 +309,10 @@ def subtract_measured_background(
             spectrum_id=sample.spectrum_id,
             detector_id=sample.detector_id,
             calibration=dict(sample.calibration),
+            source_type=sample.source_type,
+            device_id=sample.device_id,
+            device_label=sample.device_label,
+            gps=dict(sample.gps),
             metadata=dict(sample.metadata),
         )
 
@@ -369,13 +368,21 @@ def subtract_measured_background(
         counts=net_counts,
         counts_uncertainty=net_uncertainty,
         channels=aligned.channels,
-        energies=None,
+        energies=(
+            np.asarray(sample.energies, dtype=float).copy()
+            if sample.energies is not None
+            else None
+        ),
         live_time=float(sample.live_time),
         real_time=float(sample.real_time),
         start_time=sample.start_time,
         spectrum_id=sample.spectrum_id,
         detector_id=sample.detector_id,
         calibration=dict(sample.calibration),
+        source_type=sample.source_type,
+        device_id=sample.device_id,
+        device_label=sample.device_label,
+        gps=dict(sample.gps),
         metadata=metadata,
     )
 

@@ -37,14 +37,20 @@ def require_nonnegative(name: str, values: Any) -> np.ndarray:
 
 
 def require_covariance_matrix(name: str, values: Any) -> np.ndarray:
-    """Require a finite square covariance matrix with non-negative diagonal."""
+    """Require a finite, symmetric positive-semidefinite covariance matrix."""
 
     matrix = require_finite(name, values)
     if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1]:
         raise ValueError(f"The input for {name} must be a square matrix.")
     if np.any(np.diag(matrix) < 0.0):
         raise ValueError(f"The diagonal of {name} must be non-negative.")
-    return matrix
+    scale = max(float(np.max(np.abs(matrix))), np.finfo(float).tiny)
+    if not np.allclose(matrix, matrix.T, rtol=0.0, atol=1e-12 * scale):
+        raise ValueError(f"The input for {name} must be symmetric.")
+    symmetric = (matrix + matrix.T) * 0.5
+    if np.linalg.eigvalsh(symmetric)[0] < -1e-12 * scale:
+        raise ValueError(f"The input for {name} must be positive semidefinite.")
+    return symmetric
 
 
 __all__ = [

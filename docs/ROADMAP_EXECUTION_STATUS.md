@@ -1,5 +1,9 @@
 # FluxForge Roadmap Execution Status
 
+## Active recovery scope — 16 September 2026
+
+The current execution is limited to correctness, existing INL data, native Windows Qt and recoverable legacy isolation. The [recovery checklist](RECOVERY_TODO_20260916.md) records completed work, outstanding checks and evidence blockers. Earlier roadmap snapshots below are retained as history; they do not establish fresh validation of this recovery source.
+
 **Date:** 2026-07-22
 **Controlling roadmap document:** `docs/FLUXFORGE_CONSOLIDATED_MASTER.md`
 **Companion GUI document:** `docs/GUI_PLAN.md`

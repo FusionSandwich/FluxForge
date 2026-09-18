@@ -539,6 +539,11 @@ def _run_activity_inventory_case(case_dir: Path, manifest: dict[str, Any]) -> di
         custom_gamma_path=custom_gamma_path,
         energy_tolerance_keV=float(payload.get("energy_tolerance_keV") or 2.0),
         dead_time_fraction=float(payload.get("dead_time_fraction") or 0.0),
+        real_time_s=(
+            float(payload["real_time_s"])
+            if payload.get("real_time_s") is not None
+            else None
+        ),
     )
 
     inventory_state = build_inventory_state_from_activity_review(
@@ -924,6 +929,11 @@ def _peak_candidates_from_rows(rows: Sequence[dict[str, Any]]) -> list[PeakCandi
                     or row.get("raw_counts")
                     or row.get("amplitude")
                     or 0.0
+                ),
+                net_counts_uncertainty=(
+                    float(row["net_counts_uncertainty"])
+                    if row.get("net_counts_uncertainty") is not None
+                    else None
                 ),
                 fit_quality=float(
                     row.get("fit_quality")

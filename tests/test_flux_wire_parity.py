@@ -21,9 +21,6 @@ PROC_DIR = TEST_DATA_ROOT / "flux_wires" / "processed"
 RAW_DIR = TEST_DATA_ROOT / "flux_wires" / "raw"
 BACKGROUND_ASC = RAW_DIR / "background.ASC"
 
-ARTIFACT_DIR = REPO_ROOT / "artifacts" / "validation" / "flux_wire_parity"
-
-
 def normalize_sample_id(sample_id: str) -> str:
     """Normalize sample IDs for matching raw/processed pairs."""
     text = sample_id.strip().replace(" ", "")
@@ -61,6 +58,7 @@ class ParityResult:
 
 
 def compare_raw_to_processed(
+    output_dir: Path,
     tolerance: float = 0.02,
 ) -> Tuple[List[ParityResult], List[str]]:
     """Compare raw analysis to processed reference for all matched pairs."""
@@ -106,8 +104,8 @@ def compare_raw_to_processed(
             )
 
     # Persist artifacts for inspection
-    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
-    csv_path = ARTIFACT_DIR / "raw_vs_processed_parity.csv"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = output_dir / "raw_vs_processed_parity.csv"
     with open(csv_path, "w", encoding="utf-8") as f:
         f.write("sample_id,isotope,ref_bq,calc_bq,ratio,diff_pct\n")
         for row in comparisons:
@@ -130,12 +128,12 @@ def test_processed_flux_wire_parsing():
         assert data.energy_calibration, f"No energy calibration for {data.sample_id}"
 
 
-def test_raw_flux_wire_parity():
+def test_raw_flux_wire_parity(tmp_path):
     """Raw QG analysis reproduces processed activities within 1%."""
     assert RAW_DIR.exists(), f"Raw directory missing: {RAW_DIR}"
     assert BACKGROUND_ASC.exists(), f"Background fixture missing: {BACKGROUND_ASC}"
 
-    comparisons, missing = compare_raw_to_processed(tolerance=0.01)
+    comparisons, missing = compare_raw_to_processed(tmp_path, tolerance=0.01)
     assert comparisons, "No raw/processed comparisons generated"
     assert not missing, f"Missing isotopes in raw analysis: {missing}"
 

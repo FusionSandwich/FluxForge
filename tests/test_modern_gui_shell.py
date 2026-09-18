@@ -53,11 +53,11 @@ def _qapp():
     return QApplication.instance() or QApplication([])
 
 
-def test_describe_gui_scaffold_exposes_primary_and_legacy_entrypoints():
+def test_describe_gui_scaffold_exposes_only_primary_entrypoint():
     scaffold = describe_gui_scaffold()
 
     assert scaffold["modern_entrypoint"] == "fluxforge-gui"
-    assert scaffold["legacy_entrypoint"] == "fluxforge-gui-legacy"
+    assert scaffold["legacy_entrypoint"] is None
     assert scaffold["renderer_backends"][0]["key"] == "pyqtgraph"
 
 

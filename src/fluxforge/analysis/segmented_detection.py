@@ -14,7 +14,6 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
-from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
 from .peakfit import GaussianPeak, PeakFitResult, fit_single_peak, five_point_smooth
@@ -129,6 +128,7 @@ class DetectedPeak:
     is_report: bool = False
     report_isotope: str = ""
     report_file: str = ""
+    area_uncertainty: Optional[float] = None
 
 
 def _gaussian(x: np.ndarray, a: float, mu: float, sigma: float, c: float) -> np.ndarray:
@@ -142,42 +142,47 @@ def _refine_centroid(
     counts: np.ndarray,
     peak_idx: int,
     fit_window: int,
-) -> Tuple[float, float, float, float, bool]:
+) -> Tuple[float, float, float, float, bool, Optional[float]]:
     """
     Refine peak centroid with Gaussian fit.
 
-    Returns (energy, amplitude, sigma, area, success)
+    Fit raw counts in channel space so area has units of counts, independent
+    of the energy calibration. Return energy, height, energy sigma, area,
+    success and area standard uncertainty (including amplitude-width covariance).
     """
     n = len(counts)
     lo = max(0, peak_idx - fit_window)
     hi = min(n, peak_idx + fit_window + 1)
 
-    x_keV = energies[lo:hi]
-    y_loc = counts[lo:hi]
-
-    if len(x_keV) < 4:
-        return energies[peak_idx], counts[peak_idx], 0.0, 0.0, False
-
-    try:
-        peak_y = counts[peak_idx]
-        initial_mu = x_keV[np.argmax(y_loc)]
-        p0 = [peak_y, initial_mu, 1.0, np.median(y_loc)]
-
-        popt, _ = curve_fit(
-            _gaussian,
-            x_keV,
-            y_loc,
-            p0=p0,
-            maxfev=4000,
-            bounds=([0, x_keV.min(), 0.1, 0], [np.inf, x_keV.max(), 10.0, np.inf]),
-        )
-
-        a, mu, sigma, c = popt
-        area = a * sigma * np.sqrt(2 * np.pi)
-        return mu, a, sigma, area, True
-
-    except (RuntimeError, ValueError):
-        return energies[peak_idx], counts[peak_idx], 0.0, 0.0, False
+    fallback = (energies[peak_idx], counts[peak_idx], 0.0, 0.0, False, None)
+    if hi - lo < 5 or not np.allclose(np.diff(channels[lo:hi]), 1.0):
+        return fallback
+    result = fit_single_peak(
+        channels,
+        counts,
+        int(channels[peak_idx]),
+        fit_width=fit_window,
+        background_model="constant",
+    )
+    if not result.success or result.covariance is None:
+        return fallback
+    peak = result.peak
+    gradient = np.zeros(result.covariance.shape[0])
+    gradient[0] = peak.sigma * np.sqrt(2 * np.pi)
+    gradient[2] = peak.amplitude * np.sqrt(2 * np.pi)
+    variance = float(gradient @ result.covariance @ gradient)
+    if not np.isfinite(variance) or variance <= 0:
+        return fallback
+    energy = float(np.interp(peak.centroid, channels, energies))
+    gain = float(np.interp(peak.centroid, channels, np.gradient(energies, channels)))
+    return (
+        energy,
+        peak.amplitude,
+        abs(gain) * peak.sigma,
+        peak.area,
+        True,
+        float(np.sqrt(variance)),
+    )
 
 
 def detect_peaks_segmented(
@@ -276,8 +281,10 @@ def detect_peaks_segmented(
         for local_idx in peak_local_idx:
             global_idx = region_indices[local_idx]
 
-            energy, amplitude, sigma_keV, area, fitted = _refine_centroid(
-                channels, energies, counts, global_idx, config.fit_window
+            energy, amplitude, sigma_keV, area, fitted, area_uncertainty = (
+                _refine_centroid(
+                    channels, energies, raw_counts, global_idx, config.fit_window
+                )
             )
 
             peaks.append(
@@ -290,6 +297,7 @@ def detect_peaks_segmented(
                     area=area,
                     region=region_name,
                     is_fitted=fitted,
+                    area_uncertainty=area_uncertainty,
                 )
             )
 

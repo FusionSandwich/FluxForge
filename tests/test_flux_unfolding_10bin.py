@@ -13,8 +13,6 @@ PROC_DIR = TEST_DATA_ROOT / "flux_wires" / "processed"
 RAW_DIR = TEST_DATA_ROOT / "flux_wires" / "raw"
 MODEL_PATH = RAW_DIR / "spectrum_vit_j.csv"
 
-ARTIFACT_DIR = REPO_ROOT / "artifacts" / "validation" / "flux_unfolding_10bin"
-
 
 def load_regression_module():
     script_path = (
@@ -32,7 +30,8 @@ def load_regression_module():
     return module
 
 
-def test_flux_unfolding_10bin_regression():
+def test_flux_unfolding_10bin_regression(tmp_path):
+    artifact_dir = tmp_path / "flux_unfolding_10bin"
     assert PROC_DIR.exists(), f"Processed directory missing: {PROC_DIR}"
     assert RAW_DIR.exists(), f"Raw directory missing: {RAW_DIR}"
 
@@ -44,15 +43,15 @@ def test_flux_unfolding_10bin_regression():
     assert len(results.processed_gls.flux) == 50
     assert len(results.raw_gls.flux) == 50
 
-    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    artifact_dir.mkdir(parents=True, exist_ok=True)
     module.save_spectrum_csv(
-        ARTIFACT_DIR / "processed_discrete.csv",
+        artifact_dir / "processed_discrete.csv",
         results.processed_discrete.energy_bounds_eV,
         results.processed_discrete.flux,
         results.processed_discrete.flux_unc,
     )
     module.save_spectrum_csv(
-        ARTIFACT_DIR / "raw_discrete.csv",
+        artifact_dir / "raw_discrete.csv",
         results.raw_discrete.energy_bounds_eV,
         results.raw_discrete.flux,
         results.raw_discrete.flux_unc,

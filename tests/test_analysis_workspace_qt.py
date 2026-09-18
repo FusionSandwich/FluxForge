@@ -1,4 +1,5 @@
 import os
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -1480,6 +1481,8 @@ def test_main_window_activity_background_and_survey_map_workflows(monkeypatch):
     reason="Qt analysis workspace dependencies are unavailable.",
 )
 def test_main_window_activity_review_exports_csv_and_plots(monkeypatch, tmp_path):
+    from fluxforge.gui.panels import modern_shell as modern_shell_module
+
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -1501,11 +1504,27 @@ def test_main_window_activity_review_exports_csv_and_plots(monkeypatch, tmp_path
     fit = fit_efficiency_model(_make_efficiency_points(), model_key="log_poly_2")
     window.analysis_workspace.set_efficiency_fit(fit)
 
+    captured_timing = {}
+    real_review = modern_shell_module.review_spectrum_activation
+
+    def capture_review_timing(*args, **kwargs):
+        captured_timing.update(kwargs)
+        return real_review(*args, **kwargs)
+
+    monkeypatch.setattr(
+        modern_shell_module,
+        "review_spectrum_activation",
+        capture_review_timing,
+    )
+
     activity_panel = bottom.activity_results_panel
     activity_panel.source_age_hours.setValue(24.0)
     review = activity_panel.analyze_spectrum_activities()
     assert review is not None
     assert len(review.isotope_summaries) >= 1
+    assert captured_timing["real_time_s"] == pytest.approx(
+        window.analysis_workspace.spectrum().real_time
+    )
 
     csv_path = tmp_path / "activity_review.csv"
     decay_path = tmp_path / "activity_decay.png"
@@ -1520,6 +1539,15 @@ def test_main_window_activity_review_exports_csv_and_plots(monkeypatch, tmp_path
     assert "irradiation_time_activity_Bq" in csv_path.read_text(encoding="utf-8")
     assert "Irradiation-time activity" in activity_panel.results.toPlainText()
     assert len(window.analysis_workspace.state.activity_results) >= 1
+
+    window.analysis_workspace.replace_peaks(
+        tuple(
+            replace(peak, net_counts_uncertainty=None)
+            for peak in window.analysis_workspace.state.peaks
+        )
+    )
+    assert activity_panel.analyze_spectrum_activities() is None
+    assert "needs net-count uncertainty" in activity_panel.summary.text()
     window.close()
 
 

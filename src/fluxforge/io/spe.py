@@ -126,7 +126,7 @@ class GammaSpectrum:
 
         energies = np.zeros_like(self.channels, dtype=float)
         for i, coeff in enumerate(coefficients):
-            energies += coeff * (self.channels**i)
+            energies += coeff * (np.asarray(self.channels, dtype=float) ** i)
 
         return apply_energy_deviation_pairs(energies, self._deviation_pairs())
 
@@ -135,7 +135,9 @@ class GammaSpectrum:
     ) -> Union[float, np.ndarray]:
         """Convert channel number to energy using calibration."""
         coeffs = self.calibration.get("energy", [0.0, 1.0])
-        result = sum(c * (channel**i) for i, c in enumerate(coeffs))
+        result = np.polynomial.polynomial.polyval(
+            np.asarray(channel, dtype=float), coeffs
+        )
         corrected = apply_energy_deviation_pairs(result, self._deviation_pairs())
         if np.isscalar(channel):
             return float(np.asarray(corrected, dtype=float))
@@ -144,50 +146,86 @@ class GammaSpectrum:
     def energy_to_channel(
         self, energy: Union[float, np.ndarray]
     ) -> Union[int, np.ndarray]:
-        """Convert energy to channel number using calibration."""
-        coeffs = self.calibration.get("energy", [0.0, 1.0])
-        deviation_pairs = self._deviation_pairs()
+        """Invert a finite, unambiguous calibration on the recorded channel domain.
 
-        if deviation_pairs:
-            from scipy import optimize
-
-            def _invert_scalar(target_energy: float) -> int:
-                upper = max(len(self.channels) - 1, 1)
-
-                def energy_diff(ch):
-                    return float(self.channel_to_energy(ch)) - target_energy
-
-                return int(np.round(optimize.brentq(energy_diff, 0, upper)))
-
-            if np.isscalar(energy):
-                return _invert_scalar(float(energy))
-            values = np.asarray(energy, dtype=float)
-            return np.asarray([_invert_scalar(float(value)) for value in values], dtype=int)
-
-        if len(coeffs) == 2:
-            # Linear: E = a0 + a1*ch => ch = (E - a0) / a1
-            channel = (energy - coeffs[0]) / coeffs[1]
-        elif len(coeffs) == 3:
-            # Quadratic: solve a2*ch^2 + a1*ch + (a0 - E) = 0
-            a = coeffs[2]
-            b = coeffs[1]
-            c = coeffs[0] - energy
-            discriminant = b**2 - 4 * a * c
-            channel = (-b + np.sqrt(discriminant)) / (2 * a)
+        Linear calibrations retain extrapolation for out-of-range ROI bounds.
+        Nonlinear calibrations require a monotone mapping on the stored domain.
+        """
+        values = np.asarray(energy, dtype=float)
+        coeffs = np.asarray(self.calibration.get("energy", [0.0, 1.0]), dtype=float)
+        if coeffs.ndim != 1 or not coeffs.size or not np.all(np.isfinite(coeffs)):
+            raise ValueError("Energy calibration coefficients must be finite.")
+        if not np.all(np.isfinite(values)):
+            raise ValueError("Target energies must be finite.")
+        coeffs = np.trim_zeros(coeffs, trim="b")
+        if coeffs.size < 2:
+            raise ValueError("Constant energy calibration cannot be inverted.")
+        pairs = self._deviation_pairs()
+        if coeffs.size == 2 and not pairs:
+            channels = (values - coeffs[0]) / coeffs[1]
         else:
-            # Use numerical inversion for higher order
-            from scipy import optimize
+            from scipy.optimize import brentq
 
-            def energy_diff(ch):
-                return self.channel_to_energy(ch) - energy
-
-            channel = optimize.brentq(energy_diff, 0, len(self.channels))
-
-        return (
-            int(np.round(channel))
-            if np.isscalar(channel)
-            else np.round(channel).astype(int)
-        )
+            domain = np.asarray(self.channels, dtype=float)
+            if domain.size < 2 or not np.all(np.isfinite(domain)):
+                raise ValueError(
+                    "Nonlinear inversion requires a finite channel domain."
+                )
+            lo, hi = float(np.min(domain)), float(np.max(domain))
+            if lo == hi:
+                raise ValueError("Nonlinear inversion requires distinct channels.")
+            derivative = np.polynomial.polynomial.polyder(coeffs)
+            roots = np.polynomial.polynomial.polyroots(derivative)
+            turns = sorted(
+                [lo, hi]
+                + [
+                    float(z.real)
+                    for z in roots
+                    if abs(z.imag) < 1e-10 and lo < z.real < hi
+                ]
+            )
+            probes = np.asarray(
+                [(left + right) / 2 for left, right in zip(turns, turns[1:])]
+            )
+            slopes = np.polynomial.polynomial.polyval(probes, derivative)
+            if not (np.all(slopes > 0) or np.all(slopes < 0)):
+                raise ValueError(
+                    "Energy calibration is not monotone on the channel domain."
+                )
+            if pairs:
+                anchors = np.array(
+                    sorted((p.energy_keV, p.correction_keV) for p in pairs)
+                )
+                if not np.all(np.isfinite(anchors)):
+                    raise ValueError("Energy deviation pairs must be finite.")
+                if len(anchors) > 1 and (
+                    np.any(np.diff(anchors[:, 0]) <= 0)
+                    or np.any(np.diff(anchors.sum(axis=1)) <= 0)
+                ):
+                    raise ValueError(
+                        "Energy deviation mapping must be strictly increasing."
+                    )
+            bounds = sorted(
+                (float(self.channel_to_energy(lo)), float(self.channel_to_energy(hi)))
+            )
+            if np.any(values < bounds[0]) or np.any(values > bounds[1]):
+                raise ValueError(
+                    "Target energy is outside the calibrated channel domain."
+                )
+            channels = np.asarray(
+                [
+                    brentq(
+                        lambda ch: float(self.channel_to_energy(ch)) - target, lo, hi
+                    )
+                    for target in values.ravel()
+                ]
+            ).reshape(values.shape)
+        if not np.all(np.isfinite(channels)) or np.any(
+            np.abs(channels) >= np.iinfo(np.int64).max
+        ):
+            raise ValueError("Inverted channel is outside the supported integer range.")
+        rounded = np.rint(channels).astype(np.int64)
+        return int(rounded) if values.ndim == 0 else rounded
 
     def _deviation_pairs(self) -> tuple[EnergyDeviationPair, ...]:
         raw_pairs = self.calibration.get("deviation_pairs") or ()
@@ -351,7 +389,7 @@ def read_spe_file(
     """
     filepath = Path(filepath)
 
-    with open(filepath, "r", errors="replace") as f:
+    with open(filepath, "r", encoding="utf-8-sig", errors="strict") as f:
         content = f.read()
 
     # Auto-detect format
@@ -361,10 +399,22 @@ def read_spe_file(
         else:
             format_hint = "standard"
 
+    if format_hint not in {"dollar", "standard"}:
+        raise ValueError(f"Unsupported SPE format: {format_hint}")
     if format_hint == "dollar":
         return _parse_dollar_spe(content, str(filepath))
     else:
         return _parse_standard_spe(content, str(filepath))
+
+
+def _finite_spe_numbers(text: str, section: str) -> np.ndarray:
+    try:
+        values = np.asarray([float(token) for token in text.split()], dtype=float)
+    except ValueError as exc:
+        raise ValueError(f"Invalid numeric token in SPE {section}.") from exc
+    if not values.size or not np.all(np.isfinite(values)):
+        raise ValueError(f"SPE {section} requires finite numeric values.")
+    return values
 
 
 def _parse_dollar_spe(content: str, filename: str) -> GammaSpectrum:
@@ -441,78 +491,44 @@ def _parse_dollar_spe(content: str, filename: str) -> GammaSpectrum:
         elif len(times) == 1:
             live_time = real_time = float(times[0])
 
-    # Parse data
-    counts = []
-    start_channel = 0
-    end_channel = 0
+    data_lines = [line for line in sections.get("$DATA", []) if line.strip()]
+    if not data_lines:
+        raise ValueError("SPE is missing a nonempty $DATA section.")
+    parts = data_lines[0].split()
+    if len(parts) != 2:
+        raise ValueError("SPE $DATA requires an inclusive start/end channel range.")
+    try:
+        start_channel, end_channel = map(int, parts)
+    except ValueError as exc:
+        raise ValueError("SPE channel bounds must be integers.") from exc
+    if start_channel < 0 or end_channel < start_channel:
+        raise ValueError("SPE channel range is invalid.")
+    counts = _finite_spe_numbers(" ".join(data_lines[1:]), "$DATA")
+    if len(counts) != end_channel - start_channel + 1:
+        raise ValueError("SPE count length does not match its declared channel range.")
+    channels = np.arange(start_channel, end_channel + 1)
 
-    if "$DATA" in sections:
-        data_lines = sections["$DATA"]
-        if data_lines:
-            # First line has channel range
-            range_parts = data_lines[0].split()
-            if len(range_parts) >= 2:
-                start_channel = int(range_parts[0])
-                end_channel = int(range_parts[1])
-
-            # Remaining lines are counts - handle both single value per line
-            # and multiple values per line (space-separated)
-            for line in data_lines[1:]:
-                line = line.strip()
-                if line:
-                    # Split by whitespace to handle multiple values per line
-                    values = line.split()
-                    for val in values:
-                        try:
-                            counts.append(float(val))
-                        except ValueError:
-                            continue
-
-    counts = np.array(counts)
-    channels = np.arange(start_channel, start_channel + len(counts))
-
-    # Parse energy calibration
     calibration = {}
-    if "$ENER_FIT" in sections and sections["$ENER_FIT"]:
-        coeffs = []
-        for line in sections["$ENER_FIT"]:
-            for x in line.split():
-                if not x:
-                    continue
-                try:
-                    coeffs.append(float(x))
-                except ValueError:
-                    # Skip non-numeric tokens like 'keV'
-                    continue
-        calibration["energy"] = coeffs
-
-    if "$MCA_CAL" in sections and sections["$MCA_CAL"]:
-        # Usually has number of coefficients on first line
-        mca_lines = sections["$MCA_CAL"]
-        if len(mca_lines) > 1:
-            coeffs = []
-            for line in mca_lines[1:]:
-                for x in line.split():
-                    if not x:
-                        continue
-                    try:
-                        coeffs.append(float(x))
-                    except ValueError:
-                        continue
-            if "energy" not in calibration:
-                calibration["energy"] = coeffs
-
-    if "$SHAPE_CAL" in sections and sections["$SHAPE_CAL"]:
-        coeffs = []
-        for line in sections["$SHAPE_CAL"]:
-            for x in line.split():
-                if not x:
-                    continue
-                try:
-                    coeffs.append(float(x))
-                except ValueError:
-                    continue
-        calibration["shape"] = coeffs
+    if "$ENER_FIT" in sections:
+        calibration["energy"] = _finite_spe_numbers(
+            " ".join(sections["$ENER_FIT"]), "$ENER_FIT"
+        ).tolist()
+    for section, key in (("$MCA_CAL", "energy"), ("$SHAPE_CAL", "shape")):
+        if section in sections:
+            rows = [line for line in sections[section] if line.strip()]
+            if len(rows) < 2 or not re.fullmatch(r"[0-9]+", rows[0]):
+                raise ValueError(
+                    f"{section} requires a coefficient count followed by coefficients."
+                )
+            text = " ".join(rows[1:])
+            if section == "$MCA_CAL":
+                text = re.sub(r"\s+keV\s*$", "", text, flags=re.IGNORECASE)
+            coefficients = _finite_spe_numbers(text, section)
+            if len(coefficients) != int(rows[0]):
+                raise ValueError(
+                    f"{section} coefficient count does not match its header."
+                )
+            calibration.setdefault(key, coefficients.tolist())
 
     # Collect metadata
     metadata = {
@@ -556,73 +572,38 @@ def _parse_standard_spe(content: str, filename: str) -> GammaSpectrum:
     - Header lines with counts, times
     - Followed by channel data
     """
-    lines = [l.strip() for l in content.split("\n") if l.strip()]
-
-    counts = []
-    live_time = 0.0
-    real_time = 0.0
+    lines = [line.strip() for line in content.splitlines() if line.strip()]
+    markers = [
+        i
+        for i, line in enumerate(lines)
+        if line.lower() in {"data:", "counts:", "spectrum:"}
+    ]
+    live_time = real_time = 0.0
     calibration = {}
-    metadata = {}
-
-    in_data = False
-    header_complete = False
-
-    for i, line in enumerate(lines):
-        # Try to parse as a count value
-        try:
-            val = float(line)
-            if header_complete:
-                counts.append(val)
+    if markers:
+        index = markers[0]
+        for line in lines[:index]:
+            label, _, value = line.partition(":")
+            if label.lower() in {"live time", "real time"}:
+                parsed = _finite_spe_numbers(value, label)
+                if len(parsed) != 1:
+                    raise ValueError("SPE timing headers require one value.")
+                if label.lower() == "live time":
+                    live_time = float(parsed[0])
+                else:
+                    real_time = float(parsed[0])
+            elif label.lower() in {"energy", "calibration"}:
+                calibration["energy"] = _finite_spe_numbers(value, label).tolist()
             else:
-                # Still in header - might be timing info
-                if len(counts) == 0:
-                    # Could be various header formats
-                    pass
-            continue
-        except ValueError:
-            pass
-
-        # Check for keywords
-        line_lower = line.lower()
-
-        if "live" in line_lower and "time" in line_lower:
-            match = re.search(r"[\d.]+", line)
-            if match:
-                live_time = float(match.group())
-        elif "real" in line_lower and "time" in line_lower:
-            match = re.search(r"[\d.]+", line)
-            if match:
-                real_time = float(match.group())
-        elif "calibration" in line_lower or "energy" in line_lower:
-            # Look for coefficients on this or next line
-            coeffs = re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", line)
-            if coeffs:
-                calibration["energy"] = [float(c) for c in coeffs]
-
-        # Detect start of data section
-        if any(marker in line_lower for marker in ["data:", "counts:", "spectrum:"]):
-            header_complete = True
-            in_data = True
-
-    # If we didn't find explicit counts, try parsing all numeric lines
-    if len(counts) == 0:
-        for line in lines:
-            try:
-                counts.append(float(line))
-            except ValueError:
-                continue
-
-    counts = np.array(counts)
-    channels = np.arange(len(counts))
-
+                raise ValueError(f"Unsupported untagged SPE header: {line}")
+        lines = lines[index + 1 :]
+    counts = _finite_spe_numbers(" ".join(lines), "data")
     return GammaSpectrum(
         counts=counts,
-        channels=channels,
         live_time=live_time,
         real_time=real_time,
         spectrum_id=Path(filename).stem,
         calibration=calibration,
-        metadata=metadata,
     )
 
 
@@ -641,6 +622,46 @@ def write_spe_file(
     format_type : str
         Format type: 'dollar' for ORTEC-style
     """
+    if format_type != "dollar":
+        raise ValueError("Only dollar-tagged SPE export is supported.")
+    counts = np.asarray(spectrum.counts, dtype=float)
+    channels = np.asarray(spectrum.channels, dtype=float)
+    if counts.ndim != 1 or not counts.size or not np.all(np.isfinite(counts)):
+        raise ValueError("SPE export requires a nonempty finite count vector.")
+    if np.any(counts < 0) or np.any(counts != np.floor(counts)):
+        raise ValueError(
+            "SPE export requires nonnegative integer counts; use a spectrum artifact for processed data."
+        )
+    if (
+        channels.shape != counts.shape
+        or not np.all(np.isfinite(channels))
+        or np.any(channels < 0)
+        or np.any(channels != np.floor(channels))
+        or np.any(np.diff(channels) != 1)
+    ):
+        raise ValueError("SPE export requires contiguous nonnegative integer channels.")
+    if not np.allclose(
+        np.asarray(spectrum.counts_uncertainty), np.sqrt(counts), rtol=1e-12, atol=0
+    ):
+        raise ValueError(
+            "SPE cannot store custom count uncertainties; use a spectrum artifact."
+        )
+    if spectrum.calibration.get("deviation_pairs"):
+        raise ValueError(
+            "SPE cannot store energy deviation pairs; use a spectrum artifact."
+        )
+    for key in ("energy", "shape"):
+        if key in spectrum.calibration:
+            values = np.asarray(spectrum.calibration[key], dtype=float)
+            if values.ndim != 1 or not values.size or not np.all(np.isfinite(values)):
+                raise ValueError(f"Invalid SPE {key} calibration coefficients.")
+    for value in (spectrum.spectrum_id, spectrum.detector_id):
+        if any(c in value for c in "\r\n"):
+            raise ValueError("SPE identifiers cannot contain line breaks.")
+    if any(
+        not np.isfinite(t) or t < 0 for t in (spectrum.live_time, spectrum.real_time)
+    ):
+        raise ValueError("SPE times must be finite and nonnegative.")
     filepath = Path(filepath)
 
     lines = []
@@ -659,11 +680,11 @@ def write_spe_file(
     if spectrum.start_time:
         lines.append(spectrum.start_time.strftime("%m/%d/%Y %H:%M:%S"))
     else:
-        lines.append(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
+        lines.pop()  # A missing acquisition time must remain missing.
 
     # Times
     lines.append("$MEAS_TIM:")
-    lines.append(f"{spectrum.live_time:.0f} {spectrum.real_time:.0f}")
+    lines.append(f"{spectrum.live_time:.17g} {spectrum.real_time:.17g}")
 
     # Data
     lines.append("$DATA:")
@@ -682,23 +703,23 @@ def write_spe_file(
     if "energy" in spectrum.calibration:
         lines.append("$ENER_FIT:")
         coeffs = spectrum.calibration["energy"]
-        lines.append(" ".join(f"{c:.6E}" for c in coeffs))
+        lines.append(" ".join(f"{c:.17g}" for c in coeffs))
 
         lines.append("$MCA_CAL:")
         lines.append(str(len(coeffs)))
-        lines.append(" ".join(f"{c:.6E}" for c in coeffs) + " keV")
+        lines.append(" ".join(f"{c:.17g}" for c in coeffs) + " keV")
 
     # Shape calibration
     if "shape" in spectrum.calibration:
         lines.append("$SHAPE_CAL:")
         coeffs = spectrum.calibration["shape"]
         lines.append(str(len(coeffs)))
-        lines.append(" ".join(f"{c:.6E}" for c in coeffs))
+        lines.append(" ".join(f"{c:.17g}" for c in coeffs))
 
     # End marker
     lines.append("$ENDRECORD:")
 
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 
@@ -729,13 +750,21 @@ def read_multiple_spe(
         total_real = 0.0
 
         for sp in spectra:
-            if len(sp.counts) == len(total_counts):
-                total_counts += sp.counts
+            first = spectra[0]
+            if (
+                not np.array_equal(sp.channels, first.channels)
+                or sp.calibration != first.calibration
+            ):
+                raise ValueError(
+                    "SPE summation requires identical channel grids and calibrations."
+                )
+            total_counts += sp.counts
             total_live += sp.live_time
             total_real += sp.real_time
 
         return GammaSpectrum(
             counts=total_counts,
+            counts_uncertainty=np.sqrt(sum(sp.counts_uncertainty**2 for sp in spectra)),
             channels=spectra[0].channels.copy(),
             live_time=total_live,
             real_time=total_real,

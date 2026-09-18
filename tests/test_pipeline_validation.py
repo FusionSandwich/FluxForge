@@ -386,7 +386,9 @@ class TestStageDReactionRates:
         half_life = 44.495 * 86400  # Fe-59 half-life in seconds
         segments = [IrradiationSegment(duration_s=7200.0, relative_power=1.0)]
 
-        rate_estimate = reaction_rate_from_activity(activity, segments, half_life)
+        rate_estimate = reaction_rate_from_activity(
+            activity, segments, half_life, activity_uncertainty=20.0
+        )
 
         assert rate_estimate.rate > 0
         assert rate_estimate.uncertainty > 0
@@ -410,9 +412,12 @@ class TestStageDReactionRates:
         for reaction in measurements["reactions"]:
             gamma_lines = [GammaLineMeasurement(**gl) for gl in reaction["gamma_lines"]]
 
-            activity, _ = weighted_activity(gamma_lines)
+            activity, activity_uncertainty = weighted_activity(gamma_lines)
             rate_estimate = reaction_rate_from_activity(
-                activity, segments, reaction["half_life_s"]
+                activity,
+                segments,
+                reaction["half_life_s"],
+                activity_uncertainty=activity_uncertainty,
             )
 
             # Reaction rate should be positive
@@ -684,9 +689,12 @@ class TestStageFUnfolding:
 
         for reaction in measurements["reactions"]:
             gamma_lines = [GammaLineMeasurement(**gl) for gl in reaction["gamma_lines"]]
-            activity, _ = weighted_activity(gamma_lines)
+            activity, activity_uncertainty = weighted_activity(gamma_lines)
             rate_estimate = reaction_rate_from_activity(
-                activity, segments, reaction["half_life_s"]
+                activity,
+                segments,
+                reaction["half_life_s"],
+                activity_uncertainty=activity_uncertainty,
             )
             measured_rates.append(rate_estimate.rate)
             rate_uncertainties.append(rate_estimate.uncertainty)

@@ -267,7 +267,8 @@ class NuclideResult:
 class EfficiencyCalibration:
     """HPGe detector efficiency calibration parameters."""
 
-    # Polynomial coefficients for ln(eff) = C1 + C2*ln(E) + C3*ln(E)^2 + C4*ln(E)^3
+    # Coefficients for the exported polynomial factor
+    # C1 + C2*ln(E) + C3*ln(E)^2 + C4*ln(E)^3.
     C1: float = 0.0
     C2: float = 0.0
     C3: float = 0.0
@@ -296,41 +297,24 @@ class EfficiencyCalibration:
         ε = DetModel × (C1 + C2×log(E) + C3×log(E)² + C4×log(E)³)
 
         Where:
-        - DetModel = A × exp(...attenuation terms...) × (1-exp(-detector_term))
+        - DetModel = A × exp(-(μ_Al T1 + μ_Ge DL)/cos(AI))
+          × (1-exp(-μ_Ge DI/cos(AI)))
         - C1-C4 are polynomial coefficients
         - log is natural logarithm
         - E is energy in keV
+        - μ is the linear attenuation coefficient in cm⁻¹
+        - T1, DL, and DI are path lengths in cm
 
-        Note: This is a polynomial in log(E), NOT a log-polynomial.
-        The coefficients directly give ln(efficiency), which we then exponentiate.
+        The local XCOM tables store mass attenuation coefficients μ/ρ in
+        cm²/g.  ``AttenuationData.get_mu`` multiplies by density in g/cm³ so
+        every Beer-Lambert exponent is dimensionless.  The exported polynomial
+        factor is used directly; it is not exponentiated.
         """
         E = np.atleast_1d(np.asarray(energy_keV, dtype=float))
 
         # Natural log of energy
         with np.errstate(divide="ignore", invalid="ignore"):
             lnE = np.log(np.where(E > 0, E, np.nan))
-
-        # The polynomial (C1 + C2*lnE + C3*lnE^2 + C4*lnE^3) gives ln(ε/A)
-        # where A is the geometry factor
-        #
-        # From the QuantaGraph output format:
-        #   ε = DetModel × (C1 + C2×Log(E) + C3×Log(E)² + C4×Log(E)³)
-        # where DetModel includes the geometry factor A and attenuation
-        #
-        # The coefficients C1~-20 indicates this is ln(efficiency) form
-        # because ln(0.001) ~ -6.9, not -20
-        #
-        # Actually looking at typical HPGe efficiencies (~0.001-0.01 at 25cm),
-        # and C1=-20.026, if we compute:
-        #   ln(eff) = C1 + C2*lnE + C3*lnE^2 + C4*lnE^3
-        #   at E=1332 keV: lnE = 7.195
-        #   ln(eff) = -20.026 + 10.29*7.195 - 1.655*51.77 + 0.0867*372.5
-        #           = -20.026 + 74.04 - 85.68 + 32.3 = 0.63
-        #   eff = exp(0.63) = 1.88  (way too high!)
-        #
-        # So the formula must be:
-        #   eff_intermediate = C1 + C2*lnE + C3*lnE^2 + C4*lnE^3
-        #   Then multiply by geometry factor A
 
         poly = self.C1 + self.C2 * lnE + self.C3 * lnE**2 + self.C4 * lnE**3
 
@@ -340,10 +324,10 @@ class EfficiencyCalibration:
         detector_model = np.full_like(E, self.geometry_factor_A, dtype=float)
         valid = np.isfinite(E) & (E > 0)
         if np.any(valid):
-            # The LabSOCS/QG detector-model equation uses mass attenuation
-            # coefficients in the window/dead-layer/intrinsic terms.
-            al_mu = get_attenuation_data("Aluminum").get_mu_rho(E[valid])
-            ge_mu = get_attenuation_data("Germanium").get_mu_rho(E[valid])
+            # The report multiplies each attenuation coefficient by a length,
+            # so use linear μ [cm^-1], not mass μ/ρ [cm^2/g].
+            al_mu = get_attenuation_data("Aluminum").get_mu(E[valid])
+            ge_mu = get_attenuation_data("Germanium").get_mu(E[valid])
             t1_cm = max(self.al_window_T1_um, 0.0) * 1.0e-4
             dl_cm = max(self.dead_layer_DL_um, 0.0) * 1.0e-4
             di_cm = max(self.detector_thickness_DI_cm, 0.0)

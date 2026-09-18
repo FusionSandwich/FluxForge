@@ -106,6 +106,7 @@ def make_peak_report(
     live_time_s: float,
     peaks: Iterable[Dict[str, Any]],
     source_path: Optional[Path] = None,
+    real_time_s: Optional[float] = None,
 ) -> Dict[str, Any]:
     units = {
         "energy_keV": "keV",
@@ -114,6 +115,8 @@ def make_peak_report(
         "sigma_keV": "keV",
         "area": "counts",
         "live_time_s": "s",
+        "real_time_s": "s",
+        "area_uncertainty": "counts",
     }
     definitions = {
         "channel": "peak centroid channel",
@@ -123,6 +126,8 @@ def make_peak_report(
         "sigma_keV": "gaussian sigma",
         "area": "net peak area",
         "live_time_s": "spectrum live time",
+        "real_time_s": "elapsed counting time",
+        "area_uncertainty": "standard uncertainty of fitted net peak area",
     }
     hashes = {"source": hash_file(source_path)} if source_path else None
     provenance = build_provenance(
@@ -135,6 +140,7 @@ def make_peak_report(
         "schema": _schema_id("peak_report"),
         "spectrum_id": spectrum_id,
         "live_time_s": live_time_s,
+        "real_time_s": real_time_s,
         "peaks": list(peaks),
         "provenance": provenance,
     }
@@ -147,12 +153,14 @@ def write_peak_report(
     live_time_s: float,
     peaks: Iterable[Dict[str, Any]],
     source_path: Optional[Path] = None,
+    real_time_s: Optional[float] = None,
 ) -> Dict[str, Any]:
     payload = make_peak_report(
         spectrum_id=spectrum_id,
         live_time_s=live_time_s,
         peaks=peaks,
         source_path=source_path,
+        real_time_s=real_time_s,
     )
     write_artifact(path, payload)
     return payload

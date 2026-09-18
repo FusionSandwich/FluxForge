@@ -224,9 +224,12 @@ def test_goal_2_reaction_rates():
         for reaction in measurements["reactions"]:
             gamma_lines = [GammaLineMeasurement(**gl) for gl in reaction["gamma_lines"]]
 
-            activity, _ = weighted_activity(gamma_lines)
+            activity, activity_uncertainty = weighted_activity(gamma_lines)
             rate_estimate = reaction_rate_from_activity(
-                activity, segments, reaction["half_life_s"]
+                activity,
+                segments,
+                reaction["half_life_s"],
+                activity_uncertainty=activity_uncertainty,
             )
 
             # Verify the relationship: rate * buildup_factor = activity
@@ -627,9 +630,12 @@ def test_goal_7_complete_workflow():
 
         for reaction in measurements["reactions"]:
             gamma_lines = [GammaLineMeasurement(**gl) for gl in reaction["gamma_lines"]]
-            activity, _ = weighted_activity(gamma_lines)
+            activity, activity_uncertainty = weighted_activity(gamma_lines)
             rate_estimate = reaction_rate_from_activity(
-                activity, segments, reaction["half_life_s"]
+                activity,
+                segments,
+                reaction["half_life_s"],
+                activity_uncertainty=activity_uncertainty,
             )
             measured_rates.append(rate_estimate.rate)
             rate_uncertainties.append(rate_estimate.uncertainty)
@@ -746,7 +752,7 @@ def test_capability_irdff_database():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def generate_summary_report(request):
+def generate_summary_report(request, tmp_path_factory):
     """Generate summary report after all tests complete."""
     yield
 
@@ -754,7 +760,7 @@ def generate_summary_report(request):
     SUMMARY.print_report()
 
     # Save JSON report
-    report_path = TESTS_DIR / "goal_validation_report.json"
+    report_path = tmp_path_factory.mktemp("goal-summary") / "goal_validation_report.json"
     with open(report_path, "w") as f:
         json.dump(SUMMARY.to_dict(), f, indent=2)
 

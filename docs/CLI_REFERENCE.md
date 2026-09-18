@@ -188,11 +188,11 @@ fluxforge library-remove --source-id user:my_lines
 ### `activity`
 
 - Purpose: Compute line activities from peak report
-- Common use case: Convert a peak report into line-level activities for one isotope or reaction.
+- Common use case: Convert net peak areas with explicit calibration inputs; the example uses synthetic values and reports count-start activity.
 - Detailed help: `fluxforge activity --help`
 
 ```bash
-fluxforge activity --peaks-file rafm4_b_peaks.json --live-time-s 3600 --output activities.json
+fluxforge activity --peaks-file synthetic_peaks.json --efficiency 0.01 --emission-probability 0.5 --half-life-s 1000 --output activities.json
 ```
 
 ### `activity-review`

@@ -313,8 +313,13 @@ def load_example_plot_inputs() -> MasterPlotInputs:
     measured_uncertainties: List[float] = []
     for reaction in dict(measurements)["reactions"]:
         gamma_lines = [GammaLineMeasurement(**line) for line in reaction["gamma_lines"]]
-        activity, _ = weighted_activity(gamma_lines)
-        rate = reaction_rate_from_activity(activity, segments, reaction["half_life_s"])
+        activity, activity_uncertainty = weighted_activity(gamma_lines)
+        rate = reaction_rate_from_activity(
+            activity,
+            segments,
+            reaction["half_life_s"],
+            activity_uncertainty=activity_uncertainty,
+        )
         measured_rates.append(float(rate.rate))
         measured_uncertainties.append(float(rate.uncertainty))
 

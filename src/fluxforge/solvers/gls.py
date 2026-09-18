@@ -40,9 +40,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Any
 
+import numpy as np
+
 from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
 from fluxforge.core.unfolding_inputs import (
     require_covariance_matrix,
+    require_finite,
     require_nonnegative,
 )
 from fluxforge.core.linalg import (
@@ -51,7 +54,6 @@ from fluxforge.core.linalg import (
     add_vectors,
     elementwise_clip,
     matmul,
-    pseudo_inverse,
     sub_vectors,
     transpose,
 )
@@ -233,10 +235,26 @@ def gls_adjust(
     """
     import math
 
+    if not isinstance(response_cov_policy, ResponseCovariancePolicy):
+        response_cov_policy = ResponseCovariancePolicy(response_cov_policy)
+    if response_cov_policy in (
+        ResponseCovariancePolicy.NUISANCE,
+        ResponseCovariancePolicy.MONTE_CARLO,
+    ):
+        raise NotImplementedError(
+            "This entrypoint supports IGNORE and AUGMENT_VY only; use "
+            "gls_adjust_with_response_cov for Monte Carlo propagation."
+        )
+    if (
+        response_cov_policy == ResponseCovariancePolicy.AUGMENT_VY
+        and response_cov is None
+    ):
+        raise ValueError("AUGMENT_VY requires response_cov element variances")
+
     response_array = require_nonnegative("response", response)
     if response_array.ndim != 2:
         raise ValueError("response must be a 2-D array")
-    measurements_array = require_nonnegative("measurements", measurements).reshape(-1)
+    measurements_array = require_finite("measurements", measurements).reshape(-1)
     measurement_cov_array = require_covariance_matrix(
         "measurement_cov",
         measurement_cov,
@@ -249,7 +267,10 @@ def gls_adjust(
             f"Response matrix shape ({response_array.shape[0]}×{response_array.shape[1]}) "
             f"doesn't match measurements ({measurements_array.size}) and prior ({prior_flux_array.size})"
         )
-    if measurement_cov_array.shape != (measurements_array.size, measurements_array.size):
+    if measurement_cov_array.shape != (
+        measurements_array.size,
+        measurements_array.size,
+    ):
         raise ValueError("measurement_cov shape must match the measurements length")
     if prior_cov_array.shape != (prior_flux_array.size, prior_flux_array.size):
         raise ValueError("prior_cov shape must match the prior_flux length")
@@ -288,7 +309,8 @@ def gls_adjust(
             innovation_cov[i][j] += working_measurement_cov[i][j]
 
     # Invert innovation covariance
-    innovation_cov_inv = pseudo_inverse(innovation_cov)
+    innovation_array = np.asarray(innovation_cov, dtype=float)
+    innovation_cov_inv = np.linalg.pinv(innovation_array, hermitian=True).tolist()
 
     # Kalman gain: V_φ R^T (R V_φ R^T + V_y)^(-1)
     gain = matmul(prior_cov, matmul(transpose(response), innovation_cov_inv))  # type: ignore[arg-type]
@@ -298,12 +320,23 @@ def gls_adjust(
 
     # Innovation (residuals): y - R φ₀
     residuals = sub_vectors(measurements, model_prediction)  # type: ignore[arg-type]
+    projected_residual = (
+        innovation_array @ np.asarray(innovation_cov_inv) @ np.asarray(residuals)
+    )
+    if not np.allclose(
+        projected_residual,
+        residuals,
+        rtol=1e-9,
+        atol=1e-12 * max(1.0, np.linalg.norm(residuals)),
+    ):
+        raise ValueError("Measurements contradict a zero-variance constraint")
 
     # Update: V_φ R^T (R V_φ R^T + V_y)^(-1) (y - R φ₀)
     update = matmul(gain, residuals)  # type: ignore[arg-type]
 
     # Posterior flux: φ̂ = φ₀ + update
     phi_hat = add_vectors(prior_flux, update)
+    clipped_bins = [i for i, value in enumerate(phi_hat) if value < 0.0]
     if enforce_nonnegativity:
         phi_hat = elementwise_clip(phi_hat, 0.0)
 
@@ -317,10 +350,9 @@ def gls_adjust(
     chi2 = _quadratic_form(residuals, innovation_cov_inv)
 
     # Degrees of freedom
-    n_dof = max(
-        n_reactions - 1, 1
-    )  # Typically n_reactions - n_parameters, but flux has many DOF
-    reduced_chi2 = chi2 / n_dof if n_dof > 0 else chi2
+    # Prior-predictive innovation statistic, not a post-fit residual statistic.
+    n_dof = int(np.linalg.matrix_rank(innovation_array))
+    reduced_chi2 = chi2 / n_dof if n_dof > 0 else float("nan")
 
     # Diagnostics
     pull = None
@@ -339,11 +371,8 @@ def gls_adjust(
             for g in range(n_groups)
         ]
 
-        # Influence (diagonal of hat matrix H = R (R^T V_y^-1 R)^(-1) R^T V_y^-1)
-        # Simplified: use gain magnitude
-        influence = [
-            sum(abs(gain[i][j]) for j in range(n_reactions)) for i in range(n_groups)
-        ]
+        # Measurement-space leverage: diagonal of R K, one value per monitor.
+        influence = np.diag(response_array @ np.asarray(gain)).tolist()
 
         diagnostics = {
             "n_reactions": n_reactions,
@@ -353,6 +382,24 @@ def gls_adjust(
             "max_relative_change": max(abs(c) for c in prior_posterior_change),
             "response_cov_policy": response_cov_policy.value,
         }
+
+    diagnostics.update(
+        {
+            "chi2_convention": "prior_predictive_innovation",
+            "degrees_of_freedom_convention": "rank_of_innovation_covariance",
+            "posterior_residuals": (
+                measurements_array - response_array @ np.asarray(phi_hat)
+            ).tolist(),
+            "covariance_convention": "unconstrained_linear_gaussian_posterior",
+            "clipped_bin_indices": clipped_bins if enforce_nonnegativity else [],
+            "constrained_posterior_valid": not (enforce_nonnegativity and clipped_bins),
+            "response_uncertainty_approximation": (
+                "independent_element_variances_at_prior_flux"
+                if response_cov_policy == ResponseCovariancePolicy.AUGMENT_VY
+                else "ignored"
+            ),
+        }
+    )
 
     diagnostics = merge_flux_diagnostics(
         diagnostics,
@@ -378,15 +425,8 @@ def gls_adjust(
 
 
 def _estimate_condition(mat: Matrix) -> float:
-    """Estimate condition number from diagonal ratio."""
-    diag = _diagonal(mat)
-    if not diag:
-        return 1.0
-    max_d = max(abs(d) for d in diag)
-    min_d = min(abs(d) for d in diag if abs(d) > 1e-20)
-    if min_d > 0:
-        return max_d / min_d
-    return float("inf")
+    """Return the spectral condition number, including off-diagonal coupling."""
+    return float(np.linalg.cond(np.asarray(mat, dtype=float)))
 
 
 def gls_adjust_with_response_cov(
@@ -432,13 +472,16 @@ def gls_adjust_with_response_cov(
     import random
     import math
 
+    if isinstance(n_samples, bool) or not isinstance(n_samples, int) or n_samples < 2:
+        raise ValueError("n_samples must be an integer of at least 2")
+
     response_array = require_nonnegative("response", response)
     if response_array.ndim != 2:
         raise ValueError("response must be a 2-D array")
     response_cov_array = require_nonnegative("response_cov", response_cov)
     if response_cov_array.shape != response_array.shape:
         raise ValueError("response_cov shape must match the response shape")
-    measurements_array = require_nonnegative("measurements", measurements).reshape(-1)
+    measurements_array = require_finite("measurements", measurements).reshape(-1)
     measurement_cov_array = require_covariance_matrix(
         "measurement_cov",
         measurement_cov,
@@ -458,6 +501,8 @@ def gls_adjust_with_response_cov(
 
     # Collect MC samples of posterior flux
     flux_samples = []
+    conditional_covariances = []
+    clipped_sample_count = 0
 
     for _ in range(n_samples):
         # Perturb response matrix
@@ -480,6 +525,8 @@ def gls_adjust_with_response_cov(
             compute_diagnostics=False,
         )
         flux_samples.append(result.flux)
+        conditional_covariances.append(result.covariance)
+        clipped_sample_count += bool(result.diagnostics["clipped_bin_indices"])
 
     # Compute mean and covariance from samples
     mean_flux = [
@@ -494,6 +541,10 @@ def gls_adjust_with_response_cov(
                 for samples in flux_samples
             )
             mc_cov[g1][g2] = cov_sum / (n_samples - 1)
+            # Total covariance = E[Cov(flux | response)] + Cov(E[flux | response]).
+            mc_cov[g1][g2] += (
+                sum(cov[g1][g2] for cov in conditional_covariances) / n_samples
+            )
 
     # Run nominal GLS for residuals and chi2
     nominal = gls_adjust(
@@ -524,5 +575,11 @@ def gls_adjust_with_response_cov(
             **nominal.diagnostics,
             "response_cov_policy": "monte_carlo",
             "n_mc_samples": n_samples,
+            "covariance_convention": "mean_conditional_covariance_plus_between_response_covariance",
+            "response_uncertainty_units": "element_standard_deviations",
+            "response_uncertainty_approximation": "independent_gaussian_elements_clipped_at_zero",
+            "clipped_sample_count": clipped_sample_count,
+            "constrained_posterior_valid": clipped_sample_count == 0,
+            "diagnostics_reference": "nominal_response",
         },
     )

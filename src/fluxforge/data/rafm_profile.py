@@ -19,17 +19,30 @@ class RAFMProfile:
     energy_calibration: List[float]
     efficiency: Dict[str, Any]
     resolution: List[float]
+    background_resource: Optional[str] = None
 
     def resolve_background_path(
         self, repo_root: Optional[Path] = None
     ) -> Optional[Path]:
-        """Resolve the bundled background path relative to the FluxForge repo root."""
+        """Resolve a packaged background, or an explicit repository override.
+
+        Installed wheels keep the selected background beside the profile data.
+        The legacy repository-relative locator remains available to callers
+        supplying repo_root and to profiles without a packaged resource.
+        """
+        if repo_root is not None and self.background_relative_path:
+            return (repo_root / self.background_relative_path).resolve()
+        if self.background_resource:
+            resource = resources.files("fluxforge.data").joinpath(self.background_resource)
+            if not resource.is_file():
+                raise FileNotFoundError(
+                    f"Packaged background for profile {self.name!r} is missing: {resource}"
+                )
+            # Wheel installations expose package data as persistent filesystem files.
+            return Path(str(resource)).resolve()
         if not self.background_relative_path:
             return None
-        base = (
-            repo_root if repo_root is not None else Path(__file__).resolve().parents[3]
-        )
-        return (base / self.background_relative_path).resolve()
+        return (Path(__file__).resolve().parents[3] / self.background_relative_path).resolve()
 
 
 def _load_profile_payload() -> Dict[str, Any]:
@@ -62,6 +75,7 @@ def load_rafm_profile(name: str) -> RAFMProfile:
         name=name,
         description=str(entry.get("description", "")),
         background_relative_path=entry.get("background_relative_path"),
+        background_resource=entry.get("background_resource"),
         energy_calibration=[
             float(value) for value in entry.get("energy_calibration", [])
         ],

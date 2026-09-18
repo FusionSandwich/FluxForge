@@ -23,7 +23,12 @@ from fluxforge.solvers.rmle import (
     rmle_unfolding,
 )
 from fluxforge.unfold._types import ReactionRates, ResponseBundle
-from fluxforge.unfolding import GravelUnfolder, MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
+from fluxforge.unfolding import (
+    GravelUnfolder,
+    MLSeedUnfolder,
+    MaxedUnfolder,
+    RMLEUnfolder,
+)
 from fluxforge.workflows import spectrum_unfolding as spectrum_workflow
 from fluxforge.workflows.spectrum_unfolding import FluxWireMeasurement, SpectrumUnfolder
 
@@ -329,6 +334,31 @@ def test_public_neutron_unfolding_paths_reject_negative_measurements(
     measurements = case.measurements.copy()
     measurements[0] *= -1.0
 
+    if name in {"gls", "gls_mc"}:
+        # Gaussian observation models admit signed background-subtracted estimates.
+        if name == "gls":
+            result = gls_adjust(
+                case.response,
+                measurements,
+                case.measurement_cov,
+                case.prior,
+                case.prior_cov,
+                enforce_nonnegativity=False,
+            )
+        else:
+            result = gls_adjust_with_response_cov(
+                case.response,
+                case.response_cov,
+                measurements,
+                case.measurement_cov,
+                case.prior,
+                case.prior_cov,
+                n_samples=2,
+                enforce_nonnegativity=False,
+            )
+        assert np.all(np.isfinite(result.flux))
+        return
+
     with pytest.raises(ValueError, match="must be non-negative"):
         if name == "gls":
             gls_adjust(
@@ -415,6 +445,7 @@ def test_public_neutron_unfolding_paths_reject_negative_measurements(
                     measurement_uncertainty=case.uncertainties,
                 )
 
+
 @pytest.mark.parametrize("method", ["GRAVEL", "MLEM", "MAXED", "RMLE", "ML_SEED"])
 def test_spectrum_unfolder_public_workflow_runs_real_solver(
     monkeypatch: pytest.MonkeyPatch,
@@ -428,7 +459,9 @@ def test_spectrum_unfolder_public_workflow_runs_real_solver(
         "IRDFFDatabase",
         lambda *args, **kwargs: SimpleNamespace(),
     )
-    monkeypatch.setattr(SpectrumUnfolder, "_build_response_matrix", fake_build_response_matrix)
+    monkeypatch.setattr(
+        SpectrumUnfolder, "_build_response_matrix", fake_build_response_matrix
+    )
 
     unfolder = SpectrumUnfolder(
         custom_energy_edges=np.array([1.0, 2.0, 4.0, 8.0]),
@@ -449,7 +482,10 @@ def test_spectrum_unfolder_public_workflow_runs_real_solver(
     assert np.all(result.flux >= 0.0)
     assert result.predicted_rates.shape == (3,)
     threshold = 5e-2 if method in {"MAXED", "ML_SEED"} else 1e-2
-    assert _refold_relative_error(np.eye(3), result.flux, np.array([120.0, 60.0, 20.0])) < threshold
+    assert (
+        _refold_relative_error(np.eye(3), result.flux, np.array([120.0, 60.0, 20.0]))
+        < threshold
+    )
 
 
 def test_quick_unfold_runs_public_workflow_with_small_synthetic_response(
@@ -468,7 +504,9 @@ def test_quick_unfold_runs_public_workflow_with_small_synthetic_response(
         "get_flux_wire_energy_groups",
         lambda: np.array([1.0, 2.0, 4.0, 8.0]),
     )
-    monkeypatch.setattr(SpectrumUnfolder, "_build_response_matrix", fake_build_response_matrix)
+    monkeypatch.setattr(
+        SpectrumUnfolder, "_build_response_matrix", fake_build_response_matrix
+    )
 
     result = spectrum_workflow.quick_unfold(
         {"rx1": 120.0, "rx2": 60.0, "rx3": 20.0},
@@ -481,7 +519,10 @@ def test_quick_unfold_runs_public_workflow_with_small_synthetic_response(
     assert result.flux.shape == (3,)
     assert result.flux_uncertainty.shape == (3,)
     assert result.reactions_used == ["rx1", "rx2", "rx3"]
-    assert _refold_relative_error(np.eye(3), result.flux, np.array([120.0, 60.0, 20.0])) < 1e-2
+    assert (
+        _refold_relative_error(np.eye(3), result.flux, np.array([120.0, 60.0, 20.0]))
+        < 1e-2
+    )
 
 
 def test_spectrum_unfolder_allows_ml_seed_initialization_for_gravel_and_rmle(
@@ -495,7 +536,9 @@ def test_spectrum_unfolder_allows_ml_seed_initialization_for_gravel_and_rmle(
         "IRDFFDatabase",
         lambda *args, **kwargs: SimpleNamespace(),
     )
-    monkeypatch.setattr(SpectrumUnfolder, "_build_response_matrix", fake_build_response_matrix)
+    monkeypatch.setattr(
+        SpectrumUnfolder, "_build_response_matrix", fake_build_response_matrix
+    )
 
     unfolder = SpectrumUnfolder(
         custom_energy_edges=np.array([1.0, 2.0, 4.0, 8.0]),
@@ -531,7 +574,9 @@ def test_spectrum_unfolder_allows_ml_seed_initialization_for_gravel_and_rmle(
     assert rmle_result.metadata["seed_confidence_score"] >= 0.4
 
 
-@pytest.mark.parametrize("method", ["gls", "gravel", "mlem", "maxed", "rmle", "ml_seed"])
+@pytest.mark.parametrize(
+    "method", ["gls", "gravel", "mlem", "maxed", "rmle", "ml_seed"]
+)
 def test_cmd_unfold_exposes_values_and_uncertainties_for_all_methods(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path,
@@ -604,7 +649,9 @@ def test_cmd_unfold_exposes_values_and_uncertainties_for_all_methods(
         assert diagnostics["confidence_score"] >= 0.4
 
 
-def test_cmd_unfold_rejects_negative_measurements(monkeypatch: pytest.MonkeyPatch, tmp_path):
+def test_cmd_unfold_rejects_negative_measurements(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+):
     monkeypatch.setattr(
         app,
         "read_response_bundle",
@@ -688,11 +735,14 @@ def test_gamma_unfolding_paths_cover_public_entrypoints(
     assert np.all(wrapped_result.unfolded_spectrum >= 0.0)
     assert ls_result.uncertainty.shape == gamma_case.true_source.shape
     assert poisson_result.uncertainty.shape == gamma_case.true_source.shape
-    assert _refold_relative_error(
-        gamma_case.response.matrix,
-        poisson_result.solution,
-        gamma_case.counts,
-    ) < 0.3
+    assert (
+        _refold_relative_error(
+            gamma_case.response.matrix,
+            poisson_result.solution,
+            gamma_case.counts,
+        )
+        < 0.3
+    )
 
 
 def test_gamma_unfolding_paths_reject_negative_counts(

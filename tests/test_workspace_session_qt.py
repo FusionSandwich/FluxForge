@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
+from fluxforge.core.analysis_workspace import detect_peak_candidates
 from fluxforge.core.workspace_document import (
     AnalysisROI,
     CalibrationModel,
@@ -76,6 +78,17 @@ def test_save_and_open_session_replaces_complete_workspace(tmp_path: Path) -> No
     try:
         spectrum_id = window.analysis_workspace.document.active_spectrum_id
         assert spectrum_id is not None
+        detected_peaks = detect_peak_candidates(window.analysis_workspace.spectrum())
+        assert detected_peaks
+        assert detected_peaks[0].net_counts_uncertainty is not None
+        window.analysis_workspace.replace_peaks(
+            (
+                replace(
+                    detected_peaks[0],
+                    net_counts_uncertainty=3.25,
+                ),
+            )
+        )
         roi = AnalysisROI(
             roi_id="saved-roi",
             spectrum_id=spectrum_id,
@@ -117,6 +130,7 @@ def test_save_and_open_session_replaces_complete_workspace(tmp_path: Path) -> No
         target = tmp_path / "complete.ffs"
         assert window.save_session(target)
         persisted = read_ffs_session(target).document
+        assert persisted.peaks[0].net_counts_uncertainty == pytest.approx(3.25)
         assert persisted.roi_by_id("saved-roi") == roi
         assert persisted.detector_profile_by_id("saved-detector") == profile
         assert persisted.viewport_by_id("primary-spectrum").log_y is True
@@ -137,6 +151,9 @@ def test_save_and_open_session_replaces_complete_workspace(tmp_path: Path) -> No
         loaded_payload.pop("updated_at")
         persisted_payload.pop("updated_at")
         assert loaded_payload == persisted_payload
+        assert window.analysis_workspace.state.peaks[
+            0
+        ].net_counts_uncertainty == pytest.approx(3.25)
         assert window._session_path == target.resolve()
         assert window._document_dirty is False
         assert window.undo_stack.isClean()

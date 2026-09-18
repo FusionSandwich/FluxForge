@@ -79,7 +79,7 @@ class ReportingEngine:
             ) from _JINJA2_IMPORT_ERROR
         self._environment = Environment(
             loader=FileSystemLoader(str(self.template_dir)),
-            autoescape=select_autoescape(["html", "xml"]),
+            autoescape=select_autoescape(["html", "xml", "html.j2", "xml.j2"]),
         )
         return self._environment
 

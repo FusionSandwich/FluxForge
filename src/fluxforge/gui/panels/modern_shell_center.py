@@ -151,16 +151,28 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             history = self._history_spectra() or (active,)
             roi_bounds = self._selected_roi_bounds()
-            count_forecast = estimate_count_target_forecast(
-                active,
-                roi_bounds_keV=roi_bounds,
-                target_counts=float(self.target_counts_spin.value()),
-                history_spectra=history,
-            )
-            dead_time_forecast = estimate_dead_time_forecast(history)
-            recalibration_forecast = estimate_recalibration_forecast(
-                self.qa_monitor.history()
-            )
+            try:
+                count_forecast = estimate_count_target_forecast(
+                    active,
+                    roi_bounds_keV=roi_bounds,
+                    target_counts=float(self.target_counts_spin.value()),
+                    history_spectra=history,
+                )
+                dead_time_forecast = estimate_dead_time_forecast(history)
+                recalibration_forecast = estimate_recalibration_forecast(
+                    self.qa_monitor.history()
+                )
+            except Exception:
+                # Forecasting is advisory.  A bad history point or numerical
+                # failure must not escape a workspace notification and turn a
+                # successfully loaded spectrum into a failed open operation.
+                self.metrics_browser.setHtml(
+                    "<p>Active spectrum loaded; predictive metrics are unavailable.</p>"
+                )
+                self.summary_browser.setHtml(
+                    "<p>No predictive forecast is available for the current history.</p>"
+                )
+                return
 
             input_rate = float(
                 active.metadata.get("input_count_rate_cps", active.count_rate)
@@ -594,26 +606,33 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             overlay = overlay_slot.spectrum if overlay_slot is not None else None
             traces: list[SpectrumTrace] = []
             if foreground is not None:
+                foreground_label = (
+                    foreground_slot.source_label
+                    if foreground_slot is not None and foreground_slot.source_label
+                    else "Foreground"
+                )
+                primary_label = foreground_label
                 primary_counts = np.asarray(foreground.counts, dtype=float)
                 if (
                     background is not None
                     and state.active_spectrum_key != "background"
                     and state.background_mode in {"simple", "scaled", "statistical"}
                 ):
-                    primary_counts = subtract_background_counts(
-                        foreground,
-                        background,
-                        mode=state.background_mode,
-                        scale=state.background_scale,
-                    )
+                    try:
+                        primary_counts = subtract_background_counts(
+                            foreground,
+                            background,
+                            mode=state.background_mode,
+                            scale=state.background_scale,
+                        )
+                    except ValueError as exc:
+                        detail = " ".join(str(exc).split())
+                        primary_label = (
+                            f"{foreground_label} — background not applied: {detail}"
+                        )
                 traces.append(
                     SpectrumTrace(
-                        label=(
-                            foreground_slot.source_label
-                            if foreground_slot is not None
-                            and foreground_slot.source_label
-                            else "Foreground"
-                        ),
+                        label=primary_label,
                         counts=tuple(float(value) for value in primary_counts),
                         channels=tuple(
                             float(value)

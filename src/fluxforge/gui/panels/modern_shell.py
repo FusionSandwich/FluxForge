@@ -688,6 +688,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 significance=peak.significance,
                 roi_bounds_keV=peak.roi_bounds_keV,
                 net_counts=peak.net_counts,
+                net_counts_uncertainty=peak.net_counts_uncertainty,
                 fit_quality=peak.fit_quality,
                 status=peak.status,
                 nuclide=peak.nuclide,
@@ -1444,6 +1445,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     custom_gamma_path=custom_gamma_path,
                     dead_time_fraction=float(
                         getattr(spectrum, "dead_time_fraction", 0.0) or 0.0
+                    ),
+                    real_time_s=(
+                        float(spectrum.real_time)
+                        if float(spectrum.real_time) > 0.0
+                        else None
                     ),
                 )
             except Exception as exc:

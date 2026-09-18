@@ -165,6 +165,7 @@ from fluxforge.io.genie import read_genie_spectrum
 from fluxforge.io.spe import GammaSpectrum, read_spe_file
 from fluxforge.plots.activation import plot_decay_curves
 from fluxforge.physics.activation import (
+    GammaLineMeasurement,
     IrradiationSegment,
     activation_study_metrics,
     irradiation_buildup_factor,
@@ -1099,11 +1100,16 @@ def _load_spectrum_from_path(
             energy_calibration_override=energy_override,
             efficiency_override=efficiency_override,
         )
-    else:
+    elif suffix in {".json", ".yaml", ".yml"}:
         payload = read_spectrum_file(input_path)
         if validate:
             validate_or_raise(payload)
         spectrum = GammaSpectrum.from_dict(payload["spectrum"])
+
+    else:
+        from fluxforge.io.reader_factory import read_spectrum_any
+
+        spectrum = read_spectrum_any(input_path)
 
     return _apply_overrides_to_spectrum(
         spectrum,
@@ -2041,6 +2047,7 @@ def cmd_spectrum_plot(args: argparse.Namespace) -> None:
                 peak_report_output,
                 spectrum_id=raw_spectrum.spectrum_id,
                 live_time_s=raw_spectrum.live_time,
+                real_time_s=raw_spectrum.real_time,
                 peaks=peaks,
                 source_path=args.input,
             )
@@ -2096,6 +2103,7 @@ def cmd_peaks(args: argparse.Namespace) -> None:
                 args.output,
                 spectrum_id=raw_spectrum.spectrum_id,
                 live_time_s=raw_spectrum.live_time,
+                real_time_s=raw_spectrum.real_time,
                 peaks=peaks,
                 source_path=args.spectrum_file,
             )
@@ -2136,7 +2144,7 @@ def cmd_peaks(args: argparse.Namespace) -> None:
                 "left_energy_keV": peak.roi_bounds_keV[0],
                 "right_energy_keV": peak.roi_bounds_keV[1],
                 "net_counts": peak.net_counts,
-                "net_counts_unc": np.sqrt(max(peak.net_counts, 0.0)),
+                "net_counts_uncertainty": peak.net_counts_uncertainty,
                 "significance": peak.significance,
                 "fit_quality": peak.fit_quality,
                 "peak_search_method": method,
@@ -2147,6 +2155,7 @@ def cmd_peaks(args: argparse.Namespace) -> None:
             args.output,
             spectrum_id=spectrum.spectrum_id,
             live_time_s=spectrum.live_time,
+            real_time_s=spectrum.real_time,
             peaks=peak_payload,
             source_path=args.spectrum_file,
         )
@@ -2175,6 +2184,8 @@ def cmd_peaks(args: argparse.Namespace) -> None:
             "raw_counts": peak.raw_counts,
             "sigma_keV": peak.sigma_keV,
             "area": peak.area,
+            "area_uncertainty": peak.area_uncertainty,
+            "is_fitted": peak.is_fitted,
             "region": peak.region,
             "is_report": peak.is_report,
             "report_isotope": peak.report_isotope,
@@ -2188,6 +2199,7 @@ def cmd_peaks(args: argparse.Namespace) -> None:
         args.output,
         spectrum_id=spectrum.spectrum_id,
         live_time_s=spectrum.live_time,
+        real_time_s=spectrum.real_time,
         peaks=peak_payload,
         source_path=args.spectrum_file,
     )
@@ -2971,19 +2983,37 @@ def cmd_activity(args: argparse.Namespace) -> None:
     peak_report = read_peak_report(args.peaks_file)
     if args.validate:
         validate_or_raise(peak_report)
-    live_time_s = peak_report.get("live_time_s") or args.live_time_s
+    live_time_s = peak_report.get("live_time_s")
+    if live_time_s is None:
+        live_time_s = args.live_time_s
     if live_time_s is None:
         raise ValueError("Live time is required to compute activities.")
 
     lines = []
     for idx, peak in enumerate(peak_report["peaks"]):
-        net_counts = peak.get("area") or peak.get("raw_counts") or peak.get("amplitude")
+        net_counts = next((peak[key] for key in ("area", "net_counts")
+                           if peak.get(key) is not None), None)
+        area_uncertainty = next((peak[key] for key in (
+            "net_counts_uncertainty", "area_uncertainty", "net_counts_unc"
+        ) if peak.get(key) is not None), None)
+        if net_counts is None or area_uncertainty is None:
+            raise ValueError("Activity requires net peak area and its uncertainty; refit the peak.")
+        net_counts = float(net_counts)
+        area_uncertainty = float(area_uncertainty)
+        if not np.isfinite(area_uncertainty) or area_uncertainty <= 0:
+            raise ValueError("Net-area uncertainty must be finite and positive.")
         efficiency = args.efficiency
         emission_probability = args.emission_probability
-        activity = net_counts / max(
-            efficiency * emission_probability * live_time_s, 1e-12
+        cooling_time = getattr(args, "cooling_time_s", None)
+        measurement = GammaLineMeasurement(
+            net_counts=net_counts, live_time_s=float(live_time_s),
+            real_time_s=peak_report.get("real_time_s"),
+            efficiency=efficiency, gamma_intensity=emission_probability,
+            half_life_s=args.half_life_s,
+            cooling_time_s=0.0 if cooling_time is None else float(cooling_time),
         )
-        activity_unc = activity / np.sqrt(max(net_counts, 1e-12))
+        activity = measurement.activity_at_reference()
+        activity_unc = area_uncertainty * measurement.activity_per_net_count_at_reference()
         isotope = peak.get("report_isotope") or args.isotope or "unknown"
         reaction_id = args.reaction_id or isotope or f"reaction_{idx + 1}"
         line = {
@@ -2996,6 +3026,12 @@ def cmd_activity(args: argparse.Namespace) -> None:
             "efficiency": efficiency,
             "emission_probability": emission_probability,
             "half_life_s": args.half_life_s,
+            "activity_reference": "count_start" if cooling_time is None else "end_of_irradiation",
+            "cooling_time_s": cooling_time,
+            "live_time_s": live_time_s,
+            "real_time_s": measurement.resolved_count_timing()[0],
+            "net_counts_uncertainty": area_uncertainty,
+            "uncertainty_scope": "net-area only; supplied efficiency, emission probability and timing treated as fixed",
         }
         line.update(
             activation_study_metrics(
@@ -3022,7 +3058,9 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
     if args.validate:
         validate_or_raise(peak_report)
 
-    live_time_s = peak_report.get("live_time_s") or args.live_time_s
+    live_time_s = peak_report.get("live_time_s")
+    if live_time_s is None:
+        live_time_s = args.live_time_s
     if live_time_s is None:
         raise ValueError("Live time is required to review activities.")
 
@@ -3032,8 +3070,31 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
         if not isinstance(peak, dict):
             continue
         energy_keV = float(peak.get("energy_keV", 0.0) or 0.0)
-        net_counts = float(
-            peak.get("area") or peak.get("raw_counts") or peak.get("amplitude") or 0.0
+        net_counts_value = next(
+            (
+                peak[key]
+                for key in ("area", "net_counts")
+                if peak.get(key) is not None
+            ),
+            None,
+        )
+        if net_counts_value is None:
+            raise ValueError(
+                f"Peak {peak.get('peak_id') or index + 1!r} has no net-area counts; "
+                "peak amplitude cannot be used as an area."
+            )
+        net_counts = float(net_counts_value)
+        net_counts_uncertainty = next(
+            (
+                peak[key]
+                for key in (
+                    "net_counts_uncertainty",
+                    "area_uncertainty",
+                    "net_counts_unc",
+                )
+                if peak.get(key) is not None
+            ),
+            None,
         )
         isotope = (
             str(peak.get("report_isotope") or peak.get("isotope") or "").strip() or None
@@ -3049,6 +3110,11 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
                     float(peak.get("right_keV", energy_keV + tolerance_keV)),
                 ),
                 net_counts=net_counts,
+                net_counts_uncertainty=(
+                    float(net_counts_uncertainty)
+                    if net_counts_uncertainty is not None
+                    else None
+                ),
                 fit_quality=float(
                     peak.get("reduced_chi_squared") or peak.get("fit_quality") or 1.0
                 ),
@@ -3069,7 +3135,16 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
             else None
         ),
         energy_tolerance_keV=float(args.energy_tolerance_keV),
-        dead_time_fraction=float(getattr(args, "dead_time_fraction", 0.0) or 0.0),
+        dead_time_fraction=(
+            float(args.dead_time_fraction)
+            if getattr(args, "dead_time_fraction", None) is not None
+            else None
+        ),
+        real_time_s=(
+            float(peak_report["real_time_s"])
+            if peak_report.get("real_time_s") is not None
+            else None
+        ),
         sample_mass_g=getattr(args, "sample_mass_g", None),
     )
 
@@ -3978,9 +4053,18 @@ def cmd_rates(args: argparse.Namespace) -> None:
     segment_objs = [IrradiationSegment(**seg) for seg in segments]
     rates = []
     for idx, line in enumerate(line_payload["lines"]):
+        if line.get("activity_reference") != "end_of_irradiation":
+            raise ValueError("Reaction rates require activity explicitly referenced to end_of_irradiation.")
         half_life_s = line.get("half_life_s", args.half_life_s)
         rate_estimate = reaction_rate_from_activity(
-            line["activity_Bq"], segment_objs, half_life_s
+            line["activity_Bq"],
+            segment_objs,
+            half_life_s,
+            activity_uncertainty=(
+                float(line["activity_unc_Bq"])
+                if line.get("activity_unc_Bq") is not None
+                else None
+            ),
         )
         reaction_id = (
             line.get("reaction_id") or line.get("isotope") or f"reaction_{idx + 1}"
@@ -6853,9 +6937,11 @@ def build_parser() -> argparse.ArgumentParser:
     activity.add_argument("--peaks-file", type=Path, required=True)
     activity.add_argument("--output", type=Path, default=Path("activities.json"))
     activity.add_argument("--live-time-s", type=float)
-    activity.add_argument("--efficiency", type=float, default=1.0)
-    activity.add_argument("--emission-probability", type=float, default=1.0)
-    activity.add_argument("--half-life-s", type=float, default=1.0)
+    activity.add_argument("--efficiency", type=float, required=True)
+    activity.add_argument("--emission-probability", type=float, required=True)
+    activity.add_argument("--half-life-s", type=float, required=True)
+    activity.add_argument("--cooling-time-s", type=float,
+                         help="Verified interval from end of irradiation to count start; omit for count-start activity.")
     activity.add_argument("--sample-mass-g", type=float)
     activity.add_argument("--isotope", type=str)
     activity.add_argument("--reaction-id", type=str)
@@ -6874,7 +6960,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     activity_review.add_argument("--live-time-s", type=float)
     activity_review.add_argument("--cooling-time-s", type=float, default=0.0)
-    activity_review.add_argument("--dead-time-fraction", type=float, default=0.0)
+    activity_review.add_argument("--dead-time-fraction", type=float, default=None)
     activity_review.add_argument("--energy-tolerance-keV", type=float, default=2.0)
     activity_review.add_argument(
         "--source-id",

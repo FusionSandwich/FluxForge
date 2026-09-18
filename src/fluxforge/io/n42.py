@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import re
 import base64
-import struct
 from dataclasses import dataclass, field
 from datetime import datetime
 from importlib import resources
@@ -230,47 +229,48 @@ def _parse_numeric_values(text: str) -> Optional[List[float]]:
 def _parse_channel_data(
     data_elem: ET.Element, namespaces: Dict[str, str]
 ) -> np.ndarray:
+    """Decode explicit numeric counts or the legacy explicit Base64 extension.
+
+    N42 compressionCode=None means numeric text, never inferred binary data.
+    CountedZeroes is defined by the NIST schema; other compression is rejected.
     """
-    Parse channel data from N42 element.
-
-    N42 supports multiple encodings:
-    - Space-separated integers
-    - Base64 encoded binary
-    - Compressed formats
-    """
-    if data_elem is None or data_elem.text is None:
-        return np.array([])
-
-    # Check for compression attribute
-    compression = data_elem.get("compressionCode", "")
-
-    # Get raw text
+    if data_elem is None or not data_elem.text or not data_elem.text.strip():
+        raise ValueError("N42 ChannelData is empty or missing.")
     text = data_elem.text.strip()
-
-    if not text:
-        return np.array([])
-
-    # Check if base64 encoded
-    # Base64 typically has no spaces and specific character set
-    is_base64 = not any(c.isspace() for c in text[:100]) and len(text) > 100
-
-    if is_base64 or compression.lower() in ["none", "base64"]:
+    compression = data_elem.get("compressionCode", "None").lower()
+    if compression == "base64":
         try:
-            # Try base64 decode
-            binary_data = base64.b64decode(text)
-            # Assume 4-byte unsigned integers (common for gamma spectra)
-            n_values = len(binary_data) // 4
-            counts = struct.unpack(f"<{n_values}I", binary_data[: n_values * 4])
-            return np.array(counts, dtype=np.float64)
-        except Exception:
-            pass
-
-    # Try space/comma separated counts
-    counts = _parse_numeric_values(text)
-    if counts is not None:
-        return np.array(counts, dtype=np.float64)
-
-    return np.array([])
+            binary = base64.b64decode("".join(text.split()), validate=True)
+        except Exception as exc:
+            raise ValueError("Invalid legacy N42 Base64 channel data.") from exc
+        if not binary or len(binary) % 4:
+            raise ValueError(
+                "Legacy N42 Base64 data must contain complete uint32 values."
+            )
+        return np.frombuffer(binary, dtype="<u4").astype(float)
+    if compression not in {"", "none", "countedzeroes"}:
+        raise ValueError(f"Unsupported N42 compressionCode: {compression}")
+    values = _parse_numeric_values(text)
+    if not values or not np.all(np.isfinite(values)):
+        raise ValueError("Invalid numeric N42 ChannelData.")
+    if compression != "countedzeroes":
+        return np.asarray(values, dtype=float)
+    counts = []
+    index = 0
+    while index < len(values):
+        value = values[index]
+        index += 1
+        if value == 0:
+            if index == len(values):
+                raise ValueError("CountedZeroes requires a run length after zero.")
+            repeat = values[index]
+            index += 1
+            if repeat < 1 or repeat != int(repeat) or len(counts) + repeat > 16_777_216:
+                raise ValueError("Invalid or unsupported CountedZeroes run length.")
+            counts.extend([0.0] * int(repeat))
+        else:
+            counts.append(value)
+    return np.asarray(counts, dtype=float)
 
 
 def _parse_calibration(
@@ -287,8 +287,9 @@ def _parse_calibration(
 
     if coef_elem is not None and coef_elem.text:
         coeffs = _parse_numeric_values(coef_elem.text)
-        if coeffs is not None:
+        if coeffs and np.all(np.isfinite(coeffs)):
             return tuple(coeffs)
+        raise ValueError("Invalid N42 calibration coefficients.")
 
     # Try individual coefficient elements
     coeffs = []
@@ -305,11 +306,14 @@ def _parse_calibration(
     if coeffs:
         return tuple(coeffs)
 
-    return (0.0, 1.0)
+    raise ValueError("Unsupported or empty N42 energy calibration.")
 
 
 def _parse_measurement(
-    meas_elem: ET.Element, namespaces: Dict[str, str]
+    meas_elem: ET.Element,
+    namespaces: Dict[str, str],
+    spectrum_elem: Optional[ET.Element] = None,
+    calibrations: Optional[Dict[str, ET.Element]] = None,
 ) -> N42Measurement:
     """Parse a single measurement element."""
     measurement = N42Measurement()
@@ -318,7 +322,8 @@ def _parse_measurement(
     measurement.spectrum_id = meas_elem.get("id", "")
 
     # Find spectrum element
-    spectrum_elem = _find_element(meas_elem, "Spectrum", namespaces)
+    if spectrum_elem is None:
+        spectrum_elem = _find_element(meas_elem, "Spectrum", namespaces)
     if spectrum_elem is None:
         spectrum_elem = _find_element(meas_elem, "ChannelData", namespaces)
 
@@ -340,6 +345,8 @@ def _parse_measurement(
         real_time_str = _get_text(spectrum_elem, "RealTimeDuration", namespaces)
         if not real_time_str:
             real_time_str = _get_text(spectrum_elem, "RealTime", namespaces)
+        if not real_time_str:
+            real_time_str = _get_text(meas_elem, "RealTimeDuration", namespaces)
         if real_time_str:
             measurement.real_time = _parse_duration(real_time_str)
 
@@ -352,6 +359,17 @@ def _parse_measurement(
     cal_elem = _find_element(meas_elem, "EnergyCalibration", namespaces)
     if cal_elem is None:
         cal_elem = _find_element(meas_elem, "Calibration", namespaces)
+    if spectrum_elem is not None:
+        nested = _find_element(spectrum_elem, "EnergyCalibration", namespaces)
+        if nested is not None:
+            cal_elem = nested
+        reference = spectrum_elem.get("energyCalibrationReference")
+        if reference:
+            if calibrations is None or reference not in calibrations:
+                raise ValueError(
+                    f"Unresolved N42 energy calibration reference: {reference}"
+                )
+            cal_elem = calibrations[reference]
     measurement.energy_calibration = _parse_calibration(cal_elem, namespaces)
 
     # Get detector information
@@ -384,9 +402,7 @@ def _parse_measurement(
         meas_elem, "MeasurementLocationDescription", namespaces
     )
     if location_description:
-        measurement.metadata["measurement_location_description"] = (
-            location_description
-        )
+        measurement.metadata["measurement_location_description"] = location_description
 
     geo_elem = _find_element(meas_elem, "GeographicPoint", namespaces)
     if geo_elem is not None:
@@ -416,7 +432,7 @@ def n42_2012_schema_path() -> Path:
 
 
 def validate_n42_file(filepath: Union[str, Path]) -> tuple[bool, list[str]]:
-    """Validate an N42 file against the bundled FluxForge 2012 schema."""
+    """Validate the FluxForge export subset, not full official N42 compliance."""
 
     if not LXML_AVAILABLE:
         raise RuntimeError("lxml is required for N42 schema validation.")
@@ -623,10 +639,25 @@ def read_n42_file(
             # Wrap in a pseudo-measurement element
             meas_elems.append(spec_elem)
 
+    calibrations = {}
+    for element in _find_all_elements(root, "EnergyCalibration", namespaces):
+        identifier = element.get("id")
+        if identifier:
+            if identifier in calibrations:
+                raise ValueError(f"Duplicate N42 energy calibration ID: {identifier}")
+            calibrations[identifier] = element
     for meas_elem in meas_elems:
-        measurement = _parse_measurement(meas_elem, namespaces)
-        if measurement.n_channels > 0:
-            doc.measurements.append(measurement)
+        spectra = _find_all_elements(meas_elem, "Spectrum", namespaces)
+        if meas_elem.tag.split("}")[-1] == "Spectrum":
+            spectra = [meas_elem]
+        for spec_elem in spectra or [None]:
+            measurement = _parse_measurement(
+                meas_elem, namespaces, spec_elem, calibrations
+            )
+            if len(spectra) > 1 and spec_elem is not None:
+                measurement.spectrum_id = spec_elem.get("id", measurement.spectrum_id)
+            if measurement.n_channels > 0:
+                doc.measurements.append(measurement)
 
     if verbose:
         print(f"  Spectra found: {doc.n_spectra}")
@@ -734,13 +765,23 @@ def write_n42_file(
 
     # Add measurements
     for i, meas in enumerate(measurements):
+        counts = np.asarray(meas.counts)
+        if (
+            counts.ndim != 1
+            or not counts.size
+            or not np.all(np.isfinite(counts))
+            or np.any(counts < 0)
+            or np.any(counts != np.floor(counts))
+        ):
+            raise ValueError(
+                "N42 export requires finite nonnegative integer counts; "
+                "use a spectrum artifact for processed data."
+            )
         meas_elem = ET.SubElement(root, f"{{{ns}}}RadMeasurement")
         meas_elem.set("id", meas.spectrum_id or f"Measurement{i}")
 
         class_elem = ET.SubElement(meas_elem, f"{{{ns}}}MeasurementClassCode")
-        class_elem.text = str(
-            meas.metadata.get("measurement_class_code", "Foreground")
-        )
+        class_elem.text = str(meas.metadata.get("measurement_class_code", "Foreground"))
 
         # Start time
         if meas.start_time:
@@ -756,7 +797,7 @@ def write_n42_file(
 
         # Channel data
         data_elem = ET.SubElement(spec_elem, f"{{{ns}}}ChannelData")
-        data_elem.text = " ".join(str(int(c)) for c in meas.counts)
+        data_elem.text = " ".join(str(int(c)) for c in counts)
 
         # Energy calibration
         if len(meas.energy_calibration) > 1:
@@ -786,7 +827,9 @@ def write_n42_file(
     if validate and version == "2012":
         valid, errors = validate_n42_file(filepath)
         if not valid:
-            message = "\n".join(errors) if errors else "Unknown schema validation error."
+            message = (
+                "\n".join(errors) if errors else "Unknown schema validation error."
+            )
             raise ValueError(f"N42 schema validation failed for {filepath}:\n{message}")
     return filepath
 

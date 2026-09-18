@@ -44,9 +44,12 @@ def test_fe_cd_example_cli_flow():
     rate_uncertainties = []
     for reaction in measurements["reactions"]:
         gamma_lines = [GammaLineMeasurement(**gl) for gl in reaction["gamma_lines"]]
-        activity, _ = weighted_activity(gamma_lines)
+        activity, activity_uncertainty = weighted_activity(gamma_lines)
         rate_estimate = reaction_rate_from_activity(
-            activity, segments, reaction["half_life_s"]
+            activity,
+            segments,
+            reaction["half_life_s"],
+            activity_uncertainty=activity_uncertainty,
         )
         measured_rates.append(rate_estimate.rate)
         rate_uncertainties.append(rate_estimate.uncertainty)

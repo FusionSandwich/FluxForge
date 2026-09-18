@@ -65,13 +65,31 @@
     "gammaSpectrum": {
       "type": "object",
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "counts": {
+                "contains": {"type": "number", "exclusiveMaximum": 0}
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "counts_uncertainty": {
+                "$ref": "#/$defs/nonNegativeNumberArray"
+              }
+            }
+          }
+        }
+      ],
       "required": [
         "counts", "counts_uncertainty", "channels", "energies", "live_time",
         "real_time", "start_time", "spectrum_id", "detector_id", "calibration",
         "source_type", "device_id", "device_label", "gps", "metadata"
       ],
       "properties": {
-        "counts": {"$ref": "#/$defs/nonNegativeNumberArray"},
+        "counts": {"$ref": "#/$defs/numberArray"},
         "counts_uncertainty": {
           "anyOf": [{"$ref": "#/$defs/nonNegativeNumberArray"}, {"type": "null"}]
         },
@@ -199,6 +217,9 @@
         "manual_overrides": {"$ref": "#/$defs/jsonObject"},
         "provenance": {"$ref": "#/$defs/jsonObject"},
         "net_counts": {"$ref": "#/$defs/finiteNumber"},
+        "net_counts_uncertainty": {
+          "anyOf": [{"$ref": "#/$defs/nonNegativeNumber"}, {"type": "null"}]
+        },
         "significance": {"$ref": "#/$defs/nonNegativeNumber"},
         "fit_quality": {"$ref": "#/$defs/nonNegativeNumber"},
         "candidate_nuclides": {"type": "array", "items": {"$ref": "#/$defs/nonEmptyString"}},

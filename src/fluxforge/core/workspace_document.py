@@ -231,10 +231,17 @@ def _validate_spectrum_payload(value: Any, path: str) -> dict[str, Any]:
     _reject_unknown(data, allowed, path)
     if "counts" not in data:
         raise WorkspaceValidationError(f"{path}.counts", "is required")
+    signed_counts = False
     for name in ("counts", "channels"):
         for index, item in enumerate(_sequence(data.get(name, ()), f"{path}.{name}")):
-            minimum = 0.0 if name == "counts" else None
-            _number(item, f"{path}.{name}[{index}]", minimum=minimum)
+            number = _number(item, f"{path}.{name}[{index}]")
+            if name == "counts" and number < 0.0:
+                signed_counts = True
+    if signed_counts and data.get("counts_uncertainty") is None:
+        raise WorkspaceValidationError(
+            f"{path}.counts_uncertainty",
+            "is required when counts contain negative values",
+        )
     for name in ("counts_uncertainty", "energies"):
         raw = data.get(name)
         if raw is None:
@@ -292,10 +299,6 @@ class WorkspaceSpectrum:
         if counts.ndim != 1 or not np.all(np.isfinite(counts)):
             raise WorkspaceValidationError(
                 f"{path}.spectrum.counts", "must be a finite one-dimensional array"
-            )
-        if np.any(counts < 0.0):
-            raise WorkspaceValidationError(
-                f"{path}.spectrum.counts", "must not contain negative counts"
             )
         if (
             uncertainty.shape != counts.shape
@@ -689,6 +692,7 @@ class PeakModel:
     manual_overrides: Mapping[str, Any] = field(default_factory=dict)
     provenance: Mapping[str, Any] = field(default_factory=dict)
     net_counts: float = 0.0
+    net_counts_uncertainty: float | None = None
     significance: float = 0.0
     fit_quality: float = 0.0
     candidate_nuclides: tuple[str, ...] = ()
@@ -713,6 +717,11 @@ class PeakModel:
         # Background-subtracted net areas may be negative.  Preserve them so an
         # analyst can review the invalid/non-detection state instead of clipping.
         _number(self.net_counts, f"{path}.net_counts")
+        _optional_number(
+            self.net_counts_uncertainty,
+            f"{path}.net_counts_uncertainty",
+            minimum=0.0,
+        )
         _number(self.significance, f"{path}.significance", minimum=0.0)
         _number(self.fit_quality, f"{path}.fit_quality", minimum=0.0)
         component_ids = [component.component_id for component in self.components]
@@ -759,6 +768,7 @@ class PeakModel:
             "manual_overrides": _thaw_json(self.manual_overrides),
             "provenance": _thaw_json(self.provenance),
             "net_counts": self.net_counts,
+            "net_counts_uncertainty": self.net_counts_uncertainty,
             "significance": self.significance,
             "fit_quality": self.fit_quality,
             "candidate_nuclides": list(self.candidate_nuclides),
@@ -784,6 +794,7 @@ class PeakModel:
             "manual_overrides",
             "provenance",
             "net_counts",
+            "net_counts_uncertainty",
             "significance",
             "fit_quality",
             "candidate_nuclides",
@@ -820,6 +831,11 @@ class PeakModel:
             ),
             provenance=_mapping(data.get("provenance", {}), "peak.provenance"),
             net_counts=_number(data.get("net_counts", 0.0), "peak.net_counts"),
+            net_counts_uncertainty=_optional_number(
+                data.get("net_counts_uncertainty"),
+                "peak.net_counts_uncertainty",
+                minimum=0.0,
+            ),
             significance=_number(
                 data.get("significance", 0.0), "peak.significance", minimum=0.0
             ),

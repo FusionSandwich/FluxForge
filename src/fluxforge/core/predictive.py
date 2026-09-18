@@ -71,6 +71,8 @@ def _fit_linear_trend(xs: Sequence[float], ys: Sequence[float]) -> LinearTrendFi
     x_values = np.asarray(tuple(xs), dtype=float)
     y_values = np.asarray(tuple(ys), dtype=float)
     sample_count = int(min(x_values.size, y_values.size))
+    x_values = x_values[:sample_count]
+    y_values = y_values[:sample_count]
     if sample_count <= 1:
         intercept = float(y_values[0]) if sample_count == 1 else 0.0
         return LinearTrendFit(
@@ -81,18 +83,33 @@ def _fit_linear_trend(xs: Sequence[float], ys: Sequence[float]) -> LinearTrendFi
             r_squared=1.0 if sample_count == 1 else 0.0,
         )
 
-    slope, intercept = np.polyfit(x_values, y_values, 1)
+    x_mean = float(np.mean(x_values))
+    y_mean = float(np.mean(y_values))
+    x_centered = x_values - x_mean
+    denom = float(np.sum(x_centered**2))
+    if denom <= np.finfo(float).eps * max(float(np.sum(x_values**2)), 1.0):
+        residuals = y_values - y_mean
+        ss_res = float(np.sum(residuals**2))
+        ss_tot = float(np.sum((y_values - y_mean) ** 2))
+        return LinearTrendFit(
+            sample_count=sample_count,
+            slope=0.0,
+            intercept=y_mean,
+            slope_stderr=0.0,
+            r_squared=(
+                1.0 if ss_tot == 0.0 else max(0.0, 1.0 - ss_res / ss_tot)
+            ),
+        )
+
+    slope = float(np.sum(x_centered * (y_values - y_mean)) / denom)
+    intercept = y_mean - slope * x_mean
     fitted = slope * x_values + intercept
     residuals = y_values - fitted
     ss_res = float(np.sum(residuals**2))
     ss_tot = float(np.sum((y_values - np.mean(y_values)) ** 2))
     if sample_count > 2:
-        x_centered = x_values - np.mean(x_values)
-        denom = float(np.sum(x_centered**2))
-        slope_stderr = (
-            float(np.sqrt((ss_res / max(sample_count - 2, 1)) / denom))
-            if denom > 0.0
-            else 0.0
+        slope_stderr = float(
+            np.sqrt((ss_res / max(sample_count - 2, 1)) / denom)
         )
     else:
         slope_stderr = 0.0

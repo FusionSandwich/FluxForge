@@ -50,6 +50,7 @@ PEAK_REPORT_SCHEMA: Dict[str, Any] = {
         "schema": {"const": _schema_id("peak_report")},
         "spectrum_id": {"type": "string"},
         "live_time_s": {"type": "number"},
+        "real_time_s": {"type": ["number", "null"]},
         "peaks": {
             "type": "array",
             "items": {
@@ -62,6 +63,8 @@ PEAK_REPORT_SCHEMA: Dict[str, Any] = {
                     "raw_counts": {"type": "number"},
                     "sigma_keV": {"type": "number"},
                     "area": {"type": "number"},
+                    "area_uncertainty": {"type": ["number", "null"]},
+                    "net_counts_uncertainty": {"type": ["number", "null"]},
                     "region": {"type": "string"},
                     "is_report": {"type": "boolean"},
                     "report_isotope": {"type": "string"},

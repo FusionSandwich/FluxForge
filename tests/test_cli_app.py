@@ -1059,6 +1059,7 @@ def test_cmd_activity_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp
                         "channel": 100,
                         "energy_keV": 1173.23,
                         "area": 12000.0,
+                        "net_counts_uncertainty": 120.0,
                         "report_isotope": "Co60",
                     },
                     {
@@ -1066,6 +1067,7 @@ def test_cmd_activity_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp
                         "channel": 120,
                         "energy_keV": 1332.49,
                         "area": 10000.0,
+                        "net_counts_uncertainty": 105.0,
                         "report_isotope": "Co60",
                     },
                     {
@@ -1073,6 +1075,7 @@ def test_cmd_activity_review_writes_json_csv_and_plot_artifacts(monkeypatch, tmp
                         "channel": 80,
                         "energy_keV": 889.28,
                         "area": 7000.0,
+                        "net_counts_uncertainty": 90.0,
                         "report_isotope": "Sc46",
                     },
                 ],
@@ -1151,6 +1154,7 @@ def test_cmd_activity_review_can_export_reaction_rate_csv(monkeypatch, tmp_path)
                         "channel": 100,
                         "energy_keV": 1173.23,
                         "area": 12000.0,
+                        "net_counts_uncertainty": 120.0,
                         "report_isotope": "Co60",
                     }
                 ],
@@ -2878,6 +2882,8 @@ def test_cmd_peaks_activity_and_rates(monkeypatch, tmp_path):
         raw_counts=10.0,
         sigma_keV=0.1,
         area=12.0,
+        area_uncertainty=2.5,
+        is_fitted=True,
         region=[0, 2],
         is_report=True,
         report_isotope="Co-60",
@@ -2904,6 +2910,8 @@ def test_cmd_peaks_activity_and_rates(monkeypatch, tmp_path):
     )
     assert peak_written["output"] == peak_out
     assert len(peak_written["payload"]["peaks"]) == 1
+    assert peak_written["payload"]["peaks"][0]["area_uncertainty"] == 2.5
+    assert peak_written["payload"]["real_time_s"] == _dummy_spectrum().real_time
 
     def fake_write_line_activities(output, **kwargs):
         lines_written["output"] = output
@@ -2929,6 +2937,7 @@ def test_cmd_peaks_activity_and_rates(monkeypatch, tmp_path):
             efficiency=0.5,
             emission_probability=0.25,
             half_life_s=1.0,
+            cooling_time_s=0.0,
             sample_mass_g=2.0,
             isotope=None,
             reaction_id=None,
@@ -2990,6 +2999,8 @@ def test_cmd_peaks_passes_fit_window_through_config(monkeypatch, tmp_path):
         raw_counts=10.0,
         sigma_keV=0.1,
         area=12.0,
+        area_uncertainty=2.5,
+        is_fitted=True,
         region=[0, 2],
         is_report=False,
         report_isotope="",
@@ -3030,6 +3041,7 @@ def test_cmd_peaks_parity_method_uses_core_detection(monkeypatch, tmp_path):
         channel=1.2,
         energy_keV=1.2,
         net_counts=42.0,
+        net_counts_uncertainty=4.5,
         roi_bounds_keV=(0.8, 1.6),
         nuclide="Co-60",
         peak_id="peak-1",

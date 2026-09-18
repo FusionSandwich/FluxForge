@@ -10,6 +10,7 @@ from fluxforge.data.nuclear_data_sources import (
     get_nuclear_data_source,
     list_nuclear_data_sources,
     list_registered_user_gamma_sources,
+    load_gamma_identification_source,
     register_user_gamma_source,
     remove_user_gamma_source,
     summarize_nuclear_data_source,
@@ -78,6 +79,7 @@ class DataLibraryManager:
         settings=None,
     ) -> None:
         self._settings = settings
+        self._last_recovery_message: str | None = None
         self._state = self._validated_state(initial_state or self._load_state())
         self._listeners: list[LibraryListener] = []
         if self._settings is not None:
@@ -86,6 +88,12 @@ class DataLibraryManager:
     @property
     def state(self) -> DataLibraryState:
         return self._state
+
+    @property
+    def recovery_message(self) -> str | None:
+        """Describe the most recent automatic library-selection recovery."""
+
+        return self._last_recovery_message
 
     def subscribe(self, listener: LibraryListener) -> None:
         if listener not in self._listeners:
@@ -137,13 +145,15 @@ class DataLibraryManager:
     def _validated_state(self, state: DataLibraryState) -> DataLibraryState:
         """Recover from removed or unavailable user gamma-library selections."""
 
-        custom_paths = [state.custom_gamma_path] if state.custom_gamma_path else ()
         try:
-            get_nuclear_data_source(
-                state.gamma_identification_source_id,
-                custom_paths=custom_paths,
+            self._validate_gamma_selection(state)
+        except Exception as exc:
+            detail = str(exc).strip() or type(exc).__name__
+            self._last_recovery_message = (
+                "The selected gamma library "
+                f"'{state.gamma_identification_source_id}' could not be loaded "
+                f"and was replaced with the bundled library: {detail}"
             )
-        except (KeyError, OSError, ValueError):
             return DataLibraryState(
                 gamma_identification_source_id="fluxforge_bundled_gamma",
                 calibration_source_id=state.calibration_source_id,
@@ -152,7 +162,20 @@ class DataLibraryManager:
                 activation_catalog_source_id=state.activation_catalog_source_id,
                 custom_gamma_path=None,
             )
+        self._last_recovery_message = None
         return state
+
+    def _validate_gamma_selection(self, state: DataLibraryState) -> None:
+        custom_paths = [state.custom_gamma_path] if state.custom_gamma_path else ()
+        record = get_nuclear_data_source(
+            state.gamma_identification_source_id,
+            custom_paths=custom_paths,
+        )
+        if record.kind == "custom-gamma-library":
+            load_gamma_identification_source(
+                state.gamma_identification_source_id,
+                custom_path=state.custom_gamma_path,
+            )
 
     def _save_state(self, state: DataLibraryState) -> None:
         if self._settings is None:
@@ -203,32 +226,34 @@ class DataLibraryManager:
         *,
         custom_gamma_path: str | None = None,
     ) -> DataLibraryState:
-        return self._publish(
-            DataLibraryState(
-                gamma_identification_source_id=source_id,
-                calibration_source_id=self._state.calibration_source_id,
-                naa_monitor_source_id=self._state.naa_monitor_source_id,
-                dosimetry_source_id=self._state.dosimetry_source_id,
-                activation_catalog_source_id=self._state.activation_catalog_source_id,
-                custom_gamma_path=self._normalize_optional_text(
-                    custom_gamma_path
-                    if custom_gamma_path is not None
-                    else self._state.custom_gamma_path
-                ),
-            )
+        next_state = DataLibraryState(
+            gamma_identification_source_id=source_id,
+            calibration_source_id=self._state.calibration_source_id,
+            naa_monitor_source_id=self._state.naa_monitor_source_id,
+            dosimetry_source_id=self._state.dosimetry_source_id,
+            activation_catalog_source_id=self._state.activation_catalog_source_id,
+            custom_gamma_path=self._normalize_optional_text(
+                custom_gamma_path
+                if custom_gamma_path is not None
+                else self._state.custom_gamma_path
+            ),
         )
+        self._validate_gamma_selection(next_state)
+        self._last_recovery_message = None
+        return self._publish(next_state)
 
     def set_custom_gamma_path(self, custom_gamma_path: str | None) -> DataLibraryState:
-        return self._publish(
-            DataLibraryState(
-                gamma_identification_source_id=self._state.gamma_identification_source_id,
-                calibration_source_id=self._state.calibration_source_id,
-                naa_monitor_source_id=self._state.naa_monitor_source_id,
-                dosimetry_source_id=self._state.dosimetry_source_id,
-                activation_catalog_source_id=self._state.activation_catalog_source_id,
-                custom_gamma_path=self._normalize_optional_text(custom_gamma_path),
-            )
+        next_state = DataLibraryState(
+            gamma_identification_source_id=self._state.gamma_identification_source_id,
+            calibration_source_id=self._state.calibration_source_id,
+            naa_monitor_source_id=self._state.naa_monitor_source_id,
+            dosimetry_source_id=self._state.dosimetry_source_id,
+            activation_catalog_source_id=self._state.activation_catalog_source_id,
+            custom_gamma_path=self._normalize_optional_text(custom_gamma_path),
         )
+        self._validate_gamma_selection(next_state)
+        self._last_recovery_message = None
+        return self._publish(next_state)
 
     def set_calibration_source(self, source_id: str) -> DataLibraryState:
         return self._publish(
@@ -463,7 +488,7 @@ class DataLibraryManager:
                     state.get("custom_gamma_path", self._state.custom_gamma_path)
                 ),
             )
-        return self._publish(next_state)
+        return self._publish(self._validated_state(next_state))
 
     def registered_user_gamma_sources(self) -> tuple[NuclearDataSourceRecord, ...]:
         return list_registered_user_gamma_sources()

@@ -15,7 +15,12 @@ AVOGADRO = 6.02214076e23
 
 @dataclass
 class GammaLineMeasurement:
-    """Represents a single gamma-line observation used to infer activity."""
+    """Represents a single gamma-line observation used to infer activity.
+
+    Dead time is treated as a uniform live fraction over the real counting
+    interval.  This is the only timing model available when event timestamps
+    or a time-dependent live-time history are not supplied.
+    """
 
     net_counts: float
     live_time_s: float
@@ -23,25 +28,76 @@ class GammaLineMeasurement:
     gamma_intensity: float
     half_life_s: float
     cooling_time_s: float = 0.0
-    dead_time_fraction: float = 0.0
+    dead_time_fraction: float | None = None
+    real_time_s: float | None = None
+
+    def resolved_count_timing(self) -> tuple[float, float]:
+        """Return ``(real_time_s, live_fraction)`` after consistency checks."""
+
+        live_time = float(self.live_time_s)
+        if not math.isfinite(live_time) or live_time <= 0.0:
+            raise ValueError("Live time must be finite and positive.")
+
+        supplied_fraction = self.dead_time_fraction
+        if supplied_fraction is not None:
+            supplied_fraction = float(supplied_fraction)
+            if not math.isfinite(supplied_fraction) or not 0.0 <= supplied_fraction < 1.0:
+                raise ValueError("Dead-time fraction must be finite and in [0, 1).")
+
+        if self.real_time_s is None:
+            live_fraction = 1.0 - (supplied_fraction or 0.0)
+            return live_time / live_fraction, live_fraction
+
+        real_time = float(self.real_time_s)
+        if not math.isfinite(real_time) or real_time <= 0.0:
+            raise ValueError("Real time must be finite and positive when supplied.")
+        if live_time > real_time and not math.isclose(live_time, real_time, rel_tol=1e-12):
+            raise ValueError("Live time cannot exceed real time.")
+        live_fraction = live_time / real_time
+        if supplied_fraction is not None and not math.isclose(
+            supplied_fraction,
+            1.0 - live_fraction,
+            rel_tol=1e-9,
+            abs_tol=1e-12,
+        ):
+            raise ValueError("Real time is inconsistent with dead-time fraction.")
+        return real_time, live_fraction
+
+    def effective_counting_duration_s(self) -> float:
+        """Return the decay-weighted live exposure under the uniform-live assumption."""
+
+        if not math.isfinite(float(self.half_life_s)) or self.half_life_s <= 0.0:
+            raise ValueError("Half-life must be finite and positive.")
+        real_time, live_fraction = self.resolved_count_timing()
+        decay_const = math.log(2.0) / float(self.half_life_s)
+        decay_integral = -math.expm1(-decay_const * real_time) / decay_const
+        return live_fraction * decay_integral
+
+    def activity_per_net_count_at_reference(self) -> float:
+        """Return the activity conversion factor for one signed net count."""
+
+        efficiency = float(self.efficiency)
+        gamma_intensity = float(self.gamma_intensity)
+        cooling_time = float(self.cooling_time_s)
+        if not math.isfinite(efficiency) or efficiency <= 0.0:
+            raise ValueError("Efficiency must be finite and positive.")
+        if not math.isfinite(gamma_intensity) or gamma_intensity <= 0.0:
+            raise ValueError("Gamma intensity must be finite and positive.")
+        if not math.isfinite(cooling_time) or cooling_time < 0.0:
+            raise ValueError("Cooling time must be finite and non-negative.")
+        exposure = self.effective_counting_duration_s()
+        decay_const = math.log(2.0) / float(self.half_life_s)
+        return math.exp(decay_const * cooling_time) / (
+            efficiency * gamma_intensity * exposure
+        )
 
     def activity_at_reference(self) -> float:
         """Return the activity at the chosen reference (usually EOI)."""
 
-        decay_const = math.log(2.0) / self.half_life_s
-        corrected_counts = self.net_counts / max(1.0 - self.dead_time_fraction, 1e-12)
-        buildup = (1.0 - math.exp(-decay_const * self.live_time_s)) / max(
-            decay_const, 1e-12
-        )
-        if buildup <= 0:
-            raise ValueError("Live time must be positive to compute activity.")
-        activity_at_count_start = corrected_counts / (
-            self.efficiency * self.gamma_intensity * buildup
-        )
-        activity_ref = activity_at_count_start * math.exp(
-            decay_const * self.cooling_time_s
-        )
-        return activity_ref
+        net_counts = float(self.net_counts)
+        if not math.isfinite(net_counts):
+            raise ValueError("Net counts must be finite.")
+        return net_counts * self.activity_per_net_count_at_reference()
 
 
 @dataclass
@@ -57,7 +113,7 @@ class ReactionRateEstimate:
     """Container holding a reaction rate estimate and propagated uncertainty."""
 
     rate: float
-    uncertainty: float
+    uncertainty: float | None
 
 
 def weighted_activity(
@@ -92,7 +148,7 @@ def irradiation_buildup_factor(
     for segment in segments:
         elapsed += segment.duration_s
         segment_term = segment.relative_power * (
-            1.0 - math.exp(-decay_const * segment.duration_s)
+            -math.expm1(-decay_const * segment.duration_s)
         )
         decay_after = math.exp(-decay_const * (total_duration - elapsed))
         factor += segment_term * decay_after
@@ -100,7 +156,10 @@ def irradiation_buildup_factor(
 
 
 def reaction_rate_from_activity(
-    activity_eoi: float, segments: Sequence[IrradiationSegment], half_life_s: float
+    activity_eoi: float,
+    segments: Sequence[IrradiationSegment],
+    half_life_s: float,
+    activity_uncertainty: float | None = None,
 ) -> ReactionRateEstimate:
     if activity_eoi < 0:
         raise ValueError("Activity must be non-negative.")
@@ -108,7 +167,12 @@ def reaction_rate_from_activity(
     if factor <= 0:
         raise ValueError("Irradiation factor must be positive.")
     rate = activity_eoi / factor
-    uncertainty = rate / math.sqrt(max(activity_eoi, 1e-12))
+    uncertainty = None
+    if activity_uncertainty is not None:
+        resolved_uncertainty = float(activity_uncertainty)
+        if not math.isfinite(resolved_uncertainty) or resolved_uncertainty < 0.0:
+            raise ValueError("Activity uncertainty must be finite and non-negative.")
+        uncertainty = resolved_uncertainty / factor
     return ReactionRateEstimate(rate=rate, uncertainty=uncertainty)
 
 

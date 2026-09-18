@@ -111,6 +111,7 @@ def _rich_document() -> WorkspaceDocument:
         tags=("reviewed",),
         status="accepted",
         net_counts=10.0,
+        net_counts_uncertainty=1.5,
         significance=3.2,
         fit_quality=1.1,
         normalized_residuals=(-0.2, 0.1),
@@ -197,6 +198,16 @@ def test_workspace_document_v2_rich_json_round_trip() -> None:
     assert restored.spectra[0].spectrum.counts.tolist() == [0.0, 4.0, 9.0, 1.0]
     assert restored.detector_profiles[0].efficiency_model is not None
     assert restored.viewports[0].selected_roi_id == "roi-1"
+    assert restored.peaks[0].net_counts_uncertainty == pytest.approx(1.5)
+
+
+def test_legacy_peak_without_net_counts_uncertainty_requires_refit() -> None:
+    payload = _rich_document().to_dict()
+    payload["peaks"][0].pop("net_counts_uncertainty")
+
+    restored = WorkspaceDocument.from_dict(payload)
+
+    assert restored.peaks[0].net_counts_uncertainty is None
 
 
 def test_empty_workspace_round_trip_is_valid() -> None:

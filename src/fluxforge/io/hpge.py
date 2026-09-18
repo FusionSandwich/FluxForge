@@ -295,8 +295,7 @@ def read_chn_file(filepath: Union[str, Path]) -> CHNSpectrum:
         # Standard ORTEC format
         return _parse_ortec_chn(data, filepath)
     else:
-        # Try Maestro/alternative format
-        return _parse_maestro_chn(data, filepath)
+        raise ValueError(f"Unsupported CHN header type: {header_check}; expected ORTEC -1.")
 
 
 def _parse_ortec_chn(data: bytes, filepath: Path) -> CHNSpectrum:
@@ -334,25 +333,13 @@ def _parse_ortec_chn(data: bytes, filepath: Path) -> CHNSpectrum:
         channel_offset = struct.unpack("<H", data[28:30])[0]
         n_channels = struct.unpack("<H", data[30:32])[0]
 
-        # Validate n_channels
-        if n_channels == 0 or n_channels > 32768:
-            # Try common values
-            file_size = len(data)
-            for test_channels in [4096, 8192, 2048, 16384]:
-                expected_size = 32 + test_channels * 4
-                if abs(file_size - expected_size) < 256:
-                    n_channels = test_channels
-                    break
-            else:
-                n_channels = (len(data) - 32) // 4
-
-        # Read channel data (32-bit integers)
+        if n_channels == 0:
+            raise ValueError("CHN declares zero channels; channel count cannot be inferred.")
         data_start = 32
-        counts = np.zeros(n_channels, dtype=np.int32)
-        for i in range(n_channels):
-            offset = data_start + i * 4
-            if offset + 4 <= len(data):
-                counts[i] = struct.unpack("<I", data[offset : offset + 4])[0]
+        data_end = data_start + n_channels * 4
+        if len(data) < data_end:
+            raise ValueError("Truncated CHN channel payload.")
+        counts = np.frombuffer(data, dtype="<u4", count=n_channels, offset=data_start).copy()
 
         # Parse date/time if available
         start_time = None
@@ -410,106 +397,6 @@ def _parse_ortec_chn(data: bytes, filepath: Path) -> CHNSpectrum:
 
     except Exception as e:
         raise ValueError(f"Failed to parse ORTEC CHN file: {e}") from e
-
-
-def _parse_maestro_chn(data: bytes, filepath: Path) -> CHNSpectrum:
-    """Parse Maestro-style CHN file."""
-
-    # Maestro CHN has slightly different header structure
-    # Try to detect based on file structure
-
-    # Common structure:
-    # 0-1: Version or type indicator
-    # 2-3: Number of channels
-    # 4-7: Live time (32-bit, units vary)
-    # 8-11: Real time (32-bit, units vary)
-
-    try:
-        # Try version indicator
-        version = struct.unpack("<H", data[0:2])[0]
-        n_channels = struct.unpack("<H", data[2:4])[0]
-
-        # Validate n_channels
-        if n_channels == 0 or n_channels > 32768:
-            # Calculate from file size assuming 32-bit data
-            n_channels = max((len(data) - 64) // 4, 0)
-            if n_channels > 32768:
-                n_channels = 4096  # Default
-
-        # Time values - try different unit interpretations
-        live_raw = struct.unpack("<I", data[4:8])[0]
-        real_raw = struct.unpack("<I", data[8:12])[0]
-
-        # Common unit is 0.02 seconds or milliseconds
-        if live_raw > 1_000_000:
-            # Likely milliseconds
-            live_time_s = live_raw / 1000.0
-            real_time_s = real_raw / 1000.0
-        elif live_raw > 10_000:
-            # Likely 0.02 second units
-            live_time_s = live_raw * 0.02
-            real_time_s = real_raw * 0.02
-        else:
-            # Likely seconds
-            live_time_s = float(live_raw)
-            real_time_s = float(real_raw)
-
-        # Read channel data
-        data_start = 64  # Common offset for Maestro
-        if data_start + n_channels * 4 > len(data):
-            data_start = 32
-
-        counts = np.zeros(n_channels, dtype=np.int32)
-        for i in range(n_channels):
-            offset = data_start + i * 4
-            if offset + 4 <= len(data):
-                counts[i] = struct.unpack("<I", data[offset : offset + 4])[0]
-
-        # Check for calibration in header or trailer
-        calibration: Dict[str, float] = {}
-
-        # Try common calibration locations
-        for cal_offset in [12, 16, data_start + n_channels * 4]:
-            if cal_offset + 12 <= len(data):
-                try:
-                    cal_a = struct.unpack("<f", data[cal_offset : cal_offset + 4])[0]
-                    cal_b = struct.unpack("<f", data[cal_offset + 4 : cal_offset + 8])[
-                        0
-                    ]
-                    cal_c = struct.unpack("<f", data[cal_offset + 8 : cal_offset + 12])[
-                        0
-                    ]
-
-                    if -1000 < cal_a < 1000 and 0 < cal_b < 100 and -1 < cal_c < 1:
-                        calibration = {
-                            "offset": cal_a,
-                            "gain": cal_b,
-                            "quadratic": cal_c,
-                        }
-                        break
-                except Exception:
-                    continue
-
-        channels = np.arange(n_channels)
-
-        return CHNSpectrum(
-            counts=counts,
-            channels=channels,
-            live_time_s=live_time_s,
-            real_time_s=real_time_s,
-            start_time=None,
-            calibration=calibration,
-            detector_id="",
-            sample_description="",
-            n_channels=n_channels,
-            metadata={
-                "source_file": str(filepath),
-                "format": "chn_maestro",
-            },
-        )
-
-    except Exception as e:
-        raise ValueError(f"Failed to parse Maestro CHN file: {e}") from e
 
 
 def _parse_chn_datetime(date_str: str, time_str: str) -> Optional[datetime]:

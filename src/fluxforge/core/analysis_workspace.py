@@ -17,6 +17,7 @@ from fluxforge.analysis.peak_finders import (
     get_peak_finder,
 )
 from fluxforge.analysis.peakfit import auto_find_peaks, estimate_background, fit_multiple_peaks
+from fluxforge.analysis.spectrum_math import subtract_measured_background
 from fluxforge.data.efficiency import EfficiencyCurve
 from fluxforge.data.gamma_database import FLUXFORGE_GAMMA_DATA, GammaDatabase
 from fluxforge.data.nuclear_data_sources import load_gamma_identification_source
@@ -45,6 +46,7 @@ class PeakCandidate:
     tags: tuple[str, ...] = ()
     normalized_residuals: tuple[float, ...] = ()
     residual_channels: tuple[float, ...] = ()
+    net_counts_uncertainty: float | None = None
 
 
 @dataclass(frozen=True)
@@ -501,6 +503,7 @@ def apply_ml_peak_predictions(
                 tags=tuple(tags),
                 normalized_residuals=peak.normalized_residuals,
                 residual_channels=peak.residual_channels,
+                net_counts_uncertainty=peak.net_counts_uncertainty,
             )
         )
     return tuple(updated)
@@ -732,6 +735,7 @@ def detect_peak_candidates(
                 fit_quality=float(fit.peak_result.reduced_chi_squared),
                 normalized_residuals=tuple(float(value) for value in normalized_residuals),
                 residual_channels=tuple(float(value) for value in fit.channels),
+                net_counts_uncertainty=float(fit.peak_result.net_counts_uncertainty),
             )
         )
     return tuple(candidates)
@@ -898,6 +902,7 @@ def bayesian_match_peak_candidates(
                     tags=peak.tags,
                     normalized_residuals=peak.normalized_residuals,
                     residual_channels=peak.residual_channels,
+                    net_counts_uncertainty=peak.net_counts_uncertainty,
                 )
             )
             continue
@@ -982,6 +987,22 @@ def fit_efficiency_model(
     )
 
 
+def resolve_peak_net_counts_uncertainty(peak: PeakCandidate) -> tuple[float, str]:
+    """Resolve net-area uncertainty without assuming net counts are Poisson."""
+
+    if peak.net_counts_uncertainty is not None:
+        uncertainty = float(peak.net_counts_uncertainty)
+        if math.isfinite(uncertainty) and uncertainty > 0.0:
+            return uncertainty, "provided"
+        raise ValueError("Net-count uncertainty must be finite and positive.")
+
+    raise ValueError(
+        f"Peak {peak.peak_id!r} needs net-count uncertainty; background-subtracted "
+        "counts do not support a sqrt(net_counts) substitute, and detection "
+        "significance is not an area uncertainty."
+    )
+
+
 def calculate_peak_activity(
     peak: PeakCandidate,
     spectrum: GammaSpectrum,
@@ -994,32 +1015,55 @@ def calculate_peak_activity(
 ) -> ActivityCalculationResult:
     """Calculate activity, MDA, and age-corrected activity for one peak."""
 
+    source_age = float(source_age_s)
+    if not math.isfinite(source_age) or source_age < 0.0:
+        raise ValueError("Source age must be finite and non-negative.")
+    live_time_s = float(spectrum.live_time)
+    if not math.isfinite(live_time_s) or live_time_s <= 0.0:
+        raise ValueError("Spectrum live time must be finite and positive.")
+    real_time_s = float(spectrum.real_time)
+    resolved_real_time_s = real_time_s if real_time_s > 0.0 else None
+    resolved_dead_time = (
+        float(dead_time_fraction)
+        if dead_time_fraction is not None
+        else (float(spectrum.dead_time_fraction) if resolved_real_time_s is not None else None)
+    )
     measurement = GammaLineMeasurement(
         net_counts=float(peak.net_counts),
-        live_time_s=max(float(spectrum.live_time or 1.0), 1e-6),
+        live_time_s=live_time_s,
         efficiency=float(
             np.asarray(efficiency_curve.efficiency(peak.energy_keV), dtype=float).reshape(-1)[0]
         ),
-        gamma_intensity=max(float(gamma_intensity), 1e-6),
-        half_life_s=max(float(half_life_s), 1e-6),
-        dead_time_fraction=float(
-            dead_time_fraction
-            if dead_time_fraction is not None
-            else getattr(spectrum, "dead_time_fraction", 0.0)
-        ),
+        gamma_intensity=float(gamma_intensity),
+        half_life_s=float(half_life_s),
+        dead_time_fraction=resolved_dead_time,
+        real_time_s=resolved_real_time_s,
     )
     activity_bq = measurement.activity_at_reference()
-    count_relative_uncertainty = 1.0 / math.sqrt(max(peak.net_counts, 1.0))
+    net_counts_uncertainty, _uncertainty_source = resolve_peak_net_counts_uncertainty(
+        peak
+    )
+    count_uncertainty_bq = (
+        net_counts_uncertainty * measurement.activity_per_net_count_at_reference()
+    )
     efficiency_relative_uncertainty = float(
         np.asarray(
             efficiency_curve.efficiency_uncertainty(peak.energy_keV), dtype=float
         ).reshape(-1)[0]
     )
-    uncertainty_bq = activity_bq * math.sqrt(
-        count_relative_uncertainty**2 + efficiency_relative_uncertainty**2
+    if (
+        not math.isfinite(efficiency_relative_uncertainty)
+        or efficiency_relative_uncertainty < 0.0
+    ):
+        raise ValueError(
+            "Efficiency relative uncertainty must be finite and non-negative."
+        )
+    uncertainty_bq = math.sqrt(
+        count_uncertainty_bq**2
+        + (abs(activity_bq) * efficiency_relative_uncertainty) ** 2
     )
     age_corrected_activity = activity_bq * math.exp(
-        math.log(2.0) * source_age_s / max(half_life_s, 1e-6)
+        math.log(2.0) * source_age / float(half_life_s)
     )
 
     background_counts = max(
@@ -1028,14 +1072,16 @@ def calculate_peak_activity(
     )
     detection_limit_counts = 2.71 + 4.65 * math.sqrt(background_counts)
     mda_bq = detection_limit_counts / max(
-        measurement.efficiency * measurement.gamma_intensity * measurement.live_time_s,
+        measurement.efficiency
+        * measurement.gamma_intensity
+        * measurement.effective_counting_duration_s(),
         1e-12,
     )
 
     chain_summary = build_decay_chain_summary(
         peak.nuclide or "unknown",
         half_life_s=half_life_s,
-        source_age_s=source_age_s,
+        source_age_s=source_age,
     )
     return ActivityCalculationResult(
         nuclide=peak.nuclide or "Unassigned",
@@ -1045,11 +1091,11 @@ def calculate_peak_activity(
         age_corrected_activity_bq=float(age_corrected_activity),
         age_corrected_uncertainty_bq=float(
             uncertainty_bq
-            * math.exp(math.log(2.0) * source_age_s / max(half_life_s, 1e-6))
+            * math.exp(math.log(2.0) * source_age / float(half_life_s))
         ),
         mda_bq=float(mda_bq),
         half_life_s=float(half_life_s),
-        source_age_s=float(source_age_s),
+        source_age_s=source_age,
         chain_summary=chain_summary,
     )
 
@@ -1087,27 +1133,13 @@ def subtract_background_counts(
     scale: float = 1.0,
 ) -> np.ndarray:
     """Subtract background counts using the requested analysis mode."""
-
-    foreground_counts = np.asarray(foreground.counts, dtype=float)
-    if background is None:
-        return foreground_counts.copy()
-
-    background_counts = np.asarray(background.counts, dtype=float)
-    if background_counts.shape != foreground_counts.shape:
-        background_counts = np.resize(background_counts, foreground_counts.shape)
-
-    if mode == "simple":
-        factor = 1.0
-    elif mode == "scaled":
-        factor = float(scale)
-    elif mode == "statistical":
-        factor = (
-            max(float(foreground.live_time or 1.0), 1.0)
-            / max(float(background.live_time or 1.0), 1.0)
-        )
-    else:
-        raise ValueError(f"Unsupported background-subtraction mode: {mode}")
-    return np.clip(foreground_counts - factor * background_counts, 0.0, None)
+    adjusted = background_adjusted_spectrum(
+        foreground,
+        background,
+        mode=mode,
+        scale=scale,
+    )
+    return np.asarray(adjusted.counts, dtype=float).copy()
 
 
 def background_adjusted_spectrum(
@@ -1119,53 +1151,39 @@ def background_adjusted_spectrum(
 ) -> GammaSpectrum:
     """Return a spectrum copy with the selected external background workflow applied."""
 
-    adjusted = subtract_background_counts(
-        foreground,
-        background,
-        mode=mode,
-        scale=scale,
-    )
-    factor = _background_subtraction_factor(
-        foreground,
-        background,
-        mode=mode,
-        scale=scale,
-    )
-    foreground_unc = np.asarray(foreground.counts_uncertainty, dtype=float)
-    if background is None:
-        adjusted_unc = foreground_unc.copy()
+    if mode == "simple":
+        shared_mode = "manual"
+        manual_scale = 1.0
+    elif mode == "scaled":
+        shared_mode = "manual"
+        manual_scale = float(scale)
+    elif mode == "statistical":
+        shared_mode = "live"
+        manual_scale = None
     else:
-        background_unc = np.asarray(background.counts_uncertainty, dtype=float)
-        if background_unc.shape != foreground_unc.shape:
-            background_unc = np.resize(background_unc, foreground_unc.shape)
-        adjusted_unc = np.sqrt(np.maximum(foreground_unc**2 + (factor * background_unc) ** 2, 0.0))
-    metadata = dict(getattr(foreground, "metadata", {}) or {})
-    metadata["background_subtraction"] = {
-        "mode": mode,
-        "scale": float(factor),
-        "source": background.spectrum_id if background is not None else None,
-    }
-    return GammaSpectrum(
-        counts=np.asarray(adjusted, dtype=float),
-        counts_uncertainty=np.asarray(adjusted_unc, dtype=float),
-        channels=np.asarray(foreground.channels, dtype=float),
-        energies=(
-            np.asarray(foreground.energies, dtype=float)
-            if foreground.energies is not None
-            else None
-        ),
-        live_time=float(foreground.live_time),
-        real_time=float(foreground.real_time),
-        start_time=foreground.start_time,
-        spectrum_id=foreground.spectrum_id,
-        detector_id=foreground.detector_id,
-        calibration=dict(foreground.calibration),
-        source_type=foreground.source_type,
-        device_id=foreground.device_id,
-        device_label=foreground.device_label,
-        gps=dict(getattr(foreground, "gps", {}) or {}),
-        metadata=metadata,
+        raise ValueError(f"Unsupported background-subtraction mode: {mode}")
+
+    adjusted = subtract_measured_background(
+        foreground,
+        background,
+        mode=shared_mode,
+        manual_scale=manual_scale,
+        negative_policy="preserve",
+        warn_missing=False,
     )
+    metadata = dict(adjusted.metadata)
+    subtraction_metadata = dict(metadata.get("background_subtraction", {}))
+    factor = float(subtraction_metadata.get("scale_factor", 0.0))
+    subtraction_metadata.update(
+        {
+            "mode": mode,
+            "scale": factor,
+            "source": background.spectrum_id if background is not None else None,
+        }
+    )
+    metadata["background_subtraction"] = subtraction_metadata
+    adjusted.metadata = metadata
+    return adjusted
 
 
 def analyze_roi_region(
@@ -1210,17 +1228,33 @@ def analyze_roi_region(
     gross_counts = float(np.sum(counts[roi_mask]))
     gross_unc = float(np.sqrt(np.sum(np.square(counts_unc[roi_mask]))))
 
-    background_curve, sideband_bounds = _estimate_roi_background_curve(
-        working,
-        roi_bounds_keV=(lo_keV, hi_keV),
-        background_method=background_method,
-        sideband_width_keV=sideband_width_keV,
+    background_curve, sideband_bounds, background_estimator_weights = (
+        _estimate_roi_background_curve(
+            working,
+            roi_bounds_keV=(lo_keV, hi_keV),
+            background_method=background_method,
+            sideband_width_keV=sideband_width_keV,
+        )
     )
     background_counts = float(np.sum(background_curve[roi_mask]))
-    background_unc = float(np.sqrt(np.sum(np.clip(background_curve[roi_mask], 0.0, None))))
     net_curve = counts - background_curve
     net_counts = float(np.sum(net_curve[roi_mask]))
-    net_unc = float(np.sqrt(max(gross_unc**2 + background_unc**2, 0.0)))
+    channel_variance = np.square(counts_unc)
+    if background_estimator_weights is not None:
+        background_variance = float(
+            np.sum(np.square(background_estimator_weights) * channel_variance)
+        )
+        net_estimator_weights = roi_mask.astype(float) - background_estimator_weights
+        net_variance = float(
+            np.sum(np.square(net_estimator_weights) * channel_variance)
+        )
+        background_unc = float(np.sqrt(max(background_variance, 0.0)))
+        net_unc = float(np.sqrt(max(net_variance, 0.0)))
+    else:
+        background_unc = float(
+            np.sqrt(np.sum(np.clip(background_curve[roi_mask], 0.0, None)))
+        )
+        net_unc = float(np.sqrt(max(gross_unc**2 + background_unc**2, 0.0)))
     centroid_keV, centroid_unc_keV = _weighted_centroid_keV(
         working,
         net_curve,
@@ -1238,6 +1272,14 @@ def analyze_roi_region(
             f"External background slot applied with {background_mode} normalization."
         )
     notes.append(f"ROI continuum estimated with {background_method}.")
+    if background_estimator_weights is not None:
+        notes.append(
+            "Sideband uncertainty propagated from estimator weights, including shared ROI bins."
+        )
+    else:
+        notes.append(
+            "Continuum-model uncertainty uses the integrated-count approximation because fit covariance is unavailable."
+        )
 
     overlap_components: tuple[ROIComponentFit, ...] = ()
     if decompose_overlaps:
@@ -1371,7 +1413,11 @@ def _estimate_roi_background_curve(
     roi_bounds_keV: tuple[float, float],
     background_method: str,
     sideband_width_keV: float | None,
-) -> tuple[np.ndarray, tuple[tuple[float, float], tuple[float, float]]]:
+) -> tuple[
+    np.ndarray,
+    tuple[tuple[float, float], tuple[float, float]],
+    np.ndarray | None,
+]:
     channels = np.asarray(spectrum.channels, dtype=float)
     counts = np.asarray(spectrum.counts, dtype=float)
     roi_lo_ch, roi_hi_ch = _roi_channel_bounds(spectrum, roi_bounds_keV)
@@ -1386,20 +1432,40 @@ def _estimate_roi_background_curve(
         right_lo_ch, right_hi_ch = _roi_channel_bounds(spectrum, right_keV)
         left_mask = (channels >= left_lo_ch) & (channels <= left_hi_ch)
         right_mask = (channels >= right_lo_ch) & (channels <= right_hi_ch)
-        left_rate = float(np.mean(counts[left_mask])) if np.any(left_mask) else float(counts[max(roi_lo_ch - 1, 0)])
-        right_rate = float(np.mean(counts[right_mask])) if np.any(right_mask) else float(counts[min(roi_hi_ch, len(counts) - 1)])
+        left_weights = np.zeros_like(counts, dtype=float)
+        right_weights = np.zeros_like(counts, dtype=float)
+        if np.any(left_mask):
+            left_weights[left_mask] = 1.0 / float(np.count_nonzero(left_mask))
+        else:
+            left_weights[int(np.argmin(np.abs(channels - roi_lo_ch)))] = 1.0
+        if np.any(right_mask):
+            right_weights[right_mask] = 1.0 / float(np.count_nonzero(right_mask))
+        else:
+            right_weights[int(np.argmin(np.abs(channels - roi_hi_ch)))] = 1.0
+        left_rate = float(np.dot(left_weights, counts))
+        right_rate = float(np.dot(right_weights, counts))
         roi_channels = channels[(channels >= roi_lo_ch) & (channels <= roi_hi_ch)]
         if roi_channels.size:
-            interp = np.interp(
-                roi_channels,
-                np.asarray([float(roi_lo_ch), float(roi_hi_ch)], dtype=float),
-                np.asarray([left_rate, right_rate], dtype=float),
+            if roi_hi_ch == roi_lo_ch:
+                right_fractions = np.full(roi_channels.shape, 0.5, dtype=float)
+            else:
+                right_fractions = (roi_channels - roi_lo_ch) / float(
+                    roi_hi_ch - roi_lo_ch
+                )
+            interp = (
+                (1.0 - right_fractions) * left_rate
+                + right_fractions * right_rate
             )
         else:
             interp = np.array([], dtype=float)
+            right_fractions = np.array([], dtype=float)
         background_curve = np.zeros_like(counts, dtype=float)
         background_curve[(channels >= roi_lo_ch) & (channels <= roi_hi_ch)] = interp
-        return background_curve, (left_keV, right_keV)
+        background_estimator_weights = (
+            float(np.sum(1.0 - right_fractions)) * left_weights
+            + float(np.sum(right_fractions)) * right_weights
+        )
+        return background_curve, (left_keV, right_keV), background_estimator_weights
 
     peak_regions = [(int(roi_lo_ch), int(roi_hi_ch))]
     if background_method == "snip":
@@ -1418,7 +1484,7 @@ def _estimate_roi_background_curve(
     else:
         raise ValueError(f"Unsupported ROI background method: {background_method}")
     empty_bounds = ((roi_lo_keV, roi_lo_keV), (roi_hi_keV, roi_hi_keV))
-    return np.asarray(curve, dtype=float), empty_bounds
+    return np.asarray(curve, dtype=float), empty_bounds, None
 
 
 def _weighted_centroid_keV(
@@ -1646,6 +1712,7 @@ __all__ = [
     "fit_efficiency_model",
     "register_builtin_efficiency_models",
     "register_builtin_nuclide_id_engines",
+    "resolve_peak_net_counts_uncertainty",
     "subtract_background_counts",
 ]
 

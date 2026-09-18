@@ -4,6 +4,10 @@ Status: active
 Last Updated: 2026-07-22
 Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence links and remaining coverage targets.
 
+## Recovery checks — 16 September 2026
+
+Fresh evidence is tracked in [the recovery checklist](RECOVERY_TODO_20260916.md) and [Windows receipt](WINDOWS_VALIDATION_20260916.md). The initial isolated installed package passed 113 distinct checks, including native startup, session persistence, real-spectrum workflows, ROI and exports. The 17 September follow-up resolves installed profile-resource availability and integrates reader, background/ROI, library, forecast and report corrections. The follow-up installed core/reader slice passes 99 checks; eight historical background/parity workflows now stop at an incompatible-grid guard. Current wheel identity and affected checks are recorded in the Windows receipt. The refreshed native Qt run and a minimal probe stall at QApplication startup; that native qualification remains pending despite passing source offscreen recovery checks. Activity export preserves area uncertainty and requires refitting legacy peaks. Manual usability qualification remains open. The July receipts below remain historical.
+
 ## 1. Latest Validation Snapshot
 
 - UWNR/RAFM raw-data smoke validation:

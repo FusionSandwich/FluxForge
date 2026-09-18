@@ -1176,6 +1176,7 @@ class AnalysisWorkspaceController:
                 prior.provenance if prior else {"source": "legacy_peak_candidate"}
             ),
             net_counts=float(candidate.net_counts),
+            net_counts_uncertainty=candidate.net_counts_uncertainty,
             significance=float(candidate.significance),
             fit_quality=float(candidate.fit_quality),
             candidate_nuclides=candidate.candidate_nuclides,
@@ -1210,6 +1211,7 @@ class AnalysisWorkspaceController:
             significance=peak.significance,
             roi_bounds_keV=roi_bounds,
             net_counts=peak.net_counts,
+            net_counts_uncertainty=peak.net_counts_uncertainty,
             fit_quality=peak.fit_quality,
             status=peak.status,
             nuclide=nuclide,

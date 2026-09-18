@@ -1572,9 +1572,10 @@ def fit_multiple_peaks(
         return np.full_like(x, params[-1], dtype=float)
 
     if share_sigma:
+        sigma_index = 2 * len(peak_channels)
 
         def model(x_vals: np.ndarray, *params: float) -> np.ndarray:
-            sigma = params[-3]
+            sigma = params[sigma_index]
             total = (
                 params[-2] * x_vals + params[-1]
                 if background_model == "linear"
@@ -1679,10 +1680,10 @@ def fit_multiple_peaks(
         if share_sigma:
             amp = float(popt[2 * i])
             centroid = float(popt[2 * i + 1])
-            sigma = float(popt[-3])
+            sigma = float(popt[sigma_index])
             amp_unc = float(perr[2 * i])
             cent_unc = float(perr[2 * i + 1])
-            sigma_unc = float(perr[-3])
+            sigma_unc = float(perr[sigma_index])
         else:
             offset = 3 * i
             amp = float(popt[offset])
