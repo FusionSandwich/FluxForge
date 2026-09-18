@@ -56,6 +56,21 @@ The [PNNL STAYSL guide](https://www.pnnl.gov/main/publications/external/technica
 - Native interface receipts are maintained separately; counts from overlapping test slices must not be summed as distinct tests.
 - PeakEasy: `deferred_external_validation`. No fresh execution or parity claim. Historical comparisons require identical source observations and conventions.
 
+## Unfolding method coverage and INL-data boundary
+
+The public unfolding methods are covered by the shared workflow tests, but those tests use controlled response matrices unless explicitly identified below. A passing synthetic refold or identity case is method coverage; it is not validation against INL measurements.
+
+| Method/path | Controlled method test | Real INL/RAFM data path | Current status |
+|---|---|---|---|
+| GLS and response-covariance GLS | `tests/test_unfolding_workflows.py` public neutron paths | `tests/test_pipeline_validation.py` Stage F response/unfold path | Software path passes; physical calibration, covariance and dosimetry acceptance remain open. |
+| GRAVEL | Registry/public neutron workflow tests | Flux-wire regression entrypoint | Method path passes; real regression is blocked before unfolding when the measured/background energy grids differ. |
+| MLEM and covariance MLEM | Public neutron workflow tests | Flux-wire regression entrypoint | Method path passes; no accepted INL result because the input reduction is blocked at background-grid validation. |
+| Gradient descent / regularized gradient / Tikhonov | Public neutron workflow tests | No accepted INL method receipt | Synthetic method coverage only. |
+| MCMC | Public neutron workflow test | No accepted INL method receipt | Synthetic method coverage only. |
+| MAXED, RMLE, and ML Seed registry methods | Public registry workflow tests | No accepted INL method receipt | Synthetic/contract coverage only. |
+
+Current bounded run on the recovery Windows environment: 40 unfolding workflow tests passed; the real `tests/test_flux_unfolding_10bin.py` regression failed at the explicit incompatible-energy-grid guard before any method result was produced. The Stage F subset in `tests/test_pipeline_validation.py` passed 10 tests. This is recorded as a validation boundary, not an accepted INL unfolding result. Do not mark any unfolding method as INL-validated until a real-data receipt exists for that method with bound response, calibration, timing, covariance, and provenance inputs.
+
 
 ## Feature follow-up — 17 September 2026
 
