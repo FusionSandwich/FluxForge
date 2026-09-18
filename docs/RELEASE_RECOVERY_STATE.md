@@ -1,5 +1,9 @@
 # Recovery state — 16 September 2026
 
+## Strict goal status rule
+
+G1–G4 are independent completion gates. No goal may be marked complete until all of its required acceptance evidence is present; partial results, software-only checks, documented blockers, or completion of another goal do not satisfy the missing gate. The overall handoff is complete only when all four goals are complete. The current `partial` and `blocked` labels below are therefore deliberate and must remain until their listed receipts exist.
+
 - Selected source: `C:\Users\Josh\projects\FluxForge-validation`, branch `recovery-validation`, base `c297542da781291c3d1461af181b79349bda3087`.
 - Selection: current remote tip confirmed with `ls-remote`; original checkout is an ancestor, 0 unique / 28 behind. Workspace-state and production-shell development commits have equivalent integrated patches; direct manipulation is integrated by ancestry. No upstream merge or push performed.
 - Original checkout: `C:\Users\Josh\projects\FluxForge`, `39bfc708a901f3f9c06ddb4105d3634566ad14f9`; modified package metadata and untracked build/environment/install notes remain untouched.

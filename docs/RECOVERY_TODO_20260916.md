@@ -2,6 +2,12 @@
 
 Current scope: scientific correctness, all available INL reductions, native Windows Qt workflows, and recoverable legacy isolation. Checked items represent completed work; an open item is not an acceptance claim.
 
+## Completion gates
+
+Goals G1–G4 are strict gates, not a progress ladder. A goal remains **incomplete** until every required acceptance condition in its goal section is satisfied and its evidence receipt is recorded. Partial implementation, passing software tests, accounted-for blocked rows, or completion of a later goal cannot promote an earlier goal. Do not mark or report a goal as complete while any required scientific, data, native-workflow, preservation, or provenance gate remains open. Deferred goals G5–G7 are outside this pass and must not be treated as completed by omission.
+
+The required order is preservation and evidence selection, G1 scientific correctness, G2 complete existing-data analysis, G3 native Windows qualification, and G4 cleanup/archive acceptance. Work may proceed in parallel where safe, but status promotion is conjunctive within each goal and the overall handoff is complete only when G1, G2, G3, and G4 each have a complete receipt. If a required output is blocked, the owning goal remains incomplete even when the block is fully documented.
+
 The separate feature-validation task completed its initial pass: 107 passing checks, 34 failed expectations grouped into 17 findings, and one platform skip. Its live checklist and detailed receipts are under `D:\FluxForge-feature-validation-20260916`. Follow-up fixes and regression checks are now in progress; these counts describe the initial pass, not current acceptance.
 
 Follow-up work was separated by files: reader/calibration/CLI fixes were prepared in the independent task; background, ROI uncertainty and shared-width fitting were corrected together; library recovery, forecasts and HTML escaping were completed in another bounded pass. Profile packaging and SQLite proposals have passed 12 integrated source checks. Follow-up numerical and recovery fixes are integrated; the bounded reader proposal is now integrated and its 62 focused checks pass in the combined source tree. Physical experimental qualification remains open.

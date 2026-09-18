@@ -1,5 +1,9 @@
 # FluxForge Roadmap Execution Status
 
+## Completion policy
+
+The first-four scope uses strict gates. G1, G2, G3, and G4 must each reach full acceptance before the handoff can be called complete; work on a later goal never closes an earlier goal. A provisional reduction, passing implementation test, complete inventory, or explicitly documented blocker is evidence of progress only. Any open required gate keeps its goal incomplete.
+
 ## Active recovery scope — 16 September 2026
 
 The current execution is limited to correctness, existing INL data, native Windows Qt and recoverable legacy isolation. The [recovery checklist](RECOVERY_TODO_20260916.md) records completed work, outstanding checks and evidence blockers. Earlier roadmap snapshots below are retained as history; they do not establish fresh validation of this recovery source.
