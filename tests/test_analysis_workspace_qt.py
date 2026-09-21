@@ -1386,13 +1386,23 @@ def test_main_window_exposes_log_scale_and_peak_label_toggles():
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     _qapp().processEvents()
 
     sidebar = window.left_dock.widget()
+    # A label-toggle test needs a gamma-emitting reference, not whichever
+    # nuclide happens to sort first in the user's selected library.
+    source_index = sidebar.gamma_source_combo.findData("nndc_offline_activation")
+    assert source_index >= 0
+    sidebar.gamma_source_combo.setCurrentIndex(source_index)
+    sidebar.nuclide_query.setText("Co-60")
+    _qapp().processEvents()
+    assert sidebar.nuclides.count() >= 1
     sidebar.nuclides.setCurrentRow(0)
     _qapp().processEvents()
+    assert sidebar.nuclide_line_table.rowCount() >= 1
     QTest.mouseClick(sidebar.save_selected_nuclide_button, Qt.LeftButton)
     _qapp().processEvents()
     QTest.mouseClick(sidebar.apply_saved_overlay_button, Qt.LeftButton)

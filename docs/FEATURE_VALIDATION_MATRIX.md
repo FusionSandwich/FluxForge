@@ -1,5 +1,12 @@
 # FluxForge feature validation matrix
 
+Measured-background covariance update: storage, conservative alignment and
+supported ROI/Gaussian consumers have independent source tests; this does not
+qualify combined reaction rates or any INL unfolding method. Legacy QG, shared
+cross-sample covariance and physical provenance remain blocked. Broad native
+GUI testing has an unresolved abnormal exit. Exact evidence and unsupported
+boundaries are in the [implementation receipt](INL_BACKGROUND_IMPLEMENTATION_RECEIPT.md).
+
 This matrix is the inventory for the first-four handoff. Every maintained feature must have a named test or an explicit blocked receipt. A feature marked “covered” means the software contract was exercised; it does not imply physical experimental acceptance. Real INL validation additionally requires bound calibration, timing, response, nuclear-data, covariance, and source-provenance evidence.
 
 ## Command and workflow surface

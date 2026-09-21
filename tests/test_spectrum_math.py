@@ -128,7 +128,7 @@ def test_subtract_measured_background_negative_policy_and_clipping_warning():
     assert corrected_clip.counts[0] == 0.0
 
 
-def test_subtract_measured_background_rejects_incompatible_energy_grid():
+def test_subtract_measured_background_rejects_incomplete_energy_coverage():
     sample = GammaSpectrum(
         counts=np.array([100.0, 100.0, 100.0]),
         channels=np.array([0, 1, 2]),
@@ -148,7 +148,7 @@ def test_subtract_measured_background_rejects_incompatible_energy_grid():
 
     with pytest.raises(
         ValueError,
-        match="identical energy grids.*covariance propagation is not supported",
+        match="strict coverage",
     ):
         subtract_measured_background(sample, background, mode="live")
 

@@ -214,6 +214,7 @@ def _validate_spectrum_payload(value: Any, path: str) -> dict[str, Any]:
     allowed = {
         "counts",
         "counts_uncertainty",
+        "counts_covariance",
         "channels",
         "energies",
         "live_time",
@@ -237,10 +238,10 @@ def _validate_spectrum_payload(value: Any, path: str) -> dict[str, Any]:
             number = _number(item, f"{path}.{name}[{index}]")
             if name == "counts" and number < 0.0:
                 signed_counts = True
-    if signed_counts and data.get("counts_uncertainty") is None:
+    if signed_counts and data.get("counts_uncertainty") is None and data.get("counts_covariance") is None:
         raise WorkspaceValidationError(
             f"{path}.counts_uncertainty",
-            "is required when counts contain negative values",
+            "or counts_covariance is required when counts contain negative values",
         )
     for name in ("counts_uncertainty", "energies"):
         raw = data.get(name)

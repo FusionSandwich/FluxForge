@@ -233,6 +233,7 @@ def main(argv: list[str] | None = None) -> int:
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
         selection_bus=SelectionBus(),
+        load_example=True,
     )
     window.show()
     app.processEvents()

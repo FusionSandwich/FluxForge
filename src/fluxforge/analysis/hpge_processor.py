@@ -354,6 +354,7 @@ class HPGeProcessor:
 
         # Calculate energies
         energies = self._calibrate(working_spectrum.channels, energy_cal)
+        working_spectrum.require_diagonal("Legacy HPGe processor")
         counts_for_analysis = nonnegative_counts_for_algorithm(
             working_spectrum,
             algorithm_name="HPGe peak background estimation",

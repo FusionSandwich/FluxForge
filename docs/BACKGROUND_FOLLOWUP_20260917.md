@@ -8,6 +8,8 @@ The new regression cases reproduced 21 failures before the change, with two vali
 
 ## Mismatched RAFM grids
 
+The 18 September investigation confirms this mismatch across all ten bundled raw samples and verifies rejection through actual CLI and native GUI interfaces. Implementation remains open. Use the [ordered fix and acceptance plan](INL_BACKGROUND_FIX_PLAN_20260918.md), [investigation receipt](VALIDATION_RESUME_20260918.md), and [new-chat prompt](INL_BACKGROUND_FIX_NEW_CHAT_PROMPT.md) to continue.
+
 The shipped background calibration is [-1.502, 0.4991, 2.239e-7]; one representative sample family uses [0.541, 0.498, 2.605e-7]. Both have 8192 channels, but their energy difference changes from -2.043 to +4.512 keV across the array. The bin edges are not nested; over 8180 background bins overlap multiple sample bins. Neither channelwise subtraction nor a single integer shift is valid from these headers.
 
 A valid general solution needs an overlap matrix W, rebinned background Wb and net covariance C = diag(sample variance) + scale^2 W diag(background variance) W^T. The off-diagonal covariance must survive spectrum/session serialization and enter ROI linear estimators and peak fitting. Per-channel uncertainty alone cannot represent it. The existing grid guard remains in force; eight historical workflows remain blocked.

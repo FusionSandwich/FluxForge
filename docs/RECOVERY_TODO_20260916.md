@@ -1,12 +1,19 @@
 # Recovery execution checklist — 16 September 2026
 
+Measured-background implementation remains OPEN. See the
+[current receipt](INL_BACKGROUND_IMPLEMENTATION_RECEIPT.md) for successful
+per-spectrum covariance checks, the remaining raw QG reduction blocker and the
+native GUI abnormal-exit investigation. No G1/G2/G3/G4 status is advanced.
+
 Current scope: scientific correctness, all available INL reductions, native Windows Qt workflows, and recoverable legacy isolation. Checked items represent completed work; an open item is not an acceptance claim.
 
 ## Completion gates
 
 Goals G1–G4 are strict gates, not a progress ladder. A goal remains **incomplete** until every required acceptance condition in its goal section is satisfied and its evidence receipt is recorded. Partial implementation, passing software tests, accounted-for blocked rows, or completion of a later goal cannot promote an earlier goal. Do not mark or report a goal as complete while any required scientific, data, native-workflow, preservation, or provenance gate remains open. Deferred goals G5–G7 are outside this pass and must not be treated as completed by omission.
 
-The required order is preservation and evidence selection, G1 scientific correctness, G2 complete existing-data analysis, G3 native Windows qualification, and G4 cleanup/archive acceptance. Work may proceed in parallel where safe, but status promotion is conjunctive within each goal and the overall handoff is complete only when G1, G2, G3, and G4 each have a complete receipt. If a required output is blocked, the owning goal remains incomplete even when the block is fully documented.
+The required order is preservation and evidence selection, G1 scientific correctness, G2 complete existing-data analysis, G3 native Windows qualification, and G4 cleanup/archive acceptance. Do not move past a goal until all of its required acceptance conditions are complete and verified. Explicitly requested diagnostic work, such as continued GUI testing, may supply evidence while an earlier goal remains open; it does not advance the goal sequence. The overall handoff is complete only when G1, G2, G3, and G4 each have a complete receipt. If a required output is blocked, the owning goal remains incomplete even when the block is fully documented.
+
+Latest bounded continuation: [18 September validation receipt](VALIDATION_RESUME_20260918.md). Fresh results are 39 native GUI passes, 173 backend passes and one failing INL regression. No goal was promoted.
 
 The complete feature inventory and its test mapping are maintained in [FEATURE_VALIDATION_MATRIX.md](FEATURE_VALIDATION_MATRIX.md). Before declaring a goal complete, reconcile that matrix against the current command catalog, GUI surface, and source modules; every applicable feature must have a passing receipt or an explicit blocking record owned by that goal.
 
@@ -24,6 +31,8 @@ Follow-up work was separated by files: reader/calibration/CLI fixes were prepare
 - [x] Retain the final uncommitted source patches and changed-file archives in `C:\Users\Josh\projects\FluxForge-recovery-20260916\final-local-changes`, with a verified manifest.
 
 ## C — Scientific correctness
+
+- [ ] Complete the [INL background-grid fix plan](INL_BACKGROUND_FIX_PLAN_20260918.md): covariance storage, conservative subtraction, downstream propagation and verified real CLI/GUI workflows. Current interface tests prove rejection only; the INL unfolding regression remains blocked. [New-chat continuation prompt](INL_BACKGROUND_FIX_NEW_CHAT_PROMPT.md).
 
 - [x] Correct GLS covariance validation, pseudoinverse, exact-constraint checks, observation-space diagnostics and response-uncertainty propagation.
 - [x] Verify the posterior against independent equations: 70 inverse-contract checks pass (10 unavailable external-reference skips), plus 100 covariance/solver regression checks.

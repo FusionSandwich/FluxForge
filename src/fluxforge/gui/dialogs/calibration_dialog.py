@@ -1928,6 +1928,8 @@ if (
                         self.roi_background_combo.currentData() or "linear"
                     ),
                     prior_fwhm_channels=prior_fwhm_channels,
+                    counts_covariance=self._spectrum.counts_covariance,
+                    counts_uncertainty=self._spectrum.counts_uncertainty,
                 )
             except Exception as exc:
                 self._clear_roi_fit_visuals(str(exc))

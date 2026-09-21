@@ -13,6 +13,45 @@ import warnings
 import numpy as np
 
 from fluxforge.io.spe import GammaSpectrum
+from fluxforge.analysis.histogram_rebin import rebin_histogram
+
+
+def spectrum_bin_edges(spectrum: GammaSpectrum) -> np.ndarray:
+    """Midpoint edges of recorded energy centers, with half-spacing end bins."""
+    centers = _spectrum_energies(spectrum)
+    if (centers is None or centers.ndim != 1 or centers.size != len(spectrum.counts)
+            or centers.size < 2 or not np.all(np.isfinite(centers))
+            or np.any(np.diff(centers) <= 0)):
+        raise ValueError("Conservative background rebinning requires at least two finite, strictly increasing energy centers matching counts")
+    edges = np.r_[centers[0] - (centers[1] - centers[0]) / 2,
+                  centers[:-1] + np.diff(centers) / 2,
+                  centers[-1] + (centers[-1] - centers[-2]) / 2]
+    if not np.all(np.isfinite(edges)) or np.any(np.diff(edges) <= 0):
+        raise ValueError("Background energy bin edges must be finite and strictly increasing")
+    return edges
+
+
+def _conservative_background(sample, background):
+    result = rebin_histogram(
+        spectrum_bin_edges(background), background.counts, spectrum_bin_edges(sample),
+        source_covariance=background.counts_covariance,
+        source_variance=(background.counts_uncertainty ** 2 if background.counts_covariance is None else None),
+        coverage="strict",
+    )
+    payload = background.to_dict()
+    payload.update(counts=result.counts.tolist(), counts_uncertainty=np.sqrt(result.covariance.diagonal()).tolist(),
+                   counts_covariance=None, channels=sample.channels.tolist(),
+                   energies=_spectrum_energies(sample).tolist(), calibration=dict(sample.calibration))
+    aligned = GammaSpectrum.from_dict(payload)
+    aligned.counts_covariance = result.covariance
+    aligned.counts_uncertainty = np.sqrt(result.covariance.diagonal())
+    aligned.metadata = dict(background.metadata, rebin={
+        "edge_convention": "energy_center_midpoints_half_spacing_endpoints",
+        "coverage_policy": "strict", "minimum_coverage": float(result.coverage.min()),
+        "discarded_source_counts": result.discarded_source_counts,
+        "within_bin_density": "uniform", "source_calibration": dict(background.calibration),
+    })
+    return aligned, True
 
 
 @dataclass
@@ -45,13 +84,7 @@ def _resample_background_to_sample_energy(
     atol_keV: float = 1.0e-3,
     rtol: float = 1.0e-6,
 ) -> Tuple[GammaSpectrum, bool]:
-    """
-    Validate that background and sample use the same energy/channel grid.
-
-    General histogram rebinning can introduce covariance between output bins,
-    which ``GammaSpectrum`` cannot represent.  Reject mismatched grids rather
-    than silently applying point interpolation or padding counts.
-    """
+    """Align histograms conservatively, retaining full counting covariance."""
     sample_energies = _spectrum_energies(sample)
     background_energies = _spectrum_energies(background)
     sample_channels = np.asarray(sample.channels, dtype=float)
@@ -78,15 +111,16 @@ def _resample_background_to_sample_energy(
     ):
         raise ValueError("Background subtraction energy grids must be finite.")
 
+    for spectrum, centers in ((sample, sample_energies), (background, background_energies)):
+        if centers.ndim != 1 or len(centers) != len(spectrum.counts) or np.any(np.diff(centers) <= 0):
+            raise ValueError("Background energy grids must be strictly increasing and match counts")
+
     if sample_energies.shape == background_energies.shape and np.allclose(
         sample_energies, background_energies, atol=atol_keV, rtol=rtol
     ):
         return background, False
 
-    raise ValueError(
-        "Background subtraction requires identical energy grids; conservative "
-        "rebinning with covariance propagation is not supported."
-    )
+    return _conservative_background(sample, background)
 
 
 def _align_spectra(
@@ -147,6 +181,8 @@ def _align_spectra(
 
 def add_spectra(left: GammaSpectrum, right: GammaSpectrum) -> GammaSpectrum:
     """Add two spectra with channel alignment."""
+    left.require_diagonal("Legacy spectrum addition")
+    right.require_diagonal("Legacy spectrum addition")
     aligned = _align_spectra(left, right)
     variance = aligned.left_uncertainty**2 + aligned.right_uncertainty**2
     return GammaSpectrum(
@@ -163,6 +199,8 @@ def add_spectra(left: GammaSpectrum, right: GammaSpectrum) -> GammaSpectrum:
 
 def subtract_spectra(left: GammaSpectrum, right: GammaSpectrum) -> GammaSpectrum:
     """Subtract two spectra with channel alignment (left - right)."""
+    left.require_diagonal("Legacy spectrum subtraction")
+    right.require_diagonal("Legacy spectrum subtraction")
     aligned = _align_spectra(left, right)
     variance = aligned.left_uncertainty**2 + aligned.right_uncertainty**2
     return GammaSpectrum(
@@ -188,6 +226,7 @@ def moving_average(
     """
     if width <= 0:
         raise ValueError("width must be a positive integer.")
+    spectrum.require_diagonal("Legacy moving-average smoothing")
 
     counts = np.asarray(spectrum.counts, dtype=float)
     if counts.size < 2 * width + 1:
@@ -294,6 +333,7 @@ def subtract_measured_background(
             )
         return GammaSpectrum(
             counts=np.asarray(sample.counts, dtype=float).copy(),
+            counts_covariance=(sample.counts_covariance.copy() if sample.counts_covariance is not None else None),
             counts_uncertainty=np.asarray(
                 sample.counts_uncertainty, dtype=float
             ).copy(),
@@ -328,6 +368,10 @@ def subtract_measured_background(
     variance = (
         aligned.left_uncertainty**2 + (scale_factor**2) * aligned.right_uncertainty**2
     )
+    covariance = None
+    if sample.counts_covariance is not None or aligned_background.counts_covariance is not None:
+        covariance = sample.covariance_matrix() + scale_factor**2 * aligned_background.covariance_matrix()
+        variance = covariance.diagonal()
     net_uncertainty = np.sqrt(np.maximum(variance, 0.0))
 
     negative_policy_normalized = negative_policy.lower()
@@ -339,6 +383,8 @@ def subtract_measured_background(
     negatives = int(np.count_nonzero(net_counts < 0.0))
     clipped = False
     if negative_policy_normalized == "clip":
+        if covariance is not None:
+            raise ValueError("Clipping is unsupported for correlated counts; preserve signed estimates")
         if negatives > 0:
             warnings.warn(
                 f"Background subtraction produced {negatives} negative bins; clipping to zero.",
@@ -360,12 +406,16 @@ def subtract_measured_background(
                 "clipped": clipped,
                 "background_spectrum_id": background.spectrum_id,
                 "energy_aligned": energy_aligned,
+                "rebin": aligned_background.metadata.get("rebin"),
+                "covariance_assumptions": "independent sample and background; fixed scale and energy bins",
+                "shared_background_covariance": "not propagated between separate results",
             },
         }
     )
 
     return GammaSpectrum(
         counts=net_counts,
+        counts_covariance=covariance,
         counts_uncertainty=net_uncertainty,
         channels=aligned.channels,
         energies=(

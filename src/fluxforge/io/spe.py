@@ -17,6 +17,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+from scipy import sparse
+
+from fluxforge.core.count_covariance import (
+    covariance_from_payload, covariance_to_payload, linear_variance,
+    validate_count_covariance,
+)
 
 from fluxforge.core.calibration import (
     EnergyDeviationPair,
@@ -77,10 +83,24 @@ class GammaSpectrum:
     device_label: str = ""
     gps: Dict[str, Any] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    counts_covariance: Optional[sparse.csr_matrix] = None
 
     def __post_init__(self):
         """Initialize derived fields."""
         self.counts = np.asarray(self.counts, dtype=float)
+
+        if (np.any(self.counts < 0.0)
+                and self.counts_uncertainty is None
+                and self.counts_covariance is None):
+            raise ValueError(
+                "Signed counts require counts_uncertainty or counts_covariance"
+            )
+
+        if self.counts_covariance is not None:
+            self.counts_covariance = validate_count_covariance(self.counts_covariance, len(self.counts))
+            diagonal_unc = np.sqrt(self.counts_covariance.diagonal())
+            if self.counts_uncertainty is None:
+                self.counts_uncertainty = diagonal_unc
 
         if self.counts_uncertainty is None:
             self.counts_uncertainty = np.sqrt(np.maximum(self.counts, 0.0))
@@ -90,6 +110,19 @@ class GammaSpectrum:
                 raise ValueError(
                     "counts_uncertainty must have the same shape as counts."
                 )
+            if (not np.all(np.isfinite(self.counts_uncertainty))
+                    or np.any(self.counts_uncertainty < 0.0)):
+                raise ValueError(
+                    "counts_uncertainty must be finite and non-negative."
+                )
+            if (self.counts_covariance is not None
+                    and not np.allclose(
+                        self.counts_uncertainty,
+                        diagonal_unc,
+                        rtol=1e-10,
+                        atol=1e-12,
+                    )):
+                raise ValueError("counts_uncertainty must match counts_covariance diagonal")
 
         raw_channels = np.asarray(self.channels)
         if len(raw_channels) == 0 and len(self.counts) > 0:
@@ -272,8 +305,23 @@ class GammaSpectrum:
 
         mask = (self.channels >= ch_min) & (self.channels <= ch_max)
         total = self.counts[mask].sum()
-        total_unc = np.sqrt(np.sum(self.counts_uncertainty[mask] ** 2))
+        total_unc = np.sqrt(self.linear_variance(mask.astype(float)))
         return float(total), float(total_unc)
+
+    def linear_variance(self, weights) -> float:
+        """Variance of a fixed weighted count sum, including correlations."""
+        return linear_variance(weights, self.counts_uncertainty, self.counts_covariance)
+
+    def covariance_matrix(self):
+        """Return full count covariance, interpreting absent storage as diagonal."""
+        if self.counts_covariance is not None:
+            return self.counts_covariance.copy()
+        return sparse.diags(self.counts_uncertainty ** 2, format="csr")
+
+    def require_diagonal(self, operation):
+        """Fail explicitly when a legacy quantitative operation lacks support."""
+        if self.counts_covariance is not None:
+            raise ValueError(f"{operation} does not support counts_covariance; use a covariance-aware workflow")
 
     @property
     def dead_time_fraction(self) -> float:
@@ -298,8 +346,13 @@ class GammaSpectrum:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
+        if self.counts_covariance is not None:
+            checked = validate_count_covariance(self.counts_covariance, len(self.counts))
+            if not np.allclose(self.counts_uncertainty ** 2, checked.diagonal(), rtol=1e-10, atol=1e-12):
+                raise ValueError("counts_uncertainty must match counts_covariance diagonal")
         return {
             "counts": self.counts.tolist(),
+            "counts_covariance": covariance_to_payload(self.counts_covariance),
             "counts_uncertainty": (
                 self.counts_uncertainty.tolist()
                 if self.counts_uncertainty is not None
@@ -323,8 +376,12 @@ class GammaSpectrum:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "GammaSpectrum":
         """Create GammaSpectrum from dictionary."""
+        if (np.any(np.asarray(data["counts"]) < 0) and data.get("counts_uncertainty") is None
+                and data.get("counts_covariance") is None):
+            raise ValueError("Signed counts require counts_uncertainty or counts_covariance")
         return cls(
             counts=np.array(data["counts"]),
+            counts_covariance=covariance_from_payload(data.get("counts_covariance"), len(data["counts"])),
             counts_uncertainty=(
                 np.array(data["counts_uncertainty"])
                 if data.get("counts_uncertainty") is not None
@@ -624,6 +681,7 @@ def write_spe_file(
     """
     if format_type != "dollar":
         raise ValueError("Only dollar-tagged SPE export is supported.")
+    spectrum.require_diagonal("SPE export")
     counts = np.asarray(spectrum.counts, dtype=float)
     channels = np.asarray(spectrum.channels, dtype=float)
     if counts.ndim != 1 or not counts.size or not np.all(np.isfinite(counts)):

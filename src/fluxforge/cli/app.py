@@ -1218,6 +1218,11 @@ def _write_background_adjusted_csv(
     *,
     background_file: Optional[Path],
 ) -> None:
+    if spectrum.counts_covariance is not None:
+        from fluxforge.io.spectrum_csv import write_spectrum_csv
+        _ensure_parent_dir(output_path)
+        write_spectrum_csv(output_path, spectrum, metadata_lines=_export_metadata_lines(spectrum, background_file=background_file))
+        return
     energies = _spectrum_energies(spectrum)
     uncertainties = np.asarray(spectrum.counts_uncertainty, dtype=float)
     rows = [
@@ -1243,6 +1248,7 @@ def _write_final_corrected_csv(
     *,
     background_file: Optional[Path],
 ) -> bool:
+    spectrum.require_diagonal("Efficiency-corrected CSV export")
     efficiency_model = _efficiency_model_from_spectrum(spectrum)
     if efficiency_model is None:
         warnings.warn(
@@ -1418,6 +1424,7 @@ def _manual_peak_rows(
                 )
             )
         )
+        net_unc = float(np.sqrt(analysis_spectrum.linear_variance((np.arange(len(analysis_counts)) >= lo).astype(float) * (np.arange(len(analysis_counts)) <= hi))))
         label = (
             region.get("label")
             or region.get("name")
@@ -2170,6 +2177,7 @@ def cmd_peaks(args: argparse.Namespace) -> None:
         config = SegmentedDetectionConfig()
     config.fit_window = int(args.fit_window)
 
+    spectrum.require_diagonal("Segmented Poisson peak fitting; use a Gaussian method or ROI analysis")
     peaks = detect_peaks_segmented(
         spectrum.channels,
         energies,

@@ -715,7 +715,7 @@ def detect_peak_candidates(
             max(float(channel) - half_width, 0.0),
             min(float(channel) + half_width, float(len(counts) - 1)),
         )
-        fit = fit_roi_peak(channels, counts, roi_bounds_ch)
+        fit = fit_roi_peak(channels, counts, roi_bounds_ch, counts_covariance=spectrum.counts_covariance, counts_uncertainty=spectrum.counts_uncertainty)
         roi_bounds_keV = (
             float(spectrum.channel_to_energy(roi_bounds_ch[0])),
             float(spectrum.channel_to_energy(roi_bounds_ch[1])),
@@ -1226,7 +1226,7 @@ def analyze_roi_region(
     counts = np.asarray(working.counts, dtype=float)
     counts_unc = np.asarray(working.counts_uncertainty, dtype=float)
     gross_counts = float(np.sum(counts[roi_mask]))
-    gross_unc = float(np.sqrt(np.sum(np.square(counts_unc[roi_mask]))))
+    gross_unc = float(np.sqrt(working.linear_variance(roi_mask.astype(float))))
 
     background_curve, sideband_bounds, background_estimator_weights = (
         _estimate_roi_background_curve(
@@ -1242,15 +1242,16 @@ def analyze_roi_region(
     channel_variance = np.square(counts_unc)
     if background_estimator_weights is not None:
         background_variance = float(
-            np.sum(np.square(background_estimator_weights) * channel_variance)
+            working.linear_variance(background_estimator_weights)
         )
         net_estimator_weights = roi_mask.astype(float) - background_estimator_weights
         net_variance = float(
-            np.sum(np.square(net_estimator_weights) * channel_variance)
+            working.linear_variance(net_estimator_weights)
         )
         background_unc = float(np.sqrt(max(background_variance, 0.0)))
         net_unc = float(np.sqrt(max(net_variance, 0.0)))
     else:
+        working.require_diagonal(f"{background_method} continuum uncertainty")
         background_unc = float(
             np.sqrt(np.sum(np.clip(background_curve[roi_mask], 0.0, None)))
         )
@@ -1260,6 +1261,21 @@ def analyze_roi_region(
         net_curve,
         roi_mask,
     )
+    if working.counts_covariance is not None:
+        # Delta-method derivative of the displayed positive-weight centroid,
+        # including its linear sideband continuum and shared bins.
+        energy = np.asarray(working.energies if working.energies is not None else working.channel_to_energy(working.channels))
+        positive = roi_mask & (net_curve > 0)
+        total = float(net_curve[positive].sum())
+        if total > 0:
+            centroid_keV = float(energy[positive] @ net_curve[positive] / total)
+            derivative = np.zeros_like(counts)
+            derivative[positive] = (energy[positive] - centroid_keV) / total
+            _, _, continuum_derivative = _estimate_roi_background_curve(
+                working, roi_bounds_keV=(lo_keV, hi_keV), background_method=background_method,
+                sideband_width_keV=sideband_width_keV, roi_estimator_weights=derivative[roi_mask],
+            )
+            centroid_unc_keV = float(np.sqrt(working.linear_variance(derivative - continuum_derivative)))
     significance = float(
         net_counts / max(net_unc, 1.0e-12)
         if net_unc > 0.0
@@ -1413,6 +1429,7 @@ def _estimate_roi_background_curve(
     roi_bounds_keV: tuple[float, float],
     background_method: str,
     sideband_width_keV: float | None,
+    roi_estimator_weights: np.ndarray | None = None,
 ) -> tuple[
     np.ndarray,
     tuple[tuple[float, float], tuple[float, float]],
@@ -1462,8 +1479,8 @@ def _estimate_roi_background_curve(
         background_curve = np.zeros_like(counts, dtype=float)
         background_curve[(channels >= roi_lo_ch) & (channels <= roi_hi_ch)] = interp
         background_estimator_weights = (
-            float(np.sum(1.0 - right_fractions)) * left_weights
-            + float(np.sum(right_fractions)) * right_weights
+            float(np.sum((1.0 - right_fractions) * (1 if roi_estimator_weights is None else roi_estimator_weights))) * left_weights
+            + float(np.sum(right_fractions * (1 if roi_estimator_weights is None else roi_estimator_weights))) * right_weights
         )
         return background_curve, (left_keV, right_keV), background_estimator_weights
 
@@ -1558,6 +1575,8 @@ def _fit_roi_overlap_components(
         fit_width=max(int((roi_hi_ch - roi_lo_ch) / 2), 4),
         background_model="linear",
         share_sigma=True,
+        counts_covariance=spectrum.counts_covariance,
+        counts_uncertainty=spectrum.counts_uncertainty,
     )
     components: list[ROIComponentFit] = []
     for result in fit_results[:max_components]:

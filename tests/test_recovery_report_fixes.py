@@ -268,7 +268,7 @@ def test_background_display_rejects_invalid_inputs_and_recovers(
         )
         mismatch_status = canvas.status_label.text().lower()
         assert "background not applied" in mismatch_status
-        assert "identical energy grids" in mismatch_status
+        assert "strict coverage" in mismatch_status
 
         controller.assign_loaded_spectrum_to_slot(valid_key, "background")
         app.processEvents()

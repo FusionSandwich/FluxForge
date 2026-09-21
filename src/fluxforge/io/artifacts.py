@@ -57,13 +57,16 @@ def make_spectrum_file(
     units = {
         "counts": "counts",
         "counts_uncertainty": "counts",
+        "counts_covariance": "counts^2",
         "channels": "index",
         "energies": "keV",
         "live_time": "s",
         "real_time": "s",
     }
     definitions = {
-        "counts": "raw counts per channel",
+        "counts": ("processed signed counts per channel" if spectrum.metadata.get("operation")
+                   or any(spectrum.counts < 0) else "raw counts per channel"),
+        "counts_covariance": "full count covariance in CSR storage; null means diagonal uncertainty",
         "counts_uncertainty": "1-sigma per-channel uncertainty",
         "channels": "adc channel index",
         "energies": "calibrated energy in keV (null if unknown)",
@@ -74,7 +77,7 @@ def make_spectrum_file(
     hashes = {"source": hash_file(source_path)} if source_path else None
     provenance = build_provenance(
         units=units,
-        normalization={"counts": "raw"},
+        normalization={"counts": spectrum.metadata.get("operation", "raw")},
         definitions=definitions,
         source_hashes=hashes,
     )

@@ -48,7 +48,7 @@ def _analyze_batch_job(job: BatchAnalysisJob, prefer_gpu: bool) -> BatchAnalysis
     dominant = predictions[0].predicted_nuclide if predictions else (peaks[0].nuclide or "") if peaks else ""
     total_counts = float(np.sum(np.asarray(spectrum.counts, dtype=float)))
     total_uncertainty = float(
-        np.sqrt(np.sum(np.asarray(spectrum.counts_uncertainty, dtype=float) ** 2))
+        np.sqrt(spectrum.linear_variance(np.ones(len(spectrum.counts))))
     )
     payload = {
         "job_id": job.job_id,

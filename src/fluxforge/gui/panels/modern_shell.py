@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+from html import escape
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -2865,22 +2866,27 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "<p>No active spectrum available for ROI analysis.</p>"
                 )
                 return
-            result = analyze_roi_region(
-                foreground,
-                roi_bounds_keV=self._roi_bounds(),
-                label=(foreground.spectrum_id or "ROI"),
-                background_method=self.background_selector.current_key()
-                or self.workspace_controller.state.roi_background_method,
-                peak_search_method=self.peak_search_selector.current_key()
-                or self.workspace_controller.state.peak_search_method,
-                sideband_width_keV=float(self.sideband_width.value()),
-                background_spectrum=background,
-                background_mode=self.workspace_controller.state.background_mode,
-                background_scale=self.workspace_controller.state.background_scale,
-                decompose_overlaps=bool(self.overlap_checkbox.isChecked()),
-                max_components=int(self.max_components.value()),
-                registries=self.registries,
-            )
+            try:
+                result = analyze_roi_region(
+                    foreground,
+                    roi_bounds_keV=self._roi_bounds(),
+                    label=(foreground.spectrum_id or "ROI"),
+                    background_method=self.background_selector.current_key()
+                    or self.workspace_controller.state.roi_background_method,
+                    peak_search_method=self.peak_search_selector.current_key()
+                    or self.workspace_controller.state.peak_search_method,
+                    sideband_width_keV=float(self.sideband_width.value()),
+                    background_spectrum=background,
+                    background_mode=self.workspace_controller.state.background_mode,
+                    background_scale=self.workspace_controller.state.background_scale,
+                    decompose_overlaps=bool(self.overlap_checkbox.isChecked()),
+                    max_components=int(self.max_components.value()),
+                    registries=self.registries,
+                )
+            except ValueError as exc:
+                self.workspace_controller.set_roi_analysis(None)
+                self.summary.setHtml(f"<p>ROI analysis not applied: {escape(str(exc))}</p>")
+                return
             self.workspace_controller.set_roi_analysis(result)
             self.selection_bus.publish(
                 SelectionState(

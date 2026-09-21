@@ -512,6 +512,7 @@ def estimate_peak_area_local_background(
     background_width_channels: int = 1,
     background_gap_fwhm: float = 0.0,
     spectrum_uncertainty: Optional[np.ndarray] = None,
+    spectrum_covariance=None,
 ) -> Tuple[float, float, float, float, Tuple[int, int]]:
     """
     Estimate peak area using a fixed ROI with local sideband background.
@@ -589,6 +590,13 @@ def estimate_peak_area_local_background(
     else:
         gross_var = max(gross, 0.0)
     net_unc = float(np.sqrt(max(gross_var + background_var, 0.0)))
+    if spectrum_covariance is not None:
+        weights = np.zeros(len(counts))
+        weights[ch_min:ch_max+1] = 1
+        if sideband_samples:
+            weights[left_min:left_max+1] -= roi_channels / len(sideband_samples)
+            weights[right_min:right_max+1] -= roi_channels / len(sideband_samples)
+        net_unc = float(np.sqrt(max(float(weights @ (spectrum_covariance @ weights)), 0)))
     return net, net_unc, gross, background_sum, (ch_min, ch_max)
 
 
@@ -1513,6 +1521,7 @@ def analyze_raw_spectrum(
         else spectrum
     )
 
+    working_spectrum.require_diagonal("SNIP-integrated flux-wire areas; use targeted sideband analysis")
     signed_counts = np.asarray(working_spectrum.counts, dtype=float)
     raw_counts = np.asarray(spectrum.counts, dtype=float)
     background, counts_for_search, _ = _snip_background_from_signed_counts(
@@ -1680,6 +1689,10 @@ def analyze_raw_spectrum_targeted(
         )
         if background_subtract
         else analysis_data.spectrum
+    )
+    spectrum.require_diagonal(
+        "Legacy targeted flux-wire counting uses unadjusted-count estimators and historical overrides; "
+        "covariance-aware measured-background reduction is not implemented"
     )
     signed_counts = np.asarray(spectrum.counts, dtype=float)
     raw_counts = np.asarray(analysis_data.spectrum.counts, dtype=float)

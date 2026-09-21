@@ -2524,6 +2524,7 @@ def test_cmd_ingest_profile_supplies_background_and_efficiency(monkeypatch, tmp_
         channels=np.array([0, 1, 2]),
         live_time=10.0,
         real_time=10.0,
+        calibration={"energy": [0.0, 1.0, 0.0]},
         spectrum_id="background",
     )
 

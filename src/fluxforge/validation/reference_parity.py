@@ -330,16 +330,20 @@ def _run_overlay_role_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str
     scale = float(payload.get("scale") or 1.0)
     overlay_scale = float(payload.get("overlay_scale") or 1.0)
 
-    adjusted_counts = subtract_background_counts(
+    adjusted = background_adjusted_spectrum(
         foreground,
         background,
         mode=mode,
         scale=scale,
     )
+    adjusted.require_diagonal("Legacy overlay-role parity reduction")
+    adjusted_counts = adjusted.counts
     display_counts = np.asarray(adjusted_counts, dtype=float)
+    display_variance = np.asarray(adjusted.counts_uncertainty, dtype=float) ** 2
     overlay_sum_counts = 0.0
 
     if overlay is not None:
+        overlay.require_diagonal("Legacy overlay-role parity reduction")
         overlay_counts = np.asarray(overlay.counts, dtype=float)
         overlay_sum_counts = float(np.sum(overlay_counts))
         sample_count = min(display_counts.size, overlay_counts.size)
@@ -348,6 +352,9 @@ def _run_overlay_role_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str
         display_counts = display_counts[:sample_count] + (
             max(overlay_scale, 0.0) * overlay_counts[:sample_count]
         )
+        display_variance = display_variance[:sample_count] + (
+            max(overlay_scale, 0.0) * overlay.counts_uncertainty[:sample_count]
+        ) ** 2
 
     if display_counts.size == 0:
         raise ValueError("Overlay-role parity input must produce non-empty display channels.")
@@ -360,6 +367,7 @@ def _run_overlay_role_case(case_dir: Path, manifest: dict[str, Any]) -> dict[str
 
     display_spectrum = GammaSpectrum(
         counts=display_counts,
+        counts_uncertainty=np.sqrt(display_variance),
         channels=display_channels,
         live_time=float(foreground.live_time),
         real_time=float(foreground.real_time),
@@ -893,14 +901,16 @@ def _spectrum_from_payload(payload: dict[str, Any]) -> GammaSpectrum:
     calibration = payload.get("calibration")
     if not isinstance(calibration, dict):
         calibration = {"energy": [0.0, 1.0, 0.0]}
-    return GammaSpectrum(
-        counts=counts,
-        channels=channels,
+    normalized = dict(payload)
+    normalized.update(
+        counts=counts.tolist(),
+        channels=channels.tolist(),
         live_time=float(payload.get("live_time_s") or payload.get("live_time") or 600.0),
         real_time=float(payload.get("real_time_s") or payload.get("real_time") or 600.0),
         calibration=calibration,
         spectrum_id=str(payload.get("spectrum_id") or "parity_fixture"),
     )
+    return GammaSpectrum.from_dict(normalized)
 
 
 def _peak_candidates_from_rows(rows: Sequence[dict[str, Any]]) -> list[PeakCandidate]:

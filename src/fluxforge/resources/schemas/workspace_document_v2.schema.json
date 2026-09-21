@@ -75,21 +75,74 @@
             }
           },
           "then": {
-            "properties": {
-              "counts_uncertainty": {
-                "$ref": "#/$defs/nonNegativeNumberArray"
+            "anyOf": [
+              {
+                "required": ["counts_uncertainty"],
+                "properties": {"counts_uncertainty": {"$ref": "#/$defs/nonNegativeNumberArray"}}
+              },
+              {
+                "required": ["counts_covariance"],
+                "properties": {"counts_covariance": {"type": "object"}}
               }
-            }
+            ]
           }
         }
       ],
       "required": [
-        "counts", "counts_uncertainty", "channels", "energies", "live_time",
+        "counts", "channels", "energies", "live_time",
         "real_time", "start_time", "spectrum_id", "detector_id", "calibration",
         "source_type", "device_id", "device_label", "gps", "metadata"
       ],
       "properties": {
         "counts": {"$ref": "#/$defs/numberArray"},
+        "counts_covariance": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "format",
+            "shape",
+            "data",
+            "indices",
+            "indptr"
+          ],
+          "properties": {
+            "format": {
+              "const": "csr"
+            },
+            "shape": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "indices": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "indptr": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
         "counts_uncertainty": {
           "anyOf": [{"$ref": "#/$defs/nonNegativeNumberArray"}, {"type": "null"}]
         },

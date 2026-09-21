@@ -155,7 +155,7 @@ def estimate_count_target_forecast(
     else:
         current_counts = float(np.sum(np.asarray(spectrum.counts, dtype=float)))
         current_uncertainty = float(
-            np.sqrt(np.sum(np.asarray(spectrum.counts_uncertainty, dtype=float) ** 2))
+            np.sqrt(spectrum.linear_variance(np.ones(len(spectrum.counts))))
         )
     live_time = max(float(spectrum.live_time), 0.0)
     count_rate = current_counts / live_time if live_time > 0.0 else 0.0

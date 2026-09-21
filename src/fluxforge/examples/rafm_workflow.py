@@ -1010,6 +1010,7 @@ def save_counts_csv(
     corrected_uncertainty: Sequence[float],
     output_path: Path,
 ) -> None:
+    adjusted_spectrum.require_diagonal("RAFM corrected-count CSV export")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     energies = (
         adjusted_spectrum.energies
@@ -1049,6 +1050,7 @@ def compute_final_corrected(
     adjusted_spectrum: GammaSpectrum,
     raw_data: FluxWireData,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    adjusted_spectrum.require_diagonal("RAFM efficiency-corrected count arrays")
     energies = (
         adjusted_spectrum.energies
         if adjusted_spectrum.energies is not None

@@ -233,7 +233,7 @@ def main(argv: list[str] | None = None) -> int:
     app = QApplication.instance() or QApplication([])
     manager = ModeManager()
     bus = SelectionBus()
-    window = FluxForgeMainWindow(mode_manager=manager, selection_bus=bus)
+    window = FluxForgeMainWindow(mode_manager=manager, selection_bus=bus, load_example=True)
     window.show()
     app.processEvents()
 

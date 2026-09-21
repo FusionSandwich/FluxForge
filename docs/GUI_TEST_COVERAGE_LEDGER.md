@@ -1,10 +1,23 @@
 # GUI Test Coverage Ledger
 
+Current background-fix evidence: `interfaces-v3` has three passing real CLI/native
+GUI success/rejection checks. `broad-native-v2` exited abnormally; v3 completed
+without crashing (105 passed, 4 failed, 1 skipped). Follow-up fixes address the
+reporting dependency and test setup. v4 was interrupted at Josh's request to
+keep one window open. Persistent-window subtraction and corrected-file/session
+covariance checks pass, but visual inspection finds a 0–1 keV initial viewport.
+Full visual/native qualification remains OPEN. See the
+[implementation receipt](INL_BACKGROUND_IMPLEMENTATION_RECEIPT.md).
+
 Status: active
-Last Updated: 2026-07-22
+Last Updated: 2026-09-18
 Purpose: explicit inventory of FluxForge GUI parts tested so far, with evidence links and remaining coverage targets.
 
-## Recovery checks — 16 September 2026
+## Fresh continuation — 18 September 2026
+
+Native Windows source tests completed: 39 passed with one ill-conditioned-matrix warning across modern shell, workspace sessions and unfolding workspace. This supersedes the earlier pending QApplication startup observation below for this bounded source run. It does not establish installed-wheel, manual usability or physical INL acceptance. The separate real INL regression still fails before unfolding at the background energy-grid guard. Exact scope, evidence and remaining gates are in [the fresh validation receipt](VALIDATION_RESUME_20260918.md).
+
+## Historical recovery checks — 16 September 2026
 
 Fresh evidence is tracked in [the recovery checklist](RECOVERY_TODO_20260916.md) and [Windows receipt](WINDOWS_VALIDATION_20260916.md). The initial isolated installed package passed 113 distinct checks, including native startup, session persistence, real-spectrum workflows, ROI and exports. The 17 September follow-up resolves installed profile-resource availability and integrates reader, background/ROI, library, forecast and report corrections. The follow-up installed core/reader slice passes 99 checks; eight historical background/parity workflows now stop at an incompatible-grid guard. Current wheel identity and affected checks are recorded in the Windows receipt. The refreshed native Qt run and a minimal probe stall at QApplication startup; that native qualification remains pending despite passing source offscreen recovery checks. Activity export preserves area uncertainty and requires refitting legacy peaks. Manual usability qualification remains open. The July receipts below remain historical.
 

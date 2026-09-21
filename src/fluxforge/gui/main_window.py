@@ -1052,7 +1052,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _on_mode_state_changed(self, state) -> None:
             resolved_theme = resolve_theme(state.theme)
-            QApplication.instance().setStyleSheet(load_stylesheet(resolved_theme))
+            application = QApplication.instance()
+            stylesheet = load_stylesheet(resolved_theme)
+            if application.styleSheet() != stylesheet:
+                application.setStyleSheet(stylesheet)
             label = f"Mode: {state.mode.value.title()}"
             if state.standard:
                 label += f" · {state.standard}"
@@ -1743,8 +1746,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _reset_analysis_workspace(self) -> None:
             self.qa_monitor.clear_demo_history()
-            self.analysis_workspace.set_state(
-                self._build_initial_workspace_state(include_example=False)
+            # Reset the canonical document. Updating its legacy projection
+            # intentionally retains document-only spectra and role assignments.
+            self.analysis_workspace.set_document(
+                AnalysisWorkspaceController(
+                    self._build_initial_workspace_state(include_example=False)
+                ).document
             )
             self.selection_bus.publish(SelectionState())
 

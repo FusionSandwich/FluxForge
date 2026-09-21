@@ -117,6 +117,8 @@ def fit_roi_peak(
     background_model: str = "linear",
     prior_fwhm_channels: float | None = None,
     registries: PluginRegistries | None = None,
+    counts_covariance=None,
+    counts_uncertainty=None,
 ) -> InteractivePeakFitResult:
     """Fit the peak inside an ROI using a registered fitter."""
 
@@ -127,6 +129,8 @@ def fit_roi_peak(
         register_builtin_peak_fitters(shared)
     entry = shared.peak_fitters.get_entry(fitter_key)
     definition: PeakFitterDefinition = entry.implementation
+    if counts_covariance is not None and definition.model_key != "gaussian":
+        raise ValueError(f"{definition.model_key} does not support correlated count uncertainty; use gaussian")
 
     x = np.asarray(channels, dtype=float)
     y = np.asarray(counts, dtype=float)
@@ -152,6 +156,8 @@ def fit_roi_peak(
             int(round(initial_centroid)),
             fit_width=max(int(round((upper - lower) / 2.0)), 3),
             background_model=fit_background,
+            counts_covariance=counts_covariance,
+            counts_uncertainty=counts_uncertainty,
         )
         if definition.model_key == "bayesian_gaussian":
             result = _apply_bayesian_fwhm_prior(

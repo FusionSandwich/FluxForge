@@ -271,6 +271,7 @@ class PeakFitResult:
     covariance: Optional[np.ndarray] = None
     success: bool = True
     message: str = ""
+    area_gradient: Optional[np.ndarray] = None
 
     @property
     def reduced_chi_squared(self) -> float:
@@ -285,6 +286,8 @@ class PeakFitResult:
     @property
     def net_counts_uncertainty(self) -> float:
         """Net counts uncertainty."""
+        if self.area_gradient is not None and self.covariance is not None:
+            return float(np.sqrt(max(float(self.area_gradient @ self.covariance @ self.area_gradient), 0.0)))
         return self.peak.area_uncertainty
 
 
@@ -1296,6 +1299,36 @@ def auto_find_peaks(
     return [(int(channels[p]), float(h)) for p, h in zip(peaks, heights)]
 
 
+def _observation_sigma(y, lo, hi, covariance, uncertainty):
+    if covariance is not None:
+        from scipy import sparse
+        if not sparse.issparse(covariance):
+            raise TypeError("counts_covariance must be sparse")
+        matrix = covariance.tocsr()[lo:hi, lo:hi].toarray()
+        if matrix.shape != (len(y), len(y)) or not np.all(np.isfinite(matrix)):
+            raise ValueError("Fit counts_covariance has invalid shape or values")
+        if not np.allclose(matrix, matrix.T, rtol=1e-12, atol=1e-12):
+            raise ValueError("Fit counts_covariance must be symmetric")
+        try:
+            np.linalg.cholesky(matrix)
+        except np.linalg.LinAlgError as exc:
+            raise ValueError("Singular fit counts_covariance is unsupported; exact constraints require a different fitter") from exc
+        return matrix
+    if uncertainty is not None:
+        sigma = np.asarray(uncertainty, dtype=float)[lo:hi]
+        if sigma.shape != y.shape or not np.all(np.isfinite(sigma)) or np.any(sigma < 0):
+            raise ValueError("Invalid fit counts_uncertainty")
+        # Retain the historical one-count floor for diagonal counting estimates.
+        return np.maximum(sigma, 1.0)
+    return np.maximum(np.sqrt(np.maximum(y, 0.0)), 1.0)
+
+
+def _observation_chi_squared(residuals, sigma):
+    if sigma.ndim == 2:
+        return float(residuals @ np.linalg.solve(sigma, residuals))
+    return float(np.sum((residuals / sigma) ** 2))
+
+
 def fit_single_peak(
     channels: np.ndarray,
     counts: np.ndarray,
@@ -1304,6 +1337,8 @@ def fit_single_peak(
     background_model: str = "linear",
     fix_centroid: bool = False,
     initial_sigma: Optional[float] = None,
+    counts_covariance=None,
+    counts_uncertainty=None,
 ) -> PeakFitResult:
     """
     Fit single Gaussian peak to spectrum region.
@@ -1339,11 +1374,8 @@ def fit_single_peak(
     x = channels[ch_lo:ch_hi].astype(float)
     y = counts[ch_lo:ch_hi].astype(float)
 
-    # Weights for chi-squared (Poisson uncertainty)
-    # Background subtraction can legitimately leave negative bins. Poisson
-    # variance is undefined there, so use a zero-count floor instead of taking
-    # sqrt of a negative value and silently producing NaN fit weights.
-    weights = 1.0 / np.maximum(np.sqrt(np.clip(y, 0.0, None)), 1.0)
+    # Use supplied observation uncertainties/covariance, including signed data.
+    fit_sigma = _observation_sigma(y, ch_lo, ch_hi, counts_covariance, counts_uncertainty)
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()
@@ -1409,7 +1441,7 @@ def fit_single_peak(
             x,
             y,
             p0=p0,
-            sigma=1.0 / weights,
+            sigma=fit_sigma,
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
             maxfev=5000,
@@ -1455,11 +1487,12 @@ def fit_single_peak(
     # Calculate residuals and chi-squared
     y_fit = model(x, *popt)
     residuals = y - y_fit
-    chi_sq = np.sum((residuals * weights) ** 2)
+    chi_sq = _observation_chi_squared(residuals, fit_sigma)
     dof = len(y) - len(popt)
 
     return PeakFitResult(
         peak=peak,
+        area_gradient=np.array([sigma, 0, amplitude] + [0]*(len(popt)-3)) * np.sqrt(2*np.pi),
         background=background,
         background_model=background_model,
         residuals=residuals,
@@ -1479,6 +1512,8 @@ def fit_multiple_peaks(
     fit_width: int = 10,
     background_model: str = "linear",
     share_sigma: bool = False,
+    counts_covariance=None,
+    counts_uncertainty=None,
 ) -> List[PeakFitResult]:
     """
     Fit multiple peaks simultaneously.
@@ -1514,6 +1549,8 @@ def fit_multiple_peaks(
                 peak_ch,
                 fit_width=fit_width,
                 background_model=background_model,
+                counts_covariance=counts_covariance,
+                counts_uncertainty=counts_uncertainty,
             )
             for peak_ch in sorted(peak_channels)
         ]
@@ -1525,7 +1562,8 @@ def fit_multiple_peaks(
 
     x = channels[ch_lo:ch_hi].astype(float)
     y = counts[ch_lo:ch_hi].astype(float)
-    weights = 1.0 / np.maximum(np.sqrt(np.maximum(y, 0.0)), 1.0)
+
+    fit_sigma = _observation_sigma(y, ch_lo, ch_hi, counts_covariance, counts_uncertainty)
 
     if x.size < max(7, 3 * len(peak_channels)):
         return [
@@ -1535,6 +1573,8 @@ def fit_multiple_peaks(
                 peak_ch,
                 fit_width=fit_width,
                 background_model=background_model,
+                counts_covariance=counts_covariance,
+                counts_uncertainty=counts_uncertainty,
             )
             for peak_ch in peak_channels
         ]
@@ -1649,7 +1689,7 @@ def fit_multiple_peaks(
             x,
             y,
             p0=p0,
-            sigma=1.0 / weights,
+            sigma=fit_sigma,
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
             maxfev=20000,
@@ -1665,13 +1705,15 @@ def fit_multiple_peaks(
                 peak_ch,
                 fit_width=fit_width,
                 background_model=background_model,
+                counts_covariance=counts_covariance,
+                counts_uncertainty=counts_uncertainty,
             )
             for peak_ch in peak_channels
         ]
 
     y_fit = model(x, *popt)
     residuals = y - y_fit
-    chi_sq = float(np.sum((residuals * weights) ** 2))
+    chi_sq = _observation_chi_squared(residuals, fit_sigma)
     dof = int(len(y) - len(popt))
     continuum = _continuum(np.asarray(popt, dtype=float))
 
@@ -1701,8 +1743,12 @@ def fit_multiple_peaks(
             amplitude_unc=amp_unc,
             sigma_unc=sigma_unc,
         )
+        area_gradient = np.zeros(len(popt))
+        area_gradient[2*i if share_sigma else 3*i] = sigma * np.sqrt(2*np.pi)
+        area_gradient[sigma_index if share_sigma else 3*i+2] = amp * np.sqrt(2*np.pi)
         results.append(
             PeakFitResult(
+                area_gradient=area_gradient,
                 peak=peak,
                 background=continuum.copy(),
                 background_model=background_model,
@@ -1930,6 +1976,8 @@ def fit_hypermet_peak(
     enable_tail: bool = True,
     enable_step: bool = False,
     initial_sigma: Optional[float] = None,
+    counts_covariance=None,
+    counts_uncertainty=None,
 ) -> Tuple[HypermetPeak, PeakFitResult]:
     """
     Fit Hypermet peak to spectrum region.
@@ -1961,6 +2009,8 @@ def fit_hypermet_peak(
     result : PeakFitResult
         Full fitting result (uses Gaussian representation for compatibility)
     """
+    if counts_covariance is not None:
+        raise ValueError("Hypermet tail-area covariance is unsupported; use Gaussian covariance fitting or ROI sidebands")
     # Extract fit region
     idx_peak = np.argmin(np.abs(channels - peak_channel))
     ch_lo = max(0, idx_peak - fit_width)
@@ -1969,8 +2019,7 @@ def fit_hypermet_peak(
     x = channels[ch_lo:ch_hi].astype(float)
     y = counts[ch_lo:ch_hi].astype(float)
 
-    # Weights for chi-squared
-    weights = 1.0 / np.maximum(np.sqrt(y), 1.0)
+    fit_sigma = _observation_sigma(y, ch_lo, ch_hi, counts_covariance, counts_uncertainty)
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()
@@ -2029,7 +2078,7 @@ def fit_hypermet_peak(
             x,
             y,
             p0=p0,
-            sigma=1.0 / weights,
+            sigma=fit_sigma,
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
             maxfev=10000,
@@ -2079,7 +2128,7 @@ def fit_hypermet_peak(
     background = popt[6] * x + popt[7]
     y_fit = hypermet_with_linear_bg(x, *popt)
     residuals = y - y_fit
-    chi_sq = np.sum((residuals * weights) ** 2)
+    chi_sq = _observation_chi_squared(residuals, fit_sigma)
     dof = len(y) - len(popt)
 
     result = PeakFitResult(

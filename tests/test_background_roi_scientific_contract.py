@@ -42,14 +42,6 @@ def test_gui_background_preserves_signed_counts_and_poisson_variance():
         ),
         (
             GammaSpectrum(
-                counts=np.ones(2), calibration={"energy": [1.0, 2.0]}
-            ),
-            GammaSpectrum(
-                counts=np.ones(4), calibration={"energy": [0.5, 1.0]}
-            ),
-        ),
-        (
-            GammaSpectrum(
                 counts=np.ones(3), calibration={"energy": [0.0, 1.0]}
             ),
             GammaSpectrum(
@@ -58,11 +50,19 @@ def test_gui_background_preserves_signed_counts_and_poisson_variance():
         ),
     ],
 )
-def test_background_rejects_grids_that_need_padding_or_rebinning(
+def test_background_rejects_grids_that_need_padding_or_uncovered_bins(
     sample, background
 ):
-    with pytest.raises(ValueError, match="identical .*grid"):
+    with pytest.raises(ValueError, match="identical .*grid|strict coverage"):
         subtract_measured_background(sample, background)
+
+
+def test_background_accepts_fully_covered_nested_grids():
+    sample = GammaSpectrum(counts=np.ones(2), calibration={"energy": [1.,2.]}, live_time=1)
+    background = GammaSpectrum(counts=np.ones(4), calibration={"energy": [.5,1.]}, live_time=1)
+    result = subtract_measured_background(sample, background)
+    np.testing.assert_allclose(result.counts, [-1,-1])
+    np.testing.assert_allclose(result.counts_covariance.toarray(), np.diag([3,3]))
 
 
 @pytest.mark.parametrize("scale", [float("nan"), float("inf"), -1.0])

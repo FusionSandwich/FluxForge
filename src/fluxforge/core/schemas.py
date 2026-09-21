@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from typing import Any, Dict
+from fluxforge.core.count_covariance import CSR_SCHEMA
 
 
 def _schema_id(name: str, version: str = "v1") -> str:
@@ -22,6 +23,7 @@ SPECTRUM_FILE_SCHEMA: Dict[str, Any] = {
             "required": ["counts", "channels", "live_time", "real_time"],
             "properties": {
                 "counts": {"type": "array", "items": {"type": "number"}},
+                "counts_covariance": CSR_SCHEMA,
                 "counts_uncertainty": {
                     "type": ["array", "null"],
                     "items": {"type": "number"},
