@@ -79,10 +79,54 @@ jobs:
           python -m pip install -e '.[dev]'
           python -m pip install 'Jinja2>=3.1'
 
-      - name: Run non-window regression checks
+      - name: Validate active-spectrum projection without GUI panel imports
+        run: |
+          python - <<'PY'
+          import numpy as np
+
+          from fluxforge.gui.analysis_workspace import AnalysisWorkspaceController
+          from fluxforge.io.spe import GammaSpectrum
+
+          def spectrum(spectrum_id: str, offset: float) -> GammaSpectrum:
+              counts = np.array([1.0, 2.0, 3.0], dtype=float) + offset
+              return GammaSpectrum(
+                  counts=counts,
+                  counts_uncertainty=np.sqrt(counts),
+                  channels=np.arange(counts.size, dtype=float),
+                  live_time=10.0,
+                  real_time=10.0,
+                  spectrum_id=spectrum_id,
+              )
+
+          controller = AnalysisWorkspaceController()
+          first_key = controller.register_loaded_spectrum(
+              spectrum('first-spectrum', 0.0),
+              label='first.spe',
+              source_path='/tmp/first.spe',
+          )
+          controller.assign_loaded_spectrum_to_slot(first_key, 'foreground')
+          assert controller.document.active_spectrum_id == first_key
+
+          second_key = controller.register_loaded_spectrum(
+              spectrum('second-spectrum', 1.0),
+              label='second.spe',
+              source_path='/tmp/second.spe',
+          )
+          assert controller.document.active_spectrum_id == first_key
+          controller.assign_loaded_spectrum_to_slot(second_key, 'foreground')
+          assert controller.document.active_spectrum_id == second_key
+
+          foreground = next(
+              role
+              for role in controller.document.spectrum_roles
+              if role.role == 'foreground'
+          )
+          assert foreground.spectrum_ids[0] == second_key
+          PY
+
+      - name: Run focused background interface checks
         run: |
           python -m pytest -q \
-            tests/test_analysis_workspace_qt.py::test_active_spectrum_follows_first_and_reassigned_foreground \
             tests/test_inl_background_interfaces.py::test_inl_cli_subtraction_and_invalid_coverage
 
       - name: Commit and push reviewed changes
