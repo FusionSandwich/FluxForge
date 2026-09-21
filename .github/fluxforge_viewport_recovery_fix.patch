@@ -1,17 +1,18 @@
 diff --git a/src/fluxforge/gui/analysis_workspace.py b/src/fluxforge/gui/analysis_workspace.py
 --- a/src/fluxforge/gui/analysis_workspace.py
 +++ b/src/fluxforge/gui/analysis_workspace.py
-@@ -1036,11 +1036,44 @@ class AnalysisWorkspaceController:
+@@ -1036,11 +1036,43 @@ class AnalysisWorkspaceController:
          if not spectrum_inventory_changed:
              spectra = base.spectra
              roles = list(base.spectrum_roles)
 +
-+        # Retain a canonical active spectrum only while it is still the primary
-+        # spectrum selected by the current role projection. The previous
-+        # implementation preserved ``base.active_spectrum_id`` solely because
-+        # the role name (usually ``foreground``) was unchanged. After Reset ->
-+        # Open, that could retain ``None``; after assigning a different loaded
-+        # spectrum to the same role, it could retain the old spectrum ID.
++        # Retain a canonical active spectrum only while it is still selected by
++        # the current role projection.  The previous implementation preserved
++        # ``base.active_spectrum_id`` solely because the role name (usually
++        # ``foreground``) was unchanged.  After Reset -> Open, that could retain
++        # ``None``; after assigning a different loaded spectrum to the same role,
++        # it could retain the old spectrum ID even though the role now targeted
++        # a new primary spectrum.
          if (
              previous_state is not None
              and state.active_spectrum_key == previous_state.active_spectrum_key
@@ -31,8 +32,7 @@ diff --git a/src/fluxforge/gui/analysis_workspace.py b/src/fluxforge/gui/analysi
 +                and (
 +                    (
 +                        active_role is not None
-+                        and bool(active_role.spectrum_ids)
-+                        and active_role.spectrum_ids[0] == previous_active_id
++                        and previous_active_id in active_role.spectrum_ids
 +                    )
 +                    or (
 +                        active_role is None
@@ -63,7 +63,7 @@ diff --git a/src/fluxforge/gui/backends/pyqtgraph_backend.py b/src/fluxforge/gui
                  self.set_annotation_lines(self._annotation_specs)
 +
 +            # A cleared ViewBox can retain its old disabled range (commonly the
-+            # empty 0-1 default). Fit only the first nonempty trace load; a
++            # empty 0-1 default).  Fit only the first nonempty trace load; a
 +            # canonical persisted viewport, when present, is applied immediately
 +            # afterwards by CentralWorkspaceTabs and therefore still wins.
 +            if first_nonempty_load:
@@ -72,7 +72,7 @@ diff --git a/src/fluxforge/gui/backends/pyqtgraph_backend.py b/src/fluxforge/gui
  
          def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
              self.set_annotation_lines(
-@@ -1380,6 +1389,11 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
+@@ -1380,6 +1387,11 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
              )
  
          def clear(self) -> None:
@@ -207,7 +207,7 @@ diff --git a/tests/test_inl_background_interfaces.py b/tests/test_inl_background
 +
 +        # Reset View must recover full-spectrum framing in the same live window
 +        # and persist the recovered range rather than merely fixing the plot
-+        # buffer. The timer is part of the production interaction path.
++        # buffer.  The timer is part of the production interaction path.
 +        canvas.plot_item.disableAutoRange()
 +        canvas.plot_item.setXRange(0.0, 1.0, padding=0.0)
 +        app.processEvents()

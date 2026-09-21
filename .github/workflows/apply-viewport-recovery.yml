@@ -36,6 +36,24 @@ jobs:
         run: |
           git apply --check .github/fluxforge_viewport_recovery_fix.patch
           git apply .github/fluxforge_viewport_recovery_fix.patch
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/fluxforge/gui/analysis_workspace.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''                    (
+                        active_role is not None
+                        and previous_active_id in active_role.spectrum_ids
+                    )'''
+          new = '''                    (
+                        active_role is not None
+                        and bool(active_role.spectrum_ids)
+                        and active_role.spectrum_ids[0] == previous_active_id
+                    )'''
+          if text.count(old) != 1:
+              raise SystemExit('Expected exactly one active-role condition to refine')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
           git diff --check
 
       - name: Compile changed Python files
