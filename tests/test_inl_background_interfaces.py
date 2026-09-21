@@ -61,6 +61,7 @@ def test_inl_gui_real_files_subtraction_session_and_recovery(tmp_path):
     from fluxforge.gui.main_window import FluxForgeMainWindow
     from fluxforge.gui.mode_manager import ModeManager
     from fluxforge.gui.selection_bus import SelectionBus
+    from PySide6.QtTest import QTest
     from PySide6.QtCore import QSettings
     from fluxforge.standards import QAMonitor
 
@@ -141,6 +142,35 @@ def test_inl_gui_real_files_subtraction_session_and_recovery(tmp_path):
         restored = controller.spectrum('foreground')
         np.testing.assert_array_equal(restored.counts, expected.counts)
         assert (restored.counts_covariance != expected.counts_covariance).nnz == 0
+        assert controller.document.active_spectrum_id is not None
+
+        expected_x = np.asarray(
+            restored.energies
+            if restored.energies is not None
+            else restored.channels,
+            dtype=float,
+        )
+        x_range = canvas.plot_item.viewRange()[0]
+        assert x_range[0] <= expected_x[0]
+        assert x_range[1] >= expected_x[-1]
+
+        # Reset View must recover full-spectrum framing in the same live window
+        # and persist the recovered range rather than merely fixing the plot
+        # buffer.  The timer is part of the production interaction path.
+        canvas.plot_item.disableAutoRange()
+        canvas.plot_item.setXRange(0.0, 1.0, padding=0.0)
+        app.processEvents()
+        canvas.reset_view_button.click()
+        QTest.qWait(180)
+        app.processEvents()
+        x_range = canvas.plot_item.viewRange()[0]
+        assert x_range[0] <= expected_x[0]
+        assert x_range[1] >= expected_x[-1]
+        persisted_viewport = controller.document.viewport_by_id('primary-spectrum')
+        assert persisted_viewport is not None
+        assert persisted_viewport.x_range[0] <= expected_x[0]
+        assert persisted_viewport.x_range[1] >= expected_x[-1]
+
         corrected_session = tmp_path / 'corrected-inl.ffs'
         assert window.save_session(corrected_session)
         window.open_path(corrected_session)
@@ -149,6 +179,9 @@ def test_inl_gui_real_files_subtraction_session_and_recovery(tmp_path):
         assert (restored.counts_covariance != expected.counts_covariance).nnz == 0
         np.testing.assert_allclose(canvas.buffer.full_resolution, expected.counts,
                                    rtol=1e-6, atol=1e-6)
+        reopened_x_range = canvas.plot_item.viewRange()[0]
+        assert reopened_x_range[0] <= expected_x[0]
+        assert reopened_x_range[1] >= expected_x[-1]
     finally:
         window.close()
         app.processEvents()

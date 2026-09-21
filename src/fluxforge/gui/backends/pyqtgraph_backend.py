@@ -329,6 +329,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.clear()
                 return
 
+            first_nonempty_load = not self._current_traces
             self._current_traces = tuple(traces)
             self._x_axis_is_energy = traces[0].x_axis_label.lower().startswith("energy")
             self.plot.setLabel("bottom", traces[0].x_axis_label)
@@ -373,6 +374,14 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             if self._annotation_specs:
                 self.set_annotation_lines(self._annotation_specs)
+
+            # A cleared ViewBox can retain its old disabled range (commonly the
+            # empty 0-1 default).  Fit only the first nonempty trace load; a
+            # canonical persisted viewport, when present, is applied immediately
+            # afterwards by CentralWorkspaceTabs and therefore still wins.
+            if first_nonempty_load:
+                self.plot_item.enableAutoRange(x=True, y=True)
+                self.plot_item.autoRange()
 
         def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
             self.set_annotation_lines(
@@ -1377,6 +1386,11 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def clear(self) -> None:
+            # A delayed pan/zoom receipt belongs to the document being cleared;
+            # it must not recreate a stale viewport during Reset/Open.
+            self._viewport_commit_timer.stop()
+            self._interaction_spectrum_id = None
+
             self._replace_roi_items(())
             self._peak_overlays_by_id = {}
             self._selected_roi_id = None

@@ -15,6 +15,7 @@ from fluxforge.gui.main_window import FluxForgeMainWindow  # noqa: E402
 from fluxforge.gui.mode_manager import ModeManager  # noqa: E402
 from fluxforge.gui.panels.modern_shell import build_demo_spectrum  # noqa: E402
 from fluxforge.gui.qt_compat import QApplication  # noqa: E402
+from fluxforge.gui.spectrum_canvas import SpectrumTrace  # noqa: E402
 from fluxforge.io.session import read_ffs_session  # noqa: E402
 
 
@@ -307,5 +308,37 @@ def test_switching_spectrum_clears_exact_selection_and_retargets_viewport() -> N
             viewport.spectrum_id
             == window.analysis_workspace.document.active_spectrum_id
         )
+    finally:
+        window.close()
+
+
+def test_clear_cancels_stale_viewport_commit_and_autoranges_next_trace() -> None:
+    window, app = _window_with_duplicate_energy_peaks()
+    try:
+        canvas = window.central_tabs.canvas
+        canvas.plot_item.disableAutoRange()
+        canvas.plot_item.setXRange(0.0, 1.0, padding=0.0)
+        canvas._schedule_viewport_commit()
+        assert canvas._viewport_commit_timer.isActive()
+
+        canvas.clear()
+        assert not canvas._viewport_commit_timer.isActive()
+        assert canvas._interaction_spectrum_id is None
+
+        canvas.set_traces(
+            (
+                SpectrumTrace(
+                    label="Replacement",
+                    counts=(1.0, 4.0, 2.0),
+                    channels=(100.0, 200.0, 300.0),
+                    x_axis_label="Energy (keV)",
+                ),
+            )
+        )
+        app.processEvents()
+
+        x_range = canvas.plot_item.viewRange()[0]
+        assert x_range[0] <= 100.0
+        assert x_range[1] >= 300.0
     finally:
         window.close()

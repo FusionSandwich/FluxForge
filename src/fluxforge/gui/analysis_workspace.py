@@ -1037,11 +1037,44 @@ class AnalysisWorkspaceController:
         if not spectrum_inventory_changed:
             spectra = base.spectra
             roles = list(base.spectrum_roles)
+
+        # Retain a canonical active spectrum only while it is still selected by
+        # the current role projection.  The previous implementation preserved
+        # ``base.active_spectrum_id`` solely because the role name (usually
+        # ``foreground``) was unchanged.  After Reset -> Open, that could retain
+        # ``None``; after assigning a different loaded spectrum to the same role,
+        # it could retain the old spectrum ID even though the role now targeted
+        # a new primary spectrum.
         if (
             previous_state is not None
             and state.active_spectrum_key == previous_state.active_spectrum_key
         ):
-            active_spectrum_id = base.active_spectrum_id
+            previous_active_id = base.active_spectrum_id
+            active_role = next(
+                (
+                    item
+                    for item in roles
+                    if item.role == state.active_spectrum_key
+                ),
+                None,
+            )
+            previous_active_still_selected = (
+                previous_active_id is not None
+                and (
+                    (
+                        active_role is not None
+                        and bool(active_role.spectrum_ids)
+                        and active_role.spectrum_ids[0] == previous_active_id
+                    )
+                    or (
+                        active_role is None
+                        and state.active_spectrum_key == previous_active_id
+                        and previous_active_id in spectra_by_id
+                    )
+                )
+            )
+            if previous_active_still_selected:
+                active_spectrum_id = previous_active_id
         if previous_state is not None and state.peaks == previous_state.peaks:
             peaks = base.peaks
             rois = base.rois

@@ -263,6 +263,43 @@ def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
     assert controller.describe()["ml_source_id"] == "fluxforge_bundled_gamma"
 
 
+def test_active_spectrum_follows_first_and_reassigned_foreground():
+    """The canonical active ID must follow the role's displayed primary."""
+
+    controller = AnalysisWorkspaceController()
+    first_key = controller.register_loaded_spectrum(
+        build_demo_spectrum(),
+        label="first.spe",
+        source_path="/tmp/first.spe",
+    )
+    controller.assign_loaded_spectrum_to_slot(first_key, "foreground")
+
+    assert controller.document.active_spectrum_id == first_key
+    foreground_role = next(
+        item
+        for item in controller.document.spectrum_roles
+        if item.role == "foreground"
+    )
+    assert foreground_role.spectrum_ids[0] == first_key
+
+    second_key = controller.register_loaded_spectrum(
+        build_demo_overlay_spectrum(),
+        label="second.spe",
+        source_path="/tmp/second.spe",
+    )
+    # Merely adding an inventory entry must not retarget the displayed role.
+    assert controller.document.active_spectrum_id == first_key
+
+    controller.assign_loaded_spectrum_to_slot(second_key, "foreground")
+    assert controller.document.active_spectrum_id == second_key
+    foreground_role = next(
+        item
+        for item in controller.document.spectrum_roles
+        if item.role == "foreground"
+    )
+    assert foreground_role.spectrum_ids[0] == second_key
+
+
 def _write_spectrum_csv(path: Path, spectrum) -> None:
     lines = ["channel,counts"]
     for channel, count in zip(
