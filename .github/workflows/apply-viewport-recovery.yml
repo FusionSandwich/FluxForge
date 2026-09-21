@@ -38,21 +38,29 @@ jobs:
           git apply .github/fluxforge_viewport_recovery_fix.patch
           python - <<'PY'
           from pathlib import Path
+          import re
 
           path = Path('src/fluxforge/gui/analysis_workspace.py')
           text = path.read_text(encoding='utf-8')
-          old = '''                    (
-                        active_role is not None
-                        and previous_active_id in active_role.spectrum_ids
-                    )'''
-          new = '''                    (
-                        active_role is not None
-                        and bool(active_role.spectrum_ids)
-                        and active_role.spectrum_ids[0] == previous_active_id
-                    )'''
-          if text.count(old) != 1:
-              raise SystemExit('Expected exactly one active-role condition to refine')
-          path.write_text(text.replace(old, new), encoding='utf-8')
+          pattern = re.compile(
+              r'(?m)^(?P<indent>[ \t]*)active_role is not None\n'
+              r'(?P=indent)and previous_active_id in active_role\.spectrum_ids$'
+          )
+
+          def replacement(match: re.Match[str]) -> str:
+              indent = match.group('indent')
+              return (
+                  f'{indent}active_role is not None\n'
+                  f'{indent}and bool(active_role.spectrum_ids)\n'
+                  f'{indent}and active_role.spectrum_ids[0] == previous_active_id'
+              )
+
+          text, count = pattern.subn(replacement, text)
+          if count != 1:
+              raise SystemExit(
+                  f'Expected exactly one active-role condition to refine; found {count}'
+              )
+          path.write_text(text, encoding='utf-8')
           PY
           git diff --check
 
