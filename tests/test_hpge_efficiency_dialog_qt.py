@@ -77,7 +77,10 @@ def test_csv_contract_is_atomic_and_certificate_unsupported(tmp_path):
         writer.writerow([661.7, 1000, 32, 100, 1000, 0.02, 0.8, 0.01, 1])
     dialog.import_csv(path)
     assert dialog.table.rowCount() == 1
+    assert dialog.table.item(0, 9).text() == ""
+    dialog.table.item(0, 9).setText("certificate-A")
     assert dialog._read_points()[0].energy_keV == pytest.approx(661.7)
+    assert dialog._read_points()[0].activity_source_id == "certificate-A"
     with pytest.raises(ValueError, match="Only CSV"):
         dialog.import_csv(tmp_path / "certificate.pdf")
     dialog.close()

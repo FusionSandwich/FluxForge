@@ -80,9 +80,9 @@ def test_efficiency_profile_is_canonical_and_survives_session_round_trip() -> No
     spectrum_id = controller.document.active_spectrum_id
     assert spectrum_id is not None
     points = (
-        EfficiencyPoint(100.0, 1000.0, 100.0, 1000.0, 0.5),
-        EfficiencyPoint(500.0, 500.0, 100.0, 1000.0, 0.5),
-        EfficiencyPoint(1000.0, 250.0, 100.0, 1000.0, 0.5),
+        EfficiencyPoint(100.0, 1000.0, 100.0, 1000.0, 0.5, activity_source_id="A"),
+        EfficiencyPoint(500.0, 500.0, 100.0, 1000.0, 0.5, activity_source_id="A"),
+        EfficiencyPoint(1000.0, 250.0, 100.0, 1000.0, 0.5, activity_source_id="A"),
     )
     controller.apply_efficiency_calibration(_fit(), _detector(), points=points)
 
@@ -92,6 +92,7 @@ def test_efficiency_profile_is_canonical_and_survives_session_round_trip() -> No
     assert profile is not None and profile.efficiency_model is not None
     assert profile.efficiency_model.model_key == "log_poly_2"
     assert len(profile.efficiency_model.points) == 3
+    assert all(point["activity_source_id"] == "A" for point in profile.efficiency_model.points)
     assert profile.geometry.crystal_length_cm == pytest.approx(6.45)
     assert profile.geometry.dead_layer_um == pytest.approx(0.7)
     assert profile.geometry.window_thickness_um == pytest.approx(450.0)

@@ -1,9 +1,15 @@
 """Physical and diagnostic regression checks for HPGe efficiency fits."""
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 
-from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
+from fluxforge.analysis.detector_calibration import (
+    EfficiencyPoint,
+    efficiency_measurement_covariance,
+    fit_efficiency_curve,
+)
 from fluxforge.analysis.efficiency_models import (
     semi_empirical_efficiency,
     semi_empirical_efficiency_uncertainty,
@@ -149,3 +155,81 @@ def test_small_percentage_residuals_do_not_hide_statistically_bad_fit():
     assert fit.fit_quality["max_absolute_percentage_residual"] < 3
     assert fit.fit_quality["chi_square_p_value"] < 0.05
     assert fit.fit_quality["review_status"] == "review_required"
+
+
+def test_shared_activity_source_preserves_common_uncertainty_floor():
+    def calibration_points(first_id, second_id):
+        return (
+            EfficiencyPoint(100.0, 1e6, 100.0, 1e6, 1.0,
+                count_uncertainty=1e3, activity_rel_unc=0.10,
+                activity_source_id=first_id),
+            EfficiencyPoint(200.0, 1e6, 100.0, 1e6, 1.0,
+                count_uncertainty=1e3, activity_rel_unc=0.10,
+                activity_source_id=second_id),
+        )
+
+    shared = fit_efficiency_curve(calibration_points("certificate-A", "certificate-A"), degree=0)
+    separate = fit_efficiency_curve(calibration_points("certificate-A", "certificate-B"), degree=0)
+    assert np.sqrt(shared.covariance[0, 0]) >= 0.10
+    assert np.sqrt(separate.covariance[0, 0]) == pytest.approx(
+        np.sqrt((0.10**2 + 0.001**2) / 2), rel=1e-6
+    )
+
+
+def test_unspecified_activity_source_forces_review_even_with_exact_fit():
+    energies = (100.0, 200.0, 400.0, 800.0)
+    efficiencies = np.exp(-4.0 - 0.5 * np.log(energies))
+    points = tuple(
+        EfficiencyPoint(energy, efficiency * 1e8, 1.0, 1e8, 1.0,
+            count_uncertainty=efficiency * 1e5, activity_rel_unc=0.05)
+        for energy, efficiency in zip(energies, efficiencies)
+    )
+    fit = fit_efficiency_model(points, model_key="log_poly_2")
+    assert fit.fit_quality["max_absolute_percentage_residual"] < 1e-6
+    assert fit.fit_quality["activity_correlation"] == "unspecified"
+    assert fit.fit_quality["review_status"] == "review_required"
+    grouped = fit_efficiency_model(
+        tuple(replace(point, activity_source_id="A") for point in points),
+        model_key="log_poly_2",
+    )
+    assert grouped.fit_quality["activity_correlation"] == "grouped"
+    assert grouped.fit_quality["review_status"] == "pass"
+
+
+def test_semi_empirical_fit_uses_grouped_activity_covariance():
+    energies = np.array([30, 45, 60, 80, 120, 180, 280, 450, 700, 1100, 1700, 2600], dtype=float)
+    values = semi_empirical_efficiency(energies, [0.02, 2.0, 1.5, 1.0, 0.5])
+    points = tuple(
+        EfficiencyPoint(float(energy), float(value * 1e8), 1.0, 1e8, 1.0,
+            count_uncertainty=float(value * 1e6), activity_rel_unc=0.05,
+            activity_source_id="certificate-A")
+        for energy, value in zip(energies, values)
+    )
+    fit = fit_efficiency_model(points, model_key="semi_empirical_hpge")
+    assert fit.fit_quality["identifiability"] == "full"
+    assert fit.fit_quality["activity_correlation"] == "grouped"
+    assert fit.fit_quality["review_status"] == "pass"
+    assert np.all(np.linalg.eigvalsh(np.asarray(fit.covariance)) >= -1e-12)
+
+
+def test_log_fit_chi_square_uses_the_fitted_log_covariance():
+    energies = np.array([100, 200, 400, 800, 1600, 2400], dtype=float)
+    efficiencies = np.exp(-4.0 - 0.5 * np.log(energies))
+    efficiencies[-1] *= 1.053
+    points = tuple(
+        EfficiencyPoint(
+            float(energy), float(efficiency * 1e8), 1.0, 1e8, 1.0,
+            count_uncertainty=float(efficiency * 1e6),
+            activity_rel_unc=0.05, activity_source_id="A",
+        )
+        for energy, efficiency in zip(energies, efficiencies)
+    )
+    fit = fit_efficiency_model(points, model_key="log_poly_2")
+    log_residuals = np.log(fit.measured_efficiencies) - np.log(fit.fitted_efficiencies)
+    cholesky = np.linalg.cholesky(
+        efficiency_measurement_covariance(points, log_space=True)
+    )
+    expected = float(np.sum(np.square(np.linalg.solve(cholesky, log_residuals))))
+    assert fit.fit_quality["chi_squared"] == pytest.approx(expected)
+    assert fit.fit_quality["chi_square_p_value"] > 0.05
+    assert fit.fit_quality["review_status"] == "pass"

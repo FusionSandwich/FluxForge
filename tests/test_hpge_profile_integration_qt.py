@@ -82,7 +82,10 @@ def test_dialog_apply_persists_profile_and_one_undo_step() -> None:
     stack.redo()
     assert controller.active_detector_profile() == profile
     assert controller.state.efficiency_fit is not None
+    stack.clear()
     panel.close()
+    panel.deleteLater()
+    app.processEvents()
 
 
 def test_malformed_saved_points_report_error_without_opening_dialog(monkeypatch) -> None:

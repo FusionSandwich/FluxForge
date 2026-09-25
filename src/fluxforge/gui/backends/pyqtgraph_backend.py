@@ -327,6 +327,8 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
         def set_traces(self, traces: Sequence[SpectrumTrace]) -> None:
             if not traces:
                 self.clear()
+                if self.selection_bus is not None:
+                    self._on_selection_changed(self.selection_bus.state)
                 return
 
             self._current_traces = tuple(traces)

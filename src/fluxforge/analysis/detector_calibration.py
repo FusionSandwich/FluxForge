@@ -28,9 +28,15 @@ class EfficiencyPoint:
     count_uncertainty: Optional[float] = None
     activity_rel_unc: Optional[float] = None
     probability_uncertainty: Optional[float] = None
+    activity_source_id: Optional[str] = None
 
     def efficiency(self) -> Tuple[float, float]:
         """Return (efficiency, uncertainty)."""
+        if self.activity_source_id is not None and (
+            not isinstance(self.activity_source_id, str)
+            or not self.activity_source_id.strip()
+        ):
+            raise ValueError("activity_source_id must be a non-empty source identifier.")
         eff, unc = calculate_efficiency_from_source(
             measured_counts=self.net_counts,
             live_time=self.live_time_s,
@@ -42,6 +48,43 @@ class EfficiencyPoint:
             probability_uncertainty=self.probability_uncertainty,
         )
         return eff, unc
+
+
+def efficiency_measurement_covariance(
+    points: Iterable[EfficiencyPoint], *, log_space: bool = False
+) -> np.ndarray:
+    """First-order point covariance, correlating activity errors by source ID.
+
+    Count and line-probability errors remain independent. Lines with the same
+    non-empty activity source ID share a fully correlated activity error.
+    """
+    observed = tuple(points)
+    measured = np.asarray([point.efficiency() for point in observed], dtype=float)
+    if measured.ndim != 2 or measured.shape[1] != 2:
+        raise ValueError("Efficiency covariance needs measured calibration points.")
+    efficiencies, uncertainties = measured.T
+    relative = uncertainties / efficiencies
+    covariance = np.diag(relative**2)
+    for left, first in enumerate(observed):
+        source_id = first.activity_source_id
+        if source_id is None:
+            continue
+        for right in range(left + 1, len(observed)):
+            second = observed[right]
+            if second.activity_source_id == source_id:
+                shared = float(first.activity_rel_unc or 0.0) * float(
+                    second.activity_rel_unc or 0.0
+                )
+                covariance[left, right] = covariance[right, left] = shared
+    if not log_space:
+        covariance *= np.outer(efficiencies, efficiencies)
+    try:
+        np.linalg.cholesky(covariance)
+    except np.linalg.LinAlgError as exc:
+        raise ValueError(
+            "Calibration point covariance needs independent count or line uncertainty."
+        ) from exc
+    return covariance
 
 
 @dataclass
@@ -97,35 +140,37 @@ def fit_efficiency_curve(
     """
     if not isinstance(degree, int) or degree < 0:
         raise ValueError("Polynomial degree must be a nonnegative integer.")
+    observed = tuple(points)
     energies = []
     efficiencies = []
-    uncertainties = []
 
-    for point in points:
+    for point in observed:
         eff, unc = point.efficiency()
         if not np.isfinite(point.energy_keV) or point.energy_keV <= 0:
             raise ValueError("Calibration energy must be finite and positive (keV).")
         energies.append(point.energy_keV)
         efficiencies.append(eff)
-        uncertainties.append(unc)
 
     if len(energies) < degree + 1:
         raise ValueError("Not enough calibration points for requested degree.")
 
     energies_arr = np.array(energies, dtype=float)
     eff_arr = np.array(efficiencies, dtype=float)
-    unc_arr = np.array(uncertainties, dtype=float)
 
     if len(np.unique(energies_arr)) < degree + 1:
         raise ValueError("Distinct calibration energies are required for this degree.")
     x = np.log(energies_arr)
     y = np.log(eff_arr)
     design = np.column_stack([x**power for power in range(degree + 1)])
-    log_sigma = unc_arr / eff_arr
-    weighted = design / log_sigma[:, None]
+    cholesky = np.linalg.cholesky(
+        efficiency_measurement_covariance(observed, log_space=True)
+    )
+    weighted = np.linalg.solve(cholesky, design)
     if np.linalg.matrix_rank(weighted) != degree + 1:
         raise ValueError("Polynomial efficiency basis is rank deficient.")
-    coeffs_arr, _, _, _ = np.linalg.lstsq(weighted, y / log_sigma, rcond=None)
+    coeffs_arr, _, _, _ = np.linalg.lstsq(
+        weighted, np.linalg.solve(cholesky, y), rcond=None
+    )
     cov = np.linalg.inv(weighted.T @ weighted)
     coeffs = coeffs_arr.tolist()
 
@@ -158,14 +203,18 @@ def fit_gray_efficiency_curve(
     if np.any(~np.isfinite(energies)) or np.any(energies <= 0):
         raise ValueError("Calibration energy must be finite and positive (keV).")
     measured = np.asarray([point.efficiency() for point in observed], dtype=float)
-    efficiencies, uncertainties = measured.T
+    efficiencies = measured[:, 0]
     log_energy = np.log(energies)
     design = np.column_stack((np.ones_like(energies), log_energy, log_energy**2, 1 / energies))
-    log_sigma = uncertainties / efficiencies
-    weighted = design / log_sigma[:, None]
+    cholesky = np.linalg.cholesky(
+        efficiency_measurement_covariance(observed, log_space=True)
+    )
+    weighted = np.linalg.solve(cholesky, design)
     if np.linalg.matrix_rank(weighted) != 4:
         raise ValueError("Gray efficiency basis is rank deficient; use distinct energies.")
-    coefficients, _, _, _ = np.linalg.lstsq(weighted, np.log(efficiencies) / log_sigma, rcond=None)
+    coefficients, _, _, _ = np.linalg.lstsq(
+        weighted, np.linalg.solve(cholesky, np.log(efficiencies)), rcond=None
+    )
     covariance = np.linalg.inv(weighted.T @ weighted)
     curve = EfficiencyCurve(
         model_type="functional",

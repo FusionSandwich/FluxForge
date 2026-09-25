@@ -68,6 +68,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             "Gamma Intensity",
             "Intensity Unc.",
             "Geometry Factor",
+            "Activity Source ID",
         )
 
         DETECTOR_FIELDS = (
@@ -191,7 +192,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             contract = QLabel(
                 "CSV only (certificate/PDF formats unsupported). Required headers: "
-                + ", ".join(self.CSV_COLUMNS) + ". Every row must be valid.", self,
+                + ", ".join(self.CSV_COLUMNS)
+                + ". Every row must be valid. Enter a common Activity Source ID "
+                  "for lines sharing one source's activity uncertainty.", self,
             )
             contract.setObjectName("EfficiencyCsvContractLabel")
             contract.setWordWrap(True)
@@ -285,10 +288,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         point.emission_probability,
                         point.probability_uncertainty or 0.0,
                         point.geometry_factor,
+                        point.activity_source_id or "",
                     )
                 ):
                     self.table.setItem(
-                        row, column, QTableWidgetItem(f"{float(value):.6g}")
+                        row, column, QTableWidgetItem(
+                            f"{float(value):.6g}" if column < 9 else str(value)
+                        )
                     )
             self.table.blockSignals(False)
             self._invalidate_fit()
@@ -326,9 +332,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 except (AttributeError, TypeError, ValueError) as exc:
                     raise ValueError(f"Row {row + 1}: all nine numeric fields are required") from exc
                 self._validate_values(values, row + 1)
+                source_item = self.table.item(row, 9)
+                source_id = source_item.text().strip() if source_item is not None else ""
                 points.append(EfficiencyPoint(*values[:2], values[3], values[4], values[6],
                     geometry_factor=values[8], count_uncertainty=values[2],
-                    activity_rel_unc=values[5], probability_uncertainty=values[7]))
+                    activity_rel_unc=values[5], probability_uncertainty=values[7],
+                    activity_source_id=source_id or None))
             return tuple(points)
 
         @staticmethod
@@ -347,7 +356,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _add_row(self) -> None:
             row = self.table.rowCount()
             self.table.insertRow(row)
-            for column in range(9):
+            for column in range(len(self.HEADERS)):
                 self.table.setItem(row, column, QTableWidgetItem(""))
             self.table.setCurrentCell(row, 0)
             self.fit_button.setEnabled(True)
@@ -395,6 +404,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.table.insertRow(row)
                 for column, value in enumerate(values):
                     self.table.setItem(row, column, QTableWidgetItem(f"{value:.12g}"))
+                self.table.setItem(row, 9, QTableWidgetItem(""))
             self.table.blockSignals(False)
             self.fit_button.setEnabled(True)
             self._invalidate_fit()
@@ -494,7 +504,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     f"reduced χ² {reduced_text}; p {p_text}.\n"
                     f"Parameters: {self._fit_parameters_text()}.{conditional} "
                     "Detector fields are metadata, not fit coefficients. "
-                    "χ² assumes independent point errors; shared-source covariance is not modeled."
+                    "Source IDs correlate activity errors; blank IDs leave that correlation unknown."
                 )
             )
             self.accept_button.setEnabled(True)

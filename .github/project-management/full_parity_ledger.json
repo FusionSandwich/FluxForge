@@ -306,7 +306,7 @@
       "source_urls": ["fluxforge-roadmap", "gammavision", "genie"],
       "backend": "implemented", "cli": "prototype", "gui": "prototype", "fixture": "prototype", "test": "prototype",
       "evidence": ["src/fluxforge/analysis/efficiency_models.py", "src/fluxforge/gui/dialogs/efficiency_dialog.py", "src/fluxforge/gui/detector_profile_adapter.py", "tests/test_hpge_efficiency_models.py", "tests/test_hpge_efficiency_dialog_qt.py", "tests/test_hpge_profile_persistence.py", "tests/test_hpge_profile_integration_qt.py", "docs/HPGE_EFFICIENCY_CALIBRATION.md", "docs/BRANCH03_HPGE_EVIDENCE.md"],
-      "notes": "Measured/fitted and percentage-residual review, a ±3% band, conditional fit covariance, and detector-profile persistence are implemented. Shared-source correlation, validated geometry transfer, certificate/PDF import, standards golden cases, and full platform/release acceptance remain open."
+      "notes": "Measured/fitted and percentage-residual review, a ±3% band, source-ID-grouped activity covariance, and detector-profile persistence are implemented. Cross-certificate/probability correlation, validated geometry transfer, certificate/PDF import, standards golden cases, and full platform/release acceptance remain open."
     },
     {
       "id": "BG.3", "title": "Off, Compact, and Full peak-residual modes", "roadmap": "bGamma carryover", "status": "prototype",

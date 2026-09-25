@@ -13,6 +13,7 @@ from scipy.stats import chi2
 
 from fluxforge.analysis.detector_calibration import (
     EfficiencyPoint,
+    efficiency_measurement_covariance,
     fit_efficiency_curve,
     fit_gray_efficiency_curve,
 )
@@ -936,11 +937,12 @@ def fit_efficiency_model(
     if np.any(~np.isfinite(energies)) or np.any(energies <= 0):
         raise ValueError("Calibration energy must be finite and positive (keV).")
     measured_with_uncertainty = np.asarray([point.efficiency() for point in points], dtype=float)
-    measured, uncertainties = measured_with_uncertainty.T
+    measured = measured_with_uncertainty[:, 0]
+    measurement_covariance = efficiency_measurement_covariance(points)
 
     if definition.form == "semi_empirical_hpge":
         curve, covariance, parameter_names, quality = _fit_semi_empirical_coefficients(
-            energies, measured, uncertainties
+            energies, measured, measurement_covariance
         )
     elif definition.form == "gray":
         fit = fit_gray_efficiency_curve(points)
@@ -960,8 +962,27 @@ def fit_efficiency_model(
     residuals = measured - predicted
     percentage = 100.0 * residuals / measured
     status = tuple("within_3_percent" if abs(value) <= 3 else "outside_3_percent" for value in percentage)
-    chi_squared = float(np.sum(np.square(residuals / uncertainties)))
+    if definition.form == "semi_empirical_hpge":
+        diagnostic_residuals = residuals
+        diagnostic_covariance = measurement_covariance
+    else:
+        diagnostic_residuals = np.log(measured) - np.log(predicted)
+        diagnostic_covariance = efficiency_measurement_covariance(
+            points, log_space=True
+        )
+    whitened_residuals = np.linalg.solve(
+        np.linalg.cholesky(diagnostic_covariance), diagnostic_residuals
+    )
+    chi_squared = float(np.sum(np.square(whitened_residuals)))
     degrees_of_freedom = len(points) - len(parameter_names)
+    source_groups = {
+        point.activity_source_id for point in points
+        if point.activity_source_id is not None and (point.activity_rel_unc or 0.0) > 0
+    }
+    unspecified_activity_sources = any(
+        (point.activity_rel_unc or 0.0) > 0
+        and point.activity_source_id is None for point in points
+    )
     chi_square_p_value = (
         float(chi2.sf(chi_squared, degrees_of_freedom))
         if degrees_of_freedom > 0 else None
@@ -971,6 +992,7 @@ def fit_efficiency_model(
         if all(value == "within_3_percent" for value in status)
         and chi_square_p_value is not None
         and chi_square_p_value >= 0.05
+        and not unspecified_activity_sources
         else "review_required"
     )
     quality = {
@@ -980,6 +1002,11 @@ def fit_efficiency_model(
         "reduced_chi_squared": chi_squared / degrees_of_freedom if degrees_of_freedom > 0 else None,
         "chi_square_p_value": chi_square_p_value,
         "chi_square_alpha": 0.05,
+        "activity_source_groups": len(source_groups),
+        "activity_correlation": (
+            "unspecified" if unspecified_activity_sources
+            else "grouped" if source_groups else "none"
+        ),
         "max_absolute_percentage_residual": float(np.max(np.abs(percentage))),
         "review_status": review_status,
     }
@@ -1582,7 +1609,7 @@ def compute_cascade_sum_lines(
 def _fit_semi_empirical_coefficients(
     energies: np.ndarray,
     values: np.ndarray,
-    uncertainties: np.ndarray,
+    measurement_covariance: np.ndarray,
 ) -> tuple[EfficiencyCurve, np.ndarray, tuple[str, ...], dict]:
     """Fit response terms with explicit conditional fallback for sparse spectra.
 
@@ -1593,12 +1620,11 @@ def _fit_semi_empirical_coefficients(
     names = ("scale", "length_g_cm2", "alpha", "length0_g_cm2", "kappa")
     if len(energies) < 4 or len(np.unique(energies)) < 4:
         raise ValueError("Semi-empirical HPGe fit needs at least four distinct energies.")
-    if np.any(~np.isfinite(uncertainties)) or np.any(uncertainties <= 0):
-        raise ValueError("Efficiency uncertainties must be finite and positive.")
+    cholesky = np.linalg.cholesky(measurement_covariance)
 
     def residual(coefficients: np.ndarray) -> np.ndarray:
         prediction = semi_empirical_efficiency(energies, coefficients)
-        return (prediction - values) / uncertainties
+        return np.linalg.solve(cholesky, prediction - values)
 
     def identifiable(jacobian: np.ndarray) -> bool:
         norms = np.linalg.norm(jacobian, axis=0)
