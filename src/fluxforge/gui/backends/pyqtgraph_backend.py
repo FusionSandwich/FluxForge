@@ -327,8 +327,11 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
         def set_traces(self, traces: Sequence[SpectrumTrace]) -> None:
             if not traces:
                 self.clear()
+                if self.selection_bus is not None:
+                    self._on_selection_changed(self.selection_bus.state)
                 return
 
+            first_nonempty_load = not self._current_traces
             self._current_traces = tuple(traces)
             self._x_axis_is_energy = traces[0].x_axis_label.lower().startswith("energy")
             self.plot.setLabel("bottom", traces[0].x_axis_label)
@@ -373,6 +376,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             if self._annotation_specs:
                 self.set_annotation_lines(self._annotation_specs)
+
+            if first_nonempty_load:
+                self.plot_item.enableAutoRange(x=True, y=True)
+                self.plot_item.autoRange()
 
         def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
             self.set_annotation_lines(
@@ -1377,6 +1384,8 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def clear(self) -> None:
+            self._viewport_commit_timer.stop()
+            self._interaction_spectrum_id = None
             self._replace_roi_items(())
             self._peak_overlays_by_id = {}
             self._selected_roi_id = None

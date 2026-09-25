@@ -11,6 +11,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 
+from fluxforge.analysis.detector_calibration import EfficiencyPoint
 from fluxforge.core.analysis_workspace import (
     ActivityCalculationResult,
     EfficiencyCalibrationFitResult,
@@ -34,6 +35,10 @@ from fluxforge.core.workspace_document import (
     WorkspaceSpectrum,
 )
 from fluxforge.data.efficiency import EfficiencyCurve
+from fluxforge.gui.detector_profile_adapter import (
+    detector_calibration_from_profile,
+    detector_profile_with_efficiency,
+)
 from fluxforge.io.flux_wire import EfficiencyCalibration
 from fluxforge.io.spe import GammaSpectrum
 
@@ -107,11 +112,12 @@ class AnalysisWorkspaceController:
         self._document_listeners: list[WorkspaceDocumentListener] = []
         if isinstance(initial_state, WorkspaceDocument):
             initial_state.validate()
-            self._document = initial_state
-            self._state = self._state_from_document(initial_state)
+            self._document = self._migrate_legacy_efficiency_document(initial_state)
+            self._state = self._state_from_document(self._document)
         else:
             self._state = initial_state or AnalysisWorkspaceState()
             self._document = self._document_from_state(self._state)
+            self._document = self._migrate_legacy_efficiency_document(self._document)
 
     @property
     def state(self) -> AnalysisWorkspaceState:
@@ -139,12 +145,19 @@ class AnalysisWorkspaceController:
         if listener in self._document_listeners:
             self._document_listeners.remove(listener)
 
-    def set_document(self, document: WorkspaceDocument) -> WorkspaceDocument:
+    def set_document(
+        self,
+        document: WorkspaceDocument,
+        *,
+        migrate_legacy_efficiency: bool = True,
+    ) -> WorkspaceDocument:
         """Replace the canonical document and rebuild the legacy projection."""
 
         if not isinstance(document, WorkspaceDocument):
             raise TypeError("document must be a WorkspaceDocument")
         document.validate()
+        if migrate_legacy_efficiency:
+            document = self._migrate_legacy_efficiency_document(document)
         self._document = document
         self._state = self._state_from_document(document)
         self._notify()
@@ -306,7 +319,17 @@ class AnalysisWorkspaceController:
         )
         if self._document.spectrum_by_id(spectrum_id) is None:
             raise KeyError(f"Unknown spectrum role or ID: {key!r}")
-        self._replace_document(active_spectrum_id=spectrum_id)
+        if spectrum_id == self._document.active_spectrum_id:
+            return self._state
+        workflow = dict(self._document.workflow_state)
+        legacy = dict(workflow.get("analysis_workspace_v1", {}))
+        legacy["activity_results"] = []
+        workflow["analysis_workspace_v1"] = legacy
+        workflow["analysis_invalidation"] = {
+            "reason": "active spectrum changed",
+            "requires_reanalysis": True,
+        }
+        self._replace_document(active_spectrum_id=spectrum_id, workflow_state=workflow)
         return self._state
 
     def replace_peaks(self, peaks: Sequence[PeakCandidate]) -> AnalysisWorkspaceState:
@@ -569,6 +592,26 @@ class AnalysisWorkspaceController:
             items.append(profile)
         return self._replace_document(detector_profiles=tuple(items))
 
+    def apply_detector_profile(
+        self, spectrum_id: str, profile: DetectorProfile
+    ) -> WorkspaceDocument:
+        """Attach one profile without changing measured or calibrated spectrum data."""
+
+        profile.validate("detector_profile")
+        if self._document.spectrum_by_id(spectrum_id) is None:
+            raise KeyError(f"Unknown spectrum ID: {spectrum_id}")
+        profiles = tuple(
+            item for item in self._document.detector_profiles
+            if item.detector_profile_id != profile.detector_profile_id
+        ) + (profile,)
+        spectra = tuple(
+            replace(item, detector_profile_id=profile.detector_profile_id)
+            if item.spectrum_id == spectrum_id
+            else item
+            for item in self._document.spectra
+        )
+        return self._replace_document(detector_profiles=profiles, spectra=spectra)
+
     def delete_detector_profile(self, profile_id: str) -> WorkspaceDocument:
         profiles = tuple(
             item
@@ -804,17 +847,116 @@ class AnalysisWorkspaceController:
         self,
         fit: EfficiencyCalibrationFitResult | None,
     ) -> AnalysisWorkspaceState:
+        spectrum_id = self._document.active_spectrum_id
+        if fit is not None and spectrum_id is not None:
+            self.apply_efficiency_calibration(
+                fit,
+                self._state.detector_efficiency
+                or EfficiencyCalibration(relative_uncertainty=0.05),
+                spectrum_id=spectrum_id,
+            )
+            return self._state
         return self.update(efficiency_fit=fit)
 
     def set_detector_efficiency(
         self,
         calibration: EfficiencyCalibration | None,
     ) -> AnalysisWorkspaceState:
+        if calibration is not None and self._state.efficiency_fit is not None:
+            spectrum_id = self._document.active_spectrum_id
+            if spectrum_id is not None:
+                self.apply_efficiency_calibration(
+                    self._state.efficiency_fit,
+                    calibration,
+                    spectrum_id=spectrum_id,
+                )
+                return self._state
         return self.update(
             detector_efficiency=(
                 dataclasses.replace(calibration) if calibration is not None else None
             )
         )
+
+    def active_detector_profile(self) -> DetectorProfile | None:
+        """Return the profile attached to the active spectrum, if any."""
+
+        spectrum_id = self._document.active_spectrum_id
+        record = self._document.spectrum_by_id(spectrum_id) if spectrum_id else None
+        return (
+            self._document.detector_profile_by_id(record.detector_profile_id)
+            if record is not None and record.detector_profile_id is not None
+            else None
+        )
+
+    def proposed_efficiency_profile(
+        self,
+        fit: EfficiencyCalibrationFitResult,
+        detector: EfficiencyCalibration,
+        *,
+        points: Sequence[EfficiencyPoint] = (),
+        spectrum_id: str | None = None,
+    ) -> DetectorProfile:
+        """Validate one prospective profile without mutating the workspace."""
+
+        target = spectrum_id or self._document.active_spectrum_id
+        record = self._document.spectrum_by_id(target) if target else None
+        if record is None:
+            raise ValueError("Select a spectrum before applying efficiency calibration")
+        prior = (
+            self._document.detector_profile_by_id(record.detector_profile_id)
+            if record.detector_profile_id
+            else None
+        )
+        if prior is not None and any(
+            item.spectrum_id != target
+            and item.detector_profile_id == prior.detector_profile_id
+            for item in self._document.spectra
+        ):
+            base_id = f"{target}-detector-profile"
+            profile_ids = {
+                item.detector_profile_id for item in self._document.detector_profiles
+            }
+            candidate = base_id
+            suffix = 2
+            while candidate in profile_ids:
+                candidate = f"{base_id}-{suffix}"
+                suffix += 1
+            prior = replace(prior, detector_profile_id=candidate)
+        return detector_profile_with_efficiency(
+            spectrum_id=target,
+            prior=prior,
+            fit=fit,
+            detector=detector,
+            points=points,
+        )
+
+    def apply_efficiency_calibration(
+        self,
+        fit: EfficiencyCalibrationFitResult,
+        detector: EfficiencyCalibration,
+        *,
+        points: Sequence[EfficiencyPoint] = (),
+        spectrum_id: str | None = None,
+    ) -> WorkspaceDocument:
+        """Apply an efficiency fit to the active spectrum's canonical profile."""
+
+        target = spectrum_id or self._document.active_spectrum_id
+        profile = self.proposed_efficiency_profile(
+            fit, detector, points=points, spectrum_id=target
+        )
+        assert target is not None
+        self.apply_detector_profile(target, profile)
+        workflow = dict(self._document.workflow_state)
+        legacy = dict(workflow.get("analysis_workspace_v1", {}))
+        legacy["activity_results"] = []
+        legacy["efficiency_fit"] = None
+        legacy["detector_efficiency"] = None
+        workflow["analysis_workspace_v1"] = legacy
+        workflow["analysis_invalidation"] = {
+            "reason": "efficiency calibration changed",
+            "requires_reanalysis": True,
+        }
+        return self._replace_document(workflow_state=workflow)
 
     def set_activity_results(
         self,
@@ -892,7 +1034,64 @@ class AnalysisWorkspaceController:
     def _replace_document(self, **changes: Any) -> WorkspaceDocument:
         changes.setdefault("updated_at", _workspace_timestamp())
         document = replace(self._document, **changes)
-        return self.set_document(document)
+        return self.set_document(document, migrate_legacy_efficiency=False)
+
+    @staticmethod
+    def _migrate_legacy_efficiency_document(
+        document: WorkspaceDocument,
+    ) -> WorkspaceDocument:
+        """Lift a saved legacy efficiency fit into the versioned detector profile."""
+
+        spectrum_id = document.active_spectrum_id
+        record = document.spectrum_by_id(spectrum_id) if spectrum_id else None
+        if record is None:
+            return document
+        existing = (
+            document.detector_profile_by_id(record.detector_profile_id)
+            if record.detector_profile_id
+            else None
+        )
+        if existing is not None and existing.efficiency_model is not None:
+            return document
+        payload = document.workflow_state.get("analysis_workspace_v1", {})
+        if not isinstance(payload, Mapping):
+            return document
+        fit = _decode_efficiency_fit(payload.get("efficiency_fit"))
+        if fit is None:
+            return document
+        detector = _decode_dataclass(
+            EfficiencyCalibration, payload.get("detector_efficiency")
+        ) or EfficiencyCalibration(relative_uncertainty=0.05)
+        profile = detector_profile_with_efficiency(
+            spectrum_id=spectrum_id,
+            prior=existing,
+            fit=fit,
+            detector=detector,
+        )
+        profiles = tuple(
+            item for item in document.detector_profiles
+            if item.detector_profile_id != profile.detector_profile_id
+        ) + (profile,)
+        spectra = tuple(
+            replace(item, detector_profile_id=profile.detector_profile_id)
+            if item.spectrum_id == spectrum_id
+            else item
+            for item in document.spectra
+        )
+        workflow = dict(document.workflow_state)
+        legacy = dict(payload)
+        legacy["efficiency_fit"] = None
+        legacy["detector_efficiency"] = None
+        workflow["analysis_workspace_v1"] = legacy
+        migrated = replace(
+            document,
+            updated_at=_workspace_timestamp(),
+            detector_profiles=profiles,
+            spectra=spectra,
+            workflow_state=workflow,
+        )
+        migrated.validate()
+        return migrated
 
     def _document_from_state(
         self,
@@ -1048,6 +1247,17 @@ class AnalysisWorkspaceController:
 
         workflow = dict(base.workflow_state)
         workflow["analysis_workspace_v1"] = self._legacy_workflow_payload(state)
+        active_record = (
+            base.spectrum_by_id(active_spectrum_id) if active_spectrum_id else None
+        )
+        active_profile = (
+            base.detector_profile_by_id(active_record.detector_profile_id)
+            if active_record is not None and active_record.detector_profile_id
+            else None
+        )
+        if active_profile is not None and active_profile.efficiency_model is not None:
+            workflow["analysis_workspace_v1"]["efficiency_fit"] = None
+            workflow["analysis_workspace_v1"]["detector_efficiency"] = None
         document = replace(
             base,
             updated_at=_workspace_timestamp(),
@@ -1114,6 +1324,21 @@ class AnalysisWorkspaceController:
         )
         legacy_payload = document.workflow_state.get("analysis_workspace_v1", {})
         legacy = self._legacy_state_values(legacy_payload)
+        active_record = document.spectrum_by_id(document.active_spectrum_id or "")
+        active_profile = (
+            document.detector_profile_by_id(active_record.detector_profile_id)
+            if active_record is not None and active_record.detector_profile_id
+            else None
+        )
+        if active_profile is not None and active_profile.efficiency_model is not None:
+            fit_payload = active_profile.efficiency_model.parameters.get("fit_result")
+            legacy["efficiency_fit"] = _decode_efficiency_fit(fit_payload)
+            legacy["detector_efficiency"] = detector_calibration_from_profile(
+                active_profile
+            )
+        else:
+            legacy["efficiency_fit"] = None
+            legacy["detector_efficiency"] = None
         selected = legacy.pop("selected_peak_id", None)
         if selected and all(item.peak_id != selected for item in peaks):
             selected = peaks[0].peak_id if peaks else None
@@ -1486,6 +1711,25 @@ def _decode_efficiency_fit(payload: Any) -> EfficiencyCalibrationFitResult | Non
             residuals=tuple(float(item) for item in payload.get("residuals", ())),
             rmse=float(payload.get("rmse", 0.0)),
             points_used=int(payload.get("points_used", 0)),
+            measured_efficiencies=tuple(
+                float(item) for item in payload.get("measured_efficiencies", ())
+            ),
+            fitted_efficiencies=tuple(
+                float(item) for item in payload.get("fitted_efficiencies", ())
+            ),
+            percentage_residuals=tuple(
+                float(item) for item in payload.get("percentage_residuals", ())
+            ),
+            point_status=tuple(str(item) for item in payload.get("point_status", ())),
+            covariance=(
+                tuple(tuple(float(value) for value in row) for row in payload["covariance"])
+                if payload.get("covariance") is not None
+                else None
+            ),
+            covariance_parameters=tuple(
+                str(item) for item in payload.get("covariance_parameters", ())
+            ),
+            fit_quality=dict(payload.get("fit_quality") or {}),
         )
     except (TypeError, ValueError):
         return None

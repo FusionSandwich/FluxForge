@@ -286,6 +286,31 @@ def test_view_actions_and_crosshair_are_canonical_undoable_and_persisted(
         window.close()
 
 
+def test_saved_viewport_survives_temporary_canvas_clear() -> None:
+    window, app = _window_with_duplicate_energy_peaks()
+    try:
+        tabs = window.central_tabs
+        canvas = tabs.canvas
+        canvas.plot_item.setXRange(400.0, 600.0, padding=0.0)
+        app.processEvents()
+        saved = canvas.viewport_state(
+            viewport_id="primary-spectrum",
+            spectrum_id=window.analysis_workspace.document.active_spectrum_id,
+        )
+        window.analysis_workspace.upsert_viewport(saved)
+        app.processEvents()
+
+        canvas.set_traces(())
+        tabs._sync_workspace_state(window.analysis_workspace.state)
+        app.processEvents()
+
+        assert canvas.plot_item.getViewBox().viewRange()[0] == pytest.approx(
+            saved.x_range
+        )
+    finally:
+        window.close()
+
+
 def test_switching_spectrum_clears_exact_selection_and_retargets_viewport() -> None:
     window, app = _window_with_duplicate_energy_peaks()
     try:

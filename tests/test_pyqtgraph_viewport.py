@@ -157,3 +157,30 @@ def test_pyqtgraph_viewport_restore_hides_optional_layers() -> None:
     assert not canvas._crosshair_vertical.isVisible()
     assert not canvas._crosshair_horizontal.isVisible()
     canvas.close()
+
+
+def test_first_trace_after_clear_fits_data_instead_of_stale_range() -> None:
+    app = _qapp()
+    canvas = PyQtGraphSpectrumCanvas(selection_bus=SelectionBus())
+    canvas.resize(900, 600)
+    canvas.show()
+    trace = SpectrumTrace(
+        label="Foreground",
+        counts=tuple(float(index + 1) for index in range(1000)),
+        channels=tuple(float(index) for index in range(1000)),
+        x_axis_label="Energy (keV)",
+    )
+    canvas.set_traces((trace,))
+    canvas.plot_item.setXRange(0.0, 1.0, padding=0.0)
+    canvas.plot_item.setYRange(0.0, 1.0, padding=0.0)
+    app.processEvents()
+
+    canvas.set_traces(())
+    canvas.set_traces((trace,))
+    app.processEvents()
+
+    x_range, y_range = canvas.plot_item.getViewBox().viewRange()
+    assert x_range[0] < 1.0
+    assert x_range[1] > 900.0
+    assert y_range[1] > 900.0
+    canvas.close()

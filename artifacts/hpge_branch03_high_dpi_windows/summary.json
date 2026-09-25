@@ -1,0 +1,13 @@
+{
+  "qt_platform": "windows",
+  "model": "log_poly_2",
+  "points": 5,
+  "diagnostic_rows": 5,
+  "review_status": "review_required",
+  "covariance_parameters": [
+    "a0",
+    "a1",
+    "a2"
+  ],
+  "screenshot": "hpge-efficiency-fit.png"
+}

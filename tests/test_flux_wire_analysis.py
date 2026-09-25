@@ -116,10 +116,7 @@ def test_combine_peak_activities_emits_single_vs_all_diagnostics() -> None:
     assert "variance_line_activity_bq2" in row
     assert "max_abs_relative_line_delta" in row
     assert row["max_abs_relative_line_delta"] > 0.0
-    assert (
-        row["single_peak_outlier_energies"]
-        or row["excluded_peak_energies"]
-    )
+    assert row["single_peak_outlier_energies"] or row["excluded_peak_energies"]
 
     first_diag = row["single_peak_activity_diagnostics"][0]
     assert "relative_delta_vs_combined" in first_diag
