@@ -125,6 +125,10 @@ Example** for the bundled deterministic HPGe example, or open your own spectrum
 with **File > Open Spectrum**. The equivalent one-command example launch is
 `fluxforge gui --project-dir . --open-example`.
 
+For measured detector calibration points, model review, CSV import, and the
+limits of fitted uncertainty and geometry metadata, see
+[HPGe efficiency calibration](docs/HPGE_EFFICIENCY_CALIBRATION.md).
+
 Recommended first files:
 
 - foreground spectrum: `examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC`

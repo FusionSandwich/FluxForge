@@ -95,17 +95,19 @@ def fit_efficiency_curve(
 
     ln(eff) = a0 + a1*ln(E) + a2*ln(E)^2 + ...
     """
+    if not isinstance(degree, int) or degree < 0:
+        raise ValueError("Polynomial degree must be a nonnegative integer.")
     energies = []
     efficiencies = []
     uncertainties = []
 
     for point in points:
         eff, unc = point.efficiency()
-        if eff <= 0:
-            continue
+        if not np.isfinite(point.energy_keV) or point.energy_keV <= 0:
+            raise ValueError("Calibration energy must be finite and positive (keV).")
         energies.append(point.energy_keV)
         efficiencies.append(eff)
-        uncertainties.append(max(unc, 1e-12))
+        uncertainties.append(unc)
 
     if len(energies) < degree + 1:
         raise ValueError("Not enough calibration points for requested degree.")
@@ -114,14 +116,20 @@ def fit_efficiency_curve(
     eff_arr = np.array(efficiencies, dtype=float)
     unc_arr = np.array(uncertainties, dtype=float)
 
+    if len(np.unique(energies_arr)) < degree + 1:
+        raise ValueError("Distinct calibration energies are required for this degree.")
     x = np.log(energies_arr)
     y = np.log(eff_arr)
-    weights = 1.0 / np.clip(unc_arr / eff_arr, 1e-6, None)
+    design = np.column_stack([x**power for power in range(degree + 1)])
+    log_sigma = unc_arr / eff_arr
+    weighted = design / log_sigma[:, None]
+    if np.linalg.matrix_rank(weighted) != degree + 1:
+        raise ValueError("Polynomial efficiency basis is rank deficient.")
+    coeffs_arr, _, _, _ = np.linalg.lstsq(weighted, y / log_sigma, rcond=None)
+    cov = np.linalg.inv(weighted.T @ weighted)
+    coeffs = coeffs_arr.tolist()
 
-    coeffs_desc, cov = np.polyfit(x, y, degree, w=weights, cov=True)
-    coeffs = coeffs_desc[::-1].tolist()
-
-    y_fit = np.polyval(coeffs_desc, x)
+    y_fit = design @ coeffs_arr
     residuals = y - y_fit
 
     if energy_range is None:
@@ -135,6 +143,41 @@ def fit_efficiency_curve(
 
     return EfficiencyFit(
         coefficients=coeffs, covariance=cov, curve=curve, residuals=residuals
+    )
+
+
+def fit_gray_efficiency_curve(
+    points: Iterable[EfficiencyPoint],
+    detector_id: str = "",
+) -> EfficiencyFit:
+    """Fit ln(eff) = a + b ln(E) + c ln(E)^2 + d/E, weighted by known errors."""
+    observed = list(points)
+    if len(observed) < 4:
+        raise ValueError("Gray efficiency fit requires at least four points.")
+    energies = np.asarray([point.energy_keV for point in observed], dtype=float)
+    if np.any(~np.isfinite(energies)) or np.any(energies <= 0):
+        raise ValueError("Calibration energy must be finite and positive (keV).")
+    measured = np.asarray([point.efficiency() for point in observed], dtype=float)
+    efficiencies, uncertainties = measured.T
+    log_energy = np.log(energies)
+    design = np.column_stack((np.ones_like(energies), log_energy, log_energy**2, 1 / energies))
+    log_sigma = uncertainties / efficiencies
+    weighted = design / log_sigma[:, None]
+    if np.linalg.matrix_rank(weighted) != 4:
+        raise ValueError("Gray efficiency basis is rank deficient; use distinct energies.")
+    coefficients, _, _, _ = np.linalg.lstsq(weighted, np.log(efficiencies) / log_sigma, rcond=None)
+    covariance = np.linalg.inv(weighted.T @ weighted)
+    curve = EfficiencyCurve(
+        model_type="functional",
+        parameters={"form": "gray", **dict(zip(("a", "b", "c", "d"), coefficients.tolist()))},
+        energy_range=(float(np.min(energies)), float(np.max(energies))),
+        detector_id=detector_id,
+    )
+    return EfficiencyFit(
+        coefficients=coefficients.tolist(),
+        covariance=covariance,
+        curve=curve,
+        residuals=np.log(efficiencies) - design @ coefficients,
     )
 
 

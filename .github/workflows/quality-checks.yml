@@ -184,6 +184,13 @@ jobs:
       - name: Calibration workspace Qt tests
         run: pytest -q tests/test_calibration_workspace_qt.py
 
+      - name: HPGe efficiency calibration and profile tests
+        run: |
+          pytest -q tests/test_hpge_efficiency_models.py
+          pytest -q tests/test_hpge_efficiency_dialog_qt.py
+          pytest -q tests/test_hpge_profile_persistence.py
+          pytest -q tests/test_hpge_profile_integration_qt.py
+
       - name: Unfolding workspace Qt tests
         run: pytest -q tests/test_unfolding_workspace_qt.py
 

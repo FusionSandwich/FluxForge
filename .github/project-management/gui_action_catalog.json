@@ -75,6 +75,11 @@
       "object_names": ["ExportCalibrationEnergyResidualPlotAction", "ExportCalibrationFwhmPlotAction", "ExportCalibrationRoiFitPlotAction", "ExportCalibrationRoiResidualPlotAction", "ExportCalibrationSpectrumPlotAction"]
     },
     {
+      "surface": "efficiency-dialog.context-export",
+      "test_ids": ["tests/test_hpge_efficiency_dialog_qt.py"],
+      "object_names": ["ExportEfficiencyMeasuredFittedPlotAction", "ExportEfficiencyPercentResidualPlotAction"]
+    },
+    {
       "surface": "unfolding-dialog.context-export",
       "test_ids": ["tests/test_unfolding_workspace_qt.py"],
       "object_names": ["ExportUnfoldingConvergencePlotAction", "ExportUnfoldingFluxPlotAction", "ExportUnfoldingResponseMatrixPlotAction"]
@@ -138,8 +143,8 @@
     },
     {
       "surface": "efficiency-dialog",
-      "test_ids": ["tests/test_calibration_workspace_qt.py"],
-      "object_names": ["AcceptEfficiencyCalibrationButton", "CancelEfficiencyCalibrationButton", "EfficiencyModelMethodSelectorCombo", "FitEfficiencyModelButton", "HpgeC1Spin", "HpgeC2Spin", "HpgeC3Spin", "HpgeC4Spin", "HpgeDetectorIdEdit", "Hpgeal_window_T1_umSpin", "Hpgedetector_diameter_cmSpin", "Hpgedetector_thickness_DI_cmSpin", "Hpgedead_layer_DL_umSpin", "Hpgegeometry_factor_ASpin", "Hpgeincident_angle_AI_degSpin", "Hpgerelative_uncertaintySpin", "Hpgesource_distance_cmSpin", "SeedEfficiencyExamplePointsButton"]
+      "test_ids": ["tests/test_calibration_workspace_qt.py", "tests/test_hpge_efficiency_dialog_qt.py"],
+      "object_names": ["AcceptEfficiencyCalibrationButton", "AddEfficiencyPointButton", "CancelEfficiencyCalibrationButton", "DeleteEfficiencyPointsButton", "EfficiencyCalibrationTable", "EfficiencyModelMethodSelectorCombo", "FitEfficiencyModelButton", "HpgeC1Spin", "HpgeC2Spin", "HpgeC3Spin", "HpgeC4Spin", "HpgeDetectorIdEdit", "Hpgeal_window_T1_umSpin", "Hpgedetector_diameter_cmSpin", "Hpgedetector_thickness_DI_cmSpin", "Hpgedead_layer_DL_umSpin", "Hpgegeometry_factor_ASpin", "Hpgeincident_angle_AI_degSpin", "Hpgerelative_uncertaintySpin", "Hpgesource_distance_cmSpin", "ImportEfficiencyCsvButton", "SeedEfficiencyExamplePointsButton"]
     },
     {
       "surface": "unfolding-dialog",
