@@ -4,7 +4,7 @@ Open **Activity Results → Fit efficiency** after selecting a spectrum. Add mea
 
 ## Calibration input
 
-CSV import accepts UTF-8 CSV with these exact headers (column order may vary):
+CSV import accepts UTF-8 CSV with these nine required headers (column order may vary):
 
 ```csv
 energy_keV,net_counts,count_uncertainty,live_time_s,activity_bq,activity_rel_unc,emission_probability,probability_uncertainty,geometry_factor
@@ -13,7 +13,7 @@ energy_keV,net_counts,count_uncertainty,live_time_s,activity_bq,activity_rel_unc
 
 Every row must contain nine finite numbers. Energy, counts, live time, activity, emission probability, and geometry factor must be positive; emission probability cannot exceed one. Count uncertainty is absolute counts, activity uncertainty is a relative fraction, and probability uncertainty is an absolute probability. A zero count uncertainty uses the supplied value as zero; leave it unspecified only through the Python API to request the Poisson default. CSV import replaces the table only after every row passes validation. Certificate and PDF import are unsupported.
 
-The table has an additional **Activity Source ID** column. Give lines that share one source's activity certificate the same non-empty ID. Source IDs are preserved with the points and make their activity uncertainties fully correlated in fitting and chi square review. The exact nine-column CSV leaves this column blank; enter IDs after import. A blank ID means the correlation is unknown, so any nonzero activity uncertainty requires review.
+The table has an additional **Activity Source ID** column. Give lines that share one source's activity certificate the same non-empty ID. A CSV may include an optional `activity_source_id` header; the nine-column format remains valid and leaves this field blank for manual entry after import. Source IDs are preserved with the points and make their activity uncertainties fully correlated in fitting and chi square review. A blank ID means the correlation is unknown, so any nonzero activity uncertainty requires review.
 
 The calculated absolute efficiency is `net_counts / (live_time_s × activity_bq × emission_probability × geometry_factor)`. Keep activity and geometry factors traceable to the calibration measurement. A result outside `(0, 1]` is rejected.
 

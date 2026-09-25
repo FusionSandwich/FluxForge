@@ -51,12 +51,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     class EfficiencyCalibrationDialog(QDialog):
         """Fit and apply registered detector-efficiency models."""
 
-        # Exact CSV header contract; import is atomic if any row is invalid.
+        # Numeric CSV headers are required; source identity is optional.
         CSV_COLUMNS = (
             "energy_keV", "net_counts", "count_uncertainty", "live_time_s",
             "activity_bq", "activity_rel_unc", "emission_probability",
             "probability_uncertainty", "geometry_factor",
         )
+        CSV_SOURCE_COLUMN = "activity_source_id"
 
         HEADERS = (
             "Energy keV",
@@ -193,8 +194,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             contract = QLabel(
                 "CSV only (certificate/PDF formats unsupported). Required headers: "
                 + ", ".join(self.CSV_COLUMNS)
-                + ". Every row must be valid. Enter a common Activity Source ID "
-                  "for lines sharing one source's activity uncertainty.", self,
+                + ". Optional header: "
+                + self.CSV_SOURCE_COLUMN
+                + ". Give lines sharing one source the same ID.",
+                self,
             )
             contract.setObjectName("EfficiencyCsvContractLabel")
             contract.setWordWrap(True)
@@ -377,14 +380,27 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     self.summary.setText(f"CSV import failed: {exc}")
 
         def import_csv(self, path: str | Path) -> None:
-            """Import an exact-header CSV, replacing the table only after full validation."""
+            """Import nine numeric columns and an optional activity source ID."""
             path = Path(path)
             if path.suffix.lower() != ".csv":
                 raise ValueError("Only CSV is supported; certificate/PDF formats have no defined parser")
             with path.open("r", newline="", encoding="utf-8-sig") as stream:
                 reader = csv.DictReader(stream, strict=True)
-                if reader.fieldnames is None or len(reader.fieldnames) != 9 or set(reader.fieldnames) != set(self.CSV_COLUMNS):
-                    raise ValueError("CSV headers must be exactly: " + ", ".join(self.CSV_COLUMNS))
+                headers = reader.fieldnames
+                required = set(self.CSV_COLUMNS)
+                allowed_headers = (required, required | {self.CSV_SOURCE_COLUMN})
+                if (
+                    headers is None
+                    or len(headers) not in (9, 10)
+                    or len(headers) != len(set(headers))
+                    or set(headers) not in allowed_headers
+                ):
+                    raise ValueError(
+                        "CSV headers must include exactly: "
+                        + ", ".join(self.CSV_COLUMNS)
+                        + f"; optional: {self.CSV_SOURCE_COLUMN}"
+                    )
+                has_source_id = self.CSV_SOURCE_COLUMN in headers
                 parsed = []
                 for row_number, row in enumerate(reader, 2):
                     try:
@@ -394,17 +410,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     if None in row:
                         raise ValueError(f"CSV line {row_number}: extra columns")
                     self._validate_values(values, row_number)
-                    parsed.append(values)
+                    source_id = (
+                        (row[self.CSV_SOURCE_COLUMN] or "").strip()
+                        if has_source_id
+                        else ""
+                    )
+                    parsed.append((values, source_id))
             if not parsed:
                 raise ValueError("CSV contains no calibration rows")
             self.table.blockSignals(True)
             self.table.setRowCount(0)
-            for values in parsed:
+            for values, source_id in parsed:
                 row = self.table.rowCount()
                 self.table.insertRow(row)
                 for column, value in enumerate(values):
                     self.table.setItem(row, column, QTableWidgetItem(f"{value:.12g}"))
-                self.table.setItem(row, 9, QTableWidgetItem(""))
+                self.table.setItem(row, 9, QTableWidgetItem(source_id))
             self.table.blockSignals(False)
             self.fit_button.setEnabled(True)
             self._invalidate_fit()
