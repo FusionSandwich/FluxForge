@@ -198,6 +198,20 @@ COMMAND_METADATA: "OrderedDict[str, CommandMetadata]" = OrderedDict(
             ),
         ),
         (
+            "run-readiness-check",
+            CommandMetadata(
+                family="validation",
+                use_case=(
+                    "Verify required local run inputs and SHA-256 bindings before "
+                    "launching a larger model without executing the model."
+                ),
+                example=(
+                    "fluxforge run-readiness-check --manifest run_manifest.json "
+                    "--output run_readiness.json"
+                ),
+            ),
+        ),
+        (
             "parity-check",
             CommandMetadata(
                 family="validation",
