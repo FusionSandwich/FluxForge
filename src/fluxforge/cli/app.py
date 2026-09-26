@@ -185,6 +185,10 @@ from fluxforge.validation import (
     spectrum_comparison_metrics,
     summarize_phase5_crosswalk,
 )
+from fluxforge.validation.run_readiness import (
+    check_run_readiness_manifest,
+    write_run_readiness_report,
+)
 from fluxforge.plugins import PluginRegistries
 from fluxforge.workflows.irradiation_optimization import (
     build_phase6_support_artifacts,
@@ -2530,6 +2534,19 @@ def cmd_batch_compare(args: argparse.Namespace) -> None:
     _ensure_parent_dir(output)
     output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"Wrote batch comparison to {output}")
+
+
+def cmd_run_readiness_check(args: argparse.Namespace) -> None:
+    manifest = Path(args.manifest)
+    report = check_run_readiness_manifest(manifest)
+    output_arg = getattr(args, "output", None)
+    if output_arg is None:
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return
+
+    output = Path(output_arg)
+    write_run_readiness_report(output, report)
+    print(f"Wrote run-readiness report to {output}")
 
 
 def cmd_parity_check(args: argparse.Namespace) -> None:
@@ -6633,6 +6650,29 @@ def build_parser() -> argparse.ArgumentParser:
         "--output", type=Path, default=Path("batch_compare.json")
     )
     batch_compare.set_defaults(func=cmd_batch_compare)
+
+    run_readiness_check = subparsers.add_parser(
+        "run-readiness-check",
+        help="Verify local run-readiness manifest paths and SHA-256 bindings",
+    )
+    run_readiness_check.add_argument(
+        "--manifest",
+        type=Path,
+        required=True,
+        help=(
+            "JSON manifest whose artifact paths are relative to the manifest "
+            "directory"
+        ),
+    )
+    run_readiness_check.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help=(
+            "Optional new JSON report path; existing files are never overwritten"
+        ),
+    )
+    run_readiness_check.set_defaults(func=cmd_run_readiness_check)
 
     parity_check = subparsers.add_parser(
         "parity-check",

@@ -111,6 +111,16 @@ fluxforge batch-compare --baseline baseline.csv --candidate candidate.csv --keys
 
 Run parity, crosswalk, GUI acceptance, and release-gate checks.
 
+### `run-readiness-check`
+
+- Purpose: Verify local run-readiness manifest paths and SHA-256 bindings
+- Common use case: Verify required local run inputs and SHA-256 bindings before launching a larger model without executing the model.
+- Detailed help: `fluxforge run-readiness-check --help`
+
+```bash
+fluxforge run-readiness-check --manifest run_manifest.json --output run_readiness.json
+```
+
 ### `parity-check`
 
 - Purpose: Run algorithm/workflow parity fixtures and report pass/fail summaries
