@@ -191,7 +191,9 @@ def gravel(
         response: Response matrix R_{i,g}.
         measurements: Measured reaction rates y_i.
         initial_flux: Starting flux guess. Defaults to uniform.
-        measurement_uncertainty: Optional 1-sigma uncertainties on y_i for weighting.
+        measurement_uncertainty: Optional 1-sigma uncertainties on y_i. Rows are
+            weighted by (y_i / sigma_i)^2 as in UMG GRAVEL; without them,
+            Poisson variance (weight y_i) is assumed.
         max_iters: Maximum iterations to perform.
         tolerance: Relative max change threshold for convergence.
         chi2_tolerance: Chi-squared per DOF threshold for convergence.
@@ -229,11 +231,14 @@ def gravel(
     phi = elementwise_maximum(phi, floor)
     regularization_reference = phi[:]
 
-    # Weights from uncertainties
-    weights = (
-        [1.0 / (u * u) if u > 0 else 0.0 for u in measurement_uncertainty]
+    # GRAVEL row factor (Matzke, UMG): W_ig = (y_i / sigma_i)^2 R_ig phi_g / p_i.
+    # Without uncertainties, Poisson variance sigma_i^2 = y_i gives factor y_i
+    # (the Neutron-Unfolding reference form). Both are invariant to the units
+    # chosen for any individual row.
+    row_factors = (
+        [(m / u) ** 2 if u > 0 else 0.0 for m, u in zip(measurements, measurement_uncertainty)]
         if measurement_uncertainty
-        else [1.0 for _ in measurements]
+        else list(measurements)
     )
 
     history: List[Vector] = [phi[:]]
@@ -280,16 +285,13 @@ def gravel(
         updated: Vector = []
         max_rel_change = 0.0
         for g in range(n_groups):
-            # SAND-II/GRAVEL weighting: W[i,g] = data[i] * R[i,g] * phi[g] / predicted[i]
-            # This properly weights by both the response and current flux estimate
             num = 0.0
             den = 0.0
             for i in range(n_meas):
                 if measurements[i] > 0 and predicted[i] > floor:
-                    W_ig = measurements[i] * response[i][g] * phi[g] / predicted[i]
-                    weighted_W_ig = W_ig * weights[i]
-                    num += weighted_W_ig * log_ratios[i]
-                    den += weighted_W_ig
+                    W_ig = row_factors[i] * response[i][g] * phi[g] / predicted[i]
+                    num += W_ig * log_ratios[i]
+                    den += W_ig
 
             if den <= floor:
                 updated.append(phi[g])
@@ -380,7 +382,8 @@ def mlem(
         response: Response matrix R_{i,g}.
         measurements: Measured reaction rates y_i.
         initial_flux: Starting flux guess. Defaults to uniform.
-        measurement_uncertainty: Optional 1-sigma uncertainties for chi2 calculation.
+        measurement_uncertainty: Optional 1-sigma uncertainties, used for chi2 and
+            as effective-count row weights ``y_i / sigma_i**2``.
         max_iters: Maximum iterations to perform.
         tolerance: Relative max change threshold for convergence.
         chi2_tolerance: Chi-squared per DOF threshold for convergence.
@@ -416,8 +419,12 @@ def mlem(
 
     phi = elementwise_maximum(phi, floor)
     regularization_reference = phi[:]
+    # With uncertainties, each row is treated as Poisson data with
+    # (y_i / sigma_i)^2 effective counts, i.e. rescaled by y_i / sigma_i^2.
+    # That weight keeps the update invariant to the units of any single row;
+    # plain 1/sigma^2 would weight rows by the inverse of their magnitude.
     weights = (
-        [1.0 / (u * u) if u > 0 else 0.0 for u in measurement_uncertainty]
+        [m / (u * u) if u > 0 else 0.0 for m, u in zip(measurements, measurement_uncertainty)]
         if measurement_uncertainty
         else [1.0 for _ in measurements]
     )
