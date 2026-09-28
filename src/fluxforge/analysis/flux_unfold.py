@@ -19,7 +19,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -133,6 +133,8 @@ class FluxWireReaction:
         Irradiation duration in seconds
     decay_time_s : float
         Time from end of irradiation to measurement
+    rate_note : str
+        Why ``reaction_rate`` is zero/unavailable, when it is
     """
 
     sample_id: str
@@ -145,28 +147,77 @@ class FluxWireReaction:
     n_atoms: float = 1.0
     irradiation_time_s: float = 0.0
     decay_time_s: float = 0.0
+    rate_note: str = ""
+
+
+def irradiation_history_factor(
+    half_life_s: float,
+    irradiation_time_s: Optional[float] = None,
+    irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
+    assume_saturated: bool = False,
+) -> float:
+    """
+    Build-up factor S such that A_EOI = N * R * S (ASTM E261).
+
+    ``irradiation_history`` is an ordered sequence of ``(duration_s,
+    relative_power)`` segments ending at end of irradiation (EOI), including
+    zero-power gaps. ``R`` is the reaction rate at ``relative_power = 1``:
+
+        S = sum_j p_j (1 - exp(-lambda d_j)) exp(-lambda tau_j)
+
+    where ``tau_j`` is the time from the end of segment ``j`` to EOI. Product
+    burn-up during irradiation is neglected. A single constant-power interval
+    is ``irradiation_time_s``. Missing or non-positive timing raises unless
+    ``assume_saturated=True`` is given explicitly.
+    """
+    if half_life_s <= 0:
+        raise ValueError("half_life_s must be positive")
+    decay_const = np.log(2) / half_life_s
+    if irradiation_history is not None:
+        segments = [(float(d), float(p)) for d, p in irradiation_history]
+        if not segments or any(d < 0 or p < 0 for d, p in segments):
+            raise ValueError("irradiation_history needs non-negative (duration_s, relative_power) segments")
+        if not any(d > 0 and p > 0 for d, p in segments):
+            raise ValueError("irradiation_history has no irradiating segment")
+        factor = 0.0
+        time_after = 0.0
+        for duration, power in reversed(segments):
+            factor += power * -np.expm1(-decay_const * duration) * np.exp(-decay_const * time_after)
+            time_after += duration
+        return float(factor)
+    if irradiation_time_s is not None and irradiation_time_s > 0:
+        return float(-np.expm1(-decay_const * irradiation_time_s))
+    if assume_saturated:
+        return 1.0
+    raise ValueError(
+        "Irradiation time or history is required; pass assume_saturated=True "
+        "only for an irradiation much longer than the product half-life"
+    )
 
 
 def activity_to_reaction_rate(
     activity_bq: float,
     n_atoms: float,
     half_life_s: float,
-    irradiation_time_s: float,
+    irradiation_time_s: Optional[float],
     decay_time_s: float = 0.0,
     live_time_s: float = 0.0,
+    *,
+    irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
+    assume_saturated: bool = False,
 ) -> float:
     """
     Convert measured activity to reaction rate.
 
     The activity at measurement time is related to reaction rate by:
 
-        A = R * N * λ * [1 - exp(-λ*t_irr)] * exp(-λ*t_decay) * C_live
+        A = R * N * S * exp(-λ*t_decay) * C_live
 
     where:
-        R = reaction rate (reactions/atom/s) = σ × Φ
+        R = reaction rate (reactions/atom/s) = σ × Φ, at relative power 1
         N = number of target atoms
         λ = decay constant = ln(2) / t_half
-        t_irr = irradiation time
+        S = irradiation build-up factor (see ``irradiation_history_factor``)
         t_decay = decay time from end of irradiation to measurement
         C_live = live time correction factor
 
@@ -178,12 +229,17 @@ def activity_to_reaction_rate(
         Number of target atoms
     half_life_s : float
         Half-life of product isotope in seconds
-    irradiation_time_s : float
-        Total irradiation time in seconds
+    irradiation_time_s : float or None
+        Constant-power irradiation time in seconds (ignored when
+        ``irradiation_history`` is given)
     decay_time_s : float
         Decay time from irradiation end to measurement start
     live_time_s : float
         Measurement live time (for decay during counting correction)
+    irradiation_history : sequence of (duration_s, relative_power), optional
+        Segmented power history ending at EOI, including zero-power gaps.
+    assume_saturated : bool
+        Explicitly treat the irradiation as saturated when no timing exists.
 
     Returns
     -------
@@ -195,12 +251,12 @@ def activity_to_reaction_rate(
 
     decay_const = np.log(2) / half_life_s
 
-    # Saturation factor: accounts for buildup during irradiation
-    if irradiation_time_s > 0:
-        saturation = 1.0 - np.exp(-decay_const * irradiation_time_s)
-    else:
-        # Assume saturated (long irradiation)
-        saturation = 1.0
+    saturation = irradiation_history_factor(
+        half_life_s,
+        irradiation_time_s=irradiation_time_s,
+        irradiation_history=irradiation_history,
+        assume_saturated=assume_saturated,
+    )
 
     # Decay factor: accounts for decay between irradiation and measurement
     decay_factor = np.exp(-decay_const * decay_time_s) if decay_time_s > 0 else 1.0
@@ -267,9 +323,10 @@ def reaction_rate_to_flux(
 def extract_reactions_from_processed(
     data: FluxWireData,
     sample_mass_mg: Optional[float] = None,  # Use default if None
-    irradiation_time_s: float = 3600.0,  # Default 1 hour
+    irradiation_time_s: Optional[float] = None,
     decay_time_s: float = 0.0,
     calculate_flux: bool = True,
+    irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from processed flux wire data.
@@ -281,11 +338,14 @@ def extract_reactions_from_processed(
     sample_mass_mg : float, optional
         Sample mass in mg. Uses default from FLUX_WIRE_SAMPLES if None.
     irradiation_time_s : float
-        Irradiation time in seconds
+        Constant-power irradiation time in seconds (required unless
+        ``irradiation_history`` is given)
     decay_time_s : float
         Decay time from irradiation to measurement
     calculate_flux : bool
         If True, also calculate flux from reaction rate
+    irradiation_history : sequence of (duration_s, relative_power), optional
+        Segmented power history ending at EOI
 
     Returns
     -------
@@ -328,6 +388,7 @@ def extract_reactions_from_processed(
                 irradiation_time_s=irradiation_time_s,
                 decay_time_s=decay_time_s,
                 live_time_s=data.live_time,
+                irradiation_history=irradiation_history,
             )
             rate_unc = rate * (activity_unc / activity_bq) if activity_bq > 0 else 0
         else:
@@ -365,7 +426,7 @@ def extract_reactions_from_raw(
     raw_data: FluxWireData,
     reference_data: Optional[FluxWireData] = None,
     sample_mass_mg: Optional[float] = None,
-    irradiation_time_s: float = 3600.0,
+    irradiation_time_s: Optional[float] = None,
     decay_time_s: float = 0.0,
     calculate_flux: bool = True,
     peak_threshold: float = 0.0,
@@ -374,6 +435,7 @@ def extract_reactions_from_raw(
     background_scale_factor: Optional[float] = None,
     background_subtract: bool = True,
     profile_name: Optional[str] = None,
+    irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from raw flux wire spectra.
@@ -428,6 +490,7 @@ def extract_reactions_from_raw(
                 irradiation_time_s=irradiation_time_s,
                 decay_time_s=decay_time_s,
                 live_time_s=raw_data.live_time,
+                irradiation_history=irradiation_history,
             )
             rate_unc = rate * (activity_unc / activity_bq) if activity_bq > 0 else 0.0
         else:
@@ -878,7 +941,7 @@ def unfold_flux_wires(
     flux_wire_files: List[Union[str, Path]],
     n_discrete_bins: int = 10,
     n_gls_groups: int = 50,
-    irradiation_time_s: float = 3600.0,
+    irradiation_time_s: Optional[float] = None,
     n_atoms: float = 1e20,
     verbose: bool = True,
 ) -> FluxWireUnfoldResult:
@@ -905,6 +968,9 @@ def unfold_flux_wires(
     FluxWireUnfoldResult
         Complete unfolding results
     """
+    if irradiation_time_s is None or irradiation_time_s <= 0:
+        raise ValueError("irradiation_time_s is required for flux-wire unfolding")
+
     if verbose:
         print("=" * 80)
         print("FLUX WIRE SPECTRUM UNFOLDING")

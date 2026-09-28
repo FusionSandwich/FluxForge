@@ -88,6 +88,8 @@ class TimingInfo:
     measurement_time: Optional[datetime]
     decay_label: Optional[str]
     schedule_source: Optional[str]
+    # Optional ordered (duration_s, relative_power) segments ending at EOI
+    irradiation_history: Optional[List[Tuple[float, float]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -104,6 +106,7 @@ class TimingInfo:
             ),
             "decay_label": self.decay_label,
             "schedule_source": self.schedule_source,
+            "irradiation_history": self.irradiation_history,
         }
 
 
@@ -425,6 +428,18 @@ def parse_decay_label(stem: str) -> Optional[str]:
     return None
 
 
+def _parse_irradiation_history(
+    segments: Optional[Sequence[Dict[str, Any]]],
+) -> Optional[List[Tuple[float, float]]]:
+    """Parse schedule ``irradiation_history`` entries ({duration_s, relative_power})."""
+    if not segments:
+        return None
+    return [
+        (float(item["duration_s"]), float(item.get("relative_power", 1.0)))
+        for item in segments
+    ]
+
+
 def resolve_measurement_timing(
     stem: str,
     start_time: Optional[datetime],
@@ -510,6 +525,9 @@ def resolve_measurement_timing(
                 or start_time,
                 decay_label=None,
                 schedule_source="sample_schedule.flux_wires",
+                irradiation_history=_parse_irradiation_history(
+                    flux_wire_info.get("irradiation_history")
+                ),
             )
         return TimingInfo(
             sample_group="RAFM1",
@@ -2857,14 +2875,25 @@ def build_flux_wire_reactions(
     normalized_sample_id = str(sample_id).strip().lower()
     normalized_sample_key = str(sample_key).strip().lower()
     for isotope, payload in isotope_payload.items():
-        activity_bq = float(
-            payload.get("activity_eoi_bq") or payload.get("activity_bq") or 0.0
-        )
-        activity_unc_bq = float(
-            payload.get("activity_eoi_unc_bq") or payload.get("activity_unc_bq") or 0.0
-        )
         half_life_s = FLUX_WIRE_NUCLIDES.get(isotope, {}).get("half_life_s", 0.0)
         reaction_id = get_reaction_id(isotope, sample_element)
+        # Only an end-of-irradiation activity may be converted with zero decay
+        # time; measurement-time activity is never substituted for it.
+        if payload.get("activity_eoi_bq") is None:
+            reactions.append(
+                FluxWireReaction(
+                    sample_id=sample_id,
+                    reaction_id=reaction_id,
+                    isotope=isotope,
+                    activity_bq=0.0,
+                    irradiation_time_s=float(timing.irradiation_time_s or 0.0),
+                    decay_time_s=float(timing.decay_time_s or 0.0),
+                    rate_note="no end-of-irradiation activity (decay timing missing or non-finite)",
+                )
+            )
+            continue
+        activity_bq = float(payload["activity_eoi_bq"])
+        activity_unc_bq = float(payload.get("activity_eoi_unc_bq") or 0.0)
 
         base_relative_unc = (
             float(activity_unc_bq / activity_bq)
@@ -2930,9 +2959,10 @@ def build_flux_wire_reactions(
                 activity_bq=activity_bq,
                 n_atoms=n_atoms,
                 half_life_s=half_life_s,
-                irradiation_time_s=irradiation_time_s,
+                irradiation_time_s=timing.irradiation_time_s,
                 decay_time_s=0.0,
                 live_time_s=0.0,
+                irradiation_history=timing.irradiation_history,
             )
             if activity_bq > 0 and n_atoms > 0 and half_life_s > 0
             else 0.0

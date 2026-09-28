@@ -518,6 +518,8 @@ def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> N
             "Sc48": {
                 "activity_bq": 1000.0,
                 "activity_unc_bq": 50.0,
+                "activity_eoi_bq": 1000.0,
+                "activity_eoi_unc_bq": 50.0,
             }
         },
         timing,
@@ -535,6 +537,8 @@ def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> N
             "Co60": {
                 "activity_bq": 500.0,
                 "activity_unc_bq": 10.0,
+                "activity_eoi_bq": 500.0,
+                "activity_eoi_unc_bq": 10.0,
             }
         },
         timing,
