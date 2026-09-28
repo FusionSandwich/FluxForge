@@ -208,9 +208,16 @@ def run_unfolding_regression(
             )
         )
 
-    processed_discrete = unfold_discrete_bins(processed_reactions, n_bins=10)
+    # Discrete binning of equivalent fluxes only; Cd-covered capture rows have
+    # no equivalent flux and are left to the bare/Cd (ASTM E262) analysis.
+    def with_equivalent_flux(reactions):
+        return [r for r in reactions if getattr(r, "flux", 0.0) > 0]
+
+    processed_discrete = unfold_discrete_bins(
+        with_equivalent_flux(processed_reactions), n_bins=10
+    )
     processed_gls = unfold_gls(processed_reactions, n_groups=50)
-    raw_discrete = unfold_discrete_bins(raw_reactions, n_bins=10)
+    raw_discrete = unfold_discrete_bins(with_equivalent_flux(raw_reactions), n_bins=10)
     raw_gls = unfold_gls(raw_reactions, n_groups=50)
 
     model = load_model_spectrum(model_path)

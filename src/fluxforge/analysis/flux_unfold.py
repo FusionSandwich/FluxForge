@@ -326,23 +326,36 @@ def reaction_rate_to_flux(
     Returns
     -------
     tuple of (float, str)
-        Flux in n/cm²/s and the flux type (thermal, epithermal, or fast)
+        Equivalent flux in n/cm²/s and its definition:
+
+        * ``"2200m_s_equivalent"`` for capture reactions: R / sigma_0 of a
+          *bare* monitor. It includes the epithermal contribution and is not
+          the thermal flux; separate thermal and epithermal components with a
+          bare/Cd pair (ASTM E262, ``fluxforge.analysis.astm_e262``).
+        * ``"spectrum_averaged_equivalent"`` for threshold reactions: R divided
+          by a tabulated spectrum-averaged cross section.
+
+        Do not pass Cd-covered capture rates; they are resonance dominated.
     """
     xs_data = THERMAL_CROSS_SECTIONS.get(reaction_id, {})
 
-    # Thermal (n,g) reactions
+    # Capture (n,g) reactions
     if "sigma_thermal" in xs_data and xs_data.get("sigma_thermal", 0) > 0:
         sigma_thermal = xs_data["sigma_thermal"] * 1e-24  # Convert barns to cm²
         flux = reaction_rate / sigma_thermal
-        return flux, "thermal"
+        return flux, "2200m_s_equivalent"
 
     # Threshold reactions
     elif "sigma_avg" in xs_data:
         sigma_avg = xs_data["sigma_avg"] * 1e-24  # Convert barns to cm²
         flux = reaction_rate / sigma_avg
-        return flux, "fast"
+        return flux, "spectrum_averaged_equivalent"
 
     return 0.0, "unknown"
+
+
+def _is_cd_covered(sample_id: str) -> bool:
+    return "-cd-" in str(sample_id).lower()
 
 
 def extract_reactions_from_processed(
@@ -429,7 +442,10 @@ def extract_reactions_from_processed(
         flux = 0.0
         flux_type = "unknown"
         if calculate_flux and rate > 0:
-            flux, flux_type = reaction_rate_to_flux(rate, reaction_id)
+            if _is_cd_covered(data.sample_id) and "(n,g)" in reaction_id:
+                flux_type = "not_computed_cd_covered_capture"
+            else:
+                flux, flux_type = reaction_rate_to_flux(rate, reaction_id)
 
         rxn = FluxWireReaction(
             sample_id=data.sample_id,
@@ -537,7 +553,10 @@ def extract_reactions_from_raw(
         flux = 0.0
         flux_type = "unknown"
         if calculate_flux and rate > 0:
-            flux, flux_type = reaction_rate_to_flux(rate, reaction_id)
+            if _is_cd_covered(raw_data.sample_id) and "(n,g)" in reaction_id:
+                flux_type = "not_computed_cd_covered_capture"
+            else:
+                flux, flux_type = reaction_rate_to_flux(rate, reaction_id)
 
         rxn = FluxWireReaction(
             sample_id=raw_data.sample_id,
@@ -636,6 +655,12 @@ class DiscreteUnfoldResult:
     reactions: List[FluxWireReaction]
     chi2: float = 0.0
     method: str = "discrete"
+    # "equivalent_flux" (n/cm2/s) or "reaction_rate_indicator" (1/s per atom).
+    # For the indicator, ``flux`` is NaN and the values are in ``values``.
+    quantity: str = "equivalent_flux"
+    units: str = "n/cm2/s"
+    values: Optional[np.ndarray] = None
+    values_unc: Optional[np.ndarray] = None
 
 
 def unfold_discrete_bins(
@@ -649,7 +674,14 @@ def unfold_discrete_bins(
     Perform discrete N-bin spectrum unfolding.
 
     This is a simple approach where we assign each reaction to one dominant
-    energy bin based on its threshold or resonance energy.
+    energy bin based on its threshold or resonance energy. It is a
+    per-reaction indicator, not an unfolded spectrum: bins without a reaction
+    are empty and response shapes are ignored.
+
+    All reactions must carry the same quantity. If every reaction has an
+    equivalent ``flux`` the result is in n/cm2/s; if none does, the result
+    is a reaction-rate indicator returned in ``values`` with ``flux`` set to
+    NaN. Mixed inputs raise ``ValueError``.
 
     Parameters
     ----------
@@ -671,6 +703,15 @@ def unfold_discrete_bins(
     groups = make_equal_lethargy_groups(n_bins, e_min_eV, e_max_eV)
     boundaries = np.array(groups.boundaries_eV)
     bin_centers = np.sqrt(boundaries[:-1] * boundaries[1:])
+
+    used = [rxn for rxn in reactions if rxn.reaction_rate > 0]
+    has_flux = [getattr(rxn, "flux", 0.0) > 0 for rxn in used]
+    if any(has_flux) and not all(has_flux):
+        raise ValueError(
+            "unfold_discrete_bins received a mix of equivalent fluxes and reaction "
+            "rates; bin one quantity at a time"
+        )
+    use_flux = bool(used) and all(has_flux)
 
     # Initialize flux arrays
     flux = np.zeros(n_bins)
@@ -712,12 +753,24 @@ def unfold_discrete_bins(
         elif flux_count[i] == 1:
             flux_unc[i] = np.sqrt(flux_unc[i])
 
+    if use_flux:
+        return DiscreteUnfoldResult(
+            energy_bounds_eV=boundaries,
+            flux=flux,
+            flux_unc=flux_unc,
+            reactions=reactions,
+            method="discrete_binning",
+        )
     return DiscreteUnfoldResult(
         energy_bounds_eV=boundaries,
-        flux=flux,
-        flux_unc=flux_unc,
+        flux=np.full(n_bins, np.nan),
+        flux_unc=np.full(n_bins, np.nan),
         reactions=reactions,
         method="discrete_binning",
+        quantity="reaction_rate_indicator",
+        units="reactions/atom/s",
+        values=flux,
+        values_unc=flux_unc,
     )
 
 
@@ -776,7 +829,8 @@ def unfold_gls(
     Parameters
     ----------
     reactions : list of FluxWireReaction
-        Measured reactions with reaction rates
+        Measured reactions; only ``reaction_rate`` is used as the observable
+        (never a derived equivalent flux)
     n_groups : int
         Number of energy groups for output spectrum
     e_min_eV, e_max_eV : float
@@ -802,10 +856,8 @@ def unfold_gls(
     groups = make_equal_lethargy_groups(n_groups, e_min_eV, e_max_eV)
     boundaries = np.array(groups.boundaries_eV)
 
-    # Filter reactions with valid flux or rates
-    valid_reactions = [
-        r for r in reactions if getattr(r, "flux", 0) > 0 or r.reaction_rate > 0
-    ]
+    # One observable only: reaction rate per target atom
+    valid_reactions = [r for r in reactions if r.reaction_rate > 0]
     n_reactions = len(valid_reactions)
 
     if n_reactions == 0:
@@ -816,15 +868,9 @@ def unfold_gls(
         bin_widths = boundaries[1:] - boundaries[:-1]
         bin_centers = np.sqrt(boundaries[:-1] * boundaries[1:])
         prior_flux = bin_widths / bin_centers  # 1/E spectrum
-        # Scale to reasonable magnitude based on flux values
-        flux_values = [
-            getattr(r, "flux", 0) for r in valid_reactions if getattr(r, "flux", 0) > 0
-        ]
-        if flux_values:
-            avg_flux = np.mean(flux_values)
-        else:
-            avg_flux = np.mean([r.reaction_rate for r in valid_reactions])
-        prior_flux = prior_flux / prior_flux.sum() * avg_flux * n_groups
+        # Scale to the magnitude of the observed rates (placeholder response)
+        avg_rate = np.mean([r.reaction_rate for r in valid_reactions])
+        prior_flux = prior_flux / prior_flux.sum() * avg_rate * n_groups
 
     prior_flux = np.array(prior_flux)
 
@@ -840,23 +886,10 @@ def unfold_gls(
         # Create row of response matrix
         row = _make_response_row(rxn.reaction_id, boundaries, n_groups)
         response[i, :] = row
-        # Use flux if available, otherwise use reaction rate
-        rxn_flux = getattr(rxn, "flux", 0.0)
-        if rxn_flux > 0:
-            measurements[i] = rxn_flux
-            measurement_unc[i] = max(
-                (
-                    rxn_flux * rxn.reaction_rate_unc / rxn.reaction_rate
-                    if rxn.reaction_rate > 0
-                    else min_relative_uncertainty * rxn_flux
-                ),
-                min_relative_uncertainty * rxn_flux,
-            )
-        else:
-            measurements[i] = rxn.reaction_rate
-            measurement_unc[i] = max(
-                rxn.reaction_rate_unc, min_relative_uncertainty * rxn.reaction_rate
-            )
+        measurements[i] = rxn.reaction_rate
+        measurement_unc[i] = max(
+            rxn.reaction_rate_unc, min_relative_uncertainty * rxn.reaction_rate
+        )
 
     # Measurement covariance (diagonal) with regularization
     measurement_cov = np.diag(measurement_unc**2 + regularization)
@@ -964,8 +997,15 @@ class FluxWireUnfoldResult:
         if self.discrete_result:
             result["discrete"] = {
                 "energy_bounds_eV": self.discrete_result.energy_bounds_eV.tolist(),
+                "quantity": self.discrete_result.quantity,
+                "units": self.discrete_result.units,
                 "flux": self.discrete_result.flux.tolist(),
                 "flux_unc": self.discrete_result.flux_unc.tolist(),
+                "values": (
+                    None
+                    if self.discrete_result.values is None
+                    else self.discrete_result.values.tolist()
+                ),
                 "chi2": self.discrete_result.chi2,
             }
 

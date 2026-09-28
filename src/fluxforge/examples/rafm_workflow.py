@@ -18,7 +18,6 @@ from fluxforge.analysis.flux_unfold import (
     calculate_n_atoms,
     get_isotope_fraction,
     get_reaction_id,
-    unfold_discrete_bins,
     unfold_gls,
     _make_response_row,
 )
@@ -4200,24 +4199,8 @@ def run_flux_wire_unfolding(
     if not valid_reactions:
         return {}
 
-    discrete = unfold_discrete_bins(valid_reactions, n_bins=10)
-    discrete_response = simplified_response_matrix(
-        valid_reactions, discrete.energy_bounds_eV
-    )
-    discrete_predicted = discrete_response @ discrete.flux
-    discrete_result = adapt_unfold_result(
-        "DISCRETE",
-        discrete.energy_bounds_eV,
-        discrete.flux,
-        discrete.flux_unc,
-        valid_reactions,
-        discrete_response,
-        discrete_predicted,
-        discrete.chi2,
-    )
-    prior_discrete = parse_prior_spectrum(prior_path, discrete.energy_bounds_eV)
-    save_unfolding_artifacts(discrete_result, prior_discrete, output_root)
-
+    # Discrete binning is a per-reaction indicator, not an unfolded spectrum,
+    # and is deliberately not produced or overlaid as a flux here.
     gls = unfold_gls(valid_reactions, n_groups=20)
     gls_response = simplified_response_matrix(valid_reactions, gls.energy_bounds_eV)
     gls_predicted = gls_response @ gls.flux
@@ -4235,7 +4218,6 @@ def run_flux_wire_unfolding(
     save_unfolding_artifacts(gls_result, prior_gls, output_root)
 
     iterative_results: Dict[str, UnfoldingResult] = {
-        "DISCRETE": discrete_result,
         "GLS": gls_result,
     }
     for method in ("GRAVEL", "MLEM"):
