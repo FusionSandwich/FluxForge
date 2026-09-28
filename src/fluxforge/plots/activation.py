@@ -730,9 +730,13 @@ def plot_cd_ratio_analysis(
     title: str = "Cd-Ratio Analysis for Flux Characterization",
     figsize: Tuple[float, float] = (10, 6),
     save_path: Optional[Union[str, Path]] = None,
+    quantity_label: str = "Activity (Bq)",
 ) -> Any:
     """
     Visualize Cd-ratio analysis results for multiple wire types.
+
+    ``quantity_label`` names the plotted bare/Cd quantity (e.g. per-atom
+    reaction rate); the ``bare_activity``/``cd_activity`` keys hold it.
 
     Parameters
     ----------
@@ -771,8 +775,8 @@ def plot_cd_ratio_analysis(
     ax1.set_xticks(x)
     ax1.set_xticklabels(wires)
     ax1.set_xlabel("Wire Material")
-    ax1.set_ylabel("Activity (Bq)")
-    ax1.set_title("Bare vs Cd-Covered Activities")
+    ax1.set_ylabel(quantity_label)
+    ax1.set_title("Bare vs Cd-Covered")
     ax1.legend()
     ax1.grid(True, alpha=0.3)
 

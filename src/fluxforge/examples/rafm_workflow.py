@@ -3742,6 +3742,14 @@ def _read_csv_rows(path: Path) -> List[Dict[str, Any]]:
 def cd_ratio_rows(
     flux_wire_artifacts: Sequence[Dict[str, Any]], metadata: RAFMMetadata
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Dict[str, float]]]:
+    """Cd ratios per reaction from per-target-atom end-of-irradiation rates.
+
+    R_Cd = R_bare / R_Cd for the same reaction on paired bare and Cd-covered
+    wires. Rates are already normalized for target atoms, irradiation history
+    and decay, so wire masses and count dates cancel correctly. The
+    uncertainty combines both rows' total relative uncertainties in
+    quadrature (conservative: shared components would partly cancel).
+    """
     by_key = {
         normalize_pairing_key(item["sample_id"], metadata.pairing_aliases): item
         for item in flux_wire_artifacts
@@ -3750,6 +3758,17 @@ def cd_ratio_rows(
     plot_payload: Dict[str, Dict[str, float]] = {}
     configured_ranges = metadata.config.get("cd_ratio_expected_ranges", {})
     default_review_min = float(metadata.config.get("cd_ratio_default_review_min", 1.10))
+
+    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float]]:
+        return {
+            str(row["reaction_id"]): (
+                float(row.get("reaction_rate") or 0.0),
+                float(row.get("reaction_rate_unc") or 0.0),
+            )
+            for row in artifact.get("reactions", [])
+            if "Unknown(" not in str(row.get("reaction_id"))
+        }
+
     for cd_key, artifact in sorted(by_key.items()):
         if "-cd-" not in cd_key:
             continue
@@ -3757,63 +3776,59 @@ def cd_ratio_rows(
         bare = by_key.get(bare_key)
         if bare is None:
             continue
-        bare_total = sum(
-            float(value.get("activity_bq", 0.0))
-            for value in bare.get("isotopes", {}).values()
-        )
-        cd_total = sum(
-            float(value.get("activity_bq", 0.0))
-            for value in artifact.get("isotopes", {}).values()
-        )
         material = bare_key.split("-")[0].capitalize()
-        ratio = bare_total / cd_total if cd_total > 0 else None
-
+        bare_rates, cd_rates = rates(bare), rates(artifact)
         expected_range = configured_ranges.get(material, {})
         expected_min = expected_range.get("min")
         expected_max = expected_range.get("max")
         if expected_min is None and material in {"Cu", "Sc"}:
             expected_min = default_review_min
-
-        flag_cd_ratio_review = False
-        if ratio is None:
-            flag_cd_ratio_review = True
-        else:
-            if expected_min is not None and ratio < float(expected_min):
-                flag_cd_ratio_review = True
-            if expected_max is not None and ratio > float(expected_max):
-                flag_cd_ratio_review = True
-
-        if ratio is None:
-            review_note = "Cd sample has zero/invalid total activity"
-        elif flag_cd_ratio_review:
-            review_note = "Cd ratio is outside configured or default review bounds"
-        else:
-            review_note = "Cd ratio is within configured/default review bounds"
-
-        rows.append(
-            {
-                "material": material,
-                "bare_sample": bare["sample_id"],
-                "cd_sample": artifact["sample_id"],
-                "bare_activity_bq": bare_total,
-                "cd_activity_bq": cd_total,
-                "cd_ratio": ratio,
-                "expected_cd_ratio_min": (
-                    None if expected_min is None else float(expected_min)
-                ),
-                "expected_cd_ratio_max": (
-                    None if expected_max is None else float(expected_max)
-                ),
-                "flag_cd_ratio_review": bool(flag_cd_ratio_review),
-                "review_note": review_note,
-            }
-        )
-        if ratio is not None:
-            plot_payload[material] = {
-                "bare_activity": bare_total,
-                "cd_activity": cd_total,
-                "cd_ratio": ratio,
-            }
+        for reaction_id in sorted(set(bare_rates) & set(cd_rates)):
+            bare_rate, bare_unc = bare_rates[reaction_id]
+            cd_rate, cd_unc = cd_rates[reaction_id]
+            ratio = bare_rate / cd_rate if bare_rate > 0 and cd_rate > 0 else None
+            ratio_unc = (
+                ratio * math.hypot(bare_unc / bare_rate, cd_unc / cd_rate)
+                if ratio is not None
+                else None
+            )
+            flag_review = ratio is None or (
+                (expected_min is not None and ratio < float(expected_min))
+                or (expected_max is not None and ratio > float(expected_max))
+            )
+            if ratio is None:
+                review_note = "Missing or zero per-atom rate on one wire"
+            elif flag_review:
+                review_note = "Cd ratio is outside configured or default review bounds"
+            else:
+                review_note = "Cd ratio is within configured/default review bounds"
+            rows.append(
+                {
+                    "material": material,
+                    "reaction_id": reaction_id,
+                    "bare_sample": bare["sample_id"],
+                    "cd_sample": artifact["sample_id"],
+                    "bare_rate_per_atom_s": bare_rate,
+                    "cd_rate_per_atom_s": cd_rate,
+                    "cd_ratio": ratio,
+                    "cd_ratio_unc": ratio_unc,
+                    "basis": "per-target-atom EOI reaction rates",
+                    "expected_cd_ratio_min": (
+                        None if expected_min is None else float(expected_min)
+                    ),
+                    "expected_cd_ratio_max": (
+                        None if expected_max is None else float(expected_max)
+                    ),
+                    "flag_cd_ratio_review": bool(flag_review),
+                    "review_note": review_note,
+                }
+            )
+            if ratio is not None:
+                plot_payload[f"{material} {reaction_id}"] = {
+                    "bare_activity": bare_rate,
+                    "cd_activity": cd_rate,
+                    "cd_ratio": ratio,
+                }
     return rows, plot_payload
 
 
@@ -4491,7 +4506,8 @@ def run_rafm_validation(
     if cd_plot_payload:
         plot_cd_ratio_analysis(
             cd_plot_payload,
-            title="Flux-wire Cd ratios",
+            title="Flux-wire Cd ratios (per-atom EOI rates)",
+            quantity_label="Reaction rate (1/s per target atom)",
             save_path=tree["plots_comparisons"] / "flux_wire_cd_ratios.png",
         )
 
