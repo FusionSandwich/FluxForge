@@ -886,7 +886,7 @@ class SpectrumUnfolder:
         method: str = "GRAVEL",
         max_iterations: int = 1000,
         tolerance: float = 1e-4,
-        chi2_tolerance: float = 0.01,
+        chi2_tolerance: Optional[float] = None,
         relaxation: float = 0.7,
         prior_strength: float = 0.0,
         smoothing_strength: float = 0.0,
@@ -896,6 +896,9 @@ class SpectrumUnfolder:
         support_metric: str = "prior_contribution",
         basis_edges: Optional[np.ndarray] = None,
         aggregate_duplicate_reactions: bool = False,
+        uncertainty_method: str = "none",
+        n_uncertainty_samples: int = 50,
+        uncertainty_seed: Optional[int] = 0,
     ) -> UnfoldingResult:
         """
         Perform spectrum unfolding.
@@ -908,8 +911,10 @@ class SpectrumUnfolder:
             Maximum iterations
         tolerance : float
             Convergence tolerance (relative change)
-        chi2_tolerance : float
-            Chi-squared per DOF threshold
+        chi2_tolerance : float, optional
+            Optional stop when chi-squared per measurement falls below this
+            value. Recorded as ``stop_reason='chi2_target'``, never as
+            convergence. Disabled by default.
         relaxation : float
             Under-relaxation factor (0-1)
         prior_strength : float
@@ -936,6 +941,14 @@ class SpectrumUnfolder:
             Combine repeated rows with the same reaction identifier using
             inverse-variance weighting before unfolding. This is useful when
             replicate wires map to identical response functions.
+        uncertainty_method : {"none", "monte_carlo"}
+            ``"none"`` (default) returns NaN flux uncertainty. ``"monte_carlo"``
+            re-solves with Gaussian-resampled rates and reports the sample
+            standard deviation per group (rate uncertainty only).
+        n_uncertainty_samples : int
+            Number of Monte Carlo re-solves.
+        uncertainty_seed : int, optional
+            Seed for the Monte Carlo resampling.
 
         Returns
         -------
@@ -1086,139 +1099,141 @@ class SpectrumUnfolder:
 
         # Run unfolding
         seed_metadata: Dict[str, Any] = {}
-        if method.upper() == "GRAVEL":
-            if use_ml_seed:
-                seed_result = MLSeedUnfolder().unfold(
-                    solver_measurements,
-                    solver_response_matrix,
-                    initial_flux=solver_initial,
-                    measurement_uncertainty=solver_rate_uncertainties,
-                    confidence_threshold=ml_seed_threshold,
-                )
-                seed_metadata = {
-                    "seed_with_ml": True,
-                    "seed_accepted": bool(
-                        seed_result.parameters_used.get("accepted", False)
-                    ),
-                    "seed_confidence_score": float(
-                        seed_result.parameters_used.get("confidence_score", 0.0)
-                    ),
-                    "seed_backend": str(
-                        seed_result.parameters_used.get("backend", "")
-                    ),
-                }
-                if bool(seed_result.parameters_used.get("accepted", False)):
-                    solver_initial = np.asarray(seed_result.flux, dtype=float)
-            result = gravel(
-                response=solver_response_matrix.tolist(),
-                measurements=solver_measurements.tolist(),
-                initial_flux=solver_initial.tolist(),
-                measurement_uncertainty=solver_rate_uncertainties.tolist(),
-                max_iters=max_iterations,
-                tolerance=tolerance,
-                chi2_tolerance=chi2_tolerance,
-                relaxation=relaxation,
-                prior_strength=prior_strength,
-                smoothing_strength=smoothing_strength,
-                verbose=self.verbose,
+        method_key = method.upper()
+        if method_key not in {"GRAVEL", "MLEM", "MAXED", "ML_SEED", "RMLE"}:
+            raise ValueError(
+                f"Unknown method: {method}. Use 'GRAVEL', 'MLEM', 'MAXED', 'RMLE', or 'ML_SEED'."
             )
-        elif method.upper() == "MLEM":
-            result = mlem(
-                response=solver_response_matrix.tolist(),
-                measurements=solver_measurements.tolist(),
-                initial_flux=solver_initial.tolist(),
-                measurement_uncertainty=solver_rate_uncertainties.tolist(),
-                max_iters=max_iterations,
-                tolerance=tolerance,
-                chi2_tolerance=chi2_tolerance,
-                relaxation=relaxation,
-                prior_strength=prior_strength,
-                smoothing_strength=smoothing_strength,
-                verbose=self.verbose,
-            )
-        elif method.upper() == "MAXED":
-            result = MaxedUnfolder(
-                max_iterations=max_iterations,
-            ).unfold(
-                solver_measurements,
-                solver_response_matrix,
-                initial_flux=solver_initial,
-                measurement_uncertainty=solver_rate_uncertainties,
-            )
-        elif method.upper() == "ML_SEED":
-            result = MLSeedUnfolder().unfold(
+        if method_key == "GRAVEL" and use_ml_seed:
+            seed_result = MLSeedUnfolder().unfold(
                 solver_measurements,
                 solver_response_matrix,
                 initial_flux=solver_initial,
                 measurement_uncertainty=solver_rate_uncertainties,
                 confidence_threshold=ml_seed_threshold,
             )
-        elif method.upper() == "RMLE":
-            result = RMLEUnfolder(
+            seed_metadata = {
+                "seed_with_ml": True,
+                "seed_accepted": bool(
+                    seed_result.parameters_used.get("accepted", False)
+                ),
+                "seed_confidence_score": float(
+                    seed_result.parameters_used.get("confidence_score", 0.0)
+                ),
+                "seed_backend": str(
+                    seed_result.parameters_used.get("backend", "")
+                ),
+            }
+            if bool(seed_result.parameters_used.get("accepted", False)):
+                solver_initial = np.asarray(seed_result.flux, dtype=float)
+
+        def _solve(measurement_vector: np.ndarray, verbose: bool):
+            if method_key == "GRAVEL":
+                return gravel(
+                    response=solver_response_matrix.tolist(),
+                    measurements=measurement_vector.tolist(),
+                    initial_flux=solver_initial.tolist(),
+                    measurement_uncertainty=solver_rate_uncertainties.tolist(),
+                    max_iters=max_iterations,
+                    tolerance=tolerance,
+                    chi2_tolerance=chi2_tolerance,
+                    relaxation=relaxation,
+                    prior_strength=prior_strength,
+                    smoothing_strength=smoothing_strength,
+                    verbose=verbose,
+                )
+            if method_key == "MLEM":
+                return mlem(
+                    response=solver_response_matrix.tolist(),
+                    measurements=measurement_vector.tolist(),
+                    initial_flux=solver_initial.tolist(),
+                    measurement_uncertainty=solver_rate_uncertainties.tolist(),
+                    max_iters=max_iterations,
+                    tolerance=tolerance,
+                    chi2_tolerance=chi2_tolerance,
+                    relaxation=relaxation,
+                    prior_strength=prior_strength,
+                    smoothing_strength=smoothing_strength,
+                    verbose=verbose,
+                )
+            if method_key == "MAXED":
+                return MaxedUnfolder(max_iterations=max_iterations).unfold(
+                    measurement_vector,
+                    solver_response_matrix,
+                    initial_flux=solver_initial,
+                    measurement_uncertainty=solver_rate_uncertainties,
+                )
+            if method_key == "ML_SEED":
+                return MLSeedUnfolder().unfold(
+                    measurement_vector,
+                    solver_response_matrix,
+                    initial_flux=solver_initial,
+                    measurement_uncertainty=solver_rate_uncertainties,
+                    confidence_threshold=ml_seed_threshold,
+                )
+            return RMLEUnfolder(
                 max_iterations=max_iterations,
                 tolerance=tolerance,
             ).unfold(
-                solver_measurements,
+                measurement_vector,
                 solver_response_matrix,
                 initial_flux=solver_initial,
                 measurement_uncertainty=solver_rate_uncertainties,
                 seed_with_ml=use_ml_seed,
                 confidence_threshold=ml_seed_threshold,
             )
-        else:
-            raise ValueError(
-                f"Unknown method: {method}. Use 'GRAVEL', 'MLEM', 'MAXED', 'RMLE', or 'ML_SEED'."
-            )
 
-        # Calculate predicted rates
-        solver_flux = np.array(result.flux, dtype=float)
-        if np.all(active_mask):
-            solved_state = solver_flux
-        else:
-            solved_state = full_solver_initial.copy()
-            solved_state[active_mask] = solver_flux
-        if basis_matrix is None:
-            flux_array = solved_state
-        else:
-            flux_array = basis_matrix @ solved_state
+        def _full_flux(solver_flux_vector) -> np.ndarray:
+            solver_flux_vector = np.asarray(solver_flux_vector, dtype=float)
+            if np.all(active_mask):
+                state = solver_flux_vector
+            else:
+                state = full_solver_initial.copy()
+                state[active_mask] = solver_flux_vector
+            return state if basis_matrix is None else basis_matrix @ state
+
+        result = _solve(solver_measurements, self.verbose)
+        flux_array = _full_flux(result.flux)
         predicted_rates = response_matrix @ flux_array
 
-        # Estimate flux uncertainties (simplified - from response matrix propagation)
-        result_uncertainty = getattr(result, "uncertainties", None)
-        if result_uncertainty is not None:
-            solved_uncertainty = np.asarray(result_uncertainty, dtype=float)
-            full_state_uncertainty = np.zeros_like(solved_state)
-            if np.all(active_mask):
-                full_state_uncertainty = solved_uncertainty
-            else:
-                full_state_uncertainty[active_mask] = solved_uncertainty
-            if basis_matrix is None:
-                flux_uncertainty = full_state_uncertainty
-            else:
-                flux_uncertainty = basis_matrix @ full_state_uncertainty
+        # Flux uncertainty must come from the estimator actually used. The
+        # ridge pseudo-inverse is unrelated to GRAVEL/MLEM and is not reported.
+        uncertainty_metadata: Dict[str, Any] = {"flux_uncertainty_method": uncertainty_method}
+        if uncertainty_method == "none":
+            flux_uncertainty = np.full(flux_array.shape, np.nan)
+            uncertainty_metadata["flux_uncertainty_note"] = (
+                "not estimated; use uncertainty_method='monte_carlo'"
+            )
+        elif uncertainty_method == "monte_carlo":
+            if n_uncertainty_samples < 2:
+                raise ValueError("n_uncertainty_samples must be at least 2")
+            rng = np.random.default_rng(uncertainty_seed)
+            tiny = np.finfo(float).tiny
+            samples = []
+            for _ in range(n_uncertainty_samples):
+                perturbed = rng.normal(solver_measurements, solver_rate_uncertainties)
+                samples.append(_full_flux(_solve(np.maximum(perturbed, tiny), False).flux))
+            flux_uncertainty = np.std(np.asarray(samples), axis=0, ddof=1)
+            uncertainty_metadata.update(
+                {
+                    "flux_uncertainty_samples": int(n_uncertainty_samples),
+                    "flux_uncertainty_seed": uncertainty_seed,
+                    "flux_uncertainty_note": (
+                        "standard deviation over re-solves with Gaussian-resampled "
+                        "rates; diagonal rate uncertainty only, response and prior "
+                        "uncertainty not included"
+                    ),
+                }
+            )
         else:
-            if basis_matrix is None and np.all(active_mask):
-                flux_uncertainty = self._estimate_flux_uncertainty(
-                    flux_array, response_matrix, rate_uncertainties
-                )
-            else:
-                active_unc = self._estimate_flux_uncertainty(
-                    solver_flux,
-                    solver_response_matrix,
-                    solver_rate_uncertainties,
-                )
-                full_state_uncertainty = np.zeros_like(solved_state)
-                full_state_uncertainty[active_mask] = active_unc
-                if basis_matrix is None:
-                    flux_uncertainty = full_state_uncertainty
-                else:
-                    flux_uncertainty = basis_matrix @ full_state_uncertainty
+            raise ValueError("uncertainty_method must be 'none' or 'monte_carlo'")
 
         if self.verbose:
             print(f"\nUnfolding complete:")
             print(f"  Iterations: {result.iterations}")
             print(f"  Converged: {result.converged}")
-            print(f"  Chi²/dof: {result.chi_squared:.4f}")
+            print(f"  Chi²/measurement: {result.chi_squared:.4f}")
+            print(f"  Stop reason: {getattr(result, 'stop_reason', 'unspecified')}")
 
         return UnfoldingResult(
             energy_edges=self.energy_edges,
@@ -1265,7 +1280,10 @@ class SpectrumUnfolder:
                         duplicate_metadata["reaction_counts"]
                     ),
                     **basis_metadata,
+                    **uncertainty_metadata,
+                    "stop_reason": getattr(result, "stop_reason", "unspecified"),
                     "tolerance": tolerance,
+                    "chi2_tolerance": chi2_tolerance,
                     "relaxation": relaxation,
                     "prior_strength": prior_strength,
                     "smoothing_strength": smoothing_strength,
@@ -1273,36 +1291,6 @@ class SpectrumUnfolder:
                 flux_array,
             ),
         )
-
-    def _estimate_flux_uncertainty(
-        self,
-        flux: np.ndarray,
-        response: np.ndarray,
-        rate_unc: np.ndarray,
-    ) -> np.ndarray:
-        """
-        Estimate flux uncertainties via pseudo-inverse propagation.
-
-        This is a simplified uncertainty estimate. For rigorous uncertainty
-        quantification, use Monte Carlo propagation.
-        """
-        # Sensitivity matrix: dφ/dy ~ (R^T R)^{-1} R^T
-        try:
-            RtR = response.T @ response
-            # Add regularization for stability
-            reg = 1e-10 * np.trace(RtR) / RtR.shape[0] * np.eye(RtR.shape[0])
-            RtR_inv = np.linalg.inv(RtR + reg)
-            sensitivity = RtR_inv @ response.T
-
-            # Propagate uncertainties
-            flux_var = np.sum((sensitivity * rate_unc) ** 2, axis=1)
-            flux_unc = np.sqrt(flux_var)
-        except np.linalg.LinAlgError:
-            # Fall back to simple relative uncertainty
-            avg_rel_unc = np.mean(rate_unc / np.maximum(np.abs(flux), 1e-30))
-            flux_unc = flux * avg_rel_unc
-
-        return flux_unc
 
     def compare_with_mcnp(
         self,

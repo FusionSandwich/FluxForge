@@ -24,10 +24,22 @@ from fluxforge.core.linalg import Matrix, Vector, elementwise_maximum, matmul
 # Small enough to preserve reference-implementation parity without hitting zero.
 _ITERATIVE_POSITIVE_FLOOR = 1e-100
 
+CHI_SQUARED_DEFINITION = (
+    "sum(((y_i - (R phi)_i) / sigma_i)^2) / n_measurements; descriptive, not "
+    "corrected for fitted degrees of freedom or regularization"
+)
+
 
 @dataclass
 class IterativeSolution:
-    """Container for iterative solver results."""
+    """Container for iterative solver results.
+
+    ``converged`` reports numerical convergence of the iteration only (relative
+    change or ddJ criterion). ``chi_squared`` is the postfit chi-squared per
+    measurement (see ``CHI_SQUARED_DEFINITION``); for underdetermined problems it
+    is not a reduced chi-squared. ``stop_reason`` is one of ``"converged"``,
+    ``"chi2_target"`` or ``"max_iterations"``.
+    """
 
     flux: Vector
     history: List[Vector]
@@ -37,9 +49,14 @@ class IterativeSolution:
     chi_squared_history: List[float] = field(default_factory=list)
     final_residuals: Optional[Vector] = None
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    chi_squared_total: Optional[float] = None
+    n_measurements: Optional[int] = None
+    stop_reason: str = "unspecified"
 
     def __post_init__(self) -> None:
         self.diagnostics = merge_flux_diagnostics(self.diagnostics, self.flux)
+        self.diagnostics.setdefault("chi_squared_definition", CHI_SQUARED_DEFINITION)
+        self.diagnostics.setdefault("stop_reason", self.stop_reason)
 
 
 def _default_flux(n_groups: int, scale: float = 1.0) -> Vector:
@@ -177,7 +194,7 @@ def gravel(
     measurement_uncertainty: Optional[Vector] = None,
     max_iters: int = 1000,
     tolerance: float = 1e-4,
-    chi2_tolerance: float = 0.01,
+    chi2_tolerance: Optional[float] = None,
     floor: float = _ITERATIVE_POSITIVE_FLOOR,
     relaxation: float = 0.7,
     prior_strength: float = 0.0,
@@ -196,7 +213,8 @@ def gravel(
             Poisson variance (weight y_i) is assumed.
         max_iters: Maximum iterations to perform.
         tolerance: Relative max change threshold for convergence.
-        chi2_tolerance: Chi-squared per DOF threshold for convergence.
+        chi2_tolerance: Optional stop when chi2 per measurement falls below this
+            value. Records ``stop_reason='chi2_target'``; never sets ``converged``.
         floor: Minimum flux/prediction value to avoid divide-by-zero.
         relaxation: Under-relaxation factor (0-1). Lower = more stable, slower.
         prior_strength: Geometric pull toward the initial spectrum after each
@@ -244,6 +262,7 @@ def gravel(
     history: List[Vector] = [phi[:]]
     chi2_history: List[float] = []
     converged = False
+    stop_reason = "max_iterations"
     ddj_indices = [idx for idx, value in enumerate(measurements) if value > 0.0]
     J_prev = 0.0
     dJ_prev = 1.0
@@ -256,11 +275,11 @@ def gravel(
         chi2, residuals = _compute_chi_squared(
             response, phi, measurements, measurement_uncertainty, floor
         )
-        chi2_per_dof = chi2 / max(n_meas - 1, 1)
-        chi2_history.append(chi2_per_dof)
+        chi2_per_meas = chi2 / max(n_meas, 1)
+        chi2_history.append(chi2_per_meas)
 
         if verbose and it % 100 == 0:
-            print(f"  GRAVEL iter {it}: chi2/dof = {chi2_per_dof:.4f}")
+            print(f"  GRAVEL iter {it}: chi2/n = {chi2_per_meas:.4f}")
 
         if convergence_mode == "ddJ":
             ddj_predicted = [predicted[idx] for idx in ddj_indices]
@@ -320,24 +339,27 @@ def gravel(
         # Check convergence criteria
         if convergence_mode == "ddJ" and ddJ < tolerance:
             converged = True
+            stop_reason = "converged"
             if verbose:
                 print(
-                    f"  GRAVEL converged at iter {it}: ddJ = {ddJ:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                    f"  GRAVEL converged at iter {it}: ddJ = {ddJ:.2e}, chi2/n = {chi2_per_meas:.4f}"
                 )
             break
 
         if convergence_mode == "relative" and max_rel_change < tolerance:
             converged = True
+            stop_reason = "converged"
             if verbose:
                 print(
-                    f"  GRAVEL converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                    f"  GRAVEL converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/n = {chi2_per_meas:.4f}"
                 )
             break
 
-        if chi2_per_dof < chi2_tolerance:
-            converged = True
+        if chi2_tolerance is not None and chi2_per_meas < chi2_tolerance:
+            # A small residual is a stopping target, not numerical convergence.
+            stop_reason = "chi2_target"
             if verbose:
-                print(f"  GRAVEL converged at iter {it}: chi2/dof = {chi2_per_dof:.4f}")
+                print(f"  GRAVEL stopped at chi2 target, iter {it}: chi2/n = {chi2_per_meas:.4f}")
             break
 
     final_chi2, final_residuals = _compute_chi_squared(
@@ -349,7 +371,10 @@ def gravel(
         history=history,
         iterations=it if "it" in dir() else max_iters,
         converged=converged,
-        chi_squared=final_chi2 / max(n_meas - 1, 1),
+        chi_squared=final_chi2 / max(n_meas, 1),
+        chi_squared_total=final_chi2,
+        n_measurements=n_meas,
+        stop_reason=stop_reason,
         chi_squared_history=chi2_history,
         final_residuals=final_residuals,
         diagnostics=merge_flux_diagnostics(
@@ -368,7 +393,7 @@ def mlem(
     measurement_uncertainty: Optional[Vector] = None,
     max_iters: int = 1000,
     tolerance: float = 1e-4,
-    chi2_tolerance: float = 0.01,
+    chi2_tolerance: Optional[float] = None,
     floor: float = _ITERATIVE_POSITIVE_FLOOR,
     relaxation: float = 0.8,
     prior_strength: float = 0.0,
@@ -386,7 +411,8 @@ def mlem(
             as effective-count row weights ``y_i / sigma_i**2``.
         max_iters: Maximum iterations to perform.
         tolerance: Relative max change threshold for convergence.
-        chi2_tolerance: Chi-squared per DOF threshold for convergence.
+        chi2_tolerance: Optional stop when chi2 per measurement falls below this
+            value. Records ``stop_reason='chi2_target'``; never sets ``converged``.
         floor: Minimum flux/prediction value to avoid divide-by-zero.
         relaxation: Under-relaxation factor (0-1). Lower = more stable, slower.
         prior_strength: Geometric pull toward the initial spectrum after each
@@ -432,6 +458,7 @@ def mlem(
     history: List[Vector] = [phi[:]]
     chi2_history: List[float] = []
     converged = False
+    stop_reason = "max_iterations"
 
     # For ddJ convergence mode (Neutron-Unfolding style)
     J_prev = 0.0
@@ -445,8 +472,8 @@ def mlem(
         chi2, residuals = _compute_chi_squared(
             response, phi, measurements, measurement_uncertainty, floor
         )
-        chi2_per_dof = chi2 / max(n_meas - 1, 1)
-        chi2_history.append(chi2_per_dof)
+        chi2_per_meas = chi2 / max(n_meas, 1)
+        chi2_history.append(chi2_per_meas)
 
         # Compute J for ddJ mode (Neutron-Unfolding objective)
         if convergence_mode == "ddJ":
@@ -460,7 +487,7 @@ def mlem(
             dJ_prev = dJ
 
         if verbose and it % 100 == 0:
-            print(f"  MLEM iter {it}: chi2/dof = {chi2_per_dof:.4f}")
+            print(f"  MLEM iter {it}: chi2/n = {chi2_per_meas:.4f}")
 
         updated: Vector = []
         max_rel_change = 0.0
@@ -496,23 +523,26 @@ def mlem(
         # Check convergence criteria
         if convergence_mode == "ddJ" and ddJ < tolerance:
             converged = True
+            stop_reason = "converged"
             if verbose:
                 print(
-                    f"  MLEM converged at iter {it}: ddJ = {ddJ:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                    f"  MLEM converged at iter {it}: ddJ = {ddJ:.2e}, chi2/n = {chi2_per_meas:.4f}"
                 )
             break
         elif convergence_mode == "relative" and max_rel_change < tolerance:
             converged = True
+            stop_reason = "converged"
             if verbose:
                 print(
-                    f"  MLEM converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/dof = {chi2_per_dof:.4f}"
+                    f"  MLEM converged at iter {it}: rel_change = {max_rel_change:.2e}, chi2/n = {chi2_per_meas:.4f}"
                 )
             break
 
-        if chi2_per_dof < chi2_tolerance:
-            converged = True
+        if chi2_tolerance is not None and chi2_per_meas < chi2_tolerance:
+            # A small residual is a stopping target, not numerical convergence.
+            stop_reason = "chi2_target"
             if verbose:
-                print(f"  MLEM converged at iter {it}: chi2/dof = {chi2_per_dof:.4f}")
+                print(f"  MLEM stopped at chi2 target, iter {it}: chi2/n = {chi2_per_meas:.4f}")
             break
 
     final_chi2, final_residuals = _compute_chi_squared(
@@ -524,7 +554,10 @@ def mlem(
         history=history,
         iterations=it if "it" in dir() else max_iters,
         converged=converged,
-        chi_squared=final_chi2 / max(n_meas - 1, 1),
+        chi_squared=final_chi2 / max(n_meas, 1),
+        chi_squared_total=final_chi2,
+        n_measurements=n_meas,
+        stop_reason=stop_reason,
         chi_squared_history=chi2_history,
         final_residuals=final_residuals,
         diagnostics=merge_flux_diagnostics(
@@ -543,7 +576,7 @@ def gradient_descent(
     measurement_uncertainty: Optional[Vector] = None,
     max_iters: int = 10000,
     tolerance: float = 1e-6,
-    chi2_tolerance: float = 0.01,
+    chi2_tolerance: Optional[float] = None,
     floor: float = 1e-12,
     learning_rate: float = 1.0,
     smoothness_weight: float = 0.01,
@@ -564,7 +597,8 @@ def gradient_descent(
         measurement_uncertainty: Optional 1-sigma uncertainties.
         max_iters: Maximum iterations to perform.
         tolerance: Loss change threshold for convergence.
-        chi2_tolerance: Chi-squared per DOF threshold for convergence.
+        chi2_tolerance: Optional stop when chi2 per measurement falls below this
+            value. Records ``stop_reason='chi2_target'``; never sets ``converged``.
         floor: Minimum flux value to ensure positivity.
         learning_rate: Step size for gradient updates.
         smoothness_weight: Weight λ for smoothness regularization term.
@@ -594,6 +628,7 @@ def gradient_descent(
     chi2_history: List[float] = []
     loss_history: List[float] = []
     converged = False
+    stop_reason = "max_iterations"
 
     # Track minimum loss for early stopping
     min_loss = float("inf")
@@ -624,11 +659,11 @@ def gradient_descent(
         chi2, residuals = _compute_chi_squared(
             response, phi, measurements, measurement_uncertainty, floor
         )
-        chi2_per_dof = chi2 / max(n_meas - 1, 1)
-        chi2_history.append(chi2_per_dof)
+        chi2_per_meas = chi2 / max(n_meas, 1)
+        chi2_history.append(chi2_per_meas)
 
         if verbose and it % 500 == 0:
-            print(f"  GD iter {it}: loss = {loss:.4e}, chi2/dof = {chi2_per_dof:.4f}")
+            print(f"  GD iter {it}: loss = {loss:.4e}, chi2/n = {chi2_per_meas:.4f}")
 
         # Auto-scale on first iteration
         if it == 1 and auto_scale:
@@ -678,10 +713,11 @@ def gradient_descent(
         history.append(phi[:])
 
         # Check for convergence
-        if chi2_per_dof < chi2_tolerance:
-            converged = True
+        if chi2_tolerance is not None and chi2_per_meas < chi2_tolerance:
+            # A small residual is a stopping target, not numerical convergence.
+            stop_reason = "chi2_target"
             if verbose:
-                print(f"  GD converged at iter {it}: chi2/dof = {chi2_per_dof:.4f}")
+                print(f"  GD stopped at chi2 target, iter {it}: chi2/n = {chi2_per_meas:.4f}")
             break
 
         # Check loss plateau
@@ -690,6 +726,7 @@ def gradient_descent(
             loss_range = max(recent_losses) - min(recent_losses)
             if loss_range / max(max(recent_losses), floor) < 1e-5:
                 converged = True
+                stop_reason = "converged"
                 if verbose:
                     print(f"  GD converged at iter {it}: loss plateau detected")
                 break
@@ -717,7 +754,10 @@ def gradient_descent(
         history=history,
         iterations=it if "it" in dir() else max_iters,
         converged=converged,
-        chi_squared=final_chi2 / max(n_meas - 1, 1),
+        chi_squared=final_chi2 / max(n_meas, 1),
+        chi_squared_total=final_chi2,
+        n_measurements=n_meas,
+        stop_reason=stop_reason,
         chi_squared_history=chi2_history,
         final_residuals=final_residuals,
         diagnostics=merge_flux_diagnostics(
