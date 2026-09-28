@@ -46,6 +46,13 @@ from fluxforge.io.flux_wire import FluxWireData, read_processed_txt, read_raw_as
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.physics.activation import activation_study_metrics
 from fluxforge.physics.monitor_response import CoverLayer, MonitorResponseSpec
+from fluxforge.uncertainty.reaction_rate_budget import (
+    RateUncertaintyBudget,
+    UncertaintyComponent,
+    budget_table,
+    floor_as_component,
+    rate_covariance,
+)
 from fluxforge.plots.activation import (
     ComparisonResult,
     plot_cd_ratio_analysis,
@@ -2928,53 +2935,49 @@ def build_flux_wire_reactions(
             if activity_bq > 0.0 and activity_unc_bq >= 0.0
             else 0.0
         )
-        additional_relative_terms: List[float] = []
-        relative_uncertainty_floor = 0.0
-
+        components: List[UncertaintyComponent] = []
+        if activity_unc_bq > 0.0:
+            components.append(
+                UncertaintyComponent(
+                    "activity", base_relative_unc, None,
+                    "reported activity uncertainty (composition not itemized)",
+                )
+            )
+        # Model terms are explicit, named components (never silent floors).
+        model_terms: List[Tuple[str, float, float]] = []
         if reaction_id == "Ti-48(n,p)Sc-48":
-            additional_relative_terms.append(
-                float(
-                    metadata.config.get(
-                        "ti48_model_relative_uncertainty_additional", 0.15
-                    )
-                )
-            )
-            relative_uncertainty_floor = max(
-                relative_uncertainty_floor,
-                float(
-                    metadata.config.get("ti48_model_relative_uncertainty_floor", 0.20)
-                ),
-            )
-
+            model_terms.append((
+                "ti48_model",
+                float(metadata.config.get("ti48_model_relative_uncertainty_additional", 0.15)),
+                float(metadata.config.get("ti48_model_relative_uncertainty_floor", 0.20)),
+            ))
         if "-cd-" in normalized_sample_id or "-cd-" in normalized_sample_key:
-            additional_relative_terms.append(
-                float(
-                    metadata.config.get(
-                        "cd_model_relative_uncertainty_additional", 0.20
-                    )
+            model_terms.append((
+                "cd_model",
+                float(metadata.config.get("cd_model_relative_uncertainty_additional", 0.20)),
+                float(metadata.config.get("cd_model_relative_uncertainty_floor", 0.25)),
+            ))
+        for name, additional, _ in model_terms:
+            if additional > 0.0:
+                components.append(
+                    UncertaintyComponent(name, additional, None, f"config {name}_relative_uncertainty_additional")
                 )
-            )
-            relative_uncertainty_floor = max(
-                relative_uncertainty_floor,
-                float(
-                    metadata.config.get("cd_model_relative_uncertainty_floor", 0.25)
-                ),
-            )
-
-        effective_relative_unc = float(base_relative_unc)
-        if additional_relative_terms:
-            effective_relative_unc = float(
-                math.sqrt(
-                    effective_relative_unc**2
-                    + sum(max(term, 0.0) ** 2 for term in additional_relative_terms)
-                )
-            )
-        effective_relative_unc = max(
-            effective_relative_unc,
-            float(relative_uncertainty_floor),
+        floor = max((term[2] for term in model_terms), default=0.0)
+        current = math.sqrt(sum(c.relative**2 for c in components))
+        floor_component = floor_as_component(
+            "model_floor", current, floor, "config *_model_relative_uncertainty_floor"
         )
-        if activity_bq > 0.0:
-            activity_unc_bq = float(activity_bq * effective_relative_unc)
+        if floor_component is not None:
+            components.append(floor_component)
+        for name, spec in dict(metadata.config.get("rate_uncertainty_components", {})).items():
+            components.append(
+                UncertaintyComponent(
+                    name,
+                    float(spec["relative"]),
+                    spec.get("correlation_group", "all_flux_wires"),
+                    str(spec.get("source", "workflow config")),
+                )
+            )
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
@@ -2994,10 +2997,8 @@ def build_flux_wire_reactions(
             if activity_bq > 0 and n_atoms > 0 and half_life_s > 0
             else 0.0
         )
-        rate_unc = (
-            rate * (activity_unc_bq / activity_bq)
-            if activity_bq > 0 and activity_unc_bq >= 0
-            else 0.0
+        budget = RateUncertaintyBudget(
+            row_id=f"{sample_id}|{reaction_id}", rate=rate, components=components
         )
         reactions.append(
             FluxWireReaction(
@@ -3007,10 +3008,11 @@ def build_flux_wire_reactions(
                 activity_bq=activity_bq,
                 activity_unc_bq=activity_unc_bq,
                 reaction_rate=rate,
-                reaction_rate_unc=rate_unc,
+                reaction_rate_unc=budget.total_absolute,
                 n_atoms=n_atoms,
                 irradiation_time_s=irradiation_time_s,
                 decay_time_s=decay_time_s,
+                uncertainty_budget=budget,
             )
         )
     return reactions
@@ -3624,8 +3626,73 @@ def reaction_rows_to_dicts(
     rows = []
     for reaction in reactions:
         row = asdict(reaction)
+        row.pop("uncertainty_budget", None)
+        budget = reaction.uncertainty_budget
+        row["rate_uncertainty_components"] = (
+            ";".join(f"{c.name}={c.relative:.4g}" for c in budget.components) if budget else ""
+        )
+        row["rate_uncertainty_missing"] = ";".join(budget.missing) if budget else ""
+        row["rate_uncertainty_budget"] = (
+            {
+                "row_id": budget.row_id,
+                "rate": budget.rate,
+                "components": [asdict(component) for component in budget.components],
+            }
+            if budget
+            else None
+        )
         rows.append(row)
     return rows
+
+
+_REACTION_ROW_EXTRA_KEYS = (
+    "rate_uncertainty_components",
+    "rate_uncertainty_missing",
+    "rate_uncertainty_budget",
+    "uncertainty_budget",
+)
+
+
+def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
+    """Rebuild a FluxWireReaction (with its uncertainty budget) from a row dict."""
+    data = {key: value for key, value in row.items() if key not in _REACTION_ROW_EXTRA_KEYS}
+    reaction = FluxWireReaction(**data)
+    # Accept both the serialized form and a raw ``asdict(reaction)`` payload.
+    serialized = row.get("rate_uncertainty_budget") or row.get("uncertainty_budget")
+    if isinstance(serialized, RateUncertaintyBudget):
+        reaction.uncertainty_budget = serialized
+    elif serialized:
+        reaction.uncertainty_budget = RateUncertaintyBudget(
+            row_id=serialized["row_id"],
+            rate=float(serialized["rate"]),
+            components=[UncertaintyComponent(**c) for c in serialized["components"]],
+        )
+    return reaction
+
+
+def csv_reaction_rows(rows: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Reaction rows without the nested budget (it has its own tables)."""
+    return [{k: v for k, v in row.items() if k != "rate_uncertainty_budget"} for row in rows]
+
+
+def write_rate_uncertainty_tables(
+    reactions: Sequence[FluxWireReaction], tables_root: Path
+) -> None:
+    """Write the per-row uncertainty budget and the rate covariance matrix."""
+    budgets = [
+        r.uncertainty_budget
+        for r in reactions
+        if r.uncertainty_budget is not None and r.reaction_rate > 0
+    ]
+    write_rows_csv(budget_table(budgets), tables_root / "flux_wire_rate_uncertainty_budget.csv")
+    covariance = rate_covariance(budgets)
+    write_rows_csv(
+        [
+            {"row_id": budget.row_id, **{b.row_id: float(v) for b, v in zip(budgets, row)}}
+            for budget, row in zip(budgets, covariance)
+        ],
+        tables_root / "flux_wire_rate_covariance.csv",
+    )
 
 
 def _qg_isotope_activity_payload(
@@ -3817,13 +3884,19 @@ def run_qg_benchmark(
 
     write_rows_csv(sample_rows, tree["tables"] / "qg_samples.csv")
     write_rows_csv(isotope_rows, tree["tables"] / "qg_isotope_summary.csv")
-    write_rows_csv(reaction_rows, tree["tables"] / "flux_wire_reaction_rates.csv")
+    write_rows_csv(
+        csv_reaction_rows(reaction_rows), tree["tables"] / "flux_wire_reaction_rates.csv"
+    )
+    write_rate_uncertainty_tables(all_reactions, tree["tables"])
 
     unfolding_results = run_flux_wire_unfolding(
         all_reactions,
         paths.prior_spectrum_path,
         tree["unfolding"],
         cd_cover=cd_cover_from_config(metadata.config),
+        min_relative_uncertainty=float(
+            metadata.config.get("unfolding_min_relative_uncertainty", 0.05)
+        ),
     )
     summary = {
         "overall_passed": True,
@@ -4112,7 +4185,13 @@ def run_flux_wire_unfolding(
     prior_path: Path,
     output_root: Path,
     cd_cover: Optional[CoverLayer] = None,
+    min_relative_uncertainty: float = 0.05,
 ) -> Dict[str, UnfoldingResult]:
+    """Run the diagnostic RAFM unfolding methods.
+
+    ``min_relative_uncertainty`` is an explicit lower bound on the rate
+    uncertainty passed to GRAVEL/MLEM; it is recorded in each result's metadata.
+    """
     valid_reactions = [
         reaction
         for reaction in reactions
@@ -4172,7 +4251,8 @@ def run_flux_wire_unfolding(
                 reaction=reaction.reaction_id,
                 activity_Bq=reaction.reaction_rate,
                 uncertainty_Bq=max(
-                    reaction.reaction_rate_unc, 0.05 * reaction.reaction_rate
+                    reaction.reaction_rate_unc,
+                    min_relative_uncertainty * reaction.reaction_rate,
                 ),
                 rate_per_atom=reaction.reaction_rate,
                 sample_id=reaction.sample_id,
@@ -4191,6 +4271,12 @@ def run_flux_wire_unfolding(
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)
         unfolder.set_initial_guess(prior_flux, source="VITAMIN-J prior")
         result = unfolder.unfold(method=method)
+        result.metadata["min_relative_uncertainty_applied"] = float(min_relative_uncertainty)
+        result.metadata["rows_raised_to_min_relative_uncertainty"] = [
+            f"{r.sample_id}|{r.reaction_id}"
+            for r in valid_reactions
+            if r.reaction_rate_unc < min_relative_uncertainty * r.reaction_rate
+        ]
         save_unfolding_artifacts(result, prior_flux, output_root)
         iterative_results[method] = result
 
@@ -4374,7 +4460,12 @@ def run_rafm_validation(
         flux_wire_count_rows,
         tree["tables"] / "flux_wire_count_disagreement_summary.md",
     )
-    write_rows_csv(reaction_rows, tree["tables"] / "flux_wire_reaction_rates.csv")
+    write_rows_csv(
+        csv_reaction_rows(reaction_rows), tree["tables"] / "flux_wire_reaction_rates.csv"
+    )
+    write_rate_uncertainty_tables(
+        [reaction_from_row(row) for row in reaction_rows], tree["tables"]
+    )
     write_rows_csv(
         [{"raw_file": str(path)} for path in unmatched_raw],
         tree["tables"] / "unmatched_raw.csv",
@@ -4425,12 +4516,15 @@ def run_rafm_validation(
     all_reactions: List[FluxWireReaction] = []
     for artifact in flux_wire_artifacts:
         for row in artifact.get("reactions", []):
-            all_reactions.append(FluxWireReaction(**row))
+            all_reactions.append(reaction_from_row(row))
     unfolding_results = run_flux_wire_unfolding(
         all_reactions,
         paths.prior_spectrum_path,
         tree["unfolding"],
         cd_cover=cd_cover_from_config(metadata.config),
+        min_relative_uncertainty=float(
+            metadata.config.get("unfolding_min_relative_uncertainty", 0.05)
+        ),
     )
 
     summary_comparisons = [

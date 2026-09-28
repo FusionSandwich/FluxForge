@@ -122,7 +122,8 @@ def _compute_chi_squared(
     residuals = []
     chi2 = 0.0
     for i, (m, p) in enumerate(zip(measurements, predicted)):
-        unc = uncertainties[i] if uncertainties else max(m * 0.1, floor)
+        # Without supplied uncertainties the solvers assume Poisson variance.
+        unc = uncertainties[i] if uncertainties else math.sqrt(max(m, floor))
         if unc > 0:
             r = (m - p) / unc
             residuals.append(r)

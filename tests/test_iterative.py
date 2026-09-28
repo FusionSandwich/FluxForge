@@ -121,6 +121,7 @@ def test_gradient_descent_identity_case():
         learning_rate=0.5,
         smoothness_weight=0.0,  # No smoothness for identity test
         chi2_tolerance=0.01,
+        measurement_uncertainty=[0.1 * m for m in measurements],
     )
 
     assert solution.converged or solution.chi_squared < 0.1

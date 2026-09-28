@@ -526,9 +526,13 @@ def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> N
         metadata,
     )
     assert ti_reactions
-    ti_rel_unc = ti_reactions[0].activity_unc_bq / ti_reactions[0].activity_bq
+    ti_rel_unc = ti_reactions[0].reaction_rate_unc / ti_reactions[0].reaction_rate
     assert ti_reactions[0].reaction_id == "Ti-48(n,p)Sc-48"
     assert ti_rel_unc >= 0.20 - 1e-12
+    # The reported activity uncertainty is not inflated; the model term is explicit.
+    assert ti_reactions[0].activity_unc_bq == 50.0
+    names = {c.name for c in ti_reactions[0].uncertainty_budget.components}
+    assert {"activity", "ti48_model", "model_floor"} <= names
 
     cd_reactions = build_flux_wire_reactions(
         "Co-Cd-RAFM-1_25cm",
@@ -545,5 +549,6 @@ def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> N
         metadata,
     )
     assert cd_reactions
-    cd_rel_unc = cd_reactions[0].activity_unc_bq / cd_reactions[0].activity_bq
+    cd_rel_unc = cd_reactions[0].reaction_rate_unc / cd_reactions[0].reaction_rate
     assert cd_rel_unc >= 0.25 - 1e-12
+    assert "cd_model" in {c.name for c in cd_reactions[0].uncertainty_budget.components}

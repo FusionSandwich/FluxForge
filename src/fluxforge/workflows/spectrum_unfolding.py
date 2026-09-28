@@ -959,6 +959,7 @@ class SpectrumUnfolder:
         uncertainty_method: str = "none",
         n_uncertainty_samples: int = 50,
         uncertainty_seed: Optional[int] = 0,
+        default_relative_uncertainty: Optional[float] = None,
     ) -> UnfoldingResult:
         """
         Perform spectrum unfolding.
@@ -1009,6 +1010,10 @@ class SpectrumUnfolder:
             Number of Monte Carlo re-solves.
         uncertainty_seed : int, optional
             Seed for the Monte Carlo resampling.
+        default_relative_uncertainty : float, optional
+            Relative uncertainty to assume for measurements that carry none.
+            Without it, such measurements raise ``ValueError``; the value used
+            is recorded in the result metadata.
 
         Returns
         -------
@@ -1028,6 +1033,7 @@ class SpectrumUnfolder:
         # Get measured rates and uncertainties
         measured_rates = []
         rate_uncertainties = []
+        defaulted_uncertainty_rows: List[str] = []
         for m in self.measurements:
             if m.reaction in valid_reactions:
                 rate_value = float(m.reaction_rate_per_atom)
@@ -1038,11 +1044,15 @@ class SpectrumUnfolder:
                     rate_value = float(m.activity_Bq)
                 measured_rates.append(rate_value)
                 rel_uncertainty = float(m.relative_uncertainty)
-                rate_uncertainties.append(
-                    rate_value * rel_uncertainty
-                    if rel_uncertainty > 0.0
-                    else rate_value * 0.1
-                )
+                if rel_uncertainty <= 0.0:
+                    if default_relative_uncertainty is None:
+                        raise ValueError(
+                            f"Measurement {m.sample_id or m.reaction} has no uncertainty; "
+                            "supply one or pass default_relative_uncertainty explicitly"
+                        )
+                    rel_uncertainty = float(default_relative_uncertainty)
+                    defaulted_uncertainty_rows.append(m.sample_id or m.reaction)
+                rate_uncertainties.append(rate_value * rel_uncertainty)
 
         measured_rates = require_nonnegative("measured_rates", measured_rates).reshape(-1)
         rate_uncertainties = require_nonnegative(
@@ -1345,6 +1355,8 @@ class SpectrumUnfolder:
                     **basis_metadata,
                     **uncertainty_metadata,
                     "response_rows": list(getattr(self, "_response_row_metadata", [])),
+                    "default_relative_uncertainty": default_relative_uncertainty,
+                    "rows_with_default_uncertainty": defaulted_uncertainty_rows,
                     "stop_reason": getattr(result, "stop_reason", "unspecified"),
                     "tolerance": tolerance,
                     "chi2_tolerance": chi2_tolerance,

@@ -149,6 +149,8 @@ class FluxWireReaction:
     irradiation_time_s: float = 0.0
     decay_time_s: float = 0.0
     rate_note: str = ""
+    # Named reaction-rate uncertainty components (RateUncertaintyBudget)
+    uncertainty_budget: Optional[Any] = field(default=None, repr=False, compare=False)
 
 
 def irradiation_history_factor(
@@ -387,9 +389,8 @@ def extract_reactions_from_processed(
     for nuclide in data.nuclides:
         isotope = nuclide.isotope
         activity_bq = nuclide.activity_bq
-        activity_unc = (
-            nuclide.activity_unc * 3.7e4 if nuclide.activity_unc else activity_bq * 0.1
-        )
+        # Report uncertainty is left at zero (and noted) when absent, never invented.
+        activity_unc = nuclide.activity_unc * 3.7e4 if nuclide.activity_unc else 0.0
 
         # Get half-life
         half_life_s = FLUX_WIRE_NUCLIDES.get(isotope, {}).get("half_life_s", 0)
@@ -441,6 +442,7 @@ def extract_reactions_from_processed(
             n_atoms=n_atoms,
             irradiation_time_s=irradiation_time_s,
             decay_time_s=decay_time_s,
+            rate_note="" if activity_unc > 0 else "activity uncertainty not reported",
         )
         # Add flux as extra attribute
         rxn.flux = flux
@@ -495,7 +497,7 @@ def extract_reactions_from_raw(
 
     for isotope, activity in analysis.nuclide_activities.items():
         activity_bq = activity.get("activity_bq", 0.0)
-        activity_unc = activity.get("activity_unc_bq", activity_bq * 0.1)
+        activity_unc = float(activity.get("activity_unc_bq") or 0.0)
 
         # Get half-life
         half_life_s = FLUX_WIRE_NUCLIDES.get(isotope, {}).get("half_life_s", 0.0)
@@ -548,6 +550,7 @@ def extract_reactions_from_raw(
             n_atoms=n_atoms,
             irradiation_time_s=irradiation_time_s,
             decay_time_s=decay_time_s,
+            rate_note="" if activity_unc > 0 else "activity uncertainty not reported",
         )
         rxn.flux = flux
         rxn.flux_type = flux_type
@@ -762,6 +765,7 @@ def unfold_gls(
     prior_uncertainty: float = 2.0,  # Prior relative uncertainty (more constraining)
     cross_sections: Optional[Dict[str, np.ndarray]] = None,
     regularization: float = 1e-10,  # Regularization for matrix stability
+    min_relative_uncertainty: float = 0.10,
 ) -> GLSUnfoldResult:
     """
     Perform GLS spectrum adjustment unfolding.
@@ -785,6 +789,9 @@ def unfold_gls(
         Pre-loaded group cross sections
     regularization : float
         Small value added to covariance diagonals for stability
+    min_relative_uncertainty : float
+        Explicit lower bound applied to each observation's relative
+        uncertainty (historical behaviour: 0.10).
 
     Returns
     -------
@@ -841,13 +848,15 @@ def unfold_gls(
                 (
                     rxn_flux * rxn.reaction_rate_unc / rxn.reaction_rate
                     if rxn.reaction_rate > 0
-                    else 0.1 * rxn_flux
+                    else min_relative_uncertainty * rxn_flux
                 ),
-                0.1 * rxn_flux,
+                min_relative_uncertainty * rxn_flux,
             )
         else:
             measurements[i] = rxn.reaction_rate
-            measurement_unc[i] = max(rxn.reaction_rate_unc, 0.1 * rxn.reaction_rate)
+            measurement_unc[i] = max(
+                rxn.reaction_rate_unc, min_relative_uncertainty * rxn.reaction_rate
+            )
 
     # Measurement covariance (diagonal) with regularization
     measurement_cov = np.diag(measurement_unc**2 + regularization)
