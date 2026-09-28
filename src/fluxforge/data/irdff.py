@@ -304,6 +304,107 @@ IRDFF_REACTIONS = {
 # Cd cutoff energy (standard)
 CADMIUM_CUTOFF_EV = 0.55  # eV
 
+# Concatenated pointwise archive inside the IAEA IRDFF-II_TAB.zip
+IRDFF_TAB_ARCHIVE_NAME = "IRDFF-II.tab.txt"
+BUILTIN_APPROXIMATION_SOURCE = "built-in approximation (not IRDFF-II)"
+
+
+class MissingCrossSectionError(ValueError):
+    """Raised when a requested reaction has no cross-section data."""
+
+
+def _endf_float(token: str) -> float:
+    """Parse a float that may use ENDF's exponent form (``1.0745-5``)."""
+    try:
+        return float(token)
+    except ValueError:
+        match = re.fullmatch(r"([+-]?\d*\.?\d+)([+-]\d+)", token)
+        if match is None:
+            raise
+        return float(f"{match.group(1)}e{match.group(2)}")
+
+
+def parse_irdff_tab_archive(path: Union[str, Path]) -> Dict[str, np.ndarray]:
+    """
+    Parse the concatenated IAEA ``IRDFF-II.tab.txt`` archive.
+
+    Each block starts with a reaction header (e.g. ``Co-59(n,g)``) followed by
+    lines of energy (eV), cross section (b), absolute uncertainty (b) and
+    relative uncertainty (%). Returns ``{header: array(n, 4)}``.
+    """
+    blocks: Dict[str, List[List[float]]] = {}
+    current: Optional[List[List[float]]] = None
+    with open(path, "r", encoding="ascii", errors="replace") as handle:
+        for line in handle:
+            parts = line.split()
+            if not parts:
+                continue
+            try:
+                values = [_endf_float(token) for token in parts]
+            except ValueError:
+                header = line.strip()
+                if header in blocks:
+                    raise ValueError(f"Duplicate IRDFF-II block {header!r} in {path}")
+                current = blocks.setdefault(header, [])
+                continue
+            if current is None:
+                raise ValueError(f"Data before the first reaction header in {path}")
+            values += [np.nan] * (4 - len(values))
+            current.append(values[:4])
+    return {name: np.asarray(rows, dtype=float) for name, rows in blocks.items() if rows}
+
+
+_REACTION_ID_RE = re.compile(
+    r"^(?P<el>[A-Z][a-z]?)-(?P<a>\d+)\(n,(?P<ej>[^)]+)\)(?P<pel>[A-Z][a-z]?)-(?P<pa>\d+)(?P<state>[mg]?)$"
+)
+# (delta Z, delta A) of the residual nucleus for n + target -> ejectile + residual
+_EJECTILE_SHIFTS = {
+    "g": (0, 1),
+    "p": (-1, 0),
+    "d": (-1, -1),
+    "t": (-1, -2),
+    "a": (-2, -3),
+    "n'": (0, 0),
+    "2n": (0, -1),
+    "3n": (0, -2),
+    "np": (-1, -1),
+}
+
+
+def match_irdff_archive_key(reaction: str, keys) -> Optional[str]:
+    """
+    Map a FluxForge reaction ID (``Co-59(n,g)Co-60``) to an IRDFF-II header.
+
+    IRDFF-II omits the product when it is the unique residual
+    (``Co-59(n,g)``). Such a header is accepted only when the requested
+    product is exactly that residual in its ground/total state; metastable
+    products must match a header that names them.
+    """
+    compact = reaction.replace(" ", "")
+    key_set = {key.replace(" ", ""): key for key in keys}
+    if compact in key_set:
+        return key_set[compact]
+    match = _REACTION_ID_RE.match(compact)
+    if match is None or match.group("state") == "m":
+        return None
+    shift = _EJECTILE_SHIFTS.get(match.group("ej"))
+    if shift is None:
+        return None
+    from fluxforge.data.elements import z_from_element
+
+    try:
+        z_target = z_from_element(match.group("el"))
+        z_product = z_from_element(match.group("pel"))
+    except (KeyError, ValueError):
+        return None
+    if (z_product, int(match.group("pa"))) != (
+        z_target + shift[0],
+        int(match.group("a")) + shift[1],
+    ):
+        return None
+    short = f"{match.group('el')}-{match.group('a')}(n,{match.group('ej')})"
+    return key_set.get(short)
+
 
 # =============================================================================
 # IRDFF-II Data Loading Functions
@@ -337,6 +438,13 @@ class IRDFFCrossSection:
         Reaction threshold in eV
     source : str
         Data source (typically 'IRDFF-II')
+    interpolation : str
+        Interpolation law of the tabulation: ``"lin-lin"`` for the linearized
+        IRDFF-II pointwise archive, ``"log-log"`` for sparse approximations.
+    evaluation_key : str
+        Reaction name exactly as it appears in the evaluated source.
+    source_sha256 : str
+        SHA256 of the source file the data were read from (empty if none).
     """
 
     reaction: str
@@ -349,14 +457,22 @@ class IRDFFCrossSection:
     relative_unc: np.ndarray  # %
     threshold_eV: float = 0.0
     source: str = "IRDFF-II"
+    interpolation: str = "log-log"
+    evaluation_key: str = ""
+    source_sha256: str = ""
 
     @property
     def energies_MeV(self) -> np.ndarray:
         """Energy grid in MeV."""
         return self.energies / 1e6
 
+    @property
+    def is_approximation(self) -> bool:
+        """True for built-in sparse approximations rather than evaluated data."""
+        return self.source == BUILTIN_APPROXIMATION_SOURCE
+
     def evaluate(
-        self, energy_eV: Union[float, np.ndarray], log_interp: bool = True
+        self, energy_eV: Union[float, np.ndarray], log_interp: Optional[bool] = None
     ) -> np.ndarray:
         """
         Evaluate cross section at given energy.
@@ -365,8 +481,9 @@ class IRDFFCrossSection:
         ----------
         energy_eV : float or np.ndarray
             Energy in eV
-        log_interp : bool
-            Use log-log interpolation (recommended)
+        log_interp : bool, optional
+            Force log-log (True) or lin-lin (False) interpolation. By default
+            the tabulation's own interpolation law is used.
 
         Returns
         -------
@@ -374,6 +491,8 @@ class IRDFFCrossSection:
             Cross section in barns
         """
         energy_eV = np.atleast_1d(np.asarray(energy_eV, dtype=float))
+        if log_interp is None:
+            log_interp = self.interpolation == "log-log"
 
         if log_interp:
             # Log-log interpolation
@@ -419,7 +538,10 @@ class IRDFFCrossSection:
         group_xs : np.ndarray
             Group-averaged cross sections (barns)
         group_unc : np.ndarray
-            Group uncertainties (barns)
+            Group uncertainties (barns). Pointwise absolute uncertainties are
+            treated as fully correlated within a group, so the group value is
+            the weighted mean absolute uncertainty (an upper bound that has the
+            units of barns). Correlations between groups are not provided.
         """
         n_groups = len(group_edges_eV) - 1
         group_xs = np.zeros(n_groups)
@@ -429,9 +551,14 @@ class IRDFFCrossSection:
             e_lo = group_edges_eV[g]
             e_hi = group_edges_eV[g + 1]
 
-            # Create fine grid within group
+            # Fine grid within the group, plus every tabulated point inside it
+            # so narrow resonances are integrated rather than stepped over.
             n_points = 100
-            e_fine = np.geomspace(max(e_lo, 1e-5), e_hi, n_points)
+            e_start = max(e_lo, 1e-5)
+            tabulated = self.energies[(self.energies > e_start) & (self.energies < e_hi)]
+            e_fine = np.unique(
+                np.concatenate([np.geomspace(e_start, e_hi, n_points), tabulated])
+            )
 
             sigma_fine = self.evaluate(e_fine)
 
@@ -450,12 +577,9 @@ class IRDFFCrossSection:
 
             if denominator > 0:
                 group_xs[g] = numerator / denominator
-                # Approximate uncertainty (average in group)
                 unc_fine = np.interp(e_fine, self.energies, self.uncertainties)
-                group_unc[g] = (
-                    np.sqrt(_trapezoid((unc_fine * weight_fine) ** 2, e_fine))
-                    / denominator
-                )
+                unc_fine[sigma_fine == 0.0] = 0.0
+                group_unc[g] = _trapezoid(unc_fine * weight_fine, e_fine) / denominator
 
         return group_xs, group_unc
 
@@ -481,6 +605,8 @@ class IRDFFDatabase:
         cache_dir: Optional[Path] = None,
         auto_download: bool = True,
         verbose: bool = False,
+        archive_path: Optional[Union[str, Path]] = None,
+        allow_builtin_approximations: bool = False,
     ):
         """
         Initialize IRDFF-II database interface.
@@ -493,16 +619,34 @@ class IRDFFDatabase:
             Automatically download data if not cached
         verbose : bool
             Print status messages
+        archive_path : str or Path, optional
+            Explicit path to the IAEA ``IRDFF-II.tab.txt`` archive. Defaults to
+            ``$FLUXFORGE_IRDFF_ARCHIVE`` or ``<cache_dir>/tab/IRDFF-II.tab.txt``.
+        allow_builtin_approximations : bool
+            Permit the sparse built-in cross-section approximations when a
+            reaction is absent from the evaluated data. They omit resonance
+            structure and must not be used for physical unfolding.
         """
         self.cache_dir = Path(cache_dir) if cache_dir else DEFAULT_CACHE_DIR
         self.auto_download = auto_download
         self.verbose = verbose
+        self.allow_builtin_approximations = allow_builtin_approximations
+        env_archive = os.environ.get("FLUXFORGE_IRDFF_ARCHIVE")
+        self.archive_path = (
+            Path(archive_path)
+            if archive_path
+            else Path(env_archive)
+            if env_archive
+            else self.cache_dir / "tab" / IRDFF_TAB_ARCHIVE_NAME
+        )
 
         # Ensure cache directory exists
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Loaded cross sections cache
         self._xs_cache: Dict[str, IRDFFCrossSection] = {}
+        self._archive: Optional[Dict[str, np.ndarray]] = None
+        self._archive_sha256 = ""
         self._tab_data_loaded = False
         self._group_data_loaded = False
 
@@ -530,6 +674,8 @@ class IRDFFDatabase:
         zip_path = self.cache_dir / "IRDFF-II_TAB.zip"
         extract_dir = self.cache_dir / "tab"
 
+        if self.archive_path.exists():
+            return True
         if extract_dir.exists() and any(extract_dir.glob("*.dat")):
             return True
 
@@ -554,6 +700,47 @@ class IRDFFDatabase:
         except Exception as e:
             print(f"Error extracting {zip_path}: {e}")
             return False
+
+    def _load_archive(self) -> Optional[Dict[str, np.ndarray]]:
+        """Parse the concatenated IAEA IRDFF-II tab archive once, if present."""
+        if self._archive is None and self.archive_path.exists():
+            self._archive = parse_irdff_tab_archive(self.archive_path)
+            self._archive_sha256 = hashlib.sha256(
+                self.archive_path.read_bytes()
+            ).hexdigest()
+        return self._archive
+
+    def _get_archive_xs(self, reaction: str) -> Optional[IRDFFCrossSection]:
+        """Look up a reaction in the evaluated archive with product checking."""
+        archive = self._load_archive()
+        if not archive:
+            return None
+        key = match_irdff_archive_key(reaction, archive.keys())
+        if key is None:
+            return None
+        block = archive[key]
+        energies, xs = block[:, 0], block[:, 1]
+        nonzero = np.flatnonzero(xs > 0.0)
+        target, _, product = reaction.partition(")")
+        return IRDFFCrossSection(
+            reaction=reaction,
+            target=target.split("(")[0],
+            product=product,
+            mt_number=0,
+            energies=energies,
+            cross_sections=xs,
+            uncertainties=block[:, 2],
+            relative_unc=block[:, 3],
+            # Last zero point before the first non-zero value, so the
+            # linear ramp just above threshold is preserved.
+            threshold_eV=(
+                float(energies[nonzero[0] - 1]) if len(nonzero) and nonzero[0] > 0 else 0.0
+            ),
+            source="IRDFF-II",
+            interpolation="lin-lin",
+            evaluation_key=key,
+            source_sha256=self._archive_sha256,
+        )
 
     def _parse_tab_file(self, filepath: Path) -> Optional[IRDFFCrossSection]:
         """
@@ -660,15 +847,16 @@ class IRDFFDatabase:
         if reaction in self._xs_cache and not force_reload:
             return self._xs_cache[reaction]
 
-        # Try to find in our built-in data first
-        xs = self._get_builtin_xs(reaction)
-        if xs is not None:
-            self._xs_cache[reaction] = xs
-            return xs
-
-        # Try to load from downloaded files
+        # Evaluated IRDFF-II data first: the IAEA archive, then per-reaction files.
         if self._ensure_tab_data():
-            xs = self._search_tab_files(reaction)
+            xs = self._get_archive_xs(reaction) or self._search_tab_files(reaction)
+            if xs is not None:
+                self._xs_cache[reaction] = xs
+                return xs
+
+        # Sparse approximations only when explicitly allowed.
+        if self.allow_builtin_approximations:
+            xs = self._get_builtin_xs(reaction)
             if xs is not None:
                 self._xs_cache[reaction] = xs
                 return xs
@@ -684,8 +872,8 @@ class IRDFFDatabase:
         These are tabulated directly in the code for immediate availability
         without requiring internet access.
         """
-        # Built-in cross sections for our flux wire reactions
-        # These are simplified/representative values from IRDFF-II
+        # Sparse hand-entered approximations (roughly 1/v for captures, with no
+        # resolved resonances). Not evaluated IRDFF-II data; opt-in only.
         builtin_xs = self._get_builtin_cross_section_data()
 
         if reaction in builtin_xs:
@@ -700,7 +888,7 @@ class IRDFFDatabase:
                 uncertainties=np.array(data["xs"]) * 0.05,  # 5% default uncertainty
                 relative_unc=np.ones(len(data["xs"])) * 5.0,
                 threshold_eV=data["threshold"],
-                source="IRDFF-II (built-in)",
+                source=BUILTIN_APPROXIMATION_SOURCE,
             )
         return None
 
@@ -1388,8 +1576,10 @@ class IRDFFDatabase:
             if normalized in filename_norm or filename_norm in normalized:
                 return self._parse_tab_file(filepath)
 
-        # Also try .txt files
+        # Also try .txt files (never the concatenated archive or its listings)
         for filepath in extract_dir.rglob("*.txt"):
+            if filepath.name.startswith("IRDFF-II."):
+                continue
             filename_norm = filepath.stem.replace("_", "").replace("-", "").lower()
             if normalized in filename_norm or filename_norm in normalized:
                 return self._parse_tab_file(filepath)
@@ -1585,6 +1775,7 @@ def build_response_matrix(
     energy_edges: np.ndarray,
     db: Optional[IRDFFDatabase] = None,
     verbose: bool = False,
+    on_missing: str = "raise",
 ) -> Tuple[np.ndarray, List[str], np.ndarray]:
     """
     Build response matrix for spectrum unfolding.
@@ -1602,6 +1793,10 @@ def build_response_matrix(
         Database instance (will create if None)
     verbose : bool
         Print status messages
+    on_missing : {"raise", "skip"}
+        ``"raise"`` (default) raises :class:`MissingCrossSectionError` naming
+        every reaction without data. ``"skip"`` drops those rows; callers must
+        then align measurements with the returned reaction names.
 
     Returns
     -------
@@ -1612,6 +1807,8 @@ def build_response_matrix(
     uncertainties : np.ndarray
         Uncertainty matrix (same shape)
     """
+    if on_missing not in {"raise", "skip"}:
+        raise ValueError("on_missing must be 'raise' or 'skip'")
     if db is None:
         db = IRDFFDatabase(verbose=verbose)
 
@@ -1621,6 +1818,12 @@ def build_response_matrix(
     response = np.zeros((n_reactions, n_groups))
     uncertainties = np.zeros((n_reactions, n_groups))
     valid_reactions = []
+
+    missing = sorted({rxn for rxn in reactions if db.get_cross_section(rxn) is None})
+    if missing and on_missing == "raise":
+        raise MissingCrossSectionError(
+            "No evaluated cross section for: " + ", ".join(missing)
+        )
 
     for i, rxn in enumerate(reactions):
         xs = db.get_cross_section(rxn)
