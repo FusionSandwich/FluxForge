@@ -32,6 +32,11 @@ from fluxforge.data.irdff import (
     list_dosimetry_reactions,
     get_cross_section,
 )
+from fluxforge.data.group_structures import (
+    get_group_structure,
+    group_structure_info,
+    list_group_structures,
+)
 
 from fluxforge.data.gamma_database import (
     GammaLine,
@@ -158,6 +163,9 @@ __all__ = [
     "IRDFF_REACTIONS",
     "get_flux_wire_energy_groups",
     "get_activation_energy_groups",
+    "get_group_structure",
+    "group_structure_info",
+    "list_group_structures",
     "build_response_matrix",
     "get_irdff_database",
     "list_dosimetry_reactions",

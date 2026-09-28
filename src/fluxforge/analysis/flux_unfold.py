@@ -612,17 +612,17 @@ def make_equal_lethargy_groups(
 
 def make_vitamin_j_175_groups() -> EnergyGroupStructure:
     """
-    Create VITAMIN-J 175-group structure (common for fusion).
+    Exact VITAMIN-J 175-group structure (NJOY GROUPR option 17, as used by
+    ALARA 175-group libraries), 1e-5 eV to 19.64 MeV.
 
     Returns
     -------
     EnergyGroupStructure
-        VITAMIN-J 175-group boundaries
+        VITAMIN-J 175-group boundaries in eV, ascending
     """
-    # Standard 175-group boundaries from VITAMIN-J
-    # Simplified version - would need full list from library
-    # For now, create approximate equal-lethargy structure
-    return make_equal_lethargy_groups(175, e_min_eV=1e-5, e_max_eV=2e7)
+    from fluxforge.data.group_structures import get_group_structure
+
+    return EnergyGroupStructure(boundaries_eV=list(get_group_structure("VITAMIN-J")))
 
 
 # =============================================================================

@@ -1633,57 +1633,18 @@ class IRDFFDatabase:
 
     def get_energy_grid(self, grid_type: str = "sand725") -> np.ndarray:
         """
-        Get IRDFF-II standard energy grid.
+        Get an exact standard energy grid (eV, ascending).
 
-        Parameters
-        ----------
-        grid_type : str
-            'sand725' (725-group SAND-II) or 'mcnp640' (640-group MCNP)
-
-        Returns
-        -------
-        np.ndarray
-            Energy group boundaries in eV
+        ``"sand725"`` and ``"mcnp640"`` are the IAEA IRDFF-II SAND-II 725 and
+        640-group structures from their published ``.egb`` files; any name
+        known to :mod:`fluxforge.data.group_structures` is also accepted.
         """
-        if grid_type == "sand725":
-            return self._get_sand725_grid()
-        elif grid_type == "mcnp640":
-            return self._get_mcnp640_grid()
-        else:
-            raise ValueError(f"Unknown grid type: {grid_type}")
+        from fluxforge.data.group_structures import get_group_structure
 
-    def _get_sand725_grid(self) -> np.ndarray:
-        """
-        Get SAND-II 725-group energy structure.
-
-        Standard lethargy width: Δu = 0.1 from 1e-5 eV to 60 MeV
-        """
-        # Generate lethargy-based grid
-        e_min = 1e-5  # eV
-        e_max = 60e6  # eV (60 MeV)
-        n_groups = 725
-
-        # Lethargy grid
-        u_max = np.log(e_max / e_min)
-        du = u_max / n_groups
-        u = np.linspace(0, u_max, n_groups + 1)
-
-        return e_min * np.exp(u)  # eV
-
-    def _get_mcnp640_grid(self) -> np.ndarray:
-        """
-        Get MCNP 640-group energy structure (vitamin-J style).
-        """
-        # MCNP 640-group structure from thermal to 20 MeV
-        # Lethargy-based with thermal fine structure
-        e_min = 1e-5  # eV
-        e_max = 20e6  # eV (20 MeV)
-        n_groups = 640
-
-        u_max = np.log(e_max / e_min)
-        u = np.linspace(0, u_max, n_groups + 1)
-
-        return e_min * np.exp(u)  # eV
+        try:
+            return get_group_structure(grid_type)
+        except KeyError as exc:
+            raise ValueError(f"Unknown grid type: {grid_type}") from exc
 
 
 # =============================================================================

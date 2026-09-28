@@ -41,6 +41,7 @@ from fluxforge.data.flux_wire_unfolding import (
     get_flux_wire_isotope_fraction,
     load_flux_wire_sample_defaults,
 )
+from fluxforge.data.group_structures import get_group_structure
 from fluxforge.data.nndc import Isotope
 from fluxforge.physics.monitor_response import MonitorResponseSpec, build_monitor_response
 from fluxforge.solvers.iterative import gravel, mlem, IterativeSolution
@@ -425,7 +426,9 @@ class SpectrumUnfolder:
         Parameters
         ----------
         energy_structure : str
-            Energy group structure: 'flux_wire', 'activation', 'sand725', 'mcnp640'
+            'flux_wire', 'activation', or any exact standard structure from
+            :mod:`fluxforge.data.group_structures` (e.g. 'VITAMIN-J',
+            'VITAMIN-J-175', 'CCFE-709', 'SAND-II-725')
         custom_energy_edges : np.ndarray, optional
             Custom energy edges in eV (overrides energy_structure)
         verbose : bool
@@ -441,8 +444,7 @@ class SpectrumUnfolder:
         elif energy_structure == "activation":
             self.energy_edges = get_activation_energy_groups()
         else:
-            db = IRDFFDatabase()
-            self.energy_edges = db.get_energy_grid(energy_structure)
+            self.energy_edges = get_group_structure(energy_structure)
 
         self.n_groups = len(self.energy_edges) - 1
 
