@@ -306,6 +306,8 @@ CADMIUM_CUTOFF_EV = 0.55  # eV
 
 # Concatenated pointwise archive inside the IAEA IRDFF-II_TAB.zip
 IRDFF_TAB_ARCHIVE_NAME = "IRDFF-II.tab.txt"
+# Cover/absorber total, elastic and disappearance cross sections (B, B-10, Cd, Gd)
+IRDFF_ABS_ARCHIVE_NAME = "IRDFF-II.abs.txt"
 BUILTIN_APPROXIMATION_SOURCE = "built-in approximation (not IRDFF-II)"
 
 
@@ -647,6 +649,8 @@ class IRDFFDatabase:
         self._xs_cache: Dict[str, IRDFFCrossSection] = {}
         self._archive: Optional[Dict[str, np.ndarray]] = None
         self._archive_sha256 = ""
+        self._abs_archive: Optional[Dict[str, np.ndarray]] = None
+        self._abs_archive_sha256 = ""
         self._tab_data_loaded = False
         self._group_data_loaded = False
 
@@ -741,6 +745,47 @@ class IRDFFDatabase:
             evaluation_key=key,
             source_sha256=self._archive_sha256,
         )
+
+    def get_cover_cross_section(
+        self, material: str, quantity: str = "disap"
+    ) -> Optional[IRDFFCrossSection]:
+        """
+        Evaluated cover-material cross section from the IRDFF-II abs archive.
+
+        ``material`` is an archive element such as ``"Cd"``, ``"Gd"``, ``"B"``
+        or ``"B-10"``; ``quantity`` is ``"tot"``, ``"elas"`` or ``"disap"``.
+        """
+        key = f"{material}(n,{quantity})"
+        cache_key = f"abs:{key}"
+        if cache_key in self._xs_cache:
+            return self._xs_cache[cache_key]
+        abs_path = self.archive_path.with_name(IRDFF_ABS_ARCHIVE_NAME)
+        if not abs_path.exists() and not self._ensure_tab_data():
+            return None
+        if not abs_path.exists():
+            return None
+        if self._abs_archive is None:
+            self._abs_archive = parse_irdff_tab_archive(abs_path)
+            self._abs_archive_sha256 = hashlib.sha256(abs_path.read_bytes()).hexdigest()
+        block = self._abs_archive.get(key)
+        if block is None:
+            return None
+        xs = IRDFFCrossSection(
+            reaction=key,
+            target=material,
+            product="",
+            mt_number={"tot": 1, "elas": 2, "disap": 101}.get(quantity, 0),
+            energies=block[:, 0],
+            cross_sections=block[:, 1],
+            uncertainties=np.zeros(len(block)),
+            relative_unc=np.zeros(len(block)),
+            source="IRDFF-II",
+            interpolation="lin-lin",
+            evaluation_key=key,
+            source_sha256=self._abs_archive_sha256,
+        )
+        self._xs_cache[cache_key] = xs
+        return xs
 
     def _parse_tab_file(self, filepath: Path) -> Optional[IRDFFCrossSection]:
         """

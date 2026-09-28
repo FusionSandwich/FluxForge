@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from math import exp, log
 from pathlib import Path
 import re
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -42,6 +42,7 @@ from fluxforge.data.flux_wire_unfolding import (
     load_flux_wire_sample_defaults,
 )
 from fluxforge.data.nndc import Isotope
+from fluxforge.physics.monitor_response import MonitorResponseSpec, build_monitor_response
 from fluxforge.solvers.iterative import gravel, mlem, IterativeSolution
 from fluxforge.unfolding import MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
 
@@ -86,6 +87,16 @@ def _reaction_target_and_product(reaction: str) -> Tuple[Optional[str], Optional
     return None, None
 
 
+def _row_key_label(key: Any) -> str:
+    """Readable label for a response-row physics key."""
+    if isinstance(key, tuple) and len(key) == 3:
+        reaction, cover, shielding = key
+        if (cover, shielding) == ("bare", "unshielded"):
+            return str(reaction)
+        return f"{reaction} [{cover}; {shielding}]"
+    return str(key)
+
+
 @dataclass
 class FluxWireMeasurement:
     """
@@ -114,6 +125,14 @@ class FluxWireMeasurement:
     rate_per_atom : float | None
         Optional pre-normalized reaction rate in reactions/atom/s. When set,
         this bypasses the activity-to-rate conversion path.
+    sample_id : str | None
+        Physical monitor identity (keeps replicate/bare/covered rows distinct).
+    cover : str | None
+        Cover label (``None``/``"bare"`` or e.g. ``"Cd"``). A covered
+        measurement must also carry a ``response_spec`` with a matching
+        :class:`~fluxforge.physics.monitor_response.CoverLayer`.
+    response_spec : MonitorResponseSpec | None
+        Physical response definition (cover transmission, self-shielding).
     """
 
     reaction: str
@@ -126,6 +145,16 @@ class FluxWireMeasurement:
     sample_mass_g: float = 1.0
     isotope_abundance: float = 1.0
     rate_per_atom: Optional[float] = None
+    sample_id: Optional[str] = None
+    cover: Optional[str] = None
+    response_spec: Optional[MonitorResponseSpec] = None
+
+    @property
+    def row_key(self) -> Tuple[str, str, str]:
+        """Physics identity of this measurement's response row."""
+        if self.response_spec is not None:
+            return self.response_spec.physics_key
+        return (self.reaction, self.cover or "bare", "unshielded")
 
     @property
     def target_isotope(self) -> Optional[str]:
@@ -429,6 +458,7 @@ class SpectrumUnfolder:
 
         # Response matrix (built when needed)
         self._response_matrix: Optional[np.ndarray] = None
+        self._response_row_metadata: List[Dict[str, Any]] = []
         self._reaction_list: List[str] = []
 
         if self.verbose:
@@ -616,6 +646,16 @@ class SpectrumUnfolder:
             return self._response_matrix, self._reaction_list, self._response_unc
 
         reactions = [m.reaction for m in self.measurements]
+        for m in self.measurements:
+            covered = m.cover not in (None, "", "bare")
+            if covered and (m.response_spec is None or m.response_spec.cover is None):
+                raise ValueError(
+                    f"Measurement {m.sample_id or m.reaction} is labeled cover={m.cover!r} "
+                    "but has no response_spec with a CoverLayer; a bare response row "
+                    "would be used for a covered monitor"
+                )
+            if m.response_spec is not None and m.response_spec.reaction != m.reaction:
+                raise ValueError("response_spec.reaction must match the measurement reaction")
 
         response, valid_reactions, uncertainties = build_response_matrix(
             reactions=reactions,
@@ -623,6 +663,18 @@ class SpectrumUnfolder:
             db=self.irdff_db,
             verbose=self.verbose,
         )
+        self._response_row_metadata = []
+        for index, m in enumerate(self.measurements):
+            if m.response_spec is None:
+                self._response_row_metadata.append(
+                    {"sample_id": m.sample_id, "reaction": m.reaction, "cover": None,
+                     "self_shielding": None}
+                )
+                continue
+            row = build_monitor_response(m.response_spec, self.energy_edges, self.irdff_db)
+            response[index] = row.group_cross_section_barn
+            uncertainties[index] = row.group_uncertainty_barn
+            self._response_row_metadata.append(row.metadata)
 
         group_widths = np.diff(self.energy_edges).reshape(1, -1)
         response = response * group_widths * _BARN_TO_CM2
@@ -782,6 +834,7 @@ class SpectrumUnfolder:
         response_uncertainties: Optional[np.ndarray] = None,
         *,
         floor: float = 1e-30,
+        row_keys: Optional[Sequence[Any]] = None,
     ) -> Dict[str, Any]:
         """
         Aggregate repeated reaction rows using inverse-variance weighting.
@@ -789,6 +842,10 @@ class SpectrumUnfolder:
         This is useful when multiple wire replicates map to the same reaction
         response row. Treating those replicates as fully independent rows
         artificially over-weights one response shape in the inversion.
+
+        Rows are grouped by ``row_keys`` (the physics identity: reaction,
+        cover and self-shielding) when given, so bare and covered monitors of
+        the same reaction are never merged.
         """
         if len(valid_reactions) <= 1:
             return {
@@ -807,13 +864,16 @@ class SpectrumUnfolder:
                 },
             }
 
-        order: List[str] = []
-        grouped_indices: Dict[str, List[int]] = {}
-        for idx, reaction in enumerate(valid_reactions):
-            if reaction not in grouped_indices:
-                grouped_indices[reaction] = []
-                order.append(reaction)
-            grouped_indices[reaction].append(idx)
+        keys = list(row_keys) if row_keys is not None else list(valid_reactions)
+        if len(keys) != len(valid_reactions):
+            raise ValueError("row_keys must align with valid_reactions")
+        order: List[Any] = []
+        grouped_indices: Dict[Any, List[int]] = {}
+        for idx, key in enumerate(keys):
+            if key not in grouped_indices:
+                grouped_indices[key] = []
+                order.append(key)
+            grouped_indices[key].append(idx)
 
         has_duplicates = any(len(indices) > 1 for indices in grouped_indices.values())
         if not has_duplicates:
@@ -839,9 +899,10 @@ class SpectrumUnfolder:
         aggregated_uncertainties: List[float] = []
         aggregated_response_unc_rows: List[np.ndarray] = []
 
-        for reaction in order:
-            indices = grouped_indices[reaction]
+        for key in order:
+            indices = grouped_indices[key]
             representative_idx = indices[0]
+            reaction = valid_reactions[representative_idx]
             representative_row = np.asarray(response_matrix[representative_idx], dtype=float)
             weights = 1.0 / np.maximum(rate_uncertainties[indices], floor) ** 2
             weight_sum = float(np.sum(weights))
@@ -875,8 +936,7 @@ class SpectrumUnfolder:
                 "original_rows": int(len(valid_reactions)),
                 "aggregated_rows": int(len(aggregated_reactions)),
                 "reaction_counts": {
-                    str(reaction): int(len(grouped_indices[reaction]))
-                    for reaction in order
+                    _row_key_label(key): int(len(grouped_indices[key])) for key in order
                 },
             },
         }
@@ -1005,6 +1065,9 @@ class SpectrumUnfolder:
                 measured_rates,
                 rate_uncertainties,
                 response_unc,
+                row_keys=[
+                    m.row_key for m in self.measurements if m.reaction in valid_reactions
+                ],
             )
             response_matrix = require_nonnegative(
                 "response_matrix",
@@ -1281,6 +1344,7 @@ class SpectrumUnfolder:
                     ),
                     **basis_metadata,
                     **uncertainty_metadata,
+                    "response_rows": list(getattr(self, "_response_row_metadata", [])),
                     "stop_reason": getattr(result, "stop_reason", "unspecified"),
                     "tolerance": tolerance,
                     "chi2_tolerance": chi2_tolerance,

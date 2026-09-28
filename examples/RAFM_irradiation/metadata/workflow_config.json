@@ -36,6 +36,8 @@
   "ti48_model_relative_uncertainty_floor": 0.2,
   "cd_model_relative_uncertainty_additional": 0.2,
   "cd_model_relative_uncertainty_floor": 0.25,
+  "cd_cover_thickness_cm": 0.0508,
+  "cd_cover_thickness_note": "INL nominal 0.0508 cm (20 mil) Cd; actual cover dimensions, closure and gaps not yet verified",
   "cd_ratio_default_review_min": 1.1,
   "cd_ratio_expected_ranges": {
     "Cu": {

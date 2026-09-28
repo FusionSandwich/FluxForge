@@ -44,6 +44,7 @@ from fluxforge.data.rafm_profile import load_rafm_profile
 from fluxforge.io.flux_wire import FluxWireData, read_processed_txt, read_raw_asc
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.physics.activation import activation_study_metrics
+from fluxforge.physics.monitor_response import CoverLayer, MonitorResponseSpec
 from fluxforge.plots.activation import (
     ComparisonResult,
     plot_cd_ratio_analysis,
@@ -3756,7 +3757,10 @@ def run_qg_benchmark(
     write_rows_csv(reaction_rows, tree["tables"] / "flux_wire_reaction_rates.csv")
 
     unfolding_results = run_flux_wire_unfolding(
-        all_reactions, paths.prior_spectrum_path, tree["unfolding"]
+        all_reactions,
+        paths.prior_spectrum_path,
+        tree["unfolding"],
+        cd_cover=cd_cover_from_config(metadata.config),
     )
     summary = {
         "overall_passed": True,
@@ -4028,10 +4032,23 @@ def save_unfolding_artifacts(
     )
 
 
+def cd_cover_from_config(config: Dict[str, Any]) -> Optional[CoverLayer]:
+    """Cd cover used for ``-cd-`` flux wires, from the workflow configuration."""
+    thickness = config.get("cd_cover_thickness_cm")
+    if thickness is None:
+        return None
+    return CoverLayer(
+        material="Cd",
+        thickness_cm=float(thickness),
+        thickness_unc_cm=float(config.get("cd_cover_thickness_unc_cm", 0.0)),
+    )
+
+
 def run_flux_wire_unfolding(
     reactions: Sequence[FluxWireReaction],
     prior_path: Path,
     output_root: Path,
+    cd_cover: Optional[CoverLayer] = None,
 ) -> Dict[str, UnfoldingResult]:
     valid_reactions = [
         reaction
@@ -4082,6 +4099,12 @@ def run_flux_wire_unfolding(
     for method in ("GRAVEL", "MLEM"):
         unfolder = SpectrumUnfolder(energy_structure="flux_wire", verbose=False)
         for reaction in valid_reactions:
+            covered = "-cd-" in str(reaction.sample_id).lower()
+            if covered and cd_cover is None:
+                raise ValueError(
+                    f"{reaction.sample_id} is Cd-covered but no cd_cover_thickness_cm "
+                    "is configured; refusing to unfold it with a bare response"
+                )
             unfolder.add_reaction(
                 reaction=reaction.reaction_id,
                 activity_Bq=reaction.reaction_rate,
@@ -4089,6 +4112,18 @@ def run_flux_wire_unfolding(
                     reaction.reaction_rate_unc, 0.05 * reaction.reaction_rate
                 ),
                 rate_per_atom=reaction.reaction_rate,
+                sample_id=reaction.sample_id,
+                cover="Cd" if covered else None,
+                response_spec=(
+                    MonitorResponseSpec(
+                        observation_id=f"{reaction.sample_id}|{reaction.reaction_id}",
+                        sample_id=reaction.sample_id,
+                        reaction=reaction.reaction_id,
+                        cover=cd_cover,
+                    )
+                    if covered
+                    else None
+                ),
             )
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)
         unfolder.set_initial_guess(prior_flux, source="VITAMIN-J prior")
@@ -4329,7 +4364,10 @@ def run_rafm_validation(
         for row in artifact.get("reactions", []):
             all_reactions.append(FluxWireReaction(**row))
     unfolding_results = run_flux_wire_unfolding(
-        all_reactions, paths.prior_spectrum_path, tree["unfolding"]
+        all_reactions,
+        paths.prior_spectrum_path,
+        tree["unfolding"],
+        cd_cover=cd_cover_from_config(metadata.config),
     )
 
     summary_comparisons = [
