@@ -192,6 +192,8 @@ def run_unfolding_regression(
                 proc,
                 irradiation_time_s=8 * 3600,
                 decay_time_s=4 * 3600,
+                # Verify against the Quantum Gold analysis settings.
+                report_includes_count_decay=False,
             )
         )
         raw_reactions.extend(
@@ -202,6 +204,7 @@ def run_unfolding_regression(
                 decay_time_s=4 * 3600,
                 background_spectrum=background,
                 profile_name=PROFILE_NAME,
+                report_includes_count_decay=False,
             )
         )
 

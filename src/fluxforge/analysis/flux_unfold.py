@@ -25,6 +25,7 @@ import numpy as np
 
 from fluxforge.analysis.flux_wire_analysis import (
     FLUX_WIRE_NUCLIDES,
+    QG_REPORT_ACTIVITY_REFERENCE,
     FluxWireAnalysisResult,
     analyze_flux_wire,
     analyze_flux_wire_targeted,
@@ -205,13 +206,14 @@ def activity_to_reaction_rate(
     *,
     irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
     assume_saturated: bool = False,
+    count_real_time_s: float = 0.0,
 ) -> float:
     """
     Convert measured activity to reaction rate.
 
     The activity at measurement time is related to reaction rate by:
 
-        A = R * N * S * exp(-λ*t_decay) * C_live
+        A = R * N * S * exp(-λ*t_decay) * C_count
 
     where:
         R = reaction rate (reactions/atom/s) = σ × Φ, at relative power 1
@@ -219,7 +221,8 @@ def activity_to_reaction_rate(
         λ = decay constant = ln(2) / t_half
         S = irradiation build-up factor (see ``irradiation_history_factor``)
         t_decay = decay time from end of irradiation to measurement
-        C_live = live time correction factor
+        C_count = (1 - exp(-λ*t_real)) / (λ*t_real), converting a count-averaged
+            activity to count start (t_real = clock duration of the count)
 
     Parameters
     ----------
@@ -235,17 +238,27 @@ def activity_to_reaction_rate(
     decay_time_s : float
         Decay time from irradiation end to measurement start
     live_time_s : float
-        Measurement live time (for decay during counting correction)
+        No longer accepted (must be 0). Decay during counting depends on the
+        clock time of the count; use ``count_real_time_s``.
     irradiation_history : sequence of (duration_s, relative_power), optional
         Segmented power history ending at EOI, including zero-power gaps.
     assume_saturated : bool
         Explicitly treat the irradiation as saturated when no timing exists.
+    count_real_time_s : float
+        Clock duration of the count when ``activity_bq`` is a count-averaged
+        activity. Leave 0 for activities already referenced to count start
+        (or EOI) with decay during counting corrected.
 
     Returns
     -------
     float
         Reaction rate in reactions/atom/s
     """
+    if live_time_s:
+        raise ValueError(
+            "live_time_s is not valid for decay during counting; pass the count's "
+            "clock time as count_real_time_s (and only for count-averaged activities)"
+        )
     if n_atoms <= 0 or half_life_s <= 0:
         return 0.0
 
@@ -261,10 +274,10 @@ def activity_to_reaction_rate(
     # Decay factor: accounts for decay between irradiation and measurement
     decay_factor = np.exp(-decay_const * decay_time_s) if decay_time_s > 0 else 1.0
 
-    # Live time correction: average activity during counting
-    if live_time_s > 0:
-        live_correction = (1.0 - np.exp(-decay_const * live_time_s)) / (
-            decay_const * live_time_s
+    # Decay during the count: count-averaged activity -> count-start activity
+    if count_real_time_s > 0:
+        live_correction = -np.expm1(-decay_const * count_real_time_s) / (
+            decay_const * count_real_time_s
         )
     else:
         live_correction = 1.0
@@ -277,6 +290,16 @@ def activity_to_reaction_rate(
         return 0.0
 
     return activity_bq / denominator
+
+
+def _report_count_time(includes_count_decay: Optional[bool], data: FluxWireData) -> float:
+    """Count real time to apply to report activities, from an explicit declaration."""
+    if includes_count_decay is None:
+        raise ValueError(
+            "Declare report_includes_count_decay: whether the processed report's "
+            "count-start activities already correct decay during acquisition"
+        )
+    return 0.0 if includes_count_decay else float(data.real_time)
 
 
 def get_isotope_fraction(reaction_id: str, element: str) -> float:
@@ -327,6 +350,7 @@ def extract_reactions_from_processed(
     decay_time_s: float = 0.0,
     calculate_flux: bool = True,
     irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
+    report_includes_count_decay: Optional[bool] = None,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from processed flux wire data.
@@ -346,6 +370,10 @@ def extract_reactions_from_processed(
         If True, also calculate flux from reaction rate
     irradiation_history : sequence of (duration_s, relative_power), optional
         Segmented power history ending at EOI
+    report_includes_count_decay : bool
+        Whether the report's count-start activities already correct decay
+        during the acquisition. Required: if False, the count's real time is
+        used to correct it here; if True, no further correction is applied.
 
     Returns
     -------
@@ -354,6 +382,7 @@ def extract_reactions_from_processed(
     """
     reactions = []
     sample_element = get_sample_element(data.sample_id)
+    report_count_time = _report_count_time(report_includes_count_decay, data)
 
     for nuclide in data.nuclides:
         isotope = nuclide.isotope
@@ -387,8 +416,8 @@ def extract_reactions_from_processed(
                 half_life_s=half_life_s,
                 irradiation_time_s=irradiation_time_s,
                 decay_time_s=decay_time_s,
-                live_time_s=data.live_time,
                 irradiation_history=irradiation_history,
+                count_real_time_s=report_count_time,
             )
             rate_unc = rate * (activity_unc / activity_bq) if activity_bq > 0 else 0
         else:
@@ -436,6 +465,7 @@ def extract_reactions_from_raw(
     background_subtract: bool = True,
     profile_name: Optional[str] = None,
     irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
+    report_includes_count_decay: Optional[bool] = None,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from raw flux wire spectra.
@@ -489,8 +519,12 @@ def extract_reactions_from_raw(
                 half_life_s=half_life_s,
                 irradiation_time_s=irradiation_time_s,
                 decay_time_s=decay_time_s,
-                live_time_s=raw_data.live_time,
                 irradiation_history=irradiation_history,
+                count_real_time_s=(
+                    _report_count_time(report_includes_count_decay, raw_data)
+                    if activity.get("activity_reference") == QG_REPORT_ACTIVITY_REFERENCE
+                    else float(raw_data.real_time)
+                ),
             )
             rate_unc = rate * (activity_unc / activity_bq) if activity_bq > 0 else 0.0
         else:
@@ -944,6 +978,7 @@ def unfold_flux_wires(
     irradiation_time_s: Optional[float] = None,
     n_atoms: float = 1e20,
     verbose: bool = True,
+    report_includes_count_decay: Optional[bool] = None,
 ) -> FluxWireUnfoldResult:
     """
     Unfold neutron spectrum from flux wire measurements.
@@ -970,6 +1005,8 @@ def unfold_flux_wires(
     """
     if irradiation_time_s is None or irradiation_time_s <= 0:
         raise ValueError("irradiation_time_s is required for flux-wire unfolding")
+    if report_includes_count_decay is None:
+        raise ValueError("report_includes_count_decay must be declared for processed reports")
 
     if verbose:
         print("=" * 80)
@@ -994,6 +1031,7 @@ def unfold_flux_wires(
             reactions = extract_reactions_from_processed(
                 data,
                 irradiation_time_s=irradiation_time_s,
+                report_includes_count_decay=report_includes_count_decay,
             )
             all_reactions.extend(reactions)
 

@@ -2128,6 +2128,9 @@ def analyze_raw_spectrum_targeted(
     return results
 
 
+QG_REPORT_ACTIVITY_REFERENCE = "qg_report_measurement_date"
+
+
 def analyze_flux_wire_targeted(
     data: FluxWireData,
     reference_data: Optional[FluxWireData] = None,
@@ -2237,6 +2240,12 @@ def analyze_flux_wire_targeted(
                 result.nuclide_activities[isotope]["activity_unc_uci"] = (
                     float(activity_row["activity_unc_bq"]) / 3.7e4
                 )
+                # Report activities are "as of Measurement Date" (count start)
+                result.nuclide_activities[isotope][
+                    "activity_reference"
+                ] = QG_REPORT_ACTIVITY_REFERENCE
+        for activity_row in result.nuclide_activities.values():
+            activity_row.setdefault("activity_reference", "count_average_live_normalized")
 
     if reference_data is not None and reference_data.has_nuclides:
         for nuclide in reference_data.nuclides:

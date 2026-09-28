@@ -23,6 +23,7 @@ from fluxforge.analysis.flux_unfold import (
     _make_response_row,
 )
 from fluxforge.analysis.flux_wire_analysis import (
+    QG_REPORT_ACTIVITY_REFERENCE,
     FLUX_WIRE_NUCLIDES,
     GammaLine,
     IdentifiedPeak,
@@ -554,17 +555,42 @@ def resolve_measurement_timing(
     )
 
 
+def report_count_real_time_s(config: Dict[str, Any], report: FluxWireData) -> float:
+    """Count duration to apply to Quantum Gold report activities.
+
+    Reports state activities "as of Measurement Date" (count start). Whether
+    decay during the acquisition is already corrected depends on the analysis
+    settings, so the workflow requires ``qg_report_activity_includes_count_decay``
+    to be declared rather than guessing (and possibly correcting twice).
+    """
+    declared = config.get("qg_report_activity_includes_count_decay")
+    if declared is None:
+        raise ValueError(
+            "Set qg_report_activity_includes_count_decay in the workflow config "
+            "(true if Quantum Gold already corrected decay during acquisition)"
+        )
+    return 0.0 if bool(declared) else float(report.real_time)
+
+
 def decay_correction_factor(
-    half_life_s: float, live_time_s: float, decay_time_s: Optional[float]
+    half_life_s: float, count_real_time_s: float, decay_time_s: Optional[float]
 ) -> float:
+    """Factor converting an activity to end of irradiation.
+
+    ``count_real_time_s`` is the clock (real) duration of the count and is used
+    to convert a count-averaged activity to count start. Pass 0 when the
+    activity is already referenced to count start with decay during the count
+    corrected. Live time must not be used here: dead time does not change the
+    decay that occurs during the count.
+    """
     if half_life_s <= 0:
         return 1.0
     decay_constant = math.log(2.0) / half_life_s
     live_term = 1.0
-    if live_time_s > 0:
-        denominator = 1.0 - math.exp(-decay_constant * live_time_s)
+    if count_real_time_s > 0:
+        denominator = -math.expm1(-decay_constant * count_real_time_s)
         if denominator > 0:
-            live_term = decay_constant * live_time_s / denominator
+            live_term = decay_constant * count_real_time_s / denominator
     exponent = decay_constant * (decay_time_s or 0.0)
     if exponent > 700.0:
         return float("inf")
@@ -576,13 +602,13 @@ def peak_to_dict(
     peak: IdentifiedPeak,
     half_life_map: Dict[str, float],
     timing: TimingInfo,
-    live_time_s: float,
+    count_real_time_s: float,
 ) -> Dict[str, Any]:
     eoi_activity = None
     eoi_unc = None
     if peak.isotope and timing.compare_eoi and timing.decay_time_s is not None:
         half_life_s = half_life_map.get(peak.isotope, 0.0)
-        factor = decay_correction_factor(half_life_s, live_time_s, timing.decay_time_s)
+        factor = decay_correction_factor(half_life_s, count_real_time_s, timing.decay_time_s)
         if math.isfinite(factor):
             eoi_activity = peak.activity_bq * factor if peak.activity_bq > 0 else 0.0
             eoi_unc = peak.activity_unc_bq * factor if peak.activity_unc_bq > 0 else 0.0
@@ -640,8 +666,9 @@ def aggregate_isotope_results(
     activity_payload: Dict[str, Dict[str, Any]],
     half_life_map: Dict[str, float],
     timing: TimingInfo,
-    live_time_s: float,
+    count_real_time_s: float,
     sample_mass_g: float | None = None,
+    count_real_time_by_isotope: Optional[Dict[str, float]] = None,
 ) -> Dict[str, Dict[str, Any]]:
     results: Dict[str, Dict[str, Any]] = {}
     for isotope, payload in activity_payload.items():
@@ -690,8 +717,9 @@ def aggregate_isotope_results(
         )
         if timing.compare_eoi and timing.decay_time_s is not None:
             half_life_s = half_life_map.get(isotope, 0.0)
+            count_time = (count_real_time_by_isotope or {}).get(isotope, count_real_time_s)
             factor = decay_correction_factor(
-                half_life_s, live_time_s, timing.decay_time_s
+                half_life_s, count_time, timing.decay_time_s
             )
             if math.isfinite(factor):
                 result["activity_eoi_bq"] = result["activity_bq"] * factor
@@ -814,7 +842,7 @@ def _peak_activity_for_qc(
     peak: IdentifiedPeak,
     half_life_map: Dict[str, float],
     timing: TimingInfo,
-    live_time_s: float,
+    count_real_time_s: float,
 ) -> Tuple[Optional[float], Optional[float], str]:
     activity = float(peak.activity_bq)
     activity_unc = float(peak.activity_unc_bq)
@@ -823,7 +851,7 @@ def _peak_activity_for_qc(
         return None, None, stage
     if peak.isotope and timing.compare_eoi and timing.decay_time_s is not None:
         half_life_s = half_life_map.get(peak.isotope, 0.0)
-        factor = decay_correction_factor(half_life_s, live_time_s, timing.decay_time_s)
+        factor = decay_correction_factor(half_life_s, count_real_time_s, timing.decay_time_s)
         if math.isfinite(factor):
             activity *= factor
             activity_unc *= factor
@@ -839,7 +867,7 @@ def build_fluxforge_line_consistency_rows(
     peaks: Sequence[IdentifiedPeak],
     half_life_map: Dict[str, float],
     timing: TimingInfo,
-    live_time_s: float,
+    count_real_time_s: float,
     config: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
     rel_limit = float(config.get("line_activity_consistency_max_rel_deviation", 0.25))
@@ -864,7 +892,7 @@ def build_fluxforge_line_consistency_rows(
         activity_stage = "count_start"
         for peak in sorted(iso_peaks, key=lambda item: item.energy_keV):
             activity, activity_unc, stage = _peak_activity_for_qc(
-                peak, half_life_map, timing, live_time_s
+                peak, half_life_map, timing, count_real_time_s
             )
             if activity is None or activity_unc is None:
                 continue
@@ -1319,7 +1347,7 @@ def apply_generic_qg_report_parity(
 def reference_isotope_payload(
     reference_data: Optional[FluxWireData],
     timing: TimingInfo,
-    live_time_s: float,
+    count_real_time_s: float,
     sample_mass_g: float | None = None,
 ) -> Dict[str, Dict[str, Any]]:
     if reference_data is None:
@@ -1355,7 +1383,7 @@ def reference_isotope_payload(
         )
         if timing.compare_eoi and timing.decay_time_s is not None:
             factor = decay_correction_factor(
-                float(nuclide.half_life_seconds), live_time_s, timing.decay_time_s
+                float(nuclide.half_life_seconds), count_real_time_s, timing.decay_time_s
             )
             if math.isfinite(factor):
                 result["activity_eoi_bq"] = result["activity_bq"] * factor
@@ -2597,7 +2625,7 @@ def analyze_generic_sample(
         combine_peak_activities(targeted_peaks),
         half_lives,
         timing,
-        adjusted.live_time,
+        adjusted.real_time,
         sample_mass_g=estimate_rafm_sample_mass_g(sample_id, metadata),
     )
     analysis_configuration = {
@@ -2658,7 +2686,7 @@ def analyze_generic_sample(
         peaks,
         half_lives,
         timing,
-        adjusted.live_time,
+        adjusted.real_time,
         metadata.config,
     )
     measurement_qc_rows = build_measurement_qc_rows(
@@ -2697,7 +2725,7 @@ def analyze_generic_sample(
             isotope_payload = reference_isotope_payload(
                 reference_data,
                 timing,
-                adjusted.live_time,
+                report_count_real_time_s(metadata.config, reference_data),
                 sample_mass_g=estimate_rafm_sample_mass_g(sample_id, metadata),
             )
         peak_rows, missing_peaks = build_peak_comparison_records(
@@ -2798,10 +2826,10 @@ def analyze_generic_sample(
         "fluxforge_line_consistency_csv": str(fluxforge_consistency_path),
         "measurement_qc_csv": str(measurement_qc_path),
         "peaks": [
-            peak_to_dict(peak, half_lives, timing, adjusted.live_time) for peak in peaks
+            peak_to_dict(peak, half_lives, timing, adjusted.real_time) for peak in peaks
         ],
         "unidentified_peaks": [
-            peak_to_dict(peak, half_lives, timing, adjusted.live_time)
+            peak_to_dict(peak, half_lives, timing, adjusted.real_time)
             for peak in unidentified_peaks
         ],
         "isotopes": isotope_payload,
@@ -2961,7 +2989,6 @@ def build_flux_wire_reactions(
                 half_life_s=half_life_s,
                 irradiation_time_s=timing.irradiation_time_s,
                 decay_time_s=0.0,
-                live_time_s=0.0,
                 irradiation_history=timing.irradiation_history,
             )
             if activity_bq > 0 and n_atoms > 0 and half_life_s > 0
@@ -3121,12 +3148,18 @@ def analyze_flux_wire_sample(
         analysis.nuclide_activities,
         flux_wire_half_lives(),
         timing,
-        raw_data.live_time,
+        raw_data.real_time,
         sample_mass_g=(
             (flux_wire_mass_mg(sample_key, metadata) or 0.0) / 1000.0
             if flux_wire_mass_mg(sample_key, metadata) is not None
             else None
         ),
+        count_real_time_by_isotope={
+            isotope: report_count_real_time_s(metadata.config, reference_data)
+            for isotope, row in analysis.nuclide_activities.items()
+            if row.get("activity_reference") == QG_REPORT_ACTIVITY_REFERENCE
+            and reference_data is not None
+        },
     )
     analysis_configuration = {
         "profile_name": metadata.config["profile_name"],
@@ -3186,7 +3219,7 @@ def analyze_flux_wire_sample(
         analysis.peaks,
         flux_wire_half_lives(),
         timing,
-        raw_data.live_time,
+        raw_data.real_time,
         metadata.config,
     )
     measurement_qc_rows = build_measurement_qc_rows(
@@ -3311,11 +3344,11 @@ def analyze_flux_wire_sample(
         "fluxforge_line_consistency_csv": str(fluxforge_consistency_path),
         "measurement_qc_csv": str(measurement_qc_path),
         "peaks": [
-            peak_to_dict(peak, flux_wire_half_lives(), timing, raw_data.live_time)
+            peak_to_dict(peak, flux_wire_half_lives(), timing, raw_data.real_time)
             for peak in analysis.peaks
         ],
         "unidentified_peaks": [
-            peak_to_dict(peak, flux_wire_half_lives(), timing, raw_data.live_time)
+            peak_to_dict(peak, flux_wire_half_lives(), timing, raw_data.real_time)
             for peak in unidentified_peaks
         ],
         "isotopes": isotope_payload,
@@ -3750,7 +3783,7 @@ def run_qg_benchmark(
             activity_payload,
             flux_wire_half_lives(),
             timing,
-            reference_data.live_time,
+            report_count_real_time_s(metadata.config, reference_data),
             sample_mass_g=(
                 (flux_wire_mass_mg(sample_key, metadata) or 0.0) / 1000.0
                 if flux_wire_mass_mg(sample_key, metadata) is not None

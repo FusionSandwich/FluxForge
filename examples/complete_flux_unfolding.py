@@ -137,6 +137,7 @@ def extract_all_reactions(
                     irradiation_time_s=irradiation_time_s,
                     decay_time_s=decay_time_s,
                     calculate_flux=True,
+                    report_includes_count_decay=False,
                 )
                 proc_reactions.extend(rxns)
             except Exception as e:

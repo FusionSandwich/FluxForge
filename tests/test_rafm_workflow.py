@@ -468,7 +468,7 @@ def test_fluxforge_line_consistency_rows_include_single_vs_all_metrics() -> None
         peaks,
         {"Sc47": 3.349e5},
         timing,
-        live_time_s=3600.0,
+        count_real_time_s=3600.0,
         config=config,
     )
 

@@ -180,6 +180,7 @@ def demonstrate_reaction_rate_extraction(proc_dir: Path):
                 sample_mass_mg=None,  # Use default from FLUX_WIRE_SAMPLES
                 irradiation_time_s=3600,
                 calculate_flux=True,
+                report_includes_count_decay=False,
             )
             all_reactions.extend(reactions)
 
