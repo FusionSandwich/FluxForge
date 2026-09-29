@@ -6,7 +6,10 @@ import warnings
 import pytest
 
 from fluxforge.analysis.flux_wire_analysis import analyze_raw_spectrum
-from fluxforge.analysis.spectrum_math import subtract_measured_background
+from fluxforge.analysis.spectrum_math import (
+    nonnegative_counts_for_algorithm,
+    subtract_measured_background,
+)
 from fluxforge.data.rafm_profile import list_rafm_profiles, load_rafm_profile
 from fluxforge.io.flux_wire import read_raw_asc
 from fluxforge.io.genie import read_genie_spectrum
@@ -34,6 +37,27 @@ def test_rafm_shared_background_subtraction_live_mode():
         "scale_factor"
     ] == pytest.approx(expected_scale)
     assert corrected.counts_uncertainty.shape == sample.counts.shape
+
+
+@pytest.mark.skipif(
+    not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(),
+    reason="RAFM example data not present",
+)
+def test_rafm_hybrid_keeps_signed_counts_until_an_algorithm_requires_clipping():
+    background = read_genie_spectrum(BACKGROUND_ASC)
+    sample = read_genie_spectrum(SAMPLE_ASC)
+    corrected = subtract_measured_background(sample, background, mode="live")
+    signed = corrected.counts.copy()
+    assert (signed < 0.0).any()
+    assert corrected.metadata["background_subtraction"]["negative_bins"] == int(
+        (signed < 0.0).sum()
+    )
+
+    with pytest.warns(RuntimeWarning, match="requires non-negative counts"):
+        algorithm_counts = nonnegative_counts_for_algorithm(corrected, "test algorithm")
+    assert (algorithm_counts >= 0.0).all()
+    assert (corrected.counts == signed).all()
+    assert (corrected.counts_uncertainty >= 0.0).all()
 
 
 def test_astm_profile_aliases_are_listed_and_match_rafm_defaults():

@@ -35,6 +35,18 @@ Typical outputs:
 - validation summaries
 - text reports
 
+### Background subtraction and negative channels
+
+The RAFM runs use the measured `background.ASC` spectrum, scaled by acquisition
+time. A background-subtracted channel may be negative because the two measured
+counts fluctuate. In the default `hybrid` mode, FluxForge retains that signed
+value and the propagated uncertainty in the saved spectrum and ROI accounting.
+It does not mean a negative physical count rate. An algorithm that requires
+nonnegative input uses a separate working copy; when it clips negative channels,
+FluxForge issues a warning and leaves the saved signed spectrum unchanged.
+Inspect the `background_subtraction` metadata for the scale factor and number of
+negative channels before interpreting a result.
+
 ## How to Run the Phase 6 Worked Example
 
 ```bash
