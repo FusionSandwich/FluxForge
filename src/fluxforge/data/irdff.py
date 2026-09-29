@@ -609,6 +609,7 @@ class IRDFFDatabase:
         verbose: bool = False,
         archive_path: Optional[Union[str, Path]] = None,
         allow_builtin_approximations: bool = False,
+        expected_archive_sha256: Optional[str] = None,
     ):
         """
         Initialize IRDFF-II database interface.
@@ -628,11 +629,21 @@ class IRDFFDatabase:
             Permit the sparse built-in cross-section approximations when a
             reaction is absent from the evaluated data. They omit resonance
             structure and must not be used for physical unfolding.
+        expected_archive_sha256 : str, optional
+            Reject an evaluated tab archive whose SHA-256 differs from this pin.
         """
         self.cache_dir = Path(cache_dir) if cache_dir else DEFAULT_CACHE_DIR
         self.auto_download = auto_download
         self.verbose = verbose
         self.allow_builtin_approximations = allow_builtin_approximations
+        if expected_archive_sha256 is not None and (
+            len(expected_archive_sha256) != 64
+            or any(c not in "0123456789abcdefABCDEF" for c in expected_archive_sha256)
+        ):
+            raise ValueError("expected_archive_sha256 must be a 64-character hex digest")
+        self.expected_archive_sha256 = (
+            expected_archive_sha256.lower() if expected_archive_sha256 else None
+        )
         env_archive = os.environ.get("FLUXFORGE_IRDFF_ARCHIVE")
         self.archive_path = (
             Path(archive_path)
@@ -707,11 +718,19 @@ class IRDFFDatabase:
 
     def _load_archive(self) -> Optional[Dict[str, np.ndarray]]:
         """Parse the concatenated IAEA IRDFF-II tab archive once, if present."""
+        if self.expected_archive_sha256 and not self.archive_path.exists():
+            raise FileNotFoundError(
+                f"Pinned IRDFF-II archive is missing: {self.archive_path}"
+            )
         if self._archive is None and self.archive_path.exists():
+            digest = hashlib.sha256(self.archive_path.read_bytes()).hexdigest()
+            if self.expected_archive_sha256 and digest != self.expected_archive_sha256:
+                raise ValueError(
+                    f"IRDFF-II archive SHA-256 mismatch: expected "
+                    f"{self.expected_archive_sha256}, got {digest}"
+                )
             self._archive = parse_irdff_tab_archive(self.archive_path)
-            self._archive_sha256 = hashlib.sha256(
-                self.archive_path.read_bytes()
-            ).hexdigest()
+            self._archive_sha256 = digest
         return self._archive
 
     def _get_archive_xs(self, reaction: str) -> Optional[IRDFFCrossSection]:
@@ -889,18 +908,24 @@ class IRDFFDatabase:
         IRDFFCrossSection or None
             Cross section data, or None if not found
         """
+        if self.expected_archive_sha256 and not self.archive_path.exists():
+            raise FileNotFoundError(
+                f"Pinned IRDFF-II archive is missing: {self.archive_path}"
+            )
         if reaction in self._xs_cache and not force_reload:
             return self._xs_cache[reaction]
 
         # Evaluated IRDFF-II data first: the IAEA archive, then per-reaction files.
         if self._ensure_tab_data():
-            xs = self._get_archive_xs(reaction) or self._search_tab_files(reaction)
+            xs = self._get_archive_xs(reaction)
+            if xs is None and self.expected_archive_sha256 is None:
+                xs = self._search_tab_files(reaction)
             if xs is not None:
                 self._xs_cache[reaction] = xs
                 return xs
 
         # Sparse approximations only when explicitly allowed.
-        if self.allow_builtin_approximations:
+        if self.allow_builtin_approximations and self.expected_archive_sha256 is None:
             xs = self._get_builtin_xs(reaction)
             if xs is not None:
                 self._xs_cache[reaction] = xs

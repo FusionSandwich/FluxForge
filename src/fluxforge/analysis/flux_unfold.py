@@ -113,6 +113,10 @@ def calculate_n_atoms(
                 "(or allow_default_mass=True for a nominal bundled mass)"
             )
         mass_mg = params["mass_mg"]
+    if not np.isfinite(mass_mg) or mass_mg <= 0:
+        raise ValueError("mass_mg must be finite and positive")
+    if not np.isfinite(isotope_fraction) or not 0 < isotope_fraction <= 1:
+        raise ValueError("isotope_fraction must be finite and in (0, 1]")
 
     atomic_mass = params.get("atomic_mass")
     if atomic_mass is None:
@@ -127,6 +131,8 @@ def calculate_n_atoms(
         if element_mass_fraction is not None
         else float(params.get("purity", 1.0))
     )
+    if not np.isfinite(fraction) or not 0 < fraction <= 1:
+        raise ValueError("element_mass_fraction must be finite and in (0, 1]")
 
     mass_g = mass_mg / 1000.0
     n_atoms = (mass_g * AVOGADRO / atomic_mass) * fraction * isotope_fraction
@@ -288,8 +294,12 @@ def activity_to_reaction_rate(
             "live_time_s is not valid for decay during counting; pass the count's "
             "clock time as count_real_time_s (and only for count-averaged activities)"
         )
-    if n_atoms <= 0 or half_life_s <= 0:
-        return 0.0
+    if not np.isfinite(activity_bq) or activity_bq < 0:
+        raise ValueError("activity_bq must be finite and nonnegative")
+    if not np.isfinite(n_atoms) or n_atoms <= 0:
+        raise ValueError("n_atoms must be finite and positive")
+    if not np.isfinite(half_life_s) or half_life_s <= 0:
+        raise ValueError("half_life_s must be finite and positive")
 
     decay_const = np.log(2) / half_life_s
 
@@ -315,8 +325,8 @@ def activity_to_reaction_rate(
     # A = R * N * saturation * decay_factor * live_correction
     denominator = n_atoms * saturation * decay_factor * live_correction
 
-    if denominator <= 0:
-        return 0.0
+    if not np.isfinite(denominator) or denominator <= 0:
+        raise ValueError("Reaction-rate normalization must be finite and positive")
 
     return activity_bq / denominator
 

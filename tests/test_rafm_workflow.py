@@ -494,7 +494,7 @@ def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> N
         sample_schedules={},
         flux_wire_metadata={
             "ti-rafm-1": [{"mass_mg": 10.0}],
-            "co-cd-rafm-1": [{"mass_mg": 10.0}],
+            "co-cd-rafm-1": [{"mass_mg": 10.0, "element_mass_fraction": 1.0}],
         },
         pairing_aliases={},
         sample_gamma_library={},
@@ -549,6 +549,14 @@ def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> N
         metadata,
     )
     assert cd_reactions
+    metadata.flux_wire_metadata["co-cd-rafm-1"][0]["element_mass_fraction"] = 0.001
+    dilute_reactions = build_flux_wire_reactions(
+        "Co-Cd-RAFM-1_25cm", "co-cd-rafm-1",
+        {"Co60": {"activity_eoi_bq": 500.0, "activity_eoi_unc_bq": 10.0}},
+        timing, metadata,
+    )
+    assert dilute_reactions[0].n_atoms == pytest.approx(cd_reactions[0].n_atoms * 0.001)
+    assert dilute_reactions[0].reaction_rate == pytest.approx(cd_reactions[0].reaction_rate * 1000)
     cd_rel_unc = cd_reactions[0].reaction_rate_unc / cd_reactions[0].reaction_rate
     assert cd_rel_unc >= 0.25 - 1e-12
     assert "cd_model" in {c.name for c in cd_reactions[0].uncertainty_budget.components}

@@ -2886,14 +2886,21 @@ def estimate_rafm_sample_mass_g(
     return volume_cm3 * density_g_cm3
 
 
-def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[float]:
+def flux_wire_metadata_row(
+    normalized_key: str, metadata: RAFMMetadata
+) -> Optional[Dict[str, Any]]:
     rows = metadata.flux_wire_metadata.get(normalized_key, [])
     if not rows:
         fallback_key = re.sub(r"([_-]rafm-[0-9]+)[a-z]$", r"\1", normalized_key)
         rows = metadata.flux_wire_metadata.get(fallback_key, [])
-    if not rows:
+    return rows[0] if rows else None
+
+
+def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[float]:
+    row = flux_wire_metadata_row(normalized_key, metadata)
+    if row is None:
         return None
-    mass = rows[0].get("mass_mg")
+    mass = row.get("mass_mg")
     if mass is None:
         raise ValueError(f"flux_wire_metadata entry for {normalized_key!r} has no mass_mg")
     return float(mass)
@@ -2909,6 +2916,7 @@ def build_flux_wire_reactions(
     reactions: List[FluxWireReaction] = []
     sample_element = get_sample_element(sample_id)
     mass_mg = flux_wire_mass_mg(sample_key, metadata)
+    wire_metadata = flux_wire_metadata_row(sample_key, metadata) or {}
     normalized_sample_id = str(sample_id).strip().lower()
     normalized_sample_key = str(sample_key).strip().lower()
     for isotope, payload in isotope_payload.items():
@@ -2983,7 +2991,8 @@ def build_flux_wire_reactions(
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
-            sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction
+            sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction,
+            element_mass_fraction=wire_metadata.get("element_mass_fraction"),
         )
         irradiation_time_s = float(timing.irradiation_time_s or 0.0)
         decay_time_s = float(timing.decay_time_s or 0.0)
