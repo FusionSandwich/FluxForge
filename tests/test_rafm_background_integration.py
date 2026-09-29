@@ -3,9 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 import warnings
 
+import numpy as np
 import pytest
 
-from fluxforge.analysis.flux_wire_analysis import analyze_raw_spectrum
+from fluxforge.analysis.flux_wire_analysis import (
+    _snip_background_from_signed_counts,
+    analyze_raw_spectrum,
+)
+from fluxforge.analysis.peak_finders import snip_background
 from fluxforge.analysis.spectrum_math import (
     nonnegative_counts_for_algorithm,
     subtract_measured_background,
@@ -28,6 +33,23 @@ def test_rafm_profile_resolves_committed_shared_background():
     assert profile_background.samefile(BACKGROUND_ASC)
     assert fixture_background.is_file()
     assert fixture_background.read_bytes() == profile_background.read_bytes()
+
+
+def test_signed_snip_offsets_working_copy_and_preserves_signed_input():
+    signed = np.array([-3.0, 1.0, 4.0, 20.0, 4.0, -1.0, 2.0])
+    original = signed.copy()
+    background, working, offset = _snip_background_from_signed_counts(
+        signed, n_iterations=2
+    )
+
+    assert offset == 3.0
+    assert np.array_equal(working, original + offset)
+    assert np.array_equal(signed, original)
+    assert np.all(working >= 0.0)
+    assert np.all(background >= 0.0)
+    assert background == pytest.approx(
+        np.maximum(snip_background(original + offset, n_iterations=2) - offset, 0.0)
+    )
 
 
 @pytest.mark.skipif(
