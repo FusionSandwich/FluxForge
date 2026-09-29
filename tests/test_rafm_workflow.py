@@ -195,6 +195,38 @@ def test_rafm4_committed_artifacts_use_phase2_whale_tube_timing(sample_letter):
     assert "Schedule source: sample_schedules.phase2" in report
 
 
+def test_committed_rafm_samples_have_individual_reports_and_paired_plots():
+    raw_dir = EXAMPLE_ROOT / "raw_gamma_spec"
+    results = EXAMPLE_ROOT / "results"
+    raw_stems = {path.stem for path in raw_dir.rglob("*.ASC")}
+    artifacts = results / "analysis_json"
+    reports = results / "reports"
+    plots = results / "plots/comparisons"
+    assert raw_stems == {path.stem for path in artifacts.glob("*.json")}
+
+    required_sections = (
+        "QG peaks not identified by FluxForge",
+        "Matched energies with isotope mismatch",
+        "QG nuclides missing from FluxForge activity results",
+        "Peak count parity failures",
+        "FluxForge detected peaks still left unidentified",
+        "FluxForge identified peaks with no QG counterpart",
+    )
+    for stem in raw_stems:
+        artifact = json.loads((artifacts / f"{stem}.json").read_text(encoding="utf-8"))
+        report = (reports / f"{stem}_comparison.txt").read_text(encoding="utf-8")
+        assert f"Sample: {stem}" in report
+        if artifact["qg_file"]:
+            assert all(section in report for section in required_sections)
+            plot = plots / f"{stem}_vs_qg.png"
+            assert plot.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+        else:
+            assert "No paired QG processed file was found" in report
+
+    assert not (plots / "peak_counts_parity.png").exists()
+    assert not (plots / "isotope_activity_parity.png").exists()
+
+
 def test_estimate_rafm_sample_mass_from_geometry_metadata():
     metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
 
