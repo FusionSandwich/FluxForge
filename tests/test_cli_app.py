@@ -2505,6 +2505,52 @@ def test_rafm_runbook_profile_ingest_uses_background_and_file_energy(tmp_path):
     assert spectrum["metadata"]["background_subtraction"]["scale_factor"] == 9.0
 
 
+@pytest.mark.parametrize(
+    ("overrides", "expected_energy", "expected_c1"),
+    [
+        ([], [0.541, 0.498, 2.605e-07], -20.26),
+        (
+            ["--energy-calibration", "0,1", "--efficiency-coefficients", "1,2,3,4"],
+            [0.0, 1.0],
+            1.0,
+        ),
+    ],
+)
+def test_rafm_profile_batch_ingest_real_asc_preserves_file_and_user_precedence(
+    tmp_path, overrides, expected_energy, expected_c1
+):
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    (input_dir / "Co-Cd-RAFM-1_25cm.ASC").write_bytes(
+        (
+            ROOT
+            / "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC"
+        ).read_bytes()
+    )
+    output_dir = tmp_path / "output"
+    args = app.build_parser().parse_args(
+        [
+            "ingest-batch",
+            "--input-dir",
+            str(input_dir),
+            "--output-dir",
+            str(output_dir),
+            "--profile",
+            "rafm_25cm",
+            *overrides,
+        ]
+    )
+    args.func(args)
+
+    spectrum = json.loads(
+        (output_dir / "Co-Cd-RAFM-1_25cm.json").read_text(encoding="utf-8")
+    )["spectrum"]
+    assert len(spectrum["counts"]) == 8192
+    assert spectrum["calibration"]["energy"] == pytest.approx(expected_energy)
+    assert spectrum["metadata"]["efficiency"]["C1"] == pytest.approx(expected_c1)
+    assert spectrum["metadata"]["background_subtraction"]["scale_factor"] == 9.0
+
+
 def test_rafm_runbook_negative_efficiency_override_parses():
     args = app.build_parser().parse_args(
         [
