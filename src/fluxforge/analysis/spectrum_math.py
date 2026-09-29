@@ -60,19 +60,60 @@ def _resample_background_to_sample_energy(
     if len(sample_energies) == len(background_energies) and np.allclose(
         sample_energies[:n_min], background_energies[:n_min], atol=atol_keV, rtol=rtol
     ):
-        return background, False
+        if np.array_equal(sample.channels, background.channels):
+            return background, False
+        return (
+            GammaSpectrum(
+                counts=np.asarray(background.counts, dtype=float).copy(),
+                counts_uncertainty=np.asarray(
+                    background.counts_uncertainty, dtype=float
+                ).copy(),
+                channels=np.asarray(sample.channels).copy(),
+                energies=np.asarray(sample_energies, dtype=float).copy(),
+                live_time=float(background.live_time),
+                real_time=float(background.real_time),
+                start_time=background.start_time,
+                spectrum_id=background.spectrum_id,
+                detector_id=background.detector_id,
+                calibration=dict(sample.calibration),
+                metadata=dict(background.metadata),
+            ),
+            True,
+        )
 
     background_counts = np.asarray(background.counts, dtype=float)
     background_unc = np.asarray(background.counts_uncertainty, dtype=float)
+    if (
+        background_energies.size < 2
+        or np.any(~np.isfinite(background_energies))
+        or np.any(np.diff(background_energies) <= 0.0)
+        or np.any(~np.isfinite(sample_energies))
+    ):
+        raise ValueError("Energy alignment requires finite, increasing background energies.")
     resampled_counts = np.interp(
         sample_energies, background_energies, background_counts, left=0.0, right=0.0
     )
-    resampled_variance = np.interp(
-        sample_energies,
-        background_energies,
-        background_unc**2,
-        left=0.0,
-        right=0.0,
+    # Each interpolated channel is a weighted sum of two independent source
+    # channels. Variance therefore uses squared interpolation weights.
+    upper = np.clip(
+        np.searchsorted(background_energies, sample_energies, side="right"),
+        1,
+        background_energies.size - 1,
+    )
+    lower = upper - 1
+    fraction = (
+        (sample_energies - background_energies[lower])
+        / (background_energies[upper] - background_energies[lower])
+    )
+    within = (
+        (sample_energies >= background_energies[0])
+        & (sample_energies <= background_energies[-1])
+    )
+    resampled_variance = np.where(
+        within,
+        (1.0 - fraction) ** 2 * background_unc[lower] ** 2
+        + fraction**2 * background_unc[upper] ** 2,
+        0.0,
     )
     metadata = dict(background.metadata)
     metadata["energy_resampled_to_sample_grid"] = True
@@ -235,31 +276,26 @@ def _resolve_scale_factor(
 ) -> float:
     mode = mode.lower()
     if mode == "live":
+        numerator = float(sample.live_time)
         denom = float(background.live_time)
-        if denom <= 0.0:
-            warnings.warn(
-                "Background live time is non-positive; using scale factor 1.0.",
-                RuntimeWarning,
-                stacklevel=3,
-            )
-            return 1.0
-        return float(sample.live_time) / denom
+        if not np.isfinite(numerator) or numerator <= 0.0 or not np.isfinite(denom) or denom <= 0.0:
+            raise ValueError("Live-time background scaling requires positive finite sample and background live times.")
+        return numerator / denom
 
     if mode == "real":
+        numerator = float(sample.real_time)
         denom = float(background.real_time)
-        if denom <= 0.0:
-            warnings.warn(
-                "Background real time is non-positive; using scale factor 1.0.",
-                RuntimeWarning,
-                stacklevel=3,
-            )
-            return 1.0
-        return float(sample.real_time) / denom
+        if not np.isfinite(numerator) or numerator <= 0.0 or not np.isfinite(denom) or denom <= 0.0:
+            raise ValueError("Real-time background scaling requires positive finite sample and background real times.")
+        return numerator / denom
 
     if mode == "manual":
         if manual_scale is None:
             raise ValueError("manual_scale must be provided when mode='manual'.")
-        return float(manual_scale)
+        scale = float(manual_scale)
+        if not np.isfinite(scale) or scale < 0.0:
+            raise ValueError("manual_scale must be finite and nonnegative.")
+        return scale
 
     raise ValueError(f"Unknown background scale mode: {mode}")
 
@@ -321,13 +357,20 @@ def subtract_measured_background(
         sample, background
     )
     aligned = _align_spectra(sample, aligned_background)
+    # Background subtraction describes the measured sample, so extra
+    # background channels must not extend its count or energy grid.
+    sample_channels = len(sample.counts)
     scale_factor = _resolve_scale_factor(
         sample, background, mode=mode, manual_scale=manual_scale
     )
 
-    net_counts = aligned.left_counts - scale_factor * aligned.right_counts
+    net_counts = (
+        aligned.left_counts[:sample_channels]
+        - scale_factor * aligned.right_counts[:sample_channels]
+    )
     variance = (
-        aligned.left_uncertainty**2 + (scale_factor**2) * aligned.right_uncertainty**2
+        aligned.left_uncertainty[:sample_channels] ** 2
+        + (scale_factor**2) * aligned.right_uncertainty[:sample_channels] ** 2
     )
     net_uncertainty = np.sqrt(np.maximum(variance, 0.0))
 
@@ -368,8 +411,12 @@ def subtract_measured_background(
     return GammaSpectrum(
         counts=net_counts,
         counts_uncertainty=net_uncertainty,
-        channels=aligned.channels,
-        energies=None,
+        channels=np.asarray(sample.channels).copy(),
+        energies=(
+            np.asarray(sample.energies, dtype=float).copy()
+            if sample.energies is not None
+            else None
+        ),
         live_time=float(sample.live_time),
         real_time=float(sample.real_time),
         start_time=sample.start_time,

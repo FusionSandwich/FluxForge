@@ -89,6 +89,32 @@ def test_subtract_measured_background_real_and_manual_scaling():
     assert np.allclose(corrected_manual.counts_uncertainty, np.sqrt(expected_var))
 
 
+@pytest.mark.parametrize("bad_scale", [-1.0, float("nan"), float("inf")])
+def test_subtract_measured_background_rejects_invalid_manual_scale(bad_scale):
+    sample = GammaSpectrum(counts=np.array([10.0]), channels=np.array([0]))
+    background = GammaSpectrum(counts=np.array([2.0]), channels=np.array([0]))
+    with pytest.raises(ValueError, match="manual_scale must be finite and nonnegative"):
+        subtract_measured_background(
+            sample, background, mode="manual", manual_scale=bad_scale
+        )
+    with pytest.raises(ValueError, match="manual_scale must be provided"):
+        subtract_measured_background(sample, background, mode="manual")
+
+
+@pytest.mark.parametrize("mode", ["live", "real"])
+def test_subtract_measured_background_rejects_missing_normalization_time(mode):
+    sample = GammaSpectrum(
+        counts=np.array([10.0]), channels=np.array([0]),
+        live_time=10.0, real_time=20.0,
+    )
+    background = GammaSpectrum(
+        counts=np.array([2.0]), channels=np.array([0]),
+        live_time=0.0, real_time=0.0,
+    )
+    with pytest.raises(ValueError, match="requires positive finite"):
+        subtract_measured_background(sample, background, mode=mode)
+
+
 def test_subtract_measured_background_missing_warns_and_returns_raw():
     sample = GammaSpectrum(
         counts=np.array([5.0, 7.0]),
@@ -150,6 +176,71 @@ def test_subtract_measured_background_resamples_background_to_sample_energy_grid
 
     assert np.allclose(corrected.counts, [100.0, 90.0, 80.0])
     assert corrected.metadata["background_subtraction"]["energy_aligned"] is True
+
+
+def test_background_energy_interpolation_uses_squared_weights_for_variance():
+    sample = GammaSpectrum(
+        counts=np.array([10.0, 10.0]),
+        channels=np.array([0, 1]),
+        energies=np.array([0.5, 1.5]),
+        live_time=10.0,
+    )
+    background = GammaSpectrum(
+        counts=np.array([2.0, 4.0, 6.0]),
+        counts_uncertainty=np.array([1.0, 2.0, 3.0]),
+        channels=np.array([0, 1, 2]),
+        energies=np.array([0.0, 1.0, 2.0]),
+        live_time=10.0,
+    )
+    corrected = subtract_measured_background(sample, background)
+    np.testing.assert_allclose(corrected.counts, [7.0, 5.0])
+    np.testing.assert_allclose(
+        corrected.counts_uncertainty**2,
+        [10.0 + 0.25 * (1.0 + 4.0), 10.0 + 0.25 * (4.0 + 9.0)],
+    )
+
+
+def test_background_subtraction_preserves_explicit_sample_energies():
+    sample = GammaSpectrum(
+        counts=np.array([10.0, 20.0]), channels=np.array([0, 1]),
+        energies=np.array([1.0, 2.0]), live_time=10.0,
+    )
+    background = GammaSpectrum(
+        counts=np.array([2.0, 4.0]), channels=np.array([0, 1]),
+        energies=np.array([1.0, 2.0]), live_time=10.0,
+    )
+    corrected = subtract_measured_background(sample, background)
+    np.testing.assert_array_equal(corrected.energies, sample.energies)
+
+
+def test_background_subtraction_aligns_equal_energies_with_different_channels():
+    sample = GammaSpectrum(
+        counts=np.array([10.0, 20.0]), channels=np.array([0, 1]),
+        energies=np.array([1.0, 2.0]), live_time=10.0,
+    )
+    background = GammaSpectrum(
+        counts=np.array([2.0, 4.0]), channels=np.array([10, 11]),
+        energies=np.array([1.0, 2.0]), live_time=10.0,
+    )
+    corrected = subtract_measured_background(sample, background)
+    np.testing.assert_array_equal(corrected.channels, sample.channels)
+    np.testing.assert_array_equal(corrected.counts, [8.0, 16.0])
+    assert corrected.metadata["background_subtraction"]["energy_aligned"] is True
+
+
+def test_background_subtraction_stays_on_sample_grid_when_background_is_longer():
+    sample = GammaSpectrum(
+        counts=np.array([10.0, 20.0]), channels=np.array([0, 1]),
+        energies=np.array([1.0, 2.0]), live_time=10.0,
+    )
+    background = GammaSpectrum(
+        counts=np.array([2.0, 4.0, 100.0]),
+        channels=np.array([0, 1, 2]), live_time=10.0,
+    )
+    corrected = subtract_measured_background(sample, background)
+    np.testing.assert_array_equal(corrected.counts, [8.0, 16.0])
+    np.testing.assert_array_equal(corrected.channels, sample.channels)
+    np.testing.assert_array_equal(corrected.energies, sample.energies)
 
 
 def test_nonnegative_counts_for_algorithm_warns_on_negative_bins():
