@@ -47,6 +47,16 @@ FluxForge issues a warning and leaves the saved signed spectrum unchanged.
 Inspect the `background_subtraction` metadata for the scale factor and number of
 negative channels before interpreting a result.
 
+### Calibration and efficiency overrides
+
+Genie `.ASC` and `.txt` readers use energy and efficiency coefficients from the
+file when present. A selected RAFM profile fills detector values that the file
+does not supply; it preserves the file's energy calibration. Explicit
+`--energy-calibration` and `--efficiency-coefficients` CLI values, or the
+corresponding reader arguments, take precedence over file and profile values.
+The saved spectrum records the effective coefficients, so check that artifact
+before comparing an analysis with a processed report.
+
 ## How to Run the Phase 6 Worked Example
 
 ```bash

@@ -193,12 +193,21 @@ def _apply_profile_defaults(
         data.efficiency = _efficiency_from_override(profile.efficiency)
     if not data.resolution and profile.resolution:
         data.resolution = [float(value) for value in profile.resolution]
-    if data.spectrum is not None and profile.efficiency:
-        metadata = dict(data.spectrum.metadata)
-        if not metadata.get("efficiency"):
-            metadata["efficiency"] = dict(profile.efficiency)
-        data.spectrum.metadata = metadata
+    _sync_spectrum_efficiency_metadata(data)
     return data
+
+
+def _sync_spectrum_efficiency_metadata(data: "FluxWireData") -> None:
+    """Record the complete effective calibration used by the flux-wire reader."""
+    if data.spectrum is None or data.efficiency is None:
+        return
+    metadata = dict(data.spectrum.metadata)
+    existing = metadata.get("efficiency")
+    effective = dict(existing) if isinstance(existing, dict) else {}
+    effective.update(data.efficiency.to_dict())
+    effective["DetModel"] = data.efficiency.geometry_factor_A
+    metadata["efficiency"] = effective
+    data.spectrum.metadata = metadata
 
 
 @dataclass
@@ -619,12 +628,7 @@ def read_raw_asc(
         data.efficiency = _efficiency_from_override(
             efficiency_override, base=data.efficiency
         )
-        if data.spectrum is not None:
-            metadata = dict(data.spectrum.metadata)
-            metadata["efficiency"] = {
-                str(k): float(v) for k, v in efficiency_override.items()
-            }
-            data.spectrum.metadata = metadata
+        _sync_spectrum_efficiency_metadata(data)
 
     return data
 
@@ -692,7 +696,13 @@ def read_processed_txt(
         data.energy_calibration = [a0, a1, a2]
 
     # Parse efficiency calibration
-    eff = EfficiencyCalibration()
+    # Profile values fill fields absent from a partial processed-report header.
+    # Header values below then take precedence, followed by caller overrides.
+    eff = (
+        _efficiency_from_override(load_rafm_profile(profile_name).efficiency)
+        if profile_name
+        else EfficiencyCalibration()
+    )
 
     for match in EFF_COEF_RE.finditer(content):
         coef_num = int(match.group(1))
