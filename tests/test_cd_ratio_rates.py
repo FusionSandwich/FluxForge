@@ -44,3 +44,24 @@ def test_missing_rate_is_flagged() -> None:
         metadata,
     )
     assert rows[0]["cd_ratio"] is None and rows[0]["flag_cd_ratio_review"]
+
+
+def test_shared_efficiency_cancels_from_cd_ratio_uncertainty() -> None:
+    metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
+    bare = _artifact("Co-RAFM-1_25cm", 1.0, 2e-12, 0.05 * 2e-12)
+    cd = _artifact("Co-Cd-RAFM-1_25cm", 1.0, 1e-12, 0.05 * 1e-12)
+    for artifact in (bare, cd):
+        rate = artifact["reactions"][0]["reaction_rate"]
+        artifact["reactions"][0]["uncertainty_budget"] = {
+            "row_id": artifact["sample_id"], "rate": rate,
+            "components": [
+                {"name": "activity", "relative": 0.04, "correlation_group": None},
+                {"name": "detector_efficiency", "relative": 0.03,
+                 "correlation_group": "same-calibration"},
+            ],
+        }
+    rows, _ = cd_ratio_rows([bare, cd], metadata)
+    assert rows[0]["shared_rate_covariance"] == pytest.approx(0.03**2 * 2e-24)
+    assert rows[0]["cd_ratio_unc"] / rows[0]["cd_ratio"] == pytest.approx(
+        math.sqrt(2) * 0.04
+    )

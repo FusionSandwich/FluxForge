@@ -3751,8 +3751,8 @@ def cd_ratio_rows(
     R_Cd = R_bare / R_Cd for the same reaction on paired bare and Cd-covered
     wires. Rates are already normalized for target atoms, irradiation history
     and decay, so wire masses and count dates cancel correctly. The
-    uncertainty combines both rows' total relative uncertainties in
-    quadrature (conservative: shared components would partly cancel).
+    uncertainty propagates each row's marginal rate uncertainty and removes
+    shared covariance when component budgets identify a common source.
     """
     by_key = {
         normalize_pairing_key(item["sample_id"], metadata.pairing_aliases): item
@@ -3763,11 +3763,12 @@ def cd_ratio_rows(
     configured_ranges = metadata.config.get("cd_ratio_expected_ranges", {})
     default_review_min = float(metadata.config.get("cd_ratio_default_review_min", 1.10))
 
-    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float]]:
+    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float, Optional[Dict[str, Any]]]]:
         return {
             str(row["reaction_id"]): (
                 float(row.get("reaction_rate") or 0.0),
                 float(row.get("reaction_rate_unc") or 0.0),
+                row.get("uncertainty_budget") or row.get("rate_uncertainty_budget"),
             )
             for row in artifact.get("reactions", [])
             if "Unknown(" not in str(row.get("reaction_id"))
@@ -3788,14 +3789,31 @@ def cd_ratio_rows(
         if expected_min is None and material in {"Cu", "Sc"}:
             expected_min = default_review_min
         for reaction_id in sorted(set(bare_rates) & set(cd_rates)):
-            bare_rate, bare_unc = bare_rates[reaction_id]
-            cd_rate, cd_unc = cd_rates[reaction_id]
+            bare_rate, bare_unc, bare_budget = bare_rates[reaction_id]
+            cd_rate, cd_unc, cd_budget = cd_rates[reaction_id]
             ratio = bare_rate / cd_rate if bare_rate > 0 and cd_rate > 0 else None
-            ratio_unc = (
-                ratio * math.hypot(bare_unc / bare_rate, cd_unc / cd_rate)
-                if ratio is not None
-                else None
-            )
+            shared_covariance = 0.0
+            missing_uncertainty_components: List[str] = ["budget_unavailable"]
+            if ratio is not None and isinstance(bare_budget, dict) and isinstance(cd_budget, dict):
+                budgets = [
+                    RateUncertaintyBudget(
+                        row_id=str(budget["row_id"]), rate=rate,
+                        components=[UncertaintyComponent(**item) for item in budget["components"]],
+                    )
+                    for budget, rate in ((bare_budget, bare_rate), (cd_budget, cd_rate))
+                ]
+                shared_covariance = float(rate_covariance(budgets)[0, 1])
+                missing_uncertainty_components = sorted(set(budgets[0].missing + budgets[1].missing))
+            if ratio is None:
+                ratio_unc = None
+            else:
+                relative_variance = (
+                    (bare_unc / bare_rate) ** 2 + (cd_unc / cd_rate) ** 2
+                    - 2 * shared_covariance / (bare_rate * cd_rate)
+                )
+                if relative_variance < -1e-12:
+                    raise ValueError("Cd ratio component covariance exceeds marginal uncertainty")
+                ratio_unc = ratio * math.sqrt(max(relative_variance, 0.0))
             flag_review = ratio is None or (
                 (expected_min is not None and ratio < float(expected_min))
                 or (expected_max is not None and ratio > float(expected_max))
@@ -3816,6 +3834,8 @@ def cd_ratio_rows(
                     "cd_rate_per_atom_s": cd_rate,
                     "cd_ratio": ratio,
                     "cd_ratio_unc": ratio_unc,
+                    "shared_rate_covariance": shared_covariance,
+                    "missing_uncertainty_components": ";".join(missing_uncertainty_components),
                     "basis": "per-target-atom EOI reaction rates",
                     "expected_cd_ratio_min": (
                         None if expected_min is None else float(expected_min)
