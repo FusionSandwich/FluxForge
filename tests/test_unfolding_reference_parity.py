@@ -172,6 +172,16 @@ def _pyunfold_reference_cases():
             "prior": None,
         }
     )
+    # Some upstream toy fixtures specify efficiencies separately while their
+    # response columns still sum to one. Scale both probability rows and their
+    # errors to the documented P(effect|cause) column-sum contract before
+    # passing identical inputs to upstream PyUnfold and the guarded wrapper.
+    for case in cases:
+        response = np.asarray(case["response"], dtype=float)
+        efficiencies = np.asarray(case["efficiencies"], dtype=float)
+        scale = efficiencies / response.sum(axis=0)
+        case["response"] = response * scale
+        case["response_err"] = np.asarray(case["response_err"], dtype=float) * scale
     return iterative_unfold, cases
 
 
@@ -349,6 +359,7 @@ def test_neutron_ibu_matches_local_pyunfold_reference(
             ReactionRates(
                 values=np.asarray(case["data"], dtype=float),
                 uncertainties=np.asarray(case["data_err"], dtype=float),
+                quantity="effect_counts",
             ),
             ResponseBundle(
                 matrix=np.asarray(case["response"], dtype=float),
@@ -356,6 +367,7 @@ def test_neutron_ibu_matches_local_pyunfold_reference(
                     np.asarray(case["response"], dtype=float).shape[1] + 1,
                     dtype=float,
                 ),
+                quantity="conditional_probability",
             ),
             prior_flux=(
                 None
