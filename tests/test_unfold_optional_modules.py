@@ -120,26 +120,72 @@ def test_neutron_ibu_guard_and_solver(monkeypatch: pytest.MonkeyPatch) -> None:
 
     solver = neutron_ibu.NeutronUnfolderIBU(ts="chi2", ts_stopping=0.05, max_iter=20)
     rates = ReactionRates(
-        values=np.array([10.0, 20.0]), uncertainties=np.array([1.0, 2.0])
+        values=np.array([10.0, 20.0]), uncertainties=np.array([1.0, 2.0]),
+        quantity="effect_counts",
     )
     response = ResponseBundle(
-        matrix=np.array([[1.0, 0.2], [0.1, 1.0]]),
+        matrix=np.array([[0.9, 0.2], [0.1, 0.8]]),
         energy_bins=np.array([0.0, 1.0, 2.0]),
+        quantity="conditional_probability",
     )
 
-    result = solver.solve(rates, response, prior_flux=np.array([3.0, 1.0]))
+    explicit = {
+        "response_err": np.full((2, 2), 0.01),
+        "efficiencies": np.ones(2),
+        "efficiencies_err": np.full(2, 0.01),
+    }
+    result = solver.solve(rates, response, prior_flux=np.array([3.0, 1.0]), **explicit)
     np.testing.assert_allclose(result.unfolded_flux, np.array([2.0, 1.0]))
-    np.testing.assert_allclose(np.diag(result.flux_covariance), np.array([0.05, 0.05]))
+    assert result.flux_covariance is None
+    assert result.diagnostics["physical_activation_comparator"] is False
+    assert result.diagnostics["output_quantity"] == "cause_counts"
     assert result.n_iterations == 4
     assert result.test_statistic == 0.03
     assert result.diagnostics["custom_diagnostic"] == 42
 
-    comparison = solver.compare_with_gls(np.array([2.1, 1.1]), result, rtol=0.2)
+    comparison = solver.compare_with_gls(
+        np.array([2.1, 1.1]), result, rtol=0.2,
+        comparison_kind="synthetic_cause_counts",
+    )
     assert isinstance(comparison["agrees"], bool)
     assert "max_relative_difference" in comparison
 
     with pytest.raises(ValueError):
-        solver.compare_with_gls(np.array([1.0, 2.0, 3.0]), result)
+        solver.compare_with_gls(
+            np.array([1.0, 2.0, 3.0]), result,
+            comparison_kind="synthetic_cause_counts",
+        )
+
+    with pytest.raises(ValueError, match="explicit synthetic cause-count"):
+        solver.compare_with_gls(np.array([2.1, 1.1]), result)
+
+    with pytest.raises(ValueError, match="Explicit response_err"):
+        solver.solve(rates, response)
+
+    with pytest.raises(ValueError, match="qualified adapter"):
+        solver.solve(
+            ReactionRates(values=rates.values, uncertainties=rates.uncertainties),
+            ResponseBundle(matrix=response.matrix * 1e-24, energy_bins=response.energy_bins),
+            **explicit,
+        )
+
+    with pytest.raises(ValueError, match="probabilities <= 1"):
+        solver.solve(
+            rates,
+            ResponseBundle(
+                matrix=response.matrix * 2,
+                energy_bins=response.energy_bins,
+                quantity="conditional_probability",
+            ),
+            **explicit,
+        )
+
+    with pytest.raises(ValueError, match="column sums"):
+        solver.solve(
+            rates, response, response_err=explicit["response_err"],
+            efficiencies=np.array([0.9, 1.0]),
+            efficiencies_err=explicit["efficiencies_err"],
+        )
 
     with pytest.raises(ValueError):
         solver.solve(
@@ -147,4 +193,6 @@ def test_neutron_ibu_guard_and_solver(monkeypatch: pytest.MonkeyPatch) -> None:
             response,
         )
     with pytest.raises(ValueError):
-        solver.solve(rates, response, prior_flux=np.array([1.0, 2.0, 3.0]))
+        solver.solve(
+            rates, response, prior_flux=np.array([1.0, 2.0, 3.0]), **explicit
+        )

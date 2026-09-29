@@ -65,15 +65,25 @@ def predict_holdouts(
     m, n = a.shape
     if y.shape != (m,) or p.shape != (n,) or c.shape != (n, n) or v.shape != (m, m):
         raise ValueError("Inconsistent shapes for response, rates, prior or covariance")
-    hold = np.array(sorted(set(int(i) for i in holdout_index)), dtype=int)
+    if not all(np.all(np.isfinite(item)) for item in (a, y, p, c, v)):
+        raise ValueError("Response, rates, prior and covariance must be finite")
+    if any(not isinstance(i, (int, np.integer)) for i in holdout_index):
+        raise ValueError("holdout_index must contain integer row indices")
+    hold = np.array(sorted(int(i) for i in holdout_index), dtype=int)
+    if len(set(hold)) != len(hold):
+        raise ValueError("holdout_index must not repeat a row")
     if hold.size == 0 or np.any(hold < 0) or np.any(hold >= m):
         raise ValueError("holdout_index must name at least one valid row")
     fit = np.setdiff1d(np.arange(m), hold)
     if fit.size == 0:
         raise ValueError("At least one fit row is required")
 
-    # Row scaling for conditioning (a pure change of units for each rate row)
-    scale = np.sqrt(np.clip(np.diag(v), np.finfo(float).tiny, None))
+    # Scale by the full prior-predictive row variance. A holdout can have no
+    # observation noise and still have finite uncertainty from the flux prior.
+    predictive_variance = np.einsum("ij,jk,ik->i", a, c, a) + np.diag(v)
+    if np.any(predictive_variance <= 0) or not np.all(np.isfinite(predictive_variance)):
+        raise ValueError("Every row needs positive finite predictive variance")
+    scale = np.sqrt(predictive_variance)
     a_s = a / scale[:, None]
     y_s = y / scale
     v_s = v / scale[:, None] / scale[None, :]
@@ -100,7 +110,12 @@ def predict_holdouts(
     mean = mean_s * scale[hold]
     cov = cov_s * scale[hold][:, None] * scale[hold][None, :]
     residual = y[hold] - mean
-    chi2 = float(residual @ np.linalg.solve(cov, residual))
+    try:
+        chi2 = float(residual @ np.linalg.solve(cov, residual))
+    except np.linalg.LinAlgError as exc:
+        raise ValueError("Holdout predictive covariance is not invertible") from exc
+    if not np.isfinite(chi2):
+        raise ValueError("Holdout predictive covariance is not usable")
     return HoldoutPrediction(flux, posterior, mean, cov, residual, chi2, int(hold.size))
 
 

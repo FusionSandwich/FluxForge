@@ -50,6 +50,13 @@ class RateUncertaintyBudget:
     components: List[UncertaintyComponent] = field(default_factory=list)
     required: Sequence[str] = REQUIRED_COMPONENTS
 
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.rate) or self.rate < 0:
+            raise ValueError("Reaction rate must be finite and non-negative")
+        names = [component.name for component in self.components]
+        if len(names) != len(set(names)):
+            raise ValueError("Uncertainty component names must be unique within a row")
+
     @property
     def missing(self) -> List[str]:
         names = {component.name for component in self.components}

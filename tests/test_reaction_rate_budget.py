@@ -50,3 +50,11 @@ def test_floor_is_expressed_as_explicit_component() -> None:
     component = floor_as_component("model_floor", 0.1, 0.25, "config")
     assert math.hypot(0.1, component.relative) == pytest.approx(0.25)
     assert floor_as_component("model_floor", 0.3, 0.25, "config") is None
+
+
+def test_duplicate_component_name_cannot_corrupt_covariance_diagonal() -> None:
+    with pytest.raises(ValueError, match="unique"):
+        RateUncertaintyBudget("row", 2.0, [
+            UncertaintyComponent("efficiency", 0.03),
+            UncertaintyComponent("efficiency", 0.04),
+        ])
