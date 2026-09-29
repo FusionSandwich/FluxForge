@@ -107,6 +107,43 @@ def test_rafm_analysis_runs_with_shared_background():
     not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(),
     reason="RAFM example data not present",
 )
+def test_flux_wire_roi_uncertainty_responds_to_background_uncertainty():
+    sample = read_genie_spectrum(SAMPLE_ASC)
+    background = read_genie_spectrum(BACKGROUND_ASC)
+    inflated_background = read_genie_spectrum(BACKGROUND_ASC)
+    inflated_background.counts_uncertainty *= 10.0
+
+    baseline = analyze_raw_spectrum(
+        sample,
+        background_spectrum=background,
+        sample_name="Co-Cd-RAFM-1_25cm",
+        peak_threshold=2.0,
+    )
+    inflated = analyze_raw_spectrum(
+        sample,
+        background_spectrum=inflated_background,
+        sample_name="Co-Cd-RAFM-1_25cm",
+        peak_threshold=2.0,
+    )
+    by_channel = {peak.channel: peak for peak in inflated}
+    shared = [
+        (peak, by_channel[peak.channel])
+        for peak in baseline
+        if peak.channel in by_channel
+    ]
+    assert shared
+    assert any(
+        changed.net_counts_unc > original.net_counts_unc for original, changed in shared
+    )
+    for original, changed in shared:
+        assert changed.net_counts == pytest.approx(original.net_counts)
+        assert changed.net_counts_unc >= original.net_counts_unc
+
+
+@pytest.mark.skipif(
+    not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(),
+    reason="RAFM example data not present",
+)
 @pytest.mark.parametrize("profile_name", ["rafm_25cm", "astm_inl_dosimetry"])
 def test_rafm_profile_supplies_background_and_efficiency_defaults(profile_name: str):
     data = read_raw_asc(SAMPLE_ASC, profile_name=profile_name)
