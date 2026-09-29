@@ -21,6 +21,15 @@ BACKGROUND_ASC = RAFM_ROOT / "background.ASC"
 SAMPLE_ASC = RAFM_ROOT / "raw_gamma_spec" / "flux_wires" / "Co-Cd-RAFM-1_25cm.ASC"
 
 
+def test_rafm_profile_resolves_committed_shared_background():
+    profile_background = load_rafm_profile("rafm_25cm").resolve_background_path()
+    fixture_background = REPO_ROOT / "tests/data/flux_wires/raw/background.ASC"
+    assert profile_background is not None
+    assert profile_background.samefile(BACKGROUND_ASC)
+    assert fixture_background.is_file()
+    assert fixture_background.read_bytes() == profile_background.read_bytes()
+
+
 @pytest.mark.skipif(
     not BACKGROUND_ASC.exists() or not SAMPLE_ASC.exists(),
     reason="RAFM example data not present",
