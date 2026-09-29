@@ -8,7 +8,10 @@ import pytest
 
 from fluxforge.analysis.flux_wire_analysis import (
     _snip_background_from_signed_counts,
+    GammaLine,
     analyze_raw_spectrum,
+    analyze_raw_spectrum_targeted,
+    estimate_peak_area_local_background,
 )
 from fluxforge.analysis.peak_finders import snip_background
 from fluxforge.analysis.spectrum_math import (
@@ -169,6 +172,40 @@ def test_flux_wire_roi_uncertainty_responds_to_background_uncertainty():
     for original, changed in shared:
         assert changed.net_counts == pytest.approx(original.net_counts)
         assert changed.net_counts_unc >= original.net_counts_unc
+
+
+@pytest.mark.parametrize("counting_method", ["qg", "covell", "gilmore", "iec_tiered"])
+def test_real_rafm_targeted_uncertainty_keeps_propagated_roi_floor(counting_method):
+    data = read_raw_asc(SAMPLE_ASC, profile_name="rafm_25cm")
+    background = read_raw_asc(BACKGROUND_ASC, profile_name="rafm_25cm").spectrum
+    background.counts_uncertainty *= 10.0
+    corrected = subtract_measured_background(data.spectrum, background, mode="live")
+    lines = [
+        GammaLine(energy_keV=1173.23, intensity=0.9985, isotope="Co60"),
+        GammaLine(energy_keV=1332.49, intensity=0.9998, isotope="Co60"),
+    ]
+    peaks = analyze_raw_spectrum_targeted(
+        data,
+        lines,
+        background_spectrum=background,
+        profile_name="rafm_25cm",
+        counting_method=counting_method,
+        peak_threshold=0.0,
+    )
+
+    assert len(peaks) == 2
+    for peak in peaks:
+        slope = (
+            data.energy_calibration[1] + 2.0 * data.energy_calibration[2] * peak.channel
+        )
+        _, roi_unc, _, _, _ = estimate_peak_area_local_background(
+            corrected.counts,
+            peak.channel,
+            peak.fwhm / slope,
+            spectrum_uncertainty=corrected.counts_uncertainty,
+        )
+        assert peak.net_counts_unc >= roi_unc - 1.0e-9
+        assert peak.comparison_net_counts_unc < roi_unc
 
 
 @pytest.mark.skipif(

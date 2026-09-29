@@ -2051,12 +2051,12 @@ def analyze_raw_spectrum_targeted(
                 elif roi_unc > 0.0 and (roi_net / roi_unc) < peak_threshold:
                     use_fit_net = True
 
-            if _is_qg_counting_method(method_key):
-                net = float(comparison_net)
-                net_unc = float(comparison_unc)
-            else:
-                net = float(comparison_net)
-                net_unc = float(comparison_unc)
+            net = float(comparison_net)
+            # The selected counting method can fit a narrower window than the
+            # measured-background ROI. Keep its estimate for QG comparison,
+            # but do not report a physical uncertainty below the propagated
+            # sample/background counting term.
+            net_unc = float(max(comparison_unc, roi_unc))
 
             stored_gross = float(
                 comparison_gross if _is_qg_counting_method(method_key) else raw_gross
