@@ -2436,6 +2436,52 @@ def test_cmd_ingest_applies_manual_background_scaling(monkeypatch, tmp_path):
     assert np.allclose(captured["counts"], [9.0, 18.0, 27.0])
 
 
+@pytest.mark.parametrize(
+    ("relative_input", "expected_channels"),
+    [
+        (
+            "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC",
+            8192,
+        ),
+        (
+            "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM1/RAFM1_Long_144h_EOI.txt",
+            8192,
+        ),
+        ("tests/data/spectrum_io/examples/eu_calib_7cm.Spe", 16384),
+    ],
+)
+def test_ingest_real_spectrum_formats_with_manual_background(
+    tmp_path, relative_input, expected_channels
+):
+    output = tmp_path / "spectrum.json"
+    args = app.build_parser().parse_args(
+        [
+            "ingest",
+            "--input",
+            str(ROOT / relative_input),
+            "--background-file",
+            str(ROOT / "examples/RAFM_irradiation/background.ASC"),
+            "--background-scale-mode",
+            "manual",
+            "--background-scale-factor",
+            "0.5",
+            "--energy-calibration",
+            "0,1",
+            "--efficiency-coefficients",
+            "1,2,3,4",
+            "--output",
+            str(output),
+        ]
+    )
+    args.func(args)
+    spectrum = json.loads(output.read_text(encoding="utf-8"))["spectrum"]
+    assert len(spectrum["counts"]) == expected_channels
+    assert len(spectrum["counts_uncertainty"]) == expected_channels
+    assert spectrum["metadata"]["background_subtraction"]["scale_factor"] == 0.5
+    assert spectrum["calibration"]["energy"] == [0.0, 1.0]
+    assert spectrum["metadata"]["efficiency"]["C1"] == 1.0
+
+
 def test_cmd_ingest_writes_optional_adjusted_and_final_exports(
     monkeypatch, tmp_path, capsys
 ):
