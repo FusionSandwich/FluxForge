@@ -74,6 +74,10 @@ def test_subtract_measured_background_real_and_manual_scaling():
 
     corrected_real = subtract_measured_background(sample, background, mode="real")
     assert np.allclose(corrected_real.counts, [6.0, 12.0])
+    assert np.allclose(
+        corrected_real.counts_uncertainty**2,
+        np.array([10.0, 20.0]) + 2.0**2 * np.array([2.0, 4.0]),
+    )
     assert corrected_real.metadata["background_subtraction"][
         "scale_factor"
     ] == pytest.approx(2.0)
