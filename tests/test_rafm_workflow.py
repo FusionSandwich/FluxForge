@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -158,6 +159,40 @@ def test_resolve_measurement_timing_for_rafm_and_flux_wires():
     assert wire.compare_eoi is True
     assert wire.irradiation_time_s == 7200
     assert wire.irradiation_phase == "phase2_whale_tube"
+
+
+@pytest.mark.parametrize("sample_letter", ["A", "B", "C", "N"])
+def test_rafm4_committed_artifacts_use_phase2_whale_tube_timing(sample_letter):
+    metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
+    sample_id = f"RAFM4-{sample_letter}_15dEOI"
+    timing = resolve_measurement_timing(sample_id, None, metadata)
+    artifact = json.loads(
+        (EXAMPLE_ROOT / "results/analysis_json" / f"{sample_id}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    recorded = artifact["timing"]
+    phase2 = metadata.sample_schedules["schedules"][sample_letter]["phase2"]
+    expected_decay = next(
+        item["seconds"] for item in phase2["cooling_times"] if item["label"] == "15d"
+    )
+
+    assert (
+        timing.irradiation_phase == recorded["irradiation_phase"] == "phase2_whale_tube"
+    )
+    assert (
+        timing.schedule_source
+        == recorded["schedule_source"]
+        == "sample_schedules.phase2"
+    )
+    assert timing.irradiation_end.isoformat() == recorded["irradiation_end"]
+    assert recorded["irradiation_time_s"] == phase2["irradiation_seconds"] == 7200
+    assert timing.decay_time_s == recorded["decay_time_s"] == expected_decay
+    report = (
+        EXAMPLE_ROOT / "results/reports" / f"{sample_id}_comparison.txt"
+    ).read_text(encoding="utf-8")
+    assert "Irradiation phase: phase2_whale_tube" in report
+    assert "Schedule source: sample_schedules.phase2" in report
 
 
 def test_estimate_rafm_sample_mass_from_geometry_metadata():
