@@ -39,8 +39,13 @@ def _covariance(values: object, size: int, name: str) -> np.ndarray:
         raise ValueError(f"{name} must be symmetric")
     cov = (cov + cov.T) / 2
     scale = float(np.max(np.abs(cov)))
-    if scale and float(np.min(np.linalg.eigvalsh(cov / scale))) < 0:
-        raise ValueError(f"{name} must be positive semidefinite")
+    if scale:
+        eigenvalues = np.linalg.eigvalsh(cov / scale)
+        tolerance = 10 * size * np.finfo(float).eps * max(
+            1.0, float(np.max(np.abs(eigenvalues)))
+        )
+        if float(np.min(eigenvalues)) < -tolerance:
+            raise ValueError(f"{name} must be positive semidefinite")
     return cov
 
 
@@ -126,6 +131,7 @@ class PhysicalGLSResult:
             "response_matrix": self.response_matrix.tolist(),
             "measured_rates": self.measured_rates.tolist(),
             "predicted_rates": self.predicted_rates.tolist(),
+            "predicted_rates_definition": "unconditional forward fold of fitted flux",
             "residuals": self.residuals.tolist(),
             "fit_predictions": self.fit_predictions.tolist(),
             "fit_residuals": self.fit_residuals.tolist(),
@@ -138,6 +144,7 @@ class PhysicalGLSResult:
             "response_condition": self.response_condition,
             "negative_flux_groups": list(self.negative_flux_groups),
             "holdout_predictions": self.holdout_predictions.tolist(),
+            "holdout_predictions_definition": "joint-Gaussian prediction conditioned on fit rows",
             "holdout_residuals": self.holdout_residuals.tolist(),
             "holdout_predictive_covariance": self.holdout_predictive_covariance.tolist(),
             "holdout_standardized_chi2": self.holdout_standardized_chi2,

@@ -148,6 +148,59 @@ def test_reject_duplicate_identity_and_condition_correlated_holdout():
     np.testing.assert_array_equal(correlated.flux, second.flux)
 
 
+def test_physical_gls_correlated_holdout_matches_joint_gaussian() -> None:
+    inputs, _ = fixture_inputs()
+    inputs["holdout_ids"] = ["ni_bare"]
+    rates = inputs["measured_rates"].copy()
+    rates[:2] *= [1.03, 0.98]
+    rates[2] *= 1.07
+    inputs["measured_rates"] = rates
+    # Shared detector calibration induces fit/holdout covariance.
+    shared = np.outer(0.03 * rates, 0.03 * rates)
+    inputs["observation_covariance"] += shared
+    result = unfold_gls_physical(**inputs)
+
+    a = inputs["response_matrix"]
+    p = inputs["prior_flux"]
+    s = a @ inputs["prior_covariance"] @ a.T + inputs["observation_covariance"]
+    fit, hold = [0, 1], [2]
+    fit_innovation = rates[fit] - a[fit] @ p
+    expected_mean = a[hold] @ p + s[np.ix_(hold, fit)] @ np.linalg.solve(
+        s[np.ix_(fit, fit)], fit_innovation
+    )
+    expected_cov = s[np.ix_(hold, hold)] - s[np.ix_(hold, fit)] @ np.linalg.solve(
+        s[np.ix_(fit, fit)], s[np.ix_(fit, hold)]
+    )
+    np.testing.assert_allclose(result.holdout_predictions, expected_mean, rtol=1e-9)
+    np.testing.assert_allclose(result.holdout_predictive_covariance, expected_cov, rtol=1e-8)
+    changed = dict(inputs)
+    changed["measured_rates"] = rates.copy()
+    changed["measured_rates"][2] *= 10
+    np.testing.assert_array_equal(result.flux, unfold_gls_physical(**changed).flux)
+
+
+def test_correlated_response_error_contributes_to_conditional_holdout() -> None:
+    inputs, _ = fixture_inputs()
+    inputs["holdout_ids"] = ["ni_bare"]
+    rates = inputs["measured_rates"]
+    response_error = np.outer(0.04 * rates, 0.04 * rates)
+    inputs["response_error_covariance"] = response_error
+    inputs["sources"]["response_error_covariance"] = SourceBinding(
+        "synthetic://shared-nuclear-data", "b" * 64,
+        "(reactions/target_atom/s)^2",
+    )
+    result = unfold_gls_physical(**inputs)
+    a = inputs["response_matrix"]
+    p = inputs["prior_flux"]
+    s = (a @ inputs["prior_covariance"] @ a.T
+         + inputs["observation_covariance"] + response_error)
+    fit, hold = [0, 1], [2]
+    expected_cov = s[np.ix_(hold, hold)] - s[np.ix_(hold, fit)] @ np.linalg.solve(
+        s[np.ix_(fit, fit)], s[np.ix_(fit, hold)]
+    )
+    np.testing.assert_allclose(result.holdout_predictive_covariance, expected_cov)
+
+
 def test_response_error_increases_uncertainty_and_requires_source():
     inputs, _ = fixture_inputs()
     baseline = unfold_gls_physical(**inputs)
