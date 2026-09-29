@@ -533,6 +533,7 @@ def step5_unfold_spectrum(
             uncertainty_Bq=m.uncertainty_Bq,
             saturation_factor=sat_factor,
             decay_factor=decay_factor,
+            sample_mass_g=m.sample_mass_g,
         )
         print(f"  {m.reaction}: {m.activity_Bq:.3e} ± {m.uncertainty_Bq:.3e} Bq")
 

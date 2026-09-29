@@ -197,7 +197,7 @@ def test_spectrum_unfolder_metadata_carries_negative_bin_summary(monkeypatch):
         FluxWireMeasurement("rx2", activity_Bq=0.8, uncertainty_Bq=0.1),
     ]
 
-    result = unfolder.unfold(method="GRAVEL", max_iterations=10)
+    result = unfolder.unfold(method="GRAVEL", max_iterations=10, allow_activity_as_rate=True)
 
     assert result.metadata["negative_bin_count"] == 1
     assert result.metadata["has_negative_bins"] is True

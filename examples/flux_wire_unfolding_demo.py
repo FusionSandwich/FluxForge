@@ -181,6 +181,7 @@ def demonstrate_reaction_rate_extraction(proc_dir: Path):
                 irradiation_time_s=3600,
                 calculate_flux=True,
                 report_includes_count_decay=False,
+                allow_default_mass=True,  # nominal bundled wire masses (example only)
             )
             all_reactions.extend(reactions)
 

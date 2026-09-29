@@ -244,7 +244,7 @@ class TestSpectrumUnfolder(unittest.TestCase):
         unfolder.add_reaction("Ni-58(n,p)Co-58", activity_Bq=5e5, uncertainty_Bq=5e4)
         unfolder.add_reaction("Co-59(n,g)Co-60", activity_Bq=1e4, uncertainty_Bq=1e3)
 
-        result = unfolder.unfold(method="GRAVEL", max_iterations=100)
+        result = unfolder.unfold(method="GRAVEL", max_iterations=100, allow_activity_as_rate=True)
 
         self.assertIsNotNone(result)
         self.assertEqual(len(result.flux), unfolder.n_groups)
@@ -594,7 +594,7 @@ class TestIntegration(unittest.TestCase):
         unfolder.add_reaction("Co-59(n,g)Co-60", activity_Bq=5e3, uncertainty_Bq=5e2)
 
         # 4. Run unfolding
-        result = unfolder.unfold(method="GRAVEL", max_iterations=200)
+        result = unfolder.unfold(method="GRAVEL", max_iterations=200, allow_activity_as_rate=True)
 
         self.assertTrue(result.converged or result.iterations == 200)
         self.assertEqual(len(result.flux), len(edges) - 1)
@@ -612,7 +612,7 @@ class TestIntegration(unittest.TestCase):
         unfolder.add_reaction("Ti-46(n,p)Sc-46", activity_Bq=1e5, uncertainty_Bq=1e4)
         unfolder.add_reaction("Ni-58(n,p)Co-58", activity_Bq=3e5, uncertainty_Bq=3e4)
 
-        result = unfolder.unfold(method="MLEM", max_iterations=100)
+        result = unfolder.unfold(method="MLEM", max_iterations=100, allow_activity_as_rate=True)
 
         self.assertEqual(result.method, "MLEM")
         self.assertGreater(len(result.flux), 0)

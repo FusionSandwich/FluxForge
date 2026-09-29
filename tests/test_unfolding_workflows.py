@@ -441,7 +441,9 @@ def test_spectrum_unfolder_public_workflow_runs_real_solver(
     ]
     unfolder.set_initial_guess(np.array([80.0, 80.0, 80.0]), source="test")
 
-    result = unfolder.unfold(method=method, max_iterations=200, tolerance=1e-8)
+    result = unfolder.unfold(
+        method=method, max_iterations=200, tolerance=1e-8, allow_activity_as_rate=True
+    )
 
     assert result.method == method
     assert result.flux.shape == (3,)
@@ -514,6 +516,7 @@ def test_spectrum_unfolder_allows_ml_seed_initialization_for_gravel_and_rmle(
         tolerance=1e-8,
         use_ml_seed=True,
         ml_seed_threshold=0.4,
+        allow_activity_as_rate=True,
     )
     rmle_result = unfolder.unfold(
         method="RMLE",
@@ -521,6 +524,7 @@ def test_spectrum_unfolder_allows_ml_seed_initialization_for_gravel_and_rmle(
         tolerance=1e-8,
         use_ml_seed=True,
         ml_seed_threshold=0.4,
+        allow_activity_as_rate=True,
     )
 
     assert gravel_result.metadata["seed_with_ml"] is True

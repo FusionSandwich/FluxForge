@@ -138,6 +138,7 @@ def extract_all_reactions(
                     decay_time_s=decay_time_s,
                     calculate_flux=True,
                     report_includes_count_decay=False,
+                    allow_default_mass=True,  # nominal bundled wire masses (example only)
                 )
                 proc_reactions.extend(rxns)
             except Exception as e:

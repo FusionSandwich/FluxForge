@@ -228,25 +228,27 @@ class NuclideResult:
         return self.half_life_value * conversions.get(self.half_life_unit.lower(), 1)
 
     @property
+    def activity_to_bq_factor(self) -> float:
+        """Factor converting this result's activity unit to Bq."""
+        factors = {
+            "uci": 3.7e4, "\u00b5ci": 3.7e4, "\u03bcci": 3.7e4,
+            "nci": 37.0, "ci": 3.7e10, "mci": 3.7e7,
+            "bq": 1.0, "kbq": 1e3, "mbq": 1e6,
+        }
+        unit = self.activity_unit.strip().lower()
+        if unit not in factors:
+            raise ValueError(f"Unknown activity unit {self.activity_unit!r} for {self.isotope}")
+        return factors[unit]
+
+    @property
     def activity_bq(self) -> float:
-        """Convert activity to Bq."""
-        # 1 Ci = 3.7e10 Bq
-        unit = self.activity_unit.lower()
-        if unit == "uci":
-            return self.activity * 3.7e4
-        elif unit == "nci":
-            return self.activity * 37.0
-        elif unit == "ci":
-            return self.activity * 3.7e10
-        elif unit == "mci":
-            return self.activity * 3.7e7
-        elif unit == "bq":
-            return self.activity
-        elif unit == "kbq":
-            return self.activity * 1e3
-        elif unit == "mbq":
-            return self.activity * 1e6
-        return self.activity  # Unknown unit
+        """Convert activity to Bq (1 Ci = 3.7e10 Bq)."""
+        return self.activity * self.activity_to_bq_factor
+
+    @property
+    def activity_unc_bq(self) -> float:
+        """Convert the activity uncertainty to Bq with the same unit logic."""
+        return self.activity_unc * self.activity_to_bq_factor
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""

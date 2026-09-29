@@ -46,12 +46,14 @@ def _report() -> FluxWireData:
 
 def test_report_activity_requires_declaration() -> None:
     with pytest.raises(ValueError, match="report_includes_count_decay"):
-        extract_reactions_from_processed(_report(), irradiation_time_s=7200.0)
+        extract_reactions_from_processed(_report(), sample_mass_mg=17.364, irradiation_time_s=7200.0)
     corrected = extract_reactions_from_processed(
-        _report(), irradiation_time_s=7200.0, report_includes_count_decay=True
+        _report(), sample_mass_mg=17.364, irradiation_time_s=7200.0,
+        report_includes_count_decay=True,
     )[0]
     uncorrected = extract_reactions_from_processed(
-        _report(), irradiation_time_s=7200.0, report_includes_count_decay=False
+        _report(), sample_mass_mg=17.364, irradiation_time_s=7200.0,
+        report_includes_count_decay=False,
     )[0]
     lam = math.log(2) / IN115M_HALF_LIFE_S
     assert corrected.reaction_rate > 0

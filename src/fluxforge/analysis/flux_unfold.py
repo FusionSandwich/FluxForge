@@ -73,9 +73,12 @@ AVOGADRO = 6.02214076e23  # atoms/mol
 
 
 def calculate_n_atoms(
-    element: str,
+    element: Optional[str],
     mass_mg: Optional[float] = None,
     isotope_fraction: float = 1.0,
+    *,
+    element_mass_fraction: Optional[float] = None,
+    allow_default_mass: bool = False,
 ) -> float:
     """
     Calculate number of target atoms in a flux wire sample.
@@ -83,26 +86,50 @@ def calculate_n_atoms(
     Parameters
     ----------
     element : str
-        Element symbol (e.g., 'Co', 'Cu')
-    mass_mg : float, optional
-        Sample mass in mg. Uses default from FLUX_WIRE_SAMPLES if None.
+        Element symbol (e.g., 'Co', 'Cu'). Required; never guessed.
+    mass_mg : float
+        Monitor mass in mg. Required unless ``allow_default_mass=True``, which
+        uses the bundled nominal wire mass for the element.
     isotope_fraction : float
         Fraction of target isotope (e.g., 0.6917 for Cu-63 in natural Cu)
+    element_mass_fraction : float, optional
+        Mass fraction of ``element`` in the monitor (dilute alloy wires such as
+        Co-Al). Defaults to the bundled purity for pure-element wires, else 1.
+    allow_default_mass : bool
+        Explicitly accept the bundled nominal mass when ``mass_mg`` is None.
 
     Returns
     -------
     float
         Number of target atoms
     """
+    if not element:
+        raise ValueError("Monitor element is required to count target atoms")
     params = FLUX_WIRE_SAMPLES.get(element, {})
     if mass_mg is None:
-        mass_mg = params.get("mass_mg", 10.0)
+        if not allow_default_mass or "mass_mg" not in params:
+            raise ValueError(
+                f"Monitor mass is required for {element}; pass mass_mg "
+                "(or allow_default_mass=True for a nominal bundled mass)"
+            )
+        mass_mg = params["mass_mg"]
 
-    atomic_mass = params.get("atomic_mass", 60.0)
-    purity = params.get("purity", 0.9999)
+    atomic_mass = params.get("atomic_mass")
+    if atomic_mass is None:
+        from fluxforge.data.elements import atomic_mass as element_atomic_mass
+
+        try:
+            atomic_mass = element_atomic_mass(element)
+        except (KeyError, ValueError) as exc:
+            raise ValueError(f"No atomic mass for element {element!r}") from exc
+    fraction = (
+        float(element_mass_fraction)
+        if element_mass_fraction is not None
+        else float(params.get("purity", 1.0))
+    )
 
     mass_g = mass_mg / 1000.0
-    n_atoms = (mass_g * AVOGADRO / atomic_mass) * purity * isotope_fraction
+    n_atoms = (mass_g * AVOGADRO / atomic_mass) * fraction * isotope_fraction
 
     return n_atoms
 
@@ -366,6 +393,7 @@ def extract_reactions_from_processed(
     calculate_flux: bool = True,
     irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
     report_includes_count_decay: Optional[bool] = None,
+    allow_default_mass: bool = False,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from processed flux wire data.
@@ -403,7 +431,7 @@ def extract_reactions_from_processed(
         isotope = nuclide.isotope
         activity_bq = nuclide.activity_bq
         # Report uncertainty is left at zero (and noted) when absent, never invented.
-        activity_unc = nuclide.activity_unc * 3.7e4 if nuclide.activity_unc else 0.0
+        activity_unc = nuclide.activity_unc_bq if nuclide.activity_unc else 0.0
 
         # Get half-life
         half_life_s = FLUX_WIRE_NUCLIDES.get(isotope, {}).get("half_life_s", 0)
@@ -417,9 +445,10 @@ def extract_reactions_from_processed(
         # Calculate number of target atoms
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
-            element=sample_element or "Co",
+            element=sample_element,
             mass_mg=sample_mass_mg,
             isotope_fraction=isotope_fraction,
+            allow_default_mass=allow_default_mass,
         )
 
         # Calculate reaction rate
@@ -484,6 +513,7 @@ def extract_reactions_from_raw(
     profile_name: Optional[str] = None,
     irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
     report_includes_count_decay: Optional[bool] = None,
+    allow_default_mass: bool = False,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from raw flux wire spectra.
@@ -524,9 +554,10 @@ def extract_reactions_from_raw(
         # Calculate number of target atoms
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
-            element=sample_element or "Co",
+            element=sample_element,
             mass_mg=sample_mass_mg,
             isotope_fraction=isotope_fraction,
+            allow_default_mass=allow_default_mass,
         )
 
         # Calculate reaction rate
@@ -1028,6 +1059,7 @@ def unfold_flux_wires(
     n_atoms: float = 1e20,
     verbose: bool = True,
     report_includes_count_decay: Optional[bool] = None,
+    allow_default_mass: bool = False,
 ) -> FluxWireUnfoldResult:
     """
     Unfold neutron spectrum from flux wire measurements.
@@ -1081,6 +1113,7 @@ def unfold_flux_wires(
                 data,
                 irradiation_time_s=irradiation_time_s,
                 report_includes_count_decay=report_includes_count_decay,
+                allow_default_mass=allow_default_mass,
             )
             all_reactions.extend(reactions)
 

@@ -194,6 +194,7 @@ def run_unfolding_regression(
                 decay_time_s=4 * 3600,
                 # Verify against the Quantum Gold analysis settings.
                 report_includes_count_decay=False,
+                allow_default_mass=True,  # nominal bundled wire masses (example only)
             )
         )
         raw_reactions.extend(
@@ -205,6 +206,7 @@ def run_unfolding_regression(
                 background_spectrum=background,
                 profile_name=PROFILE_NAME,
                 report_includes_count_decay=False,
+                allow_default_mass=True,  # nominal bundled wire masses (example only)
             )
         )
 

@@ -2893,7 +2893,10 @@ def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[f
         rows = metadata.flux_wire_metadata.get(fallback_key, [])
     if not rows:
         return None
-    return float(rows[0].get("mass_mg"))
+    mass = rows[0].get("mass_mg")
+    if mass is None:
+        raise ValueError(f"flux_wire_metadata entry for {normalized_key!r} has no mass_mg")
+    return float(mass)
 
 
 def build_flux_wire_reactions(
@@ -2980,7 +2983,7 @@ def build_flux_wire_reactions(
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
-            sample_element or "Co", mass_mg=mass_mg, isotope_fraction=isotope_fraction
+            sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction
         )
         irradiation_time_s = float(timing.irradiation_time_s or 0.0)
         decay_time_s = float(timing.decay_time_s or 0.0)

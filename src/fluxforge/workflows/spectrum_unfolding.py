@@ -139,11 +139,11 @@ class FluxWireMeasurement:
     reaction: str
     activity_Bq: float
     uncertainty_Bq: float = 0.0
-    saturation_factor: float = 1.0
-    decay_factor: float = 1.0
+    saturation_factor: Optional[float] = None
+    decay_factor: Optional[float] = None
     irradiation_time: float = 0.0
     cooling_time: float = 0.0
-    sample_mass_g: float = 1.0
+    sample_mass_g: Optional[float] = None
     isotope_abundance: float = 1.0
     rate_per_atom: Optional[float] = None
     sample_id: Optional[str] = None
@@ -196,6 +196,8 @@ class FluxWireMeasurement:
     @property
     def target_atom_count(self) -> float:
         """Number of target atoms in the measured wire."""
+        if self.sample_mass_g is None:
+            raise ValueError(f"{self.reaction}: sample_mass_g is required to normalize per atom")
         if self.sample_mass_g <= 0.0:
             return 0.0
 
@@ -225,44 +227,35 @@ class FluxWireMeasurement:
 
     @property
     def effective_saturation_factor(self) -> float:
-        """Saturation factor, derived from timing metadata when available."""
-        if self.saturation_factor > 0.0 and not np.isclose(self.saturation_factor, 1.0):
+        """Explicit saturation factor, else one derived from irradiation time."""
+        if self.saturation_factor is not None:
             return float(self.saturation_factor)
+        if self.irradiation_time <= 0.0:
+            raise ValueError(
+                f"{self.reaction}: give saturation_factor or irradiation_time; "
+                "saturation is never assumed"
+            )
+        decay_constant = log(2.0) / self._product_half_life_s()
+        return float(-np.expm1(-decay_constant * self.irradiation_time))
 
+    def _product_half_life_s(self) -> float:
         product = self.product_isotope
-        if product is None or self.irradiation_time <= 0.0:
-            return float(self.saturation_factor)
-
-        canonical_product = _canonical_isotope_or_none(product)
-        if canonical_product is None:
-            return float(self.saturation_factor)
-
-        half_life_s = Isotope.from_string(canonical_product).half_life_s
+        canonical_product = _canonical_isotope_or_none(product) if product else None
+        half_life_s = (
+            Isotope.from_string(canonical_product).half_life_s if canonical_product else None
+        )
         if half_life_s is None or half_life_s <= 0.0 or half_life_s == float("inf"):
-            return float(self.saturation_factor)
-
-        decay_constant = log(2.0) / half_life_s
-        return float(1.0 - exp(-decay_constant * self.irradiation_time))
+            raise ValueError(f"{self.reaction}: product half-life unavailable")
+        return float(half_life_s)
 
     @property
     def effective_decay_factor(self) -> float:
-        """Decay factor, derived from timing metadata when available."""
-        if self.decay_factor > 0.0 and not np.isclose(self.decay_factor, 1.0):
+        """Explicit decay factor, else from cooling time (1 for EOI activity)."""
+        if self.decay_factor is not None:
             return float(self.decay_factor)
-
-        product = self.product_isotope
-        if product is None or self.cooling_time <= 0.0:
-            return float(self.decay_factor)
-
-        canonical_product = _canonical_isotope_or_none(product)
-        if canonical_product is None:
-            return float(self.decay_factor)
-
-        half_life_s = Isotope.from_string(canonical_product).half_life_s
-        if half_life_s is None or half_life_s <= 0.0 or half_life_s == float("inf"):
-            return float(self.decay_factor)
-
-        decay_constant = log(2.0) / half_life_s
+        if self.cooling_time <= 0.0:
+            return 1.0
+        decay_constant = log(2.0) / self._product_half_life_s()
         return float(exp(-decay_constant * self.cooling_time))
 
     @property
@@ -475,8 +468,8 @@ class SpectrumUnfolder:
         reaction: str,
         activity_Bq: float,
         uncertainty_Bq: float = 0.0,
-        saturation_factor: float = 1.0,
-        decay_factor: float = 1.0,
+        saturation_factor: Optional[float] = None,
+        decay_factor: Optional[float] = None,
         rate_per_atom: Optional[float] = None,
         **kwargs,
     ) -> None:
@@ -491,10 +484,10 @@ class SpectrumUnfolder:
             Measured activity at EOI in Bq
         uncertainty_Bq : float
             Uncertainty in Bq
-        saturation_factor : float
-            Saturation correction
-        decay_factor : float
-            Decay correction
+        saturation_factor : float, optional
+            Saturation correction (else derived from ``irradiation_time``)
+        decay_factor : float, optional
+            Decay correction (else derived from ``cooling_time``; 1 at EOI)
         rate_per_atom : float, optional
             Pre-normalized reaction rate in reactions/atom/s. Use this when the
             upstream workflow already converted activity to reaction rate.
@@ -962,6 +955,7 @@ class SpectrumUnfolder:
         n_uncertainty_samples: int = 50,
         uncertainty_seed: Optional[int] = 0,
         default_relative_uncertainty: Optional[float] = None,
+        allow_activity_as_rate: bool = False,
     ) -> UnfoldingResult:
         """
         Perform spectrum unfolding.
@@ -1016,6 +1010,10 @@ class SpectrumUnfolder:
             Relative uncertainty to assume for measurements that carry none.
             Without it, such measurements raise ``ValueError``; the value used
             is recorded in the result metadata.
+        allow_activity_as_rate : bool
+            Use raw activity (Bq) as the observable for measurements lacking
+            mass/timing normalization. Only meaningful for relative spectral
+            shape; affected rows are listed in the metadata.
 
         Returns
         -------
@@ -1036,14 +1034,20 @@ class SpectrumUnfolder:
         measured_rates = []
         rate_uncertainties = []
         defaulted_uncertainty_rows: List[str] = []
+        activity_proxy_rows: List[str] = []
         for m in self.measurements:
             if m.reaction in valid_reactions:
-                rate_value = float(m.reaction_rate_per_atom)
-                if rate_value <= 0.0 and float(m.activity_Bq) > 0.0:
-                    # Preserve historical behavior for synthetic/legacy fixtures:
-                    # when atom-normalization metadata is unavailable, use
-                    # activity as the proxy reaction-rate observable.
+                try:
+                    rate_value = float(m.reaction_rate_per_atom)
+                except ValueError as exc:
+                    if not allow_activity_as_rate:
+                        raise ValueError(
+                            f"{exc}. Supply rate_per_atom, or sample_mass_g with "
+                            "irradiation timing; pass allow_activity_as_rate=True only "
+                            "for relative-shape use of raw activities"
+                        ) from exc
                     rate_value = float(m.activity_Bq)
+                    activity_proxy_rows.append(m.sample_id or m.reaction)
                 measured_rates.append(rate_value)
                 rel_uncertainty = float(m.relative_uncertainty)
                 if rel_uncertainty <= 0.0:
@@ -1359,6 +1363,7 @@ class SpectrumUnfolder:
                     "response_rows": list(getattr(self, "_response_row_metadata", [])),
                     "default_relative_uncertainty": default_relative_uncertainty,
                     "rows_with_default_uncertainty": defaulted_uncertainty_rows,
+                    "activity_used_as_rate_rows": activity_proxy_rows,
                     "stop_reason": getattr(result, "stop_reason", "unspecified"),
                     "tolerance": tolerance,
                     "chi2_tolerance": chi2_tolerance,
@@ -1488,10 +1493,13 @@ def quick_unfold(
     if initial_spectrum is not None:
         unfolder.set_initial_guess(initial_spectrum, source="user")
 
+    # Raw activities are the observable here: the result is a relative
+    # spectral shape only (see UnfoldingResult.metadata).
     return unfolder.unfold(
         method=method,
         use_ml_seed=use_ml_seed,
         ml_seed_threshold=ml_seed_threshold,
+        allow_activity_as_rate=True,
     )
 
 
