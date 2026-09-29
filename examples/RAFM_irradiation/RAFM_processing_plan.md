@@ -24,7 +24,7 @@ This runbook defines how to process RAFM irradiation gamma spectra in FluxForge 
 2. Resolve calibration and efficiency values.
    - If user overrides are provided, they take precedence.
    - Raw `.ASC` spectra keep their per-file header calibration `Energy = A + B*Ch + C*Ch^2`.
-   - The RAFM example workflow now explicitly overrides raw-file energy calibration with the shared `rafm_25cm` profile calibration `Energy = -1.694 + 0.4996*Ch + 6.710E-08*Ch^2` because the RAFM `@25 cm` QG exports use one common detector calibration for this campaign.
+   - The full RAFM validation workflow opts into the shared `rafm_25cm` profile calibration `Energy = -1.694 + 0.4996*Ch + 6.710E-08*Ch^2` through `metadata/workflow_config.json`. A plain `ingest --profile rafm_25cm` command keeps the raw file's energy calibration.
    - `--profile rafm_25cm` fills the shared 25 cm efficiency, resolution, and background defaults for all RAFM samples and flux wires.
    - The bundled `rafm_25cm` profile matches the QG detector-model coefficients from `RAFM-1_25cm.ANS`:
      - `C1=-20.26`, `C2=10.29`, `C3=-1.655`, `C4=0.08666`
@@ -36,8 +36,10 @@ This runbook defines how to process RAFM irradiation gamma spectra in FluxForge 
    - Alternate modes: `real`, `manual`
    - FluxForge now calibrates/resamples the measured background onto the sample energy grid before subtraction when the sample and background use different energy calibrations.
 4. Propagate subtraction uncertainty per channel:
-   - `net_i = sample_i - f * background_i`
-   - `var_i = sample_i + f^2 * background_i`
+   - `net_i = sample_i - f * background_aligned_i`
+   - `var_i = sigma_sample_i^2 + f^2 * sigma_background_aligned_i^2`
+   - For a background energy interpolation with weights `1-t` and `t`, the aligned channel variance is `(1-t)^2 * sigma_background_j^2 + t^2 * sigma_background_(j+1)^2`.
+   - Interpolated channels can share source background counts. The current per-channel artifact records their diagonal uncertainties; ROI sums do not yet include the resulting cross-channel covariance. Treat ROI uncertainty and derived activity uncertainty as provisional until that covariance is included.
 5. Continue analysis using signed counts for storage and uncertainty propagation.
    - SNIP uses an internal offset working copy for background estimation, then shifts the background estimate back to physical space.
 6. Perform peak detection, fitting, isotope assignment, and activity calculations.
@@ -165,12 +167,15 @@ This runbook defines how to process RAFM irradiation gamma spectra in FluxForge 
 - If background subtraction is enabled and no background spectrum is supplied, FluxForge warns and proceeds with raw counts.
 - `--profile rafm_25cm` avoids that warning for RAFM example data by supplying the shared background file automatically.
 - Background subtraction can produce negative bins. In `hybrid` mode this is expected and retained for uncertainty accounting.
+- If live or real acquisition time is absent or non-positive, subtraction now stops rather than assuming a scale factor. Check the source header or use an explicitly justified manual scale.
 - SNIP no longer clips RAFM background-subtracted spectra before background estimation; it uses an internal offset instead.
 - Final corrected CSV export requires usable efficiency coefficients. If they are missing, FluxForge warns and skips that export.
 
 ## Recommended RAFM Batch Command
+From the repository root, using the checked-in source without an editable install:
+
 ```bash
-python -m fluxforge.cli.app ingest-batch \
+PYTHONPATH=src python -m fluxforge.cli.app ingest-batch \
   --input-dir examples/RAFM_irradiation/raw_gamma_spec \
   --profile rafm_25cm \
   --background-scale-mode live \
@@ -205,7 +210,7 @@ The workflow will:
 
 ## Single-Spectrum Export Example
 ```bash
-python -m fluxforge.cli.app ingest \
+PYTHONPATH=src python -m fluxforge.cli.app ingest \
   --input examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC \
   --profile rafm_25cm \
   --output examples/RAFM_irradiation/results/spectrum_artifacts/RAFM4/RAFM4-B_15dEOI.json \
@@ -215,10 +220,10 @@ python -m fluxforge.cli.app ingest \
 
 ## Explicit Override Example
 ```bash
-python -m fluxforge.cli.app ingest \
+PYTHONPATH=src python -m fluxforge.cli.app ingest \
   --input examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC \
   --profile rafm_25cm \
-  --efficiency-coefficients "-3.743,2.167,-0.3724,0.02036,0.296" \
+  --efficiency-coefficients=-3.743,2.167,-0.3724,0.02036,0.296 \
   --output examples/RAFM_irradiation/results/spectrum_artifacts/RAFM4/RAFM4-B_15dEOI.json \
   --save-final-corrected examples/RAFM_irradiation/results/final_corrected/RAFM4/RAFM4-B_15dEOI_final_corrected.csv
 ```

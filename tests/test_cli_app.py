@@ -2482,6 +2482,49 @@ def test_ingest_real_spectrum_formats_with_manual_background(
     assert spectrum["metadata"]["efficiency"]["C1"] == 1.0
 
 
+def test_rafm_runbook_profile_ingest_uses_background_and_file_energy(tmp_path):
+    output = tmp_path / "co-cd-spectrum.json"
+    args = app.build_parser().parse_args(
+        [
+            "ingest",
+            "--input",
+            str(
+                ROOT
+                / "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC"
+            ),
+            "--profile",
+            "rafm_25cm",
+            "--output",
+            str(output),
+        ]
+    )
+    args.func(args)
+    spectrum = json.loads(output.read_text(encoding="utf-8"))["spectrum"]
+    assert spectrum["calibration"]["energy"] == pytest.approx([0.541, 0.498, 2.605e-07])
+    assert spectrum["metadata"]["efficiency"]["C1"] == pytest.approx(-20.26)
+    assert spectrum["metadata"]["background_subtraction"]["scale_factor"] == 9.0
+
+
+def test_rafm_runbook_negative_efficiency_override_parses():
+    args = app.build_parser().parse_args(
+        [
+            "ingest",
+            "--input",
+            "examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC",
+            "--profile",
+            "rafm_25cm",
+            "--efficiency-coefficients=-3.743,2.167,-0.3724,0.02036,0.296",
+        ]
+    )
+    assert app._parse_efficiency_override(args.efficiency_coefficients) == {
+        "C1": -3.743,
+        "C2": 2.167,
+        "C3": -0.3724,
+        "C4": 0.02036,
+        "DetModel": 0.296,
+    }
+
+
 def test_cmd_ingest_writes_optional_adjusted_and_final_exports(
     monkeypatch, tmp_path, capsys
 ):

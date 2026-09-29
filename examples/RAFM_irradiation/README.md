@@ -28,6 +28,9 @@ Equivalent script:
 python examples/RAFM_irradiation/run_validation.py --no-fail
 ```
 
+See the [RAFM processing runbook](RAFM_processing_plan.md) for single-spectrum
+ingest, explicit overrides, output locations, and warning interpretation.
+
 Typical outputs:
 
 - analysis JSON bundles
