@@ -332,3 +332,14 @@ def test_body_owns_input_arrays():
     energies[0] = float("nan")
     assert shielding.key == key
     assert shielding.total_cross_section_barn == (1.0, 2.0)
+
+
+def test_large_uncertainty_floor_does_not_scale_weighted_mean():
+    rows = np.ones((2, 2))
+    result = SpectrumUnfolder.__new__(
+        SpectrumUnfolder
+    )._aggregate_duplicate_reaction_rows(
+        rows, ["r", "r"], np.array([2.0, 4.0]), np.array([1.0, 2.0]), floor=100.0
+    )
+    np.testing.assert_array_equal(result["measurements"], [3.0])
+    np.testing.assert_allclose(result["uncertainties"], [100.0 / np.sqrt(2.0)])

@@ -943,7 +943,7 @@ class SpectrumUnfolder:
             weights = (scale / sigmas) ** 2
             weight_sum = float(np.sum(weights))
             aggregated_measurement = float(
-                np.sum(weights * measured_rates[indices]) / max(weight_sum, floor)
+                np.sum(weights * measured_rates[indices]) / weight_sum
             )
             aggregated_uncertainty = float(scale / np.sqrt(weight_sum))
             if len(indices) == 1:
