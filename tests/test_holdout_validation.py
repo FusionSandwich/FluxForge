@@ -67,3 +67,32 @@ def test_standardized_holdout_chi2_is_calibrated_with_shared_errors() -> None:
         y = a @ truth + lv @ rng.standard_normal(6)
         chi2.append(predict_holdouts(a, y, p, c, v, [4, 5]).holdout_standardized_chi2)
     assert np.mean(chi2) == pytest.approx(2.0, rel=0.06)
+
+
+def test_noiseless_holdout_keeps_prior_predictive_uncertainty() -> None:
+    a = np.array([[1.0], [2.0]])
+    y = np.array([1.1, 2.0])
+    p = np.array([1.0])
+    c = np.array([[1.0]])
+    v = np.diag([0.1, 0.0])
+    out = predict_holdouts(a, y, p, c, v, [1])
+    assert out.holdout_mean[0] == pytest.approx(2.0 * (1.0 + 0.1 / 1.1))
+    assert out.holdout_covariance[0, 0] == pytest.approx(4.0 * (1.0 - 1.0 / 1.1))
+    assert np.isfinite(out.holdout_standardized_chi2)
+
+
+def test_deterministic_holdout_has_no_standardized_chi2() -> None:
+    with pytest.raises(ValueError, match="positive finite predictive variance"):
+        predict_holdouts(
+            np.array([[1.0], [0.0]]), np.array([1.0, 0.0]),
+            np.array([1.0]), np.array([[1.0]]),
+            np.diag([0.1, 0.0]), [1],
+        )
+
+
+def test_holdout_index_rejects_truncation_and_duplicates() -> None:
+    a, p, c, v, rates = _problem()
+    with pytest.raises(ValueError, match="integer row indices"):
+        predict_holdouts(a, rates, p, c, v, [4.9])
+    with pytest.raises(ValueError, match="repeat"):
+        predict_holdouts(a, rates, p, c, v, [4, 4])

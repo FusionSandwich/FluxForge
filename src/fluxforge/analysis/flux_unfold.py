@@ -848,6 +848,16 @@ class GLSUnfoldResult:
     chi2: float
     reactions: List[FluxWireReaction]
     method: str = "GLS"
+    prior_flux: Optional[np.ndarray] = None
+    prior_covariance: Optional[np.ndarray] = None
+    observation_covariance: Optional[np.ndarray] = None
+    response_matrix: Optional[np.ndarray] = None
+    measured_rates: Optional[np.ndarray] = None
+    predicted_rates: Optional[np.ndarray] = None
+    postfit_residuals: Optional[np.ndarray] = None
+    postfit_observation_chi2: Optional[float] = None
+    response_rank: Optional[int] = None
+    diagnostic_only: bool = True
 
 
 def unfold_gls(
@@ -862,7 +872,11 @@ def unfold_gls(
     min_relative_uncertainty: float = 0.10,
 ) -> GLSUnfoldResult:
     """
-    Perform GLS spectrum adjustment unfolding.
+    Reproduce the historical reaction-label Gaussian GLS diagnostic.
+
+    This path does not use a physical sample/Cd response or ``cross_sections``.
+    Its absolute covariance floor and prior-innovation ``chi2`` preclude a
+    physical validation claim. Use ``unfold_gls_physical`` for qualified inputs.
 
     Uses Generalized Least Squares to adjust a prior spectrum to match
     the measured reaction rates.
@@ -881,7 +895,7 @@ def unfold_gls(
     prior_uncertainty : float
         Relative uncertainty on prior (as multiplicative factor)
     cross_sections : dict, optional
-        Pre-loaded group cross sections
+        Accepted for historical API compatibility; not used by this diagnostic.
     regularization : float
         Small value added to covariance diagonals for stability
     min_relative_uncertainty : float
@@ -981,6 +995,19 @@ def unfold_gls(
         chi2=chi2,
         reactions=valid_reactions,
         method="GLS",
+        prior_flux=prior_flux.copy(),
+        prior_covariance=prior_cov.copy(),
+        observation_covariance=measurement_cov.copy(),
+        response_matrix=response.copy(),
+        measured_rates=measurements.copy(),
+        predicted_rates=response @ phi_hat,
+        postfit_residuals=measurements - response @ phi_hat,
+        postfit_observation_chi2=float(
+            (measurements - response @ phi_hat)
+            @ np.linalg.pinv(measurement_cov)
+            @ (measurements - response @ phi_hat)
+        ),
+        response_rank=int(np.linalg.matrix_rank(response)),
     )
 
 

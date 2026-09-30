@@ -1,23 +1,16 @@
 """
 Neutron spectrum unfolding via Iterative Bayesian Unfolding (PyUnfold).
 
-This module implements an *optional* cross-check solver for **Stage G**
-of FluxForge: unfolding the neutron flux spectrum from activation
-reaction-rate measurements.
+This optional wrapper runs PyUnfold on probability/count inputs. Activation
+reaction rates and cross-section responses are dimensionful and cannot be
+passed directly as a physical neutron-flux comparator.
 
 It wraps the PyUnfold library (D'Agostini iterative Bayesian unfolding)
 and provides a FluxForge-idiomatic interface.
 
 Library dependency
 ------------------
-Requires the optional ``pyunfold`` package (pip install pyunfold).
-
-Usage example
--------------
->>> from fluxforge.unfold.neutron_ibu import NeutronUnfolderIBU
->>> solver = NeutronUnfolderIBU()
->>> result = solver.solve(reaction_rates, response_bundle, prior_flux)
->>> print(result.unfolded_flux)
+Requires the optional ``pyunfold`` package.
 """
 
 from __future__ import annotations
@@ -45,7 +38,7 @@ except ImportError:  # pragma: no cover
 def _require_pyunfold() -> None:
     if not _HAS_PYUNFOLD:
         raise ImportError(
-            "NeutronUnfolderIBU requires PyUnfold. Install with: pip install pyunfold"
+            "NeutronUnfolderIBU requires the optional PyUnfold package"
         )
 
 
@@ -65,13 +58,13 @@ class NeutronIBUResult:
     Attributes
     ----------
     unfolded_flux : np.ndarray
-        Posterior estimate of the neutron flux spectrum, shape (N_groups,).
+        Legacy field name for PyUnfold's cause-count estimate, not flux.
     statistical_uncertainty : np.ndarray
-        Statistical (Poisson) uncertainty on unfolded_flux.
+        Statistical uncertainty on the unfolded cause distribution.
     systematic_uncertainty : np.ndarray
         Systematic uncertainty from response matrix statistics.
     flux_covariance : np.ndarray | None
-        Full covariance matrix if available, shape (N_groups, N_groups).
+        None: PyUnfold returns marginal errors, not full covariance.
     n_iterations : int
         Number of unfolding iterations performed.
     test_statistic : float
@@ -97,6 +90,11 @@ class NeutronIBUResult:
             self.unfolded_flux,
         )
 
+    @property
+    def cause_counts(self) -> np.ndarray:
+        """PyUnfold's unfolded cause distribution in count units."""
+        return self.unfolded_flux
+
 
 # ---------------------------------------------------------------------------
 # Main class
@@ -105,20 +103,20 @@ class NeutronUnfolderIBU:
     """
     Neutron flux unfolder using PyUnfold (D'Agostini Iterative Bayesian).
 
-    This solver provides an independent cross-check to the primary STAYSL-style
-    generalized least-squares (GLS) solver.  It is guaranteed to produce
-    non-negative fluxes and handles non-Gaussian priors gracefully.
+    This wrapper is usable for PyUnfold's cause/effect count model. It is not
+    a physical activation-spectrum comparator until a qualified adapter maps
+    rates and covariance into that model.
 
     The mapping of FluxForge concepts to PyUnfold inputs is:
 
     +-----------------------+---------------------------+
     | FluxForge             | PyUnfold                  |
     +=======================+===========================+
-    | Reaction rates        | data (effects / counts)   |
+    | Effect counts         | data                      |
     +-----------------------+---------------------------+
-    | Cross-section matrix  | response (mixing matrix)  |
+    | Conditional P(E|C)    | response                  |
     +-----------------------+---------------------------+
-    | Prior neutron flux    | prior / efficiencies      |
+    | Cause distribution    | prior                     |
     +-----------------------+---------------------------+
 
     Parameters
@@ -166,30 +164,42 @@ class NeutronUnfolderIBU:
         Parameters
         ----------
         reaction_rates : ReactionRates
-            Measured SigPhi values and uncertainties.
+            Effect counts and uncertainties, marked ``quantity='effect_counts'``.
         response : ResponseBundle
-            Energy-dependent cross-section mixing matrix.
+            Conditional probabilities, marked
+            ``quantity='conditional_probability'``.
         prior_flux : np.ndarray, optional
-            A priori neutron flux (e.g., from OpenMC). If None, a uniform
-            prior is used internally.
+            Prior cause distribution. If None, PyUnfold uses a uniform prior.
         efficiencies : np.ndarray, optional
-            Detection efficiencies per energy group. If None, assumed 1.0.
+            Detection efficiencies per cause bin; required.
         efficiencies_err : np.ndarray, optional
-            Efficiency uncertainties. If None, assumed 1% of efficiency.
+            Efficiency uncertainties; required.
         response_err : np.ndarray, optional
-            Uncertainties on response matrix. If None, assumed 5% relative.
+            Probability-response uncertainties; required.
 
         Returns
         -------
         NeutronIBUResult
-            Unfolded flux, uncertainties, covariance, and diagnostics.
+            Cause-count estimate, marginal uncertainties, and diagnostics.
         """
         # --- Unpack inputs ---
         data = require_nonnegative("data", reaction_rates.values).reshape(-1)
         data_err = require_nonnegative("data_err", reaction_rates.uncertainties).reshape(-1)
 
+        if reaction_rates.quantity != "effect_counts" or response.quantity != "conditional_probability":
+            raise ValueError(
+                "PyUnfold requires effect_counts and conditional_probability inputs; "
+                "activation rates/cross sections need a qualified adapter"
+            )
+        if response_err is None or efficiencies is None or efficiencies_err is None:
+            raise ValueError(
+                "Explicit response_err, efficiencies, and efficiencies_err are required"
+            )
+
         R = require_nonnegative("response", response.matrix)
         n_effects, n_causes = R.shape
+        if np.any(R > 1):
+            raise ValueError("Conditional response entries must be probabilities <= 1")
 
         if data.shape[0] != n_effects:
             raise ValueError(
@@ -198,31 +208,26 @@ class NeutronUnfolderIBU:
             )
 
         # --- Response uncertainty ---
-        if response_err is not None:
-            R_err = require_nonnegative("response_err", response_err)
-            if R_err.shape != R.shape:
-                raise ValueError("response_err shape must match the response shape")
-        else:
-            R_err = np.abs(R) * 0.05  # default 5% relative
+        R_err = require_nonnegative("response_err", response_err)
+        if R_err.shape != R.shape:
+            raise ValueError("response_err shape must match the response shape")
 
         # --- Efficiencies (detection efficiency per cause bin) ---
-        if efficiencies is not None:
-            eff = require_nonnegative("efficiencies", efficiencies).reshape(-1)
-        else:
-            eff = np.ones(n_causes, dtype=float)
+        eff = require_nonnegative("efficiencies", efficiencies).reshape(-1)
         if eff.size != n_causes:
             raise ValueError(
                 f"efficiencies size {eff.size} != response columns {n_causes}"
             )
 
-        if efficiencies_err is not None:
-            eff_err = require_nonnegative("efficiencies_err", efficiencies_err).reshape(-1)
-        else:
-            eff_err = eff * 0.01
+        eff_err = require_nonnegative("efficiencies_err", efficiencies_err).reshape(-1)
         if eff_err.size != n_causes:
             raise ValueError(
                 f"efficiencies_err size {eff_err.size} != response columns {n_causes}"
             )
+        if np.any(eff <= 0) or np.any(eff > 1) or not np.allclose(
+            np.sum(R, axis=0), eff, rtol=1e-8, atol=1e-12
+        ):
+            raise ValueError("Efficiencies must equal positive response column sums <= 1")
 
         # --- Prior ---
         if prior_flux is not None:
@@ -232,6 +237,8 @@ class NeutronUnfolderIBU:
                     f"prior_flux size {prior.size} != response columns {n_causes}"
                 )
             # Normalize to be a probability distribution
+            if not np.any(prior > 0):
+                raise ValueError("Prior cause distribution must have positive mass")
             prior = prior / np.sum(prior)
         else:
             prior = None  # PyUnfold will use uniform
@@ -257,31 +264,27 @@ class NeutronUnfolderIBU:
         stat_err = np.asarray(result["stat_err"], dtype=float)
         sys_err = np.asarray(result["sys_err"], dtype=float)
 
-        # PyUnfold doesn't directly return full covariance; approximate from uncertainties
-        total_var = stat_err**2 + sys_err**2
-        cov = np.diag(total_var)
-
         return NeutronIBUResult(
             unfolded_flux=unfolded,
             statistical_uncertainty=stat_err,
             systematic_uncertainty=sys_err,
-            flux_covariance=cov,
+            flux_covariance=None,
             n_iterations=int(result.get("num_iterations", 0)),
             test_statistic=float(result.get("ts_iter", 0.0)),
             unfolding_matrix=result.get("unfolding_matrix"),
             diagnostics=merge_flux_diagnostics(
                 {
-                    k: v
-                    for k, v in result.items()
-                    if k
-                    not in (
-                        "unfolded",
-                        "stat_err",
-                        "sys_err",
-                        "num_iterations",
-                        "ts_iter",
-                        "unfolding_matrix",
-                    )
+                    **{
+                        k: v
+                        for k, v in result.items()
+                        if k not in (
+                            "unfolded", "stat_err", "sys_err",
+                            "num_iterations", "ts_iter", "unfolding_matrix",
+                        )
+                    },
+                    "output_quantity": "cause_counts",
+                    "physical_activation_comparator": False,
+                    "covariance_status": "full covariance unavailable; marginal errors only",
                 },
                 unfolded,
                 negative_policy="bayesian_posterior_nonnegative",
@@ -298,24 +301,33 @@ class NeutronUnfolderIBU:
         ibu_result: NeutronIBUResult,
         *,
         rtol: float = 0.25,
+        comparison_kind: str = "",
     ) -> Dict:
         """
-        Compare IBU result to a GLS solution.
+        Compare synthetic cause-count vectors after explicit basis assertion.
 
         Parameters
         ----------
         gls_flux : np.ndarray
-            Flux spectrum from GLS solver.
+            Synthetic cause-count estimate to compare.
         ibu_result : NeutronIBUResult
             Result from :meth:`solve`.
         rtol : float
             Relative tolerance for agreement (default 25%).
+        comparison_kind : str
+            Must be ``synthetic_cause_counts``. Physical flux cannot be
+            compared directly to PyUnfold's cause-count output.
 
         Returns
         -------
         dict
             Comparison diagnostics including agreement flag.
         """
+        if comparison_kind != "synthetic_cause_counts":
+            raise ValueError(
+                "Comparison requires an explicit synthetic cause-count basis; "
+                "PyUnfold output is not physical neutron flux"
+            )
         gls = np.asarray(gls_flux, dtype=float)
         ibu = ibu_result.unfolded_flux
 

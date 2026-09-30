@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import math
 import re
@@ -3780,8 +3781,8 @@ def cd_ratio_rows(
     R_Cd = R_bare / R_Cd for the same reaction on paired bare and Cd-covered
     wires. Rates are already normalized for target atoms, irradiation history
     and decay, so wire masses and count dates cancel correctly. The
-    uncertainty combines both rows' total relative uncertainties in
-    quadrature (conservative: shared components would partly cancel).
+    uncertainty propagates each row's marginal rate uncertainty and removes
+    shared covariance when component budgets identify a common source.
     """
     by_key = {
         normalize_pairing_key(item["sample_id"], metadata.pairing_aliases): item
@@ -3792,11 +3793,12 @@ def cd_ratio_rows(
     configured_ranges = metadata.config.get("cd_ratio_expected_ranges", {})
     default_review_min = float(metadata.config.get("cd_ratio_default_review_min", 1.10))
 
-    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float]]:
+    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float, Optional[Dict[str, Any]]]]:
         return {
             str(row["reaction_id"]): (
                 float(row.get("reaction_rate") or 0.0),
                 float(row.get("reaction_rate_unc") or 0.0),
+                row.get("uncertainty_budget") or row.get("rate_uncertainty_budget"),
             )
             for row in artifact.get("reactions", [])
             if "Unknown(" not in str(row.get("reaction_id"))
@@ -3817,14 +3819,31 @@ def cd_ratio_rows(
         if expected_min is None and material in {"Cu", "Sc"}:
             expected_min = default_review_min
         for reaction_id in sorted(set(bare_rates) & set(cd_rates)):
-            bare_rate, bare_unc = bare_rates[reaction_id]
-            cd_rate, cd_unc = cd_rates[reaction_id]
+            bare_rate, bare_unc, bare_budget = bare_rates[reaction_id]
+            cd_rate, cd_unc, cd_budget = cd_rates[reaction_id]
             ratio = bare_rate / cd_rate if bare_rate > 0 and cd_rate > 0 else None
-            ratio_unc = (
-                ratio * math.hypot(bare_unc / bare_rate, cd_unc / cd_rate)
-                if ratio is not None
-                else None
-            )
+            shared_covariance = 0.0
+            missing_uncertainty_components: List[str] = ["budget_unavailable"]
+            if ratio is not None and isinstance(bare_budget, dict) and isinstance(cd_budget, dict):
+                budgets = [
+                    RateUncertaintyBudget(
+                        row_id=str(budget["row_id"]), rate=rate,
+                        components=[UncertaintyComponent(**item) for item in budget["components"]],
+                    )
+                    for budget, rate in ((bare_budget, bare_rate), (cd_budget, cd_rate))
+                ]
+                shared_covariance = float(rate_covariance(budgets)[0, 1])
+                missing_uncertainty_components = sorted(set(budgets[0].missing + budgets[1].missing))
+            if ratio is None:
+                ratio_unc = None
+            else:
+                relative_variance = (
+                    (bare_unc / bare_rate) ** 2 + (cd_unc / cd_rate) ** 2
+                    - 2 * shared_covariance / (bare_rate * cd_rate)
+                )
+                if relative_variance < -1e-12:
+                    raise ValueError("Cd ratio component covariance exceeds marginal uncertainty")
+                ratio_unc = ratio * math.sqrt(max(relative_variance, 0.0))
             flag_review = ratio is None or (
                 (expected_min is not None and ratio < float(expected_min))
                 or (expected_max is not None and ratio > float(expected_max))
@@ -3845,6 +3864,8 @@ def cd_ratio_rows(
                     "cd_rate_per_atom_s": cd_rate,
                     "cd_ratio": ratio,
                     "cd_ratio_unc": ratio_unc,
+                    "shared_rate_covariance": shared_covariance,
+                    "missing_uncertainty_components": ";".join(missing_uncertainty_components),
                     "basis": "per-target-atom EOI reaction rates",
                     "expected_cd_ratio_min": (
                         None if expected_min is None else float(expected_min)
@@ -4099,6 +4120,7 @@ def adapt_unfold_result(
     predicted_rates: np.ndarray,
     chi2: float,
     metadata_dict: Optional[Dict[str, Any]] = None,
+    initial_guess_source: str = "unspecified",
 ) -> UnfoldingResult:
     measured_rates = np.array(
         [reaction.reaction_rate for reaction in reactions], dtype=float
@@ -4113,10 +4135,10 @@ def adapt_unfold_result(
         predicted_rates=np.asarray(predicted_rates, dtype=float),
         chi_squared=float(chi2),
         iterations=1,
-        converged=True,
+        converged=False,
         method=method,
-        initial_guess_source="VITAMIN-J prior",
-        metadata=metadata_dict or {},
+        initial_guess_source=initial_guess_source,
+        metadata={"diagnostic_only": True, "physical_validation": False, **(metadata_dict or {})},
     )
 
 
@@ -4133,6 +4155,24 @@ def simplified_response_matrix(
 def method_overlay_plot(results: Dict[str, UnfoldingResult], output_path: Path) -> None:
     if not HAS_MATPLOTLIB or not results:
         return
+    reference = next(iter(results.values()))
+    required = ("observation_ids", "prior_flux", "uncertainty_model")
+    for result in results.values():
+        if (
+            not result.converged
+            or result.metadata.get("diagnostic_only")
+            or not result.metadata.get("physical_validation")
+            or any(key not in result.metadata for key in required)
+            or result.metadata["observation_ids"] != reference.metadata.get("observation_ids")
+            or result.metadata["uncertainty_model"] != reference.metadata.get("uncertainty_model")
+            or not np.array_equal(result.energy_edges, reference.energy_edges)
+            or not np.array_equal(result.response_matrix, reference.response_matrix)
+            or not np.array_equal(result.measured_rates, reference.measured_rates)
+        ):
+            raise ValueError(
+                "Method overlay requires converged, physically admitted results "
+                "with one observation set, response operator, energy grid, and uncertainty model"
+            )
     fig, ax = plt.subplots(figsize=(11, 6))
     for method, result in results.items():
         energies = np.sqrt(result.energy_edges[:-1] * result.energy_edges[1:]) / 1e6
@@ -4154,6 +4194,7 @@ def save_unfolding_artifacts(
     result: UnfoldingResult,
     prior_flux: np.ndarray,
     output_root: Path,
+    reference_label: Optional[str] = None,
 ) -> None:
     slug = result.method.lower()
     payload = {
@@ -4164,9 +4205,10 @@ def save_unfolding_artifacts(
         "reactions_used": result.reactions_used,
         "measured_rates": result.measured_rates.tolist(),
         "predicted_rates": result.predicted_rates.tolist(),
-        "chi_squared": result.chi_squared,
+        "chi_squared": None if result.metadata.get("diagnostic_only") else result.chi_squared,
         "iterations": result.iterations,
         "converged": result.converged,
+        "initial_guess_source": result.initial_guess_source,
         "metadata": result.metadata,
     }
     save_json(payload, output_root / f"{slug}.json")
@@ -4188,7 +4230,7 @@ def save_unfolding_artifacts(
     plot_spectrum_comparison(
         result,
         reference_flux=prior_flux,
-        reference_label="VITAMIN-J prior",
+        reference_label=reference_label or result.initial_guess_source,
         title=f"{result.method} spectrum vs prior",
         save_path=plots_root / f"{slug}_spectrum.png",
     )
@@ -4236,19 +4278,73 @@ def run_flux_wire_unfolding(
     ``min_relative_uncertainty`` is an explicit lower bound on the rate
     uncertainty passed to GRAVEL/MLEM; it is recorded in each result's metadata.
     """
+    excluded_reactions = [
+        {
+            "observation_id": f"{reaction.sample_id}|{reaction.reaction_id}",
+            "sample_id": reaction.sample_id,
+            "reaction_id": reaction.reaction_id,
+            "activity_Bq": reaction.activity_bq,
+            "reaction_rate_per_atom_s": reaction.reaction_rate,
+            "reaction_rate_unc_per_atom_s": reaction.reaction_rate_unc,
+            "admission_status": "provisional_excluded",
+            "reason": "Ni-57 absent from processed QG report; raw line and calibration admission unresolved (#192)",
+        }
+        for reaction in reactions
+        if str(reaction.sample_id).lower().startswith("ni-rafm-1")
+        and "ni-57" in reaction.reaction_id.lower()
+    ]
     valid_reactions = [
         reaction
         for reaction in reactions
         if reaction.reaction_rate > 0 and "Unknown(" not in reaction.reaction_id
+        and not (
+            str(reaction.sample_id).lower().startswith("ni-rafm-1")
+            and "ni-57" in reaction.reaction_id.lower()
+        )
     ]
     if not valid_reactions:
+        if excluded_reactions:
+            save_json({
+                "excluded_reactions": excluded_reactions,
+                "sensitivity_status": "not computed: no qualified physical inversion available",
+            }, output_root / "input_admission_review.json")
         return {}
+    save_json({
+        "included_observation_ids": [
+            f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
+        ],
+        "excluded_reactions": excluded_reactions,
+        "sensitivity_status": "not computed: no qualified physical inversion available",
+    }, output_root / "input_admission_review.json")
 
     # Discrete binning is a per-reaction indicator, not an unfolded spectrum,
     # and is deliberately not produced or overlaid as a flux here.
     gls = unfold_gls(valid_reactions, n_groups=20)
-    gls_response = simplified_response_matrix(valid_reactions, gls.energy_bounds_eV)
-    gls_predicted = gls_response @ gls.flux
+    gls_response = gls.response_matrix
+    gls_predicted = gls.predicted_rates
+    gls_metadata = {
+        "response_model": "reaction-label Gaussian placeholder",
+        "response_rank": gls.response_rank,
+        "response_nullity": len(gls.flux) - gls.response_rank,
+        "prior_flux": gls.prior_flux.tolist(),
+        "prior_flux_sha256": hashlib.sha256(
+            np.asarray(gls.prior_flux, dtype="<f8").tobytes()
+        ).hexdigest(),
+        "prior_covariance": gls.prior_covariance.tolist(),
+        "prior_covariance_sha256": hashlib.sha256(
+            np.asarray(gls.prior_covariance, dtype="<f8").tobytes()
+        ).hexdigest(),
+        "prior_hash_encoding": "little-endian float64 row-major bytes",
+        "observation_covariance": gls.observation_covariance.tolist(),
+        "response_matrix": gls_response.tolist(),
+        "measured_rates": gls.measured_rates.tolist(),
+        "predicted_rates": gls_predicted.tolist(),
+        "postfit_residuals": gls.postfit_residuals.tolist(),
+        "postfit_observation_chi2": gls.postfit_observation_chi2,
+        "prior_innovation_chi2": gls.chi2,
+        "observation_ids": [f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions],
+        "excluded_reactions": excluded_reactions,
+    }
     gls_result = adapt_unfold_result(
         "GLS",
         gls.energy_bounds_eV,
@@ -4258,9 +4354,14 @@ def run_flux_wire_unfolding(
         gls_response,
         gls_predicted,
         gls.chi2,
+        metadata_dict=gls_metadata,
+        initial_guess_source="internal equal-lethargy prior",
     )
     prior_gls = parse_prior_spectrum(prior_path, gls.energy_bounds_eV)
-    save_unfolding_artifacts(gls_result, prior_gls, output_root)
+    save_unfolding_artifacts(
+        gls_result, prior_gls, output_root,
+        reference_label="VITAMIN-J plot reference (not inversion prior)",
+    )
 
     iterative_results: Dict[str, UnfoldingResult] = {
         "GLS": gls_result,
@@ -4299,6 +4400,12 @@ def run_flux_wire_unfolding(
         unfolder.set_initial_guess(prior_flux, source="VITAMIN-J prior")
         result = unfolder.unfold(method=method)
         result.metadata["min_relative_uncertainty_applied"] = float(min_relative_uncertainty)
+        result.metadata["excluded_reactions"] = excluded_reactions
+        result.metadata["observation_ids"] = [
+            f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
+        ]
+        result.metadata["physical_validation"] = False
+        result.metadata["diagnostic_only"] = True
         result.metadata["rows_raised_to_min_relative_uncertainty"] = [
             f"{r.sample_id}|{r.reaction_id}"
             for r in valid_reactions
@@ -4307,9 +4414,15 @@ def run_flux_wire_unfolding(
         save_unfolding_artifacts(result, prior_flux, output_root)
         iterative_results[method] = result
 
-    method_overlay_plot(
-        iterative_results,
-        output_root.parent / "plots" / "unfolding" / "method_overlay.png",
+    save_json(
+        {
+            "admitted": False,
+            "reason": "Methods use different response operators, energy grids, priors, or nonconverged diagnostic results (#191)",
+            "methods": {name: {"converged": bool(item.converged),
+                               "diagnostic_only": bool(item.metadata.get("diagnostic_only"))}
+                        for name, item in iterative_results.items()},
+        },
+        output_root / "method_overlay_review.json",
     )
     return iterative_results
 

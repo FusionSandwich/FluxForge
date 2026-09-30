@@ -23,10 +23,14 @@ class ReactionRates:
         Measured reaction rates, shape (N_monitors,).
     uncertainties : np.ndarray
         Absolute 1-sigma uncertainties, same shape.
+    quantity : str
+        Defaults to activation rates. PyUnfold requires explicit
+        ``effect_counts``; this marker does not convert rates to counts.
     """
 
     values: np.ndarray  # Shape (N_monitors,)
     uncertainties: np.ndarray  # Shape (N_monitors,)
+    quantity: str = "activation_rate"
 
 
 @dataclass
@@ -39,10 +43,14 @@ class ResponseBundle:
         Response / mixing matrix, shape (N_monitors, N_groups).
     energy_bins : np.ndarray
         Energy group boundaries in eV, shape (N_groups + 1,).
+    quantity : str
+        Defaults to dimensionful activation response. PyUnfold requires
+        ``conditional_probability``; this marker does not normalize the matrix.
     """
 
     matrix: np.ndarray  # Shape (N_monitors, N_groups)
     energy_bins: np.ndarray  # Shape (N_groups + 1,)
+    quantity: str = "activation_rate_response"
 
 
 @dataclass
