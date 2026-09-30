@@ -499,12 +499,7 @@ class HPGeProcessor:
             mask = (spectrum.channels >= fit_lo) & (spectrum.channels <= fit_hi)
             if np.any(mask):
                 roi_unc = float(
-                    np.sqrt(
-                        np.sum(
-                            np.asarray(spectrum.counts_uncertainty[mask], dtype=float)
-                            ** 2
-                        )
-                    )
+                    np.sqrt(spectrum.weighted_counts_variance(mask.astype(float)))
                 )
                 net_counts_unc = max(net_counts_unc, roi_unc)
 

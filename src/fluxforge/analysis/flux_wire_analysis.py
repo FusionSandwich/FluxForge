@@ -431,6 +431,7 @@ def estimate_peak_area(
     background: np.ndarray,
     fwhm_channels: float = 8.0,
     spectrum_uncertainty: Optional[np.ndarray] = None,
+    spectrum_data: Optional[GammaSpectrum] = None,
 ) -> Tuple[float, float, float]:
     """
     Estimate peak area using simple summation method.
@@ -447,6 +448,9 @@ def estimate_peak_area(
         Full width at half maximum in channels
     spectrum_uncertainty : np.ndarray, optional
         Per-channel uncertainty for propagated counting statistics.
+    spectrum_data : GammaSpectrum, optional
+        The same spectrum, including channel covariance. Takes precedence over
+        diagonal spectrum_uncertainty when calculating counting variance.
 
     Returns
     -------
@@ -457,6 +461,8 @@ def estimate_peak_area(
     gross_counts : float
         Gross counts in ROI
     """
+    if spectrum_data is not None and not np.array_equal(spectrum, spectrum_data.counts):
+        raise ValueError("spectrum_data counts must match the integrated spectrum.")
     ch_min, ch_max = _roi_bounds(peak_channel, fwhm_channels, len(spectrum))
 
     # Sum counts in ROI
@@ -465,7 +471,13 @@ def estimate_peak_area(
 
     net = gross - bg
 
-    if spectrum_uncertainty is not None and len(spectrum_uncertainty) == len(spectrum):
+    if spectrum_data is not None:
+        weights = np.zeros(len(spectrum), dtype=float)
+        weights[ch_min : ch_max + 1] = 1.0
+        roi_var = spectrum_data.weighted_counts_variance(weights)
+    elif spectrum_uncertainty is not None and len(spectrum_uncertainty) == len(
+        spectrum
+    ):
         roi_var = float(
             np.sum(
                 np.asarray(spectrum_uncertainty[ch_min : ch_max + 1], dtype=float) ** 2
@@ -512,6 +524,7 @@ def estimate_peak_area_local_background(
     background_width_channels: int = 1,
     background_gap_fwhm: float = 0.0,
     spectrum_uncertainty: Optional[np.ndarray] = None,
+    spectrum_data: Optional[GammaSpectrum] = None,
 ) -> Tuple[float, float, float, float, Tuple[int, int]]:
     """
     Estimate peak area using a fixed ROI with local sideband background.
@@ -519,8 +532,12 @@ def estimate_peak_area_local_background(
     This mirrors the QG-style ROI accounting more closely than the fit-window
     gross counts used previously. Gross is the ROI sum, and net subtracts a
     locally estimated continuum background from the adjacent sidebands.
+    Supply spectrum_data with the same counts to include channel covariance
+    and ROI/sideband cross terms; it takes precedence over diagonal uncertainty.
     """
     counts = np.asarray(spectrum, dtype=float)
+    if spectrum_data is not None and not np.array_equal(counts, spectrum_data.counts):
+        raise ValueError("spectrum_data counts must match the integrated spectrum.")
     half_width = max(1, int(round(0.5 * roi_width_fwhm * max(fwhm_channels, 1.0))))
     gap_channels = max(0, int(round(background_gap_fwhm * max(fwhm_channels, 1.0))))
     sideband_width = max(1, int(background_width_channels))
@@ -588,7 +605,21 @@ def estimate_peak_area_local_background(
         )
     else:
         gross_var = max(gross, 0.0)
-    net_unc = float(np.sqrt(max(gross_var + background_var, 0.0)))
+    if spectrum_data is not None:
+        # The net ROI is a single linear sum. Correlated ROI/sideband counts
+        # contribute cross terms, including the negative continuum weights.
+        weights = np.zeros(len(counts), dtype=float)
+        weights[ch_min : ch_max + 1] = 1.0
+        if sideband_samples:
+            coefficient = -roi_channels / float(len(sideband_samples))
+            if left_max >= left_min:
+                weights[left_min : left_max + 1] = coefficient
+            if right_max >= right_min:
+                weights[right_min : right_max + 1] = coefficient
+        net_variance = spectrum_data.weighted_counts_variance(weights)
+    else:
+        net_variance = gross_var + background_var
+    net_unc = float(np.sqrt(max(net_variance, 0.0)))
     return net, net_unc, gross, background_sum, (ch_min, ch_max)
 
 
@@ -1556,6 +1587,7 @@ def analyze_raw_spectrum(
             background,
             fwhm_ch,
             spectrum_uncertainty=working_spectrum.counts_uncertainty,
+            spectrum_data=working_spectrum,
         )
         raw_gross, raw_gross_unc = _roi_gross_counts(raw_counts, ch, fwhm_ch)
 
@@ -1833,6 +1865,7 @@ def analyze_raw_spectrum_targeted(
                     background_width_channels=background_width_channels,
                     background_gap_fwhm=background_gap_fwhm,
                     spectrum_uncertainty=spectrum.counts_uncertainty,
+                    spectrum_data=spectrum,
                 )
             )
             roi_lo, roi_hi = roi_bounds

@@ -39,7 +39,8 @@ This runbook defines how to process RAFM irradiation gamma spectra in FluxForge 
    - `net_i = sample_i - f * background_aligned_i`
    - `var_i = sigma_sample_i^2 + f^2 * sigma_background_aligned_i^2`
    - For a background energy interpolation with weights `1-t` and `t`, the aligned channel variance is `(1-t)^2 * sigma_background_j^2 + t^2 * sigma_background_(j+1)^2`.
-   - Interpolated channels can share source background counts. The current per-channel artifact records their diagonal uncertainties; ROI sums do not yet include the resulting cross-channel covariance. Treat ROI uncertainty and derived activity uncertainty as provisional until that covariance is included.
+   - Interpolated channels can share source background counts. `GammaSpectrum` retains their sparse covariance: `C_net = C_sample + f^2 W C_background W.T`, where `W` is the energy interpolation operator. A count sum with weights `a` has variance `a.T C_net a`. Local sideband subtraction includes its negative weights and ROI/sideband cross terms. JSON spectrum artifacts retain optional sparse COO covariance; legacy artifacts without it retain independent-channel uncertainties.
+   - HPGe fitting uses the covariance-aware fit-window counting term as an uncertainty floor. This does not qualify the peak fit or supply a full detector/continuum uncertainty budget; inspect fit results and effective efficiency before interpreting activities. Cross-sample covariance from a shared background is not exported by this counting correction.
 5. Continue analysis using signed counts for storage and uncertainty propagation.
    - SNIP uses an internal offset working copy for background estimation, then shifts the background estimate back to physical space.
 6. Perform peak detection, fitting, isotope assignment, and activity calculations.

@@ -175,7 +175,10 @@ def test_flux_wire_roi_uncertainty_responds_to_background_uncertainty():
 
 
 @pytest.mark.parametrize("counting_method", ["qg", "covell", "gilmore", "iec_tiered"])
-def test_real_rafm_targeted_uncertainty_keeps_propagated_roi_floor(counting_method):
+def test_real_rafm_targeted_uncertainty_keeps_propagated_roi_floor(
+    counting_method,
+    independent_background_sum_variance,
+):
     data = read_raw_asc(SAMPLE_ASC, profile_name="rafm_25cm")
     background = read_raw_asc(BACKGROUND_ASC, profile_name="rafm_25cm").spectrum
     background.counts_uncertainty *= 10.0
@@ -198,12 +201,23 @@ def test_real_rafm_targeted_uncertainty_keeps_propagated_roi_floor(counting_meth
         slope = (
             data.energy_calibration[1] + 2.0 * data.energy_calibration[2] * peak.channel
         )
-        _, roi_unc, _, _, _ = estimate_peak_area_local_background(
+        _, roi_unc, _, _, (lo, hi) = estimate_peak_area_local_background(
             corrected.counts,
             peak.channel,
             peak.fwhm / slope,
             spectrum_uncertainty=corrected.counts_uncertainty,
+            spectrum_data=corrected,
         )
+        weights = np.zeros(len(corrected.counts))
+        weights[lo : hi + 1] = 1.0
+        weights[[lo - 1, hi + 1]] = -(hi - lo + 1) / 2.0
+        expected_variance = independent_background_sum_variance(
+            data.spectrum,
+            background,
+            weights,
+            9.0,
+        )
+        assert roi_unc**2 == pytest.approx(expected_variance)
         assert peak.net_counts_unc >= roi_unc - 1.0e-9
         assert peak.comparison_net_counts_unc < roi_unc
 

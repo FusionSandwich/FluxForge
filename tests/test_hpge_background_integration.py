@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+
 from fluxforge.analysis.hpge_processor import HPGeProcessor
 from fluxforge.io.genie import read_genie_spectrum
 
@@ -17,7 +18,9 @@ BACKGROUND = RAFM_ROOT / "background.ASC"
 @pytest.mark.skipif(
     not SAMPLE.exists() or not BACKGROUND.exists(), reason="RAFM example data absent"
 )
-def test_hpge_processor_uses_measured_background_and_propagated_roi_uncertainty():
+def test_hpge_processor_uses_measured_background_and_propagated_roi_uncertainty(
+    independent_background_sum_variance,
+):
     sample = read_genie_spectrum(SAMPLE)
     background = read_genie_spectrum(BACKGROUND)
     processor = HPGeProcessor()
@@ -36,6 +39,14 @@ def test_hpge_processor_uses_measured_background_and_propagated_roi_uncertainty(
             corrected.spectrum.channels <= fit_hi
         )
         roi_uncertainty = np.sqrt(
+            independent_background_sum_variance(
+                sample,
+                background,
+                mask.astype(float),
+                9.0,
+            )
+        )
+        assert roi_uncertainty > np.sqrt(
             np.sum(corrected.spectrum.counts_uncertainty[mask] ** 2)
         )
         assert line.net_counts_unc >= roi_uncertainty
