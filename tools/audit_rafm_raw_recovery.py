@@ -55,9 +55,89 @@ def replay_sample(
     )
 
 
+def validate_checkpoint(previous, current, selected, output, original_driver_hash):
+    """Reuse only a verified prefix with unchanged scientific code and inputs."""
+    driver = "tools/audit_rafm_raw_recovery.py"
+    assert previous["source_sha256"].keys() == current["source_sha256"].keys()
+    for path, expected in previous["source_sha256"].items():
+        if path == driver and expected != current["source_sha256"][path]:
+            assert original_driver_hash == expected, "Unreviewed original audit driver"
+        else:
+            assert current["source_sha256"][path] == expected, path
+    for key in ("metadata_sha256", "background_sha256", "effective_configuration"):
+        assert previous[key] == current[key], key
+    for name, expected in current.get("runtime_data_sha256", {}).items():
+        if "runtime_data_sha256" in previous:
+            assert previous["runtime_data_sha256"][name] == expected, name
+        else:
+            # Legacy checkpoints lack the external profile byte hash. Require
+            # its semantic identity with the original launch's committed file.
+            original = subprocess.check_output(
+                ["git", "show", f"{previous['git_head']}:{name}"], cwd=ROOT
+            )
+            assert json.loads(original) == json.loads((ROOT / name).read_bytes()), name
+    completed = previous["samples"]
+    assert len(completed) <= len(selected)
+    for row, (raw, qg) in zip(completed, selected):
+        assert row["sample"] == raw.stem
+        assert row["raw_sha256"] == digest(raw)
+        assert row["qg_sha256"] == (digest(qg) if qg else None)
+        artifact_path = output / "raw_iec/analysis_json" / f"{raw.stem}.json"
+        assert Path(row["artifact"]).resolve() == artifact_path.resolve()
+        artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+        assert prediction_digest(artifact) == row["prediction_sha256"]
+        assert artifact["validation"] == row["validation"]
+        assert artifact["measurement_time_audit"] == row["measurement_time_audit"]
+        assert artifact["validation"]["reference_used_for_analysis"] is False
+        for key in ("n_detected_peaks", "n_unidentified_peaks"):
+            assert row[key] == artifact[key], key
+        assert row["n_ambiguous_peaks"] == artifact.get("n_ambiguous_peaks", 0)
+        assert row["isotopes"] == sorted(artifact["isotopes"])
+        assert row["targeted_fit_diagnostics"] == artifact.get(
+            "targeted_fit_diagnostics", []
+        )
+        assert row["report"] == artifact["comparison_report_txt"]
+        if current.get("runtime_data_sha256"):
+            profiles = json.loads(
+                (ROOT / "src/fluxforge/data/rafm_profiles.json").read_bytes()
+            )
+            profile = profiles[current["effective_configuration"]["profile_name"]]
+            effective = artifact["analysis_configuration"]
+            assert (
+                effective["energy_calibration_coefficients"]
+                == profile["energy_calibration"]
+            )
+            assert effective["resolution_coefficients"] == profile["resolution"]
+            for key, value in profile["efficiency"].items():
+                assert effective["efficiency_parameters"][key] == value, key
+    if completed:
+        first = completed[0]
+        assert first["withheld_report_prediction_identical"]
+        withheld_path = (
+            output / "withheld_report/analysis_json" / f"{first['sample']}.json"
+        )
+        withheld = json.loads(withheld_path.read_text(encoding="utf-8"))
+        assert prediction_digest(withheld) == first["prediction_sha256"]
+        assert withheld["validation"]["passed"] is None
+        assert withheld["validation"]["reference_used_for_analysis"] is False
+    return completed
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Verify and resume an interrupted checkpoint",
+    )
+    parser.add_argument(
+        "--original-driver-sha256",
+        help="Reviewed original driver hash when only the audit driver changed",
+    )
+    parser.add_argument(
+        "--reviewed-driver-sha256", help="Pin the reviewed resume driver bytes"
+    )
     parser.add_argument(
         "--all-raw",
         action="store_true",
@@ -100,7 +180,16 @@ def main():
         if args.max_spectra <= 0:
             raise ValueError("max-spectra must be positive")
         selected = selected[: args.max_spectra]
-    output.mkdir(parents=True, exist_ok=False)
+    if args.resume:
+        assert args.reviewed_driver_sha256 == digest(
+            Path(__file__)
+        ), "Resume driver changed after review"
+        assert output.is_dir()
+        assert not (
+            output / "raw_recovery_receipt.json"
+        ).exists(), "Run already terminal"
+    else:
+        output.mkdir(parents=True, exist_ok=False)
     tree = workflow.ensure_results_tree(paths.results_root)
     background = read_raw_asc(
         paths.background_path, profile_name=metadata.config["profile_name"]
@@ -154,6 +243,11 @@ def main():
             for path in sorted(paths.metadata_root.glob("*.json"))
         },
         "background_sha256": digest(paths.background_path),
+        "runtime_data_sha256": {
+            "src/fluxforge/data/rafm_profiles.json": digest(
+                ROOT / "src/fluxforge/data/rafm_profiles.json"
+            )
+        },
         "effective_configuration": metadata.config,
         "samples": [],
         "limits": [
@@ -162,7 +256,23 @@ def main():
             "Raw extraction complete does not mean isotope identification or absolute activities are qualified.",
         ],
     }
+    if args.resume:
+        previous = json.loads(
+            (output / "raw_recovery_progress.json").read_text(encoding="utf-8")
+        )
+        receipt["samples"] = validate_checkpoint(
+            previous, receipt, selected, output, args.original_driver_sha256
+        )
+        receipt["resumed_from"] = {
+            "timestamp_utc": previous["timestamp_utc"],
+            "git_head": previous["git_head"],
+            "source_sha256": previous["source_sha256"],
+            "completed_samples": len(receipt["samples"]),
+            "prior_resume": previous.get("resumed_from"),
+        }
     for index, (raw, qg) in enumerate(selected):
+        if index < len(receipt["samples"]):
+            continue
         assert qg is None or qg.is_file()
         artifact = analyze(raw, qg, tree)
         basis = artifact["validation"]["comparison_basis"]
