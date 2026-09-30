@@ -25,7 +25,10 @@ def test_independent_case_reduces_to_posterior_prediction() -> None:
     y = rates * np.array([1.02, 0.97, 1.01, 1.0, 0.99, 1.03])
     out = predict_holdouts(a, y, p, c, v, [4, 5])
     np.testing.assert_allclose(out.holdout_mean, a[[4, 5]] @ out.fit_flux, rtol=1e-10)
-    expected = a[[4, 5]] @ out.fit_posterior_covariance @ a[[4, 5]].T + v[np.ix_([4, 5], [4, 5])]
+    expected = (
+        a[[4, 5]] @ out.fit_posterior_covariance @ a[[4, 5]].T
+        + v[np.ix_([4, 5], [4, 5])]
+    )
     np.testing.assert_allclose(out.holdout_covariance, expected, rtol=1e-8)
 
 
@@ -35,7 +38,9 @@ def test_correlated_case_matches_direct_joint_gaussian_conditioning() -> None:
     fit, hold = [0, 1, 2, 3], [4, 5]
     s = a @ c @ a.T + v
     innov = y[fit] - a[fit] @ p
-    mean = a[hold] @ p + s[np.ix_(hold, fit)] @ np.linalg.solve(s[np.ix_(fit, fit)], innov)
+    mean = a[hold] @ p + s[np.ix_(hold, fit)] @ np.linalg.solve(
+        s[np.ix_(fit, fit)], innov
+    )
     cov = s[np.ix_(hold, hold)] - s[np.ix_(hold, fit)] @ np.linalg.solve(
         s[np.ix_(fit, fit)], s[np.ix_(fit, hold)]
     )
@@ -81,13 +86,21 @@ def test_noiseless_holdout_keeps_prior_predictive_uncertainty() -> None:
     assert np.isfinite(out.holdout_standardized_chi2)
 
 
-def test_deterministic_holdout_has_no_standardized_chi2() -> None:
-    with pytest.raises(ValueError, match="positive finite predictive variance"):
-        predict_holdouts(
-            np.array([[1.0], [0.0]]), np.array([1.0, 0.0]),
-            np.array([1.0]), np.array([[1.0]]),
-            np.diag([0.1, 0.0]), [1],
-        )
+def test_deterministic_holdout_requires_compatible_data() -> None:
+    args = [
+        np.array([[1.0], [0.0]]),
+        np.array([1.0, 0.0]),
+        np.array([1.0]),
+        np.array([[1.0]]),
+        np.diag([0.1, 0.0]),
+        [1],
+    ]
+    out = predict_holdouts(*args)
+    assert out.holdout_standardized_chi2 == 0.0
+    np.testing.assert_array_equal(out.holdout_covariance, [[0.0]])
+    args[1] = np.array([1.0, 0.1])
+    with pytest.raises(ValueError, match="incompatible with noiseless"):
+        predict_holdouts(*args)
 
 
 def test_holdout_index_rejects_truncation_and_duplicates() -> None:

@@ -2998,21 +2998,29 @@ def build_flux_wire_reactions(
                     UncertaintyComponent(name, additional, None, f"config {name}_relative_uncertainty_additional")
                 )
         floor = max((term[2] for term in model_terms), default=0.0)
+        # Source components can be global, per-wire, or per observation. An
+        # itemized activity specification replaces the opaque reported term;
+        # it is never added a second time. Coverage overlap is rejected below.
+        declared = dict(metadata.config.get("rate_uncertainty_components", {}))
+        declared.update(wire_metadata.get("rate_uncertainty_components", {}))
+        declared.update(metadata.config.get("rate_uncertainty_budgets", {}).get(
+            f"{sample_id}|{reaction_id}", {}))
+        for name, spec in declared.items():
+            kwargs = dict(source=str(spec.get("source", "")),
+                          correlation_group=spec.get("correlation_group"),
+                          covers=tuple(spec.get("covers", ())))
+            component = (UncertaintyComponent(name, float(spec["relative"]), **kwargs)
+                         if "relative" in spec else UncertaintyComponent.from_input(
+                             name, float(spec["standard_uncertainty"]),
+                             float(spec["log_sensitivity"]), **kwargs))
+            components = [c for c in components if c.name != name] + [component]
+
         current = math.sqrt(sum(c.relative**2 for c in components))
         floor_component = floor_as_component(
             "model_floor", current, floor, "config *_model_relative_uncertainty_floor"
         )
         if floor_component is not None:
             components.append(floor_component)
-        for name, spec in dict(metadata.config.get("rate_uncertainty_components", {})).items():
-            components.append(
-                UncertaintyComponent(
-                    name,
-                    float(spec["relative"]),
-                    spec.get("correlation_group", "all_flux_wires"),
-                    str(spec.get("source", "workflow config")),
-                )
-            )
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
@@ -4375,6 +4383,14 @@ def run_flux_wire_unfolding(
                     f"{reaction.sample_id} is Cd-covered but no cd_cover_thickness_cm "
                     "is configured; refusing to unfold it with a bare response"
                 )
+            budget = reaction.uncertainty_budget
+            if budget is not None:
+                floor_component = floor_as_component(
+                    "iterative_rate_floor", budget.total_relative, min_relative_uncertainty,
+                    "explicit run_flux_wire_unfolding min_relative_uncertainty")
+                budget = RateUncertaintyBudget(
+                    budget.row_id, budget.rate,
+                    list(budget.components) + ([floor_component] if floor_component else []), budget.required)
             unfolder.add_reaction(
                 reaction=reaction.reaction_id,
                 activity_Bq=reaction.reaction_rate,
@@ -4383,6 +4399,7 @@ def run_flux_wire_unfolding(
                     min_relative_uncertainty * reaction.reaction_rate,
                 ),
                 rate_per_atom=reaction.reaction_rate,
+                rate_uncertainty_budget=budget,
                 sample_id=reaction.sample_id,
                 cover="Cd" if covered else None,
                 response_spec=(
@@ -4393,7 +4410,9 @@ def run_flux_wire_unfolding(
                         cover=cd_cover,
                     )
                     if covered
-                    else None
+                    else MonitorResponseSpec(
+                        observation_id=f"{reaction.sample_id}|{reaction.reaction_id}",
+                        sample_id=reaction.sample_id, reaction=reaction.reaction_id)
                 ),
             )
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)

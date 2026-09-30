@@ -281,6 +281,9 @@ class TestSpectrumUnfolder(unittest.TestCase):
         )
         unfolder._reaction_list = ["Ti-46(n,p)Sc-46", "Ni-58(n,p)Co-58"]
         unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+        unfolder._build_response_matrix = lambda: (
+            unfolder._response_matrix, unfolder._reaction_list, unfolder._response_unc
+        )
 
         result = unfolder.unfold(
             method="MLEM",
@@ -311,6 +314,9 @@ class TestSpectrumUnfolder(unittest.TestCase):
         unfolder._response_matrix = np.array([[1.0, 1.0, 1.0, 1.0]], dtype=float)
         unfolder._reaction_list = ["Ti-46(n,p)Sc-46"]
         unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+        unfolder._build_response_matrix = lambda: (
+            unfolder._response_matrix, unfolder._reaction_list, unfolder._response_unc
+        )
 
         result = unfolder.unfold(
             method="MLEM",
@@ -354,6 +360,9 @@ class TestSpectrumUnfolder(unittest.TestCase):
         )
         unfolder._reaction_list = ["Ti-46(n,p)Sc-46", "Ni-58(n,p)Co-58"]
         unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+        unfolder._build_response_matrix = lambda: (
+            unfolder._response_matrix, unfolder._reaction_list, unfolder._response_unc
+        )
 
         result = unfolder.unfold(
             method="MLEM",
@@ -406,6 +415,9 @@ class TestSpectrumUnfolder(unittest.TestCase):
             "Ni-58(n,p)Co-58",
         ]
         unfolder._response_unc = np.zeros_like(unfolder._response_matrix)
+        unfolder._build_response_matrix = lambda: (
+            unfolder._response_matrix, unfolder._reaction_list, unfolder._response_unc
+        )
 
         result = unfolder.unfold(
             method="MLEM",

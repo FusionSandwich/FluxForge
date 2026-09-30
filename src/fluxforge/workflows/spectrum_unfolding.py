@@ -19,6 +19,8 @@ References for IRDFF-II:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import hashlib
+from copy import deepcopy
 from math import exp, log
 from pathlib import Path
 import re
@@ -44,6 +46,9 @@ from fluxforge.data.flux_wire_unfolding import (
 from fluxforge.data.group_structures import get_group_structure
 from fluxforge.data.nndc import Isotope
 from fluxforge.physics.monitor_response import MonitorResponseSpec, build_monitor_response
+from fluxforge.physics.monitor_response import _validate_cross_section
+from fluxforge.uncertainty.covariance import covariance_matrix, covariance_factor
+from fluxforge.uncertainty.reaction_rate_budget import RateUncertaintyBudget, rate_covariance as budget_covariance
 from fluxforge.solvers.iterative import gravel, mlem, IterativeSolution
 from fluxforge.unfolding import MLSeedUnfolder, MaxedUnfolder, RMLEUnfolder
 
@@ -144,12 +149,13 @@ class FluxWireMeasurement:
     irradiation_time: float = 0.0
     cooling_time: float = 0.0
     sample_mass_g: Optional[float] = None
-    isotope_abundance: float = 1.0
+    isotope_abundance: Optional[float] = None
     rate_per_atom: Optional[float] = None
     sample_id: Optional[str] = None
     cover: Optional[str] = None
     response_spec: Optional[MonitorResponseSpec] = None
     element_mass_fraction: float = 1.0
+    rate_uncertainty_budget: Optional[RateUncertaintyBudget] = None
 
     @property
     def row_key(self) -> Tuple[str, str, str]:
@@ -173,9 +179,9 @@ class FluxWireMeasurement:
     @property
     def effective_isotope_abundance(self) -> float:
         """Resolved target-isotope abundance fraction."""
-        if not np.isfinite(self.isotope_abundance) or not 0 < self.isotope_abundance <= 1:
-            raise ValueError(f"{self.reaction}: isotope_abundance must be finite and in (0, 1]")
-        if self.isotope_abundance > 0.0 and not np.isclose(self.isotope_abundance, 1.0):
+        if self.isotope_abundance is not None:
+            if not np.isfinite(self.isotope_abundance) or not 0 < self.isotope_abundance <= 1:
+                raise ValueError(f"{self.reaction}: isotope_abundance must be finite and in (0, 1]")
             return float(self.isotope_abundance)
 
         target = self.target_isotope
@@ -194,7 +200,7 @@ class FluxWireMeasurement:
                 if isotope.abundance is not None and isotope.abundance > 0.0:
                     return float(isotope.abundance)
 
-        return float(self.isotope_abundance)
+        raise ValueError(f"{self.reaction}: supply isotope_abundance; natural abundance unavailable")
 
     @property
     def target_atom_count(self) -> float:
@@ -644,11 +650,33 @@ class SpectrumUnfolder:
 
     def _build_response_matrix(self) -> Tuple[np.ndarray, List[str], np.ndarray]:
         """Build response matrix from measurements."""
-        if self._response_matrix is not None and len(self._reaction_list) == len(
-            self.measurements
-        ):
-            return self._response_matrix, self._reaction_list, self._response_unc
-
+        edges = np.asarray(self.energy_edges, dtype=float)
+        if (edges.ndim != 1 or len(edges) < 2 or not np.all(np.isfinite(edges))
+                or np.any(edges <= 0) or np.any(np.diff(edges) <= 0)):
+            raise ValueError("Current energy edges must be finite, positive and strictly increasing")
+        self.n_groups = len(edges) - 1
+        fingerprint = hashlib.sha256()
+        fingerprint.update(str(id(self.irdff_db)).encode())
+        fingerprint.update(edges.astype("<f8").tobytes())
+        def bind(value):
+            fingerprint.update(repr(value).encode("utf-8") + b"\0")
+        def bind_xs(xs):
+            _validate_cross_section(xs)
+            bind((xs.source, xs.source_sha256, xs.evaluation_key, xs.interpolation, xs.threshold_eV))
+            for values in (xs.energies, xs.cross_sections, xs.uncertainties):
+                array = np.asarray(values, dtype="<f8")
+                bind(array.shape)
+                fingerprint.update(array.tobytes())
+        archive = getattr(self.irdff_db, "archive_path", None)
+        bind((str(archive), getattr(self.irdff_db, "expected_archive_sha256", None)))
+        source_digests = {}
+        if archive is not None:
+            for source in (Path(archive), Path(archive).with_name("IRDFF-II.abs.txt")):
+                if source.is_file():
+                    source_digests[source.name] = hashlib.sha256(source.read_bytes()).hexdigest()
+            expected = getattr(self.irdff_db, "expected_archive_sha256", None)
+            if expected and source_digests.get(Path(archive).name) != expected:
+                raise ValueError("Pinned evaluated archive is missing or changed")
         reactions = [m.reaction for m in self.measurements]
         for m in self.measurements:
             covered = m.cover not in (None, "", "bare")
@@ -660,6 +688,33 @@ class SpectrumUnfolder:
                 )
             if m.response_spec is not None and m.response_spec.reaction != m.reaction:
                 raise ValueError("response_spec.reaction must match the measurement reaction")
+            spec = m.response_spec
+            if spec is not None:
+                if spec.cover is not None:
+                    spec.cover.__post_init__()
+                if spec.shielding is not None:
+                    spec.shielding.__post_init__()
+            bind((m.reaction, m.sample_id, m.cover, None if spec is None else
+                  (spec.observation_id, spec.sample_id, spec.physics_key)))
+            xs = self.irdff_db.get_cross_section(m.reaction)
+            if xs is None:
+                raise ValueError(f"No evaluated cross section for {m.reaction}")
+            bind_xs(xs)
+            if archive is not None and xs.source_sha256 :
+                if xs.source_sha256 != source_digests.get(Path(archive).name):
+                    raise ValueError("Evaluated source changed; construct a fresh IRDFFDatabase")
+            if spec is not None and spec.cover is not None:
+                cover_xs = self.irdff_db.get_cover_cross_section(spec.cover.material, spec.cover.attenuation)
+                if cover_xs is None:
+                    raise ValueError("Evaluated cover data is required")
+                bind_xs(cover_xs)
+                if (archive is not None and cover_xs.source_sha256 and
+                        cover_xs.source_sha256 != source_digests.get("IRDFF-II.abs.txt")):
+                    raise ValueError("Evaluated cover source changed; construct a fresh IRDFFDatabase")
+        current_fingerprint = fingerprint.hexdigest()
+        if (getattr(self, "_response_matrix", None) is not None and
+                getattr(self, "_response_fingerprint", None) == current_fingerprint):
+            return self._response_matrix, self._reaction_list, self._response_unc
 
         response, valid_reactions, uncertainties = build_response_matrix(
             reactions=reactions,
@@ -693,6 +748,7 @@ class SpectrumUnfolder:
         self._response_matrix = response
         self._reaction_list = valid_reactions
         self._response_unc = uncertainties
+        self._response_fingerprint = current_fingerprint
 
         return response, valid_reactions, uncertainties
 
@@ -847,6 +903,7 @@ class SpectrumUnfolder:
         row_keys: Optional[Sequence[Any]] = None,
         observation_ids: Optional[Sequence[str]] = None,
         uncertainty_models: Optional[Sequence[Any]] = None,
+        measurement_covariance: Optional[np.ndarray] = None,
     ) -> Dict[str, Any]:
         """
         Aggregate repeated reaction rows using inverse-variance weighting.
@@ -860,6 +917,8 @@ class SpectrumUnfolder:
         would erase small physical differences, especially in cm2/eV units.
         """
         n = len(valid_reactions)
+        covariance = (None if measurement_covariance is None else
+                      covariance_matrix(measurement_covariance, n, "rate covariance"))
         response_matrix = require_nonnegative("response_matrix", response_matrix)
         measured_rates = require_nonnegative("measured_rates", measured_rates)
         rate_uncertainties = require_nonnegative("rate_uncertainties", rate_uncertainties)
@@ -911,6 +970,30 @@ class SpectrumUnfolder:
         memberships = [{"row_indices": indices, "observation_ids": [ids[i] for i in indices]}
                        for indices in groups]
         counts = {_row_key_label(key): len(grouped_indices[key]) for key in order}
+        transform = np.zeros((len(groups), n))
+        for out_index, indices in enumerate(groups):
+            if covariance is None:
+                sigma = np.maximum(rate_uncertainties[indices], floor)
+                weights = (np.min(sigma) / sigma) ** 2
+                weights /= weights.sum()
+            else:
+                block = covariance[np.ix_(indices, indices)]
+                scale = float(np.max(np.abs(block)))
+                ones = np.ones(len(indices))
+                if scale == 0:
+                    weights = ones / len(indices)
+                else:
+                    values, vectors = np.linalg.eigh(block / scale)
+                    positive = values > 20 * len(indices) * np.finfo(float).eps
+                    null_projection = vectors[:, ~positive] @ (vectors[:, ~positive].T @ ones)
+                    if ones @ null_projection > 20 * len(indices) * np.finfo(float).eps:
+                        weights = null_projection / (ones @ null_projection)
+                    else:
+                        inverse_one = (vectors[:, positive] / values[positive]) @ (vectors[:, positive].T @ ones)
+                        weights = inverse_one / (ones @ inverse_one)
+            transform[out_index, indices] = weights
+        aggregated_covariance = (None if covariance is None else
+                                 covariance_matrix(transform @ covariance @ transform.T, len(groups)))
         has_duplicates = any(len(indices) > 1 for indices in groups)
         if not has_duplicates:
             return {
@@ -919,12 +1002,14 @@ class SpectrumUnfolder:
                 "measurements": measured_rates,
                 "uncertainties": rate_uncertainties,
                 "response_uncertainties": response_uncertainties,
+                "measurement_covariance": covariance,
                 "metadata": {
                     "applied": False,
                     "original_rows": int(len(valid_reactions)),
                     "aggregated_rows": int(len(valid_reactions)),
                     "reaction_counts": counts,
                     "memberships": memberships,
+                    "aggregation_matrix": transform.tolist(),
                 },
             }
 
@@ -934,7 +1019,7 @@ class SpectrumUnfolder:
         aggregated_uncertainties: List[float] = []
         aggregated_response_unc_rows: List[np.ndarray] = []
 
-        for indices in groups:
+        for out_index, indices in enumerate(groups):
             representative_idx = indices[0]
             reaction = valid_reactions[representative_idx]
             representative_row = np.asarray(response_matrix[representative_idx], dtype=float)
@@ -949,6 +1034,9 @@ class SpectrumUnfolder:
             if len(indices) == 1:
                 aggregated_measurement = float(measured_rates[representative_idx])
                 aggregated_uncertainty = float(rate_uncertainties[representative_idx])
+            if covariance is not None:
+                aggregated_measurement = float(transform[out_index] @ measured_rates)
+                aggregated_uncertainty = float(np.sqrt(aggregated_covariance[out_index, out_index]))
 
             aggregated_response_rows.append(representative_row)
             aggregated_reactions.append(reaction)
@@ -970,12 +1058,14 @@ class SpectrumUnfolder:
                 if response_uncertainties is not None
                 else None
             ),
+            "measurement_covariance": aggregated_covariance,
             "metadata": {
                 "applied": True,
                 "original_rows": int(len(valid_reactions)),
                 "aggregated_rows": int(len(aggregated_reactions)),
                 "reaction_counts": counts,
                 "memberships": memberships,
+                "aggregation_matrix": transform.tolist(),
             },
         }
 
@@ -999,6 +1089,9 @@ class SpectrumUnfolder:
         uncertainty_seed: Optional[int] = 0,
         default_relative_uncertainty: Optional[float] = None,
         allow_activity_as_rate: bool = False,
+        uncertainty_estimator: str = "converged",
+        rate_covariance: Optional[np.ndarray] = None,
+        require_complete_rate_budget: bool = False,
     ) -> UnfoldingResult:
         """
         Perform spectrum unfolding.
@@ -1109,6 +1202,34 @@ class SpectrumUnfolder:
             rate_uncertainties,
         ).reshape(-1)
 
+        selected = [m for m in self.measurements if m.reaction in valid_reactions]
+        budgets = [m.rate_uncertainty_budget for m in selected]
+        covariance_note = "diagonal reported rate errors; component budget unavailable"
+        observation_covariance = None
+        if any(b is not None for b in budgets):
+            if not all(b is not None for b in budgets):
+                raise ValueError("Supply a rate budget for every observation, or none")
+            for m, budget, rate in zip(selected, budgets, measured_rates):
+                identity = (m.response_spec.observation_id if m.response_spec is not None
+                            else m.sample_id)
+                if budget.row_id != identity or budget.rate != rate:
+                    raise ValueError("Rate budget must bind the current observation identity and rate")
+            observation_covariance = budget_covariance(budgets, require_complete=require_complete_rate_budget)
+            covariance_note = ("source/component coverage complete; scientific admission separate"
+                               if all(b.complete for b in budgets) else "incomplete component budget; diagnostic covariance")
+        elif require_complete_rate_budget:
+            raise ValueError("A complete source/component rate budget is required for every observation")
+        if rate_covariance is not None:
+            supplied = covariance_matrix(rate_covariance, len(measured_rates), "rate_covariance")
+            if observation_covariance is not None and not np.allclose(supplied, observation_covariance, rtol=1e-12, atol=0.):
+                raise ValueError("Explicit rate covariance disagrees with component budgets")
+            observation_covariance = supplied
+            if all(b is None for b in budgets):
+                covariance_note = "caller-supplied covariance; component completeness unqualified"
+        if observation_covariance is not None:
+            if not np.allclose(np.sqrt(np.diag(observation_covariance)), rate_uncertainties, rtol=1e-12, atol=0.):
+                raise ValueError("Rate covariance diagonal must match reported rate uncertainties")
+
         duplicate_metadata: Dict[str, Any] = {
             "applied": False,
             "original_rows": int(len(valid_reactions)),
@@ -1139,6 +1260,7 @@ class SpectrumUnfolder:
                     [row.get("uncertainty_components_barn") for row in self._response_row_metadata]
                     if len(self._response_row_metadata) == len(valid_reactions) else None
                 ),
+                measurement_covariance=observation_covariance,
             )
             response_matrix = require_nonnegative(
                 "response_matrix",
@@ -1155,6 +1277,7 @@ class SpectrumUnfolder:
             ).reshape(-1)
             response_unc = aggregation_payload["response_uncertainties"]
             duplicate_metadata = dict(aggregation_payload["metadata"])
+            observation_covariance = aggregation_payload["measurement_covariance"]
 
         # Prepare initial guess
         if self.initial_flux is not None:
@@ -1332,7 +1455,18 @@ class SpectrumUnfolder:
 
         # Flux uncertainty must come from the estimator actually used. The
         # ridge pseudo-inverse is unrelated to GRAVEL/MLEM and is not reported.
-        uncertainty_metadata: Dict[str, Any] = {"flux_uncertainty_method": uncertainty_method}
+        uncertainty_metadata: Dict[str, Any] = {
+            "flux_uncertainty_method": uncertainty_method,
+            "rate_covariance_qualification": covariance_note,
+            "iterative_fit_covariance": "diagonal objective; full covariance used for resampling/aggregation only",
+            "rate_covariance": None if observation_covariance is None else observation_covariance.tolist(),
+            "rate_budgets": [b.as_row() for b in budgets if b is not None],
+            "normalization_abundance": [
+                {"sample_id": m.sample_id, "supplied": m.isotope_abundance,
+                 "effective": m.effective_isotope_abundance if m.sample_mass_g is not None else None,
+                 "basis": "explicit" if m.isotope_abundance is not None else "natural_lookup"}
+                for m in selected],
+        }
         if uncertainty_method == "none":
             flux_uncertainty = np.full(flux_array.shape, np.nan)
             uncertainty_metadata["flux_uncertainty_note"] = (
@@ -1344,18 +1478,61 @@ class SpectrumUnfolder:
             rng = np.random.default_rng(uncertainty_seed)
             tiny = np.finfo(float).tiny
             samples = []
-            for _ in range(n_uncertainty_samples):
-                perturbed = rng.normal(solver_measurements, solver_rate_uncertainties)
-                samples.append(_full_flux(_solve(np.maximum(perturbed, tiny), False).flux))
-            flux_uncertainty = np.std(np.asarray(samples), axis=0, ddof=1)
+            statuses = []
+            if uncertainty_estimator not in {"converged", "capped"}:
+                raise ValueError("uncertainty_estimator must be 'converged' or 'capped'")
+            factor = None if observation_covariance is None else covariance_factor(observation_covariance)
+            for draw in range(n_uncertainty_samples):
+                perturbed = (rng.normal(solver_measurements, solver_rate_uncertainties) if factor is None else
+                             solver_measurements + factor @ rng.normal(size=len(solver_measurements)))
+                status = {"draw": draw, "converged": False, "finite": False,
+                          "stop_reason": "exception", "iterations": None,
+                          "clipped_rate_rows": int(np.count_nonzero(perturbed < tiny))}
+                try:
+                    sample_result = _solve(np.maximum(perturbed, tiny), False)
+                    sample_flux = _full_flux(sample_result.flux)
+                    valid = (sample_flux.shape == flux_array.shape and np.all(np.isfinite(sample_flux))
+                             and np.all(sample_flux >= 0))
+                    status.update(converged=bool(getattr(sample_result, "converged", False)), finite=bool(valid),
+                                  stop_reason=getattr(sample_result, "stop_reason", "unspecified"),
+                                  iterations=int(sample_result.iterations))
+                    if valid:
+                        samples.append(sample_flux)
+                except (ValueError, np.linalg.LinAlgError, FloatingPointError) as exc:
+                    status["error"] = str(exc)
+                statuses.append(status)
+            finite_draws = sum(s["finite"] for s in statuses)
+            converged_draws = sum(s["finite"] and s["converged"] for s in statuses)
+            qualifies = (finite_draws == n_uncertainty_samples and
+                         np.all(np.isfinite(flux_array)) and np.all(flux_array >= 0) and
+                         (uncertainty_estimator == "capped" or
+                          (result.converged and converged_draws == n_uncertainty_samples)))
+            flux_covariance = np.atleast_2d(np.cov(np.asarray(samples), rowvar=False, ddof=1)) if qualifies else None
+            flux_uncertainty = (np.sqrt(np.maximum(np.diag(flux_covariance), 0.)) if qualifies else
+                                np.full(flux_array.shape, np.nan))
+            stop_counts = {}
+            for status in statuses:
+                stop_counts[status["stop_reason"]] = stop_counts.get(status["stop_reason"], 0) + 1
             uncertainty_metadata.update(
                 {
                     "flux_uncertainty_samples": int(n_uncertainty_samples),
                     "flux_uncertainty_seed": uncertainty_seed,
+                    "flux_uncertainty_estimator": uncertainty_estimator,
+                    "flux_uncertainty_qualification": ("capped_diagnostic" if uncertainty_estimator == "capped"
+                                                       else "converged_conditional") if qualifies else "unavailable",
+                    "flux_uncertainty_attempted": n_uncertainty_samples,
+                    "flux_uncertainty_finite_draws": finite_draws,
+                    "flux_uncertainty_converged_draws": converged_draws,
+                    "flux_uncertainty_usable": n_uncertainty_samples if qualifies else 0,
+                    "flux_uncertainty_draw_status": statuses,
+                    "flux_uncertainty_stop_counts": stop_counts,
+                    "flux_uncertainty_main_converged": bool(result.converged),
+                    "flux_uncertainty_covariance": None if flux_covariance is None else flux_covariance.tolist(),
                     "flux_uncertainty_note": (
                         "standard deviation over re-solves with Gaussian-resampled "
-                        "rates; diagonal rate uncertainty only, response and prior "
-                        "uncertainty not included"
+                        "rates using the recorded covariance; response and prior uncertainty not included. "
+                        "No failed draws are selected away; any invalid draw makes the ensemble unavailable. "
+                        "Converged estimator requires main and all draws converged; capped estimator is explicit diagnostic."
                     ),
                 }
             )
@@ -1370,11 +1547,11 @@ class SpectrumUnfolder:
             print(f"  Stop reason: {getattr(result, 'stop_reason', 'unspecified')}")
 
         return UnfoldingResult(
-            energy_edges=self.energy_edges,
+            energy_edges=self.energy_edges.copy(),
             flux=flux_array,
             flux_uncertainty=flux_uncertainty,
-            reactions_used=valid_reactions,
-            response_matrix=response_matrix,
+            reactions_used=list(valid_reactions),
+            response_matrix=response_matrix.copy(),
             measured_rates=measured_rates,
             predicted_rates=predicted_rates,
             chi_squared=result.chi_squared,
@@ -1415,7 +1592,7 @@ class SpectrumUnfolder:
                     ),
                     **basis_metadata,
                     **uncertainty_metadata,
-                    "response_rows": list(getattr(self, "_response_row_metadata", [])),
+                    "response_rows": deepcopy(getattr(self, "_response_row_metadata", [])),
                     "duplicate_reaction_memberships": duplicate_metadata.get("memberships", []),
                     "default_relative_uncertainty": default_relative_uncertainty,
                     "rows_with_default_uncertainty": defaulted_uncertainty_rows,

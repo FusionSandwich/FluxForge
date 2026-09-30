@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from typing import Sequence
 
 import numpy as np
+from fluxforge.uncertainty.covariance import covariance_matrix
 
 
 @dataclass
@@ -58,6 +59,8 @@ def predict_holdouts(
     response error). Units must be consistent: response maps flux to rates.
     """
     a = np.asarray(response, dtype=float)
+    if a.ndim != 2:
+        raise ValueError("Response must be a two-dimensional matrix")
     y = np.asarray(rates, dtype=float)
     p = np.asarray(prior_flux, dtype=float)
     c = np.asarray(prior_covariance, dtype=float)
@@ -67,6 +70,8 @@ def predict_holdouts(
         raise ValueError("Inconsistent shapes for response, rates, prior or covariance")
     if not all(np.all(np.isfinite(item)) for item in (a, y, p, c, v)):
         raise ValueError("Response, rates, prior and covariance must be finite")
+    c = covariance_matrix(c, n, "prior covariance")
+    v = covariance_matrix(v, m, "observation covariance")
     if any(not isinstance(i, (int, np.integer)) for i in holdout_index):
         raise ValueError("holdout_index must contain integer row indices")
     hold = np.array(sorted(int(i) for i in holdout_index), dtype=int)
@@ -81,9 +86,12 @@ def predict_holdouts(
     # Scale by the full prior-predictive row variance. A holdout can have no
     # observation noise and still have finite uncertainty from the flux prior.
     predictive_variance = np.einsum("ij,jk,ik->i", a, c, a) + np.diag(v)
-    if np.any(predictive_variance <= 0) or not np.all(np.isfinite(predictive_variance)):
-        raise ValueError("Every row needs positive finite predictive variance")
-    scale = np.sqrt(predictive_variance)
+    if np.any(predictive_variance < 0) or not np.all(np.isfinite(predictive_variance)):
+        raise ValueError("Every row needs nonnegative finite predictive variance")
+    fallback = max(
+        float(np.max(np.abs(y))), float(np.max(np.abs(a @ p))), np.finfo(float).tiny
+    )
+    scale = np.where(predictive_variance > 0, np.sqrt(predictive_variance), fallback)
     a_s = a / scale[:, None]
     y_s = y / scale
     v_s = v / scale[:, None] / scale[None, :]
@@ -93,13 +101,33 @@ def predict_holdouts(
     s_hf = s[np.ix_(hold, fit)]
     s_hh = s[np.ix_(hold, hold)]
     innovation = y_s[fit] - a_s[fit] @ p
-    try:
-        chol = np.linalg.cholesky(s_ff)
-    except np.linalg.LinAlgError as exc:
-        raise ValueError("Fit innovation covariance is not positive definite") from exc
+    s_ff = covariance_matrix(s_ff, len(fit), "fit predictive covariance")
+
+    def spectral(matrix):
+        values, vectors = np.linalg.eigh(matrix)
+        tolerance = (
+            20
+            * len(matrix)
+            * np.finfo(float).eps
+            * max(float(np.max(np.abs(values))), 1.0)
+        )
+        return values, vectors, values > tolerance
+
+    values, vectors, positive = spectral(s_ff)
+    tolerance = (
+        100
+        * np.finfo(float).eps
+        * max(1.0, float(np.linalg.norm(y_s)), float(np.linalg.norm(a_s @ p)))
+    )
+    if np.linalg.norm(vectors[:, ~positive].T @ innovation) > tolerance:
+        raise ValueError(
+            "Fit data are incompatible with noiseless covariance directions"
+        )
 
     def solve_ff(rhs: np.ndarray) -> np.ndarray:
-        return np.linalg.solve(chol.T, np.linalg.solve(chol, rhs))
+        return (vectors[:, positive] / values[positive]) @ (
+            vectors[:, positive].T @ rhs
+        )
 
     gain = (c @ a_s[fit].T) @ solve_ff(np.eye(fit.size))
     flux = p + gain @ innovation
@@ -107,13 +135,27 @@ def predict_holdouts(
 
     mean_s = a_s[hold] @ p + s_hf @ solve_ff(innovation)
     cov_s = _symmetric(s_hh - s_hf @ solve_ff(s_hf.T))
+    # The subtraction can leave roundoff on a mathematically zero conditional
+    # variance. Judge it against the pre-subtraction predictive scale.
+    tolerance_cov = (
+        100 * max(m, n) * np.finfo(float).eps * max(float(np.max(np.abs(s_hh))), 1.0)
+    )
+    if np.min(np.linalg.eigvalsh(cov_s)) < -tolerance_cov:
+        raise ValueError("Holdout predictive covariance is not positive semidefinite")
+    cv, cq = np.linalg.eigh(cov_s)
+    cv = np.maximum(cv, 0.0)
+    cov_s = (cq * cv) @ cq.T
     mean = mean_s * scale[hold]
     cov = cov_s * scale[hold][:, None] * scale[hold][None, :]
     residual = y[hold] - mean
-    try:
-        chi2 = float(residual @ np.linalg.solve(cov, residual))
-    except np.linalg.LinAlgError as exc:
-        raise ValueError("Holdout predictive covariance is not invertible") from exc
+    residual_s = residual / scale[hold]
+    values, vectors, positive = spectral(cov_s)
+    if np.linalg.norm(vectors[:, ~positive].T @ residual_s) > tolerance:
+        raise ValueError(
+            "Holdout data are incompatible with noiseless covariance directions"
+        )
+    projected = vectors[:, positive].T @ residual_s
+    chi2 = float(np.sum(projected**2 / values[positive]))
     if not np.isfinite(chi2):
         raise ValueError("Holdout predictive covariance is not usable")
     return HoldoutPrediction(flux, posterior, mean, cov, residual, chi2, int(hold.size))
