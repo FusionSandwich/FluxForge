@@ -672,7 +672,8 @@ class SpectrumUnfolder:
             if m.response_spec is None:
                 reaction_xs = self.irdff_db.get_cross_section(m.reaction)
                 self._response_row_metadata.append(
-                    {"sample_id": m.sample_id, "reaction": m.reaction, "cover": None,
+                    {"observation_id": f"{m.sample_id or m.reaction}:{index}",
+                     "sample_id": m.sample_id, "reaction": m.reaction, "cover": None,
                      "self_shielding": None,
                      "reaction_source": reaction_xs.source,
                      "reaction_evaluation_key": reaction_xs.evaluation_key,
@@ -844,6 +845,8 @@ class SpectrumUnfolder:
         *,
         floor: float = 1e-30,
         row_keys: Optional[Sequence[Any]] = None,
+        observation_ids: Optional[Sequence[str]] = None,
+        uncertainty_models: Optional[Sequence[Any]] = None,
     ) -> Dict[str, Any]:
         """
         Aggregate repeated reaction rows using inverse-variance weighting.
@@ -852,30 +855,33 @@ class SpectrumUnfolder:
         response row. Treating those replicates as fully independent rows
         artificially over-weights one response shape in the inversion.
 
-        Rows are grouped by ``row_keys`` (the physics identity: reaction,
-        cover and self-shielding) when given, so bare and covered monitors of
-        the same reaction are never merged.
+        Keys nominate candidates only. Nominal operators, response uncertainty
+        rows and supplied uncertainty models must match exactly. Tolerances
+        would erase small physical differences, especially in cm2/eV units.
         """
-        if len(valid_reactions) <= 1:
-            return {
-                "response": response_matrix,
-                "reactions": list(valid_reactions),
-                "measurements": measured_rates,
-                "uncertainties": rate_uncertainties,
-                "response_uncertainties": response_uncertainties,
-                "metadata": {
-                    "applied": False,
-                    "original_rows": int(len(valid_reactions)),
-                    "aggregated_rows": int(len(valid_reactions)),
-                    "reaction_counts": {
-                        str(reaction): 1 for reaction in valid_reactions
-                    },
-                },
-            }
-
+        n = len(valid_reactions)
+        response_matrix = require_nonnegative("response_matrix", response_matrix)
+        measured_rates = require_nonnegative("measured_rates", measured_rates)
+        rate_uncertainties = require_nonnegative("rate_uncertainties", rate_uncertainties)
+        if response_matrix.ndim != 2 or response_matrix.shape[0] != n:
+            raise ValueError("response_matrix must have one row per reaction")
+        if measured_rates.shape != (n,) or rate_uncertainties.shape != (n,):
+            raise ValueError("Measurements and uncertainties must align with response rows")
+        if response_uncertainties is not None:
+            response_uncertainties = require_nonnegative("response_uncertainties", response_uncertainties)
+            if response_uncertainties.shape != response_matrix.shape:
+                raise ValueError("Response uncertainties must align with response rows")
+        if not np.isfinite(floor) or floor <= 0:
+            raise ValueError("floor must be finite and positive")
         keys = list(row_keys) if row_keys is not None else list(valid_reactions)
-        if len(keys) != len(valid_reactions):
+        if len(keys) != n:
             raise ValueError("row_keys must align with valid_reactions")
+        ids = list(observation_ids) if observation_ids is not None else [str(i) for i in range(n)]
+        if len(ids) != n or len(set(ids)) != n:
+            raise ValueError("observation_ids must be unique and align with response rows")
+        models = list(uncertainty_models) if uncertainty_models is not None else [None] * n
+        if len(models) != n:
+            raise ValueError("uncertainty_models must align with response rows")
         order: List[Any] = []
         grouped_indices: Dict[Any, List[int]] = {}
         for idx, key in enumerate(keys):
@@ -884,7 +890,28 @@ class SpectrumUnfolder:
                 order.append(key)
             grouped_indices[key].append(idx)
 
-        has_duplicates = any(len(indices) > 1 for indices in grouped_indices.values())
+        groups: List[List[int]] = []
+        for key in order:
+            partitions: List[List[int]] = []
+            for idx in grouped_indices[key]:
+                for partition in partitions:
+                    first = partition[0]
+                    if (valid_reactions[idx] == valid_reactions[first]
+                            and np.array_equal(response_matrix[idx], response_matrix[first])
+                            and (response_uncertainties is None or np.array_equal(
+                                response_uncertainties[idx], response_uncertainties[first]))
+                            and models[idx] == models[first]):
+                        partition.append(idx)
+                        break
+                else:
+                    partitions.append([idx])
+            groups.extend(partitions)
+        # Preserve first-observation order even when a key has multiple partitions.
+        groups.sort(key=lambda indices: indices[0])
+        memberships = [{"row_indices": indices, "observation_ids": [ids[i] for i in indices]}
+                       for indices in groups]
+        counts = {_row_key_label(key): len(grouped_indices[key]) for key in order}
+        has_duplicates = any(len(indices) > 1 for indices in groups)
         if not has_duplicates:
             return {
                 "response": response_matrix,
@@ -896,9 +923,8 @@ class SpectrumUnfolder:
                     "applied": False,
                     "original_rows": int(len(valid_reactions)),
                     "aggregated_rows": int(len(valid_reactions)),
-                    "reaction_counts": {
-                        str(reaction): 1 for reaction in valid_reactions
-                    },
+                    "reaction_counts": counts,
+                    "memberships": memberships,
                 },
             }
 
@@ -908,17 +934,21 @@ class SpectrumUnfolder:
         aggregated_uncertainties: List[float] = []
         aggregated_response_unc_rows: List[np.ndarray] = []
 
-        for key in order:
-            indices = grouped_indices[key]
+        for indices in groups:
             representative_idx = indices[0]
             reaction = valid_reactions[representative_idx]
             representative_row = np.asarray(response_matrix[representative_idx], dtype=float)
-            weights = 1.0 / np.maximum(rate_uncertainties[indices], floor) ** 2
+            sigmas = np.maximum(rate_uncertainties[indices], floor)
+            scale = float(np.min(sigmas))
+            weights = (scale / sigmas) ** 2
             weight_sum = float(np.sum(weights))
             aggregated_measurement = float(
                 np.sum(weights * measured_rates[indices]) / max(weight_sum, floor)
             )
-            aggregated_uncertainty = float(np.sqrt(1.0 / max(weight_sum, floor)))
+            aggregated_uncertainty = float(scale / np.sqrt(weight_sum))
+            if len(indices) == 1:
+                aggregated_measurement = float(measured_rates[representative_idx])
+                aggregated_uncertainty = float(rate_uncertainties[representative_idx])
 
             aggregated_response_rows.append(representative_row)
             aggregated_reactions.append(reaction)
@@ -944,9 +974,8 @@ class SpectrumUnfolder:
                 "applied": True,
                 "original_rows": int(len(valid_reactions)),
                 "aggregated_rows": int(len(aggregated_reactions)),
-                "reaction_counts": {
-                    _row_key_label(key): int(len(grouped_indices[key])) for key in order
-                },
+                "reaction_counts": counts,
+                "memberships": memberships,
             },
         }
 
@@ -1087,6 +1116,12 @@ class SpectrumUnfolder:
             "reaction_counts": {
                 str(reaction): 1 for reaction in valid_reactions
             },
+            "memberships": [
+                {"row_indices": [i], "observation_ids": [
+                    m.response_spec.observation_id if m.response_spec is not None
+                    else f"{m.sample_id or m.reaction}:{i}"]}
+                for i, m in enumerate(self.measurements) if m.reaction in valid_reactions
+            ],
         }
         if aggregate_duplicate_reactions:
             aggregation_payload = self._aggregate_duplicate_reaction_rows(
@@ -1098,6 +1133,12 @@ class SpectrumUnfolder:
                 row_keys=[
                     m.row_key for m in self.measurements if m.reaction in valid_reactions
                 ],
+                observation_ids=[member["observation_ids"][0]
+                                 for member in duplicate_metadata["memberships"]],
+                uncertainty_models=(
+                    [row.get("uncertainty_components_barn") for row in self._response_row_metadata]
+                    if len(self._response_row_metadata) == len(valid_reactions) else None
+                ),
             )
             response_matrix = require_nonnegative(
                 "response_matrix",
@@ -1375,6 +1416,7 @@ class SpectrumUnfolder:
                     **basis_metadata,
                     **uncertainty_metadata,
                     "response_rows": list(getattr(self, "_response_row_metadata", [])),
+                    "duplicate_reaction_memberships": duplicate_metadata.get("memberships", []),
                     "default_relative_uncertainty": default_relative_uncertainty,
                     "rows_with_default_uncertainty": defaulted_uncertainty_rows,
                     "activity_used_as_rate_rows": activity_proxy_rows,

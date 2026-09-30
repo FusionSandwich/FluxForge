@@ -29,6 +29,7 @@ Assumptions (recorded in each row's metadata):
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -55,6 +56,41 @@ COVER_ELEMENT_PROPERTIES: Dict[str, Tuple[float, float]] = {
 }
 
 
+def _physical_scalar(name: str, value: float, *, positive: bool = True) -> float:
+    value = float(value)
+    if not np.isfinite(value) or (value <= 0 if positive else value < 0):
+        bound = "positive" if positive else "nonnegative"
+        raise ValueError(f"{name} must be finite and {bound}")
+    return value
+
+
+def _nonnegative(name: str, values: np.ndarray) -> np.ndarray:
+    array = np.asarray(values, dtype=float)
+    if not np.all(np.isfinite(array)) or np.any(array < 0):
+        raise ValueError(f"{name} must be finite and nonnegative")
+    return array
+
+
+def _energy_grid(name: str, values: np.ndarray, *, strict: bool = True) -> np.ndarray:
+    array = np.asarray(values, dtype=float)
+    if (
+        array.ndim != 1
+        or len(array) < 2
+        or not np.all(np.isfinite(array))
+        or np.any(array <= 0)
+        or np.any(np.diff(array) <= 0 if strict else np.diff(array) < 0)
+    ):
+        order = "strictly increasing" if strict else "nondecreasing"
+        raise ValueError(f"{name} must be finite, positive and {order}")
+    return array
+
+
+def _identity(kind: str, values: dict) -> str:
+    # JSON retains round-trip float precision; use the full digest and all fields.
+    payload = json.dumps(values, sort_keys=True, separators=(",", ":"), allow_nan=False)
+    return f"{kind}:v2:{hashlib.sha256(payload.encode('utf-8')).hexdigest()}"
+
+
 @dataclass(frozen=True)
 class CoverLayer:
     """An absorbing cover around a monitor (e.g. Cd)."""
@@ -68,8 +104,13 @@ class CoverLayer:
     angular_model: str = "isotropic"
 
     def __post_init__(self) -> None:
-        if self.thickness_cm <= 0 or self.thickness_unc_cm < 0:
-            raise ValueError("Cover thickness must be positive; uncertainty non-negative")
+        _physical_scalar("Cover thickness", self.thickness_cm)
+        _physical_scalar(
+            "Cover thickness uncertainty", self.thickness_unc_cm, positive=False
+        )
+        _physical_scalar(
+            "Shifted cover thickness", self.thickness_cm + self.thickness_unc_cm
+        )
         if self.attenuation not in {"disap", "tot"}:
             raise ValueError("attenuation must be 'disap' or 'tot'")
         if self.angular_model not in {"isotropic", "beam"}:
@@ -80,17 +121,44 @@ class CoverLayer:
             raise ValueError(
                 f"Provide density_g_cm3 and atomic_mass for cover material {self.material!r}"
             )
+        density, mass = COVER_ELEMENT_PROPERTIES.get(self.material, (None, None))
+        density = _physical_scalar(
+            "Cover density",
+            self.density_g_cm3 if self.density_g_cm3 is not None else density,
+        )
+        mass = _physical_scalar(
+            "Cover atomic mass",
+            self.atomic_mass if self.atomic_mass is not None else mass,
+        )
+        object.__setattr__(self, "density_g_cm3", density)
+        object.__setattr__(self, "atomic_mass", mass)
+        _physical_scalar("Cover number density", self.number_density_per_cm3)
 
     @property
     def number_density_per_cm3(self) -> float:
-        default_density, default_mass = COVER_ELEMENT_PROPERTIES.get(self.material, (0.0, 0.0))
-        density = self.density_g_cm3 if self.density_g_cm3 is not None else default_density
+        default_density, default_mass = COVER_ELEMENT_PROPERTIES.get(
+            self.material, (0.0, 0.0)
+        )
+        density = (
+            self.density_g_cm3 if self.density_g_cm3 is not None else default_density
+        )
         mass = self.atomic_mass if self.atomic_mass is not None else default_mass
         return density * AVOGADRO / mass
 
     @property
     def key(self) -> str:
-        return f"{self.material}:{self.thickness_cm:.6g}cm:{self.attenuation}:{self.angular_model}"
+        return _identity(
+            "cover",
+            {
+                "material": self.material,
+                "thickness_cm": float(self.thickness_cm),
+                "thickness_unc_cm": float(self.thickness_unc_cm),
+                "density_g_cm3": float(self.density_g_cm3),
+                "atomic_mass": float(self.atomic_mass),
+                "attenuation": self.attenuation,
+                "angular_model": self.angular_model,
+            },
+        )
 
 
 @dataclass(frozen=True)
@@ -108,26 +176,46 @@ class MonitorShielding:
     def __post_init__(self) -> None:
         if self.geometry not in {"slab", "cylinder", "sphere"}:
             raise ValueError("geometry must be 'slab', 'cylinder' or 'sphere'")
-        if self.dimension_cm <= 0 or self.number_density_per_cm3 <= 0:
-            raise ValueError("Monitor dimension and number density must be positive")
-        if len(self.total_energies_eV) != len(self.total_cross_section_barn) or len(
-            self.total_energies_eV
-        ) < 2:
+        _physical_scalar("Monitor dimension", self.dimension_cm)
+        _physical_scalar("Monitor number density", self.number_density_per_cm3)
+        _physical_scalar(
+            "Monitor dimension uncertainty", self.dimension_unc_cm, positive=False
+        )
+        _physical_scalar(
+            "Shifted monitor dimension", self.dimension_cm + self.dimension_unc_cm
+        )
+        _physical_scalar("Monitor mean chord", self.mean_chord_cm)
+        energies = _energy_grid("Total energies", self.total_energies_eV)
+        values = _nonnegative("Total cross section", self.total_cross_section_barn)
+        if values.shape != energies.shape:
             raise ValueError("Total cross section needs matching energy/value arrays")
+        # Own immutable values even when the caller passed lists or NumPy arrays.
+        object.__setattr__(self, "total_energies_eV", tuple(energies.tolist()))
+        object.__setattr__(self, "total_cross_section_barn", tuple(values.tolist()))
         if not self.total_source:
             raise ValueError("Record the source of the monitor total cross section")
 
     @property
     def mean_chord_cm(self) -> float:
         """4V/S: slab thickness t -> 2t, cylinder diameter d -> d, sphere d -> 2d/3."""
-        return {"slab": 2.0, "cylinder": 1.0, "sphere": 2.0 / 3.0}[self.geometry] * self.dimension_cm
+        return {"slab": 2.0, "cylinder": 1.0, "sphere": 2.0 / 3.0}[
+            self.geometry
+        ] * self.dimension_cm
 
     @property
     def key(self) -> str:
-        digest = hashlib.sha256(
-            np.asarray(self.total_cross_section_barn, dtype="<f8").tobytes()
-        ).hexdigest()[:12]
-        return f"{self.geometry}:{self.dimension_cm:.6g}cm:{digest}"
+        return _identity(
+            "body",
+            {
+                "geometry": self.geometry,
+                "dimension_cm": float(self.dimension_cm),
+                "number_density_per_cm3": float(self.number_density_per_cm3),
+                "dimension_unc_cm": float(self.dimension_unc_cm),
+                "total_energies_eV": self.total_energies_eV,
+                "total_cross_section_barn": self.total_cross_section_barn,
+                "total_source": self.total_source,
+            },
+        )
 
 
 @dataclass(frozen=True)
@@ -162,9 +250,13 @@ class MonitorResponse:
 # -----------------------------------------------------------------------------
 
 
-def cover_transmission(optical_thickness: np.ndarray, angular_model: str = "isotropic") -> np.ndarray:
+def cover_transmission(
+    optical_thickness: np.ndarray, angular_model: str = "isotropic"
+) -> np.ndarray:
     """Scalar-flux transmission through a thin slab cover."""
-    tau = np.maximum(np.asarray(optical_thickness, dtype=float), 0.0)
+    tau = _nonnegative("optical_thickness", optical_thickness)
+    if angular_model not in {"beam", "isotropic"}:
+        raise ValueError("angular_model must be 'isotropic' or 'beam'")
     if angular_model == "beam":
         return np.exp(-tau)
     out = np.ones_like(tau)
@@ -208,10 +300,15 @@ def _chord_table(geometry: str) -> Tuple[np.ndarray, np.ndarray]:
     return x_grid, transmission
 
 
-def self_shielding_factor(macroscopic_total: np.ndarray, shielding: MonitorShielding) -> np.ndarray:
+def self_shielding_factor(
+    macroscopic_total: np.ndarray, shielding: MonitorShielding
+) -> np.ndarray:
     """First-flight self-shielding factor G(E) for the monitor body."""
-    sigma = np.maximum(np.asarray(macroscopic_total, dtype=float), 0.0)
-    x = sigma * shielding.mean_chord_cm
+    shielding.__post_init__()
+    sigma = _nonnegative("macroscopic_total", macroscopic_total)
+    with np.errstate(over="ignore", invalid="ignore"):
+        x = sigma * shielding.mean_chord_cm
+    x = _nonnegative("body optical thickness", x)
     g = np.ones_like(x)
     positive = x > 1e-10
     if shielding.geometry == "slab":
@@ -243,6 +340,20 @@ def _cover_sigma(db: IRDFFDatabase, cover: CoverLayer) -> IRDFFCrossSection:
     return xs
 
 
+def _validate_cross_section(xs: IRDFFCrossSection) -> None:
+    # Evaluated text archives have repeated coordinates at printed precision.
+    # Preserve their existing interpolation; caller body tables remain strict.
+    energies = _energy_grid(f"{xs.reaction} energies", xs.energies, strict=False)
+    for name, values in [
+        ("cross sections", xs.cross_sections),
+        ("uncertainties", xs.uncertainties),
+    ]:
+        array = _nonnegative(f"{xs.reaction} {name}", values)
+        if array.shape != energies.shape:
+            raise ValueError(f"{xs.reaction} needs matching energy/{name} arrays")
+    _physical_scalar(f"{xs.reaction} threshold", xs.threshold_eV, positive=False)
+
+
 def _pointwise_factors(
     energies: np.ndarray,
     cover: Optional[CoverLayer],
@@ -253,11 +364,21 @@ def _pointwise_factors(
 ) -> np.ndarray:
     factor = np.ones_like(energies)
     if cover is not None:
-        thickness = cover.thickness_cm if cover_thickness_cm is None else cover_thickness_cm
-        tau = cover.number_density_per_cm3 * cover_xs.evaluate(energies) * BARN_TO_CM2 * thickness
+        thickness = (
+            cover.thickness_cm if cover_thickness_cm is None else cover_thickness_cm
+        )
+        tau = (
+            cover.number_density_per_cm3
+            * cover_xs.evaluate(energies)
+            * BARN_TO_CM2
+            * thickness
+        )
         factor *= cover_transmission(tau, cover.angular_model)
     if shielding is not None:
-        if shielding_dimension_cm is not None and shielding_dimension_cm != shielding.dimension_cm:
+        if (
+            shielding_dimension_cm is not None
+            and shielding_dimension_cm != shielding.dimension_cm
+        ):
             shielding = MonitorShielding(
                 geometry=shielding.geometry,
                 dimension_cm=shielding_dimension_cm,
@@ -317,8 +438,11 @@ def build_monitor_response(
     """
     db = db or IRDFFDatabase()
     edges = np.asarray(energy_edges_eV, dtype=float)
-    if edges.ndim != 1 or len(edges) < 2 or np.any(np.diff(edges) <= 0):
-        raise ValueError("energy_edges_eV must be strictly increasing")
+    edges = _energy_grid("energy_edges_eV", edges)
+    if spec.cover is not None:
+        spec.cover.__post_init__()
+    if spec.shielding is not None:
+        spec.shielding.__post_init__()
     reaction_xs = db.get_cross_section(spec.reaction)
     if reaction_xs is None:
         raise ValueError(f"No evaluated cross section for {spec.reaction}")
@@ -328,6 +452,9 @@ def build_monitor_response(
             "response rows require evaluated data"
         )
     cover_xs = _cover_sigma(db, spec.cover) if spec.cover else None
+    _validate_cross_section(reaction_xs)
+    if cover_xs is not None:
+        _validate_cross_section(cover_xs)
     extra = []
     if cover_xs is not None:
         extra.append(cover_xs.energies)
@@ -338,25 +465,39 @@ def build_monitor_response(
         return _pointwise_factors(e, spec.cover, cover_xs, spec.shielding)
 
     row, row_unc = _collapse(edges, reaction_xs, extra, nominal)
+    _nonnegative("group cross section", row)
+    _nonnegative("group cross section uncertainty", row_unc)
 
     variance = row_unc**2
     components = {"reaction_cross_section": row_unc.copy()}
     if spec.cover is not None and spec.cover.thickness_unc_cm > 0:
         shifted, _ = _collapse(
-            edges, reaction_xs, extra,
+            edges,
+            reaction_xs,
+            extra,
             lambda e: _pointwise_factors(
-                e, spec.cover, cover_xs, spec.shielding,
-                cover_thickness_cm=spec.cover.thickness_cm + spec.cover.thickness_unc_cm,
+                e,
+                spec.cover,
+                cover_xs,
+                spec.shielding,
+                cover_thickness_cm=spec.cover.thickness_cm
+                + spec.cover.thickness_unc_cm,
             ),
         )
         components["cover_thickness"] = np.abs(shifted - row)
         variance = variance + components["cover_thickness"] ** 2
     if spec.shielding is not None and spec.shielding.dimension_unc_cm > 0:
         shifted, _ = _collapse(
-            edges, reaction_xs, extra,
+            edges,
+            reaction_xs,
+            extra,
             lambda e: _pointwise_factors(
-                e, spec.cover, cover_xs, spec.shielding,
-                shielding_dimension_cm=spec.shielding.dimension_cm + spec.shielding.dimension_unc_cm,
+                e,
+                spec.cover,
+                cover_xs,
+                spec.shielding,
+                shielding_dimension_cm=spec.shielding.dimension_cm
+                + spec.shielding.dimension_unc_cm,
             ),
         )
         components["monitor_dimension"] = np.abs(shifted - row)
@@ -369,27 +510,37 @@ def build_monitor_response(
         "reaction_source": reaction_xs.source,
         "reaction_evaluation_key": reaction_xs.evaluation_key,
         "reaction_source_sha256": reaction_xs.source_sha256,
-        "cover": None if spec.cover is None else {
-            "key": spec.cover.key,
-            "thickness_cm": spec.cover.thickness_cm,
-            "thickness_unc_cm": spec.cover.thickness_unc_cm,
-            "number_density_per_cm3": spec.cover.number_density_per_cm3,
-            "data": cover_xs.evaluation_key,
-            "data_sha256": cover_xs.source_sha256,
-            "model": f"{'E2' if spec.cover.angular_model == 'isotropic' else 'exp'} slab transmission",
-        },
-        "self_shielding": None if spec.shielding is None else {
-            "key": spec.shielding.key,
-            "geometry": spec.shielding.geometry,
-            "dimension_cm": spec.shielding.dimension_cm,
-            "dimension_unc_cm": spec.shielding.dimension_unc_cm,
-            "total_source": spec.shielding.total_source,
-            "model": "first-flight chord average, isotropic incidence",
-        },
+        "cover": (
+            None
+            if spec.cover is None
+            else {
+                "key": spec.cover.key,
+                "thickness_cm": spec.cover.thickness_cm,
+                "thickness_unc_cm": spec.cover.thickness_unc_cm,
+                "number_density_per_cm3": spec.cover.number_density_per_cm3,
+                "data": cover_xs.evaluation_key,
+                "data_sha256": cover_xs.source_sha256,
+                "model": f"{'E2' if spec.cover.angular_model == 'isotropic' else 'exp'} slab transmission",
+            }
+        ),
+        "self_shielding": (
+            None
+            if spec.shielding is None
+            else {
+                "key": spec.shielding.key,
+                "geometry": spec.shielding.geometry,
+                "dimension_cm": spec.shielding.dimension_cm,
+                "dimension_unc_cm": spec.shielding.dimension_unc_cm,
+                "total_source": spec.shielding.total_source,
+                "model": "first-flight chord average, isotropic incidence",
+            }
+        ),
         "uncertainty_components_barn": {k: v.tolist() for k, v in components.items()},
         "weighting": "1/E within group",
     }
-    return MonitorResponse(spec, row, np.sqrt(variance), metadata)
+    return MonitorResponse(
+        spec, row, _nonnegative("response uncertainty", np.sqrt(variance)), metadata
+    )
 
 
 def build_monitor_response_matrix(
