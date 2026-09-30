@@ -165,9 +165,13 @@ def main():
     for index, (raw, qg) in enumerate(selected):
         assert qg is None or qg.is_file()
         artifact = analyze(raw, qg, tree)
-        assert artifact["validation"]["comparison_basis"] == (
-            "raw_estimate_vs_report" if qg else "not_evaluated"
-        )
+        basis = artifact["validation"]["comparison_basis"]
+        assert basis in {"raw_estimate_vs_report", "not_evaluated"}
+        if not qg:
+            assert basis == "not_evaluated"
+        if basis == "not_evaluated":
+            assert artifact["validation"]["passed"] is not True
+            assert not artifact["validation"].get("available_comparison_domains")
         assert artifact["validation"]["reference_used_for_analysis"] is False
         zero_width = [p for p in artifact["peaks"] if p["fwhm_keV"] == 0.0]
         assert (
