@@ -32,7 +32,11 @@ def digest(path):
 def prediction_digest(artifact):
     return hashlib.sha256(
         json.dumps(
-            {"peaks": artifact["peaks"], "isotopes": artifact["isotopes"]},
+            {
+                "peaks": artifact["peaks"],
+                "isotopes": artifact["isotopes"],
+                "fit_diagnostics": artifact.get("targeted_fit_diagnostics", []),
+            },
             sort_keys=True,
             allow_nan=False,
         ).encode()
@@ -42,6 +46,11 @@ def prediction_digest(artifact):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument(
+        "--all-raw",
+        action="store_true",
+        help="Include all committed raw RAFM and flux-wire specimens",
+    )
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument("--max-spectra", type=int)
     selection.add_argument(
@@ -52,21 +61,27 @@ def main():
     example = ROOT / "examples" / "RAFM_irradiation"
     metadata = workflow.load_rafm_example_metadata(example)
     metadata.config["generic_targeted_counting_method"] = "iec_tiered"
+    metadata.config["flux_wire_counting_method"] = "iec_tiered"
     paths = workflow.default_paths(example, results_root=output / "raw_iec")
     library, half_lives = workflow.build_generic_gamma_library(metadata)
     files = workflow.discover_input_files(paths)
-    pairs, _, _ = workflow.pair_input_files(
+    pairs, _, unmatched_qg = workflow.pair_input_files(
         files["raw"], files["qg"], metadata.pairing_aliases
     )
     selected = [
         (raw, qg) for raw, qg, _ in pairs if raw.parent.name in {"RAFM3", "RAFM4"}
     ]
     assert len(selected) == 16, "Expected the committed 12 RAFM3 and 4 RAFM4 specimens"
+    if args.all_raw:
+        selected = [(raw, qg) for raw, qg, _ in pairs]
+        assert len(selected) == 29, "Expected all 29 committed raw spectra"
     if args.sample:
         requested = set(args.sample)
         available = {raw.stem for raw, _ in selected}
         if requested - available:
-            raise ValueError(f"Unknown RAFM3/4 specimens: {sorted(requested - available)}")
+            raise ValueError(
+                f"Unknown RAFM3/4 specimens: {sorted(requested - available)}"
+            )
         selected = [(raw, qg) for raw, qg in selected if raw.stem in requested]
     if args.max_spectra is not None:
         if args.max_spectra <= 0:
@@ -86,6 +101,19 @@ def main():
 
     workflow.apply_generic_qg_report_parity = forbidden_reference_substitution
     workflow.reference_isotope_payload = forbidden_reference_substitution
+    from fluxforge.analysis import flux_wire_analysis
+
+    flux_wire_analysis.apply_qg_report_parity = forbidden_reference_substitution
+
+    def analyze(raw, qg, result_tree):
+        if raw.parent.name == "flux_wires":
+            return workflow.analyze_flux_wire_sample(
+                raw, metadata, paths, result_tree, background, qg
+            )
+        return workflow.analyze_generic_sample(
+            raw, metadata, paths, result_tree, library, half_lives, background, qg
+        )
+
     receipt = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "git_head": subprocess.check_output(
@@ -98,6 +126,10 @@ def main():
                 "src/fluxforge/analysis/flux_wire_analysis.py",
                 "src/fluxforge/analysis/peakfit.py",
                 "src/fluxforge/analysis/spectrum_math.py",
+                "src/fluxforge/io/spe.py",
+                "src/fluxforge/io/flux_wire.py",
+                "src/fluxforge/data/rafm_profile.py",
+                "tools/audit_rafm_raw_recovery.py",
             ]
         },
         "metadata_sha256": {
@@ -114,11 +146,11 @@ def main():
         ],
     }
     for index, (raw, qg) in enumerate(selected):
-        assert qg is not None and qg.is_file()
-        artifact = workflow.analyze_generic_sample(
-            raw, metadata, paths, tree, library, half_lives, background, qg
+        assert qg is None or qg.is_file()
+        artifact = analyze(raw, qg, tree)
+        assert artifact["validation"]["comparison_basis"] == (
+            "raw_estimate_vs_report" if qg else "not_evaluated"
         )
-        assert artifact["validation"]["comparison_basis"] == "raw_estimate_vs_report"
         assert artifact["validation"]["reference_used_for_analysis"] is False
         zero_width = [p for p in artifact["peaks"] if p["fwhm_keV"] == 0.0]
         assert (
@@ -127,11 +159,14 @@ def main():
         row = {
             "sample": raw.stem,
             "raw_sha256": digest(raw),
-            "qg_sha256": digest(qg),
+            "qg_sha256": digest(qg) if qg else None,
             "prediction_sha256": prediction_digest(artifact),
             "n_detected_peaks": artifact["n_detected_peaks"],
             "n_unidentified_peaks": artifact["n_unidentified_peaks"],
             "validation": artifact["validation"],
+            "n_ambiguous_peaks": artifact.get("n_ambiguous_peaks", 0),
+            "measurement_time_audit": artifact["measurement_time_audit"],
+            "targeted_fit_diagnostics": artifact.get("targeted_fit_diagnostics", []),
             "isotopes": sorted(artifact["isotopes"]),
             "artifact": str(tree["artifacts"] / f"{raw.stem}.json"),
             "report": artifact["comparison_report_txt"],
@@ -140,16 +175,7 @@ def main():
         # must leave every predicted peak and isotope result identical.
         if index == 0:
             withheld_tree = workflow.ensure_results_tree(output / "withheld_report")
-            withheld = workflow.analyze_generic_sample(
-                raw,
-                metadata,
-                paths,
-                withheld_tree,
-                library,
-                half_lives,
-                background,
-                None,
-            )
+            withheld = analyze(raw, None, withheld_tree)
             assert prediction_digest(withheld) == row["prediction_sha256"]
             assert withheld["validation"]["passed"] is None
             row["withheld_report_prediction_identical"] = True
@@ -171,12 +197,16 @@ def main():
         )
     receipt["status"] = "RUN_COMPLETE_REVIEW_REQUIRED"
     receipt["n_spectra"] = len(selected)
-    receipt["all_committed_rafm3_rafm4_replayed"] = len(selected) == 16
+    receipt["all_committed_rafm3_rafm4_replayed"] = (
+        sum(raw.parent.name in {"RAFM3", "RAFM4"} for raw, _ in selected) == 16
+    )
+    receipt["all_committed_raw_replayed"] = len(selected) == 29
     receipt["comparison_summary"] = workflow.summarize_validation_artifacts(
         [
             {"sample_id": row["sample"], "validation": row["validation"]}
             for row in receipt["samples"]
-        ]
+        ],
+        unmatched_qg=unmatched_qg if args.all_raw else (),
     )
     target = output / "raw_recovery_receipt.json"
     target.write_text(json.dumps(receipt, indent=2, allow_nan=False), encoding="utf-8")

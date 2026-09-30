@@ -1545,6 +1545,8 @@ def fit_multiple_peaks(
     fit_width: int = 10,
     background_model: str = "linear",
     share_sigma: bool = False,
+    counts_uncertainty: Optional[np.ndarray] = None,
+    counts_covariance: Any = None,
 ) -> List[PeakFitResult]:
     """
     Fit multiple peaks simultaneously.
@@ -1580,6 +1582,8 @@ def fit_multiple_peaks(
                 peak_ch,
                 fit_width=fit_width,
                 background_model=background_model,
+                counts_uncertainty=counts_uncertainty,
+                counts_covariance=counts_covariance,
             )
             for peak_ch in sorted(peak_channels)
         ]
@@ -1591,15 +1595,48 @@ def fit_multiple_peaks(
 
     x = channels[ch_lo:ch_hi].astype(float)
     y = counts[ch_lo:ch_hi].astype(float)
-    weights = 1.0 / np.maximum(np.sqrt(np.maximum(y, 0.0)), 1.0)
+    if counts_uncertainty is not None:
+        uncertainty = np.asarray(counts_uncertainty, dtype=float)
+        if uncertainty.shape != np.asarray(counts).shape:
+            raise ValueError("counts_uncertainty must match the full spectrum counts.")
+        if np.any(~np.isfinite(uncertainty)) or np.any(uncertainty < 0):
+            raise ValueError("counts_uncertainty must be finite and nonnegative.")
+        weights = 1.0 / np.maximum(uncertainty[ch_lo:ch_hi], 1.0)
+    else:
+        weights = 1.0 / np.maximum(np.sqrt(np.maximum(y, 0.0)), 1.0)
+    fit_sigma = 1.0 / weights
+    if counts_covariance is not None:
+        from scipy.sparse import csr_matrix
 
-    if x.size < max(7, 3 * len(peak_channels)):
+        covariance = csr_matrix(counts_covariance, dtype=float)
+        if covariance.shape != (len(counts), len(counts)):
+            raise ValueError("counts_covariance must match the full spectrum counts.")
+        if np.any(~np.isfinite(covariance.data)) or np.any(covariance.diagonal() < 0):
+            raise ValueError(
+                "counts_covariance must be finite with nonnegative diagonal."
+            )
+        if counts_uncertainty is not None and not np.allclose(
+            covariance.diagonal(), uncertainty**2, rtol=1e-10, atol=1e-10
+        ):
+            raise ValueError(
+                "counts_covariance diagonal must match counts_uncertainty squared."
+            )
+        fit_sigma = covariance[ch_lo:ch_hi, ch_lo:ch_hi].toarray()
+        if not np.allclose(fit_sigma, fit_sigma.T, rtol=1e-10, atol=1e-10):
+            raise ValueError("counts_covariance must be symmetric in the fit window.")
+        fit_sigma += np.diag(np.maximum(1.0 - np.diag(fit_sigma), 0.0))
+
+    parameter_count = (
+        2 * len(peak_channels) + 1 if share_sigma else 3 * len(peak_channels)
+    ) + (2 if background_model == "linear" else 1)
+    if x.size < 7 or x.size <= parameter_count:
         return [
-            fit_single_peak(
-                channels,
-                counts,
-                peak_ch,
-                fit_width=fit_width,
+            PeakFitResult(
+                peak=GaussianPeak(centroid=float(peak_ch), amplitude=0.0, sigma=1.0),
+                background=np.zeros_like(x),
+                success=False,
+                message="Insufficient bins for an identifiable joint fit",
+                fit_region=(int(x[0]), int(x[-1])),
                 background_model=background_model,
             )
             for peak_ch in peak_channels
@@ -1640,7 +1677,7 @@ def fit_multiple_peaks(
     if share_sigma:
 
         def model(x_vals: np.ndarray, *params: float) -> np.ndarray:
-            sigma = params[-3]
+            sigma = params[2 * len(peak_channels)]
             total = (
                 params[-2] * x_vals + params[-1]
                 if background_model == "linear"
@@ -1668,7 +1705,11 @@ def fit_multiple_peaks(
             bounds_upper.extend([np.inf, np.inf])
         else:
             p0.append(bg_level)
-            bounds_lower.append(0.0)
+            bounds_lower.append(
+                -np.inf
+                if counts_uncertainty is not None or counts_covariance is not None
+                else 0.0
+            )
             bounds_upper.append(np.inf)
     else:
 
@@ -1705,7 +1746,11 @@ def fit_multiple_peaks(
             bounds_upper.extend([np.inf, np.inf])
         else:
             p0.append(bg_level)
-            bounds_lower.append(0.0)
+            bounds_lower.append(
+                -np.inf
+                if counts_uncertainty is not None or counts_covariance is not None
+                else 0.0
+            )
             bounds_upper.append(np.inf)
 
     try:
@@ -1714,29 +1759,42 @@ def fit_multiple_peaks(
             x,
             y,
             p0=p0,
-            sigma=1.0 / weights,
+            sigma=fit_sigma,
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
             maxfev=20000,
         )
         perr = np.sqrt(np.diag(pcov))
-        success = True
-        message = "Fit converged"
-    except Exception:
-        return [
-            fit_single_peak(
-                channels,
-                counts,
-                peak_ch,
-                fit_width=fit_width,
-                background_model=background_model,
-            )
-            for peak_ch in peak_channels
-        ]
+        success = bool(
+            np.all(np.isfinite(popt))
+            and np.all(np.isfinite(pcov))
+            and np.all(np.diag(pcov) > 0)
+        )
+        if success:
+            scales = np.sqrt(np.diag(pcov))
+            correlation = pcov / np.outer(scales, scales)
+            success = bool(np.linalg.cond(correlation) < 1e12)
+        message = (
+            "Fit converged"
+            if success
+            else "Joint fit covariance is non-finite or unidentifiable"
+        )
+    except Exception as exc:
+        # Independent single fits would assign the same observed area more
+        # than once; preserve a failed joint result instead.
+        popt = np.asarray(p0)
+        pcov = None
+        perr = np.full(len(p0), 1e6)
+        success = False
+        message = str(exc)
 
     y_fit = model(x, *popt)
     residuals = y - y_fit
-    chi_sq = float(np.sum((residuals * weights) ** 2))
+    chi_sq = (
+        float(residuals @ np.linalg.solve(fit_sigma, residuals))
+        if np.ndim(fit_sigma) == 2 and success
+        else float(np.sum((residuals * weights) ** 2))
+    )
     dof = int(len(y) - len(popt))
     continuum = _continuum(np.asarray(popt, dtype=float))
 
@@ -1745,10 +1803,10 @@ def fit_multiple_peaks(
         if share_sigma:
             amp = float(popt[2 * i])
             centroid = float(popt[2 * i + 1])
-            sigma = float(popt[-3])
+            sigma = float(popt[2 * len(peak_channels)])
             amp_unc = float(perr[2 * i])
             cent_unc = float(perr[2 * i + 1])
-            sigma_unc = float(perr[-3])
+            sigma_unc = float(perr[2 * len(peak_channels)])
         else:
             offset = 3 * i
             amp = float(popt[offset])
@@ -1778,6 +1836,11 @@ def fit_multiple_peaks(
                 covariance=pcov,
                 success=success,
                 message=message,
+                area_parameter_indices=(
+                    (2 * i, 2 * len(peak_channels))
+                    if share_sigma
+                    else (3 * i, 3 * i + 2)
+                ),
             )
         )
 

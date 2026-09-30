@@ -621,9 +621,16 @@ def peak_to_dict(
 ) -> Dict[str, Any]:
     eoi_activity = None
     eoi_unc = None
-    if peak.isotope and timing.compare_eoi and timing.decay_time_s is not None:
+    if (
+        peak.isotope
+        and not peak.assignment_ambiguous
+        and timing.compare_eoi
+        and timing.decay_time_s is not None
+    ):
         half_life_s = half_life_map.get(peak.isotope, 0.0)
-        factor = decay_correction_factor(half_life_s, count_real_time_s, timing.decay_time_s)
+        factor = decay_correction_factor(
+            half_life_s, count_real_time_s, timing.decay_time_s
+        )
         if math.isfinite(factor):
             eoi_activity = peak.activity_bq * factor if peak.activity_bq > 0 else 0.0
             eoi_unc = peak.activity_unc_bq * factor if peak.activity_unc_bq > 0 else 0.0
@@ -663,9 +670,14 @@ def peak_to_dict(
         "fwhm_keV": float(peak.fwhm),
         "significance": float(peak.significance),
         "isotope": peak.isotope,
+        "assignment_ambiguous": peak.assignment_ambiguous,
+        "assignment_candidates": peak.to_dict()["assignment_candidates"],
+        "activity_estimation_state": peak.activity_estimation_state,
         "efficiency": float(peak.efficiency),
-        "activity_bq": float(peak.activity_bq),
-        "activity_unc_bq": float(peak.activity_unc_bq),
+        "activity_bq": None if peak.assignment_ambiguous else float(peak.activity_bq),
+        "activity_unc_bq": (
+            None if peak.assignment_ambiguous else float(peak.activity_unc_bq)
+        ),
         "activity_correction_factor": float(
             getattr(peak, "activity_correction_factor", 1.0) or 1.0
         ),
@@ -1486,6 +1498,17 @@ def match_peak(
     ]
     if not candidates:
         return None, False
+    ambiguous = [peak for peak in candidates if peak.assignment_ambiguous]
+    if ambiguous:
+        # A reference within the admission window of an unresolved component
+        # cannot establish an isotope merely from a nearby exploratory label.
+        return (
+            min(
+                ambiguous,
+                key=lambda peak: abs(peak.energy_keV - reference_peak["energy_keV"]),
+            ),
+            False,
+        )
     candidates.sort(
         key=lambda peak: (
             0 if peak.isotope == reference_peak["isotope"] else 1,
@@ -1493,7 +1516,10 @@ def match_peak(
         )
     )
     best = candidates[0]
-    return best, best.isotope == reference_peak["isotope"]
+    return (
+        best,
+        not best.assignment_ambiguous and best.isotope == reference_peak["isotope"],
+    )
 
 
 def build_peak_comparison_records(
@@ -1561,6 +1587,8 @@ def build_peak_comparison_records(
             record.update(
                 {
                     "raw_isotope": match.isotope,
+                    "assignment_ambiguous": match.assignment_ambiguous,
+                    "assignment_candidates": match.to_dict()["assignment_candidates"],
                     "raw_energy_keV": float(match.energy_keV),
                     "raw_net_counts": raw_net_counts,
                     "raw_net_unc": raw_net_unc,
@@ -1733,7 +1761,9 @@ def build_line_diagnostic_records(
             branching_ratio_delta = raw_branching - qg_rad_int_fraction
 
         diagnostic_bucket = "matched"
-        if not isotope_match:
+        if match.assignment_ambiguous:
+            diagnostic_bucket = "assignment_ambiguous"
+        elif not isotope_match:
             diagnostic_bucket = "isotope_mismatch"
         elif abs(delta_counts / float(ref_peak["net_counts"])) > count_limit or (
             combined_count_unc > 0.0
@@ -1791,19 +1821,28 @@ def build_line_diagnostic_records(
                     else None
                 ),
                 "energy_delta_keV": float(match.energy_keV - energy),
-                "raw_line_activity_bq": raw_activity,
-                "raw_line_activity_unc_bq": raw_activity_unc,
+                "raw_line_activity_bq": (
+                    None if match.assignment_ambiguous else raw_activity
+                ),
+                "raw_line_activity_unc_bq": (
+                    None if match.assignment_ambiguous else raw_activity_unc
+                ),
+                "assignment_ambiguous": match.assignment_ambiguous,
+                "activity_estimation_state": match.activity_estimation_state,
+                "comparison_stage": "measurement_time",
                 "relative_line_activity_error": (
                     delta_activity / qg_line_activity_bq
-                    if qg_line_activity_bq > 0.0
+                    if qg_line_activity_bq > 0.0 and not match.assignment_ambiguous
                     else None
                 ),
                 "line_activity_en_score": (
                     delta_activity / combined_activity_unc
-                    if combined_activity_unc > 0.0
+                    if combined_activity_unc > 0.0 and not match.assignment_ambiguous
                     else None
                 ),
-                "raw_efficiency": float(match.efficiency),
+                "raw_efficiency": (
+                    None if match.assignment_ambiguous else float(match.efficiency)
+                ),
                 "efficiency_ratio_raw_over_qg_implied": efficiency_ratio,
                 "raw_branching_ratio": raw_branching,
                 "raw_branching_ratio_uncertainty": raw_branching_unc,
@@ -1869,6 +1908,7 @@ def build_isotope_comparison_records(
             "isotope": nuclide.isotope,
             "reference_activity_bq": ref_bq,
             "reference_activity_unc_bq": ref_unc,
+            "comparison_stage": "measurement_time",
             "matched": nuclide.isotope in raw_isotopes,
         }
         if nuclide.isotope not in raw_isotopes:
@@ -1893,6 +1933,83 @@ def build_isotope_comparison_records(
     return rows, missing
 
 
+def build_measurement_time_audit(
+    line_rows, isotope_rows, qg_consistency_rows, fit_diagnostics=()
+):
+    """Describe report discrepancies without treating report values as truth.
+
+    Divide the line-activity ratio by the count ratio to cancel peak-area
+    differences. The remainder is a conversion diagnostic, not a calibrated
+    efficiency measurement. Multiple limitations may affect one specimen.
+    """
+    categories = set()
+    if fit_diagnostics:
+        categories.add("library_or_assignment_limited")
+    conversion_rows = []
+    for row in line_rows:
+        bucket = row.get("diagnostic_bucket")
+        if bucket in {"count_parity_failure", "missing_in_fluxforge"}:
+            categories.add("peak_area_limited")
+        if bucket in {
+            "assignment_ambiguous",
+            "isotope_mismatch",
+            "gamma_library_mismatch",
+        }:
+            categories.add("library_or_assignment_limited")
+        if bucket == "efficiency_or_activity_conversion_bias":
+            categories.add("activity_conversion_or_efficiency_limited")
+        values = [
+            row.get(key)
+            for key in (
+                "raw_line_activity_bq",
+                "reference_line_activity_bq",
+                "raw_net_counts",
+                "reference_net_counts",
+            )
+        ]
+        try:
+            valid_conversion = all(
+                value is not None and math.isfinite(float(value)) and float(value) > 0
+                for value in values
+            )
+        except (ValueError, TypeError):
+            valid_conversion = False
+        if not valid_conversion and not row.get("assignment_ambiguous"):
+            categories.add("activity_evidence_incomplete")
+        if (
+            row.get("isotope_match")
+            and not row.get("assignment_ambiguous")
+            and valid_conversion
+        ):
+            raw_a, ref_a, raw_n, ref_n = map(float, values)
+            ratio = (raw_a / ref_a) / (raw_n / ref_n)
+            conversion_rows.append(
+                {
+                    "isotope": row["reference_isotope"],
+                    "energy_keV": row["reference_energy_keV"],
+                    "activity_conversion_ratio_raw_over_report": ratio,
+                }
+            )
+            if abs(ratio - 1.0) > 0.2:
+                categories.add("activity_conversion_or_efficiency_limited")
+    if any(row.get("flag_internal_inconsistency") for row in qg_consistency_rows):
+        categories.add("export_data_limited")
+    if not line_rows or any(not row.get("matched") for row in isotope_rows):
+        categories.add("activity_evidence_incomplete")
+    return {
+        "comparison_stage": "measurement_time",
+        "categories": sorted(categories) or ["no_flagged_discrepancy"],
+        "conversion_diagnostics": conversion_rows,
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": False,
+        "limitations": [
+            "Categories describe differences against a processed report, not unique causal attribution.",
+            "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+            "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified.",
+        ],
+    }
+
+
 def build_validation_flags(
     sample_group: str,
     peak_rows: Sequence[Dict[str, Any]],
@@ -1904,6 +2021,7 @@ def build_validation_flags(
     thresholds: Dict[str, Any],
     *,
     reference_used_for_analysis: bool = False,
+    fit_diagnostics: Sequence[Dict[str, Any]] = (),
 ) -> Dict[str, Any]:
     count_limit = float(thresholds.get("max_relative_count_error", 1.0))
     activity_limit = float(thresholds.get("max_relative_activity_error", 1.0))
@@ -1941,7 +2059,8 @@ def build_validation_flags(
         for row in peak_rows
         if row.get("matched")
         and (
-            not row.get("isotope_match", False)
+            row.get("assignment_ambiguous", False)
+            or not row.get("isotope_match", False)
             or (
                 finite_metrics(row, ("relative_count_error", "count_en_score"))
                 and (
@@ -1975,7 +2094,7 @@ def build_validation_flags(
         row for row in measurement_qc_rows if row.get("flag_review")
     ]
 
-    passed = not count_failures and not activity_failures
+    passed = not count_failures and not activity_failures and not fit_diagnostics
     if thresholds.get("fail_on_missing_peaks", True) and sample_group in {
         "RAFM1",
         "RAFM3",
@@ -2036,6 +2155,10 @@ def build_validation_flags(
         ),
         "reference_used_for_analysis": bool(reference_used_for_analysis),
         "incomplete_comparison_rows": incomplete,
+        "ambiguous_reference_assignments": sum(
+            bool(row.get("assignment_ambiguous")) for row in peak_rows
+        ),
+        "unidentifiable_fit_groups": len(fit_diagnostics),
         "required_comparison_domains": required_domains,
         "available_comparison_domains": available_domains,
         "missing_comparison_domains": missing_domains,
@@ -2099,9 +2222,34 @@ def merge_detected_and_targeted_peaks(
     detected_peaks: Sequence[IdentifiedPeak],
     targeted_peaks: Sequence[IdentifiedPeak],
     config: Dict[str, Any],
+    fit_diagnostics: Sequence[Dict[str, Any]] = (),
 ) -> List[IdentifiedPeak]:
-    merged: List[IdentifiedPeak] = list(detected_peaks)
+    failed_windows = [
+        diagnostic["channel_window"]
+        for diagnostic in fit_diagnostics
+        if diagnostic.get("state") == "unidentifiable_joint_fit"
+    ]
+    # A failed joint estimate cannot be replaced by a provisional search label.
+    # The signed window observation remains available in the diagnostic.
+    merged: List[IdentifiedPeak] = [
+        peak
+        for peak in detected_peaks
+        if not any(lo <= peak.channel <= hi for lo, hi in failed_windows)
+    ]
     for targeted in targeted_peaks:
+        if targeted.assignment_ambiguous:
+            # An exploratory nearest-energy label must not overwrite a
+            # targeted unresolved-component result, even at higher SNR.
+            tolerance = min(
+                energy_tolerance(targeted.energy_keV, config), 0.5 * targeted.fwhm
+            )
+            merged = [
+                peak
+                for peak in merged
+                if abs(peak.energy_keV - targeted.energy_keV) > tolerance
+            ]
+            merged.append(targeted)
+            continue
         best_index: Optional[int] = None
         best_delta = float("inf")
         tolerance = energy_tolerance(targeted.energy_keV, config)
@@ -2418,6 +2566,7 @@ def write_sample_comparison_report(
     config: Dict[str, Any],
     output_path: Path,
     validation: Optional[Dict[str, Any]] = None,
+    fit_diagnostics: Sequence[Dict[str, Any]] = (),
 ) -> None:
     lines = [
         f"Sample: {sample_id}",
@@ -2452,6 +2601,41 @@ def write_sample_comparison_report(
                 "QG values were used in the analysis; agreement checks reference reproduction, not independent raw recovery or activity accuracy."
             )
         lines.append("")
+    lines.extend(
+        [
+            "Ambiguous observed components; isotope activities withheld",
+            "----------------------------------------------------------",
+        ]
+    )
+    ambiguous = [peak for peak in merged_peaks if peak.assignment_ambiguous]
+    for peak in ambiguous:
+        labels = ", ".join(
+            f"{line.isotope}@{line.energy_keV:.2f}"
+            for line in peak.assignment_candidates
+        )
+        lines.append(
+            f"- {peak.energy_keV:.2f} keV | net={peak.net_counts:.2f} +/- {peak.net_counts_unc:.2f} | candidates={labels} | {peak.activity_estimation_state}"
+        )
+    if not ambiguous:
+        lines.append("- none")
+    lines.append("")
+    for diagnostic in fit_diagnostics:
+        lines.append(
+            f"Unidentifiable joint fit: channels {diagnostic['channel_window']} | observed signed window counts={diagnostic['observed_signed_window_counts']:.2f} +/- {diagnostic['observed_window_count_std']:.2f}; no net peak area or isotope activity estimated | candidates={diagnostic['candidates']} | messages={diagnostic['fit_messages']}"
+        )
+    audit = build_measurement_time_audit(
+        line_rows, isotope_rows, qg_consistency_rows, fit_diagnostics
+    )
+    lines.extend(
+        [
+            "Measurement-time activity audit",
+            "-------------------------------",
+            "Categories: " + ", ".join(audit["categories"]),
+            "EOI parity: " + audit["eoi_parity"],
+            "Accuracy qualified: no (calibration and systematic budgets remain incomplete)",
+            "",
+        ]
+    )
     if reference_data is None:
         lines.extend(
             [
@@ -2589,6 +2773,11 @@ def write_sample_comparison_report(
     section_rows = []
     for row in line_rows:
         bucket = str(row.get("diagnostic_bucket") or "")
+        if bucket == "assignment_ambiguous":
+            section_rows.append(
+                f"- {row['reference_isotope']} @ {float(row['reference_energy_keV']):.2f} keV | bucket=assignment_ambiguous | activity not estimated"
+            )
+            continue
         if bucket in {"matched", "missing_in_fluxforge", "isotope_mismatch"}:
             continue
         section_rows.append(
@@ -2737,6 +2926,7 @@ def analyze_generic_sample(
         list(gamma_library),
         metadata.config,
     )
+    fit_diagnostics = []
     targeted_peaks = analyze_raw_spectrum_targeted(
         data=raw_data,
         expected_lines=targeted_gamma_library,
@@ -2767,6 +2957,7 @@ def analyze_generic_sample(
         counting_method=str(
             metadata.config.get("generic_targeted_counting_method", "iec_tiered")
         ),
+        fit_diagnostics=fit_diagnostics,
     )
     attenuation_config = _build_attenuation_sample_config(
         metadata.config, timing.sample_group, sample_id
@@ -2774,9 +2965,13 @@ def analyze_generic_sample(
     apply_activity_corrections(detected_peaks, attenuation_config)
     apply_activity_corrections(targeted_peaks, attenuation_config)
     peaks = merge_detected_and_targeted_peaks(
-        detected_peaks, targeted_peaks, metadata.config
+        detected_peaks, targeted_peaks, metadata.config, fit_diagnostics
     )
-    unidentified_peaks = [peak for peak in peaks if peak.isotope is None]
+    unidentified_peaks = [
+        peak
+        for peak in peaks
+        if peak.isotope is None and not peak.assignment_candidates
+    ]
     generic_method_key = (
         str(metadata.config.get("generic_targeted_counting_method", "iec_tiered"))
         .strip()
@@ -2918,6 +3113,7 @@ def analyze_generic_sample(
                 "quantumgold",
                 "quantum_gold",
             },
+            fit_diagnostics=fit_diagnostics,
         )
 
     plot_spectrum_overlay(
@@ -2980,6 +3176,7 @@ def analyze_generic_sample(
         config=metadata.config,
         output_path=report_path,
         validation=validation,
+        fit_diagnostics=fit_diagnostics,
     )
 
     artifact = {
@@ -2992,6 +3189,7 @@ def analyze_generic_sample(
         "timing": timing.to_dict(),
         "counts_csv": str(counts_csv),
         "n_detected_peaks": len(peaks),
+        "n_ambiguous_peaks": sum(peak.assignment_ambiguous for peak in peaks),
         "n_unidentified_peaks": len(unidentified_peaks),
         "comparison_report_txt": str(report_path),
         "line_diagnostics_csv": str(line_diagnostics_path),
@@ -3013,6 +3211,10 @@ def analyze_generic_sample(
         "fluxforge_line_consistency": fluxforge_consistency_rows,
         "measurement_qc": measurement_qc_rows,
         "validation": validation,
+        "targeted_fit_diagnostics": fit_diagnostics,
+        "measurement_time_audit": build_measurement_time_audit(
+            line_rows, isotope_rows, qg_consistency_rows, fit_diagnostics
+        ),
     }
     save_json(artifact, tree["artifacts"] / f"{raw_path.stem}.json")
     return artifact
@@ -3474,6 +3676,7 @@ def analyze_flux_wire_sample(
                 "quantumgold",
                 "quantum_gold",
             },
+            fit_diagnostics=analysis.fit_diagnostics,
         )
 
     plot_spectrum_overlay(
@@ -3498,7 +3701,11 @@ def analyze_flux_wire_sample(
         isotope_rows,
         tree["plots_comparisons"] / f"{raw_path.stem}_vs_qg.png",
     )
-    unidentified_peaks = [peak for peak in analysis.peaks if peak.isotope is None]
+    unidentified_peaks = [
+        peak
+        for peak in analysis.peaks
+        if peak.isotope is None and not peak.assignment_candidates
+    ]
     report_path = tree["reports"] / f"{raw_path.stem}_comparison.txt"
     line_diagnostics_path = (
         tree["tables"] / "line_diagnostics" / f"{raw_path.stem}_line_diagnostics.csv"
@@ -3537,6 +3744,7 @@ def analyze_flux_wire_sample(
         config=metadata.config,
         output_path=report_path,
         validation=validation,
+        fit_diagnostics=analysis.fit_diagnostics,
     )
 
     artifact = {
@@ -3549,6 +3757,7 @@ def analyze_flux_wire_sample(
         "timing": timing.to_dict(),
         "counts_csv": str(counts_csv),
         "n_detected_peaks": len(analysis.peaks),
+        "n_ambiguous_peaks": sum(peak.assignment_ambiguous for peak in analysis.peaks),
         "n_unidentified_peaks": len(unidentified_peaks),
         "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
         "comparison_report_txt": str(report_path),
@@ -3573,6 +3782,10 @@ def analyze_flux_wire_sample(
         "fluxforge_line_consistency": fluxforge_consistency_rows,
         "measurement_qc": measurement_qc_rows,
         "validation": validation,
+        "targeted_fit_diagnostics": analysis.fit_diagnostics,
+        "measurement_time_audit": build_measurement_time_audit(
+            line_rows, isotope_rows, qg_consistency_rows, analysis.fit_diagnostics
+        ),
     }
     save_json(artifact, tree["artifacts"] / f"{raw_path.stem}.json")
     return artifact
@@ -4544,6 +4757,21 @@ def build_summary_markdown(
         lines.extend(f"- {item}" for item in summary["unmatched_qg"])
     else:
         lines.append("- none")
+    lines.extend(
+        [
+            "",
+            "## Measurement-time activity audit",
+            "",
+            "These comparisons concern measurement-time activities. Independent EOI parity is not evaluated; absolute accuracy is not qualified.",
+            "",
+        ]
+    )
+    for sample_id, audit in summary.get("measurement_time_audits", {}).items():
+        lines.append(
+            f"- {sample_id}: basis={audit['comparison_basis']}; "
+            f"stage={audit['comparison_stage']}; categories={', '.join(audit['categories'])}; "
+            f"EOI={audit['eoi_parity']}"
+        )
     lines.extend(["", "## Line Diagnostic Buckets", ""])
     if summary.get("line_diagnostic_buckets"):
         for bucket, count in summary["line_diagnostic_buckets"].items():
@@ -4788,6 +5016,13 @@ def run_rafm_validation(
         "unmatched_raw": [str(path) for path in unmatched_raw],
         "unmatched_qg": [str(path) for path in unmatched_qg],
         "line_diagnostic_buckets": dict(sorted(line_diagnostic_buckets.items())),
+        "measurement_time_audits": {
+            artifact["sample_id"]: {
+                **artifact["measurement_time_audit"],
+                "comparison_basis": artifact["validation"]["comparison_basis"],
+            }
+            for artifact in artifacts
+        },
         "qg_internal_consistency_flags": int(
             sum(
                 1
