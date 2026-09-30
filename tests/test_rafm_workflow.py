@@ -422,6 +422,11 @@ def test_analyze_flux_wire_sample_writes_reactions(tmp_path):
     )
 
     assert artifact["sample_group"] == "flux_wires"
+    assert artifact["validation"]["passed"] is None
+    assert artifact["validation"]["comparison_basis"] == "reference_reproduction"
+    assert artifact["validation"]["reference_used_for_analysis"] is True
+    report_text = Path(artifact["comparison_report_txt"]).read_text(encoding="utf-8")
+    assert "Raw comparison passed: not established" in report_text
     assert artifact["reaction_rate_mass_metadata"]["mass_basis"] == "element_mass"
     assert "sample_mass_g" not in artifact["isotopes"]["Co60"]
     assert "specific_activity_Bq_g" not in artifact["isotopes"]["Co60"]

@@ -1893,19 +1893,53 @@ def build_validation_flags(
     fluxforge_consistency_rows: Sequence[Dict[str, Any]],
     measurement_qc_rows: Sequence[Dict[str, Any]],
     thresholds: Dict[str, Any],
+    *,
+    reference_used_for_analysis: bool = False,
 ) -> Dict[str, Any]:
     count_limit = float(thresholds.get("max_relative_count_error", 1.0))
     activity_limit = float(thresholds.get("max_relative_activity_error", 1.0))
     en_limit = float(thresholds.get("max_en_score", 999.0))
+    if not all(
+        math.isfinite(value) and value >= 0
+        for value in (count_limit, activity_limit, en_limit)
+    ):
+        raise ValueError("Comparison thresholds must be finite and nonnegative.")
+
+    def finite_metrics(row, names):
+        try:
+            return all(
+                row.get(name) is not None and math.isfinite(float(row[name]))
+                for name in names
+            )
+        except (ValueError, TypeError):
+            return False
+
+    incomplete_count_rows = [
+        row
+        for row in peak_rows
+        if row.get("matched")
+        and not finite_metrics(row, ("relative_count_error", "count_en_score"))
+    ]
+    incomplete_activity_rows = [
+        row
+        for row in isotope_rows
+        if row.get("matched")
+        and not finite_metrics(row, ("relative_activity_error", "activity_en_score"))
+    ]
 
     count_failures = [
         row
         for row in peak_rows
         if row.get("matched")
         and (
-            abs(float(row.get("relative_count_error") or 0.0)) > count_limit
-            or abs(float(row.get("count_en_score") or 0.0)) > en_limit
-            or not row.get("isotope_match", False)
+            not row.get("isotope_match", False)
+            or (
+                finite_metrics(row, ("relative_count_error", "count_en_score"))
+                and (
+                    abs(float(row["relative_count_error"])) > count_limit
+                    or abs(float(row["count_en_score"])) > en_limit
+                )
+            )
         )
     ]
     activity_failures = []
@@ -1914,9 +1948,10 @@ def build_validation_flags(
             row
             for row in isotope_rows
             if row.get("matched")
+            and finite_metrics(row, ("relative_activity_error", "activity_en_score"))
             and (
-                abs(float(row.get("relative_activity_error") or 0.0)) > activity_limit
-                or abs(float(row.get("activity_en_score") or 0.0)) > en_limit
+                abs(float(row["relative_activity_error"])) > activity_limit
+                or abs(float(row["activity_en_score"])) > en_limit
             )
         ]
 
@@ -1950,8 +1985,51 @@ def build_validation_flags(
     if thresholds.get("fail_on_measurement_qc", False):
         passed = passed and not measurement_qc_flags
 
+    evaluated = bool(peak_rows or isotope_rows or missing_peaks or missing_nuclides)
+    required_domains = ["counts"]
+    if sample_group in {"RAFM3", "RAFM4", "flux_wires"}:
+        required_domains.append("activities")
+    available_domains = []
+    if any(
+        row.get("matched")
+        and finite_metrics(row, ("relative_count_error", "count_en_score"))
+        for row in peak_rows
+    ):
+        available_domains.append("counts")
+    if any(
+        row.get("matched")
+        and finite_metrics(row, ("relative_activity_error", "activity_en_score"))
+        for row in isotope_rows
+    ):
+        available_domains.append("activities")
+    missing_domains = [
+        domain for domain in required_domains if domain not in available_domains
+    ]
+    incomplete = len(incomplete_count_rows) + len(incomplete_activity_rows)
+    comparison_passed = (
+        False
+        if not passed
+        else None if incomplete or missing_domains or not evaluated else True
+    )
     return {
-        "passed": passed,
+        # Reference reproduction can verify report import, but cannot validate
+        # raw recovery/activity estimates against the same copied quantities.
+        "passed": comparison_passed if not reference_used_for_analysis else None,
+        "comparison_passed": comparison_passed,
+        "comparison_basis": (
+            "not_evaluated"
+            if not evaluated
+            else (
+                "reference_reproduction"
+                if reference_used_for_analysis
+                else "raw_estimate_vs_report"
+            )
+        ),
+        "reference_used_for_analysis": bool(reference_used_for_analysis),
+        "incomplete_comparison_rows": incomplete,
+        "required_comparison_domains": required_domains,
+        "available_comparison_domains": available_domains,
+        "missing_comparison_domains": missing_domains,
         "count_failures": len(count_failures),
         "activity_failures": len(activity_failures),
         "line_consistency_failures": len(line_consistency_failures),
@@ -1959,6 +2037,53 @@ def build_validation_flags(
         "missing_peaks": list(missing_peaks),
         "missing_nuclides": list(missing_nuclides),
     }
+
+
+def summarize_validation_artifacts(
+    artifacts: Sequence[Dict[str, Any]],
+    *,
+    unmatched_qg: Sequence[Union[str, Path]] = (),
+) -> Dict[str, Any]:
+    """Keep failed, unchecked, and reference-reproduction runs distinct."""
+    failing = [
+        item["sample_id"]
+        for item in artifacts
+        if item["validation"].get("passed") is False
+    ]
+    unchecked = [
+        item["sample_id"]
+        for item in artifacts
+        if item["validation"].get("passed") is not True
+        and item["validation"].get("passed") is not False
+    ]
+    return {
+        "overall_passed": (
+            False
+            if failing
+            else None if unchecked or unmatched_qg or not artifacts else True
+        ),
+        "failing_samples": failing,
+        "unvalidated_samples": unchecked,
+        "unvalidated_reference_files": [str(path) for path in unmatched_qg],
+        "reference_reproduction_samples": [
+            item["sample_id"]
+            for item in artifacts
+            if item["validation"].get("comparison_basis") == "reference_reproduction"
+        ],
+    }
+
+
+def enforce_raw_comparison(summary: Dict[str, Any]) -> None:
+    """Require explicit successful comparisons when the caller enables a gate."""
+    if summary.get("overall_passed") is not True:
+        raise RuntimeError(
+            "RAFM raw comparison was not established or failed thresholds for: "
+            + ", ".join(
+                summary["failing_samples"]
+                + summary["unvalidated_samples"]
+                + summary.get("unvalidated_reference_files", [])
+            )
+        )
 
 
 def merge_detected_and_targeted_peaks(
@@ -2283,6 +2408,7 @@ def write_sample_comparison_report(
     reference_data: Optional[FluxWireData],
     config: Dict[str, Any],
     output_path: Path,
+    validation: Optional[Dict[str, Any]] = None,
 ) -> None:
     lines = [
         f"Sample: {sample_id}",
@@ -2297,6 +2423,26 @@ def write_sample_comparison_report(
         "Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path",
         "",
     ]
+    if validation is not None:
+        basis = validation.get("comparison_basis", "not_evaluated")
+        lines.extend(
+            [
+                f"Comparison basis: {basis}",
+                "Raw comparison passed: "
+                + (
+                    "yes"
+                    if validation.get("passed") is True
+                    else (
+                        "no" if validation.get("passed") is False else "not established"
+                    )
+                ),
+            ]
+        )
+        if basis == "reference_reproduction":
+            lines.append(
+                "QG values were used in the analysis; agreement checks reference reproduction, not independent raw recovery or activity accuracy."
+            )
+        lines.append("")
     if reference_data is None:
         lines.extend(
             [
@@ -2707,7 +2853,10 @@ def analyze_generic_sample(
     missing_peaks: List[str] = []
     missing_nuclides: List[str] = []
     validation = {
-        "passed": True,
+        "passed": None,
+        "comparison_passed": None,
+        "comparison_basis": "not_evaluated",
+        "reference_used_for_analysis": False,
         "count_failures": 0,
         "activity_failures": 0,
         "missing_peaks": [],
@@ -2752,6 +2901,14 @@ def analyze_generic_sample(
             fluxforge_consistency_rows,
             measurement_qc_rows,
             metadata.config.get("validation_thresholds", {}),
+            reference_used_for_analysis=generic_method_key
+            in {
+                "qg",
+                "qg_hybrid",
+                "current_hybrid",
+                "quantumgold",
+                "quantum_gold",
+            },
         )
 
     plot_spectrum_overlay(
@@ -2813,6 +2970,7 @@ def analyze_generic_sample(
         reference_data=reference_data,
         config=metadata.config,
         output_path=report_path,
+        validation=validation,
     )
 
     artifact = {
@@ -3267,7 +3425,10 @@ def analyze_flux_wire_sample(
     missing_peaks: List[str] = []
     missing_nuclides: List[str] = []
     validation = {
-        "passed": True,
+        "passed": None,
+        "comparison_passed": None,
+        "comparison_basis": "not_evaluated",
+        "reference_used_for_analysis": False,
         "count_failures": 0,
         "activity_failures": 0,
         "missing_peaks": [],
@@ -3296,6 +3457,14 @@ def analyze_flux_wire_sample(
             fluxforge_consistency_rows,
             measurement_qc_rows,
             metadata.config.get("validation_thresholds", {}),
+            reference_used_for_analysis=method_key
+            in {
+                "qg",
+                "qg_hybrid",
+                "current_hybrid",
+                "quantumgold",
+                "quantum_gold",
+            },
         )
 
     plot_spectrum_overlay(
@@ -3358,6 +3527,7 @@ def analyze_flux_wire_sample(
         reference_data=reference_data,
         config=metadata.config,
         output_path=report_path,
+        validation=validation,
     )
 
     artifact = {
@@ -4298,7 +4468,9 @@ def run_flux_wire_unfolding(
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)
         unfolder.set_initial_guess(prior_flux, source="VITAMIN-J prior")
         result = unfolder.unfold(method=method)
-        result.metadata["min_relative_uncertainty_applied"] = float(min_relative_uncertainty)
+        result.metadata["min_relative_uncertainty_applied"] = float(
+            min_relative_uncertainty
+        )
         result.metadata["rows_raised_to_min_relative_uncertainty"] = [
             f"{r.sample_id}|{r.reaction_id}"
             for r in valid_reactions
@@ -4321,7 +4493,18 @@ def build_summary_markdown(
     lines = [
         "# RAFM Validation Summary",
         "",
-        f"Overall pass: {'yes' if summary['overall_passed'] else 'no'}",
+        "Overall raw comparison: "
+        + (
+            "passed configured thresholds"
+            if summary["overall_passed"] is True
+            else (
+                "failed configured thresholds"
+                if summary["overall_passed"] is False
+                else "not established"
+            )
+        ),
+        f"Reference reproduction samples: {len(summary.get('reference_reproduction_samples', []))}",
+        f"Samples without independent comparison: {len(summary.get('unvalidated_samples', []))}",
         f"Analyzed raw spectra: {summary['n_raw_analyzed']}",
         f"Matched raw/QG pairs: {summary['n_matched_pairs']}",
         f"Unmatched raw files: {len(summary['unmatched_raw'])}",
@@ -4339,6 +4522,9 @@ def build_summary_markdown(
             lines.append(f"- {item}")
     else:
         lines.append("- none")
+    lines.extend(["", "## Samples without independent comparison", ""])
+    unchecked = summary.get("unvalidated_samples", [])
+    lines.extend([f"- {item}" for item in unchecked] if unchecked else ["- none"])
     lines.extend(["", "## Unmatched raw files", ""])
     if summary["unmatched_raw"]:
         lines.extend(f"- {item}" for item in summary["unmatched_raw"])
@@ -4575,11 +4761,7 @@ def run_rafm_validation(
             save_path=tree["plots_comparisons"] / "validation_summary_table.png",
         )
 
-    failing_samples = [
-        artifact["sample_id"]
-        for artifact in artifacts
-        if not artifact["validation"].get("passed", True)
-    ]
+    validation_summary = summarize_validation_artifacts(artifacts, unmatched_qg=unmatched_qg)
     line_diagnostic_buckets: Dict[str, int] = {}
     for row in line_rows:
         bucket = row.get("diagnostic_bucket")
@@ -4589,14 +4771,13 @@ def run_rafm_validation(
             line_diagnostic_buckets.get(str(bucket), 0) + 1
         )
     summary = {
-        "overall_passed": not failing_samples,
+        **validation_summary,
         "n_raw_analyzed": len(artifacts),
         "n_matched_pairs": sum(1 for _, qg, _ in pairs if qg is not None),
         "n_unmatched_raw": len(unmatched_raw),
         "n_unmatched_qg": len(unmatched_qg),
         "unmatched_raw": [str(path) for path in unmatched_raw],
         "unmatched_qg": [str(path) for path in unmatched_qg],
-        "failing_samples": failing_samples,
         "line_diagnostic_buckets": dict(sorted(line_diagnostic_buckets.items())),
         "qg_internal_consistency_flags": int(
             sum(
@@ -4626,10 +4807,7 @@ def run_rafm_validation(
     save_json(summary, paths.results_root / "validation_summary.json")
     build_summary_markdown(summary, paths.results_root / "validation_summary.md")
 
-    if enforce_thresholds and failing_samples:
-        raise RuntimeError(
-            "RAFM validation thresholds were violated for: "
-            + ", ".join(failing_samples)
-        )
+    if enforce_thresholds:
+        enforce_raw_comparison(summary)
 
     return summary
