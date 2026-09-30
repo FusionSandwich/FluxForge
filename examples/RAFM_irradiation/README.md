@@ -3,6 +3,11 @@
 This directory contains the main maintained replay data and workflow entrypoints
 for FluxForge.
 
+The INL Co masses are already adjusted Co element masses, despite the wires
+containing 0.46 wt% Co. Do not apply the alloy fraction a second time. See the
+[source and replay review](../../docs/reviews/INL_MONITOR_MASS_REVIEW_2026-09-29.md)
+for the mass basis, corrected Cu-Cd mass and remaining validation limits.
+
 ## What Is Here
 
 - `raw_gamma_spec/`: committed RAFM raw gamma spectra
