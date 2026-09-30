@@ -673,6 +673,7 @@ def peak_to_dict(
         "assignment_ambiguous": peak.assignment_ambiguous,
         "assignment_candidates": peak.to_dict()["assignment_candidates"],
         "activity_estimation_state": peak.activity_estimation_state,
+        "assignment_nominal_fwhm_keV": peak.assignment_nominal_fwhm_keV,
         "efficiency": float(peak.efficiency),
         "activity_bq": None if peak.assignment_ambiguous else float(peak.activity_bq),
         "activity_unc_bq": (
@@ -2241,7 +2242,8 @@ def merge_detected_and_targeted_peaks(
             # An exploratory nearest-energy label must not overwrite a
             # targeted unresolved-component result, even at higher SNR.
             tolerance = min(
-                energy_tolerance(targeted.energy_keV, config), 0.5 * targeted.fwhm
+                energy_tolerance(targeted.energy_keV, config),
+                0.5 * (targeted.assignment_nominal_fwhm_keV or targeted.fwhm),
             )
             merged = [
                 peak
@@ -2958,6 +2960,7 @@ def analyze_generic_sample(
             metadata.config.get("generic_targeted_counting_method", "iec_tiered")
         ),
         fit_diagnostics=fit_diagnostics,
+        max_assignment_energy_delta_fwhm=1.0,
     )
     attenuation_config = _build_attenuation_sample_config(
         metadata.config, timing.sample_group, sample_id
@@ -2985,6 +2988,7 @@ def analyze_generic_sample(
         sample_mass_g=estimate_rafm_sample_mass_g(sample_id, metadata),
     )
     analysis_configuration = {
+        "max_assignment_energy_delta_fwhm": 1.0,
         "profile_name": metadata.config["profile_name"],
         "counting_method": str(
             metadata.config.get("generic_targeted_counting_method", "iec_tiered")

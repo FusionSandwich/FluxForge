@@ -279,6 +279,7 @@ class IdentifiedPeak:
     assignment_candidates: List[GammaLine] = field(default_factory=list)
     assignment_ambiguous: bool = False
     activity_estimation_state: str = "estimated"
+    assignment_nominal_fwhm_keV: Optional[float] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -309,6 +310,7 @@ class IdentifiedPeak:
                 for line in self.assignment_candidates
             ],
             "activity_estimation_state": self.activity_estimation_state,
+            "assignment_nominal_fwhm_keV": self.assignment_nominal_fwhm_keV,
             "gamma_energy": self.gamma_line.energy_keV if self.gamma_line else None,
             "branching_ratio": self.gamma_line.intensity if self.gamma_line else None,
             "branching_ratio_uncertainty": (
@@ -1736,6 +1738,7 @@ def analyze_raw_spectrum_targeted(
     comparison_background_model: str = "constant",
     counting_method: str = "qg",
     fit_diagnostics: Optional[List[Dict[str, Any]]] = None,
+    max_assignment_energy_delta_fwhm: Optional[float] = None,
 ) -> List[IdentifiedPeak]:
     """
     Analyze raw spectrum by targeting known gamma lines.
@@ -1745,6 +1748,11 @@ def analyze_raw_spectrum_targeted(
     - using resolution-based ROI widths,
     - optionally falling back to Gaussian fitting when ROI sums fail.
     """
+    if max_assignment_energy_delta_fwhm is not None and (
+        not np.isfinite(max_assignment_energy_delta_fwhm)
+        or max_assignment_energy_delta_fwhm <= 0
+    ):
+        raise ValueError("Assignment energy tolerance must be finite and positive.")
     if data.spectrum is None:
         return []
 
@@ -2211,6 +2219,13 @@ def analyze_raw_spectrum_targeted(
             if significance < peak_threshold:
                 continue
 
+            energy_mismatch = (
+                max_assignment_energy_delta_fwhm is not None
+                and not assignment_ambiguous
+                and abs(peak_energy - float(line.energy_keV))
+                > max_assignment_energy_delta_fwhm * fwhm_keV
+            )
+            assignment_ambiguous = assignment_ambiguous or energy_mismatch
             results.append(
                 IdentifiedPeak(
                     channel=int(round(peak_channel)),
@@ -2224,11 +2239,16 @@ def analyze_raw_spectrum_targeted(
                     isotope=None if assignment_ambiguous else line.isotope,
                     gamma_line=None if assignment_ambiguous else line,
                     assignment_candidates=candidates,
+                    assignment_nominal_fwhm_keV=float(fwhm_keV),
                     assignment_ambiguous=assignment_ambiguous,
                     activity_estimation_state=(
-                        "withheld_ambiguous_assignment"
-                        if assignment_ambiguous
-                        else "estimated"
+                        "withheld_energy_mismatch"
+                        if energy_mismatch
+                        else (
+                            "withheld_ambiguous_assignment"
+                            if assignment_ambiguous
+                            else "estimated"
+                        )
                     ),
                     gross_counts_unc=float(stored_gross_unc),
                     background_adjusted_gross_counts=float(adjusted_gross),

@@ -11,6 +11,17 @@ Failed joint fits preserve the signed window observation and its counting
 standard deviation as a diagnostic, and suppress exploratory labels in that
 window. The window sum is not a physical net peak area.
 
+The completed first 29-spectrum audit revealed two false Sb124 assignments in
+RAFM4-B: library 602.73/1690.98 keV versus fitted 605.774/1695.866 keV. The generic
+workflow now withholds a single known assignment when the final centroid differs
+by more than one nominal profile FWHM at the library energy. Measured counts and
+the candidate survive, with state `withheld_energy_mismatch`. The fitted width
+does not set this threshold; these two fitted widths were anomalously narrow.
+A nearby exploratory label cannot restore the withheld activity: merging uses
+the stored nominal physical resolution. The flux-wire API default is unchanged.
+This withholding criterion does not prove closer assignments correct or qualify
+the detector calibration. A final-source replay supersedes the first audit.
+
 For #25, joint and single targeted fits use signed counts and the full propagated
 fit-window covariance. Joint area errors include amplitude/width covariance
 with explicit parameter layouts. Invalid covariance, insufficient fit bins,

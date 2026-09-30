@@ -244,3 +244,128 @@ def test_failed_joint_window_cannot_export_exploratory_activity():
     assert merged == [outside]
     assert "A" not in combine_peak_activities(merged)
     assert "B" in combine_peak_activities(merged)
+
+
+@pytest.mark.parametrize(
+    "delta,withheld", [(3.5325, False), (3.5326, True), (5.0, True)]
+)
+def test_assignment_energy_gate_uses_nominal_width_at_final_centroid(
+    monkeypatch, delta, withheld
+):
+    from fluxforge.analysis import flux_wire_analysis as analysis
+    from fluxforge.analysis.peakfit import GaussianPeak, PeakFitResult
+
+    monkeypatch.setattr(
+        analysis,
+        "fit_single_peak",
+        lambda **kwargs: PeakFitResult(
+            peak=GaussianPeak(centroid=100 + delta, amplitude=300, sigma=0.5),
+            background=np.zeros(25),
+            fit_region=(90, 115),
+            success=True,
+        ),
+    )
+    kwargs = dict(
+        expected_lines=[GammaLine(100, 0.9, "A")],
+        background_subtract=False,
+        peak_threshold=0,
+        counting_method="iec_tiered",
+    )
+    unguarded = analyze_raw_spectrum_targeted(specimen(), **kwargs)[0]
+    guarded = analyze_raw_spectrum_targeted(
+        specimen(), **kwargs, max_assignment_energy_delta_fwhm=1.0
+    )[0]
+    assert guarded.net_counts == unguarded.net_counts
+    assert guarded.net_counts_unc == unguarded.net_counts_unc
+    assert guarded.assignment_ambiguous is withheld
+    assert guarded.isotope == (None if withheld else "A")
+    if withheld:
+        assert guarded.activity_estimation_state == "withheld_energy_mismatch"
+        assert guarded.to_dict()["activity_bq"] is None
+        assert combine_peak_activities([guarded]) == {}
+
+
+@pytest.mark.parametrize("limit", [0, -1, np.nan, np.inf])
+def test_invalid_assignment_energy_tolerance_rejected(limit):
+    with pytest.raises(ValueError, match="finite and positive"):
+        analyze_raw_spectrum_targeted(
+            specimen(),
+            [GammaLine(100, 0.9, "A")],
+            max_assignment_energy_delta_fwhm=limit,
+        )
+
+
+def test_assignment_energy_gate_also_applies_after_failed_single_fit(monkeypatch):
+    from fluxforge.analysis import flux_wire_analysis as analysis
+    from fluxforge.analysis.peakfit import GaussianPeak, PeakFitResult
+
+    monkeypatch.setattr(
+        analysis,
+        "fit_single_peak",
+        lambda **kwargs: PeakFitResult(
+            peak=GaussianPeak(centroid=95, amplitude=0, sigma=1),
+            background=np.zeros(1),
+            success=False,
+        ),
+    )
+    peaks = analyze_raw_spectrum_targeted(
+        specimen(),
+        [GammaLine(95, 0.9, "A")],
+        background_subtract=False,
+        peak_threshold=0,
+        counting_method="iec_tiered",
+        max_assignment_energy_delta_fwhm=1.0,
+    )
+    assert peaks
+    assert peaks[0].assignment_ambiguous
+    assert peaks[0].activity_estimation_state == "withheld_energy_mismatch"
+
+
+def test_energy_mismatch_cannot_be_reassigned_by_nearby_exploratory_peak():
+    targeted = IdentifiedPeak(
+        104,
+        103.6,
+        1000,
+        30,
+        1400,
+        400,
+        0.5,
+        33,
+        assignment_candidates=[GammaLine(100, 0.9, "A")],
+        assignment_ambiguous=True,
+        activity_estimation_state="withheld_energy_mismatch",
+        assignment_nominal_fwhm_keV=3.5,
+    )
+    detected = IdentifiedPeak(
+        103,
+        102.9,
+        1000,
+        20,
+        1400,
+        400,
+        3.5,
+        50,
+        isotope="A",
+        activity_bq=100,
+        activity_unc_bq=5,
+    )
+    separate = IdentifiedPeak(
+        110,
+        110,
+        500,
+        30,
+        800,
+        300,
+        3.5,
+        16,
+        isotope="B",
+        activity_bq=50,
+        activity_unc_bq=3,
+    )
+    merged = merge_detected_and_targeted_peaks([detected, separate], [targeted], {})
+    assert detected not in merged
+    assert separate in merged
+    assert "A" not in combine_peak_activities(merged)
+    best, verified = match_peak({"energy_keV": 100, "isotope": "A"}, merged, {})
+    assert best is None
+    assert not verified
