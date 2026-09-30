@@ -1,0 +1,47 @@
+{
+  "implementation_commit": "098936f0901bf50e377655fed4f3c76dbb7b7d70",
+  "software_review_accepted": true,
+  "scientific_admission": false,
+  "tests_passed": 334,
+  "tests_skipped": 10,
+  "skip_reason": "optional PyUnfold absent; guard covered with stub",
+  "environment": "D:\\FluxForgeQA\\envs\\fluxforge-py312\\Scripts\\python.exe",
+  "downloads": 0,
+  "installs": 0,
+  "reviewed_source_sha256": {
+    "src/fluxforge/workflows/spectrum_unfolding.py": "d2a887bf26b0c09736739ce41f323973f2130f1c841f0203c7efddeec7ebca44",
+    "src/fluxforge/uncertainty/covariance.py": "f71cbb6658ef64854cb5460db54fafee711dce7fb3e3e5270c03955d13b175c6",
+    "src/fluxforge/uncertainty/reaction_rate_budget.py": "c4771c6f48dfae088cbf462ea28906ed4ba3cb163ecc3aeed083e46c26469f4c",
+    "src/fluxforge/analysis/holdout_validation.py": "a5be0838b05ee4519f72eb7e15947380451acc144f2ee0319bc7e83d8a90441a",
+    "src/fluxforge/analysis/physical_gls.py": "59053177666ddf0dc35f9a0a7dcbcd9db60e1eaba699503c3e0fc6925533f591",
+    "src/fluxforge/examples/rafm_workflow.py": "10b21224776d593167caed090b1fa6aedab7dafdfba5e372862b87cc8c0d566a",
+    "tests/test_publication_integrity.py": "0f651a5aed2b4dc38f990e543f7dfea183c58c5f79b9eff01ae4e29f9dbfc6d0",
+    "tools/validate_publication_integrity_rafm.py": "fb259dc221fec5efd449a914f79807adbe55b28327324974b9da5d2797a7a5bc"
+  },
+  "input_source_hashes_verified": true,
+  "evidence_sha256": {
+    "continuation.json": "a72ea08be1a4430d01467ad826199138743f7f614db6ccef5e926334c5c77807",
+    "continuation_final.json": "aa603cd6ceaa7b6a7f410395a79d9a57e73344c08e1c22b36a09fbda1f840e77",
+    "final_tests.txt": "8a8a7c600ee770654f7215d58e4d1fd338358f5297d0718e741071359d57f527",
+    "independent_review.md": "f341ea8232be7eb587eaa200134c2d3c49a4cfb615486c4a3f5558b8ef7ae40d",
+    "README.md": "15f48e6c158a061a871c9d613bcb1de3a36d62dab46eb157ee890d2c543d2ec4",
+    "operator\\output_sha256.json": "6fa18ec655341664fd593fa2af63c9c681c77028c43c1c35dc0f4b28ec2b2e86",
+    "operator\\receipt.json": "097901096691d4f5b02ad9cb69fd9639d381eff9a03dea60d79d03a772e31dfb",
+    "operator_final\\output_sha256.json": "63674eb8408d068078459ea75a6ed3a02a5e49b229bb64de5b7fffa6cef2cd43",
+    "operator_final\\receipt.json": "d764b1f131088b976db747ee18e74fd6d9621b1645e554fcc83bf8f6c50365d0"
+  },
+  "integrated_pr_heads": {
+    "205": "3c28ed922e8a51587da98a2b86e9ae102a5af417",
+    "207": "9d04eff6ebc867227ae439ecdcc37ddb40732b7f",
+    "210": "cff9dc72eede0af0b33ffcf22f217aea783e2c82"
+  },
+  "actual_missing_components": [
+    "detector_efficiency",
+    "gamma_yield",
+    "half_life",
+    "target_mass",
+    "isotopic_abundance",
+    "irradiation_history"
+  ],
+  "remaining_owner": "publication audit chat 01a0e525-29ba-7083-9efd-4772de8d8e59"
+}
