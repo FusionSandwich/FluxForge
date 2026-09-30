@@ -1,0 +1,215 @@
+{
+  "timestamp_utc": "2026-09-30T16:54:03.183506+00:00",
+  "git_head": "59eaee938683886c3993cbdf1428c2a4317c82ea",
+  "source_sha256": {
+    "src/fluxforge/examples/rafm_workflow.py": "f6b7ed52a0a11912d5c434055e637944e4f6f8974463b672ce65bc345fed63bc",
+    "src/fluxforge/analysis/flux_wire_analysis.py": "f30de002392bb8931fa5a724e88772a9a5f07cbf9296132cb8b4b37a8f8269c5",
+    "src/fluxforge/analysis/peakfit.py": "80cb495758ad29dae5cf07e23710fbcedd7fb129d65a4ea9003708b9c410a7d6",
+    "src/fluxforge/analysis/spectrum_math.py": "54b27bd2eb0dce8416f27b8c358163ffd626e3bebead5133e0e6f2455907c7ba"
+  },
+  "metadata_sha256": {
+    "flux_wire_metadata.json": "29e5dbc1cae2f7590479c19ffe34a915ad18d1be53dcb7d7e8be98583b6ddf72",
+    "pairing_aliases.json": "35e846e7e60ea5c6ec5d93438333a282ce70b6b8ebd573dde6015f8974746e4d",
+    "sample_gamma_library.json": "5b3acd81fe6eb373c7768cc43e950348bd93b1f7978bb6b07efbca8b5b791dbc",
+    "sample_schedule.json": "a8fc764e557b8ca0e7c6926f05113d7d7720d4c77d8b76e15ac0be122ede27a7",
+    "sample_schedules.json": "356fb3f5557402cb116aafeebc7dad8c8bb4bcd4b7e7db5438715de1102221be",
+    "workflow_config.json": "bd5aa84389098048897b5026b9168c3424a21603963652ddef6efd49601be2c1"
+  },
+  "background_sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+  "effective_configuration": {
+    "profile_name": "rafm_25cm",
+    "use_profile_energy_calibration": true,
+    "background_file": "background.ASC",
+    "min_peak_energy_keV": 80.0,
+    "max_peak_energy_keV": 3000.0,
+    "peak_significance_sigma": 3.0,
+    "targeted_peak_significance_sigma": 2.0,
+    "flux_wire_roi_width_fwhm": 4.0,
+    "flux_wire_background_width_channels": 1,
+    "flux_wire_background_gap_fwhm": 0.0,
+    "flux_wire_comparison_capture_range_channels": 32,
+    "flux_wire_broad_peak_ratio_threshold": 1.2,
+    "flux_wire_broad_peak_net_threshold": 5000.0,
+    "flux_wire_compact_window_edge_penalty": 80.0,
+    "flux_wire_compact_window_asymmetry_penalty": 10.0,
+    "flux_wire_compact_window_width_penalty": 120.0,
+    "flux_wire_broad_window_net_agreement_tolerance": 0.12,
+    "flux_wire_broad_window_max_raw_gross_ratio": 1.35,
+    "flux_wire_comparison_background_model": "constant",
+    "flux_wire_counting_method": "qg",
+    "generic_broad_window_max_raw_gross_ratio": 1.35,
+    "generic_comparison_background_model": "linear",
+    "generic_targeted_counting_method": "iec_tiered",
+    "generic_targeted_support_window_keV": 3.0,
+    "generic_targeted_support_min_intensity": 0.15,
+    "generic_targeted_fallback_top_lines_per_isotope": 6,
+    "generic_targeted_fallback_min_intensity": 0.03,
+    "generic_targeted_prune_neighbor_window_keV": 5.0,
+    "generic_targeted_prune_intensity_ratio": 20.0,
+    "line_activity_consistency_max_rel_deviation": 0.25,
+    "line_activity_consistency_min_lines": 2,
+    "line_activity_single_peak_drift_rel_threshold": 0.15,
+    "line_activity_outlier_modified_z_threshold": 3.5,
+    "ti48_model_relative_uncertainty_additional": 0.15,
+    "ti48_model_relative_uncertainty_floor": 0.2,
+    "cd_model_relative_uncertainty_additional": 0.2,
+    "cd_model_relative_uncertainty_floor": 0.25,
+    "qg_report_activity_includes_count_decay": false,
+    "qg_report_activity_includes_count_decay_note": "Reports state activities as of Measurement Date (count start). false applies the decay-during-count correction with the count real time, matching prior behaviour; verify against the Quantum Gold analysis settings.",
+    "cd_cover_thickness_cm": 0.0508,
+    "cd_cover_thickness_note": "INL nominal 0.0508 cm (20 mil) Cd; actual cover dimensions, closure and gaps not yet verified",
+    "cd_ratio_default_review_min": 1.1,
+    "cd_ratio_expected_ranges": {
+      "Cu": {
+        "min": 1.1
+      },
+      "Sc": {
+        "min": 1.1
+      }
+    },
+    "dead_time_review_threshold_pct": 15.0,
+    "attenuation_correction": {
+      "enabled": false,
+      "geometry": "point",
+      "material": "iron",
+      "thickness_cm": 0.0,
+      "container_material": null,
+      "container_thickness_cm": 0.0
+    },
+    "cross_isotope_line_collision_tolerance_keV": 0.15,
+    "peak_match_tolerances_keV": [
+      3.0,
+      3.0,
+      2.0
+    ],
+    "comparison_energy_tiers_keV": [
+      300.0,
+      1200.0
+    ],
+    "minimum_qg_net_counts": 1.0,
+    "validation_thresholds": {
+      "max_relative_count_error": 0.25,
+      "max_relative_activity_error": 0.2,
+      "max_en_score": 3.0,
+      "fail_on_line_consistency": false,
+      "fail_on_measurement_qc": false,
+      "fail_on_missing_nuclides": true,
+      "fail_on_missing_peaks": true
+    },
+    "generic_rafm_isotopes": [
+      "Al28",
+      "Co58",
+      "Co60",
+      "Cr51",
+      "Fe59",
+      "Mn54",
+      "Mn56",
+      "Sb124",
+      "Ta182",
+      "Tb154m",
+      "V52",
+      "W187"
+    ]
+  },
+  "limits": [
+    "QG is a comparison report, not ground truth; stage, calibration and systematic uncertainty require review.",
+    "Configured profile energy calibration and counting methods remain unchanged apart from selecting raw iec_tiered.",
+    "Raw extraction complete does not mean isotope identification or absolute activities are qualified."
+  ],
+  "status": "RUN_COMPLETE_REVIEW_REQUIRED",
+  "n_spectra": 2,
+  "all_committed_rafm3_rafm4_replayed": false,
+  "comparison_summary": {
+    "overall_passed": false,
+    "failing_samples": [
+      "RAFM3-B_24hrEOI",
+      "RAFM4-A_15dEOI"
+    ],
+    "unvalidated_samples": [],
+    "unvalidated_reference_files": [],
+    "reference_reproduction_samples": []
+  },
+  "samples": [
+    {
+      "sample": "RAFM3-B_24hrEOI",
+      "raw_sha256": "236b954098010357f140a6858d0df43bdd415f7d4d94f0fe4fe2c9ff5b4de1d8",
+      "qg_sha256": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+      "prediction_sha256": "29613c5b72fc660983efcaa245f93d06c09b1f4f73132ba6aa0630ce26b6504a",
+      "n_detected_peaks": 47,
+      "n_unidentified_peaks": 8,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 8,
+        "activity_failures": 3,
+        "line_consistency_failures": 30,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-B_24hrEOI:Mn56@2112.67"
+        ],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Al28",
+        "Cr51",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ],
+      "withheld_report_prediction_identical": true
+    },
+    {
+      "sample": "RAFM4-A_15dEOI",
+      "raw_sha256": "4c20d9ccef0030c0f6069ab0de65e7dbd1f6127b8035c5b36996660cba4b11b2",
+      "qg_sha256": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+      "prediction_sha256": "2923f5a666c4e8da9f0537e8bd320e8589e00791fb9cbab7c7061bf677bc17e8",
+      "n_detected_peaks": 38,
+      "n_unidentified_peaks": 2,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 16,
+        "activity_failures": 4,
+        "line_consistency_failures": 19,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co60",
+        "Cr51",
+        "Fe59",
+        "Mn54",
+        "Ta182",
+        "W187"
+      ]
+    }
+  ],
+  "review_scope": "Candidate preservation correction only; comparisons still fail and issue24 remains open."
+}

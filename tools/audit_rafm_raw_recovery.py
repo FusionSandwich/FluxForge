@@ -42,15 +42,17 @@ def prediction_digest(artifact):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, required=True)
-    parser.add_argument("--max-spectra", type=int)
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--max-spectra", type=int)
+    selection.add_argument(
+        "--sample", action="append", help="Replay a named specimen; may be repeated"
+    )
     args = parser.parse_args()
     output = args.output_root.resolve()
-    output.mkdir(parents=True, exist_ok=False)
     example = ROOT / "examples" / "RAFM_irradiation"
     metadata = workflow.load_rafm_example_metadata(example)
     metadata.config["generic_targeted_counting_method"] = "iec_tiered"
     paths = workflow.default_paths(example, results_root=output / "raw_iec")
-    tree = workflow.ensure_results_tree(paths.results_root)
     library, half_lives = workflow.build_generic_gamma_library(metadata)
     files = workflow.discover_input_files(paths)
     pairs, _, _ = workflow.pair_input_files(
@@ -60,10 +62,18 @@ def main():
         (raw, qg) for raw, qg, _ in pairs if raw.parent.name in {"RAFM3", "RAFM4"}
     ]
     assert len(selected) == 16, "Expected the committed 12 RAFM3 and 4 RAFM4 specimens"
+    if args.sample:
+        requested = set(args.sample)
+        available = {raw.stem for raw, _ in selected}
+        if requested - available:
+            raise ValueError(f"Unknown RAFM3/4 specimens: {sorted(requested - available)}")
+        selected = [(raw, qg) for raw, qg in selected if raw.stem in requested]
     if args.max_spectra is not None:
         if args.max_spectra <= 0:
             raise ValueError("max-spectra must be positive")
         selected = selected[: args.max_spectra]
+    output.mkdir(parents=True, exist_ok=False)
+    tree = workflow.ensure_results_tree(paths.results_root)
     background = read_raw_asc(
         paths.background_path, profile_name=metadata.config["profile_name"]
     ).spectrum

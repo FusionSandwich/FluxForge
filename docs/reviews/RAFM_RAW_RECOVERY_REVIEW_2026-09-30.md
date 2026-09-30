@@ -114,3 +114,41 @@ Efficiency, emission-probability and other systematic budgets remain incomplete.
 The 0.46 wt% Co case continues to use already adjusted element masses; no second
 0.0046 factor is applied. #24, #25 and #26 remain open. Draft-only corrections
 remain open until integration and issue-specific acceptance.
+
+## Follow-up: preserve different-isotope candidates
+
+The targeted pruning heuristic previously removed a line with a smaller emission
+probability when a nearby line from another isotope had a larger probability.
+Independent isotope activities can reverse that expected count ordering: a
+10000 Bq isotope with emission probability 0.002 produces twenty times the
+common exposure/efficiency factor; a 1 Bq isotope with probability 0.9 produces
+only 0.9 times it. The smaller probability is not evidence of a smaller peak.
+Pruning now requires the same known, nonblank isotope. Unknown labels also remain.
+
+The new analytical counterexamples failed on the old implementation and pass
+after correction. Same-isotope heuristic behavior remains tested. The affected
+suite (`test_generic_candidate_pruning`, `test_rafm_workflow`, and
+`test_rafm_validation_independence`) passed **49 tests**. Separate Sol review
+accepted this narrow correction and checked its actual-data effect.
+
+```powershell
+python tools/audit_rafm_raw_recovery.py --sample RAFM3-B_24hrEOI --sample RAFM4-A_15dEOI --output-root <new-output-directory>
+```
+
+The source-bound two-specimen receipt is
+`C:\Users\joshu\Documents\UWNR_work\composition_review\candidate_pruning_review_2026-09-30\raw_recovery_receipt.json`.
+Withholding the first specimen's report again preserves predictions. B-24-hour
+detected peaks change from 46 to 47, with activity failures increasing from two
+to three; eight count failures and the missing Mn-56 line remain. A-15-day changes
+from 39 to 38 peaks, with sixteen count and four activity failures unchanged.
+The B-24-hour comparison plot was inspected. These are candidate-set effects,
+not demonstrated improvements in measurement accuracy. The changed library also
+affects crowded fitting: the Mn-56 isotope aggregate now uses weak high-energy
+lines instead of its prior 846/1810 keV pair. That extraction must be investigated
+before the new candidate set can support a physical conclusion.
+
+Upstream library collision handling still picks a cross-isotope line by intensity
+within 0.15 keV, and fallback selection can exclude low-probability lines before
+this function. Neither limit is corrected by the pruning guard. #24 remains open.
+The audit's named selection rejects invalid names before creating an output tree,
+and cannot be combined with `--max-spectra`; both error paths were checked.

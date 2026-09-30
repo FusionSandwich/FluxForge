@@ -107,7 +107,7 @@ def test_workflow_profile_energy_calibration_supports_astm_inl_alias():
     assert workflow_profile_energy_calibration(astm_config) == pytest.approx(expected)
 
 
-def test_prune_generic_targeted_lines_drops_weak_nearby_nuisance_lines():
+def test_prune_generic_targeted_lines_preserves_different_isotope_candidates():
     lines = [
         GammaLine(energy_keV=1099.25, intensity=0.5659, isotope="Fe59"),
         GammaLine(energy_keV=1102.43, intensity=0.0027, isotope="Tb154m"),
@@ -123,9 +123,9 @@ def test_prune_generic_targeted_lines_drops_weak_nearby_nuisance_lines():
     assert ("Fe59", 1099.25) in got
     assert ("Co60", 1173.23) in got
     assert ("Ta182", 1231.02) in got
-    assert ("Tb154m", 1102.43) not in got
-    assert ("Tb154m", 1177.71) not in got
-    assert ("Tb154m", 1229.42) not in got
+    assert ("Tb154m", 1102.43) in got
+    assert ("Tb154m", 1177.71) in got
+    assert ("Tb154m", 1229.42) in got
 
 
 def test_select_generic_targeted_lines_keeps_supported_sets_and_limits_dense_unsupported_isotopes():

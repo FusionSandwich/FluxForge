@@ -294,10 +294,13 @@ def prune_generic_targeted_lines(
     intensity_ratio: float,
 ) -> List[GammaLine]:
     """
-    Prune weak nearby nuisance lines from the generic RAFM targeted library.
+    Prune weak nearby lines of the same isotope from the targeted library.
 
     This is only intended for the targeted recovery pass. Exploratory peak
     search should remain free to discover lines outside this pruned set.
+    Emission probabilities can be compared only when activity is shared.
+    Different or unknown isotopes have unconstrained relative activities.
+    Pruning is a candidate heuristic, not evidence that a line is absent.
     """
     if neighbor_window_keV <= 0.0 or intensity_ratio <= 1.0:
         return list(gamma_lines)
@@ -308,6 +311,12 @@ def prune_generic_targeted_lines(
         suppressed = False
         for other in lines:
             if other is line:
+                continue
+            if (
+                not line.isotope
+                or not str(line.isotope).strip()
+                or other.isotope != line.isotope
+            ):
                 continue
             if abs(other.energy_keV - line.energy_keV) > neighbor_window_keV:
                 continue
