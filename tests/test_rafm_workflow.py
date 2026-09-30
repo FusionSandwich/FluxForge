@@ -12,6 +12,8 @@ from fluxforge.examples.rafm_workflow import (
     analyze_flux_wire_sample,
     analyze_generic_sample,
     build_flux_wire_reactions,
+    flux_wire_element_mass_fraction,
+    flux_wire_specimen_mass_g,
     build_fluxforge_line_consistency_rows,
     default_paths,
     estimate_rafm_sample_mass_g,
@@ -40,6 +42,45 @@ from fluxforge.io.flux_wire import read_processed_txt, read_raw_asc
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE_ROOT = REPO_ROOT / "examples" / "RAFM_irradiation"
+
+
+@pytest.mark.parametrize("sample,mass", [("Co-RAFM-1", 4.0661), ("Co-Cd-RAFM-1", 3.6703)])
+def test_inl_adjusted_co_mass_is_not_diluted_again(sample, mass):
+    from fluxforge.analysis.flux_unfold import AVOGADRO
+
+    metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
+    timing = resolve_measurement_timing(sample + "_25cm", None, metadata)
+    row = metadata.flux_wire_metadata[sample.lower()][0]
+    assert row["mass_basis"] == "element_mass"
+    assert row["alloy_co_mass_fraction"] == 0.0046
+    assert flux_wire_specimen_mass_g(sample.lower(), metadata) is None
+    reaction = build_flux_wire_reactions(
+        sample + "_25cm", sample.lower(),
+        {"Co60": {"activity_eoi_bq": 1000.0, "activity_eoi_unc_bq": 10.0}},
+        timing, metadata,
+    )[0]
+    # The original INL mass is already Co mass, with natural Co-59 abundance 1.
+    assert reaction.n_atoms == pytest.approx(mass * 1e-3 * AVOGADRO / 58.9332)
+    row["element_mass_fraction"] = 0.0046
+    with pytest.raises(ValueError, match="another composition adjustment"):
+        build_flux_wire_reactions(sample, sample.lower(), {}, timing, metadata)
+
+
+@pytest.mark.parametrize("fraction", [0.0046, 0.0, float("nan")])
+def test_adjusted_element_mass_rejects_second_composition_correction(fraction):
+    with pytest.raises(ValueError, match="another composition adjustment"):
+        flux_wire_element_mass_fraction({"mass_basis": "element_mass", "element_mass_fraction": fraction})
+    assert flux_wire_element_mass_fraction({"mass_basis": "element_mass"}) == 1.0
+    assert flux_wire_element_mass_fraction({"mass_basis": "sample_mass", "element_mass_fraction": 0.0046}) == 0.0046
+    with pytest.raises(ValueError, match="Unknown flux-wire mass_basis"):
+        flux_wire_element_mass_fraction({"mass_basis": "isotope_mass"})
+
+
+def test_cu_cd_mass_uses_its_own_inl_designation_row():
+    metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
+    assert metadata.flux_wire_metadata["cu-cd-rafm-1"][0]["mass_mg"] == 12.9738
+    assert metadata.flux_wire_metadata["cu-rafm-1"][0]["mass_mg"] == 1.3748
+    assert flux_wire_specimen_mass_g("cu-cd-rafm-1", metadata) == pytest.approx(0.0129738)
 
 
 def test_metadata_and_pairing_aliases_load():
@@ -314,6 +355,10 @@ def test_analyze_flux_wire_sample_writes_reactions(tmp_path):
     )
 
     assert artifact["sample_group"] == "flux_wires"
+    assert artifact["reaction_rate_mass_metadata"]["mass_basis"] == "element_mass"
+    assert "sample_mass_g" not in artifact["isotopes"]["Co60"]
+    assert "specific_activity_Bq_g" not in artifact["isotopes"]["Co60"]
+    assert "eoi_specific_activity_Bq_g" not in artifact["isotopes"]["Co60"]
     assert artifact["reactions"]
     assert any(row["reaction_id"] == "Co-59(n,g)Co-60" for row in artifact["reactions"])
     assert "Co60" in artifact["isotopes"]

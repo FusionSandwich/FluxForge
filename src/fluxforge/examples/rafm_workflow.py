@@ -2906,6 +2906,29 @@ def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[f
     return float(mass)
 
 
+def flux_wire_element_mass_fraction(row: Dict[str, Any]) -> Optional[float]:
+    """Distinguish a whole sample mass from an already adjusted element mass."""
+    basis = row.get("mass_basis", "sample_mass")
+    if basis not in {"sample_mass", "element_mass"}:
+        raise ValueError(f"Unknown flux-wire mass_basis: {basis!r}")
+    fraction = row.get("element_mass_fraction")
+    if basis == "element_mass":
+        if fraction is not None and float(fraction) != 1.0:
+            raise ValueError("element_mass must not receive another composition adjustment")
+        return 1.0
+    return fraction
+
+
+def flux_wire_specimen_mass_g(sample_key: str, metadata: RAFMMetadata) -> Optional[float]:
+    """Do not present adjusted element mass as measured whole-specimen mass."""
+    row = flux_wire_metadata_row(sample_key, metadata) or {}
+    flux_wire_element_mass_fraction(row)
+    if row.get("mass_basis") == "element_mass":
+        return None
+    mass = flux_wire_mass_mg(sample_key, metadata)
+    return mass / 1000.0 if mass is not None else None
+
+
 def build_flux_wire_reactions(
     sample_id: str,
     sample_key: str,
@@ -2917,6 +2940,7 @@ def build_flux_wire_reactions(
     sample_element = get_sample_element(sample_id)
     mass_mg = flux_wire_mass_mg(sample_key, metadata)
     wire_metadata = flux_wire_metadata_row(sample_key, metadata) or {}
+    element_mass_fraction = flux_wire_element_mass_fraction(wire_metadata)
     normalized_sample_id = str(sample_id).strip().lower()
     normalized_sample_key = str(sample_key).strip().lower()
     for isotope, payload in isotope_payload.items():
@@ -2992,7 +3016,7 @@ def build_flux_wire_reactions(
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
             sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction,
-            element_mass_fraction=wire_metadata.get("element_mass_fraction"),
+            element_mass_fraction=element_mass_fraction,
         )
         irradiation_time_s = float(timing.irradiation_time_s or 0.0)
         decay_time_s = float(timing.decay_time_s or 0.0)
@@ -3162,11 +3186,7 @@ def analyze_flux_wire_sample(
         flux_wire_half_lives(),
         timing,
         raw_data.real_time,
-        sample_mass_g=(
-            (flux_wire_mass_mg(sample_key, metadata) or 0.0) / 1000.0
-            if flux_wire_mass_mg(sample_key, metadata) is not None
-            else None
-        ),
+        sample_mass_g=flux_wire_specimen_mass_g(sample_key, metadata),
         count_real_time_by_isotope={
             isotope: report_count_real_time_s(metadata.config, reference_data)
             for isotope, row in analysis.nuclide_activities.items()
@@ -3351,6 +3371,7 @@ def analyze_flux_wire_sample(
         "counts_csv": str(counts_csv),
         "n_detected_peaks": len(analysis.peaks),
         "n_unidentified_peaks": len(unidentified_peaks),
+        "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
         "comparison_report_txt": str(report_path),
         "line_diagnostics_csv": str(line_diagnostics_path),
         "qg_consistency_csv": str(qg_consistency_path),
@@ -3877,11 +3898,7 @@ def run_qg_benchmark(
             flux_wire_half_lives(),
             timing,
             report_count_real_time_s(metadata.config, reference_data),
-            sample_mass_g=(
-                (flux_wire_mass_mg(sample_key, metadata) or 0.0) / 1000.0
-                if flux_wire_mass_mg(sample_key, metadata) is not None
-                else None
-            ),
+            sample_mass_g=flux_wire_specimen_mass_g(sample_key, metadata),
         )
         reactions = build_flux_wire_reactions(
             sample_id, sample_key, isotope_payload, timing, metadata
@@ -3905,6 +3922,7 @@ def run_qg_benchmark(
                 "sample_group": timing.sample_group,
                 "n_isotopes": len(isotope_payload),
                 "n_reactions": len(reactions),
+                "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
             }
         )
 
