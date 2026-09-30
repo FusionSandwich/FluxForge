@@ -1,0 +1,54 @@
+{
+  "before_sha256": "a35f32ec11a3c32da8450db3159471a6df18ed06abb26bc3cc8f5117e564f1ce",
+  "after_sha256": "411b29b0ce47221c34b36ed5ed620ee5490a102777748fc735aa27e5f28fdf2d",
+  "before_commit": "9d04eff6ebc867227ae439ecdcc37ddb40732b7f",
+  "after_commit": "2756b00f655bc90001f8e27220268a83da972f07",
+  "exact_fields": [
+    "sources",
+    "edges_eV",
+    "row_cross_sections_barn",
+    "row_uncertainties_barn",
+    "group_integral_prior",
+    "forward_predictions",
+    "units",
+    "assumptions",
+    "limitations"
+  ],
+  "identical_data_hashes": true,
+  "reference_document_line_ending_differences": [
+    "docs/reviews/INL_MONITOR_MASS_REVIEW_2026-09-29.md"
+  ],
+  "workflow_comparison_rtol": 1e-12,
+  "workflow_comparison_atol": 0.0,
+  "workflows": {
+    "GRAVEL_aggregate_False": {
+      "response_bitwise_equal": true,
+      "max_prediction_relative_delta": 0.0
+    },
+    "GRAVEL_aggregate_True": {
+      "response_bitwise_equal": true,
+      "max_prediction_relative_delta": 3.3306690738754696e-16
+    },
+    "MLEM_aggregate_False": {
+      "response_bitwise_equal": true,
+      "max_prediction_relative_delta": 0.0
+    },
+    "MLEM_aggregate_True": {
+      "response_bitwise_equal": true,
+      "max_prediction_relative_delta": 4.440892098500626e-16
+    }
+  },
+  "before_variant_rows": [
+    1,
+    1,
+    1,
+    1
+  ],
+  "after_variant_rows": [
+    2,
+    2,
+    2,
+    2
+  ],
+  "after_invalid_rejected": 12
+}
