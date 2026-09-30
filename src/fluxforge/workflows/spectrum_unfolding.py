@@ -982,18 +982,31 @@ class SpectrumUnfolder:
                 ones = np.ones(len(indices))
                 if scale == 0:
                     weights = ones / len(indices)
+                    null_vectors = np.eye(len(indices))
                 else:
                     values, vectors = np.linalg.eigh(block / scale)
                     positive = values > 20 * len(indices) * np.finfo(float).eps
-                    null_projection = vectors[:, ~positive] @ (vectors[:, ~positive].T @ ones)
+                    null_vectors = vectors[:, ~positive]
+                    null_projection = null_vectors @ (null_vectors.T @ ones)
                     if ones @ null_projection > 20 * len(indices) * np.finfo(float).eps:
                         weights = null_projection / (ones @ null_projection)
                     else:
                         inverse_one = (vectors[:, positive] / values[positive]) @ (vectors[:, positive].T @ ones)
                         weights = inverse_one / (ones @ inverse_one)
+                common_rate = float(weights @ measured_rates[indices])
+                deterministic_residual = null_vectors.T @ (measured_rates[indices] - common_rate)
+                rate_scale = max(float(np.max(np.abs(measured_rates[indices]))), abs(common_rate))
+                roundoff = (100 * len(indices) * np.finfo(float).eps * rate_scale *
+                            max(1., float(np.sum(np.abs(weights)))))
+                if deterministic_residual.size and np.max(np.abs(deterministic_residual)) > roundoff:
+                    raise ValueError("Duplicate rates are incompatible with noiseless covariance directions")
             transform[out_index, indices] = weights
+        # Form a Gram matrix instead of subtracting nearly equal covariance
+        # terms. Singular shared errors can cancel exactly under BLUE weights.
+        transformed_factor = (None if covariance is None else
+                              transform @ covariance_factor(covariance))
         aggregated_covariance = (None if covariance is None else
-                                 covariance_matrix(transform @ covariance @ transform.T, len(groups)))
+                                 transformed_factor @ transformed_factor.T)
         has_duplicates = any(len(indices) > 1 for indices in groups)
         if not has_duplicates:
             return {

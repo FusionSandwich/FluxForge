@@ -483,3 +483,37 @@ def test_public_result_mutation_cannot_poison_cached_operator(mini_db):
     np.testing.assert_array_equal(current, original)
     assert names == ["Co-59(n,g)Co-60"]
     assert u._response_row_metadata[0]["reaction"] == names[0]
+
+
+@pytest.mark.parametrize("shared_errors", [[0.14, 0.23], [1.0, 3.0]])
+def test_unequal_fully_shared_errors_allow_noise_cancelling_aggregation(shared_errors):
+    u = SpectrumUnfolder.__new__(SpectrumUnfolder)
+    c = np.outer(shared_errors, shared_errors)
+    r = u._aggregate_duplicate_reaction_rows(
+        np.ones((2, 1)),
+        ["r", "r"],
+        np.ones(2),
+        np.array(shared_errors),
+        measurement_covariance=c,
+    )
+    assert r["measurements"][0] == pytest.approx(1.0)
+    assert r["measurement_covariance"][0, 0] >= 0.0
+    assert r["measurement_covariance"][0, 0] < 1e-14 * np.max(c)
+    assert np.linalg.eigvalsh(r["measurement_covariance"])[0] >= 0.0
+
+
+@pytest.mark.parametrize("scale", [1e-30, 1.0, 1e30])
+@pytest.mark.parametrize("shared", [True, False])
+def test_singular_replicates_reject_incompatible_deterministic_difference(
+    scale, shared
+):
+    u = SpectrumUnfolder.__new__(SpectrumUnfolder)
+    c = 0.01 * np.ones((2, 2)) * scale**2 if shared else np.zeros((2, 2))
+    with pytest.raises(ValueError, match="incompatible with noiseless"):
+        u._aggregate_duplicate_reaction_rows(
+            np.ones((2, 1)),
+            ["r", "r"],
+            np.array([1.0, 2.0]) * scale,
+            np.sqrt(np.diag(c)),
+            measurement_covariance=c,
+        )

@@ -62,7 +62,10 @@ qualification: receipts always retain `scientific_admission=False`.
 
 Compatible duplicate rows use covariance-aware linear weights and retain
 `T C T^T`, including covariance between groups and fully shared errors that
-cannot shrink with replication. Monte Carlo samples the full covariance.
+cannot shrink with replication. A transformed spectral factor forms the aggregate
+Gram covariance to preserve positive semidefiniteness when shared errors cancel.
+Replicates inconsistent with noiseless covariance directions are rejected rather
+than averaged away. Monte Carlo samples the full covariance.
 GRAVEL/MLEM objectives remain diagonal; their metadata states this limitation.
 Physical GLS remains the primary interface for a fit with full covariance.
 
