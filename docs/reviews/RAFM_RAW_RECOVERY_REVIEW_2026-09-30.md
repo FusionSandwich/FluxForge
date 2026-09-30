@@ -47,6 +47,46 @@ effective configuration, prediction hashes and per-sample validation. The termin
 status `RUN_COMPLETE_REVIEW_REQUIRED` describes execution, not measurement accuracy.
 Full spectra, tables and plots remain in local output directories.
 
+Final baseline evidence is preserved in
+[`RAFM_RAW_RECOVERY_2026-09-30.json`](RAFM_RAW_RECOVERY_2026-09-30.json).
+All four recorded source byte hashes matched the reviewed live files after
+completion; the source content was committed as `156d924`. The Git HEAD recorded
+at launch precedes that commit because the reviewed change was initially
+uncommitted. The final receipt is
+`C:\Users\joshu\Documents\UWNR_work\composition_review\raw_recovery_audit_2026-09-30_final\raw_recovery_receipt.json`.
+The earlier audit directory is development evidence superseded by this replay.
+
+### Per-sample comparison results
+
+All sixteen specimens fail at least one configured criterion. Count failures
+include isotope mismatches. Line-consistency flags are reported separately and
+the committed configuration does not use them as pass/fail gates.
+
+| Sample | Detected peaks | Unidentified | Count failures | Activity failures | Missing report peaks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RAFM3-B_24hrEOI | 46 | 8 | 8 | 2 | 1 |
+| RAFM3-B_2hrEOI | 24 | 2 | 6 | 2 | 0 |
+| RAFM3-B_300sEOI | 21 | 0 | 6 | 3 | 1 |
+| RAFM3-B_4dEOI | 39 | 10 | 5 | 2 | 1 |
+| RAFM3-C_24hrEOI | 33 | 5 | 6 | 2 | 0 |
+| RAFM3-C_2hrEOI | 26 | 3 | 4 | 2 | 0 |
+| RAFM3-C_300sEOI | 23 | 0 | 7 | 3 | 2 |
+| RAFM3-C_4dEOI | 26 | 7 | 4 | 1 | 1 |
+| RAFM3-N_24hrEOI | 33 | 6 | 6 | 2 | 1 |
+| RAFM3-N_2hrEOI | 20 | 3 | 5 | 2 | 0 |
+| RAFM3-N_300sEOI | 23 | 1 | 8 | 4 | 1 |
+| RAFM3-N_4dEOI | 39 | 11 | 6 | 1 | 1 |
+| RAFM4-A_15dEOI | 39 | 2 | 16 | 4 | 0 |
+| RAFM4-B_15dEOI | 40 | 1 | 19 | 4 | 0 |
+| RAFM4-C_15dEOI | 42 | 3 | 18 | 4 | 0 |
+| RAFM4-N_15dEOI | 49 | 3 | 20 | 5 | 0 |
+
+Across the 212 report-line comparisons, the diagnostic buckets contain 142
+count failures, 40 efficiency/activity-conversion discrepancies, two isotope
+mismatches, six gamma-library discrepancies, nine missing lines and thirteen
+matched lines. These buckets are ordered diagnostics: a count failure can also
+have an activity-conversion discrepancy. They do not isolate a unique cause.
+
 ## Discrepancies and limits
 
 The replay exposes peak-area and activity-conversion discrepancies that QG
