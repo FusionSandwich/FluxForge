@@ -517,3 +517,43 @@ def test_singular_replicates_reject_incompatible_deterministic_difference(
             np.sqrt(np.diag(c)),
             measurement_covariance=c,
         )
+
+
+@pytest.mark.parametrize("source", [None, "", "   "])
+def test_null_or_blank_sources_cannot_qualify_rafm_budget(source):
+    from fluxforge.examples.rafm_workflow import (
+        RAFMMetadata,
+        TimingInfo,
+        build_flux_wire_reactions,
+    )
+
+    declared = {
+        name: {"relative": 0.01, "source": source} for name in REQUIRED_COMPONENTS
+    }
+    metadata = RAFMMetadata(
+        config={"rate_uncertainty_components": declared},
+        sample_schedule={},
+        sample_schedules={},
+        flux_wire_metadata={"co-rafm-1": [{"mass_mg": 10.0}]},
+        pairing_aliases={},
+        sample_gamma_library={},
+    )
+    timing = TimingInfo(
+        "flux_wires", False, "synthetic", None, 7200.0, 1000.0, None, None, "synthetic"
+    )
+    b = build_flux_wire_reactions(
+        "Co-RAFM-1_25cm",
+        "co-rafm-1",
+        {"Co60": {"activity_eoi_bq": 500.0, "activity_eoi_unc_bq": 10.0}},
+        timing,
+        metadata,
+    )[0].uncertainty_budget
+    assert not b.complete
+    with pytest.raises(ValueError, match="incomplete source/component"):
+        rate_covariance([b], require_complete=True)
+
+
+@pytest.mark.parametrize("source", [123, {}, False])
+def test_nonstring_source_cannot_be_coerced_complete(source):
+    with pytest.raises(ValueError, match="source must be a string"):
+        UncertaintyComponent("activity", 0.1, source=source)

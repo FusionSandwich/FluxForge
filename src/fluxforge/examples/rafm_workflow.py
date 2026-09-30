@@ -3006,7 +3006,7 @@ def build_flux_wire_reactions(
         declared.update(metadata.config.get("rate_uncertainty_budgets", {}).get(
             f"{sample_id}|{reaction_id}", {}))
         for name, spec in declared.items():
-            kwargs = dict(source=str(spec.get("source", "")),
+            kwargs = dict(source=spec.get("source", ""),
                           correlation_group=spec.get("correlation_group"),
                           covers=tuple(spec.get("covers", ())))
             component = (UncertaintyComponent(name, float(spec["relative"]), **kwargs)

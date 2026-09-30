@@ -46,7 +46,22 @@ class UncertaintyComponent:
                 f"Component {self.name} needs a finite non-negative relative value"
             )
         object.__setattr__(self, "covers", tuple(self.covers))
-        if not self.name or self.sensitivity_sign not in (-1, 1):
+        if self.source is None:
+            object.__setattr__(self, "source", "")
+        elif not isinstance(self.source, str):
+            raise ValueError("Component source must be a string or absent")
+        if self.correlation_group is not None and (
+            not isinstance(self.correlation_group, str)
+            or not self.correlation_group.strip()
+        ):
+            raise ValueError("Correlation group must be a nonempty string or None")
+        if any(not isinstance(name, str) or not name.strip() for name in self.covers):
+            raise ValueError("Component coverage needs nonempty names")
+        if (
+            not isinstance(self.name, str)
+            or not self.name.strip()
+            or self.sensitivity_sign not in (-1, 1)
+        ):
             raise ValueError("Component needs a name and sensitivity sign +/-1")
         if len(set(self.covers)) != len(self.covers) or self.name in self.covers:
             raise ValueError(
