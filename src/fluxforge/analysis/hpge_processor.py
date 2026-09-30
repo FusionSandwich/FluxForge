@@ -478,10 +478,12 @@ class HPGeProcessor:
         try:
             fit_result = fit_single_peak(
                 spectrum.channels.astype(float),
-                counts_for_analysis.astype(float),
+                spectrum.counts.astype(float),
                 int(spectrum.channels[ch_idx]),
                 fit_width=15,
                 background_model="linear",
+                counts_uncertainty=spectrum.counts_uncertainty,
+                counts_covariance=spectrum.counts_covariance,
             )
         except Exception:
             return None
@@ -489,11 +491,7 @@ class HPGeProcessor:
         if not fit_result.success:
             return None
 
-        # Check if peak is significant
-        if fit_result.peak.area < 3 * fit_result.peak.area_uncertainty:
-            return None
-
-        net_counts_unc = float(fit_result.peak.area_uncertainty)
+        net_counts_unc = float(fit_result.net_counts_uncertainty)
         if spectrum.counts_uncertainty is not None:
             fit_lo, fit_hi = fit_result.fit_region
             mask = (spectrum.channels >= fit_lo) & (spectrum.channels <= fit_hi)
@@ -502,6 +500,9 @@ class HPGeProcessor:
                     np.sqrt(spectrum.weighted_counts_variance(mask.astype(float)))
                 )
                 net_counts_unc = max(net_counts_unc, roi_unc)
+
+        if fit_result.peak.area < 3 * net_counts_unc:
+            return None
 
         # Get efficiency
         if self.efficiency_curve:

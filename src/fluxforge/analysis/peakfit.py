@@ -259,6 +259,9 @@ class PeakFitResult:
         Whether fit converged
     message : str
         Fit status message
+    area_parameter_indices : tuple of int, optional
+        Amplitude/sigma indices for Gaussian area covariance propagation.
+        Absent preserves legacy uncertainty for other parameter layouts.
     """
 
     peak: GaussianPeak
@@ -271,6 +274,7 @@ class PeakFitResult:
     covariance: Optional[np.ndarray] = None
     success: bool = True
     message: str = ""
+    area_parameter_indices: Optional[Tuple[int, int]] = None
 
     @property
     def reduced_chi_squared(self) -> float:
@@ -285,6 +289,19 @@ class PeakFitResult:
     @property
     def net_counts_uncertainty(self) -> float:
         """Net counts uncertainty."""
+        if self.covariance is not None and self.area_parameter_indices is not None:
+            # Explicit indices avoid assuming a layout for joint multiplet
+            # fits or other peak models that also use PeakFitResult.
+            amplitude_index, sigma_index = self.area_parameter_indices
+            gradient = np.zeros(len(self.covariance))
+            gradient[amplitude_index] = self.peak.sigma * np.sqrt(2 * np.pi)
+            gradient[sigma_index] = self.peak.amplitude * np.sqrt(2 * np.pi)
+            variance = float(gradient @ self.covariance @ gradient)
+            if not np.isfinite(variance) or variance < 0:
+                raise ValueError(
+                    "Peak parameter covariance gives invalid area variance."
+                )
+            return float(np.sqrt(variance))
         return self.peak.area_uncertainty
 
 
@@ -1304,6 +1321,8 @@ def fit_single_peak(
     background_model: str = "linear",
     fix_centroid: bool = False,
     initial_sigma: Optional[float] = None,
+    counts_uncertainty: Optional[np.ndarray] = None,
+    counts_covariance: Any = None,
 ) -> PeakFitResult:
     """
     Fit single Gaussian peak to spectrum region.
@@ -1324,6 +1343,14 @@ def fit_single_peak(
         If True, fix centroid at peak_channel
     initial_sigma : float, optional
         Initial guess for sigma
+    counts_uncertainty : np.ndarray, optional
+        Finite nonnegative per-channel standard deviations for the full
+        spectrum. Required for correct marginal weighting after measured
+        background subtraction; otherwise uses independent Poisson weights.
+    counts_covariance : optional sparse or dense matrix
+        Full-spectrum counting covariance. Only the small fit-window matrix
+        is made dense for generalized least squares. When both uncertainty
+        and covariance are provided, their diagonals must agree.
 
     Returns
     -------
@@ -1339,11 +1366,42 @@ def fit_single_peak(
     x = channels[ch_lo:ch_hi].astype(float)
     y = counts[ch_lo:ch_hi].astype(float)
 
-    # Weights for chi-squared (Poisson uncertainty)
-    # Background subtraction can legitimately leave negative bins. Poisson
-    # variance is undefined there, so use a zero-count floor instead of taking
-    # sqrt of a negative value and silently producing NaN fit weights.
-    weights = 1.0 / np.maximum(np.sqrt(np.clip(y, 0.0, None)), 1.0)
+    if counts_uncertainty is not None:
+        uncertainty = np.asarray(counts_uncertainty, dtype=float)
+        if uncertainty.shape != np.asarray(counts).shape:
+            raise ValueError("counts_uncertainty must match the full spectrum counts.")
+        if np.any(~np.isfinite(uncertainty)) or np.any(uncertainty < 0):
+            raise ValueError("counts_uncertainty must be finite and nonnegative.")
+        weights = 1.0 / np.maximum(uncertainty[ch_lo:ch_hi], 1.0)
+    else:
+        # Raw-count Poisson weighting is a legacy fallback. It must not be
+        # reconstructed from clipped net counts after measured subtraction.
+        weights = 1.0 / np.maximum(np.sqrt(np.clip(y, 0.0, None)), 1.0)
+    fit_sigma = 1.0 / weights
+    if counts_covariance is not None:
+        from scipy.sparse import csr_matrix
+
+        covariance = csr_matrix(counts_covariance, dtype=float)
+        if covariance.shape != (len(counts), len(counts)):
+            raise ValueError("counts_covariance must match the full spectrum counts.")
+        if np.any(~np.isfinite(covariance.data)) or np.any(covariance.diagonal() < 0):
+            raise ValueError(
+                "counts_covariance must be finite with nonnegative diagonal."
+            )
+        if counts_uncertainty is not None and not np.allclose(
+            covariance.diagonal(),
+            uncertainty**2,
+            rtol=1e-10,
+            atol=1e-10,
+        ):
+            raise ValueError(
+                "counts_covariance diagonal must match counts_uncertainty squared."
+            )
+        fit_sigma = covariance[ch_lo:ch_hi, ch_lo:ch_hi].toarray()
+        if not np.allclose(fit_sigma, fit_sigma.T, rtol=1e-10, atol=1e-10):
+            raise ValueError("counts_covariance must be symmetric in the fit window.")
+        # Preserve the existing one-count floor for bins with variance below one.
+        fit_sigma += np.diag(np.maximum(1.0 - np.diag(fit_sigma), 0.0))
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()
@@ -1409,15 +1467,19 @@ def fit_single_peak(
             x,
             y,
             p0=p0,
-            sigma=1.0 / weights,
+            sigma=fit_sigma,
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
             maxfev=5000,
         )
 
         perr = np.sqrt(np.diag(pcov))
-        success = True
-        message = "Fit converged"
+        success = bool(np.all(np.isfinite(popt)) and np.all(np.isfinite(pcov)))
+        message = (
+            "Fit converged"
+            if success
+            else "Fit parameters or covariance are non-finite"
+        )
 
     except Exception as e:
         # Fit failed, return initial guess with large uncertainties
@@ -1455,7 +1517,10 @@ def fit_single_peak(
     # Calculate residuals and chi-squared
     y_fit = model(x, *popt)
     residuals = y - y_fit
-    chi_sq = np.sum((residuals * weights) ** 2)
+    if np.ndim(fit_sigma) == 2 and success:
+        chi_sq = float(residuals @ np.linalg.solve(fit_sigma, residuals))
+    else:
+        chi_sq = np.sum((residuals * weights) ** 2)
     dof = len(y) - len(popt)
 
     return PeakFitResult(
@@ -1469,6 +1534,7 @@ def fit_single_peak(
         covariance=pcov,
         success=success,
         message=message,
+        area_parameter_indices=(0, 2),
     )
 
 

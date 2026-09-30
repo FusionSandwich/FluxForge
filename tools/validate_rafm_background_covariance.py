@@ -84,13 +84,14 @@ def main():
                 "src/fluxforge/analysis/spectrum_math.py",
                 "src/fluxforge/analysis/flux_wire_analysis.py",
                 "src/fluxforge/analysis/hpge_processor.py",
+                "src/fluxforge/analysis/peakfit.py",
             ]
         },
         "background_sha256": digest(background_path),
         "samples": [],
         "limits": [
             "HPGe replay uses its default unity efficiency; its activity values are diagnostic, not calibrated UWNR activities.",
-            "HPGe uses a conservative covariance-aware ROI floor, not a GLS peak fit.",
+            "HPGe uses GLS counting covariance and a conservative ROI floor; model inadequacy still requires residual review.",
             "SNIP continuum-model uncertainty and full efficiency/emission budgets remain incomplete.",
             "Covell and other comparison count windows retain their existing method semantics.",
             "Count covariance across different samples sharing one background is not exported here.",
@@ -133,6 +134,22 @@ def main():
                     "fit_region": [int(lo), int(hi)],
                     "net_counts": line.net_counts,
                     "net_counts_unc": line.net_counts_unc,
+                    "centroid_channel": line.fit_result.peak.centroid,
+                    "fwhm_channels": line.fit_result.peak.fwhm,
+                    "reduced_chi_squared": line.fit_result.reduced_chi_squared,
+                    "signed_window_counts": float(
+                        np.sum(
+                            sample.counts[lo : hi + 1]
+                            - scale
+                            * np.interp(
+                                sample.energies[lo : hi + 1],
+                                background.energies,
+                                background.counts,
+                                left=0,
+                                right=0,
+                            )
+                        )
+                    ),
                     "diagonal_roi_unc": float(
                         np.sqrt(np.sum((weights * corrected.counts_uncertainty) ** 2))
                     ),

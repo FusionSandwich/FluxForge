@@ -45,7 +45,7 @@ These rates are example outputs, not a complete physical qualification. The
 element masses (4.0661 and 3.6703 mg), giving 4.154979967868026e19 and
 3.750528264446526e19 target atoms; there is no second alloy-factor multiplication.
 
-The final local receipt is
+The initial covariance-only local receipt is
 `C:\Users\joshu\Documents\UWNR_work\composition_review\covariance_review_2026-09-30_final\covariance_review_receipt.json`.
 It records input/source hashes, independent variances, per-line outputs and
 actual raw workflow artifacts. Generated spectrum plots were inspected.
@@ -53,17 +53,62 @@ actual raw workflow artifacts. Generated spectrum plots were inspected.
 ## Still open
 
 The count covariance and mass-basis checks pass. HPGe replay uses default unity
-efficiency, so its activity outputs are diagnostic. Output inspection also found
-an unstable existing Co-Cd 1332 keV fit: it reports about 85,932 peak counts from
+efficiency, so its activity outputs are diagnostic. Output inspection found
+an unstable existing Co-Cd 1332 keV fit: it reported about 85,932 peak counts from
 a window with only 13,144 signed counts, while fitting a large negative continuum
 and a centroid on the window boundary. Its reduced chi-squared is about 346.
-This result is not an accurate peak measurement. Investigate its use of Poisson
-weights on clipped background-subtracted counts before accepting HPGe results.
+That result was not an accurate peak measurement and led to the follow-up below.
 
-The covariance-aware ROI floor is not a GLS fit. Nonlinear SNIP/model uncertainty,
-efficiency/emission budgets and covariance between samples sharing a background
+Nonlinear SNIP/model uncertainty, efficiency/emission budgets and covariance
+between samples sharing a background
 remain incomplete. Symmetric indefinite covariance is detected if a requested
 weighted sum produces negative variance; construction does not run a global PSD
 test. QG reference substitutions remain separate open work in #24/#26.
 
 No issue is closed on the strength of this draft-branch correction alone.
+
+## Follow-up: signed HPGe GLS fitting
+
+HPGe now fits the signed corrected counts with their propagated counting
+covariance, rather than reconstructing Poisson weights from clipped net counts.
+Only its 31-channel fit-window covariance is made dense. Gaussian area uncertainty
+includes amplitude/sigma parameter covariance; explicit parameter indices prevent
+applying an incorrect layout to other peak models or joint multiplet results.
+Non-finite fitted covariance is not reported as successful. The 3-sigma acceptance
+check uses the final propagated counting uncertainty floor.
+
+The independent reviewer found an incorrect call-site edit during development;
+it was repaired before acceptance. The integration regression now captures the
+actual arrays passed to the fitter and checks exact signed count identity. Auto
+peak detection continues to use its corrected nonnegative algorithm copy.
+
+Synthetic signed Gaussian tests compare fitted parameter covariance against the
+analytic `inverse(J.T inverse(C) J)` result, and area variance against its analytic
+gradient, including cross terms. Tests cover variance scaling, invalid matrices,
+indefinite covariance, non-finite fit covariance, and explicit parameter layouts.
+
+The broader follow-up run passed **170 tests**. After the final dispatch correction,
+all **63 affected fitting/integration tests** passed:
+
+```powershell
+$env:MPLBACKEND = 'Agg'
+$env:PYTHONUTF8 = '1'
+python -m pytest tests/test_signed_peak_fit_covariance.py tests/test_hpge_background_integration.py tests/test_peak_background.py tests/test_hypermet.py tests/test_pipeline_validation.py -q
+```
+
+The authoritative final replay receipt, whose five source hashes were independently
+checked, is
+`C:\Users\joshu\Documents\UWNR_work\composition_review\covariance_review_2026-09-30_accepted\covariance_review_receipt.json`.
+Earlier replay directories retain the development snapshots; they are superseded.
+
+| Sample | Energy (keV) | Fitted net counts | Reported count SD | FWHM (channels) | Reduced chi-squared |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Co | 1173.23 | 33294.92 | 226.93 | 4.19 | 0.90 |
+| Co | 1332.49 | 30191.33 | 207.19 | 4.34 | 1.40 |
+| Co-Cd | 1173.23 | 9124.36 | 336.18 | 3.63 | 4.64 |
+| Co-Cd | 1332.49 | 7755.06 | 299.14 | 3.50 | 5.81 |
+
+This fixes the severe window-boundary/negative-continuum fit error and counting
+uncertainty dispatch. Elevated Co-Cd residuals still require peak/continuum model
+review under #25; they are not qualified absolute activities. Separate Sol review
+accepted only the count covariance and fitting correction, with these limits.
