@@ -37,10 +37,70 @@ class UncertaintyComponent:
     relative: float
     correlation_group: Optional[str] = None
     source: str = ""
+    covers: tuple[str, ...] = ()
+    sensitivity_sign: int = 1
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.relative) or self.relative < 0:
-            raise ValueError(f"Component {self.name} needs a finite non-negative relative value")
+            raise ValueError(
+                f"Component {self.name} needs a finite non-negative relative value"
+            )
+        object.__setattr__(self, "covers", tuple(self.covers))
+        if self.source is None:
+            object.__setattr__(self, "source", "")
+        elif not isinstance(self.source, str):
+            raise ValueError("Component source must be a string or absent")
+        if self.correlation_group is not None and (
+            not isinstance(self.correlation_group, str)
+            or not self.correlation_group.strip()
+        ):
+            raise ValueError("Correlation group must be a nonempty string or None")
+        if any(not isinstance(name, str) or not name.strip() for name in self.covers):
+            raise ValueError("Component coverage needs nonempty names")
+        if (
+            not isinstance(self.name, str)
+            or not self.name.strip()
+            or self.sensitivity_sign not in (-1, 1)
+        ):
+            raise ValueError("Component needs a name and sensitivity sign +/-1")
+        if len(set(self.covers)) != len(self.covers) or self.name in self.covers:
+            raise ValueError(
+                "Component coverage must not repeat its own or another name"
+            )
+
+    @classmethod
+    def from_input(
+        cls,
+        name,
+        standard_uncertainty,
+        log_sensitivity,
+        *,
+        source,
+        correlation_group=None,
+        covers=(),
+    ):
+        """Propagate u(x) * d(log rate)/dx, with units declared by the source.
+
+        The caller supplies a measured uncertainty and signed sensitivity, not
+        an assumed missing component. Retain sign for cross-row covariance.
+        """
+        if (
+            not math.isfinite(standard_uncertainty)
+            or standard_uncertainty < 0
+            or not math.isfinite(log_sensitivity)
+        ):
+            raise ValueError(
+                "Input uncertainty/sensitivity must be finite; uncertainty nonnegative"
+            )
+        effect = standard_uncertainty * log_sensitivity
+        return cls(
+            name,
+            abs(effect),
+            correlation_group,
+            source,
+            tuple(covers),
+            -1 if effect < 0 else 1,
+        )
 
 
 @dataclass
@@ -50,10 +110,44 @@ class RateUncertaintyBudget:
     components: List[UncertaintyComponent] = field(default_factory=list)
     required: Sequence[str] = REQUIRED_COMPONENTS
 
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.rate) or self.rate < 0:
+            raise ValueError("Reaction rate must be finite and non-negative")
+        names = [component.name for component in self.components]
+        if len(names) != len(set(names)):
+            raise ValueError("Uncertainty component names must be unique within a row")
+        accounted = set()
+        for component in self.components:
+            component.__post_init__()
+            coverage = {component.name, *component.covers}
+            if accounted.intersection(coverage):
+                raise ValueError(
+                    "Uncertainty component coverage overlaps; avoid double counting"
+                )
+            accounted.update(coverage)
+
     @property
     def missing(self) -> List[str]:
-        names = {component.name for component in self.components}
+        names = {
+            name
+            for component in self.components
+            for name in (component.name, *component.covers)
+        }
         return [name for name in self.required if name not in names]
+
+    @property
+    def complete(self) -> bool:
+        names = {name for c in self.components for name in (c.name, *c.covers)}
+        return set(REQUIRED_COMPONENTS).union(self.required).issubset(names) and all(
+            c.source.strip() for c in self.components
+        )
+
+    def require_complete(self) -> None:
+        self.__post_init__()
+        if not self.complete:
+            raise ValueError(
+                f"{self.row_id}: incomplete source/component uncertainty budget"
+            )
 
     @property
     def total_relative(self) -> float:
@@ -69,11 +163,17 @@ class RateUncertaintyBudget:
             "rate": self.rate,
             "total_relative": self.total_relative,
             "missing_components": ";".join(self.missing),
+            "component_coverage_complete": self.complete,
+            "scientific_admission": False,
         }
         for component in self.components:
             row[f"{component.name}_relative"] = component.relative
-            row[f"{component.name}_group"] = component.correlation_group or "independent"
+            row[f"{component.name}_group"] = (
+                component.correlation_group or "independent"
+            )
             row[f"{component.name}_source"] = component.source
+            row[f"{component.name}_covers"] = ";".join(component.covers)
+            row[f"{component.name}_sensitivity_sign"] = component.sensitivity_sign
         return row
 
 
@@ -88,9 +188,17 @@ def floor_as_component(
     )
 
 
-def rate_covariance(budgets: Sequence[RateUncertaintyBudget]) -> np.ndarray:
+def rate_covariance(
+    budgets: Sequence[RateUncertaintyBudget], *, require_complete: bool = False
+) -> np.ndarray:
     """Absolute covariance matrix of the rates in ``budgets``."""
     n = len(budgets)
+    if len({b.row_id for b in budgets}) != n:
+        raise ValueError("Rate budget observation identities must be unique")
+    for budget in budgets:
+        budget.__post_init__()
+        if require_complete:
+            budget.require_complete()
     cov = np.zeros((n, n))
     for i, bi in enumerate(budgets):
         for j, bj in enumerate(budgets):
@@ -104,7 +212,12 @@ def rate_covariance(budgets: Sequence[RateUncertaintyBudget]) -> np.ndarray:
                         and ci.correlation_group == cj.correlation_group
                     )
                     if same:
-                        total += ci.relative * cj.relative
+                        total += (
+                            ci.relative
+                            * cj.relative
+                            * ci.sensitivity_sign
+                            * cj.sensitivity_sign
+                        )
             cov[i, j] = total * bi.rate * bj.rate
     return cov
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import hashlib
 
 import numpy as np
 import pytest
@@ -85,6 +86,49 @@ def test_archive_data_preferred_and_labeled(mini_db: IRDFFDatabase) -> None:
     assert not xs.is_approximation
     # Lin-lin between tabulated points (not log-log)
     assert float(xs.evaluate(115.0)) == pytest.approx(1.0 + 0.5 * 799.0)
+
+
+def test_archive_hash_pin_rejects_unexpected_bytes(tmp_path: Path) -> None:
+    archive = tmp_path / IRDFF_TAB_ARCHIVE_NAME
+    archive.write_text(MINI_ARCHIVE, encoding="ascii")
+    db = IRDFFDatabase(
+        cache_dir=tmp_path, auto_download=False, archive_path=archive,
+        expected_archive_sha256="0" * 64,
+    )
+    with pytest.raises(ValueError, match="SHA-256"):
+        db.get_cross_section("Co-59(n,g)Co-60")
+
+
+def test_archive_hash_pin_accepts_matching_archive(mini_db: IRDFFDatabase) -> None:
+    digest = hashlib.sha256(mini_db.archive_path.read_bytes()).hexdigest()
+    db = IRDFFDatabase(
+        cache_dir=mini_db.cache_dir, auto_download=False,
+        archive_path=mini_db.archive_path, expected_archive_sha256=digest,
+    )
+    xs = db.get_cross_section("Co-59(n,g)Co-60")
+    assert xs.source_sha256 == digest
+
+
+def test_archive_hash_pin_requires_archive(tmp_path: Path) -> None:
+    db = IRDFFDatabase(
+        cache_dir=tmp_path, auto_download=False,
+        archive_path=tmp_path / "missing.txt", expected_archive_sha256="0" * 64,
+    )
+    with pytest.raises(FileNotFoundError, match="Pinned IRDFF-II archive"):
+        db.get_cross_section("Co-59(n,g)Co-60")
+
+
+def test_bare_response_row_records_evaluation_hash(mini_db: IRDFFDatabase) -> None:
+    from fluxforge.workflows.spectrum_unfolding import SpectrumUnfolder
+
+    unfolder = SpectrumUnfolder(custom_energy_edges=np.array([1e-5, 1e2, 2e7]), verbose=False)
+    unfolder.irdff_db = mini_db
+    unfolder.add_reaction("Co-59(n,g)Co-60", 1.0, rate_per_atom=1e-13, sample_id="Co-bare")
+    unfolder._build_response_matrix()
+    metadata = unfolder._response_row_metadata[0]
+    assert metadata["reaction_source"] == "IRDFF-II"
+    assert metadata["reaction_evaluation_key"] == "Co-59(n,g)"
+    assert metadata["reaction_source_sha256"] == hashlib.sha256(mini_db.archive_path.read_bytes()).hexdigest()
 
 
 def test_threshold_keeps_linear_ramp(mini_db: IRDFFDatabase) -> None:

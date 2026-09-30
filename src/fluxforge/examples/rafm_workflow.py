@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import math
 import re
@@ -2886,17 +2887,47 @@ def estimate_rafm_sample_mass_g(
     return volume_cm3 * density_g_cm3
 
 
-def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[float]:
+def flux_wire_metadata_row(
+    normalized_key: str, metadata: RAFMMetadata
+) -> Optional[Dict[str, Any]]:
     rows = metadata.flux_wire_metadata.get(normalized_key, [])
     if not rows:
         fallback_key = re.sub(r"([_-]rafm-[0-9]+)[a-z]$", r"\1", normalized_key)
         rows = metadata.flux_wire_metadata.get(fallback_key, [])
-    if not rows:
+    return rows[0] if rows else None
+
+
+def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[float]:
+    row = flux_wire_metadata_row(normalized_key, metadata)
+    if row is None:
         return None
-    mass = rows[0].get("mass_mg")
+    mass = row.get("mass_mg")
     if mass is None:
         raise ValueError(f"flux_wire_metadata entry for {normalized_key!r} has no mass_mg")
     return float(mass)
+
+
+def flux_wire_element_mass_fraction(row: Dict[str, Any]) -> Optional[float]:
+    """Distinguish a whole sample mass from an already adjusted element mass."""
+    basis = row.get("mass_basis", "sample_mass")
+    if basis not in {"sample_mass", "element_mass"}:
+        raise ValueError(f"Unknown flux-wire mass_basis: {basis!r}")
+    fraction = row.get("element_mass_fraction")
+    if basis == "element_mass":
+        if fraction is not None and float(fraction) != 1.0:
+            raise ValueError("element_mass must not receive another composition adjustment")
+        return 1.0
+    return fraction
+
+
+def flux_wire_specimen_mass_g(sample_key: str, metadata: RAFMMetadata) -> Optional[float]:
+    """Do not present adjusted element mass as measured whole-specimen mass."""
+    row = flux_wire_metadata_row(sample_key, metadata) or {}
+    flux_wire_element_mass_fraction(row)
+    if row.get("mass_basis") == "element_mass":
+        return None
+    mass = flux_wire_mass_mg(sample_key, metadata)
+    return mass / 1000.0 if mass is not None else None
 
 
 def build_flux_wire_reactions(
@@ -2909,6 +2940,8 @@ def build_flux_wire_reactions(
     reactions: List[FluxWireReaction] = []
     sample_element = get_sample_element(sample_id)
     mass_mg = flux_wire_mass_mg(sample_key, metadata)
+    wire_metadata = flux_wire_metadata_row(sample_key, metadata) or {}
+    element_mass_fraction = flux_wire_element_mass_fraction(wire_metadata)
     normalized_sample_id = str(sample_id).strip().lower()
     normalized_sample_key = str(sample_key).strip().lower()
     for isotope, payload in isotope_payload.items():
@@ -2965,25 +2998,34 @@ def build_flux_wire_reactions(
                     UncertaintyComponent(name, additional, None, f"config {name}_relative_uncertainty_additional")
                 )
         floor = max((term[2] for term in model_terms), default=0.0)
+        # Source components can be global, per-wire, or per observation. An
+        # itemized activity specification replaces the opaque reported term;
+        # it is never added a second time. Coverage overlap is rejected below.
+        declared = dict(metadata.config.get("rate_uncertainty_components", {}))
+        declared.update(wire_metadata.get("rate_uncertainty_components", {}))
+        declared.update(metadata.config.get("rate_uncertainty_budgets", {}).get(
+            f"{sample_id}|{reaction_id}", {}))
+        for name, spec in declared.items():
+            kwargs = dict(source=spec.get("source", ""),
+                          correlation_group=spec.get("correlation_group"),
+                          covers=tuple(spec.get("covers", ())))
+            component = (UncertaintyComponent(name, float(spec["relative"]), **kwargs)
+                         if "relative" in spec else UncertaintyComponent.from_input(
+                             name, float(spec["standard_uncertainty"]),
+                             float(spec["log_sensitivity"]), **kwargs))
+            components = [c for c in components if c.name != name] + [component]
+
         current = math.sqrt(sum(c.relative**2 for c in components))
         floor_component = floor_as_component(
             "model_floor", current, floor, "config *_model_relative_uncertainty_floor"
         )
         if floor_component is not None:
             components.append(floor_component)
-        for name, spec in dict(metadata.config.get("rate_uncertainty_components", {})).items():
-            components.append(
-                UncertaintyComponent(
-                    name,
-                    float(spec["relative"]),
-                    spec.get("correlation_group", "all_flux_wires"),
-                    str(spec.get("source", "workflow config")),
-                )
-            )
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
-            sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction
+            sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction,
+            element_mass_fraction=element_mass_fraction,
         )
         irradiation_time_s = float(timing.irradiation_time_s or 0.0)
         decay_time_s = float(timing.decay_time_s or 0.0)
@@ -3153,11 +3195,7 @@ def analyze_flux_wire_sample(
         flux_wire_half_lives(),
         timing,
         raw_data.real_time,
-        sample_mass_g=(
-            (flux_wire_mass_mg(sample_key, metadata) or 0.0) / 1000.0
-            if flux_wire_mass_mg(sample_key, metadata) is not None
-            else None
-        ),
+        sample_mass_g=flux_wire_specimen_mass_g(sample_key, metadata),
         count_real_time_by_isotope={
             isotope: report_count_real_time_s(metadata.config, reference_data)
             for isotope, row in analysis.nuclide_activities.items()
@@ -3342,6 +3380,7 @@ def analyze_flux_wire_sample(
         "counts_csv": str(counts_csv),
         "n_detected_peaks": len(analysis.peaks),
         "n_unidentified_peaks": len(unidentified_peaks),
+        "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
         "comparison_report_txt": str(report_path),
         "line_diagnostics_csv": str(line_diagnostics_path),
         "qg_consistency_csv": str(qg_consistency_path),
@@ -3750,8 +3789,8 @@ def cd_ratio_rows(
     R_Cd = R_bare / R_Cd for the same reaction on paired bare and Cd-covered
     wires. Rates are already normalized for target atoms, irradiation history
     and decay, so wire masses and count dates cancel correctly. The
-    uncertainty combines both rows' total relative uncertainties in
-    quadrature (conservative: shared components would partly cancel).
+    uncertainty propagates each row's marginal rate uncertainty and removes
+    shared covariance when component budgets identify a common source.
     """
     by_key = {
         normalize_pairing_key(item["sample_id"], metadata.pairing_aliases): item
@@ -3762,11 +3801,12 @@ def cd_ratio_rows(
     configured_ranges = metadata.config.get("cd_ratio_expected_ranges", {})
     default_review_min = float(metadata.config.get("cd_ratio_default_review_min", 1.10))
 
-    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float]]:
+    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float, Optional[Dict[str, Any]]]]:
         return {
             str(row["reaction_id"]): (
                 float(row.get("reaction_rate") or 0.0),
                 float(row.get("reaction_rate_unc") or 0.0),
+                row.get("uncertainty_budget") or row.get("rate_uncertainty_budget"),
             )
             for row in artifact.get("reactions", [])
             if "Unknown(" not in str(row.get("reaction_id"))
@@ -3787,14 +3827,31 @@ def cd_ratio_rows(
         if expected_min is None and material in {"Cu", "Sc"}:
             expected_min = default_review_min
         for reaction_id in sorted(set(bare_rates) & set(cd_rates)):
-            bare_rate, bare_unc = bare_rates[reaction_id]
-            cd_rate, cd_unc = cd_rates[reaction_id]
+            bare_rate, bare_unc, bare_budget = bare_rates[reaction_id]
+            cd_rate, cd_unc, cd_budget = cd_rates[reaction_id]
             ratio = bare_rate / cd_rate if bare_rate > 0 and cd_rate > 0 else None
-            ratio_unc = (
-                ratio * math.hypot(bare_unc / bare_rate, cd_unc / cd_rate)
-                if ratio is not None
-                else None
-            )
+            shared_covariance = 0.0
+            missing_uncertainty_components: List[str] = ["budget_unavailable"]
+            if ratio is not None and isinstance(bare_budget, dict) and isinstance(cd_budget, dict):
+                budgets = [
+                    RateUncertaintyBudget(
+                        row_id=str(budget["row_id"]), rate=rate,
+                        components=[UncertaintyComponent(**item) for item in budget["components"]],
+                    )
+                    for budget, rate in ((bare_budget, bare_rate), (cd_budget, cd_rate))
+                ]
+                shared_covariance = float(rate_covariance(budgets)[0, 1])
+                missing_uncertainty_components = sorted(set(budgets[0].missing + budgets[1].missing))
+            if ratio is None:
+                ratio_unc = None
+            else:
+                relative_variance = (
+                    (bare_unc / bare_rate) ** 2 + (cd_unc / cd_rate) ** 2
+                    - 2 * shared_covariance / (bare_rate * cd_rate)
+                )
+                if relative_variance < -1e-12:
+                    raise ValueError("Cd ratio component covariance exceeds marginal uncertainty")
+                ratio_unc = ratio * math.sqrt(max(relative_variance, 0.0))
             flag_review = ratio is None or (
                 (expected_min is not None and ratio < float(expected_min))
                 or (expected_max is not None and ratio > float(expected_max))
@@ -3815,6 +3872,8 @@ def cd_ratio_rows(
                     "cd_rate_per_atom_s": cd_rate,
                     "cd_ratio": ratio,
                     "cd_ratio_unc": ratio_unc,
+                    "shared_rate_covariance": shared_covariance,
+                    "missing_uncertainty_components": ";".join(missing_uncertainty_components),
                     "basis": "per-target-atom EOI reaction rates",
                     "expected_cd_ratio_min": (
                         None if expected_min is None else float(expected_min)
@@ -3868,11 +3927,7 @@ def run_qg_benchmark(
             flux_wire_half_lives(),
             timing,
             report_count_real_time_s(metadata.config, reference_data),
-            sample_mass_g=(
-                (flux_wire_mass_mg(sample_key, metadata) or 0.0) / 1000.0
-                if flux_wire_mass_mg(sample_key, metadata) is not None
-                else None
-            ),
+            sample_mass_g=flux_wire_specimen_mass_g(sample_key, metadata),
         )
         reactions = build_flux_wire_reactions(
             sample_id, sample_key, isotope_payload, timing, metadata
@@ -3896,6 +3951,7 @@ def run_qg_benchmark(
                 "sample_group": timing.sample_group,
                 "n_isotopes": len(isotope_payload),
                 "n_reactions": len(reactions),
+                "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
             }
         )
 
@@ -4072,6 +4128,7 @@ def adapt_unfold_result(
     predicted_rates: np.ndarray,
     chi2: float,
     metadata_dict: Optional[Dict[str, Any]] = None,
+    initial_guess_source: str = "unspecified",
 ) -> UnfoldingResult:
     measured_rates = np.array(
         [reaction.reaction_rate for reaction in reactions], dtype=float
@@ -4086,10 +4143,10 @@ def adapt_unfold_result(
         predicted_rates=np.asarray(predicted_rates, dtype=float),
         chi_squared=float(chi2),
         iterations=1,
-        converged=True,
+        converged=False,
         method=method,
-        initial_guess_source="VITAMIN-J prior",
-        metadata=metadata_dict or {},
+        initial_guess_source=initial_guess_source,
+        metadata={"diagnostic_only": True, "physical_validation": False, **(metadata_dict or {})},
     )
 
 
@@ -4106,6 +4163,24 @@ def simplified_response_matrix(
 def method_overlay_plot(results: Dict[str, UnfoldingResult], output_path: Path) -> None:
     if not HAS_MATPLOTLIB or not results:
         return
+    reference = next(iter(results.values()))
+    required = ("observation_ids", "prior_flux", "uncertainty_model")
+    for result in results.values():
+        if (
+            not result.converged
+            or result.metadata.get("diagnostic_only")
+            or not result.metadata.get("physical_validation")
+            or any(key not in result.metadata for key in required)
+            or result.metadata["observation_ids"] != reference.metadata.get("observation_ids")
+            or result.metadata["uncertainty_model"] != reference.metadata.get("uncertainty_model")
+            or not np.array_equal(result.energy_edges, reference.energy_edges)
+            or not np.array_equal(result.response_matrix, reference.response_matrix)
+            or not np.array_equal(result.measured_rates, reference.measured_rates)
+        ):
+            raise ValueError(
+                "Method overlay requires converged, physically admitted results "
+                "with one observation set, response operator, energy grid, and uncertainty model"
+            )
     fig, ax = plt.subplots(figsize=(11, 6))
     for method, result in results.items():
         energies = np.sqrt(result.energy_edges[:-1] * result.energy_edges[1:]) / 1e6
@@ -4127,6 +4202,7 @@ def save_unfolding_artifacts(
     result: UnfoldingResult,
     prior_flux: np.ndarray,
     output_root: Path,
+    reference_label: Optional[str] = None,
 ) -> None:
     slug = result.method.lower()
     payload = {
@@ -4137,9 +4213,10 @@ def save_unfolding_artifacts(
         "reactions_used": result.reactions_used,
         "measured_rates": result.measured_rates.tolist(),
         "predicted_rates": result.predicted_rates.tolist(),
-        "chi_squared": result.chi_squared,
+        "chi_squared": None if result.metadata.get("diagnostic_only") else result.chi_squared,
         "iterations": result.iterations,
         "converged": result.converged,
+        "initial_guess_source": result.initial_guess_source,
         "metadata": result.metadata,
     }
     save_json(payload, output_root / f"{slug}.json")
@@ -4161,7 +4238,7 @@ def save_unfolding_artifacts(
     plot_spectrum_comparison(
         result,
         reference_flux=prior_flux,
-        reference_label="VITAMIN-J prior",
+        reference_label=reference_label or result.initial_guess_source,
         title=f"{result.method} spectrum vs prior",
         save_path=plots_root / f"{slug}_spectrum.png",
     )
@@ -4209,19 +4286,73 @@ def run_flux_wire_unfolding(
     ``min_relative_uncertainty`` is an explicit lower bound on the rate
     uncertainty passed to GRAVEL/MLEM; it is recorded in each result's metadata.
     """
+    excluded_reactions = [
+        {
+            "observation_id": f"{reaction.sample_id}|{reaction.reaction_id}",
+            "sample_id": reaction.sample_id,
+            "reaction_id": reaction.reaction_id,
+            "activity_Bq": reaction.activity_bq,
+            "reaction_rate_per_atom_s": reaction.reaction_rate,
+            "reaction_rate_unc_per_atom_s": reaction.reaction_rate_unc,
+            "admission_status": "provisional_excluded",
+            "reason": "Ni-57 absent from processed QG report; raw line and calibration admission unresolved (#192)",
+        }
+        for reaction in reactions
+        if str(reaction.sample_id).lower().startswith("ni-rafm-1")
+        and "ni-57" in reaction.reaction_id.lower()
+    ]
     valid_reactions = [
         reaction
         for reaction in reactions
         if reaction.reaction_rate > 0 and "Unknown(" not in reaction.reaction_id
+        and not (
+            str(reaction.sample_id).lower().startswith("ni-rafm-1")
+            and "ni-57" in reaction.reaction_id.lower()
+        )
     ]
     if not valid_reactions:
+        if excluded_reactions:
+            save_json({
+                "excluded_reactions": excluded_reactions,
+                "sensitivity_status": "not computed: no qualified physical inversion available",
+            }, output_root / "input_admission_review.json")
         return {}
+    save_json({
+        "included_observation_ids": [
+            f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
+        ],
+        "excluded_reactions": excluded_reactions,
+        "sensitivity_status": "not computed: no qualified physical inversion available",
+    }, output_root / "input_admission_review.json")
 
     # Discrete binning is a per-reaction indicator, not an unfolded spectrum,
     # and is deliberately not produced or overlaid as a flux here.
     gls = unfold_gls(valid_reactions, n_groups=20)
-    gls_response = simplified_response_matrix(valid_reactions, gls.energy_bounds_eV)
-    gls_predicted = gls_response @ gls.flux
+    gls_response = gls.response_matrix
+    gls_predicted = gls.predicted_rates
+    gls_metadata = {
+        "response_model": "reaction-label Gaussian placeholder",
+        "response_rank": gls.response_rank,
+        "response_nullity": len(gls.flux) - gls.response_rank,
+        "prior_flux": gls.prior_flux.tolist(),
+        "prior_flux_sha256": hashlib.sha256(
+            np.asarray(gls.prior_flux, dtype="<f8").tobytes()
+        ).hexdigest(),
+        "prior_covariance": gls.prior_covariance.tolist(),
+        "prior_covariance_sha256": hashlib.sha256(
+            np.asarray(gls.prior_covariance, dtype="<f8").tobytes()
+        ).hexdigest(),
+        "prior_hash_encoding": "little-endian float64 row-major bytes",
+        "observation_covariance": gls.observation_covariance.tolist(),
+        "response_matrix": gls_response.tolist(),
+        "measured_rates": gls.measured_rates.tolist(),
+        "predicted_rates": gls_predicted.tolist(),
+        "postfit_residuals": gls.postfit_residuals.tolist(),
+        "postfit_observation_chi2": gls.postfit_observation_chi2,
+        "prior_innovation_chi2": gls.chi2,
+        "observation_ids": [f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions],
+        "excluded_reactions": excluded_reactions,
+    }
     gls_result = adapt_unfold_result(
         "GLS",
         gls.energy_bounds_eV,
@@ -4231,9 +4362,14 @@ def run_flux_wire_unfolding(
         gls_response,
         gls_predicted,
         gls.chi2,
+        metadata_dict=gls_metadata,
+        initial_guess_source="internal equal-lethargy prior",
     )
     prior_gls = parse_prior_spectrum(prior_path, gls.energy_bounds_eV)
-    save_unfolding_artifacts(gls_result, prior_gls, output_root)
+    save_unfolding_artifacts(
+        gls_result, prior_gls, output_root,
+        reference_label="VITAMIN-J plot reference (not inversion prior)",
+    )
 
     iterative_results: Dict[str, UnfoldingResult] = {
         "GLS": gls_result,
@@ -4247,6 +4383,14 @@ def run_flux_wire_unfolding(
                     f"{reaction.sample_id} is Cd-covered but no cd_cover_thickness_cm "
                     "is configured; refusing to unfold it with a bare response"
                 )
+            budget = reaction.uncertainty_budget
+            if budget is not None:
+                floor_component = floor_as_component(
+                    "iterative_rate_floor", budget.total_relative, min_relative_uncertainty,
+                    "explicit run_flux_wire_unfolding min_relative_uncertainty")
+                budget = RateUncertaintyBudget(
+                    budget.row_id, budget.rate,
+                    list(budget.components) + ([floor_component] if floor_component else []), budget.required)
             unfolder.add_reaction(
                 reaction=reaction.reaction_id,
                 activity_Bq=reaction.reaction_rate,
@@ -4255,6 +4399,7 @@ def run_flux_wire_unfolding(
                     min_relative_uncertainty * reaction.reaction_rate,
                 ),
                 rate_per_atom=reaction.reaction_rate,
+                rate_uncertainty_budget=budget,
                 sample_id=reaction.sample_id,
                 cover="Cd" if covered else None,
                 response_spec=(
@@ -4265,13 +4410,21 @@ def run_flux_wire_unfolding(
                         cover=cd_cover,
                     )
                     if covered
-                    else None
+                    else MonitorResponseSpec(
+                        observation_id=f"{reaction.sample_id}|{reaction.reaction_id}",
+                        sample_id=reaction.sample_id, reaction=reaction.reaction_id)
                 ),
             )
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)
         unfolder.set_initial_guess(prior_flux, source="VITAMIN-J prior")
         result = unfolder.unfold(method=method)
         result.metadata["min_relative_uncertainty_applied"] = float(min_relative_uncertainty)
+        result.metadata["excluded_reactions"] = excluded_reactions
+        result.metadata["observation_ids"] = [
+            f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
+        ]
+        result.metadata["physical_validation"] = False
+        result.metadata["diagnostic_only"] = True
         result.metadata["rows_raised_to_min_relative_uncertainty"] = [
             f"{r.sample_id}|{r.reaction_id}"
             for r in valid_reactions
@@ -4280,9 +4433,15 @@ def run_flux_wire_unfolding(
         save_unfolding_artifacts(result, prior_flux, output_root)
         iterative_results[method] = result
 
-    method_overlay_plot(
-        iterative_results,
-        output_root.parent / "plots" / "unfolding" / "method_overlay.png",
+    save_json(
+        {
+            "admitted": False,
+            "reason": "Methods use different response operators, energy grids, priors, or nonconverged diagnostic results (#191)",
+            "methods": {name: {"converged": bool(item.converged),
+                               "diagnostic_only": bool(item.metadata.get("diagnostic_only"))}
+                        for name, item in iterative_results.items()},
+        },
+        output_root / "method_overlay_review.json",
     )
     return iterative_results
 

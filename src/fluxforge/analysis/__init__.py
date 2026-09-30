@@ -258,6 +258,12 @@ from fluxforge.analysis.flux_unfold import (
     THERMAL_CROSS_SECTIONS,
     REACTION_ENERGIES,
 )
+from fluxforge.analysis.physical_gls import (
+    MonitorRow,
+    SourceBinding,
+    PhysicalGLSResult,
+    unfold_gls_physical,
+)
 
 # Flux wire selection advisor (INL reactor dosimetry workflow)
 from fluxforge.analysis.flux_wire_selection import (
@@ -506,6 +512,10 @@ __all__ = [
     "FluxWireUnfoldResult",
     "DiscreteUnfoldResult",
     "GLSUnfoldResult",
+    "MonitorRow",
+    "SourceBinding",
+    "PhysicalGLSResult",
+    "unfold_gls_physical",
     "THERMAL_CROSS_SECTIONS",
     "REACTION_ENERGIES",
     # Flux wire selection (INL reactor dosimetry)
