@@ -1520,8 +1520,18 @@ class SpectrumUnfolder:
                          np.all(np.isfinite(flux_array)) and np.all(flux_array >= 0) and
                          (uncertainty_estimator == "capped" or
                           (result.converged and converged_draws == n_uncertainty_samples)))
-            flux_covariance = np.atleast_2d(np.cov(np.asarray(samples), rowvar=False, ddof=1)) if qualifies else None
-            flux_uncertainty = (np.sqrt(np.maximum(np.diag(flux_covariance), 0.)) if qualifies else
+            ensemble_error = None
+            flux_covariance = None
+            if qualifies:
+                # Finite draws can still overflow the derived second moment.
+                with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+                    flux_covariance = np.atleast_2d(np.cov(np.asarray(samples), rowvar=False, ddof=1))
+                    candidate_uncertainty = np.sqrt(np.maximum(np.diag(flux_covariance), 0.))
+                if not (np.all(np.isfinite(flux_covariance)) and np.all(np.isfinite(candidate_uncertainty))):
+                    qualifies = False
+                    ensemble_error = "nonfinite sample covariance or standard deviation"
+                    flux_covariance = None
+            flux_uncertainty = (candidate_uncertainty if qualifies else
                                 np.full(flux_array.shape, np.nan))
             stop_counts = {}
             for status in statuses:
@@ -1537,6 +1547,7 @@ class SpectrumUnfolder:
                     "flux_uncertainty_finite_draws": finite_draws,
                     "flux_uncertainty_converged_draws": converged_draws,
                     "flux_uncertainty_usable": n_uncertainty_samples if qualifies else 0,
+                    "flux_uncertainty_ensemble_error": ensemble_error,
                     "flux_uncertainty_draw_status": statuses,
                     "flux_uncertainty_stop_counts": stop_counts,
                     "flux_uncertainty_main_converged": bool(result.converged),

@@ -557,3 +557,38 @@ def test_null_or_blank_sources_cannot_qualify_rafm_budget(source):
 def test_nonstring_source_cannot_be_coerced_complete(source):
     with pytest.raises(ValueError, match="source must be a string"):
         UncertaintyComponent("activity", 0.1, source=source)
+
+
+@pytest.mark.parametrize("estimator", ["converged", "capped"])
+def test_finite_draws_with_overflowed_covariance_are_unavailable(
+    monkeypatch, estimator
+):
+    u = synthetic(monkeypatch)
+    calls = []
+
+    def fake(*args, **kwargs):
+        calls.append(1)
+        return SimpleNamespace(
+            flux=[1e200, 1e200] if len(calls) == 2 else [1.0, 1.0],
+            converged=True,
+            iterations=1,
+            stop_reason="relative_change",
+            chi_squared=0.0,
+        )
+
+    monkeypatch.setattr("fluxforge.workflows.spectrum_unfolding.mlem", fake)
+    r = u.unfold(
+        method="MLEM",
+        uncertainty_method="monte_carlo",
+        uncertainty_estimator=estimator,
+        n_uncertainty_samples=2,
+    )
+    assert r.metadata["flux_uncertainty_finite_draws"] == 2
+    assert r.metadata["flux_uncertainty_converged_draws"] == 2
+    assert r.metadata["flux_uncertainty_qualification"] == "unavailable"
+    assert r.metadata["flux_uncertainty_usable"] == 0
+    assert r.metadata["flux_uncertainty_covariance"] is None
+    assert (
+        "nonfinite sample covariance" in r.metadata["flux_uncertainty_ensemble_error"]
+    )
+    assert np.all(np.isnan(r.flux_uncertainty))

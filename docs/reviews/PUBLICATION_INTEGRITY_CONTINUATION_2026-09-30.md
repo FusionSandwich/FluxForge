@@ -24,7 +24,8 @@ using modification time as proof of source identity.
 
 `SpectrumUnfolder.unfold(uncertainty_method="monte_carlo")` defaults to
 `uncertainty_estimator="converged"`. All requested draws must be finite and
-converged, and the main fit must converge. Otherwise uncertainties are NaN and
+converged, and the main fit must converge. The derived covariance and standard
+deviation must also be finite; overflow yields unavailable with a numerical reason. Otherwise uncertainties are NaN and
 qualification is `unavailable`. Failed draws are recorded, never selected away
 to compute a spread over the survivors. Each draw records its convergence,
 finite status, stopping reason, iteration count and number of clipped rates.
