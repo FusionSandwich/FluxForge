@@ -1,6 +1,6 @@
 # Monitor response integrity (#208/#209)
 
-Implementation: `2756b00f655bc90001f8e27220268a83da972f07`, based on PR207
+Final implementation: `f378b218a119d46609b9f7d79dbf380b1584cda8`, based on PR207
 `9d04eff6ebc867227ae439ecdcc37ddb40732b7f`. This separate feature branch
 is stacked on PR207. PR205's physical GLS draft remains separate.
 
@@ -30,7 +30,7 @@ precision; its existing interpolation is preserved without rewriting data.
 ## Tests and actual data
 
 The first 60 regression cases ran before source edits: **50 failed, 10 passed**.
-The final affected suite passed **216 tests**: monitor response/integrity;
+The final affected suite passed **217 tests**: monitor response/integrity;
 IRDFF/archive/access; unfolding diagnostics and 10-bin example; normalization
 defaults and irradiation history; RAFM workflow/background integration.
 The audit's synthetic 44.599 retained-row versus 45.089 averaged-measurement
@@ -69,11 +69,30 @@ Full receipts and numerical outputs are committed in
 `artifacts/validation/monitor_response_integrity_20260930`; original additive
 evidence is at `D:\FluxForgeQA\receipts\response_integrity_20260930`.
 Before receipt SHA-256: `a35f32ec11a3c32da8450db3159471a6df18ed06abb26bc3cc8f5117e564f1ce`.
-After receipt SHA-256: `411b29b0ce47221c34b36ed5ed620ee5490a102777748fc735aa27e5f28fdf2d`.
+Final after receipt SHA-256: `3beb7b2df86f21597f78e3d8e49be6a2d571eba3099410173bd76a6e81e85b58`.
 The checkouts have different prefixes. All data digests match; the mass-review
 reference Markdown differs only in LF/CRLF bytes, with identical normalized text.
 `tools/compare_monitor_response_receipts.py` verifies that distinction explicitly.
 Receipts include input/output hashes, code identity, units, prior and assumptions.
+
+## Independent review and final acceptance
+
+The bounded GPT-6.1 Sol reviewer independently ran 87 focused tests and checked
+source hashes, physical identity, invalid boundaries, original counterexamples,
+actual-data receipts and scientific limits. It found one scaled-weight edge case:
+a nondefault uncertainty floor could alter the dimensionless weight denominator.
+Commit `f378b21` divides by the weight sum directly and adds a floor=100 regression.
+The reviewer independently reproduced the corrected mean and passed the regression,
+then accepted that exact implementation with no remaining actionable findings.
+
+Root subsequently completed the refreshed **217-pass** suite and `after_v2`
+actual-data replay on `f378b21`; `after_final.json`, `comparison_final.json` and
+`tests_final.txt` preserve those outputs. Numerical compatibility and all four
+distinct variants / twelve rejected invalid copies remain as recorded above.
+`independent_review.md` retains both the finding and its superseding resolution.
+Later documentation/evidence commits do not change the tested implementation.
+Software repair sign-off is complete; integration into the existing drafts and
+scientific publication admission are separate decisions.
 
 ## Scientific limitations
 
