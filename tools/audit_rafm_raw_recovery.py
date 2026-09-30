@@ -43,6 +43,18 @@ def prediction_digest(artifact):
     ).hexdigest()
 
 
+def replay_sample(
+    raw, qg, metadata, paths, result_tree, background, library, half_lives, sample_key
+):
+    if raw.parent.name == "flux_wires":
+        return workflow.analyze_flux_wire_sample(
+            raw, metadata, paths, result_tree, background, qg, sample_key
+        )
+    return workflow.analyze_generic_sample(
+        raw, metadata, paths, result_tree, library, half_lives, background, qg
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, required=True)
@@ -68,6 +80,7 @@ def main():
     pairs, _, unmatched_qg = workflow.pair_input_files(
         files["raw"], files["qg"], metadata.pairing_aliases
     )
+    sample_keys = {raw: key for raw, _, key in pairs}
     selected = [
         (raw, qg) for raw, qg, _ in pairs if raw.parent.name in {"RAFM3", "RAFM4"}
     ]
@@ -106,12 +119,16 @@ def main():
     flux_wire_analysis.apply_qg_report_parity = forbidden_reference_substitution
 
     def analyze(raw, qg, result_tree):
-        if raw.parent.name == "flux_wires":
-            return workflow.analyze_flux_wire_sample(
-                raw, metadata, paths, result_tree, background, qg
-            )
-        return workflow.analyze_generic_sample(
-            raw, metadata, paths, result_tree, library, half_lives, background, qg
+        return replay_sample(
+            raw,
+            qg,
+            metadata,
+            paths,
+            result_tree,
+            background,
+            library,
+            half_lives,
+            sample_keys[raw],
         )
 
     receipt = {
