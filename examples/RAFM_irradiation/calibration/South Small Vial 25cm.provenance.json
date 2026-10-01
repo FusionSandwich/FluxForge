@@ -20,6 +20,6 @@
   "scientific_admission": false,
   "excluded_geometry": "Near-contact FeCd profile is separate",
   "invalid_raw_rows": "Retain nonpositive efficiencies exactly; flag and exclude affected rows/brackets without clipping",
-  "documented_replay": "python tools/validate_uwnr_data_use.py --inventory PATH --reconciliation PATH --count-matrix PATH --out FRESH_DIRECTORY",
+  "documented_replay": "python tools/validate_uwnr_data_use.py --inventory PATH --reconciliation PATH --count-matrix PATH --operator PATH --out FRESH_DIRECTORY",
   "source_review": "https://github.com/FusionSandwich/FluxForge/issues/32#issuecomment-5923190752"
 }
