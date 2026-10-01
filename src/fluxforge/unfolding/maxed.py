@@ -8,7 +8,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 from fluxforge.unfolding.base import (
-    estimate_unfolding_uncertainties,
+    unavailable_uncertainty_metadata,
     UnfoldingMethod,
     UnfoldingMethodDefinition,
     UnfoldingResult,
@@ -32,7 +32,7 @@ class MaxedUnfolder(UnfoldingMethod):
             label="MAXED",
             summary="Maximum-entropy unfolding with a positive, prior-guided log-space optimizer.",
             convergence_metric="objective",
-            supports_uncertainties=True,
+            supports_uncertainties=False,
             can_produce_negative_bins=False,
             method_category="user_selected",
         )
@@ -86,7 +86,9 @@ class MaxedUnfolder(UnfoldingMethod):
             entropy_penalty = np.sum(
                 flux * (np.log(np.maximum(flux, floor)) - np.log(prior)) - flux + prior
             )
-            return float(0.5 * np.dot(residual, residual) + entropy_weight * entropy_penalty)
+            return float(
+                0.5 * np.dot(residual, residual) + entropy_weight * entropy_penalty
+            )
 
         def _callback(log_flux: np.ndarray) -> None:
             objective_history.append(_objective(log_flux))
@@ -105,18 +107,16 @@ class MaxedUnfolder(UnfoldingMethod):
         predicted_measurements = response_array @ flux
         residuals = measured_array - predicted_measurements
         chi_squared = float(
-            np.dot((predicted_measurements - measured_array) / sigma, (predicted_measurements - measured_array) / sigma)
+            np.dot(
+                (predicted_measurements - measured_array) / sigma,
+                (predicted_measurements - measured_array) / sigma,
+            )
             / max(measured_array.size - 1, 1)
-        )
-        uncertainties = estimate_unfolding_uncertainties(
-            response_array,
-            measured=measured_array,
-            measurement_uncertainty=uncertainty_array,
         )
 
         return UnfoldingResult(
             flux=flux,
-            uncertainties=uncertainties,
+            uncertainties=None,
             convergence_history=tuple(objective_history),
             method_used=self.definition().label,
             parameters_used={
@@ -126,7 +126,12 @@ class MaxedUnfolder(UnfoldingMethod):
                 "optimizer": optimizer,
                 "used_initial_flux": initial_flux is not None,
                 "used_measurement_uncertainty": uncertainty_array is not None,
-                "uncertainty_estimator": "pseudo_inverse",
+                **unavailable_uncertainty_metadata(
+                    self.definition().label,
+                    response_array,
+                    measurement_uncertainty=uncertainty_array,
+                    converged=bool(optimization.success),
+                ),
                 "success": bool(optimization.success),
                 "status": int(optimization.status),
                 "message": str(optimization.message),

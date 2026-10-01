@@ -28,7 +28,7 @@ def _qapp():
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt unfolding workspace dependencies are unavailable.",
 )
-def test_unfolding_workspace_dialog_runs_maxed_and_surfaces_uncertainties():
+def test_unfolding_workspace_dialog_runs_maxed_and_explains_unavailable_uncertainty():
     _qapp()
     dialog = UnfoldingWorkspaceDialog(mode_manager=ModeManager())
     dialog.show()
@@ -41,14 +41,16 @@ def test_unfolding_workspace_dialog_runs_maxed_and_surfaces_uncertainties():
     assert dialog.current_result is not None
     assert dialog.current_result.method_used == "MAXED"
     assert dialog.results_table.rowCount() == dialog.workspace_input.initial_flux.size
-    assert dialog.results_table.item(0, 3).text() not in {"", "N/A"}
+    assert dialog.results_table.item(0, 3).text() == "N/A"
     assert (
         dialog.measurements_table.rowCount()
         == dialog.workspace_input.measured_rates.size
     )
     assert dialog.response_image.image is not None
-    assert "uncertainties are visible" in dialog.summary_label.text().lower()
-    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is True
+    assert "uncertainties are not available" in dialog.summary_label.text().lower()
+    assert "Estimator-specific" in dialog.summary_label.text()
+    assert "MAXED" in dialog.results_table.item(0, 3).toolTip()
+    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is False
     dialog.close()
 
 
@@ -70,7 +72,7 @@ def test_unfolding_workspace_dialog_defaults_to_rmle_and_exposes_lambda_controls
     assert dialog.method_selector.combo.count() == 4
     assert dialog.use_ml_seed_checkbox.isChecked() is False
     assert dialog.ml_seed_threshold_spin.value() == pytest.approx(0.6)
-    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is True
+    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is False
 
     dialog.rmle_auto_checkbox.setChecked(False)
     _qapp().processEvents()
@@ -115,7 +117,7 @@ def test_unfolding_workspace_dialog_supports_mouse_driven_algorithm_comparison()
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt unfolding workspace dependencies are unavailable.",
 )
-def test_unfolding_workspace_dialog_keeps_uncertainty_toggle_available_when_rmle_is_in_comparison():
+def test_unfolding_workspace_dialog_disables_unqualified_rmle_comparison_bands():
     _qapp()
     dialog = UnfoldingWorkspaceDialog(mode_manager=ModeManager())
     dialog.show()
@@ -126,7 +128,7 @@ def test_unfolding_workspace_dialog_keeps_uncertainty_toggle_available_when_rmle
     dialog.compare_mode_checkbox.setChecked(True)
     _qapp().processEvents()
 
-    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is True
+    assert dialog.show_uncertainty_bands_checkbox.isEnabled() is False
     dialog.close()
 
 
