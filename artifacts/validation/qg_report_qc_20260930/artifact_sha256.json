@@ -1,0 +1,18 @@
+{
+  "baseline.json": "5757f22b5dba3dbc7a30650c9356fa974d87ebf2dd7687022e3eace634c61fef",
+  "Cu-RAFM-1_line_diagnostics.csv": "968cefeb48c8c2fabc5414b694878ab371b6fc6c80bce24344e1d5432fa439e4",
+  "Cu-RAFM-1_qg_consistency.csv": "c6965afc94b4e3f4d33b94b766be2b131b3af89d113f3ed411734c89da6bf0a3",
+  "frozen_final_tests.txt": "a8ce7031ba69affb88e14aba4e20c84e8911d2fe7f39d55023bb6b6d578f1a94",
+  "independent_review.md": "4e68f0cb6a5cbef32d3c9d84130f7b12a4863b9a37b9c1b63b5c5bfb17e81ce9",
+  "line_diagnostics.csv": "1856829ca2e71c1b360cba714ad3085d13cd9c377532fb3405c7605a76252af8",
+  "README.md": "c42b230a2bbada4603e0b200b34c37585cfd9ebac10f0c0116639bc8cccb7604",
+  "receipt.json": "b390c21ea8ab6114e227eb1a9fbf2cab7bd2b1919a79d8f3194409f5458753c2",
+  "review_fix_tests.txt": "f1e400f00d309904e6b8bb02cbd57c16858b32a1bdd816739f9b045473ca19b9",
+  "Ti-RAFM-1_line_diagnostics.csv": "b3af61953be3b9d30afd8582c1691bd0eebfa7b0c11d4c670cdf1a662ea23867",
+  "Ti-RAFM-1_qg_consistency.csv": "d566775e3976fa2d4502d935df6242f71b9d98658e9226b67a1b4ec9482ecc01",
+  "Ti-RAFM-1a_line_diagnostics.csv": "ea15ee9b74d682ab0e6b62eac48d025e98359a060b23353e09d503cfc34d38a6",
+  "Ti-RAFM-1a_qg_consistency.csv": "0b22b2064a606cbb0db692f6bae0b8aaa6199ce9b308654ecf91ccd6869b63de",
+  "Ti-RAFM-1b_line_diagnostics.csv": "b472c2fd949013bf7faf172f9f4a037b6fbd4ba56cd5a2a5742150b3657184a2",
+  "Ti-RAFM-1b_qg_consistency.csv": "70e58a643a4b6842400db959b35987c5e919b1674e7f7840e3468f7e9c5a4f34",
+  "verification.json": "29b9653ba56851cea1ed8d5f51f469cfbd9da44a863d726e94181e7eca1b4654"
+}
