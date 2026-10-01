@@ -447,9 +447,11 @@ def test_duplicate_counts_preserve_shared_calibration_rank():
     c = rate_covariance(
         [RateUncertaintyBudget(str(i), 100, [component]) for i in range(3)]
     )
-    np.testing.assert_array_equal(c, np.full((3, 3), 30000.0))
+    np.testing.assert_allclose(c, np.full((3, 3), 30000.0), rtol=1e-14, atol=0)
     assert np.linalg.matrix_rank(c) == 1
-    assert float(np.ones(3) @ c @ np.ones(3) / 9) == 30000  # no 1/sqrt(3) gain
+    assert float(np.ones(3) @ c @ np.ones(3) / 9) == pytest.approx(
+        30000
+    )  # no 1/sqrt(3) gain
 
 
 def test_physical_power_log_does_not_prove_spectrum_shape(tmp_path):
@@ -515,4 +517,90 @@ def test_mixed_scalar_and_vector_shared_source_is_rejected():
                 RateUncertaintyBudget("a", 1, [vector]),
                 RateUncertaintyBudget("b", 2, [scalar]),
             ]
+        )
+
+
+def test_source_replay_checks_complete_profile_and_original_windows_bytes():
+    import runpy
+
+    replay = runpy.run_path(
+        str(Path(__file__).resolve().parents[1] / "tools/validate_uwnr_data_use.py")
+    )
+    count = {
+        "QG_report_header": {"detector_id": "South", "source_distance_cm_printed": 25},
+        "candidate_C1_C4_A_within_QG_printed_rounding": {},
+    }
+    assert replay["nominal_profile_matches"](count) is False
+    count["candidate_C1_C4_A_within_QG_printed_rounding"] = dict.fromkeys(
+        ["C1", "C2", "C3", "C4", "A"], True
+    )
+    assert replay["nominal_profile_matches"](count) is True
+    line = b"counts 12 \xb1 2"
+    assert (
+        replay["corroborated_source_line"](line + b"\r\n", 1, "counts 12 ± 2")
+        == hashlib.sha256(line).hexdigest()
+    )
+    with pytest.raises(ValueError, match="disagrees"):
+        replay["corroborated_source_line"](line, 1, "counts 13 ± 2")
+
+
+@pytest.mark.parametrize(
+    "direction,sensitivity", [([0.14, 0.23], [0.23, -0.14]), ([1, 3], [3, -1])]
+)
+def test_singular_source_cancellation_remains_psd_and_repeatable(
+    direction, sensitivity
+):
+    from fluxforge.uncertainty.covariance import covariance_matrix
+
+    c = np.outer(direction, direction)
+    component = UncertaintyComponent.from_covariance(
+        "calibration",
+        c,
+        sensitivity,
+        input_names=["a", "b"],
+        input_units=["log fraction", "log fraction"],
+        source="synthetic rank one",
+        correlation_group="g",
+    )
+    budget = RateUncertaintyBudget("a", 1, [component])
+    for _ in range(3):
+        result = rate_covariance([budget])
+        assert result[0, 0] >= 0
+        covariance_matrix(result, 1)
+        assert result[0, 0] == pytest.approx(
+            component.relative**2, rel=1e-12, abs=1e-30
+        )
+    assert result[0, 0] < 1e-14
+
+
+def test_curve_snapshot_cannot_change_values_under_source_hash():
+    directory = (
+        Path(__file__).resolve().parents[1] / "examples/RAFM_irradiation/calibration"
+    )
+    curve = QGEfficiencyTable(
+        directory / "South Small Vial 25cm.csv",
+        directory / "South Small Vial 25cm.provenance.json",
+    )
+    before = curve.diagnostic_at(983.5, unit_assumption="percent")
+    with pytest.raises(ValueError):
+        curve.values[:] *= 2
+    outward = curve.values
+    outward.setflags(write=True)
+    outward *= 2
+    curve.rows[0]["efficiency_reported"] = 1
+    curve.provenance["sha256"] = "wrong"
+    with pytest.raises(AttributeError):
+        curve.sha256 = "wrong"
+    assert curve.diagnostic_at(983.5, unit_assumption="percent") == before
+
+
+@pytest.mark.parametrize(
+    "ids", ["Co-RAFM-1a", [], [""], ["Co-RAFM-1", "Co-RAFM-1"], [1]]
+)
+def test_operating_log_monitor_identity_cannot_use_substrings(tmp_path, ids):
+    with pytest.raises(ValueError, match="monitor_ids"):
+        load_operating_history(
+            _log(tmp_path, monitor_ids=ids),
+            expected_sample="Co-RAFM-1",
+            require_separability=True,
         )

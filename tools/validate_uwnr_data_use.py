@@ -29,6 +29,26 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def nominal_profile_matches(count):
+    header = count["QG_report_header"]
+    matches = count.get("candidate_C1_C4_A_within_QG_printed_rounding", {})
+    return (
+        header["detector_id"] == "South"
+        and header["source_distance_cm_printed"] == 25
+        and set(matches) == {"C1", "C2", "C3", "C4", "A"}
+        and all(value is True for value in matches.values())
+    )
+
+
+def corroborated_source_line(source_bytes, line_number, original_line):
+    line = source_bytes.splitlines()[line_number - 1]
+    # Reconciliation transcribes Windows QG exports using cp1252. Preserve bytes
+    # separately; this text join never replaces the runtime parser convention.
+    if line.decode("cp1252") != original_line:
+        raise ValueError("Original QG source line disagrees with reconciliation")
+    return hashlib.sha256(line).hexdigest()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--inventory", type=Path, required=True)
@@ -113,21 +133,12 @@ def main():
     diagnostic = []
     for rec in roi:
         path = source_by_sha[rec["report_sha256"]]
-        actual_line = (
-            path.read_bytes()
-            .splitlines()[int(rec["line_number"]) - 1]
-            .decode("utf-8", errors="replace")
+        line_sha = corroborated_source_line(
+            path.read_bytes(), int(rec["line_number"]), rec["original_line"]
         )
-        assert actual_line == rec["original_line"]
         count = counts[rec["measurement_id"]]
         header = count["QG_report_header"]
-        nominal = (
-            header["detector_id"] == "South"
-            and header["source_distance_cm_printed"] == 25
-            and all(
-                count.get("candidate_C1_C4_A_within_QG_printed_rounding", {}).values()
-            )
-        )
+        nominal = nominal_profile_matches(count)
         energy = (
             float(rec["assignment_energy_keV"])
             if rec["assignment_energy_keV"]
@@ -158,6 +169,8 @@ def main():
                 measurement_id=rec["measurement_id"],
                 report_sha256=rec["report_sha256"],
                 source_line=int(rec["line_number"]),
+                source_line_sha256=line_sha,
+                reconciliation_text_encoding="cp1252",
                 nuclide=rec["nuclide"],
                 energy_keV=energy,
                 raw_rad_int=rad,

@@ -36,6 +36,8 @@ is a bounded named-folder observation, not a disk-wide absence claim. Shared
 background, schedules, decay data, external nuclear/method references and
 unavailable inputs have explicit roles. All physical rows remain excluded while
 full calibration/library/history/source uncertainty is unqualified.
+The reconciliation text join uses cp1252 for Windows export symbols and records
+the original line-byte hash. Runtime parser decoding stays explicitly separate.
 
 Recovered original roots contain 32 hash-matched native ANS counts and 30 ASC
 exports. The 32nd count, RAFM-A-2hr, has no corroborated QG report and remains an
@@ -71,7 +73,8 @@ covariance; independent blocks are justified only by independent source inputs.
 Replacing an opaque total requires reconstructed coverage rather than adding
 unresolved terms to it. The three Ti counts share one irradiated monitor; common
 calibration does not shrink with repeated counting. Singular covariance retains
-its rank and receives no diagonal jitter.
+its rank and receives no diagonal jitter. Propagation uses source factors and a
+Gram matrix to preserve nonnegative variance during cancellation.
 
 This is first-order propagation following [JCGM 102:2011 §6.2.1.3, equation 3](https://doi.org/10.59161/JCGM102-2011).
 Nonlinear models need appropriate propagation validation; no recovered covariance

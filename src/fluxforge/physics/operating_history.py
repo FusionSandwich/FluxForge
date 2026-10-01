@@ -56,9 +56,17 @@ def load_operating_history(
         raise ValueError(
             "Operating log EOI disagrees with the qualified schedule/timezone"
         )
-    if expected_sample is not None and expected_sample not in data.get(
-        "monitor_ids", []
+    monitor_ids = data.get("monitor_ids")
+    if (
+        not isinstance(monitor_ids, list)
+        or not monitor_ids
+        or any(not isinstance(x, str) or not x.strip() for x in monitor_ids)
+        or len(set(monitor_ids)) != len(monitor_ids)
     ):
+        raise ValueError(
+            "Operating log monitor_ids must be a nonempty list of unique monitor identities"
+        )
+    if expected_sample is not None and expected_sample not in monitor_ids:
         raise ValueError("Operating log does not bind the current monitor identity")
     segments = [
         (float(s["duration_s"]), float(s["relative_power"])) for s in data["segments"]

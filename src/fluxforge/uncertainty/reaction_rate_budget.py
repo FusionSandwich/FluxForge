@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Sequence
 
 import numpy as np
-from fluxforge.uncertainty.covariance import covariance_matrix
+from fluxforge.uncertainty.covariance import covariance_matrix, covariance_factor
 
 # Components expected for an activation reaction rate (ASTM E261 terms).
 REQUIRED_COMPONENTS = (
@@ -64,7 +64,8 @@ class UncertaintyComponent:
             raise ValueError("Component assumed flag must be boolean")
         if len(self.input_covariance):
             size = len(self.input_covariance)
-            cov = covariance_matrix(self.input_covariance, size, "input covariance")
+            raw_cov = np.asarray(self.input_covariance, dtype=float)
+            covariance_matrix(raw_cov, size, "input covariance")
             sensitivities = np.asarray(self.log_sensitivities, dtype=float)
             if (
                 sensitivities.shape != (size,)
@@ -81,7 +82,7 @@ class UncertaintyComponent:
                 raise ValueError(
                     "Covariance needs aligned named/unit inputs, finite sensitivities and source group"
                 )
-            expected = math.sqrt(max(float(sensitivities @ cov @ sensitivities), 0.0))
+            expected = float(np.linalg.norm(sensitivities @ covariance_factor(raw_cov)))
             if not math.isclose(self.relative, expected, rel_tol=1e-12, abs_tol=0.0):
                 raise ValueError(
                     "Component relative uncertainty disagrees with input covariance"
@@ -89,7 +90,7 @@ class UncertaintyComponent:
             object.__setattr__(
                 self,
                 "input_covariance",
-                tuple(tuple(float(v) for v in row) for row in cov),
+                tuple(tuple(float(v) for v in row) for row in raw_cov),
             )
             object.__setattr__(
                 self, "log_sensitivities", tuple(float(v) for v in sensitivities)
@@ -164,13 +165,15 @@ class UncertaintyComponent:
         """
         if len(input_names) == 0:
             raise ValueError("Covariance requires named inputs")
-        cov = covariance_matrix(input_covariance, len(input_names), "input covariance")
+        covariance_matrix(input_covariance, len(input_names), "input covariance")
         sensitivity = np.asarray(log_sensitivities, dtype=float)
         if sensitivity.shape != (len(input_names),) or not np.all(
             np.isfinite(sensitivity)
         ):
             raise ValueError("Covariance sensitivity must align with named inputs")
-        relative = math.sqrt(max(float(sensitivity @ cov @ sensitivity), 0.0))
+        relative = float(
+            np.linalg.norm(sensitivity @ covariance_factor(input_covariance))
+        )
         return cls(
             name,
             relative,
@@ -178,7 +181,7 @@ class UncertaintyComponent:
             source,
             tuple(covers),
             1,
-            tuple(tuple(row) for row in cov),
+            tuple(tuple(row) for row in input_covariance),
             tuple(sensitivity),
             tuple(input_names),
             tuple(input_units),
@@ -359,43 +362,29 @@ def rate_covariance(
                     "Shared source covariance/parameter binding disagrees between rows"
                 )
             groups[key] = binding
+    # Source factors form a Gram matrix, preserving PSD for singular blocks and
+    # cancellation without adding a variance floor or diagonal jitter.
+    source_effects = {}
+    for i, budget in enumerate(budgets):
+        for component in budget.components:
+            if component.input_covariance:
+                key = ("vector", component.correlation_group)
+                effect = np.asarray(component.log_sensitivities) @ covariance_factor(
+                    component.input_covariance
+                )
+            else:
+                key = (
+                    ("scalar", component.name, component.correlation_group)
+                    if component.correlation_group is not None
+                    else ("independent", i, component.name)
+                )
+                effect = np.array([component.relative * component.sensitivity_sign])
+            if key not in source_effects:
+                source_effects[key] = np.zeros((n, len(effect)))
+            source_effects[key][i] += budget.rate * effect
     cov = np.zeros((n, n))
-    for i, bi in enumerate(budgets):
-        for j, bj in enumerate(budgets):
-            total = 0.0
-            for ci in bi.components:
-                for cj in bj.components:
-                    if ci.input_covariance or cj.input_covariance:
-                        if not (
-                            ci.input_covariance
-                            and cj.input_covariance
-                            and ci.correlation_group == cj.correlation_group
-                        ):
-                            continue
-                    if ci.name != cj.name and not (
-                        ci.input_covariance and cj.input_covariance
-                    ):
-                        continue
-                    same = i == j or (
-                        ci.correlation_group is not None
-                        and ci.correlation_group == cj.correlation_group
-                    )
-                    if same:
-                        total += (
-                            float(
-                                np.asarray(ci.log_sensitivities)
-                                @ np.asarray(ci.input_covariance)
-                                @ np.asarray(cj.log_sensitivities)
-                            )
-                            if ci.input_covariance
-                            else (
-                                ci.relative
-                                * cj.relative
-                                * ci.sensitivity_sign
-                                * cj.sensitivity_sign
-                            )
-                        )
-            cov[i, j] = total * bi.rate * bj.rate
+    for effects in source_effects.values():
+        cov += effects @ effects.T
     if not np.all(np.isfinite(cov)):
         raise ValueError("Propagated rate covariance must be finite")
     return cov
