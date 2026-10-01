@@ -6,7 +6,7 @@ import json
 import math
 import re
 from collections import defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -34,6 +34,7 @@ from fluxforge.analysis.flux_wire_analysis import (
     get_sample_element,
 )
 from fluxforge.analysis.spectrum_math import subtract_measured_background
+from fluxforge.analysis.qg_report_qc import qg_yield_diagnostic
 from fluxforge.corrections.gamma_attenuation import (
     SampleConfiguration,
     SampleGeometry,
@@ -1252,6 +1253,17 @@ def plot_annotated_peaks(
     plt.close(fig)
 
 
+def _qg_line_activity_bq(nuclide, peak):
+    unit = peak.get("activity_unit", nuclide.activity_unit)
+    if not isinstance(unit, str):
+        return None
+    try:
+        return replace(nuclide, activity=float(peak.get("activity", 0.0)),
+                       activity_unit=unit).activity_bq
+    except ValueError:
+        return None
+
+
 def qg_reference_peaks(reference_data: FluxWireData) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     for nuclide in reference_data.nuclides:
@@ -1275,9 +1287,18 @@ def qg_reference_peaks(reference_data: FluxWireData) -> List[Dict[str, Any]]:
                         float(peak.get("rad_int", 0.0)),
                     ),
                     "assignment": str(peak.get("assignment", "")),
-                    "line_activity_bq": float(peak.get("activity", 0.0)) * 3.7e4,
+                    "line_activity_bq": _qg_line_activity_bq(nuclide, peak),
+                    "reported_line_activity": float(peak.get("activity", 0.0)),
+                    "reported_line_activity_unit": peak.get("activity_unit", nuclide.activity_unit),
+                    "line_activity_unit_basis": "ROI_column_header" if "activity_unit" in peak else "summary_unit_assumption",
+                    "reported_rad_int_text": peak.get("reported_rad_int_text"),
+                    "reported_line_activity_text": peak.get("reported_activity_text"),
+                    "report_source_file": peak.get("source_file", reference_data.source_file),
+                    "report_source_sha256": peak.get("source_file_sha256"),
+                    "report_source_line_number": peak.get("source_line_number"),
+                    "report_source_line_text": peak.get("source_line_text"),
                     "header_activity_bq": float(nuclide.activity_bq),
-                    "header_activity_unc_bq": float(nuclide.activity_unc) * 3.7e4,
+                    "header_activity_unc_bq": float(nuclide.activity_unc_bq),
                 }
             )
     return rows
@@ -1427,10 +1448,10 @@ def normalize_qg_rad_int_fraction(
     """
     Normalize processed QG RAD INT values to an emission-probability fraction.
 
-    QG exports are not consistent: many lines are written as percent values,
-    while some 100%-class lines are written as `1.00`. For comparison-only
-    diagnostics, choose the interpretation that is closest to the bundled
-    authoritative decay-data intensity for the matched isotope/energy.
+    These reports do not declare the RAD INT unit. This legacy comparison-only
+    scalar picks the interpretation closest to bundled decay data. It does not
+    establish the vendor library convention. The report-only source QC retains
+    both hypotheses and exposes discrepancies without correcting activities.
     """
     if raw_rad_int <= 0.0:
         return 0.0
@@ -1649,8 +1670,9 @@ def build_line_diagnostic_records(
             "reference_net_unc": float(ref_peak.get("net_unc") or 0.0),
             "reference_gross_counts": float(ref_peak.get("gross_counts") or 0.0),
             "reference_gross_unc": float(ref_peak.get("gross_unc") or 0.0),
-            "reference_line_activity_bq": qg_line_activity_bq,
-            "reference_line_activity_unc_bq": qg_line_activity_unc_bq,
+            "reference_line_activity_bq": ref_peak["line_activity_bq"],
+            "reference_line_activity_unc_bq": qg_line_activity_unc_bq if ref_peak["line_activity_bq"] is not None else None,
+            "reference_line_activity_uncertainty_basis": "counting-only proxy; full vendor uncertainty unqualified",
             "reference_header_activity_bq": float(
                 ref_peak.get("header_activity_bq") or 0.0
             ),
@@ -1664,6 +1686,37 @@ def build_line_diagnostic_records(
             "matched": match is not None,
             "isotope_match": isotope_match,
         }
+
+        # Keep both yield hypotheses and source QC independent of raw matching
+        # and parity buckets. Neither QC outcome feeds runtime activities/rates.
+        row.update(qg_yield_diagnostic(ref_peak["isotope"], energy, ref_peak["rad_int_percent"]))
+        for name in ("reported_rad_int_text", "reported_line_activity", "reported_line_activity_text",
+                     "reported_line_activity_unit", "line_activity_unit_basis",
+                     "report_source_file", "report_source_sha256", "report_source_line_number",
+                     "report_source_line_text"):
+            row[name] = ref_peak.get(name)
+        row["reference_implied_efficiency_basis"] = "legacy bundled-nearest yield convention; diagnostic only; vendor convention unverified"
+        for convention, probability in (
+            ("percent", row["reference_rad_int_percent_assumption_fraction"]),
+            ("fraction", row["reference_rad_int_fraction_assumption"]),
+        ):
+            row[f"reference_implied_efficiency_{convention}_assumption"] = (
+                float(ref_peak["net_counts"]) / (reference_data.live_time * qg_line_activity_bq * probability)
+                if qg_line_activity_bq > 0 and probability > 0 and reference_data.live_time > 0 else None)
+        header = float(ref_peak.get("header_activity_bq") or 0.0)
+        row["line_summary_relative_deviation"] = qg_line_activity_bq / header - 1 if header > 0 and qg_line_activity_bq > 0 else None
+        row["flag_line_summary_inconsistency"] = (row["line_summary_relative_deviation"] is not None and
+                                                   abs(row["line_summary_relative_deviation"]) > .25)
+        flags = []
+        if row["yield_qc_status"] in {"yield_convention_discrepancy", "yield_value_discrepancy"}:
+            flags.append(row["yield_qc_status"])
+        elif row["yield_qc_status"] != "consistent_with_percent_assumption":
+            flags.append("yield_reference_or_convention_unqualified")
+        if row["flag_line_summary_inconsistency"]:
+            flags.append("line_summary_inconsistency")
+        if ref_peak["line_activity_bq"] is None:
+            flags.append("line_activity_unit_unqualified")
+        row["source_qc_bucket"] = ";".join(flags) or "no_flag_under_report_assumptions"
 
         if match is None:
             row["diagnostic_bucket"] = "missing_in_fluxforge"
@@ -1808,9 +1861,8 @@ def build_line_diagnostic_records(
     qg_consistency_rows: List[Dict[str, Any]] = []
     for nuclide in reference_data.nuclides:
         line_activities_bq = [
-            float(peak.get("activity", 0.0)) * 3.7e4
-            for peak in nuclide.peaks
-            if float(peak.get("activity", 0.0)) > 0.0
+            value for peak in nuclide.peaks
+            if (value := _qg_line_activity_bq(nuclide, peak)) is not None and value > 0.0
         ]
         if not line_activities_bq:
             continue
@@ -1829,7 +1881,7 @@ def build_line_diagnostic_records(
                 "sample_group": sample_group,
                 "isotope": nuclide.isotope,
                 "header_activity_bq": header_activity_bq,
-                "header_activity_unc_bq": float(nuclide.activity_unc) * 3.7e4,
+                "header_activity_unc_bq": float(nuclide.activity_unc_bq),
                 "n_line_activities": len(line_activities_bq),
                 "min_line_activity_bq": min(line_activities_bq),
                 "max_line_activity_bq": max(line_activities_bq),
@@ -2448,6 +2500,17 @@ def write_sample_comparison_report(
             f"rel_line_activity={float(row.get('relative_line_activity_error') or 0.0):+.3f}"
         )
     sections.append(("Line-level diagnostic flags", section_rows))
+    source_rows = [
+        f"- {row['reference_isotope']} @ {row['reference_energy_keV']:.2f} keV | "
+        f"source QC={row['source_qc_bucket']} | printed RAD INT={row['reference_rad_int_reported_value']} "
+        f"(unit {row['reference_rad_int_reported_unit']}) | "
+        f"percent hypothesis={row['reference_rad_int_percent_assumption_fraction']} photons/decay | "
+        f"fraction hypothesis={row['reference_rad_int_fraction_assumption']} photons/decay | "
+        f"bundled intensity={row.get('bundled_emission_probability')} photons/decay | report-only"
+        for row in line_rows if row.get("source_qc_bucket") and
+        row["source_qc_bucket"] != "no_flag_under_report_assumptions"
+    ]
+    sections.append(("QG source QC (no activity or rate correction)", source_rows))
 
     section_rows = []
     for row in fluxforge_consistency_rows:
@@ -4487,6 +4550,9 @@ def build_summary_markdown(
             lines.append(f"- {bucket}: {count}")
     else:
         lines.append("- none")
+    lines.extend(["", "## QG Source QC Buckets (report-only)", ""])
+    for bucket, count in summary.get("qg_source_qc_buckets", {}).items():
+        lines.append(f"- {bucket}: {count}")
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -4720,6 +4786,11 @@ def run_rafm_validation(
         line_diagnostic_buckets[str(bucket)] = (
             line_diagnostic_buckets.get(str(bucket), 0) + 1
         )
+    source_qc_buckets: Dict[str, int] = {}
+    for row in line_rows:
+        bucket = row.get("source_qc_bucket")
+        if bucket:
+            source_qc_buckets[bucket] = source_qc_buckets.get(bucket, 0) + 1
     summary = {
         "overall_passed": not failing_samples,
         "n_raw_analyzed": len(artifacts),
@@ -4730,6 +4801,7 @@ def run_rafm_validation(
         "unmatched_qg": [str(path) for path in unmatched_qg],
         "failing_samples": failing_samples,
         "line_diagnostic_buckets": dict(sorted(line_diagnostic_buckets.items())),
+        "qg_source_qc_buckets": dict(sorted(source_qc_buckets.items())),
         "qg_internal_consistency_flags": int(
             sum(
                 1

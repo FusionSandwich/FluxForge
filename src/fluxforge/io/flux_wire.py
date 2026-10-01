@@ -12,6 +12,7 @@ and parsed nuclide activities from flux wire measurements.
 from __future__ import annotations
 
 import re
+import hashlib
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -101,7 +102,7 @@ NUCLIDE_LINE_RE = re.compile(
 # Some exports include a space after '@' (e.g., "In115m@ 336.")
 PEAK_LINE_RE = re.compile(
     r"^\s*([\d.]+)\s+"  # ROI centroid (channel or energy)
-    r"([\d.]+)\s+"  # Radiation intensity %
+    r"([\d.]+)\s+"  # Reported radiation intensity; unit not declared
     r"([\d.]+)\s+"  # Center energy (keV)
     r"([\d,]+)\s*[±�\s]+([\d,]+)\s+"  # Gross counts ± unc
     r"([\d,]+)\s*[±�\s]+([\d,]+)\s+"  # Net counts ± unc
@@ -212,6 +213,7 @@ class NuclideResult:
     activity_unc: float
     activity_unit: str  # e.g., "uCi"
     peaks: List[Dict[str, Any]] = field(default_factory=list)
+    report_provenance: Dict[str, Any] = field(default_factory=dict)
 
     @property
     def half_life_seconds(self) -> float:
@@ -262,6 +264,7 @@ class NuclideResult:
             "activity_unit": self.activity_unit,
             "activity_bq": self.activity_bq,
             "peaks": self.peaks,
+            "report_provenance": self.report_provenance,
         }
 
 
@@ -651,8 +654,9 @@ def read_processed_txt(
     """
     filepath = Path(filepath)
 
-    with open(filepath, "r", encoding="utf-8", errors="replace") as f:
-        content = f.read()
+    source_bytes = filepath.read_bytes()
+    source_sha256 = hashlib.sha256(source_bytes).hexdigest()
+    content = source_bytes.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
 
     data = FluxWireData(
         source_file=str(filepath),
@@ -751,8 +755,9 @@ def read_processed_txt(
     lines = content.split("\n")
     in_nuclides = False
     current_nuclide = None
+    peak_activity_unit = None
 
-    for line in lines:
+    for source_line_number, line in enumerate(lines, start=1):
         # Look for NUCLIDES ANALYZED header
         if NUCLIDE_HEADER_RE.search(line):
             in_nuclides = True
@@ -790,9 +795,23 @@ def read_processed_txt(
                 activity=activity,
                 activity_unc=unc,
                 activity_unit=activity_unit,
+                report_provenance={"source_file": str(filepath.resolve()),
+                    "source_file_sha256": source_sha256,
+                    "source_line_number": source_line_number, "source_line_text": line,
+                    "reported_activity_text": match.group(7),
+                    "reported_uncertainty_text": match.group(8),
+                    "activity_unit": activity_unit,
+                    "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"},
             )
+            peak_activity_unit = None
             data.nuclides.append(current_nuclide)
             continue
+
+        # The ROI activity column declares its own unit; it may differ from
+        # the nuclide summary. Missing unit stays unknown for diagnostics.
+        if re.match(r"^\s*CENTROID\b", line, re.IGNORECASE):
+            units = re.findall(r"\(([^)]+)\)", line)
+            peak_activity_unit = units[-1].strip() if units else None
 
         # Check for peak data line
         match = PEAK_LINE_RE.match(line)
@@ -807,6 +826,14 @@ def read_processed_txt(
                 "net_unc": int(_parse_number(match.group(7)) or 0),
                 "assignment": match.group(8).replace(" ", ""),
                 "activity": float(match.group(9)),
+                "activity_unit": peak_activity_unit,
+                "reported_activity_text": match.group(9),
+                "reported_rad_int_text": match.group(2),
+                "reported_rad_int_unit": "unspecified",
+                "source_file": str(filepath.resolve()),
+                "source_file_sha256": source_sha256,
+                "source_line_number": source_line_number,
+                "source_line_text": line,
             }
             current_nuclide.peaks.append(peak)
 
