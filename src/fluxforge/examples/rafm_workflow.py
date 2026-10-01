@@ -1753,10 +1753,13 @@ def build_line_diagnostic_records(
         )
         raw_activity = float(match.activity_bq)
         raw_activity_unc = float(match.activity_unc_bq)
-        delta_activity = raw_activity - qg_line_activity_bq
-        combined_activity_unc = math.sqrt(
-            max(raw_activity_unc**2 + qg_line_activity_unc_bq**2, 0.0)
+        reference_activity_known = ref_peak["line_activity_bq"] is not None
+        delta_activity = (
+            raw_activity - qg_line_activity_bq if reference_activity_known else None
         )
+        combined_activity_unc = (math.sqrt(
+            max(raw_activity_unc**2 + qg_line_activity_unc_bq**2, 0.0)
+        ) if reference_activity_known else None)
 
         raw_branching = (
             float(match.gamma_line.intensity) if match.gamma_line is not None else None
@@ -1845,7 +1848,7 @@ def build_line_diagnostic_records(
                 ),
                 "line_activity_en_score": (
                     delta_activity / combined_activity_unc
-                    if combined_activity_unc > 0.0
+                    if combined_activity_unc is not None and combined_activity_unc > 0.0
                     else None
                 ),
                 "raw_efficiency": float(match.efficiency),

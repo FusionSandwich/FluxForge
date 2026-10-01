@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 
-from fluxforge.data.rafm_decay import DATA_PATH, get_rafm_decay_entry
+from fluxforge.data.rafm_decay import DATA_PATH
 
 
 def qg_yield_diagnostic(
@@ -32,7 +32,11 @@ def qg_yield_diagnostic(
     if not math.isfinite(raw) or raw <= 0 or not math.isfinite(energy_keV):
         out["yield_qc_status"] = "invalid_reported_yield_or_energy"
         return out
-    entry = get_rafm_decay_entry(isotope)
+    # Values and provenance must bind the same bytes, rather than a mutable
+    # cached library entry whose content could differ from the recorded file.
+    source_bytes = DATA_PATH.read_bytes()
+    library = json.loads(source_bytes)
+    entry = library.get(isotope)
     lines = [] if entry is None else entry.get("gamma_lines", [])
     matches = sorted(lines, key=lambda line: abs(line["energy_keV"] - energy_keV))
     if not matches or abs(matches[0]["energy_keV"] - energy_keV) > match_tolerance_keV:
@@ -52,8 +56,7 @@ def qg_yield_diagnostic(
     tolerance = max(0.05 * expected, 3 * uncertainty)
     percent_matches = abs(raw / 100.0 - expected) <= tolerance
     fraction_matches = abs(raw - expected) <= tolerance
-    source_bytes = DATA_PATH.read_bytes()
-    metadata = json.loads(source_bytes).get("_metadata", {})
+    metadata = library.get("_metadata", {})
     out.update(
         {
             "bundled_line_energy_keV": float(line["energy_keV"]),

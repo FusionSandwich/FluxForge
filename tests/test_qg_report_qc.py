@@ -221,3 +221,46 @@ def test_report_and_csv_reference_same_source_flags(sample, tmp_path):
     else:
         assert "yield_convention_discrepancy" not in text
     assert "QG source QC (no activity or rate correction)" in text
+
+
+@pytest.mark.parametrize("unit", [None, "widgets"])
+def test_matched_unknown_line_unit_has_no_zero_reference_score(unit):
+    data = read_processed_txt(FIXTURES / "Cu-RAFM-1_25cm.txt")
+    ref = qg_reference_peaks(data)[0]
+    data.nuclides[0].peaks[0]["activity_unit"] = unit
+    raw = SimpleNamespace(
+        isotope="Cu64",
+        energy_keV=ref["energy_keV"],
+        net_counts=ref["net_counts"],
+        net_counts_unc=ref["net_unc"],
+        gross_counts=ref["gross_counts"],
+        gross_counts_unc=ref["gross_unc"],
+        comparison_net_counts=None,
+        comparison_net_counts_unc=None,
+        comparison_gross_counts=None,
+        comparison_gross_counts_unc=None,
+        activity_bq=ref["line_activity_bq"],
+        activity_unc_bq=1.0,
+        gamma_line=SimpleNamespace(intensity=0.004749, intensity_uncertainty=0.0001),
+        efficiency=0.0001,
+        background_adjusted_gross_counts=None,
+        background=0.0,
+        significance=10.0,
+    )
+    rows, _ = build_line_diagnostic_records("Cu", "flux_wires", [raw], data, {})
+    assert rows[0]["reference_line_activity_bq"] is None
+    assert rows[0]["reference_line_activity_unc_bq"] is None
+    assert rows[0]["relative_line_activity_error"] is None
+    assert rows[0]["line_activity_en_score"] is None
+    assert "line_activity_unit_unqualified" in rows[0]["source_qc_bucket"]
+    assert rows[0]["raw_line_activity_bq"] == ref["line_activity_bq"]
+
+
+def test_reference_hash_binds_file_values_not_mutated_cached_entry(monkeypatch):
+    from fluxforge.data.rafm_decay import get_rafm_decay_entry
+
+    cached = get_rafm_decay_entry("Sc48")["gamma_lines"][1]
+    monkeypatch.setitem(cached, "intensity", 0.01)
+    row = qg_yield_diagnostic("Sc48", 983.5, 1.0)
+    assert row["bundled_emission_probability"] == 1.0
+    assert row["yield_qc_status"] == "yield_convention_discrepancy"
