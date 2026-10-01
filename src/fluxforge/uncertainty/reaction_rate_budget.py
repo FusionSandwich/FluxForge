@@ -1,11 +1,11 @@
 """Reaction-rate uncertainty budgets with shared-component covariance.
 
-Each observation carries named relative 1-sigma components. A component with a
-``correlation_group`` is fully correlated between all rows that share the same
-group key (for example one detector efficiency calibration, one irradiation
-history or one nuclide's half-life); a component with no group is independent.
+Each observation carries named relative 1-sigma components. Scalar terms sharing
+name/group are fully correlated. Full input-covariance terms sharing a source
+group propagate signed row Jacobians and can be partially correlated. A scalar
+component with no group is independent.
 
-    C_ij = R_i R_j * sum_k r_ik r_jk [group_ik == group_jk != None or i == j]
+    C_rate = sum_source (diag(R) J L) (diag(R) J L)^T, where L L^T = C_source
 
 Components that a complete budget needs but that were not supplied are listed
 in ``missing`` so they are never mistaken for zero.
