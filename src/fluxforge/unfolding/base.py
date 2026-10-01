@@ -175,7 +175,7 @@ def estimate_unfolding_uncertainties(
     if len(singular) < response_array.shape[1] or np.any(singular <= tolerance):
         raise ValueError("Rank-deficient response has unavailable bin uncertainty")
     sensitivity_factor = (vt.T / singular) / scale
-    result = np.linalg.norm(sensitivity_factor, axis=1)
+    result = np.hypot.reduce(sensitivity_factor, axis=1)
     if not np.all(np.isfinite(result)):
         raise ValueError("Linear propagated uncertainty is not finite")
     return result

@@ -299,3 +299,14 @@ def test_gaussian_nonfinite_covariance_is_unavailable_despite_finite_flux():
     np.testing.assert_allclose(result.solution, [1, 2])
     assert result.uncertainty is None and result.covariance is None
     assert result.diagnostics["uncertainty_status"] == "unavailable"
+
+
+@pytest.mark.parametrize("response_scale", [1e-200, 1e200])
+def test_linear_finite_extreme_uncertainty_does_not_underflow_or_overflow(
+    response_scale,
+):
+    result = estimate_unfolding_uncertainties(
+        np.eye(2) * response_scale,
+        measurement_uncertainty=np.ones(2),
+    )
+    np.testing.assert_allclose(result, np.ones(2) / response_scale, rtol=1e-14, atol=0)
