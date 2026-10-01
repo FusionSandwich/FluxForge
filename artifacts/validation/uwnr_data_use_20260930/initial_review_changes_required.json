@@ -1,0 +1,23 @@
+{
+  "reviewer_model": "GPT-6.1 Sol",
+  "reviewed_commit": "a0fbc0f3c09156b8d5086c72a2684e5d6e021bbb",
+  "decision": "CHANGES_REQUIRED",
+  "scientific_admission": false,
+  "findings": [
+    {"severity":"P2","id":"singular_source_covariance","file":"src/fluxforge/uncertainty/reaction_rate_budget.py","repro":"C=outer([.14,.23]); J=[.23,-.14]; relative=0 but rate_covariance(single rate1)=-3.209238430557093e-19, rejected as non-PSD downstream. C=outer([1,3]); J=[3,-1] rejects construction after repeated covariance normalization.","requested":"Stable shared spectral-factor projection/Gram covariance, consistent relative uncertainty and repeated validation; no jitter."},
+    {"severity":"P2","id":"curve_runtime_byte_binding","file":"src/fluxforge/analysis/qg_calibration.py","repro":"diagnostic_at(983.5,percent)=.0004507845; table.values[:]*=2 changes result to .000901569 under identical original curve SHA and source lines949/950.","requested":"Private immutable source snapshot and defensive public copies/read-only properties."},
+    {"severity":"P2","id":"monitor_substring_identity","file":"src/fluxforge/physics/operating_history.py","repro":"monitor_ids='Co-RAFM-1a' string passes expected_sample='Co-RAFM-1', require_separability=True, because substring membership.","requested":"Validate monitor identifier array and exact membership."}
+  ],
+  "checks": {
+    "independent_focused_tests": "38 passed",
+    "independent_history_fd_max_relative_error": 0.000006216654050516637,
+    "independent_signed_shared_covariance_max_abs_error": 3.552713678800501e-15,
+    "signed_shared_negative_cross_covariance": -6.000000000000001,
+    "operator_receipt_sha256": "2deb8dcd728ee8fd4b4a7d4714435263f05c68ff4766927add6f4f9250f99500",
+    "operator_input_hashes_checked": 32,
+    "operator_sources":13,
+    "operator_aggregate_rows":7,
+    "root_frozen_suite_log":"frozen_a0fbc0f_tests.txt:231 passed"
+  },
+  "scope_limits": ["All-report actual receipt pending; source_data_use_a0fbc0f_v2 failed source-line assertion and cannot be accepted.","No measured calibration covariance or complete actual operating log supplied.","No scientific admission, source edits, acquisitions, remote actions or publication performed.","Private correspondence/workbook contents and Chat URLs excluded."]
+}

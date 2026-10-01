@@ -1,0 +1,24 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\joshu\fluxforge-worktrees\qg-report-yield-qc
+configfile: pyproject.toml
+collected 240 items
+
+tests\test_uwnr_source_inputs.py ....................................... [ 16%]
+.......                                                                  [ 19%]
+tests\test_reaction_rate_budget.py ....                                  [ 20%]
+tests\test_publication_integrity.py .................................... [ 35%]
+...............                                                          [ 42%]
+tests\test_irradiation_history.py .......                                [ 45%]
+tests\test_count_decay_time.py ....                                      [ 46%]
+tests\test_qg_report_qc.py .....................                         [ 55%]
+tests\test_rafm_workflow.py ....................                         [ 63%]
+tests\test_flux_wire_parity.py .....                                     [ 65%]
+tests\test_no_silent_defaults.py ................                        [ 72%]
+tests\test_cd_ratio_rates.py ...                                         [ 73%]
+tests\test_flux_rate_quantities.py .....                                 [ 75%]
+tests\test_unfolding_workflows.py ...................................... [ 91%]
+...                                                                      [ 92%]
+tests\test_physical_gls.py .................                             [100%]
+
+======================= 240 passed in 115.58s (0:01:55) =======================

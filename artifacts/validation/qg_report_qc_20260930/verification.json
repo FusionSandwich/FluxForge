@@ -1,0 +1,16 @@
+{
+  "reviewed_code_commit": "b718b780f266fb36786899a5ffb8b5548a5dfef3",
+  "original_pr212_commit": "da0f0680a4d652c3428a9f592057f82940a1f95d",
+  "final_receipt_sha256": "b390c21ea8ab6114e227eb1a9fbf2cab7bd2b1919a79d8f3194409f5458753c2",
+  "verified_original_input_hashes": 32,
+  "verified_total_input_hashes": 42,
+  "verified_source_hashes": 6,
+  "reports": 4,
+  "ti_yield_flags": 6,
+  "cu_control_yield_flags": 0,
+  "affected_tests_passed": 116,
+  "independent_sol_acceptance": true,
+  "source_values_unchanged": true,
+  "rate_or_summary_correction": false,
+  "scientific_admission": false
+}

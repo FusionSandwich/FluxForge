@@ -1,0 +1,52 @@
+{
+  "code_commit": "27839e128dabbc7b901f7a1acf80f19ba68d949d",
+  "runtime_acceptance_commit": "7b24c0b783b6504e8193138965aa45780720c9bf",
+  "metadata_only_delta": "Required --operator CLI argument added to documented replay; all runtime/test source bytes unchanged.",
+  "source_bindings": {
+    "src/fluxforge/analysis/qg_calibration.py": {
+      "working_file_sha256": "1772c301d079f9c25dd31a183d67fe5bbb485bde5a9870415f7c0bbea557205e",
+      "git_blob_sha256": "1772c301d079f9c25dd31a183d67fe5bbb485bde5a9870415f7c0bbea557205e"
+    },
+    "src/fluxforge/analysis/qg_report_qc.py": {
+      "working_file_sha256": "7ed90522de4ef57f36fe5ae899816a5d04d495b270c7cbbf17c4f12451be4122",
+      "git_blob_sha256": "e247dcb66b362b4aae144ed772a51ca5e1a8e741500a64d6d76aeabe88850af8"
+    },
+    "src/fluxforge/analysis/flux_unfold.py": {
+      "working_file_sha256": "6e494f645cbbc94d84173207ad877cd7b62069e4e85eec8b21a5582caf870e12",
+      "git_blob_sha256": "d641b29b778dc2a7342e7a572d70ffabbf4d6f8ef7d36b687bbd21999f2f6a39"
+    },
+    "src/fluxforge/examples/rafm_workflow.py": {
+      "working_file_sha256": "27b8e98ef9b3876e9d69deb6f556369f9c675110dd37a767e5eb64a49b56f24f",
+      "git_blob_sha256": "17939539ba42083dbc49b0b8d601fafba48334a9edcdd5cf530f3a8d50fa9d7b"
+    },
+    "src/fluxforge/uncertainty/reaction_rate_budget.py": {
+      "working_file_sha256": "189f1843f5480f92171bdfd2b3562d570765781d777aa3d8f3832d7258c84e69",
+      "git_blob_sha256": "69d13e66c1a0b135945e52ff1824d3097d35f1e756a18d273d7636f52b26f666"
+    },
+    "src/fluxforge/physics/operating_history.py": {
+      "working_file_sha256": "ce471a2e12474326eba78cf3886cedf944f58e58aca639151248822556de243f",
+      "git_blob_sha256": "ce471a2e12474326eba78cf3886cedf944f58e58aca639151248822556de243f"
+    },
+    "tools/validate_uwnr_data_use.py": {
+      "working_file_sha256": "bb286689b7bb22aaccb6242511afd2eb42def01d4e8a6be679d57d7f4fac8d1e",
+      "git_blob_sha256": "bb286689b7bb22aaccb6242511afd2eb42def01d4e8a6be679d57d7f4fac8d1e"
+    },
+    "tools/validate_monitor_response_rafm.py": {
+      "working_file_sha256": "709b2778ecfe9ac00c51890af3d073e27ce365e5406587f0cc35396a7582d26c",
+      "git_blob_sha256": "1e68c1a1b8879ef31b04966b7a4789b4ea823767174aa69bdb28c0f617d43ed4"
+    },
+    "tests/test_uwnr_source_inputs.py": {
+      "working_file_sha256": "aedd12d4b622ac15d92c580c1ed77f738efdd28a6c6f8ca1e72510d1d3a4d0cb",
+      "git_blob_sha256": "aedd12d4b622ac15d92c580c1ed77f738efdd28a6c6f8ca1e72510d1d3a4d0cb"
+    },
+    "examples/RAFM_irradiation/calibration/South Small Vial 25cm.csv": {
+      "working_file_sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+      "git_blob_sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000"
+    },
+    "examples/RAFM_irradiation/calibration/South Small Vial 25cm.provenance.json": {
+      "working_file_sha256": "0a75f027ee1145a946477b5ff82e7cbc1e4b113d433bfcba8dec0e428db8c017",
+      "git_blob_sha256": "61f4c9e143df23ce4851d0af03eb9c46343bf357cc43b0b4f982a69fb788ff33"
+    }
+  },
+  "encoding_note": "Working source files and Git blobs are bound separately because local Git autocrlf normalizes text. Evidence and curve CSV use scoped -text attributes."
+}

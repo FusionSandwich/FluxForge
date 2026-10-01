@@ -1,0 +1,79 @@
+{
+  "schema": "qg-source-followup-v1",
+  "inspected_commit": "0b3a02ee3829e3d196e17ecc93ec4d32ac31a4fe",
+  "source_sha256": {
+    "src/fluxforge/examples/rafm_workflow.py": "f5478777e0f5d6fa2c0a9c1ea259d642ebb0e0286af0c660dd7a3fbc39f18c52",
+    "src/fluxforge/analysis/flux_unfold.py": "ca3255fa6cd5a162adacdbb6a181dad3782dc91d7c7334c9c5002e871dc172cb",
+    "tests/test_count_decay_time.py": "03d0dc21398bae769876180e26a746a25b493e1e88d7cdcab9bb5233d3223fc2"
+  },
+  "reports": [
+    {
+      "measurement": "Ti-RAFM-1",
+      "report_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+      "printed_summary_activity": 0.424,
+      "activity_unit": "uCi",
+      "conditional_weight": "N/u(N), not reconstructed vendor activity uncertainty",
+      "all_four_summary": 0.4101672072437827,
+      "three_stronger_summary": 0.42412383001462645,
+      "matching_hypothesis": "three stronger",
+      "live_time_s": 14400.0,
+      "real_time_s": 14411.89,
+      "printed_half_life_s": 157320.0,
+      "uniform_live_fraction_start_average_factor": 1.0320851574099623
+    },
+    {
+      "measurement": "Ti-RAFM-1a",
+      "report_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+      "printed_summary_activity": 0.408,
+      "activity_unit": "uCi",
+      "conditional_weight": "N/u(N), not reconstructed vendor activity uncertainty",
+      "all_four_summary": 0.40789678333994495,
+      "three_stronger_summary": 0.44166820618787567,
+      "matching_hypothesis": "all four",
+      "live_time_s": 14400.0,
+      "real_time_s": 14411.95,
+      "printed_half_life_s": 157320.0,
+      "uniform_live_fraction_start_average_factor": 1.0320852923864068
+    },
+    {
+      "measurement": "Ti-RAFM-1b",
+      "report_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+      "printed_summary_activity": 0.234,
+      "activity_unit": "uCi",
+      "conditional_weight": "N/u(N), not reconstructed vendor activity uncertainty",
+      "all_four_summary": 0.2342877053219885,
+      "three_stronger_summary": 0.24563860560344766,
+      "matching_hypothesis": "all four",
+      "live_time_s": 172800.0,
+      "real_time_s": 172935.45,
+      "printed_half_life_s": 157320.0,
+      "uniform_live_fraction_start_average_factor": 1.4288928812039006
+    }
+  ],
+  "report_values_unchanged": true,
+  "rate_or_summary_correction": false,
+  "scientific_admission": false,
+  "no_new_runtime_defect_demonstrated": true,
+  "manual": {
+    "url": "https://ludlums.com/images/product_manuals/QTMmanual.pdf",
+    "version": "4.04.00",
+    "pdf_pages": [
+      46,
+      118,
+      119,
+      126
+    ],
+    "deployed_version_applicability": "unverified"
+  },
+  "nuclear_reference": {
+    "url": "https://nds.iaea.org/sgnucdat/safeg2008.pdf",
+    "pdf_page": 116,
+    "qualification": "historical percent yields; not independent covariance or calibration"
+  },
+  "limitations": [
+    "Conditional subset/weight matches do not establish vendor selection or summary uncertainty",
+    "Count factor requires uniform live fraction; historical decay processing unverified",
+    "No full power/rod history, detector covariance or active calibration identity qualified",
+    "Private mail provenance is held separately and is excluded from this public receipt"
+  ]
+}

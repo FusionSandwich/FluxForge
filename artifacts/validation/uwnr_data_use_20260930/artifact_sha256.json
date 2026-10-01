@@ -1,0 +1,15 @@
+{
+  ".gitattributes": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992",
+  "accepted_runtime_receipt.json": "3e9a11e8f4375ce71ec8e6c4956d0509712caec3f83d35442d11873e5a449d29",
+  "affected_tests.txt": "6f7be7695ca69a3f9d63e93c6a23cf69c4bce399f535069f037151574810cdf2",
+  "all_roi_diagnostics.csv": "23942e1f6e9e0c3ced3050254e5e46978b5868af36a72f44a43b9b966f0188f9",
+  "curve_rows_qc.csv": "81c529088e9269ba16d8bd1aa1ce448b07e24bee9473664ff20c32485f2b7d2c",
+  "initial_review_changes_required.json": "3a88b3e0cf2afa737967a17d70e45094d9c8e1d1000f721210a2175796962cf6",
+  "metadata_final_review.json": "e7094f31337adf9da37a2d5dd67b1a4dce64846e9f8566b5b8cb8d9af0e78ce5",
+  "operator_receipt.json": "4398f9164e3ba49c8eb10583db8d4a223d323413546eec6331ec27b8eea9e95c",
+  "README.md": "e7996cfc6b986fb4f9d80146666c5aaeb4427f675446cd05f70b23ca0305e3d7",
+  "receipt.json": "61f4006f7e5f219bb22b525d3c09e2c58785d11430472db8decf27150bef0fa8",
+  "runtime_final_review.json": "7b344b1f73c25191908991f97e343adf6409792ad29755e00e5fd382b86e9cb0",
+  "source_binding.json": "753d979e2f0e8d98ed784cf1b6df7fc85960e5813a2b15fe9d02436f7c9e7a2e",
+  "source_inventory.json": "214a629219ed5c18955e3763a89c4c2b94d71602d32395d03033b86b3ca48db8"
+}
