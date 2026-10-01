@@ -206,12 +206,12 @@ def irradiation_history_factor(
     is ``irradiation_time_s``. Missing or non-positive timing raises unless
     ``assume_saturated=True`` is given explicitly.
     """
-    if half_life_s <= 0:
+    if not np.isfinite(half_life_s) or half_life_s <= 0:
         raise ValueError("half_life_s must be positive")
     decay_const = np.log(2) / half_life_s
     if irradiation_history is not None:
         segments = [(float(d), float(p)) for d, p in irradiation_history]
-        if not segments or any(d < 0 or p < 0 for d, p in segments):
+        if not segments or any(not np.isfinite(d) or not np.isfinite(p) or d < 0 or p < 0 for d, p in segments):
             raise ValueError("irradiation_history needs non-negative (duration_s, relative_power) segments")
         if not any(d > 0 and p > 0 for d, p in segments):
             raise ValueError("irradiation_history has no irradiating segment")
@@ -333,7 +333,7 @@ def activity_to_reaction_rate(
 
 def _report_count_time(includes_count_decay: Optional[bool], data: FluxWireData) -> float:
     """Count real time to apply to report activities, from an explicit declaration."""
-    if includes_count_decay is None:
+    if type(includes_count_decay) is not bool:
         raise ValueError(
             "Declare report_includes_count_decay: whether the processed report's "
             "count-start activities already correct decay during acquisition"

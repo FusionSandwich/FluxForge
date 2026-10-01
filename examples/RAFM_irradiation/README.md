@@ -63,3 +63,7 @@ Typical outputs:
   `examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC`
 - background spectrum:
   `examples/RAFM_irradiation/background.ASC`
+
+## Source-bound UWNR curve diagnostic
+
+The exact authorized South HPGe table and public-safe provenance are in [calibration/](calibration/). Use the [all-report diagnostic and covariance guide](../../docs/reviews/UWNR_SOURCE_DATA_USE_2026-09-30.md) to replay source QC. This historical table does not qualify physical calibration; negative source rows and unknown covariance remain explicit admission exclusions.

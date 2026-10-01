@@ -47,6 +47,7 @@ from fluxforge.io.flux_wire import FluxWireData, read_processed_txt, read_raw_as
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.physics.activation import activation_study_metrics
 from fluxforge.physics.monitor_response import CoverLayer, MonitorResponseSpec
+from fluxforge.physics.operating_history import load_operating_history, history_rate_jacobian
 from fluxforge.uncertainty.reaction_rate_budget import (
     RateUncertaintyBudget,
     UncertaintyComponent,
@@ -99,6 +100,7 @@ class TimingInfo:
     schedule_source: Optional[str]
     # Optional ordered (duration_s, relative_power) segments ending at EOI
     irradiation_history: Optional[List[Tuple[float, float]]] = None
+    irradiation_operating_log: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -116,6 +118,7 @@ class TimingInfo:
             "decay_label": self.decay_label,
             "schedule_source": self.schedule_source,
             "irradiation_history": self.irradiation_history,
+            "irradiation_operating_log": self.irradiation_operating_log,
         }
 
 
@@ -443,8 +446,10 @@ def _parse_irradiation_history(
     """Parse schedule ``irradiation_history`` entries ({duration_s, relative_power})."""
     if not segments:
         return None
+    if any("duration_s" not in item or "relative_power" not in item for item in segments):
+        raise ValueError("History segments require explicit duration_s and relative_power")
     return [
-        (float(item["duration_s"]), float(item.get("relative_power", 1.0)))
+        (float(item["duration_s"]), float(item["relative_power"]))
         for item in segments
     ]
 
@@ -486,6 +491,8 @@ def resolve_measurement_timing(
                 measurement_time=measurement_time,
                 decay_label=label,
                 schedule_source="sample_schedule.phase1",
+                irradiation_history=_parse_irradiation_history(phase.get("irradiation_history")),
+                irradiation_operating_log=phase.get("irradiation_operating_log"),
             )
 
     if stem_upper.startswith("RAFM4-"):
@@ -512,6 +519,8 @@ def resolve_measurement_timing(
                 measurement_time=start_time,
                 decay_label=label,
                 schedule_source="sample_schedules.phase2",
+                irradiation_history=_parse_irradiation_history(phase2.get("irradiation_history")),
+                irradiation_operating_log=phase2.get("irradiation_operating_log"),
             )
 
     if "RAFM-1" in stem_upper or "RAFM1" in stem_upper:
@@ -537,6 +546,7 @@ def resolve_measurement_timing(
                 irradiation_history=_parse_irradiation_history(
                     flux_wire_info.get("irradiation_history")
                 ),
+                irradiation_operating_log=flux_wire_info.get("irradiation_operating_log"),
             )
         return TimingInfo(
             sample_group="RAFM1",
@@ -572,12 +582,12 @@ def report_count_real_time_s(config: Dict[str, Any], report: FluxWireData) -> fl
     to be declared rather than guessing (and possibly correcting twice).
     """
     declared = config.get("qg_report_activity_includes_count_decay")
-    if declared is None:
+    if type(declared) is not bool:
         raise ValueError(
             "Set qg_report_activity_includes_count_decay in the workflow config "
             "(true if Quantum Gold already corrected decay during acquisition)"
         )
-    return 0.0 if bool(declared) else float(report.real_time)
+    return 0.0 if declared else float(report.real_time)
 
 
 def decay_correction_factor(
@@ -3002,7 +3012,28 @@ def build_flux_wire_reactions(
     isotope_payload: Dict[str, Dict[str, Any]],
     timing: TimingInfo,
     metadata: RAFMMetadata,
+    *, mode: Optional[str] = None,
 ) -> List[FluxWireReaction]:
+    mode = metadata.config.get("rate_construction_mode", "diagnostic") if mode is None else mode
+    if mode not in {"diagnostic", "physical"}:
+        raise ValueError("Rate construction mode must be diagnostic or physical")
+    history = timing.irradiation_history
+    log_binding = None
+    if timing.irradiation_operating_log is not None:
+        history, log_binding = load_operating_history(
+            timing.irradiation_operating_log, expected_end=timing.irradiation_end,
+            expected_segments=history,
+            expected_sample=sample_id,
+            require_separability=mode == "physical",
+        )
+    if mode == "physical" and log_binding is None:
+        raise ValueError("Physical rate construction requires a complete irradiation operating log")
+    if mode == "physical" and (timing.irradiation_end is None or timing.irradiation_end.tzinfo is None):
+        raise ValueError("Physical rate construction requires a qualified timezone-bound EOI/log join")
+    if log_binding is not None and timing.irradiation_time_s is not None and not math.isclose(
+        float(timing.irradiation_time_s), sum(d for d, _ in history), rel_tol=0, abs_tol=1e-6
+    ):
+        raise ValueError("Operating log duration disagrees with the schedule")
     reactions: List[FluxWireReaction] = []
     sample_element = get_sample_element(sample_id)
     mass_mg = flux_wire_mass_mg(sample_key, metadata)
@@ -3016,6 +3047,8 @@ def build_flux_wire_reactions(
         # Only an end-of-irradiation activity may be converted with zero decay
         # time; measurement-time activity is never substituted for it.
         if payload.get("activity_eoi_bq") is None:
+            if mode == "physical":
+                raise ValueError("Physical rate construction requires qualified EOI activity")
             reactions.append(
                 FluxWireReaction(
                     sample_id=sample_id,
@@ -3042,6 +3075,7 @@ def build_flux_wire_reactions(
                 UncertaintyComponent(
                     "activity", base_relative_unc, None,
                     "reported activity uncertainty (composition not itemized)",
+                    uncertainty_scope="reported_total_unknown",
                 )
             )
         # Model terms are explicit, named components (never silent floors).
@@ -3061,7 +3095,7 @@ def build_flux_wire_reactions(
         for name, additional, _ in model_terms:
             if additional > 0.0:
                 components.append(
-                    UncertaintyComponent(name, additional, None, f"config {name}_relative_uncertainty_additional")
+                    UncertaintyComponent(name, additional, None, f"config {name}_relative_uncertainty_additional", assumed=True)
                 )
         floor = max((term[2] for term in model_terms), default=0.0)
         # Source components can be global, per-wire, or per observation. An
@@ -3074,11 +3108,28 @@ def build_flux_wire_reactions(
         for name, spec in declared.items():
             kwargs = dict(source=spec.get("source", ""),
                           correlation_group=spec.get("correlation_group"),
+                          uncertainty_scope=spec.get("uncertainty_scope", "unspecified"),
                           covers=tuple(spec.get("covers", ())))
-            component = (UncertaintyComponent(name, float(spec["relative"]), **kwargs)
+            if "input_covariance" in spec:
+                sensitivity = spec.get("log_sensitivities")
+                names, units = spec.get("input_names"), spec.get("input_units")
+                if spec.get("kind") == "irradiation_history":
+                    if log_binding is not None and kwargs["correlation_group"] != log_binding["source_id"]:
+                        raise ValueError("History covariance source group disagrees with operating log")
+                    segments = history or [(float(timing.irradiation_time_s), 1.0)]
+                    sensitivity, calculated_names, calculated_units = history_rate_jacobian(half_life_s, segments)
+                    if names != calculated_names or units != calculated_units:
+                        raise ValueError("History covariance parameter names/units disagree with segments")
+                component = UncertaintyComponent.from_covariance(
+                    name, spec["input_covariance"], sensitivity, input_names=names,
+                    input_units=units, assumed=spec.get("assumed", False) or (spec.get("kind") == "irradiation_history" and log_binding is None),
+                    **kwargs,
+                )
+            else:
+                component = (UncertaintyComponent(name, float(spec["relative"]), assumed=spec.get("assumed", False), **kwargs)
                          if "relative" in spec else UncertaintyComponent.from_input(
                              name, float(spec["standard_uncertainty"]),
-                             float(spec["log_sensitivity"]), **kwargs))
+                             float(spec["log_sensitivity"]), assumed=spec.get("assumed", False), **kwargs))
             components = [c for c in components if c.name != name] + [component]
 
         current = math.sqrt(sum(c.relative**2 for c in components))
@@ -3086,7 +3137,7 @@ def build_flux_wire_reactions(
             "model_floor", current, floor, "config *_model_relative_uncertainty_floor"
         )
         if floor_component is not None:
-            components.append(floor_component)
+            components.append(replace(floor_component, assumed=True))
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
@@ -3102,14 +3153,23 @@ def build_flux_wire_reactions(
                 half_life_s=half_life_s,
                 irradiation_time_s=timing.irradiation_time_s,
                 decay_time_s=0.0,
-                irradiation_history=timing.irradiation_history,
+                irradiation_history=history,
             )
             if activity_bq > 0 and n_atoms > 0 and half_life_s > 0
             else 0.0
         )
         budget = RateUncertaintyBudget(
-            row_id=f"{sample_id}|{reaction_id}", rate=rate, components=components
+            row_id=f"{sample_id}|{reaction_id}", rate=rate, components=components,
+            diagnostic_assumptions=([] if log_binding else ["Irradiation chronology/history is not a complete operating log"]) +
+                ([] if log_binding and log_binding["local_spectrum_separability_qualified"] else ["Scalar history assumes a separable local spectrum and explicit reference-power normalization"]),
+            irradiation_log_binding=log_binding,
         )
+        if mode == "physical":
+            budget.require_complete()
+            if any(c.assumed for c in components):
+                raise ValueError("Physical rate construction rejects assumed uncertainty components")
+            if any(c.uncertainty_scope in {"unspecified", "reported_total_unknown"} for c in components):
+                raise ValueError("Physical rate construction rejects unknown uncertainty coverage/conditioning")
         reactions.append(
             FluxWireReaction(
                 sample_id=sample_id,
@@ -3739,15 +3799,7 @@ def reaction_rows_to_dicts(
             ";".join(f"{c.name}={c.relative:.4g}" for c in budget.components) if budget else ""
         )
         row["rate_uncertainty_missing"] = ";".join(budget.missing) if budget else ""
-        row["rate_uncertainty_budget"] = (
-            {
-                "row_id": budget.row_id,
-                "rate": budget.rate,
-                "components": [asdict(component) for component in budget.components],
-            }
-            if budget
-            else None
-        )
+        row["rate_uncertainty_budget"] = asdict(budget) if budget else None
         rows.append(row)
     return rows
 
@@ -3773,6 +3825,9 @@ def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
             row_id=serialized["row_id"],
             rate=float(serialized["rate"]),
             components=[UncertaintyComponent(**c) for c in serialized["components"]],
+            required=serialized.get("required", RateUncertaintyBudget.__dataclass_fields__["required"].default),
+            diagnostic_assumptions=serialized.get("diagnostic_assumptions", []),
+            irradiation_log_binding=serialized.get("irradiation_log_binding"),
         )
     return reaction
 
