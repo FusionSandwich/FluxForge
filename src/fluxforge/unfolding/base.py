@@ -37,7 +37,9 @@ class UnfoldingResult:
     negative_bin_count: int = 0
     method_category: str = "user_selected"
     standards_locked_by: str | None = None
-    predicted_measurements: np.ndarray = field(default_factory=lambda: np.array([], dtype=float))
+    predicted_measurements: np.ndarray = field(
+        default_factory=lambda: np.array([], dtype=float)
+    )
     residuals: np.ndarray = field(default_factory=lambda: np.array([], dtype=float))
     chi_squared: float = 0.0
     iterations: int = 0
@@ -52,7 +54,9 @@ class UnfoldingResult:
             dtype=float,
         ).reshape(-1)
         self.residuals = np.asarray(self.residuals, dtype=float).reshape(-1)
-        self.convergence_history = tuple(float(value) for value in self.convergence_history)
+        self.convergence_history = tuple(
+            float(value) for value in self.convergence_history
+        )
         summary = summarize_flux_bins(self.flux)
         self.negative_bin_count = int(summary["negative_bin_count"])
         self.iterations = int(self.iterations)
@@ -124,43 +128,102 @@ def estimate_unfolding_uncertainties(
     measured: np.ndarray | None = None,
     measurement_uncertainty: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Return a stable pseudo-inverse uncertainty estimate for unfolded flux bins."""
+    """Conditional sigma for unconstrained, full-rank weighted linear least squares.
+
+    This compatibility utility describes that fixed linear estimator only, not
+    GRAVEL, MAXED, a constrained estimator or a regularized seed. Response is
+    held fixed and independent positive measurement sigmas must be supplied.
+    Rank-deficient bin uncertainty is unavailable rather than zero in null space.
+    """
 
     response_array = np.asarray(response_matrix, dtype=float)
-    if response_array.ndim != 2:
-        raise ValueError("response_matrix must be a 2-D array")
+    if (
+        response_array.ndim != 2
+        or not all(response_array.shape)
+        or not np.all(np.isfinite(response_array))
+    ):
+        raise ValueError("response_matrix must be a nonempty finite 2-D array")
 
     if measurement_uncertainty is not None:
         sigma = require_nonnegative(
             "measurement_uncertainty",
             measurement_uncertainty,
         ).reshape(-1)
-    elif measured is not None:
-        sigma = np.sqrt(
-            np.maximum(require_nonnegative("measurements", measured).reshape(-1), 1.0)
-        )
     else:
-        sigma = np.ones(response_array.shape[0], dtype=float)
+        raise ValueError(
+            "Linear uncertainty requires explicit measurement_uncertainty; no count or unit-variance assumption is inferred"
+        )
 
     if sigma.size != response_array.shape[0]:
         raise ValueError(
             "measurement_uncertainty length must match the response_matrix row count"
         )
 
-    try:
-        rt_r = response_array.T @ response_array
-        scale = max(float(np.trace(rt_r)), 1.0)
-        regularization = (1e-10 * scale / max(rt_r.shape[0], 1)) * np.eye(
-            rt_r.shape[0],
-            dtype=float,
+    if np.any(sigma <= 0):
+        raise ValueError(
+            "Linear uncertainty requires strictly positive measurement sigmas; exact constraints are unsupported"
         )
-        sensitivity = np.linalg.inv(rt_r + regularization) @ response_array.T
-        variance = np.sum((sensitivity * sigma.reshape(1, -1)) ** 2, axis=1)
-    except np.linalg.LinAlgError:
-        pseudo_inverse = np.linalg.pinv(response_array)
-        variance = np.sum((pseudo_inverse * sigma.reshape(1, -1)) ** 2, axis=1)
+    with np.errstate(over="ignore", invalid="ignore"):
+        whitened = response_array / sigma[:, None]
+    if not np.all(np.isfinite(whitened)):
+        raise ValueError("Whitened response is not finite")
+    scale = float(np.max(np.abs(whitened)))
+    if scale == 0:
+        raise ValueError("Rank-deficient response has unavailable bin uncertainty")
+    _, singular, vt = np.linalg.svd(whitened / scale, full_matrices=False)
+    tolerance = np.finfo(float).eps * max(whitened.shape) * singular[0]
+    if len(singular) < response_array.shape[1] or np.any(singular <= tolerance):
+        raise ValueError("Rank-deficient response has unavailable bin uncertainty")
+    sensitivity_factor = (vt.T / singular) / scale
+    result = np.hypot.reduce(sensitivity_factor, axis=1)
+    if not np.all(np.isfinite(result)):
+        raise ValueError("Linear propagated uncertainty is not finite")
+    return result
 
-    return np.sqrt(np.maximum(variance, 0.0))
+
+def unavailable_uncertainty_metadata(
+    method, response_matrix, *, converged, measurement_uncertainty=None
+):
+    """Explain unavailable estimator uncertainty without substituting a proxy."""
+    response = np.asarray(response_matrix, dtype=float)
+    rank = None
+    if measurement_uncertainty is not None:
+        sigma = np.asarray(measurement_uncertainty, dtype=float).reshape(-1)
+        if (
+            sigma.shape == (response.shape[0],)
+            and np.all(np.isfinite(sigma))
+            and np.all(sigma > 0)
+        ):
+            with np.errstate(over="ignore", invalid="ignore"):
+                weighted = response / sigma[:, None]
+            if np.all(np.isfinite(weighted)):
+                scale = float(np.max(np.abs(weighted))) if weighted.size else 0.0
+                rank = int(np.linalg.matrix_rank(weighted / scale)) if scale else 0
+    reasons = [
+        f"Estimator-specific uncertainty propagation is not implemented for {method}"
+    ]
+    if rank is not None and rank < response.shape[1]:
+        reasons.append(
+            "Response is rank deficient; full-bin identifiability is unqualified"
+        )
+    elif rank is None:
+        reasons.append(
+            "Error-weighted response rank is unavailable without finite positive measurement sigmas"
+        )
+    if not converged:
+        reasons.append("Solver did not converge; estimator uncertainty is unqualified")
+    return {
+        "uncertainty_estimator": "unavailable",
+        "uncertainty_status": "unavailable",
+        "uncertainty_unavailable_reason": "; ".join(reasons),
+        "uncertainty_qualified": False,
+        "response_rank": rank,
+        "response_rank_basis": (
+            "measurement-error-weighted response; numerical rank only"
+            if rank is not None
+            else "unavailable"
+        ),
+    }
 
 
 __all__ = [
@@ -168,5 +231,6 @@ __all__ = [
     "UnfoldingMethodDefinition",
     "UnfoldingResult",
     "estimate_unfolding_uncertainties",
+    "unavailable_uncertainty_metadata",
     "validate_unfolding_inputs",
 ]

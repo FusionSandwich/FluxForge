@@ -10,7 +10,7 @@ from fluxforge.core.unfolding_diagnostics import summarize_flux_bins
 from fluxforge.plugins import PluginRegistries, bootstrap_builtin_registries
 from fluxforge.solvers.iterative import gravel as legacy_gravel
 from fluxforge.unfolding.base import (
-    estimate_unfolding_uncertainties,
+    unavailable_uncertainty_metadata,
     UnfoldingMethod,
     UnfoldingMethodDefinition,
     UnfoldingResult,
@@ -36,7 +36,7 @@ class GravelUnfolder(UnfoldingMethod):
             label="GRAVEL",
             summary="Gold/SAND-II style iterative unfolding for reproducible detector-response deconvolution.",
             convergence_metric="chi_squared",
-            supports_uncertainties=True,
+            supports_uncertainties=False,
             can_produce_negative_bins=False,
             method_category="user_selected",
         )
@@ -65,9 +65,7 @@ class GravelUnfolder(UnfoldingMethod):
         relaxation = float(kwargs.get("relaxation", self.relaxation))
         prior_strength = float(kwargs.get("prior_strength", 0.0))
         smoothing_strength = float(kwargs.get("smoothing_strength", 0.0))
-        convergence_mode = str(
-            kwargs.get("convergence_mode", self.convergence_mode)
-        )
+        convergence_mode = str(kwargs.get("convergence_mode", self.convergence_mode))
         seed_with_ml = bool(kwargs.get("seed_with_ml", False))
         confidence_threshold = float(kwargs.get("confidence_threshold", 0.6))
         verbose = bool(kwargs.get("verbose", False))
@@ -107,11 +105,7 @@ class GravelUnfolder(UnfoldingMethod):
         flux = np.asarray(solution.flux, dtype=float)
         predicted_measurements = response_array @ flux
         residuals = measured_array - predicted_measurements
-        uncertainties = estimate_unfolding_uncertainties(
-            response_array,
-            measured=measured_array,
-            measurement_uncertainty=uncertainty_array,
-        )
+
         definition = self.definition()
         summary = summarize_flux_bins(
             flux,
@@ -121,7 +115,7 @@ class GravelUnfolder(UnfoldingMethod):
 
         return UnfoldingResult(
             flux=flux,
-            uncertainties=uncertainties,
+            uncertainties=None,
             convergence_history=tuple(solution.chi_squared_history),
             method_used=definition.label,
             parameters_used={
@@ -135,7 +129,12 @@ class GravelUnfolder(UnfoldingMethod):
                 "convergence_mode": convergence_mode,
                 "used_initial_flux": initial_flux is not None,
                 "used_measurement_uncertainty": uncertainty_array is not None,
-                "uncertainty_estimator": "pseudo_inverse",
+                **unavailable_uncertainty_metadata(
+                    self.definition().label,
+                    response_array,
+                    measurement_uncertainty=uncertainty_array,
+                    converged=solution.converged,
+                ),
                 "negative_policy": summary["negative_policy"],
                 "seed_with_ml": seed_with_ml,
                 "seed_accepted": bool(

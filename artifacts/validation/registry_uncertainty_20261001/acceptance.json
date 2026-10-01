@@ -1,0 +1,101 @@
+{
+  "schema": "independent-registry-uncertainty-review-v1",
+  "reviewer_model": "GPT-6.1 Sol",
+  "reviewed_commit": "b465604d8a364dce1fae4f5ba0d648cc540c0b94",
+  "base_commit": "f672374e9a0dcf82e47d9d8a0bd11d4b3808d142",
+  "decision": "ACCEPT_SOFTWARE_CONTRACT",
+  "blocking_findings_remaining": [],
+  "scientific_admission": false,
+  "resolved_findings": [
+    {
+      "severity": "P2",
+      "id": "Gaussian_covariance_nonfinite",
+      "repro": "Finite y=[1e200,2e200],sigma=[1e200,1e200],R=1e200I,NONE/FIXED/unconstrained gave flux[1,2] but NaN covariance/uncertainty labelled conditional_linear_proxy.",
+      "repair_check": "Independently reproduced repaired case: same finite flux, covariance/uncertaintyNone,statusunavailable. Finite and PSD guards reviewed; regression passes."
+    },
+    {
+      "severity": "P2",
+      "id": "generic_norm_extreme_scale",
+      "discovered_by": "root reviewer; independently reproduced from exact f16c84d Git blob",
+      "repro": "R=1e200I,sigma=1 returned[0,0];R=1e-200I rejected representable sigma1e200.",
+      "repair_check": "Scaled SVD plus hypot norm returns expected1e-200/1e200 with zero absolute tolerance; two focused regressions pass."
+    }
+  ],
+  "checks": {
+    "independent_tests": "Initial qualification+RMLE48passed; finalqualification30passed, no broad duplicate suite.",
+    "root_frozen_affected_tests": "213passed,2deselected unrelated spectrum/detection cases,18warnings in12.55s; affected_final_accepted.txt.",
+    "linear_utility": "Identity scales and independently weighted overdetermined row-unit cases; explicit positive sigma required; rank-deficient utility rejected. Weighted rank metadata invariant under row units.",
+    "RMLE_count_toy": "R=I,y=[25,400],alpha0,seeded exactcounts returns unchanged counts; default/MC0/1/3 publish no uncertainty.",
+    "RMLE_failed_MC_replicate": "Independent monkeypatch fails only replicate optimizer: main flux[25,400] and convergence preserved;completed1/failed1;uncertainty/covarianceNone.",
+    "missing_consumers": "Nonempty-string reason checks reviewed; missing reason and malformed diagnostics rejected by focused tests. JSON null roundtrip, CSV blank with reason, GUI capability flags/no missing bands reviewed and tested.",
+    "actual_replay": {
+      "receipt_sha256": "52f384c163a7ea60a440ae8ce96b1396ae41219ad74bde28f9f2067784bb5918",
+      "code_commit_matches_frozen_HEAD": true,
+      "current_input_hashes_verified": 34,
+      "current_source_hashes_verified": 20,
+      "Git_blob_hashes_verified": 20,
+      "source_sha256": {
+        "src/fluxforge/unfolding/base.py": "038993e1ffdf6adb62ec0f8665b48a4e65ee38515941ac308216b2c0f7f954f7",
+        "src/fluxforge/unfolding/gravel.py": "e63bf83d9f9a012c590bf9d4358006bfc44cb425c16da494815b1e854e41d6a2",
+        "src/fluxforge/unfolding/maxed.py": "e0bcb25cf6e156259d0071bad1a01b0928509ffaeb9371135796dde099a16969",
+        "src/fluxforge/unfolding/ml_seed.py": "afd870fe10cee14c7dad9c5cc52593c49c6ea4815278677c853dae1ea234b6de",
+        "src/fluxforge/unfolding/rmle.py": "377afd7faa73666d51c10c12af9a04021241f714e3afb17b776de5db4383479b",
+        "src/fluxforge/solvers/rmle.py": "74827ee2950a445c2c4873f9254148d0b0ba00f0d03296424ac7f7f8030281b9",
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py": "583199b9776691e8a256b5bd17c98a30fc275d82a8a64669ee1521e96d8c3bbe",
+        "src/fluxforge/cli/app.py": "c4645aa4b12dda5a171124e0e5ca3c95c994270d8c72d7420f76d3a2111b5ac9",
+        "src/fluxforge/io/artifacts.py": "1c2c154ed3356c4735dc0b492581291522a474839012054046ff04099dbeec91",
+        "src/fluxforge/core/schemas.py": "b3bb06b02acf5ba060d6e386dd3ee0fb2aeb666cd1ea6a5a051f8b6949158701",
+        "src/fluxforge/solvers/iterative.py": "a4c2a5476ade99b44f0a102a812432b770a9b701d6e8eb08bb92f8dc38ceb47b",
+        "src/fluxforge/core/unfolding_inputs.py": "e8483cbebf2e12703819f4f1b94781fe6aa0a848986c1b4d378f10332599fd7f",
+        "tools/validate_registry_uncertainty.py": "e78cbfae10aaa13bf3b4e2fab04109dfa2f2bf60b6e447dbed46bf70781262d4",
+        "tests/test_registry_uncertainty_qualification.py": "aede51578e4651909ad99b1d9e8e5aab23ba2a93941873cc6182e6067e2ddf83",
+        "tests/test_unfolding_registry.py": "df5b717410c64166c679f3d4ffdea8505fc2dbfb6f580832febcedbb56e7a504",
+        "tests/test_unfolding_workflows.py": "174411b1e5eac47beeabfe7e8de3901ac1f4137125faf244cfdcdb1e4005b3d8",
+        "tests/test_unfolding_workspace_qt.py": "8a9fefbade99ace2846cc1c620af8b293d7374738a640963ac920d4806e2cca4",
+        "tests/test_artifacts_io.py": "946e34c6628898e25b82aa5d0e427e9d23dc2ed5b2acbf3b91dd34444661c9c1",
+        "tests/test_cli_app.py": "ff7fef067bc5babd2052fb48a8d558db10d72f1fc8ee551f0852af4235390f0d",
+        "tests/test_rmle.py": "ff8e24c6661d335a565acda0045ad6ae98242c553950f80ec1b7981d3426fae5"
+      },
+      "git_blob_sha256": {
+        "src/fluxforge/unfolding/base.py": "18c3e7ec239c8d7b3d9b66c649647e874f28991c93662968c2a21ece5602d8de",
+        "src/fluxforge/unfolding/gravel.py": "eb438c61b2bdaecc32e822342046b8803dc8c20f022accc90885b4d79b189cde",
+        "src/fluxforge/unfolding/maxed.py": "f437dabc6628450a719158ad81a5a1e3e5b093501f546e0efb730cc02b4f40ca",
+        "src/fluxforge/unfolding/ml_seed.py": "bcf06ee285e13b709ddf94e4ac53d04846006063eb163aa549ff6d8a3419d87d",
+        "src/fluxforge/unfolding/rmle.py": "0e2e5f44b0cd736c9ff498ba559e60ad62717bd490a9918e8a1c4cc201c8da90",
+        "src/fluxforge/solvers/rmle.py": "197f80a6897ffea1cb3a367e700ab2824d990abf491063ece3cd85762b069489",
+        "src/fluxforge/gui/dialogs/unfolding_dialog.py": "e0eeda449895f0bc1fb3137f0f3843aa75b68c902a6249d036a5da65c0c7518b",
+        "src/fluxforge/cli/app.py": "e69dabccde753f3bc3cdc40bc60fa37539a49bd3d58d921c0d347c07e7f82f95",
+        "src/fluxforge/io/artifacts.py": "03d4245cb384a1187d468b4cf429d39d001924554d851b510f2a5bb8a1c3bb52",
+        "src/fluxforge/core/schemas.py": "36ebdd58fb913a2235dbc0a9f3302de1c9e85818b5b52e2606511e772becdfec",
+        "src/fluxforge/solvers/iterative.py": "f722ff4d8bc501bea71f4acd1e9a031b839a5b8414ef0838f67da5ab7c08c69d",
+        "src/fluxforge/core/unfolding_inputs.py": "861443dce668fb13f80a1b335527d2cf68be6e6ae6bbaf02dede30825a3bcf98",
+        "tools/validate_registry_uncertainty.py": "a4607f89ef9091087c5766b0cdcda5449ad5e822a996453bf1e37c5f8000348d",
+        "tests/test_registry_uncertainty_qualification.py": "44172293f24728f5e3dab85fbe7f48db7bb9e8497b76ebeb7cd13d77b67a3473",
+        "tests/test_unfolding_registry.py": "dc9d89a2ec3d90afe44fa48dfbd2fce9cc3af29c507bf5b700ad37dfb3f5969e",
+        "tests/test_unfolding_workflows.py": "b71c29c39a2b0dd9fdaefd8fd592f177f44ed78ab8c98daab0eec6f9ed6bd521",
+        "tests/test_unfolding_workspace_qt.py": "ea2c85adb5caee4516e77b88d15821df55563e6f94d05b576da39a09ce5fb034",
+        "tests/test_artifacts_io.py": "dd14c3b9427b2112c56f8112f09ee1205c7777b9c9939148734fe290922d9552",
+        "tests/test_cli_app.py": "6056962e4603998fe1193b08d54b9fda2aa54bd754e98a0b6c56171a5d437ce2",
+        "tests/test_rmle.py": "4e596227ca78329a082ad06ee6ab82aa626b852a5365bec39ee23c2fcec43a4e"
+      },
+      "operator_shape": [
+        13,
+        20
+      ],
+      "error_weighted_numerical_rank": 7,
+      "cases": 6,
+      "comparison": "All six GRAVEL/MAXED flux estimates,predictions,standardized residuals and convergence states exactly equal to historical replay. Finalcases also exactly equal to independently checked f16c84d replay.",
+      "registry_uncertainty": "AllNone with nonempty unavailable reason and qualifiedFalse.",
+      "consumer_exports": "Actual GRAVEL/MAXED artifact hashes verified; covariance,flux uncertainty,predicted-rate uncertainty allJSONnull with reason.",
+      "measured_inputs_corrected": false
+    }
+  },
+  "scope_limits": [
+    "Software uncertainty availability/qualification and bounded diagnostic replay only; no scientific admission.",
+    "No estimator-specific nonlinear/regularized uncertainty is implemented. No replacement percentage, generic proxy or square-root-flux uncertainty admitted.",
+    "Retained generic utility is conditional fixed-response, unconstrained,full-column-rank weighted LS with supplied independent positive measurement sigma. Response uncertainty excluded.",
+    "Successful direct Gaussian propagation remains labelled conditional_linear_proxy with uncertainty_qualified=False; positivity/automatic parameter selection not propagated; registry publishes None.",
+    "Actual13x20 numericalrank7 and physical calibration/history/geometry/covariance qualifications remain unresolved. No activation-rate Poisson run or tuning performed.",
+    "No source edits, acquisitions, remote execution or publication by independent reviewer."
+  ]
+}

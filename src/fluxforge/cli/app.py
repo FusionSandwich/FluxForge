@@ -4144,11 +4144,13 @@ def _zero_covariance(size: int) -> List[List[float]]:
 def _predicted_rates_and_uncertainty(
     response_matrix: List[List[float]],
     flux: List[float],
-    covariance: List[List[float]],
-) -> tuple[List[float], List[float]]:
+    covariance: Optional[List[List[float]]],
+) -> tuple[List[float], Optional[List[float]]]:
     response_np = np.asarray(response_matrix, dtype=float)
     flux_np = np.asarray(flux, dtype=float)
     predicted = response_np @ flux_np
+    if covariance is None:
+        return predicted.tolist(), None
 
     cov_np = np.asarray(covariance, dtype=float)
     if (
@@ -4172,7 +4174,7 @@ def _build_unfold_diagnostics(
     prior_flux: List[float],
     prior_cov: List[List[float]],
     flux: List[float],
-    covariance: List[List[float]],
+    covariance: Optional[List[List[float]]],
     diagnostics: Dict[str, Any],
 ) -> Dict[str, Any]:
     payload = dict(diagnostics)
@@ -4197,12 +4199,16 @@ def _build_unfold_diagnostics(
         payload["flux_uncertainty"] = (
             np.sqrt(np.clip(np.diag(cov_np), 0.0, None)).astype(float).tolist()
         )
+    elif covariance is None:
+        payload["flux_uncertainty"] = None
 
     predicted_rates, predicted_unc = _predicted_rates_and_uncertainty(
         response_matrix, flux, covariance
     )
     payload["predicted_rates"] = [float(value) for value in predicted_rates]
-    payload["predicted_rate_uncertainties"] = [float(value) for value in predicted_unc]
+    payload["predicted_rate_uncertainties"] = (
+        None if predicted_unc is None else [float(value) for value in predicted_unc]
+    )
 
     residuals = np.asarray(predicted_rates, dtype=float) - np.asarray(
         measured_rates, dtype=float
@@ -4224,7 +4230,7 @@ def _solve_unfold_method(
     prior_flux: List[float],
     prior_cov: List[List[float]],
     args: argparse.Namespace,
-) -> tuple[List[float], List[List[float]], float, str, Dict[str, Any]]:
+) -> tuple[List[float], Optional[List[List[float]]], float, str, Dict[str, Any]]:
     method_key = str(method).strip().lower()
     if method_key == "gls":
         solution = gls_adjust(
@@ -4271,7 +4277,13 @@ def _solve_unfold_method(
             confidence_threshold=float(getattr(args, "ml_seed_threshold", 0.6)),
             verbose=bool(getattr(args, "verbose_solver", False)),
         )
-        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
+        covariance = (
+            None
+            if solution.uncertainties is None
+            else np.diag(
+                np.square(np.asarray(solution.uncertainties, dtype=float))
+            ).tolist()
+        )
         diagnostics = {
             **dict(solution.parameters_used),
             "iterations": int(solution.iterations),
@@ -4281,7 +4293,7 @@ def _solve_unfold_method(
         }
         return (
             [float(value) for value in solution.flux],
-            covariance.tolist(),
+            covariance,
             float(solution.chi_squared),
             "gravel",
             diagnostics,
@@ -4328,7 +4340,13 @@ def _solve_unfold_method(
             initial_flux=np.asarray(prior_flux, dtype=float),
             measurement_uncertainty=np.asarray(rate_uncertainties, dtype=float),
         )
-        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
+        covariance = (
+            None
+            if solution.uncertainties is None
+            else np.diag(
+                np.square(np.asarray(solution.uncertainties, dtype=float))
+            ).tolist()
+        )
         diagnostics = {
             **dict(solution.parameters_used),
             "iterations": int(solution.iterations),
@@ -4338,7 +4356,7 @@ def _solve_unfold_method(
         }
         return (
             [float(value) for value in solution.flux],
-            covariance.tolist(),
+            covariance,
             float(solution.chi_squared),
             "maxed",
             diagnostics,
@@ -4352,7 +4370,13 @@ def _solve_unfold_method(
             measurement_uncertainty=np.asarray(rate_uncertainties, dtype=float),
             confidence_threshold=float(getattr(args, "ml_seed_threshold", 0.6)),
         )
-        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
+        covariance = (
+            None
+            if solution.uncertainties is None
+            else np.diag(
+                np.square(np.asarray(solution.uncertainties, dtype=float))
+            ).tolist()
+        )
         diagnostics = {
             **dict(solution.parameters_used),
             "iterations": int(solution.iterations),
@@ -4362,7 +4386,7 @@ def _solve_unfold_method(
         }
         return (
             [float(value) for value in solution.flux],
-            covariance.tolist(),
+            covariance,
             float(solution.chi_squared),
             "ml_seed",
             diagnostics,
@@ -4380,7 +4404,13 @@ def _solve_unfold_method(
             seed_with_ml=bool(getattr(args, "use_ml_seed", False)),
             confidence_threshold=float(getattr(args, "ml_seed_threshold", 0.6)),
         )
-        covariance = np.diag(np.square(np.asarray(solution.uncertainties, dtype=float)))
+        covariance = (
+            None
+            if solution.uncertainties is None
+            else np.diag(
+                np.square(np.asarray(solution.uncertainties, dtype=float))
+            ).tolist()
+        )
         diagnostics = {
             **dict(solution.parameters_used),
             "iterations": int(solution.iterations),
@@ -4390,7 +4420,7 @@ def _solve_unfold_method(
         }
         return (
             [float(value) for value in solution.flux],
-            covariance.tolist(),
+            covariance,
             float(solution.chi_squared),
             "rmle",
             diagnostics,
@@ -5155,6 +5185,14 @@ def _build_standard_report_text(
                 "Flux Unfolding Summary",
                 [
                     ("Method", unfold_payload.get("method") or "unknown"),
+                    (
+                        "Uncertainty status",
+                        diagnostics.get("uncertainty_status", "not declared"),
+                    ),
+                    (
+                        "Unavailable uncertainty reason",
+                        diagnostics.get("uncertainty_unavailable_reason"),
+                    ),
                     ("Energy groups", max(len(energy_edges) - 1, 0)),
                     (
                         "Integral flux",
@@ -5636,11 +5674,14 @@ def cmd_report(args: argparse.Namespace) -> None:
         )
         flux = list(unfold_payload.get("flux", []) or [])
         covariance = list(unfold_payload.get("covariance", []) or [])
+        uncertainty_reason = (unfold_payload.get("diagnostics") or {}).get(
+            "uncertainty_unavailable_reason", "Covariance unavailable"
+        )
         for idx, value in enumerate(flux):
             variance = (
                 _safe_float(covariance[idx][idx])
                 if idx < len(covariance) and idx < len(covariance[idx])
-                else 0.0
+                else None
             )
             flux_rows.append(
                 {
@@ -5654,7 +5695,12 @@ def cmd_report(args: argparse.Namespace) -> None:
                         else None
                     ),
                     "flux": _safe_float(value),
-                    "flux_uncertainty": float(np.sqrt(max(variance, 0.0))),
+                    "flux_uncertainty": (
+                        None if variance is None else float(np.sqrt(max(variance, 0.0)))
+                    ),
+                    "uncertainty_unavailable_reason": (
+                        uncertainty_reason if variance is None else ""
+                    ),
                 }
             )
         flux_table = _write_csv_table(tables_dir / "unfold_flux_groups.csv", flux_rows)

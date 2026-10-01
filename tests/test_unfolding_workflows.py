@@ -262,7 +262,9 @@ def test_public_neutron_unfolding_paths_cover_identity_case(
             measurement_uncertainty=case.uncertainties,
         )
         flux = np.asarray(result.flux, dtype=float)
-        uncertainty = np.asarray(result.uncertainties, dtype=float)
+        assert result.uncertainties is None
+        assert result.parameters_used["uncertainty_status"] == "unavailable"
+        uncertainty = None
     elif name == "registry_rmle":
         result = RMLEUnfolder(
             max_iterations=300,
@@ -273,7 +275,9 @@ def test_public_neutron_unfolding_paths_cover_identity_case(
             measurement_uncertainty=case.uncertainties,
         )
         flux = np.asarray(result.flux, dtype=float)
-        uncertainty = np.asarray(result.uncertainties, dtype=float)
+        assert result.uncertainties is None
+        assert result.parameters_used["uncertainty_status"] == "unavailable"
+        uncertainty = None
     elif name == "registry_ml_seed":
         result = MLSeedUnfolder().unfold(
             case.measurements,
@@ -283,7 +287,9 @@ def test_public_neutron_unfolding_paths_cover_identity_case(
             confidence_threshold=0.4,
         )
         flux = np.asarray(result.flux, dtype=float)
-        uncertainty = np.asarray(result.uncertainties, dtype=float)
+        assert result.uncertainties is None
+        assert result.parameters_used["uncertainty_status"] == "unavailable"
+        uncertainty = None
     else:
         result = GravelUnfolder(
             max_iterations=200,
@@ -599,8 +605,14 @@ def test_cmd_unfold_exposes_values_and_uncertainties_for_all_methods(
     assert len(payload["flux"]) == 3
     assert len(diagnostics["measured_rates"]) == 3
     assert len(diagnostics["predicted_rates"]) == 3
-    assert len(diagnostics["predicted_rate_uncertainties"]) == 3
-    assert len(diagnostics["flux_uncertainty"]) == 3
+    if method in {"gravel", "maxed", "ml_seed", "rmle"}:
+        assert payload["covariance"] is None
+        assert diagnostics["predicted_rate_uncertainties"] is None
+        assert diagnostics["flux_uncertainty"] is None
+        assert diagnostics["uncertainty_unavailable_reason"]
+    else:
+        assert len(diagnostics["predicted_rate_uncertainties"]) == 3
+        assert len(diagnostics["flux_uncertainty"]) == 3
     assert len(diagnostics["rate_pulls"]) == 3
     if method in {"gravel", "rmle"}:
         assert diagnostics["seed_confidence_score"] >= 0.4
@@ -691,7 +703,8 @@ def test_gamma_unfolding_paths_cover_public_entrypoints(
     assert np.all(poisson_result.solution >= 0.0)
     assert np.all(wrapped_result.unfolded_spectrum >= 0.0)
     assert ls_result.uncertainty.shape == gamma_case.true_source.shape
-    assert poisson_result.uncertainty.shape == gamma_case.true_source.shape
+    assert poisson_result.uncertainty is None
+    assert poisson_result.diagnostics["uncertainty_status"] == "unavailable"
     assert _refold_relative_error(
         gamma_case.response.matrix,
         poisson_result.solution,

@@ -1,0 +1,44 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\joshu\fluxforge-worktrees\registry-uncertainty-qualification
+configfile: pyproject.toml
+collected 215 items / 2 deselected / 213 selected
+
+tests\test_registry_uncertainty_qualification.py ....................... [ 10%]
+.......                                                                  [ 14%]
+tests\test_unfolding_registry.py .......                                 [ 17%]
+tests\test_unfolding_workflows.py ...................................... [ 35%]
+...                                                                      [ 36%]
+tests\test_unfolding_workspace_qt.py ...........                         [ 41%]
+tests\test_artifacts_io.py ..............                                [ 48%]
+tests\test_cli_app.py .................................................. [ 71%]
+.................................                                        [ 87%]
+tests\test_rmle.py ...........................                           [100%]
+
+============================== warnings summary ===============================
+tests/test_unfolding_workspace_qt.py::test_unfolding_workspace_runs_bundled_uwnr_rafm_rate_csv
+  C:\Users\joshu\fluxforge-worktrees\registry-uncertainty-qualification\src\fluxforge\solvers\rmle.py:873: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.2067911459186329e-32.
+    H_inv = linalg.inv(H)
+
+tests/test_cli_app.py::test_cmd_second_irradiation_plan_writes_json_and_csv_outputs
+  C:\Users\joshu\fluxforge-worktrees\registry-uncertainty-qualification\src\fluxforge\cli\app.py:3771: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    datetime.utcnow().isoformat(timespec="seconds") + "Z"
+
+tests/test_cli_app.py::test_cmd_isotope_priority_writes_json_and_csv_outputs
+  C:\Users\joshu\fluxforge-worktrees\registry-uncertainty-qualification\src\fluxforge\cli\app.py:3366: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    datetime.utcnow().isoformat(timespec="seconds") + "Z"
+
+tests/test_cli_app.py::test_cmd_masking_review_writes_json_and_csv_outputs
+  C:\Users\joshu\fluxforge-worktrees\registry-uncertainty-qualification\src\fluxforge\cli\app.py:3414: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    datetime.utcnow().isoformat(timespec="seconds") + "Z"
+
+tests/test_cli_app.py: 13 warnings
+  C:\Users\joshu\fluxforge-worktrees\registry-uncertainty-qualification\src\fluxforge\cli\app.py:3677: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    datetime.utcnow().isoformat(timespec="seconds") + "Z"
+
+tests/test_cli_app.py::test_cmd_ffexp_export_packages_phase6_products
+  C:\Users\joshu\fluxforge-worktrees\registry-uncertainty-qualification\src\fluxforge\cli\app.py:3873: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "generated_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============== 213 passed, 2 deselected, 18 warnings in 12.55s ===============

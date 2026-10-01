@@ -491,7 +491,13 @@ if (
                 uses_ml_seed
                 or (uses_gravel_or_rmle and self.use_ml_seed_checkbox.isChecked())
             )
-            self.show_uncertainty_bands_checkbox.setEnabled(True)
+            supports_uncertainty = any(
+                self.method_selector.registry.get_entry(key)
+                .implementation.definition()
+                .supports_uncertainties
+                for key in self._selected_method_keys()
+            )
+            self.show_uncertainty_bands_checkbox.setEnabled(supports_uncertainty)
             self.compare_button.setEnabled(compare_enabled)
 
         @staticmethod
@@ -822,11 +828,18 @@ if (
                 confidence_note = ""
                 if seed_confidence is not None:
                     confidence_note = f" Seed confidence {float(seed_confidence):.2f}."
+                uncertainty_reason = self.current_result.parameters_used.get(
+                    "uncertainty_unavailable_reason", ""
+                )
+                uncertainty_reason_note = (
+                    f" {uncertainty_reason}." if uncertainty_reason else ""
+                )
                 self.summary_label.setText(
                     f"{self.current_result.method_used} completed in "
                     f"{self.current_result.iterations} iterations with "
                     f"chi²/dof {self.current_result.chi_squared:.4f}. "
-                    f"Flux values and uncertainties are {uncertainty_note} in the table below."
+                    f"Flux values are shown; uncertainties are {uncertainty_note}."
+                    f"{uncertainty_reason_note}"
                     f"{confidence_note}"
                 )
                 if self.current_result.negative_bin_count > 0:
@@ -856,6 +869,9 @@ if (
                     result.negative_bin_count,
                 )
                 self._set_table_item(self.comparison_table, row, 4, uncertainty_state)
+                self.comparison_table.item(row, 4).setToolTip(
+                    result.parameters_used.get("uncertainty_unavailable_reason", "")
+                )
 
         def _refresh_results_table(self, result: UnfoldingResult) -> None:
             energy_edges = np.asarray(self.workspace_input.energy_edges, dtype=float)
@@ -884,6 +900,9 @@ if (
                 self._set_table_item(self.results_table, row, 1, band)
                 self._set_table_item(self.results_table, row, 2, flux_value)
                 self._set_table_item(self.results_table, row, 3, uncertainty)
+                self.results_table.item(row, 3).setToolTip(
+                    result.parameters_used.get("uncertainty_unavailable_reason", "")
+                )
 
         def _refresh_plots(self) -> None:
             edges = np.asarray(self.workspace_input.energy_edges, dtype=float)
