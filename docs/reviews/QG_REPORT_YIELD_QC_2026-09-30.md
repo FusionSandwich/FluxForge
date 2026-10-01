@@ -74,3 +74,46 @@ Correcting two line yields cannot justify dividing the whole summary or rate by
 Original gamma-library/settings, dated calibration, irradiation history and
 their uncertainty remain unqualified. No source, covariance or publication
 admission gate from PR212 is relaxed. Scientific admission remains false.
+
+## Additional source investigation — September 30, 2026
+
+The historical [Quantum 4.04.00 manual](https://ludlums.com/images/product_manuals/QTMmanual.pdf)
+(PDF pages 46, 118–119 and 126) describes intensity per 100 decays, percent
+efficiency, activity/uncertainty summary weighting and an activity-reference
+date. Applicability to the deployed version, active GammaLib, per-line summing
+factors and count-decay processing remains unverified. The [IAEA historical
+tabulation](https://nds.iaea.org/sgnucdat/safeg2008.pdf), Table D-2, PDF page 116,
+corroborates percent yields; it does not replace current evaluated covariance
+or provide independent detector calibration.
+
+Replaying conditional N/u(N) weights from the original reports gives:
+
+| Report | Printed summary uCi | Three stronger lines | All four lines |
+| --- | ---: | ---: | ---: |
+| Ti-RAFM-1 | 0.424 | 0.4241238300 | 0.4101672072 |
+| Ti-RAFM-1a | 0.408 | 0.4416682062 | 0.4078967833 |
+| Ti-RAFM-1b | 0.234 | 0.2456386056 | 0.2342877053 |
+
+These different matching subsets do not establish a vendor inclusion rule or
+reconstruct summary uncertainty. They give no basis for scaling whole summaries.
+With printed half-life 43.700 h and real duration 172935.45 s, Ti_b has a
+conditional uniform-live-fraction start/average factor 1.4288928812; the first
+four-hour count gives 1.0320851574. Applying this factor requires establishing
+vendor processing first. A common timing factor cannot explain a selective
+factor-100 line discrepancy.
+
+Current FluxForge already requires a count-decay declaration for QG activities:
+`report_count_real_time_s` rejects an absent declaration, returns zero duration
+for an already-corrected report and real duration otherwise. The example config
+explicitly identifies its false setting as prior behavior awaiting verification.
+The rate path preserves this distinction. Report summary activities remain
+imported values, separate from raw peak consensus and conditional reconstructions.
+No additional runtime defect is demonstrated by this evidence, so no new
+calculation repair or configuration change is made. Existing count-decay tests
+cover missing declarations, real-versus-live duration and both processing cases.
+
+Additive source-bound arithmetic and test evidence is in
+`artifacts/validation/qg_source_followup_20260930/`. The original PR213 replay
+receipt remains unchanged. Private correspondence provenance remains local;
+full measured uncertainty, active calibration identity and reactor history
+remain unqualified. Scientific admission remains false.
