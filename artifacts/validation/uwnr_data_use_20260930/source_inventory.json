@@ -1,0 +1,1302 @@
+{
+  "schema": "qg_report_qc_all_reports_inventory_v1",
+  "generated_local_date": "2026-09-30",
+  "inventory_scope_roots": [
+    "C:\\Users\\joshu\\fluxforge-worktrees\\qg-report-yield-qc\\examples\\RAFM_irradiation\\raw_gamma_spec",
+    "C:\\Users\\joshu\\fluxforge-worktrees\\qg-report-yield-qc\\examples\\RAFM_irradiation\\QG_processed_gamma_data",
+    "C:\\Users\\joshu\\Downloads\\flux_wires"
+  ],
+  "manifest_sources": {
+    "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\data\\measurement_reconciliation_2026-09-16\\provenance.json": {
+      "sha256": "3c8dbe97b3fe82924d3e96675c93414d4402145c6feee57ed8e4d47e72ac083e",
+      "bytes": 8975
+    },
+    "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\data\\measurement_reconciliation_2026-09-16\\report_roi_rows.csv": {
+      "sha256": "62d6ae249bed9d396339bfa4af9ac7e36e75c8fe7e4e74e1b622cc1e0df15f3a",
+      "bytes": 72934
+    },
+    "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\data\\measurement_reconciliation_2026-09-16\\reported_summary_rows.json": {
+      "sha256": "ec738337831083fe2e1691f14438dc26a317a375f6018ba47a2c191b484c331f",
+      "bytes": 45003
+    },
+    "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\analysis\\count_metadata_matrix_32_2026-09-27.json": {
+      "sha256": "afe9f0411990c38340592930d7507737febe1a3bc20f2854f20159e2eb967b9b",
+      "bytes": 126354
+    },
+    "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\data\\measurement_reconciliation_2026-09-16\\acquisition_corroboration.json": {
+      "sha256": "db76224d6454b37e22eed24c403c55a66bcfe02eb84d4289cf81118864c3ee69",
+      "bytes": 19504
+    },
+    "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\uwnr_rafm\\paper3_unfolding_audit_20260927\\publication_validation_20260930\\QG_EFFECTIVE_EFFICIENCY.json": {
+      "available": true,
+      "sha256": "a88082b1bcf68142824e94a91f00c682bfe1db550b5be362492df35eb24bc3df",
+      "bytes": 422935
+    },
+    "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\uwnr_rafm\\paper3_unfolding_audit_20260927\\publication_validation_20260930\\NATIVE_ANS_RECOVERY_20261001.json": {
+      "sha256": "a2426309f4bfb934e8dd9e6de298dbfd402dca0f42444cedd7c4c22a74867333",
+      "bytes": 25449
+    }
+  },
+  "counts": {
+    "provenance_report_sources": 31,
+    "expected_report_sources": 31,
+    "report_source_count_match": true,
+    "ROI_rows_reconciled": 288,
+    "expected_ROI_rows": 288,
+    "ROI_count_match": true,
+    "zero_ROI_reports": [],
+    "reports_with_zero_ROI_count": 0,
+    "summary_rows_reconciled": 88,
+    "expected_summary_rows_from_provenance": 88,
+    "summary_count_match": true,
+    "native_ANS_sources_hashverified": 32,
+    "report_ANS_companions_found": 31,
+    "report_ASC_companions_found": 29,
+    "report_ASC_companions_absent": 2,
+    "ASC_outside_current_campaign": 6
+  },
+  "reports": [
+    {
+      "filename": "Co-Cd-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Co-Cd-RAFM-1_25cm.txt",
+      "provenance_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+      "actual_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+      "provenance_hash_match": true,
+      "measurement_id": "Co-Cd-RAFM-1",
+      "ROI_count": 2,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Co-Cd-RAFM-1_25cm.ASC",
+          "sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+          "expected_sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Co-Cd-RAFM-1_25cm.ANS",
+          "sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+          "expected_sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+        "QG_report": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+        "ASC": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+        "ASC": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba"
+      }
+    },
+    {
+      "filename": "Co-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Co-RAFM-1_25cm.txt",
+      "provenance_sha256": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+      "actual_sha256": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+      "provenance_hash_match": true,
+      "measurement_id": "Co-RAFM-1",
+      "ROI_count": 2,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Co-RAFM-1_25cm.ASC",
+          "sha256": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+          "expected_sha256": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Co-RAFM-1_25cm.ANS",
+          "sha256": "1eadf548bd66b3da425d8bd891d8523e0ef1f59a9ea4471684f96dc0855675c9",
+          "expected_sha256": "1eadf548bd66b3da425d8bd891d8523e0ef1f59a9ea4471684f96dc0855675c9",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "1eadf548bd66b3da425d8bd891d8523e0ef1f59a9ea4471684f96dc0855675c9",
+        "QG_report": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+        "ASC": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "1eadf548bd66b3da425d8bd891d8523e0ef1f59a9ea4471684f96dc0855675c9",
+        "ASC": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719"
+      }
+    },
+    {
+      "filename": "Cu-Cd-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Cu-Cd-RAFM-1_25cm.txt",
+      "provenance_sha256": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+      "actual_sha256": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+      "provenance_hash_match": true,
+      "measurement_id": "Cu-Cd-RAFM-1",
+      "ROI_count": 1,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": false,
+          "reason": "Acquisition record has no ASC hash or no file with its exact expected hash was found in the named hirst spectra.",
+          "expected_sha256": null,
+          "match_count": 0
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Cu-Cd-RAFM-1_25cm.ANS",
+          "sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+          "expected_sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+        "QG_report": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+        "ASC": null
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+        "ASC": null
+      }
+    },
+    {
+      "filename": "Cu-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Cu-RAFM-1_25cm.txt",
+      "provenance_sha256": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+      "actual_sha256": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+      "provenance_hash_match": true,
+      "measurement_id": "Cu-RAFM-1",
+      "ROI_count": 1,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\CU-RAFM-1.ASC",
+          "sha256": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+          "expected_sha256": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Cu-RAFM-1_25cm.ANS",
+          "sha256": "91f21b04eb5672deb7bee7666371be82594c0e45692843076a9be81f8b0b6b4f",
+          "expected_sha256": "91f21b04eb5672deb7bee7666371be82594c0e45692843076a9be81f8b0b6b4f",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "91f21b04eb5672deb7bee7666371be82594c0e45692843076a9be81f8b0b6b4f",
+        "QG_report": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+        "ASC": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "91f21b04eb5672deb7bee7666371be82594c0e45692843076a9be81f8b0b6b4f",
+        "ASC": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd"
+      }
+    },
+    {
+      "filename": "Fe-Cd-RAFM-1_0cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Fe-Cd-RAFM-1_0cm.txt",
+      "provenance_sha256": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+      "actual_sha256": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+      "provenance_hash_match": true,
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "ROI_count": 4,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": false,
+          "reason": "Acquisition record has no ASC hash or no file with its exact expected hash was found in the named hirst spectra.",
+          "expected_sha256": null,
+          "match_count": 0
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Fe-Cd-RAFM-1_0cm.ANS",
+          "sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+          "expected_sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+        "QG_report": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+        "ASC": null
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+        "ASC": null
+      }
+    },
+    {
+      "filename": "In-Cd-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\In-Cd-RAFM-1_25cm.txt",
+      "provenance_sha256": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+      "actual_sha256": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+      "provenance_hash_match": true,
+      "measurement_id": "In-Cd-RAFM-1",
+      "ROI_count": 4,
+      "summary_count": 2,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\In-Cd-RAFM-1_25cm.ASC",
+          "sha256": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+          "expected_sha256": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\In-Cd-RAFM-1_25cm.ANS",
+          "sha256": "a2f761ebdf0aef7e6a7d27972712fe5e41ef5a6767e2b24514ad67ee0271662e",
+          "expected_sha256": "a2f761ebdf0aef7e6a7d27972712fe5e41ef5a6767e2b24514ad67ee0271662e",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "a2f761ebdf0aef7e6a7d27972712fe5e41ef5a6767e2b24514ad67ee0271662e",
+        "QG_report": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+        "ASC": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "a2f761ebdf0aef7e6a7d27972712fe5e41ef5a6767e2b24514ad67ee0271662e",
+        "ASC": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35"
+      }
+    },
+    {
+      "filename": "Ni-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Ni-RAFM-1_25cm.txt",
+      "provenance_sha256": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+      "actual_sha256": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+      "provenance_hash_match": true,
+      "measurement_id": "Ni-RAFM-1",
+      "ROI_count": 1,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Ni-RAFM-1_25cm.ASC",
+          "sha256": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+          "expected_sha256": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Ni-RAFM-1_25cm.ANS",
+          "sha256": "ab4d6877ead21040232dc1c12e66365f8e38a92e102bca92f1c84040eaae4d76",
+          "expected_sha256": "ab4d6877ead21040232dc1c12e66365f8e38a92e102bca92f1c84040eaae4d76",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "ab4d6877ead21040232dc1c12e66365f8e38a92e102bca92f1c84040eaae4d76",
+        "QG_report": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+        "ASC": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "ab4d6877ead21040232dc1c12e66365f8e38a92e102bca92f1c84040eaae4d76",
+        "ASC": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9"
+      }
+    },
+    {
+      "filename": "Sc-Cd-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Sc-Cd-RAFM-1_25cm.txt",
+      "provenance_sha256": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+      "actual_sha256": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+      "provenance_hash_match": true,
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "ROI_count": 2,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Sc-Cd-RAFM-1_25cm.ASC",
+          "sha256": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+          "expected_sha256": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Sc-Cd-RAFM-1_25cm.ANS",
+          "sha256": "32ae08601f00076d4c69f8f87b6207f3e0101eb48053ce64a64b263cdd833591",
+          "expected_sha256": "32ae08601f00076d4c69f8f87b6207f3e0101eb48053ce64a64b263cdd833591",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "32ae08601f00076d4c69f8f87b6207f3e0101eb48053ce64a64b263cdd833591",
+        "QG_report": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+        "ASC": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "32ae08601f00076d4c69f8f87b6207f3e0101eb48053ce64a64b263cdd833591",
+        "ASC": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2"
+      }
+    },
+    {
+      "filename": "Sc-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Sc-RAFM-1_25cm.txt",
+      "provenance_sha256": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+      "actual_sha256": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+      "provenance_hash_match": true,
+      "measurement_id": "Sc-RAFM-1",
+      "ROI_count": 2,
+      "summary_count": 1,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Sc-RAFM-1_25cm.ASC",
+          "sha256": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+          "expected_sha256": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Sc-RAFM-1_25cm.ANS",
+          "sha256": "64277ab9834f317a0731111faa74171fb356b17fff36e13ea2b4a5bc2c34d229",
+          "expected_sha256": "64277ab9834f317a0731111faa74171fb356b17fff36e13ea2b4a5bc2c34d229",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "64277ab9834f317a0731111faa74171fb356b17fff36e13ea2b4a5bc2c34d229",
+        "QG_report": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+        "ASC": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "64277ab9834f317a0731111faa74171fb356b17fff36e13ea2b4a5bc2c34d229",
+        "ASC": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90"
+      }
+    },
+    {
+      "filename": "Ti-RAFM-1_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Ti-RAFM-1_25cm.txt",
+      "provenance_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+      "actual_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+      "provenance_hash_match": true,
+      "measurement_id": "Ti-RAFM-1",
+      "ROI_count": 7,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Ti-RAFM-1_25cm.ASC",
+          "sha256": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7",
+          "expected_sha256": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Ti-RAFM-1_25cm.ANS",
+          "sha256": "c86ef107b036999fde62e3249ca7213eb71ba583aca1264bb54a59acc41be99b",
+          "expected_sha256": "c86ef107b036999fde62e3249ca7213eb71ba583aca1264bb54a59acc41be99b",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "c86ef107b036999fde62e3249ca7213eb71ba583aca1264bb54a59acc41be99b",
+        "QG_report": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+        "ASC": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "c86ef107b036999fde62e3249ca7213eb71ba583aca1264bb54a59acc41be99b",
+        "ASC": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7"
+      }
+    },
+    {
+      "filename": "Ti-RAFM-1a_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+      "provenance_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+      "actual_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+      "provenance_hash_match": true,
+      "measurement_id": "Ti-RAFM-1a",
+      "ROI_count": 7,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Ti-RAFM-1a_25cm.ASC",
+          "sha256": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919",
+          "expected_sha256": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Ti-RAFM-1a_25cm.ANS",
+          "sha256": "59f89ee0d0536a259dadf5484f3bfe367d423b8e0f291281594b8838e8f02a61",
+          "expected_sha256": "59f89ee0d0536a259dadf5484f3bfe367d423b8e0f291281594b8838e8f02a61",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "59f89ee0d0536a259dadf5484f3bfe367d423b8e0f291281594b8838e8f02a61",
+        "QG_report": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+        "ASC": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "59f89ee0d0536a259dadf5484f3bfe367d423b8e0f291281594b8838e8f02a61",
+        "ASC": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919"
+      }
+    },
+    {
+      "filename": "Ti-RAFM-1b_25cm.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+      "provenance_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+      "actual_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+      "provenance_hash_match": true,
+      "measurement_id": "Ti-RAFM-1b",
+      "ROI_count": 7,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\Ti-RAFM-1b_25cm.ASC",
+          "sha256": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5",
+          "expected_sha256": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires\\Ti-RAFM-1b_25cm.ANS",
+          "sha256": "1fbc1d8c255ebb2b99695144ad822d947e749686b48e2acb455640f71da7424c",
+          "expected_sha256": "1fbc1d8c255ebb2b99695144ad822d947e749686b48e2acb455640f71da7424c",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "1fbc1d8c255ebb2b99695144ad822d947e749686b48e2acb455640f71da7424c",
+        "QG_report": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+        "ASC": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "1fbc1d8c255ebb2b99695144ad822d947e749686b48e2acb455640f71da7424c",
+        "ASC": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5"
+      }
+    },
+    {
+      "filename": "RAFM3-A_24hrEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-A_24hrEOI.txt",
+      "provenance_sha256": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+      "actual_sha256": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-A-24hr",
+      "ROI_count": 11,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-A_24hrEOI.ASC",
+          "sha256": "f4c4cc5ceae16d92c7a4aac13bf6bd2dc58e55f18a65aab05aa16d20216b751f",
+          "expected_sha256": "f4c4cc5ceae16d92c7a4aac13bf6bd2dc58e55f18a65aab05aa16d20216b751f",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-A_24hrEOI.ANS",
+          "sha256": "0f2d934cbe3c401fd0b79b8e279cd2da39cb070317f23764a9d6e2c7e622fe39",
+          "expected_sha256": "0f2d934cbe3c401fd0b79b8e279cd2da39cb070317f23764a9d6e2c7e622fe39",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "0f2d934cbe3c401fd0b79b8e279cd2da39cb070317f23764a9d6e2c7e622fe39",
+        "QG_report": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+        "ASC": "f4c4cc5ceae16d92c7a4aac13bf6bd2dc58e55f18a65aab05aa16d20216b751f"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "0f2d934cbe3c401fd0b79b8e279cd2da39cb070317f23764a9d6e2c7e622fe39",
+        "ASC": "f4c4cc5ceae16d92c7a4aac13bf6bd2dc58e55f18a65aab05aa16d20216b751f"
+      }
+    },
+    {
+      "filename": "RAFM3-A_300sEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-A_300sEOI.txt",
+      "provenance_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+      "actual_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-A-300s",
+      "ROI_count": 12,
+      "summary_count": 4,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-A_300sEOI.ASC",
+          "sha256": "38766e8abb82ab71a04968a2b7d3959da7ceb672b6815a1ff86d9066613ea4cc",
+          "expected_sha256": "38766e8abb82ab71a04968a2b7d3959da7ceb672b6815a1ff86d9066613ea4cc",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-A_300sEOI.ANS",
+          "sha256": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+          "expected_sha256": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+        "QG_report": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+        "ASC": "38766e8abb82ab71a04968a2b7d3959da7ceb672b6815a1ff86d9066613ea4cc"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+        "ASC": "38766e8abb82ab71a04968a2b7d3959da7ceb672b6815a1ff86d9066613ea4cc"
+      }
+    },
+    {
+      "filename": "RAFM3-A_4dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-A_4dEOI.txt",
+      "provenance_sha256": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+      "actual_sha256": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-A-4d",
+      "ROI_count": 8,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-A_4dEOI.ASC",
+          "sha256": "554af6e9848d2642c9e6158ae40eeaad0122bdc9d591a1b8ae8c74682d52fbb1",
+          "expected_sha256": "554af6e9848d2642c9e6158ae40eeaad0122bdc9d591a1b8ae8c74682d52fbb1",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-A_4dEOI.ANS",
+          "sha256": "ea91654c78c5e26506466c281eeddfe280b187ca2a16a8c6705f58193d6ee6f0",
+          "expected_sha256": "ea91654c78c5e26506466c281eeddfe280b187ca2a16a8c6705f58193d6ee6f0",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "ea91654c78c5e26506466c281eeddfe280b187ca2a16a8c6705f58193d6ee6f0",
+        "QG_report": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+        "ASC": "554af6e9848d2642c9e6158ae40eeaad0122bdc9d591a1b8ae8c74682d52fbb1"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "ea91654c78c5e26506466c281eeddfe280b187ca2a16a8c6705f58193d6ee6f0",
+        "ASC": "554af6e9848d2642c9e6158ae40eeaad0122bdc9d591a1b8ae8c74682d52fbb1"
+      }
+    },
+    {
+      "filename": "RAFM3-B_24hrEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_24hrEOI.txt",
+      "provenance_sha256": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+      "actual_sha256": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-B-24hr",
+      "ROI_count": 11,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-B_24hrEOI.ASC",
+          "sha256": "63630480fcf4ae53b1ea4536c8673b501df0a966c14adb7bef41239705fbe185",
+          "expected_sha256": "63630480fcf4ae53b1ea4536c8673b501df0a966c14adb7bef41239705fbe185",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-B_24hrEOI.ANS",
+          "sha256": "5bf2a48f406248c88d94bbd62ef7ab9525f5075237fc5d1a1db6f61af344b9ad",
+          "expected_sha256": "5bf2a48f406248c88d94bbd62ef7ab9525f5075237fc5d1a1db6f61af344b9ad",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "5bf2a48f406248c88d94bbd62ef7ab9525f5075237fc5d1a1db6f61af344b9ad",
+        "QG_report": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+        "ASC": "63630480fcf4ae53b1ea4536c8673b501df0a966c14adb7bef41239705fbe185"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "5bf2a48f406248c88d94bbd62ef7ab9525f5075237fc5d1a1db6f61af344b9ad",
+        "ASC": "63630480fcf4ae53b1ea4536c8673b501df0a966c14adb7bef41239705fbe185"
+      }
+    },
+    {
+      "filename": "RAFM3-B_2hrEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_2hrEOI.txt",
+      "provenance_sha256": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+      "actual_sha256": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-B-2hr",
+      "ROI_count": 10,
+      "summary_count": 2,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-B_2hrEOI.ASC",
+          "sha256": "62bed58620cec3c725719dcc9751d6b7cda8565bc564f303e2e22760e96204f9",
+          "expected_sha256": "62bed58620cec3c725719dcc9751d6b7cda8565bc564f303e2e22760e96204f9",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-B_2hrEOI.ANS",
+          "sha256": "0f028ec324786918415cc1df1db35aeed6dae9ea967b00e15892696bf95870a8",
+          "expected_sha256": "0f028ec324786918415cc1df1db35aeed6dae9ea967b00e15892696bf95870a8",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "0f028ec324786918415cc1df1db35aeed6dae9ea967b00e15892696bf95870a8",
+        "QG_report": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+        "ASC": "62bed58620cec3c725719dcc9751d6b7cda8565bc564f303e2e22760e96204f9"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "0f028ec324786918415cc1df1db35aeed6dae9ea967b00e15892696bf95870a8",
+        "ASC": "62bed58620cec3c725719dcc9751d6b7cda8565bc564f303e2e22760e96204f9"
+      }
+    },
+    {
+      "filename": "RAFM3-B_300sEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_300sEOI.txt",
+      "provenance_sha256": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+      "actual_sha256": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-B-300s",
+      "ROI_count": 11,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-B_300sEOI.ASC",
+          "sha256": "8e4f6b63970dc3201fd3248f05ee8876024d3f4ea89c2307db944ba0d92bbf31",
+          "expected_sha256": "8e4f6b63970dc3201fd3248f05ee8876024d3f4ea89c2307db944ba0d92bbf31",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-B_300sEOI.ANS",
+          "sha256": "55af16afdcc51534f4427fd94aa2caf3107f77ab58865a1b530f807c268a1df5",
+          "expected_sha256": "55af16afdcc51534f4427fd94aa2caf3107f77ab58865a1b530f807c268a1df5",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "55af16afdcc51534f4427fd94aa2caf3107f77ab58865a1b530f807c268a1df5",
+        "QG_report": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+        "ASC": "8e4f6b63970dc3201fd3248f05ee8876024d3f4ea89c2307db944ba0d92bbf31"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "55af16afdcc51534f4427fd94aa2caf3107f77ab58865a1b530f807c268a1df5",
+        "ASC": "8e4f6b63970dc3201fd3248f05ee8876024d3f4ea89c2307db944ba0d92bbf31"
+      }
+    },
+    {
+      "filename": "RAFM3-B_4dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_4dEOI.txt",
+      "provenance_sha256": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+      "actual_sha256": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-B-4d",
+      "ROI_count": 8,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-B_4dEOI.ASC",
+          "sha256": "2d98bb8a0eedf3bebc079ca4caa7498ed19bd90c4ef49887aec5009da97d6b40",
+          "expected_sha256": "2d98bb8a0eedf3bebc079ca4caa7498ed19bd90c4ef49887aec5009da97d6b40",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-B_4dEOI.ANS",
+          "sha256": "d51f817d584a92f5e9ee271752899f1b5f0434c07de7b358e6119b4adbd62bf2",
+          "expected_sha256": "d51f817d584a92f5e9ee271752899f1b5f0434c07de7b358e6119b4adbd62bf2",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "d51f817d584a92f5e9ee271752899f1b5f0434c07de7b358e6119b4adbd62bf2",
+        "QG_report": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+        "ASC": "2d98bb8a0eedf3bebc079ca4caa7498ed19bd90c4ef49887aec5009da97d6b40"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "d51f817d584a92f5e9ee271752899f1b5f0434c07de7b358e6119b4adbd62bf2",
+        "ASC": "2d98bb8a0eedf3bebc079ca4caa7498ed19bd90c4ef49887aec5009da97d6b40"
+      }
+    },
+    {
+      "filename": "RAFM3-C_24hrEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_24hrEOI.txt",
+      "provenance_sha256": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+      "actual_sha256": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-C-24hr",
+      "ROI_count": 11,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-C_24hrEOI.ASC",
+          "sha256": "89d4e662cf0cf5ac584c621fcda61535d63b81f0b44ae7f5d5417d3bbdc7c82c",
+          "expected_sha256": "89d4e662cf0cf5ac584c621fcda61535d63b81f0b44ae7f5d5417d3bbdc7c82c",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-C_24hrEOI.ANS",
+          "sha256": "98fc1eef03f689eedec11b01bed53923c49062ad7a07b382684b3eaf370e3bca",
+          "expected_sha256": "98fc1eef03f689eedec11b01bed53923c49062ad7a07b382684b3eaf370e3bca",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "98fc1eef03f689eedec11b01bed53923c49062ad7a07b382684b3eaf370e3bca",
+        "QG_report": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+        "ASC": "89d4e662cf0cf5ac584c621fcda61535d63b81f0b44ae7f5d5417d3bbdc7c82c"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "98fc1eef03f689eedec11b01bed53923c49062ad7a07b382684b3eaf370e3bca",
+        "ASC": "89d4e662cf0cf5ac584c621fcda61535d63b81f0b44ae7f5d5417d3bbdc7c82c"
+      }
+    },
+    {
+      "filename": "RAFM3-C_2hrEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_2hrEOI.txt",
+      "provenance_sha256": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+      "actual_sha256": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-C-2hr",
+      "ROI_count": 10,
+      "summary_count": 2,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-C_2hrEOI.ASC",
+          "sha256": "c8080b9b42d84ec0479b688a743003b30ea7f0b46ddc3400a2b501fdd713fe78",
+          "expected_sha256": "c8080b9b42d84ec0479b688a743003b30ea7f0b46ddc3400a2b501fdd713fe78",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-C_2hrEOI.ANS",
+          "sha256": "0d41c896c079fb18d8d84fceddc03f6c927cce7ab17ba17ed2b5f1ea08cd46cd",
+          "expected_sha256": "0d41c896c079fb18d8d84fceddc03f6c927cce7ab17ba17ed2b5f1ea08cd46cd",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "0d41c896c079fb18d8d84fceddc03f6c927cce7ab17ba17ed2b5f1ea08cd46cd",
+        "QG_report": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+        "ASC": "c8080b9b42d84ec0479b688a743003b30ea7f0b46ddc3400a2b501fdd713fe78"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "0d41c896c079fb18d8d84fceddc03f6c927cce7ab17ba17ed2b5f1ea08cd46cd",
+        "ASC": "c8080b9b42d84ec0479b688a743003b30ea7f0b46ddc3400a2b501fdd713fe78"
+      }
+    },
+    {
+      "filename": "RAFM3-C_300sEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_300sEOI.txt",
+      "provenance_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+      "actual_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-C-300s",
+      "ROI_count": 11,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-C_300sEOI.ASC",
+          "sha256": "15ea5a1bbaa9974d1e50a1b4c4e9fa38cb39984e66cdf116cd3366d6ed565663",
+          "expected_sha256": "15ea5a1bbaa9974d1e50a1b4c4e9fa38cb39984e66cdf116cd3366d6ed565663",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-C_300sEOI.ANS",
+          "sha256": "785b5817f618cadcb9b4e5acb1b6b6842d9b79d2c85c6450c60ae4231b38edbb",
+          "expected_sha256": "785b5817f618cadcb9b4e5acb1b6b6842d9b79d2c85c6450c60ae4231b38edbb",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "785b5817f618cadcb9b4e5acb1b6b6842d9b79d2c85c6450c60ae4231b38edbb",
+        "QG_report": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+        "ASC": "15ea5a1bbaa9974d1e50a1b4c4e9fa38cb39984e66cdf116cd3366d6ed565663"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "785b5817f618cadcb9b4e5acb1b6b6842d9b79d2c85c6450c60ae4231b38edbb",
+        "ASC": "15ea5a1bbaa9974d1e50a1b4c4e9fa38cb39984e66cdf116cd3366d6ed565663"
+      }
+    },
+    {
+      "filename": "RAFM3-C_4dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_4dEOI.txt",
+      "provenance_sha256": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+      "actual_sha256": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-C-4d",
+      "ROI_count": 8,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-C_4dEOI.ASC",
+          "sha256": "73a16c19c40468ff7ef703357b09ef8c07374e47dfbf0a2ed0c14bf112625768",
+          "expected_sha256": "73a16c19c40468ff7ef703357b09ef8c07374e47dfbf0a2ed0c14bf112625768",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-C_4dEOI.ANS",
+          "sha256": "416b152b59d5e0a988c71b51a6110f3111a8a69d607fb31de79bf4633515ebbc",
+          "expected_sha256": "416b152b59d5e0a988c71b51a6110f3111a8a69d607fb31de79bf4633515ebbc",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "416b152b59d5e0a988c71b51a6110f3111a8a69d607fb31de79bf4633515ebbc",
+        "QG_report": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+        "ASC": "73a16c19c40468ff7ef703357b09ef8c07374e47dfbf0a2ed0c14bf112625768"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "416b152b59d5e0a988c71b51a6110f3111a8a69d607fb31de79bf4633515ebbc",
+        "ASC": "73a16c19c40468ff7ef703357b09ef8c07374e47dfbf0a2ed0c14bf112625768"
+      }
+    },
+    {
+      "filename": "RAFM3-N_24hrEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_24hrEOI.txt",
+      "provenance_sha256": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+      "actual_sha256": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-N-24hr",
+      "ROI_count": 11,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-N_24hrEOI.ASC",
+          "sha256": "891b071615d0abff32858cc2d7b13bad57649633d8b9c230cf5a30097046f3ee",
+          "expected_sha256": "891b071615d0abff32858cc2d7b13bad57649633d8b9c230cf5a30097046f3ee",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-N_24hrEOI.ANS",
+          "sha256": "b587cc72f47453d21dde373d656195d786b4fecaa75d6477d21a80e6ed28bbf7",
+          "expected_sha256": "b587cc72f47453d21dde373d656195d786b4fecaa75d6477d21a80e6ed28bbf7",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "b587cc72f47453d21dde373d656195d786b4fecaa75d6477d21a80e6ed28bbf7",
+        "QG_report": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+        "ASC": "891b071615d0abff32858cc2d7b13bad57649633d8b9c230cf5a30097046f3ee"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "b587cc72f47453d21dde373d656195d786b4fecaa75d6477d21a80e6ed28bbf7",
+        "ASC": "891b071615d0abff32858cc2d7b13bad57649633d8b9c230cf5a30097046f3ee"
+      }
+    },
+    {
+      "filename": "RAFM3-N_2hrEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_2hrEOI.txt",
+      "provenance_sha256": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+      "actual_sha256": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-N-2hr",
+      "ROI_count": 10,
+      "summary_count": 2,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-N_2hrEOI.ASC",
+          "sha256": "c154246cd7c591c8d838bdb8cd3fe67bc427f0b50614b2e392c93bdf587c955d",
+          "expected_sha256": "c154246cd7c591c8d838bdb8cd3fe67bc427f0b50614b2e392c93bdf587c955d",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-N_2hrEOI.ANS",
+          "sha256": "ae90f352be9497299eb108498044444a2db7d27ac54f097c019fdf65caa65621",
+          "expected_sha256": "ae90f352be9497299eb108498044444a2db7d27ac54f097c019fdf65caa65621",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "ae90f352be9497299eb108498044444a2db7d27ac54f097c019fdf65caa65621",
+        "QG_report": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+        "ASC": "c154246cd7c591c8d838bdb8cd3fe67bc427f0b50614b2e392c93bdf587c955d"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "ae90f352be9497299eb108498044444a2db7d27ac54f097c019fdf65caa65621",
+        "ASC": "c154246cd7c591c8d838bdb8cd3fe67bc427f0b50614b2e392c93bdf587c955d"
+      }
+    },
+    {
+      "filename": "RAFM3-N_300sEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_300sEOI.txt",
+      "provenance_sha256": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+      "actual_sha256": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-N-300s",
+      "ROI_count": 12,
+      "summary_count": 4,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-N_300sEOI.ASC",
+          "sha256": "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3",
+          "expected_sha256": "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-N_300sEOI.ANS",
+          "sha256": "20c4e6932ed6093c9e2f69bd547c2ea91f647f54a7eb375b2ed45fc36cd83d2d",
+          "expected_sha256": "20c4e6932ed6093c9e2f69bd547c2ea91f647f54a7eb375b2ed45fc36cd83d2d",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "20c4e6932ed6093c9e2f69bd547c2ea91f647f54a7eb375b2ed45fc36cd83d2d",
+        "QG_report": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+        "ASC": "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "20c4e6932ed6093c9e2f69bd547c2ea91f647f54a7eb375b2ed45fc36cd83d2d",
+        "ASC": "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3"
+      }
+    },
+    {
+      "filename": "RAFM3-N_4dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_4dEOI.txt",
+      "provenance_sha256": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+      "actual_sha256": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-N-4d",
+      "ROI_count": 8,
+      "summary_count": 3,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-N_4dEOI.ASC",
+          "sha256": "70a6812f3275722e3daafb165bf5383181fe5857cd46c3aa349160b5ca3b7823",
+          "expected_sha256": "70a6812f3275722e3daafb165bf5383181fe5857cd46c3aa349160b5ca3b7823",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-N_4dEOI.ANS",
+          "sha256": "1dee8bcd90bf223748d250d466f02d949a4a765e911ed2ccf269c5ed5e5782d3",
+          "expected_sha256": "1dee8bcd90bf223748d250d466f02d949a4a765e911ed2ccf269c5ed5e5782d3",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "1dee8bcd90bf223748d250d466f02d949a4a765e911ed2ccf269c5ed5e5782d3",
+        "QG_report": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+        "ASC": "70a6812f3275722e3daafb165bf5383181fe5857cd46c3aa349160b5ca3b7823"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "1dee8bcd90bf223748d250d466f02d949a4a765e911ed2ccf269c5ed5e5782d3",
+        "ASC": "70a6812f3275722e3daafb165bf5383181fe5857cd46c3aa349160b5ca3b7823"
+      }
+    },
+    {
+      "filename": "RAFM4-A_15dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-A_15dEOI.txt",
+      "provenance_sha256": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+      "actual_sha256": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-A-15d",
+      "ROI_count": 24,
+      "summary_count": 6,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM4-A_15dEOI.ASC",
+          "sha256": "0239355ca97609f0b0d5a9696ef95722a67ab14eae6f873b2bca8bf60df04eeb",
+          "expected_sha256": "0239355ca97609f0b0d5a9696ef95722a67ab14eae6f873b2bca8bf60df04eeb",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM4-A_15dEOI.ANS",
+          "sha256": "eb7bb3b3da1e114f55626fd81e2f60135bc412b588273d8ff7964b8fbee270ca",
+          "expected_sha256": "eb7bb3b3da1e114f55626fd81e2f60135bc412b588273d8ff7964b8fbee270ca",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "eb7bb3b3da1e114f55626fd81e2f60135bc412b588273d8ff7964b8fbee270ca",
+        "QG_report": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+        "ASC": "0239355ca97609f0b0d5a9696ef95722a67ab14eae6f873b2bca8bf60df04eeb"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "eb7bb3b3da1e114f55626fd81e2f60135bc412b588273d8ff7964b8fbee270ca",
+        "ASC": "0239355ca97609f0b0d5a9696ef95722a67ab14eae6f873b2bca8bf60df04eeb"
+      }
+    },
+    {
+      "filename": "RAFM4-B_15dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-B_15dEOI.txt",
+      "provenance_sha256": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+      "actual_sha256": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-B-15d",
+      "ROI_count": 24,
+      "summary_count": 6,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM4-B_15dEOI.ASC",
+          "sha256": "4c3913b1e9b0446cb1b5a5a6bb1911d00d4bbac7d736dda230856904fa84ecad",
+          "expected_sha256": "4c3913b1e9b0446cb1b5a5a6bb1911d00d4bbac7d736dda230856904fa84ecad",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM4-B_15dEOI.ANS",
+          "sha256": "3e679cf61897e22064526264b3237983d2a1485ac132054067b6cbe9982cc327",
+          "expected_sha256": "3e679cf61897e22064526264b3237983d2a1485ac132054067b6cbe9982cc327",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "3e679cf61897e22064526264b3237983d2a1485ac132054067b6cbe9982cc327",
+        "QG_report": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+        "ASC": "4c3913b1e9b0446cb1b5a5a6bb1911d00d4bbac7d736dda230856904fa84ecad"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "3e679cf61897e22064526264b3237983d2a1485ac132054067b6cbe9982cc327",
+        "ASC": "4c3913b1e9b0446cb1b5a5a6bb1911d00d4bbac7d736dda230856904fa84ecad"
+      }
+    },
+    {
+      "filename": "RAFM4-C_15dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-C_15dEOI.txt",
+      "provenance_sha256": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+      "actual_sha256": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-C-15d",
+      "ROI_count": 24,
+      "summary_count": 6,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM4-C_15dEOI.ASC",
+          "sha256": "18b41618567a7fface768e453ef0e47d179c3c8f1042101f8f85d1c6e80338d4",
+          "expected_sha256": "18b41618567a7fface768e453ef0e47d179c3c8f1042101f8f85d1c6e80338d4",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM4-C_15dEOI.ANS",
+          "sha256": "b4df4a3195d880de8b096f2562c83873f12725f84730a52adb60cdb1bbf1664e",
+          "expected_sha256": "b4df4a3195d880de8b096f2562c83873f12725f84730a52adb60cdb1bbf1664e",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "b4df4a3195d880de8b096f2562c83873f12725f84730a52adb60cdb1bbf1664e",
+        "QG_report": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+        "ASC": "18b41618567a7fface768e453ef0e47d179c3c8f1042101f8f85d1c6e80338d4"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "b4df4a3195d880de8b096f2562c83873f12725f84730a52adb60cdb1bbf1664e",
+        "ASC": "18b41618567a7fface768e453ef0e47d179c3c8f1042101f8f85d1c6e80338d4"
+      }
+    },
+    {
+      "filename": "RAFM4-N_15dEOI.txt",
+      "source_path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-N_15dEOI.txt",
+      "provenance_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+      "actual_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+      "provenance_hash_match": true,
+      "measurement_id": "RAFM-N-15d",
+      "ROI_count": 24,
+      "summary_count": 7,
+      "raw_companions": {
+        "ASC": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM4-N_15dEOI.ASC",
+          "sha256": "6815d2373fa3a98cc23f9eebc0914ff87509af29dca69c59cac8a4a1702f4cb8",
+          "expected_sha256": "6815d2373fa3a98cc23f9eebc0914ff87509af29dca69c59cac8a4a1702f4cb8",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        },
+        "ANS": {
+          "available": true,
+          "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM4-N_15dEOI.ANS",
+          "sha256": "19ad56848876157a40e669efb0b0c7bcd634b9caa1799e2bd62eb560f541b947",
+          "expected_sha256": "19ad56848876157a40e669efb0b0c7bcd634b9caa1799e2bd62eb560f541b947",
+          "match_method": "exact SHA256 join to acquisition_corroboration.json",
+          "match_count": 1
+        }
+      },
+      "matrix_known_raw_sha256": {
+        "ANS": "19ad56848876157a40e669efb0b0c7bcd634b9caa1799e2bd62eb560f541b947",
+        "QG_report": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+        "ASC": "6815d2373fa3a98cc23f9eebc0914ff87509af29dca69c59cac8a4a1702f4cb8"
+      },
+      "acquisition_known_raw_sha256": {
+        "ANS": "19ad56848876157a40e669efb0b0c7bcd634b9caa1799e2bd62eb560f541b947",
+        "ASC": "6815d2373fa3a98cc23f9eebc0914ff87509af29dca69c59cac8a4a1702f4cb8"
+      }
+    }
+  ],
+  "extra_known_backgrounds": [],
+  "observation_errors": [],
+  "observation_errors_status": "UNKNOWN",
+  "scope_notes": [
+    "Raw source searches were limited to the named roots above.",
+    "No private mail was searched.",
+    "Inventory facts only; no scientific, physical admission, or geometry conclusions.",
+    "QG_EFFECTIVE_EFFICIENCY evidence checked at the corrected exact path supplied by parent.",
+    "Native recovery update was additive: the 31 original report entries and their hashes remain unchanged; raw source joins use expected SHA256 values from acquisition_corroboration.json."
+  ],
+  "raw_recovery": {
+    "receipt_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\uwnr_rafm\\paper3_unfolding_audit_20260927\\publication_validation_20260930\\NATIVE_ANS_RECOVERY_20261001.json",
+    "receipt_sha256": "a2426309f4bfb934e8dd9e6de298dbfd402dca0f42444cedd7c4c22a74867333",
+    "acquisition_corroboration_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\data\\measurement_reconciliation_2026-09-16\\acquisition_corroboration.json",
+    "acquisition_corroboration_sha256": "db76224d6454b37e22eed24c403c55a66bcfe02eb84d4289cf81118864c3ee69",
+    "ans_scope_roots": [
+      "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\Flux Wires",
+      "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples"
+    ],
+    "asc_scope_root": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra",
+    "ans_rows_in_receipt": 32,
+    "ans_rows_hashverified_against_acquisition": 32,
+    "current_report_ANS_companions_found": 31,
+    "current_report_ANS_companions_absent": [],
+    "asc_receipt_rows": 30,
+    "asc_rows_hashverified_against_acquisition": 30,
+    "current_report_ASC_companions_found": 29,
+    "current_report_ASC_companions_absent": [
+      "Cu-Cd-RAFM-1",
+      "Fe-Cd-RAFM-1"
+    ],
+    "hirst_ASC_files_found": 36,
+    "hirst_ASC_hashmatched_to_current_acquisition": 30,
+    "hirst_ASC_outside_current_campaign_count": 6,
+    "outside_current_campaign_ASC": [
+      {
+        "filename": "RAFM1.ASC",
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM1.ASC",
+        "sha256": "61591a1481467e7a7ea795e5ce3fd0a30e0df7365ca23d7e3a1e7dc763f1385f",
+        "bytes": 164327,
+        "classification": "outside_current_campaign_expected_ASC_hash_set"
+      },
+      {
+        "filename": "RAFM1_Long_144h_EOI.ASC",
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM1_Long_144h_EOI.ASC",
+        "sha256": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+        "bytes": 164327,
+        "classification": "outside_current_campaign_expected_ASC_hash_set"
+      },
+      {
+        "filename": "RAFM1_Long_72h_EOI.ASC",
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM1_Long_72h_EOI.ASC",
+        "sha256": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+        "bytes": 164327,
+        "classification": "outside_current_campaign_expected_ASC_hash_set"
+      },
+      {
+        "filename": "RAFM2_Long_144h_EOI.ASC",
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM2_Long_144h_EOI.ASC",
+        "sha256": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+        "bytes": 164327,
+        "classification": "outside_current_campaign_expected_ASC_hash_set"
+      },
+      {
+        "filename": "RAFM2_Long_70d_EOI.ASC",
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM2_Long_70d_EOI.ASC",
+        "sha256": "3292b08d6107ed13157d70801b1d691569ff08bc6480e66debdaf3692c36014e",
+        "bytes": 164326,
+        "classification": "outside_current_campaign_expected_ASC_hash_set"
+      },
+      {
+        "filename": "RAFM2_Long_72h_EOI.ASC",
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM2_Long_72h_EOI.ASC",
+        "sha256": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+        "bytes": 164327,
+        "classification": "outside_current_campaign_expected_ASC_hash_set"
+      }
+    ],
+    "hash_join_basis": "Expected raw hashes came from acquisition_corroboration.json and were matched against file bytes in the exact named roots; filenames were not used as join keys."
+  },
+  "additional_native_measurements": [
+    {
+      "measurement_id": "RAFM-A-2hr",
+      "role": "32nd native ANS/ASC measurement without a QG report source in the 31-report inventory",
+      "qg_report_source_present": false,
+      "ANS": {
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Spectra\\RAFM Samples\\RAFM3-A_2hrEOI.ANS",
+        "sha256": "4539685f80f9beb11e9094b9161d0568fe7dc95cef99366ea9d69a9d9c6aa18b",
+        "bytes": 34316,
+        "match_method": "exact SHA256 join to acquisition_corroboration.json"
+      },
+      "ASC": {
+        "path": "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\hirst spectra\\RAFM3-A_2hrEOI.ASC",
+        "sha256": "4521855b644433701eeccaa8b64d018ff227affb4a16d7489c3828b51588ea48",
+        "bytes": 164327,
+        "match_method": "exact SHA256 join to acquisition_corroboration.json"
+      }
+    }
+  ]
+}

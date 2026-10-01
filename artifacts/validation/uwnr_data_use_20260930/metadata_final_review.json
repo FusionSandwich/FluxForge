@@ -1,0 +1,34 @@
+{
+  "schema": "independent-source-integration-metadata-review-v1",
+  "reviewer_model": "GPT-6.1 Sol",
+  "decision": "ACCEPT_SOFTWARE_AND_DIAGNOSTIC_REPLAY",
+  "reviewed_commit": "27839e128dabbc7b901f7a1acf80f19ba68d949d",
+  "accepted_runtime_commit": "7b24c0b783b6504e8193138965aa45780720c9bf",
+  "accepted_runtime_review": {
+    "path": "D:\\FluxForgeQA\\receipts\\qg_report_qc_20260930\\source_integration_final_review.json",
+    "sha256": "7b344b1f73c25191908991f97e343adf6409792ad29755e00e5fd382b86e9cb0",
+    "root_frozen_regression": "240 passed in115.58s",
+    "independent_source_tests": "46 passed"
+  },
+  "scientific_admission": false,
+  "findings_remaining": [],
+  "resolved_nonblocking_finding": "Provenance documented_replay adds mandatory --operator PATH.",
+  "checks": {
+    "git_delta": "Exactly one documented_replay string; no runtime/test/tool changes.",
+    "replacement_receipt_sha256": "61f4006f7e5f219bb22b525d3c09e2c58785d11430472db8decf27150bef0fa8",
+    "replacement_receipt_commit_matches_HEAD": true,
+    "current_input_hashes_verified": 144,
+    "unchanged_source_hashes_verified": 9,
+    "input_changes": "Only provenance JSON digest changed.",
+    "receipt_changes": "Only code_commit, provenance input digest and calibration.documented_replay changed.",
+    "all_roi_diagnostics_and_curve_rows_CSV": "Bitwise equal to accepted replay.",
+    "actual_outputs_and_gates": "All other receipt fields exactly equal;31reports288ROI88summary;17nonpositive curve rows;266conditional4FeCdseparate18outside;32ANS30ASCcampaign;13budgets each6missing and strictrejected;no activity/summarycorrection and0physicaladmission.",
+    "prior_13_rate_operator_receipt_unchanged_sha256": "4398f9164e3ba49c8eb10583db8d4a223d323413546eec6331ec27b8eea9e95c"
+  },
+  "scope_limits": [
+    "Targeted metadata/replacement-evidence verification only; prior independent runtime review retained.",
+    "No rerun of broad tests or operator necessary because all9source hashes unchanged.",
+    "Actual measured full covariance/history/calibration evidence remains unavailable; no scientific admission.",
+    "No source edit, remote action, acquisition or publication performed."
+  ]
+}

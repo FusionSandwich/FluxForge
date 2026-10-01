@@ -1,0 +1,93 @@
+{
+  "schema": "independent-source-integration-review-v1",
+  "reviewer_model": "GPT-6.1 Sol",
+  "reviewed_commit": "7b24c0b783b6504e8193138965aa45780720c9bf",
+  "parent_reviewed_commit": "a0fbc0f3c09156b8d5086c72a2684e5d6e021bbb",
+  "decision": "ACCEPT_SOFTWARE_AND_DIAGNOSTIC_REPLAY",
+  "scientific_admission": false,
+  "blocking_findings_remaining": [],
+  "resolved_findings": [
+    {
+      "id": "singular_source_covariance",
+      "severity": "P2",
+      "check": "Shared spectral factor/Gram construction; null blocks [.14,.23], [1,3], [.3,.7] now PSD and repeated validation stable; exact budget/covariance diagonal equality; no jitter."
+    },
+    {
+      "id": "curve_runtime_byte_binding",
+      "severity": "P2",
+      "check": "Public arrays/dictionaries are defensive copies; resetting outward array writeability and mutating rows/provenance leaves983.5percent result and hash exactly unchanged; object attributes sealed."
+    },
+    {
+      "id": "monitor_substring_identity",
+      "severity": "P2",
+      "check": "Nonempty unique string-array monitor schema and exact membership reject wrong-monitor substring declaration and malformed arrays."
+    }
+  ],
+  "nonblocking_findings": [
+    {
+      "severity": "P3",
+      "file": "examples/RAFM_irradiation/calibration/South Small Vial 25cm.provenance.json",
+      "finding": "documented_replay example omits mandatory --operator PATH; actual replay invocation/receipt supplies it.",
+      "scope": "Documentation example only; does not change reviewed runtime/data result."
+    }
+  ],
+  "independent_checks": {
+    "focused_source_input_tests": "46 passed after repairs; only module docstring changed in finalcommit",
+    "history_jacobian": "Independent saturation sum with finite differences for three half-lives, max relative error6.216654050516637e-6",
+    "signed_shared_covariance": "Three signed rows compared with direct matrix algebra; max absolute error3.552713678800501e-15; negative cross term=-6.",
+    "root_frozen_regression": "240 passed in115.58s, frozen_source_final_tests.txt",
+    "final_input_hashes_verified": 144,
+    "final_source_hashes_verified": 9,
+    "original_roi_source_line_hashes_verified": 288,
+    "source_sha256": {
+      "src/fluxforge/analysis/qg_calibration.py": "1772c301d079f9c25dd31a183d67fe5bbb485bde5a9870415f7c0bbea557205e",
+      "src/fluxforge/analysis/qg_report_qc.py": "7ed90522de4ef57f36fe5ae899816a5d04d495b270c7cbbf17c4f12451be4122",
+      "src/fluxforge/analysis/flux_unfold.py": "6e494f645cbbc94d84173207ad877cd7b62069e4e85eec8b21a5582caf870e12",
+      "src/fluxforge/examples/rafm_workflow.py": "27b8e98ef9b3876e9d69deb6f556369f9c675110dd37a767e5eb64a49b56f24f",
+      "src/fluxforge/uncertainty/reaction_rate_budget.py": "189f1843f5480f92171bdfd2b3562d570765781d777aa3d8f3832d7258c84e69",
+      "src/fluxforge/physics/operating_history.py": "ce471a2e12474326eba78cf3886cedf944f58e58aca639151248822556de243f",
+      "tools/validate_uwnr_data_use.py": "bb286689b7bb22aaccb6242511afd2eb42def01d4e8a6be679d57d7f4fac8d1e",
+      "tools/validate_monitor_response_rafm.py": "709b2778ecfe9ac00c51890af3d073e27ce365e5406587f0cc35396a7582d26c",
+      "tests/test_uwnr_source_inputs.py": "aedd12d4b622ac15d92c580c1ed77f738efdd28a6c6f8ca1e72510d1d3a4d0cb"
+    },
+    "actual_operator": {
+      "receipt_sha256": "4398f9164e3ba49c8eb10583db8d4a223d323413546eec6331ec27b8eea9e95c",
+      "observations": 13,
+      "aggregate_groups": 7,
+      "input_hashes_verified": 32,
+      "physical_rows_uncertainty_rows_forward_predictions_rates_and_rate_uncertainties": "Exactly equal to frozen publication_integrity operator_final baseline"
+    },
+    "actual_all_data": {
+      "receipt_sha256": "3e9a11e8f4375ce71ec8e6c4956d0509712caec3f83d35442d11873e5a449d29",
+      "reports": 31,
+      "ROI": 288,
+      "summaries": 88,
+      "campaign_ANS": 32,
+      "campaign_ASC": 30,
+      "report_companion_ANS": 31,
+      "report_companion_ASC": 29,
+      "curve_rows": 1960,
+      "curve_nonpositive_rows": 17,
+      "curve_status_counts": {
+        "conditional_curve_comparison": 266,
+        "excluded_separate_or_unqualified_profile": 4,
+        "excluded_outside_table": 18
+      },
+      "curve_sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+      "FeCd_separate_profile_excluded_ROI": 4,
+      "actual_budgets": 13,
+      "missing_required_components_each": 6,
+      "strict_unknown_uncertainty_rejected": true,
+      "activity_and_summary_corrections": false,
+      "physical_reports": 0,
+      "physical_ROI": 0
+    }
+  },
+  "scope_limits": [
+    "Software contract and source-QC diagnostics accepted at exact reviewed commit only.",
+    "No actual measured calibration/history covariance, complete campaign operating log, active certificate or spectrum-separability evidence supplied; scientific admission remains false.",
+    "Analytic first-order covariance/Jacobian checks do not validate nonlinear propagation or vendor processing mechanisms.",
+    "No source edits, dependencies, remote work, external writes or publication performed by reviewer.",
+    "Private mail/workbook contents, contacts and Chat URLs excluded; previous CHANGES_REQUIRED receipt preserved."
+  ]
+}
