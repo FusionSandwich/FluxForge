@@ -27,7 +27,8 @@ OPENMC_STATEPOINT_AVAILABLE = STATEPOINT_FILE.exists()
 
 
 @pytest.mark.skipif(
-    not OPENMC_STATEPOINT_AVAILABLE,
+    not OPENMC_STATEPOINT_AVAILABLE
+    and not os.environ.get("FLUXFORGE_TRANSPORT_FIXTURE_DIR"),
     reason="OpenMC example statepoint.0250.h5 is not available in this workspace",
 )
 class TestOpenMCStatepoint:

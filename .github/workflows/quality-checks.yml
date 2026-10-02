@@ -12,8 +12,11 @@ on:
       - 'JS/**'
       - 'proposal/**'
       - 'fix/**'
+      - 'codex/**'
     paths:
       - 'src/fluxforge/**/*.py'
+      - 'src/fluxforge/data/**'
+      - 'tools/run_acceptance.py'
       - 'src/fluxforge_gui/**/*.py'
       - 'tests/**/*.py'
       - '.flake8'
