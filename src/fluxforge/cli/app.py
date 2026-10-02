@@ -3070,6 +3070,11 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
         ),
         energy_tolerance_keV=float(args.energy_tolerance_keV),
         dead_time_fraction=float(getattr(args, "dead_time_fraction", 0.0) or 0.0),
+        real_time_s=(
+            peak_report.get("real_time_s")
+            if peak_report.get("real_time_s") is not None
+            else getattr(args, "real_time_s", None)
+        ),
         sample_mass_g=getattr(args, "sample_mass_g", None),
     )
 
@@ -6921,6 +6926,12 @@ def build_parser() -> argparse.ArgumentParser:
     activity_review.add_argument("--live-time-s", type=float)
     activity_review.add_argument("--cooling-time-s", type=float, default=0.0)
     activity_review.add_argument("--dead-time-fraction", type=float, default=0.0)
+    activity_review.add_argument(
+        "--real-time-s",
+        type=float,
+        default=None,
+        help="Clock duration for count decay; live time accounts for acceptance separately",
+    )
     activity_review.add_argument("--energy-tolerance-keV", type=float, default=2.0)
     activity_review.add_argument(
         "--source-id",

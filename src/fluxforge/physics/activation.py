@@ -13,6 +13,20 @@ from fluxforge.data.elements import atomic_mass, parse_isotope
 AVOGADRO = 6.02214076e23
 
 
+def count_decay_factor(half_life_s: float, real_time_s: float) -> float:
+    """Count-average/count-start activity for a clock-time acquisition.
+
+    Zero duration means the supplied activity is already at count start.
+    Live-time acceptance is separate; callers must apply it only once.
+    """
+    if not math.isfinite(half_life_s) or half_life_s <= 0.0:
+        raise ValueError("half_life_s must be finite and positive")
+    if not math.isfinite(real_time_s) or real_time_s < 0.0:
+        raise ValueError("real_time_s must be finite and nonnegative")
+    exponent = (math.log(2.0) / half_life_s) * real_time_s
+    return -math.expm1(-exponent) / exponent if exponent > 0.0 else 1.0
+
+
 @dataclass
 class GammaLineMeasurement:
     """Represents a single gamma-line observation used to infer activity."""
@@ -24,18 +38,42 @@ class GammaLineMeasurement:
     half_life_s: float
     cooling_time_s: float = 0.0
     dead_time_fraction: float = 0.0
+    real_time_s: float | None = None
 
     def activity_at_reference(self) -> float:
         """Return the activity at the chosen reference (usually EOI)."""
 
+        for name in ("live_time_s", "efficiency", "gamma_intensity", "half_life_s"):
+            value = getattr(self, name)
+            if not math.isfinite(value) or value <= 0.0:
+                raise ValueError(f"{name} must be finite and positive")
+        for name in ("net_counts", "cooling_time_s"):
+            value = getattr(self, name)
+            if not math.isfinite(value) or value < 0.0:
+                raise ValueError(f"{name} must be finite and nonnegative")
+        if (
+            not math.isfinite(self.dead_time_fraction)
+            or not 0 <= self.dead_time_fraction < 1
+        ):
+            raise ValueError("dead_time_fraction must be finite and in [0, 1)")
+        # Uniform acceptance: C = eps * yield * A_start * live * C_decay(real).
+        # Live time already accounts for lost counts; dividing counts by the
+        # acceptance as well would correct dead time twice.
+        real_time = self.real_time_s
+        if real_time is None:
+            real_time = self.live_time_s / (1.0 - self.dead_time_fraction)
+        if not math.isfinite(real_time) or real_time < self.live_time_s:
+            raise ValueError("real_time_s must be finite and at least live_time_s")
+        if self.dead_time_fraction and not math.isclose(
+            self.live_time_s / real_time,
+            1.0 - self.dead_time_fraction,
+            rel_tol=1e-6,
+            abs_tol=1e-9,
+        ):
+            raise ValueError("real_time_s and dead_time_fraction are inconsistent")
+        buildup = self.live_time_s * count_decay_factor(self.half_life_s, real_time)
         decay_const = math.log(2.0) / self.half_life_s
-        corrected_counts = self.net_counts / max(1.0 - self.dead_time_fraction, 1e-12)
-        buildup = (1.0 - math.exp(-decay_const * self.live_time_s)) / max(
-            decay_const, 1e-12
-        )
-        if buildup <= 0:
-            raise ValueError("Live time must be positive to compute activity.")
-        activity_at_count_start = corrected_counts / (
+        activity_at_count_start = self.net_counts / (
             self.efficiency * self.gamma_intensity * buildup
         )
         activity_ref = activity_at_count_start * math.exp(

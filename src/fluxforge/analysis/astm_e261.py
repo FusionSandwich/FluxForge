@@ -55,8 +55,21 @@ def target_atom_count(
     target atoms per formula unit.
     """
 
-    if sample_mass_g <= 0.0 or atomic_mass_g_mol <= 0.0:
-        return 0.0
+    for name, value in {
+        "sample_mass_g": sample_mass_g,
+        "atomic_mass_g_mol": atomic_mass_g_mol,
+        "isotopic_abundance": isotopic_abundance,
+        "mass_fraction": mass_fraction,
+        "sample_purity": sample_purity,
+        "atoms_per_formula_unit": atoms_per_formula_unit,
+    }.items():
+        if not math.isfinite(value) or value <= 0.0:
+            raise ValueError(f"{name} must be finite and positive")
+        if (
+            name in {"isotopic_abundance", "mass_fraction", "sample_purity"}
+            and value > 1.0
+        ):
+            raise ValueError(f"{name} must be in (0, 1]")
     effective_mass = sample_mass_g * mass_fraction * sample_purity * isotopic_abundance
     return float(
         (effective_mass / atomic_mass_g_mol) * AVOGADRO * atoms_per_formula_unit
@@ -111,6 +124,9 @@ def _build_measurement(row: dict[str, Any]) -> GammaLineMeasurement:
             row.get("cooling_time_s", row.get("decay_time_s", 0.0)) or 0.0
         ),
         dead_time_fraction=float(row.get("dead_time_fraction", 0.0) or 0.0),
+        real_time_s=(
+            float(row["real_time_s"]) if row.get("real_time_s") is not None else None
+        ),
     )
 
 
@@ -171,10 +187,10 @@ def analyze_astm_e261_plan(plan: dict[str, Any]) -> dict[str, Any]:
         target_atoms = target_atom_count(
             sample_mass_g=float(row.get("sample_mass_g", 0.0)),
             atomic_mass_g_mol=float(row.get("atomic_mass_g_mol", 0.0)),
-            isotopic_abundance=float(row.get("isotopic_abundance", 1.0) or 1.0),
-            mass_fraction=float(row.get("mass_fraction", 1.0) or 1.0),
-            sample_purity=float(row.get("sample_purity", 1.0) or 1.0),
-            atoms_per_formula_unit=float(row.get("atoms_per_formula_unit", 1.0) or 1.0),
+            isotopic_abundance=float(row.get("isotopic_abundance", 1.0)),
+            mass_fraction=float(row.get("mass_fraction", 1.0)),
+            sample_purity=float(row.get("sample_purity", 1.0)),
+            atoms_per_formula_unit=float(row.get("atoms_per_formula_unit", 1.0)),
         )
         effective_cross_section_barn = float(
             row.get("effective_cross_section_barn", 0.0)
@@ -182,19 +198,24 @@ def analyze_astm_e261_plan(plan: dict[str, Any]) -> dict[str, Any]:
         effective_cross_section_unc_barn = float(
             row.get("effective_cross_section_unc_barn", 0.0) or 0.0
         )
-        correction_factor = (
-            float(row.get("astm_correction_factor", 1.0) or 1.0)
-            * float(row.get("self_shielding_factor", 1.0) or 1.0)
-            * float(row.get("cover_correction_factor", 1.0) or 1.0)
-            * float(row.get("geometry_factor", 1.0) or 1.0)
-        )
+        correction_factor = 1.0
+        for name in (
+            "astm_correction_factor",
+            "self_shielding_factor",
+            "cover_correction_factor",
+            "geometry_factor",
+        ):
+            value = float(row.get(name, 1.0))
+            if not math.isfinite(value) or value <= 0.0:
+                raise ValueError(f"{name} must be finite and positive")
+            correction_factor *= value
         denominator = (
             target_atoms
             * effective_cross_section_barn
             * BARN_TO_CM2
             * correction_factor
         )
-        if denominator <= 0.0:
+        if not math.isfinite(denominator) or denominator <= 0.0:
             raise ValueError(
                 "ASTM E261 workflow requires positive target atoms, cross section, and correction factor."
             )

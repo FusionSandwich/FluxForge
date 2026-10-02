@@ -1296,6 +1296,26 @@ def auto_find_peaks(
     return [(int(channels[p]), float(h)) for p, h in zip(peaks, heights)]
 
 
+def _fit_weights(counts, ch_lo, ch_hi, counts_uncertainty=None):
+    """Inverse channel sigmas, preserving measured subtraction variance."""
+    if counts_uncertainty is None:
+        sigma = np.maximum(np.sqrt(np.maximum(counts[ch_lo:ch_hi], 0.0)), 1.0)
+    else:
+        uncertainty = np.asarray(counts_uncertainty, dtype=float)
+        if (
+            uncertainty.shape != np.asarray(counts).shape
+            or not np.all(np.isfinite(uncertainty))
+            or np.any(uncertainty < 0)
+        ):
+            raise ValueError(
+                "counts_uncertainty must match counts and be finite and nonnegative"
+            )
+        # Zero-variance channels cannot be exact constraints in curve_fit.
+        # Retain the existing one-count floor only for those channels.
+        sigma = np.where(uncertainty[ch_lo:ch_hi] > 0, uncertainty[ch_lo:ch_hi], 1.0)
+    return 1.0 / sigma
+
+
 def fit_single_peak(
     channels: np.ndarray,
     counts: np.ndarray,
@@ -1304,6 +1324,7 @@ def fit_single_peak(
     background_model: str = "linear",
     fix_centroid: bool = False,
     initial_sigma: Optional[float] = None,
+    counts_uncertainty: Optional[np.ndarray] = None,
 ) -> PeakFitResult:
     """
     Fit single Gaussian peak to spectrum region.
@@ -1343,7 +1364,7 @@ def fit_single_peak(
     # Background subtraction can legitimately leave negative bins. Poisson
     # variance is undefined there, so use a zero-count floor instead of taking
     # sqrt of a negative value and silently producing NaN fit weights.
-    weights = 1.0 / np.maximum(np.sqrt(np.clip(y, 0.0, None)), 1.0)
+    weights = _fit_weights(counts, ch_lo, ch_hi, counts_uncertainty)
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()
@@ -1479,6 +1500,7 @@ def fit_multiple_peaks(
     fit_width: int = 10,
     background_model: str = "linear",
     share_sigma: bool = False,
+    counts_uncertainty: Optional[np.ndarray] = None,
 ) -> List[PeakFitResult]:
     """
     Fit multiple peaks simultaneously.
@@ -1514,6 +1536,7 @@ def fit_multiple_peaks(
                 peak_ch,
                 fit_width=fit_width,
                 background_model=background_model,
+                counts_uncertainty=counts_uncertainty,
             )
             for peak_ch in sorted(peak_channels)
         ]
@@ -1525,7 +1548,7 @@ def fit_multiple_peaks(
 
     x = channels[ch_lo:ch_hi].astype(float)
     y = counts[ch_lo:ch_hi].astype(float)
-    weights = 1.0 / np.maximum(np.sqrt(np.maximum(y, 0.0)), 1.0)
+    weights = _fit_weights(counts, ch_lo, ch_hi, counts_uncertainty)
 
     if x.size < max(7, 3 * len(peak_channels)):
         return [
@@ -1535,6 +1558,7 @@ def fit_multiple_peaks(
                 peak_ch,
                 fit_width=fit_width,
                 background_model=background_model,
+                counts_uncertainty=counts_uncertainty,
             )
             for peak_ch in peak_channels
         ]
@@ -1664,6 +1688,7 @@ def fit_multiple_peaks(
                 peak_ch,
                 fit_width=fit_width,
                 background_model=background_model,
+                counts_uncertainty=counts_uncertainty,
             )
             for peak_ch in peak_channels
         ]
@@ -1929,6 +1954,7 @@ def fit_hypermet_peak(
     enable_tail: bool = True,
     enable_step: bool = False,
     initial_sigma: Optional[float] = None,
+    counts_uncertainty: Optional[np.ndarray] = None,
 ) -> Tuple[HypermetPeak, PeakFitResult]:
     """
     Fit Hypermet peak to spectrum region.
@@ -1969,7 +1995,7 @@ def fit_hypermet_peak(
     y = counts[ch_lo:ch_hi].astype(float)
 
     # Weights for chi-squared
-    weights = 1.0 / np.maximum(np.sqrt(y), 1.0)
+    weights = _fit_weights(counts, ch_lo, ch_hi, counts_uncertainty)
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()

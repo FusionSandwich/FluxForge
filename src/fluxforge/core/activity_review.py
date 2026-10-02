@@ -10,7 +10,12 @@ import numpy as np
 
 from fluxforge.core.analysis_workspace import PeakCandidate
 from fluxforge.data.efficiency import EfficiencyCurve
-from fluxforge.data.gamma_database import FLUXFORGE_GAMMA_DATA, DecayData, GammaDatabase, GammaLine
+from fluxforge.data.gamma_database import (
+    FLUXFORGE_GAMMA_DATA,
+    DecayData,
+    GammaDatabase,
+    GammaLine,
+)
 from fluxforge.data.isotope_names import format_isotope_name, parse_nndc_isotope_name
 from fluxforge.data.nuclear_data_sources import load_gamma_identification_source
 from fluxforge.physics.activation import GammaLineMeasurement, activation_study_metrics
@@ -92,7 +97,9 @@ class ActivityReviewIsotopeSummary:
         row = {
             "nuclide": self.nuclide,
             "line_count": self.line_count,
-            "peak_energies_keV": ", ".join(f"{value:.3f}" for value in self.peak_energies_keV),
+            "peak_energies_keV": ", ".join(
+                f"{value:.3f}" for value in self.peak_energies_keV
+            ),
             "matched_line_energies_keV": ", ".join(
                 f"{value:.3f}" for value in self.matched_line_energies_keV
             ),
@@ -136,12 +143,17 @@ class ActivityReviewResult:
     bateman_plot_data: dict[str, tuple[tuple[float, float, float], ...]]
     half_lives_s: dict[str, float]
     bateman_half_lives_s: dict[str, float]
+    real_time_s: float | None = None
 
     def line_rows(self, *, sample_mass_g: float | None = None) -> list[dict[str, Any]]:
         return [item.to_row(sample_mass_g=sample_mass_g) for item in self.line_results]
 
-    def isotope_rows(self, *, sample_mass_g: float | None = None) -> list[dict[str, Any]]:
-        return [item.to_row(sample_mass_g=sample_mass_g) for item in self.isotope_summaries]
+    def isotope_rows(
+        self, *, sample_mass_g: float | None = None
+    ) -> list[dict[str, Any]]:
+        return [
+            item.to_row(sample_mass_g=sample_mass_g) for item in self.isotope_summaries
+        ]
 
     def to_payload(self, *, sample_mass_g: float | None = None) -> dict[str, Any]:
         return {
@@ -149,6 +161,8 @@ class ActivityReviewResult:
             "source_id": self.source_id,
             "custom_gamma_path": self.custom_gamma_path,
             "live_time_s": self.live_time_s,
+            "real_time_s": self.real_time_s,
+            "count_acceptance_model": "uniform live/real acceptance; clock-time decay correction applied once",
             "cooling_time_s": self.cooling_time_s,
             "irradiation_reference": "end_of_irradiation",
             "plot_horizon_s": self.plot_horizon_s,
@@ -172,6 +186,7 @@ def review_spectrum_activation(
     custom_gamma_path: str | None = None,
     energy_tolerance_keV: float = 2.0,
     dead_time_fraction: float = 0.0,
+    real_time_s: float | None = None,
     sample_mass_g: float | None = None,
 ) -> ActivityReviewResult:
     """Resolve assigned peaks to isotope activities at count time and EOI."""
@@ -219,10 +234,13 @@ def review_spectrum_activation(
             half_life_s=half_life_s,
             cooling_time_s=cooling_time,
             dead_time_fraction=dead_time,
+            real_time_s=real_time_s,
         )
         irradiation_activity = measurement.activity_at_reference()
         decay_constant = math.log(2.0) / half_life_s
-        count_time_activity = irradiation_activity * math.exp(-decay_constant * cooling_time)
+        count_time_activity = irradiation_activity * math.exp(
+            -decay_constant * cooling_time
+        )
 
         rel_count_unc = net_counts_unc / max(net_counts, 1.0)
         rel_emission_unc = emission_probability_unc / max(emission_probability, 1e-12)
@@ -248,7 +266,9 @@ def review_spectrum_activation(
             count_time_activity_bq=float(count_time_activity),
             count_time_uncertainty_bq=float(count_time_activity * combined_rel_unc),
             irradiation_time_activity_bq=float(irradiation_activity),
-            irradiation_time_uncertainty_bq=float(irradiation_activity * combined_rel_unc),
+            irradiation_time_uncertainty_bq=float(
+                irradiation_activity * combined_rel_unc
+            ),
             cooling_time_s=float(cooling_time),
         )
         line_results.append(result)
@@ -315,7 +335,9 @@ def review_spectrum_activation(
         decay_plot_data[summary.nuclide] = tuple(
             (
                 time_s,
-                _decay_activity(summary.irradiation_time_activity_bq, summary.half_life_s, time_s),
+                _decay_activity(
+                    summary.irradiation_time_activity_bq, summary.half_life_s, time_s
+                ),
                 _decay_activity(
                     summary.irradiation_time_uncertainty_bq,
                     summary.half_life_s,
@@ -338,12 +360,17 @@ def review_spectrum_activation(
         bateman_half_lives[parent_label] = summary.half_life_s
 
     return ActivityReviewResult(
+        real_time_s=(
+            real_time_s if real_time_s is not None else live_time / (1.0 - dead_time)
+        ),
         source_id=source_id,
         custom_gamma_path=custom_gamma_path,
         live_time_s=live_time,
         cooling_time_s=cooling_time,
         plot_horizon_s=float(plot_horizon_s),
-        line_results=tuple(sorted(line_results, key=lambda item: (item.nuclide, item.peak_energy_keV))),
+        line_results=tuple(
+            sorted(line_results, key=lambda item: (item.nuclide, item.peak_energy_keV))
+        ),
         isotope_summaries=tuple(isotope_summaries),
         decay_plot_data=decay_plot_data,
         bateman_plot_data=bateman_plot_data,
@@ -364,11 +391,16 @@ def build_simple_bateman_summary(
     chain = DecayChain(
         nuclide,
         nuclide_data={
-            nuclide: {"half_life_s": float(half_life_s), "decay_products": {daughter: 1.0}},
+            nuclide: {
+                "half_life_s": float(half_life_s),
+                "decay_products": {daughter: 1.0},
+            },
             daughter: {"half_life_s": float("inf"), "decay_products": {}},
         },
     )
-    result = chain.decay(initial_atoms={nuclide: 1.0}, times=[0.0, float(cooling_time_s)])
+    result = chain.decay(
+        initial_atoms={nuclide: 1.0}, times=[0.0, float(cooling_time_s)]
+    )
     parent_fraction = float(result.atoms[nuclide][-1])
     daughter_fraction = float(result.atoms[daughter][-1])
     return (
@@ -437,7 +469,8 @@ def _resolve_gamma_line(
     candidates = [
         line
         for line in decay.gamma_lines
-        if abs(line.energy_keV - float(peak_energy_keV)) <= max(float(tolerance_keV), 1e-6)
+        if abs(line.energy_keV - float(peak_energy_keV))
+        <= max(float(tolerance_keV), 1e-6)
     ]
     if not candidates:
         return None
@@ -477,7 +510,9 @@ def _resolve_plot_horizon(
 def _decay_activity(activity_bq: float, half_life_s: float, time_s: float) -> float:
     if half_life_s <= 0.0:
         return float(activity_bq)
-    return float(activity_bq) * math.exp(-(math.log(2.0) / float(half_life_s)) * float(time_s))
+    return float(activity_bq) * math.exp(
+        -(math.log(2.0) / float(half_life_s)) * float(time_s)
+    )
 
 
 def _simple_bateman_series(
@@ -487,12 +522,17 @@ def _simple_bateman_series(
     uncertainty_bq: float,
     half_life_s: float,
     time_points: Sequence[float],
-) -> tuple[tuple[tuple[float, float, float], ...], tuple[tuple[float, float, float], ...]]:
+) -> tuple[
+    tuple[tuple[float, float, float], ...], tuple[tuple[float, float, float], ...]
+]:
     daughter = f"{nuclide} daughter"
     chain = DecayChain(
         nuclide,
         nuclide_data={
-            nuclide: {"half_life_s": float(half_life_s), "decay_products": {daughter: 1.0}},
+            nuclide: {
+                "half_life_s": float(half_life_s),
+                "decay_products": {daughter: 1.0},
+            },
             daughter: {"half_life_s": float("inf"), "decay_products": {}},
         },
     )
@@ -538,8 +578,12 @@ def _weighted_mean_and_uncertainty(
         return 0.0, 0.0
     mean_value = float(np.mean(values_array))
     if values_array.size == 1:
-        return mean_value, float(max(float(uncertainties[0]) if uncertainties else 0.0, 0.0))
-    spread = float(np.std(values_array, ddof=0) / max(math.sqrt(values_array.size), 1.0))
+        return mean_value, float(
+            max(float(uncertainties[0]) if uncertainties else 0.0, 0.0)
+        )
+    spread = float(
+        np.std(values_array, ddof=0) / max(math.sqrt(values_array.size), 1.0)
+    )
     return mean_value, spread
 
 

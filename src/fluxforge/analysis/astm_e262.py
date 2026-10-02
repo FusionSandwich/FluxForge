@@ -19,6 +19,7 @@ import math
 from fluxforge.data.k0_library import get_k0_library_record
 from typing import Any, Sequence
 
+from fluxforge.analysis.astm_e261 import target_atom_count
 from fluxforge.physics.activation import (
     GammaLineMeasurement,
     IrradiationSegment,
@@ -100,6 +101,11 @@ def _measurement_from_row(
             row.get(key("dead_time_fraction"), row.get("dead_time_fraction", 0.0))
             or 0.0
         ),
+        real_time_s=(
+            float(row.get(key("real_time_s"), row.get("real_time_s")))
+            if row.get(key("real_time_s"), row.get("real_time_s")) is not None
+            else None
+        ),
     )
 
 
@@ -130,6 +136,34 @@ def _true_thermal_from_equivalent(
     return float(phi0_cm2_s * math.sqrt(neutron_temperature_K / T0_K))
 
 
+def _target_atoms_from_row(row: dict[str, Any], prefix: str = "") -> float:
+    """Require each physical monitor's own declared target inventory."""
+    key = lambda name: f"{prefix}{name}"
+    if key("target_atoms") in row:
+        atoms = float(row[key("target_atoms")])
+        if not math.isfinite(atoms) or atoms <= 0.0:
+            raise ValueError(f"{key('target_atoms')} must be finite and positive")
+        return atoms
+    for field in ("sample_mass_g", "atomic_mass_g_mol"):
+        if key(field) not in row:
+            raise ValueError(
+                f"ASTM E262 requires {key(field)} or {key('target_atoms')}"
+            )
+    return target_atom_count(
+        **{
+            field: float(row.get(key(field), default))
+            for field, default in {
+                "sample_mass_g": 0.0,
+                "atomic_mass_g_mol": 0.0,
+                "isotopic_abundance": 1.0,
+                "mass_fraction": 1.0,
+                "sample_purity": 1.0,
+                "atoms_per_formula_unit": 1.0,
+            }.items()
+        }
+    )
+
+
 def _analyze_radiometric_measurement(
     row: dict[str, Any],
     *,
@@ -141,6 +175,7 @@ def _analyze_radiometric_measurement(
     reaction_rate_s, reaction_rate_unc_s, activity_eoi_bq, activity_unc_bq = (
         _reaction_rate_from_measurement(measurement, segments)
     )
+    target_atoms = _target_atoms_from_row(row)
 
     sigma_0_barn = float(
         row.get("sigma_0_barn", row.get("thermal_cross_section_barn", 0.0))
@@ -150,8 +185,16 @@ def _analyze_radiometric_measurement(
         or 0.0
     )
 
-    # Fallback to governed k0 library if cross-section is not manually specified
-    if sigma_0_barn <= 0.0:
+    cross_section_supplied = (
+        "sigma_0_barn" in row or "thermal_cross_section_barn" in row
+    )
+    if cross_section_supplied and (
+        not math.isfinite(sigma_0_barn) or sigma_0_barn <= 0.0
+    ):
+        raise ValueError("Supplied thermal cross-section must be finite and positive")
+
+    # Library fallback applies only when the field is absent.
+    if not cross_section_supplied:
         iso_raw = row.get("measurement_id", "")
         if "reaction_id" in row and ")" in row["reaction_id"]:
             iso_raw = row["reaction_id"].split(")")[-1]
@@ -167,15 +210,26 @@ def _analyze_radiometric_measurement(
             if float(record.k0_unc_percent) > 0.0:
                 sigma_0_unc_barn = sigma_0_barn * (record.k0_unc_percent / 100.0)
 
-    westcott_g = float(row.get("westcott_g", 1.0) or 1.0)
+    westcott_g = float(row.get("westcott_g", 1.0))
     thermal_self_shielding_factor = float(
-        row.get("thermal_self_shielding_factor", row.get("G_th", 1.0)) or 1.0
+        row.get("thermal_self_shielding_factor", row.get("G_th", 1.0))
     )
+    for name, value in {
+        "sigma_0_barn": sigma_0_barn,
+        "westcott_g": westcott_g,
+        "thermal_self_shielding_factor": thermal_self_shielding_factor,
+    }.items():
+        if not math.isfinite(value) or value <= 0.0:
+            raise ValueError(f"{name} must be finite and positive")
 
     denominator = (
-        sigma_0_barn * BARN_TO_CM2 * westcott_g * thermal_self_shielding_factor
+        target_atoms
+        * sigma_0_barn
+        * BARN_TO_CM2
+        * westcott_g
+        * thermal_self_shielding_factor
     )
-    if denominator <= 0.0:
+    if not math.isfinite(denominator) or denominator <= 0.0:
         raise ValueError(
             "ASTM E262 radiometric mode requires positive sigma_0_barn, Westcott g, and thermal self-shielding factor."
         )
@@ -201,32 +255,37 @@ def _analyze_radiometric_measurement(
             cd_activity_bq,
             cd_activity_unc_bq,
         ) = _reaction_rate_from_measurement(cd_measurement, segments)
+        cd_target_atoms = _target_atoms_from_row(row, prefix="cd_")
+        cd_inventory_scale = target_atoms / cd_target_atoms
         cd_transmission_factor = float(
             row.get(
                 "cd_transmission_factor", row.get("cadmium_transmission_factor", 1.0)
             )
-            or 1.0
         )
+        if not math.isfinite(cd_transmission_factor) or cd_transmission_factor < 0:
+            raise ValueError("cd_transmission_factor must be finite and nonnegative")
         thermal_rate_s = max(
-            reaction_rate_s - cd_transmission_factor * cd_reaction_rate_s, 0.0
+            reaction_rate_s
+            - cd_transmission_factor * cd_reaction_rate_s * cd_inventory_scale,
+            0.0,
         )
         thermal_rate_unc_s = float(
             math.sqrt(
                 reaction_rate_unc_s * reaction_rate_unc_s
-                + (cd_transmission_factor * cd_reaction_rate_unc_s)
-                * (cd_transmission_factor * cd_reaction_rate_unc_s)
+                + (cd_transmission_factor * cd_reaction_rate_unc_s * cd_inventory_scale)
+                ** 2
             )
         )
 
         cd_ratio, cd_ratio_unc = calculate_cd_ratio(
-            activity_bare=activity_eoi_bq,
-            activity_cd_covered=cd_activity_bq,
-            uncertainty_bare=activity_unc_bq,
-            uncertainty_covered=cd_activity_unc_bq,
+            activity_bare=reaction_rate_s / target_atoms,
+            activity_cd_covered=cd_reaction_rate_s / cd_target_atoms,
+            uncertainty_bare=reaction_rate_unc_s / target_atoms,
+            uncertainty_covered=cd_reaction_rate_unc_s / cd_target_atoms,
         )
         cd_components = extract_thermal_epithermal_components(
-            activity_bare=activity_eoi_bq,
-            activity_cd_covered=cd_activity_bq,
+            activity_bare=reaction_rate_s / target_atoms,
+            activity_cd_covered=cd_reaction_rate_s / cd_target_atoms,
             reaction=str(row.get("reaction_id") or ""),
             cd_thickness=float(row.get("cd_thickness_mm", 1.0) or 1.0),
         )
@@ -235,6 +294,9 @@ def _analyze_radiometric_measurement(
             "cd_activity_eoi_unc_Bq": float(cd_activity_unc_bq),
             "cd_reaction_rate_s": float(cd_reaction_rate_s),
             "cd_reaction_rate_unc_s": float(cd_reaction_rate_unc_s),
+            "cd_target_atoms": cd_target_atoms,
+            "cd_reaction_rate_per_atom_s": cd_reaction_rate_s / cd_target_atoms,
+            "cadmium_ratio_basis": "EOI reaction rate per target atom",
             "cd_transmission_factor": float(cd_transmission_factor),
             "cadmium_ratio": float(cd_ratio),
             "cadmium_ratio_unc": float(cd_ratio_unc),
@@ -269,6 +331,9 @@ def _analyze_radiometric_measurement(
         "activity_eoi_unc_Bq": float(activity_unc_bq),
         "reaction_rate_s": float(reaction_rate_s),
         "reaction_rate_unc_s": float(reaction_rate_unc_s),
+        "target_atoms": target_atoms,
+        "reaction_rate_per_atom_s": reaction_rate_s / target_atoms,
+        "thermal_reaction_rate_per_atom_s": thermal_rate_s / target_atoms,
         "thermal_reaction_rate_s": float(thermal_rate_s),
         "thermal_reaction_rate_unc_s": float(thermal_rate_unc_s),
         "sigma_0_barn": float(sigma_0_barn),
@@ -316,6 +381,8 @@ def _analyze_standard_comparison_measurement(
         standard_activity_bq,
         standard_activity_unc_bq,
     ) = _reaction_rate_from_measurement(standard_measurement, segments)
+    unknown_target_atoms = _target_atoms_from_row(row, prefix="unknown_")
+    standard_target_atoms = _target_atoms_from_row(row, prefix="standard_")
 
     known_phi0_cm2_s = float(
         row.get(
@@ -339,17 +406,21 @@ def _analyze_standard_comparison_measurement(
             "ASTM E262 standard-comparison mode requires a positive standard reaction rate."
         )
 
-    spectral_correction_factor = float(
-        row.get("spectral_correction_factor", 1.0) or 1.0
-    )
-    if spectral_correction_factor <= 0.0:
+    spectral_correction_factor = float(row.get("spectral_correction_factor", 1.0))
+    if (
+        not math.isfinite(spectral_correction_factor)
+        or spectral_correction_factor <= 0.0
+    ):
         raise ValueError(
             "ASTM E262 standard-comparison mode requires spectral_correction_factor > 0."
         )
 
     phi0_eq_cm2_s = float(
         known_phi0_cm2_s
-        * (unknown_rate_s / standard_rate_s)
+        * (
+            (unknown_rate_s / unknown_target_atoms)
+            / (standard_rate_s / standard_target_atoms)
+        )
         * spectral_correction_factor
     )
     rel_unc = math.sqrt(
@@ -383,6 +454,10 @@ def _analyze_standard_comparison_measurement(
         "unknown_reaction_rate_unc_s": float(unknown_rate_unc_s),
         "standard_reaction_rate_s": float(standard_rate_s),
         "standard_reaction_rate_unc_s": float(standard_rate_unc_s),
+        "unknown_target_atoms": unknown_target_atoms,
+        "standard_target_atoms": standard_target_atoms,
+        "unknown_reaction_rate_per_atom_s": unknown_rate_s / unknown_target_atoms,
+        "standard_reaction_rate_per_atom_s": standard_rate_s / standard_target_atoms,
         "equivalent_2200ms_fluence_rate_cm2_s": float(phi0_eq_cm2_s),
         "equivalent_2200ms_fluence_rate_unc_cm2_s": float(phi0_eq_unc_cm2_s),
         "equivalent_2200ms_fluence_cm2": float(phi0_eq_cm2_s * fluence_duration_s),
