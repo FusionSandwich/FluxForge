@@ -12,6 +12,10 @@ FluxForge has two primary user entrypoints:
 If you are new to the project, start with the installation steps below, then
 run `fluxforge commands` to see the grouped CLI surface.
 
+The [October 2026 adversarial acceptance follow-up](docs/reviews/ADVERSARIAL_ACCEPTANCE_2026-10-02.md)
+documents the integrated fixes, reproducible test runner, full RAFM replay
+results, and remaining scientific qualification requirements.
+
 ## What FluxForge Covers
 
 | Capability family | Typical use | Main entry points |
