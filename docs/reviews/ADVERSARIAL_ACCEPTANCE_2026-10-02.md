@@ -52,7 +52,8 @@ or hardware-GPU acceptance.
 | CI did not cover current work | Added pull-request and relevant branch/path triggers, mandatory scientific contracts, frozen upstream solver references, and a Python 3.11 CPU-ML job. Existing Linux/Windows GUI coverage remains configured. |
 
 The final focused scientific/persistence recheck passed 204 cases. CI's existing
-Black and Flake8 scopes passed locally, and `git diff --check` passed.
+Black and Flake8 scopes passed locally. Diff whitespace checks passed for code
+changes; the copied raw background retains its original padded ASCII header.
 
 ## Repeating software acceptance
 
@@ -100,6 +101,12 @@ enforced and plotting disabled:
 | Default workflow | 29/29; 627.297 seconds; no timeout | Gate exit 1. Twenty-six samples used report reproduction; all 29 lack an independently passing validation state. |
 | `iec_tiered` for flux wires and generic targeting | 29/29; 616.344 seconds; no timeout | Gate exit 1. Four passed configured report-comparison thresholds, 22 failed, three unvalidated; zero reference-reproduction samples. |
 
+These full reductions use the configured profile energy-calibration override.
+Their 29 saved energy grids exactly match the run's background grid; the final
+identity-guard correction leaves their alignment choice unchanged. The earlier
+public ingestion exercised raw-header energy grids. Both calibration paths
+still require measurement-specific qualification.
+
 The four comparison passes are Co-Cd, Co, CU, and Sc-Cd. RAFM1, Long144h, and
 Long72h are unvalidated. Twenty-seven raw/report pairs were found; six processed
 reports have no raw counterpart. Independent end-of-irradiation truth is absent.
@@ -137,7 +144,7 @@ substitution, or comparison success as evidence of qualified physical accuracy.
    defects with independent fixtures, then repeat the enforced comparison.
    Calibration alone cannot resolve the count-domain failures.
 2. **Traceable efficiency and geometry:** obtain the detector-specific absolute
-   efficiency calibration/certificate, source activity and uncertainty, fit
+   energy and efficiency calibration/certificate, source activity and uncertainty, fit
    covariance, validity dates, and matching sample geometry. The historical
    South Small Vial export still has an unqualified percent convention/error
    column and conflicting geometry factors. Generic uncertainty values cannot
