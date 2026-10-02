@@ -70,10 +70,7 @@ def _resample_background_to_sample_energy(
                 "Energy alignment requires finite, increasing channel centers."
             )
 
-    n_min = min(len(sample_energies), len(background_energies))
-    if len(sample_energies) == len(background_energies) and np.allclose(
-        sample_energies[:n_min], background_energies[:n_min], atol=atol_keV, rtol=rtol
-    ):
+    if np.array_equal(sample_energies, background_energies):
         if np.array_equal(sample.channels, background.channels):
             return background, False
         return (

@@ -142,3 +142,16 @@ def test_workspace_roi_uses_shared_covariance_and_sideband_cross_terms():
     assert result.net_counts_uncertainty**2 == pytest.approx(
         weights @ covariance @ weights
     )
+
+
+def test_close_energy_centers_still_use_bin_overlap_for_narrow_channels():
+    source = np.asarray([1.0, 1.0002, 1.0004])
+    sample = spectrum(np.zeros(3), source + 0.0001, 0.0002)
+    background = spectrum([10, 20, 30], source, 0.0002)
+    net = subtract_measured_background(
+        sample, background, mode="manual", manual_scale=1.0, negative_policy="preserve"
+    )
+    np.testing.assert_allclose(net.counts, [-15, -25, -15], rtol=1e-10)
+    assert np.ones(3) @ net.count_covariance_matrix() @ np.ones(3) == pytest.approx(
+        52.5
+    )
