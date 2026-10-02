@@ -45,7 +45,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE_ROOT = REPO_ROOT / "examples" / "RAFM_irradiation"
 
 
-@pytest.mark.parametrize("sample,mass", [("Co-RAFM-1", 4.0661), ("Co-Cd-RAFM-1", 3.6703)])
+@pytest.mark.parametrize(
+    "sample,mass", [("Co-RAFM-1", 4.0661), ("Co-Cd-RAFM-1", 3.6703)]
+)
 def test_inl_adjusted_co_mass_is_not_diluted_again(sample, mass):
     from fluxforge.analysis.flux_unfold import AVOGADRO
 
@@ -56,9 +58,11 @@ def test_inl_adjusted_co_mass_is_not_diluted_again(sample, mass):
     assert row["alloy_co_mass_fraction"] == 0.0046
     assert flux_wire_specimen_mass_g(sample.lower(), metadata) is None
     reaction = build_flux_wire_reactions(
-        sample + "_25cm", sample.lower(),
+        sample + "_25cm",
+        sample.lower(),
         {"Co60": {"activity_eoi_bq": 1000.0, "activity_eoi_unc_bq": 10.0}},
-        timing, metadata,
+        timing,
+        metadata,
     )[0]
     # The original INL mass is already Co mass, with natural Co-59 abundance 1.
     assert reaction.n_atoms == pytest.approx(mass * 1e-3 * AVOGADRO / 58.9332)
@@ -70,9 +74,16 @@ def test_inl_adjusted_co_mass_is_not_diluted_again(sample, mass):
 @pytest.mark.parametrize("fraction", [0.0046, 0.0, float("nan")])
 def test_adjusted_element_mass_rejects_second_composition_correction(fraction):
     with pytest.raises(ValueError, match="another composition adjustment"):
-        flux_wire_element_mass_fraction({"mass_basis": "element_mass", "element_mass_fraction": fraction})
+        flux_wire_element_mass_fraction(
+            {"mass_basis": "element_mass", "element_mass_fraction": fraction}
+        )
     assert flux_wire_element_mass_fraction({"mass_basis": "element_mass"}) == 1.0
-    assert flux_wire_element_mass_fraction({"mass_basis": "sample_mass", "element_mass_fraction": 0.0046}) == 0.0046
+    assert (
+        flux_wire_element_mass_fraction(
+            {"mass_basis": "sample_mass", "element_mass_fraction": 0.0046}
+        )
+        == 0.0046
+    )
     with pytest.raises(ValueError, match="Unknown flux-wire mass_basis"):
         flux_wire_element_mass_fraction({"mass_basis": "isotope_mass"})
 
@@ -81,7 +92,9 @@ def test_cu_cd_mass_uses_its_own_inl_designation_row():
     metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
     assert metadata.flux_wire_metadata["cu-cd-rafm-1"][0]["mass_mg"] == 12.9738
     assert metadata.flux_wire_metadata["cu-rafm-1"][0]["mass_mg"] == 1.3748
-    assert flux_wire_specimen_mass_g("cu-cd-rafm-1", metadata) == pytest.approx(0.0129738)
+    assert flux_wire_specimen_mass_g("cu-cd-rafm-1", metadata) == pytest.approx(
+        0.0129738
+    )
 
 
 def test_metadata_and_pairing_aliases_load():
@@ -668,12 +681,16 @@ def test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards() -> N
     assert cd_reactions
     metadata.flux_wire_metadata["co-cd-rafm-1"][0]["element_mass_fraction"] = 0.001
     dilute_reactions = build_flux_wire_reactions(
-        "Co-Cd-RAFM-1_25cm", "co-cd-rafm-1",
+        "Co-Cd-RAFM-1_25cm",
+        "co-cd-rafm-1",
         {"Co60": {"activity_eoi_bq": 500.0, "activity_eoi_unc_bq": 10.0}},
-        timing, metadata,
+        timing,
+        metadata,
     )
     assert dilute_reactions[0].n_atoms == pytest.approx(cd_reactions[0].n_atoms * 0.001)
-    assert dilute_reactions[0].reaction_rate == pytest.approx(cd_reactions[0].reaction_rate * 1000)
+    assert dilute_reactions[0].reaction_rate == pytest.approx(
+        cd_reactions[0].reaction_rate * 1000
+    )
     cd_rel_unc = cd_reactions[0].reaction_rate_unc / cd_reactions[0].reaction_rate
     assert cd_rel_unc >= 0.25 - 1e-12
     assert "cd_model" in {c.name for c in cd_reactions[0].uncertainty_budget.components}

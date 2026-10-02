@@ -256,7 +256,8 @@ def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
     assert background_key == "sample-spe-2"
     assert controller.slot("foreground").source_label == "sample.spe"
     assert controller.slot("background").source_path == "/tmp/background.spe"
-    assert controller.describe()["loaded_spectrum_count"] == 2
+    # The canonical inventory retains the two original slot spectra as well.
+    assert controller.describe()["loaded_spectrum_count"] == 4
     assert controller.describe()["slot_sources"]["background"] == "sample.spe"
     assert controller.describe()["bayesian_source_id"] == "fluxforge_bundled_gamma"
     assert controller.describe()["ml_source_id"] == "fluxforge_bundled_gamma"
