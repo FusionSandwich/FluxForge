@@ -7,12 +7,17 @@ Tests extraction of flux tallies from:
 """
 
 import pytest
+import os
 import numpy as np
 from pathlib import Path
 
 
 # Test data paths
-EXAMPLES_DIR = Path(__file__).parent.parent / "examples"
+EXAMPLES_DIR = Path(
+    os.environ.get(
+        "FLUXFORGE_TRANSPORT_FIXTURE_DIR", Path(__file__).parent.parent / "examples"
+    )
+)
 STATEPOINT_FILE = EXAMPLES_DIR / "statepoint.0250.h5"
 RUNTPE_FILE = EXAMPLES_DIR / "runtpe.h5"
 MCNP_INPUT_FILE = EXAMPLES_DIR / "whale_J_core_clean_loc.i"
@@ -119,6 +124,10 @@ class TestOpenMCStatepoint:
             assert np.sum(spectrum) > 0  # Non-zero flux
 
 
+@pytest.mark.skipif(
+    not RUNTPE_FILE.exists() and "FLUXFORGE_TRANSPORT_FIXTURE_DIR" not in os.environ,
+    reason="Real MCNP runtpe fixture unavailable; mandatory format contracts run separately",
+)
 class TestMCNPHDF5:
     """Tests for MCNP HDF5 output reading."""
 
@@ -199,6 +208,11 @@ class TestMCNPHDF5:
             assert fast_flux / total_flux > 0.1  # At least 10% above thermal
 
 
+@pytest.mark.skipif(
+    not MCNP_INPUT_FILE.exists()
+    and "FLUXFORGE_TRANSPORT_FIXTURE_DIR" not in os.environ,
+    reason="Real MCNP model fixture unavailable; mandatory parser contracts run separately",
+)
 class TestMCNPInputParser:
     """Tests for MCNP input file parsing."""
 

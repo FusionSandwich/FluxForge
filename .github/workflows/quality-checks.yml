@@ -106,6 +106,21 @@ jobs:
             tests/test_genie_overrides.py \
             tests/test_pipeline_validation.py
 
+      - name: Adversarial scientific contracts
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_histogram_background.py \
+            tests/test_background_covariance.py \
+            tests/test_signed_peak_fit_covariance.py \
+            tests/test_joint_peak_covariance.py \
+            tests/test_rafm_validation_independence.py \
+            tests/test_registry_uncertainty_qualification.py \
+            tests/test_nuclear_data_sources.py \
+            tests/test_run_readiness_manifest.py \
+            tests/test_transport_contracts.py
+
       - name: CLI and standards regression tests
         env:
           PYTHONPATH: src
