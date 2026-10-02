@@ -1,0 +1,99 @@
+{
+  "created_at_utc": "2026-10-02T22:32:58.239564+00:00",
+  "repository": "FusionSandwich/FluxForge",
+  "branch": "codex/rafm-analysis-issues",
+  "baseline_commit": "1148e18a53a156d74029e84ed528e5fcd9cfd263",
+  "implementation_commit": "320161afa42d3849c28e75f8c3d3a8316eb8aef0",
+  "scientific_admission": false,
+  "input_hashes_identical_and_verified": true,
+  "final_runtime_hashes_verified": true,
+  "antagonist_reviews": {
+    "activation": {
+      "source_hashes_match": true,
+      "receipt": "antagonist/activation/review_receipt.json"
+    },
+    "peaks": {
+      "source_hashes_match": true,
+      "receipt": "antagonist/peaks/review_receipt.json"
+    },
+    "unfolding": {
+      "source_hashes_match": true,
+      "receipt": "antagonist/unfolding/review_receipt.json"
+    }
+  },
+  "test_runs": {
+    "final_suite.xml": {
+      "tests": 415,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "affected_final_suite.xml": {
+      "tests": 125,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "gui_activity_helper_tests.xml": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "antagonist_reproduction.xml": {
+      "tests": 74,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "test_reconciliation": "Latest affected-suite result replaces the pre-retry broad-suite result for identical test identities. Unchanged non-peak code retains its broad-suite results. The interrupted run is excluded.",
+  "distinct_final_passing_checks": 520,
+  "distinct_repository_checks": 446,
+  "distinct_independent_antagonist_checks": 74,
+  "unresolved_test_failures": 0,
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "pytest": "9.1.1"
+  },
+  "tool_sha256": {
+    "tools/validate_analysis_issues_rafm.py": "4171fbb5a2f9446503f3941dbe62f6410632c45e75d5f62faa63857b73e04410",
+    "tools/summarize_analysis_issues_rafm.py": "bf06688dec192da4a9a1a453d286aebb20d37beb4c9e9ec71cdb53f1aa3648ea"
+  },
+  "artifact_sha256": {
+    "REPORT.md": "651ace038612acd034aeb422109eaad8fc041da62fb424039ec99a67cb6c7c95",
+    "affected_final_suite.log": "c090e6e15074168a591f2d61140bc9061eb9dbf425a75b0e432165358812086b",
+    "affected_final_suite.xml": "e92006d02693877ec6c5d97b06c81fdf9cf0605202054a340e6de68ff6480dda",
+    "antagonist/activation/pytest_output.txt": "af7c42ba37a9b64c60a4ad175d716aeb94feaa4f871f2ea8756faedbafd078b8",
+    "antagonist/activation/rafm_timing_audit.json": "53456e95fd03f9d309ba7b34a49d80172f33ae73c56017379948578362555700",
+    "antagonist/activation/review_receipt.json": "bb3da6fb174a5e24380750619da212e00157048ae1b1ecac2a84892b0dc9370c",
+    "antagonist/activation/test_activation_repro.py": "ee2d25751925f13e2f9d4ef1b3e2f638d1ec9a1e3fcd1267bac69c0fe9a231ae",
+    "antagonist/activation/test_e262_inventory_repro.py": "44d87b7cf89db1f4d6c5e7f3e6e4fcda64f72892f1ab10d10bb8fd67df960787",
+    "antagonist/activation/test_e262_paired_truth.py": "c5e14049d653e7b9363f0e61448c1887557e684780323d782d0feafb36013c09",
+    "antagonist/activation/test_final_input_boundaries.py": "fbfb9cc555e0a74fe93ff9dad605e5a0f0c4d0b8781b5a599e8c8e3d8be52c50",
+    "antagonist/peaks/review_receipt.json": "c1a60728c8b44ec94dfbd1f3ba7c9a4773b6027d1c51d65e136a8148ab8fa91c",
+    "antagonist/peaks/test_adversarial_regressions.py": "b93a1cd90b0d0195408277d1053aca9091b185459977266f6acaa71e7dcff15a",
+    "antagonist/peaks/test_continuum_covariance.py": "9db7ade4a4b7215a290fe986efa926e85e9e555decf61be399400a8e5f7cf740",
+    "antagonist/unfolding/review_receipt.json": "1d69eb2e09aff64ad225f0ef2ed3af915fba876a2ef14a4522f9aaf4da779bb9",
+    "antagonist/unfolding/test_antagonist_20261002_unfolding.py": "5faf89a73cd01dcc629b750ec8a85b4eb0fc7942f4efd93d95a127a0ca87b91c",
+    "antagonist/unfolding/test_antagonist_second_20261002.py": "851cb46b88ca533a4002755385b6b0e8b99bb7ce99b6e39029db739e58a60f1b",
+    "antagonist/unfolding/test_final_registry_unqualified_20261002.py": "48a4e594ac7bdb15d5bf6806f85bc74ea2314549208a7c5f9de4aceb4417b127",
+    "antagonist_reproduction.log": "51fd06bdd8528d22286bd05a8709c4f072f92df04a55e378d11b7849b92006bb",
+    "antagonist_reproduction.xml": "3f2925a5333654ce746f08551ed7adb210c0cad0778e74a7a1173a1c2943fc6c",
+    "clock_activity_comparison.csv": "b2a09ce001d40cf2892ce8d93c025890c466b09d2d9fbc012f1df94ed549b93e",
+    "final_suite.log": "60f64409dbc2645ab6127f54717a8f7c8ea7c370686db3ee0eaf841fab8337ec",
+    "final_suite.xml": "1e03a79dcf54a2bf934af908fe544299c95e332bbac0f5ebf227ad8c2e2b8231",
+    "gui_activity_helper_tests.xml": "56969ddd068f597e12355ee4d5f5c4e8abf1aae106f63d0212992f839b83f4aa",
+    "issue_snapshot.json": "b2869b0540b4cc01c3ad1c32b60cee9b23d57e1f87befffa1dd1239918305a91",
+    "peak_count_comparison.csv": "04d8ef0bc8588d8b3839323ef20f2482c3babeb5ca8bcb56efe3e5db04b8c6b2",
+    "rafm_before.json": "e594769dc45dbaebad4c5a74e9cc3d47155abaaeec08002e31d956e6ef56da5d",
+    "rafm_before.log": "1ac848620faecd4e6b3671970e53efd2b36c38175e72b2c77011df76c823e471",
+    "rafm_count_comparison.png": "800c4063e5afd82565e02650b553242249dcb21d93628c2f55d20165fbebbb91",
+    "rafm_final.json": "7b23450760ae1df9b530d55b04ef032aaf6edb3b5c2597e226413718f540aff5",
+    "rafm_final.log": "289cbdfb4cd4ad78aabd22a82c38068539f50a560d74f86ed04d977c3a3a5f71",
+    "reference_conditioned_parity.csv": "00836a1eaa1138c0c4b92e20bf025a7a614e22c9cdefe5f7e23c79d4e3eb2442",
+    "summary.json": "5bd69037edd681a9d79655fa8b5a72537204943ef7a9b3b0032ea97489ef3489"
+  }
+}

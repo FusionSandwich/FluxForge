@@ -1,0 +1,55 @@
+{
+  "reviewer": "activation_antagonist",
+  "created_at_utc": "2026-10-02T21:30:23.416648+00:00",
+  "reviewed_workspace": "C:\\Users\\Josh\\.codex\\worktrees\\rafm-analysis-issues\\FluxForge",
+  "head": "1148e18a53a156d74029e84ed528e5fcd9cfd263",
+  "python": "C:\\Users\\Josh\\projects\\FluxForge\\.venv\\Scripts\\python.exe",
+  "source_sha256": {
+    "src/fluxforge/analysis/astm_e261.py": "5b142b5a739114e4c8c3edc7c337e2898e857ece3de7edd9c831cb5ef48c91e7",
+    "src/fluxforge/analysis/astm_e262.py": "6334fd77f9ada835851de430d85f9632e627dd8c4ae8f95cde682f54d53a10d9",
+    "src/fluxforge/analysis/flux_unfold.py": "b722b57c9ea3e86d0e9c381eb5d714bb86cccfe4e93c2865082810b359981a20",
+    "src/fluxforge/core/analysis_workspace.py": "ba823b276e3aa59d478d574822a6065673368ecc988bac221ba0bf3ba3a26da8",
+    "src/fluxforge/examples/rafm_workflow.py": "76523d3d57296145beb28f8241eda7300061804881750db5cc0174250e567bba",
+    "src/fluxforge/physics/activation.py": "21a4159e8dfa2930ffd6dba7bf275e4358b98631fa34cffade7f3ce7cc1549c8",
+    "src/fluxforge/physics/sigphi.py": "f8116d9809108e2ad7bf0795ba53d67eb9988887d1e6f7d956b46e25c1fa757e"
+  },
+  "source_sha256_before_tests": {
+    "src/fluxforge/analysis/astm_e261.py": "5b142b5a739114e4c8c3edc7c337e2898e857ece3de7edd9c831cb5ef48c91e7",
+    "src/fluxforge/analysis/astm_e262.py": "6334fd77f9ada835851de430d85f9632e627dd8c4ae8f95cde682f54d53a10d9",
+    "src/fluxforge/analysis/flux_unfold.py": "b722b57c9ea3e86d0e9c381eb5d714bb86cccfe4e93c2865082810b359981a20",
+    "src/fluxforge/core/analysis_workspace.py": "ba823b276e3aa59d478d574822a6065673368ecc988bac221ba0bf3ba3a26da8",
+    "src/fluxforge/examples/rafm_workflow.py": "76523d3d57296145beb28f8241eda7300061804881750db5cc0174250e567bba",
+    "src/fluxforge/physics/activation.py": "21a4159e8dfa2930ffd6dba7bf275e4358b98631fa34cffade7f3ce7cc1549c8",
+    "src/fluxforge/physics/sigphi.py": "f8116d9809108e2ad7bf0795ba53d67eb9988887d1e6f7d956b46e25c1fa757e"
+  },
+  "sources_unchanged_during_tests": true,
+  "pytest_command": [
+    "C:\\Users\\Josh\\projects\\FluxForge\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests/test_activation_count_clock.py",
+    "tests/test_material_count_validation.py",
+    "tests/test_irradiation_history.py",
+    "tests/test_count_decay_time.py",
+    "tests/test_activation.py",
+    "tests/test_astm_e261.py",
+    "tests/test_astm_e262.py",
+    "tests/test_no_silent_defaults.py",
+    "tests/test_sigphi.py",
+    "scratch/antagonist_activation/test_activation_repro.py",
+    "scratch/antagonist_activation/test_e262_inventory_repro.py",
+    "scratch/antagonist_activation/test_e262_paired_truth.py",
+    "scratch/antagonist_activation/test_final_input_boundaries.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "pytest_returncode": 0,
+  "pytest_summary": "139 passed in 10.36s",
+  "accepted": true,
+  "remaining_scope": [
+    "Shared reaction_rate_from_activity invents uncertainty from A_Bq instead of propagating explicit sigma_A.",
+    "ASTM count uncertainties assume Poisson net counts; background-fit covariance and target inventory uncertainties are not included.",
+    "Near-zero bare-minus-Cd thermal rates are clipped with zero reported flux uncertainty, requiring a separate censored/zero-signal uncertainty treatment."
+  ]
+}
