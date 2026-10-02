@@ -92,7 +92,9 @@ def test_efficiency_profile_is_canonical_and_survives_session_round_trip() -> No
     assert profile is not None and profile.efficiency_model is not None
     assert profile.efficiency_model.model_key == "log_poly_2"
     assert len(profile.efficiency_model.points) == 3
-    assert all(point["activity_source_id"] == "A" for point in profile.efficiency_model.points)
+    assert all(
+        point["activity_source_id"] == "A" for point in profile.efficiency_model.points
+    )
     assert profile.geometry.crystal_length_cm == pytest.approx(6.45)
     assert profile.geometry.dead_layer_um == pytest.approx(0.7)
     assert profile.geometry.window_thickness_um == pytest.approx(450.0)
@@ -128,23 +130,28 @@ def test_detector_uncertainty_edit_updates_canonical_activity_input() -> None:
     assert controller.state.efficiency_fit.curve.efficiency_uncertainty(
         661.657
     ) == pytest.approx(0.075)
-    assert profile.efficiency_model.uncertainty_model["value"] == pytest.approx(
-        0.075
-    )
+    assert profile.efficiency_model.uncertainty_model["value"] == pytest.approx(0.075)
 
 
-def test_fitted_covariance_contributes_to_activity_uncertainty_after_round_trip() -> None:
+def test_fitted_covariance_contributes_to_activity_uncertainty_after_round_trip() -> (
+    None
+):
     points = tuple(
         EfficiencyPoint(
-            energy_keV=energy, net_counts=eff * 1e7,
-            live_time_s=100.0, activity_bq=1e5,
-            emission_probability=1.0, count_uncertainty=eff * 1e5,
+            energy_keV=energy,
+            net_counts=eff * 1e7,
+            live_time_s=100.0,
+            activity_bq=1e5,
+            emission_probability=1.0,
+            count_uncertainty=eff * 1e5,
         )
         for energy, eff in ((100, 0.025), (200, 0.018), (400, 0.012), (800, 0.008))
     )
     fit = fit_efficiency_model(points, model_key="log_poly_2")
     controller = _controller()
-    controller.apply_efficiency_calibration(fit, _detector(uncertainty=0.0), points=points)
+    controller.apply_efficiency_calibration(
+        fit, _detector(uncertainty=0.0), points=points
+    )
     restored = AnalysisWorkspaceController(
         WorkspaceDocument.from_dict(controller.document.to_dict())
     )
@@ -153,8 +160,11 @@ def test_fitted_covariance_contributes_to_activity_uncertainty_after_round_trip(
     assert relative > 0
     peak = PeakCandidate("p", 2.0, 400.0, 5.0, (399.0, 401.0), 10000.0, 1.0)
     result = calculate_peak_activity(
-        peak, restored.spectrum(), efficiency_curve=curve,
-        gamma_intensity=0.8, half_life_s=1e8,
+        peak,
+        restored.spectrum(),
+        efficiency_curve=curve,
+        gamma_intensity=0.8,
+        half_life_s=1e8,
     )
     assert result.uncertainty_bq / result.activity_bq == pytest.approx(
         (1 / 10000 + relative**2) ** 0.5
@@ -185,20 +195,28 @@ def test_efficiency_profile_undo_restores_prior_detector_state() -> None:
 
 def test_legacy_efficiency_fit_migrates_without_changing_measurement() -> None:
     controller = AnalysisWorkspaceController(
-        replace(_controller().state, efficiency_fit=_fit(), detector_efficiency=_detector())
+        replace(
+            _controller().state, efficiency_fit=_fit(), detector_efficiency=_detector()
+        )
     )
     migrated = controller.document
     assert controller.active_detector_profile() is not None
     legacy = replace(
         migrated,
         detector_profiles=(),
-        spectra=tuple(replace(item, detector_profile_id=None) for item in migrated.spectra),
+        spectra=tuple(
+            replace(item, detector_profile_id=None) for item in migrated.spectra
+        ),
         workflow_state={
             **migrated.workflow_state,
             "analysis_workspace_v1": {
                 **migrated.workflow_state["analysis_workspace_v1"],
-                "efficiency_fit": migrated.detector_profiles[0].efficiency_model.parameters["fit_result"],
-                "detector_efficiency": migrated.detector_profiles[0].efficiency_model.parameters["detector_calibration"],
+                "efficiency_fit": migrated.detector_profiles[
+                    0
+                ].efficiency_model.parameters["fit_result"],
+                "detector_efficiency": migrated.detector_profiles[
+                    0
+                ].efficiency_model.parameters["detector_calibration"],
             },
         },
     )
@@ -210,13 +228,17 @@ def test_legacy_efficiency_fit_migrates_without_changing_measurement() -> None:
     assert restored.state.efficiency_fit.model_key == "log_poly_2"
     assert restored.state.detector_efficiency.detector_id == "South-HPGe"
     assert restored.spectrum().counts is legacy.spectra[0].spectrum.counts
-    assert restored.document.workflow_state["analysis_workspace_v1"]["efficiency_fit"] is None
+    assert (
+        restored.document.workflow_state["analysis_workspace_v1"]["efficiency_fit"]
+        is None
+    )
 
 
 def test_migrated_fit_does_not_leak_to_unprofiled_spectrum() -> None:
     foreground = _controller().state.spectra[0]
     background = SpectrumSlot(
-        "background", "Background",
+        "background",
+        "Background",
         GammaSpectrum(counts=[2, 3, 4], live_time=100.0, spectrum_id="background"),
     )
     controller = AnalysisWorkspaceController(
@@ -227,9 +249,13 @@ def test_migrated_fit_does_not_leak_to_unprofiled_spectrum() -> None:
         )
     )
     assert controller.active_detector_profile() is not None
-    controller.set_activity_results((ActivityCalculationResult(
-        "Cs-137", 661.657, 10.0, 1.0, 10.0, 0.0, 1.0, 0.0, ""
-    ),))
+    controller.set_activity_results(
+        (
+            ActivityCalculationResult(
+                "Cs-137", 661.657, 10.0, 1.0, 10.0, 0.0, 1.0, 0.0, ""
+            ),
+        )
+    )
     assert controller.state.activity_results
     controller.select_spectrum("background")
     assert controller.active_detector_profile() is None
@@ -241,7 +267,8 @@ def test_migrated_fit_does_not_leak_to_unprofiled_spectrum() -> None:
 def test_shared_profile_edit_clones_profile_and_undo_restores_reference() -> None:
     foreground = _controller().state.spectra[0]
     background = SpectrumSlot(
-        "background", "Background",
+        "background",
+        "Background",
         GammaSpectrum(counts=[2, 3, 4], live_time=100.0, spectrum_id="background"),
     )
     controller = AnalysisWorkspaceController(
@@ -252,7 +279,8 @@ def test_shared_profile_edit_clones_profile_and_undo_restores_reference() -> Non
     first_profile = controller.active_detector_profile()
     assert first_id is not None and first_profile is not None
     background_id = next(
-        item.spectrum_id for item in controller.document.spectra
+        item.spectrum_id
+        for item in controller.document.spectra
         if item.spectrum_id != first_id
     )
     controller.apply_detector_profile(background_id, first_profile)
@@ -265,11 +293,23 @@ def test_shared_profile_edit_clones_profile_and_undo_restores_reference() -> Non
         controller, spectrum_id=background_id, before=first_profile, after=after
     )
     command.redo()
-    assert controller.document.spectrum_by_id(first_id).detector_profile_id == first_profile.detector_profile_id
-    assert controller.document.detector_profile_by_id(first_profile.detector_profile_id) == first_profile
-    assert controller.document.spectrum_by_id(background_id).detector_profile_id == after.detector_profile_id
+    assert (
+        controller.document.spectrum_by_id(first_id).detector_profile_id
+        == first_profile.detector_profile_id
+    )
+    assert (
+        controller.document.detector_profile_by_id(first_profile.detector_profile_id)
+        == first_profile
+    )
+    assert (
+        controller.document.spectrum_by_id(background_id).detector_profile_id
+        == after.detector_profile_id
+    )
     command.undo()
-    assert controller.document.spectrum_by_id(background_id).detector_profile_id == first_profile.detector_profile_id
+    assert (
+        controller.document.spectrum_by_id(background_id).detector_profile_id
+        == first_profile.detector_profile_id
+    )
     assert controller.document.detector_profile_by_id(after.detector_profile_id) is None
 
 
@@ -279,9 +319,8 @@ def test_malformed_persisted_points_and_covariance_are_rejected() -> None:
     profile = controller.active_detector_profile()
     assert profile is not None
     malformed_points = replace(
-        profile, efficiency_model=replace(
-            profile.efficiency_model, points=({"unexpected": 1},)
-        )
+        profile,
+        efficiency_model=replace(profile.efficiency_model, points=({"unexpected": 1},)),
     )
     with pytest.raises(WorkspaceValidationError, match="points\\[0\\]"):
         controller.apply_detector_profile(
@@ -290,12 +329,14 @@ def test_malformed_persisted_points_and_covariance_are_rejected() -> None:
     bad_fit = dict(profile.efficiency_model.parameters["fit_result"])
     bad_curve = dict(bad_fit["curve"])
     bad_curve["uncertainty_model"] = {
-        "type": "fit_covariance", "parameter_names": ["a0"],
+        "type": "fit_covariance",
+        "parameter_names": ["a0"],
         "covariance": [[-1.0]],
     }
     bad_fit["curve"] = bad_curve
     malformed_covariance = replace(
-        profile, efficiency_model=replace(
+        profile,
+        efficiency_model=replace(
             profile.efficiency_model,
             parameters={**profile.efficiency_model.parameters, "fit_result": bad_fit},
         ),
@@ -304,3 +345,28 @@ def test_malformed_persisted_points_and_covariance_are_rejected() -> None:
         controller.apply_detector_profile(
             controller.document.active_spectrum_id, malformed_covariance
         )
+
+
+def test_detector_settings_without_fit_survive_reload_and_do_not_leak() -> None:
+    foreground = _controller().state.spectra[0]
+    background = SpectrumSlot(
+        "background",
+        "Background",
+        GammaSpectrum(counts=[2, 3, 4], live_time=100.0, spectrum_id="background"),
+    )
+    controller = AnalysisWorkspaceController(
+        AnalysisWorkspaceState(spectra=(foreground, background))
+    )
+    detector = _detector()
+    controller.set_detector_efficiency(detector)
+    profile = controller.active_detector_profile()
+    assert profile is not None and profile.efficiency_model is None
+    restored = AnalysisWorkspaceController(
+        WorkspaceDocument.from_dict(controller.document.to_dict())
+    )
+    assert restored.state.detector_efficiency == detector
+    assert restored.state.efficiency_fit is None
+    restored.select_spectrum("background")
+    assert restored.state.detector_efficiency is None
+    restored.select_spectrum("foreground")
+    assert restored.state.detector_efficiency == detector

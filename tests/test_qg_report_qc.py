@@ -161,6 +161,8 @@ def test_source_flags_do_not_replace_raw_parity_bucket_or_correct_activity():
         background_adjusted_gross_counts=None,
         background=0.0,
         significance=10.0,
+        assignment_ambiguous=False,
+        activity_estimation_state="estimated",
     )
     before = deepcopy(raw.__dict__)
     rows, _ = build_line_diagnostic_records("Ti", "flux_wires", [raw], data, {})
@@ -246,6 +248,8 @@ def test_matched_unknown_line_unit_has_no_zero_reference_score(unit):
         background_adjusted_gross_counts=None,
         background=0.0,
         significance=10.0,
+        assignment_ambiguous=False,
+        activity_estimation_state="estimated",
     )
     rows, _ = build_line_diagnostic_records("Cu", "flux_wires", [raw], data, {})
     assert rows[0]["reference_line_activity_bq"] is None
