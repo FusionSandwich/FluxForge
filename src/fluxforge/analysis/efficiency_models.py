@@ -42,6 +42,10 @@ def semi_empirical_efficiency(
 
     if coeffs.size not in (5, 7):
         raise ValueError("Semi-empirical efficiency requires 5 or 7 coefficients.")
+    if np.any(~np.isfinite(energy)) or np.any(energy <= 0):
+        raise ValueError("Gamma energy must be finite and positive (keV).")
+    if np.any(~np.isfinite(coeffs)) or np.any(coeffs[:4] <= 0) or np.any(coeffs[4:] < 0):
+        raise ValueError("Semi-empirical coefficients must be finite and physically nonnegative.")
 
     scale, length, alpha, length0, kappa = coeffs[:5]
     window = coeffs[5] if coeffs.size == 7 else 0.0
@@ -64,6 +68,7 @@ def semi_empirical_efficiency_uncertainty(
     coefficients: Sequence[float],
     covariance: np.ndarray,
     step: float = 1e-6,
+    parameter_indices: Sequence[int] | None = None,
 ) -> np.ndarray:
     """
     Propagate coefficient covariance to absolute efficiency uncertainty.
@@ -71,26 +76,36 @@ def semi_empirical_efficiency_uncertainty(
     coeffs = np.asarray(coefficients, dtype=float)
     cov = np.asarray(covariance, dtype=float)
 
-    if cov.shape[0] != cov.shape[1] or cov.shape[0] != coeffs.size:
+    indices = tuple(range(coeffs.size)) if parameter_indices is None else tuple(parameter_indices)
+    if len(set(indices)) != len(indices) or any(index < 0 or index >= coeffs.size for index in indices):
+        raise ValueError("Covariance parameter indices must be unique and valid.")
+    if cov.ndim != 2 or cov.shape != (len(indices), len(indices)):
         raise ValueError("Covariance matrix size must match coefficient count.")
+    if np.any(~np.isfinite(cov)) or not np.allclose(cov, cov.T, rtol=1e-10, atol=1e-12):
+        raise ValueError("Covariance must be finite and symmetric.")
+    symmetric = (cov + cov.T) / 2
+    tolerance = max(float(np.linalg.norm(symmetric, ord=2)), 1.0) * 1e-10
+    if np.min(np.linalg.eigvalsh(symmetric)) < -tolerance:
+        raise ValueError("Covariance must be positive semidefinite.")
 
-    base = semi_empirical_efficiency(energy_keV, coeffs)
-    energy = np.asarray(energy_keV, dtype=float)
+    energy = np.atleast_1d(np.asarray(energy_keV, dtype=float))
 
     gradients = []
-    for i in range(coeffs.size):
+    for i in indices:
         delta = step * (abs(coeffs[i]) if coeffs[i] != 0 else 1.0)
         coeffs_hi = coeffs.copy()
         coeffs_lo = coeffs.copy()
         coeffs_hi[i] += delta
-        coeffs_lo[i] -= delta
+        coeffs_lo[i] = max(coeffs_lo[i] - delta, 0.0)
         f_hi = semi_empirical_efficiency(energy, coeffs_hi)
         f_lo = semi_empirical_efficiency(energy, coeffs_lo)
-        gradients.append((f_hi - f_lo) / (2.0 * delta))
+        gradients.append((f_hi - f_lo) / (coeffs_hi[i] - coeffs_lo[i]))
 
     grad = np.stack(gradients, axis=1)  # (n_energy, n_params)
-    var = np.einsum("ij,jk,ik->i", grad, cov, grad)
-    return np.sqrt(np.clip(var, 0.0, None))
+    var = np.einsum("ij,jk,ik->i", grad, symmetric, grad)
+    if np.any(var < -tolerance * np.sum(grad**2, axis=1)):
+        raise ValueError("Covariance predicts negative efficiency variance.")
+    return np.sqrt(np.maximum(var, 0.0))
 
 
 @dataclass

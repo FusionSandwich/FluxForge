@@ -186,6 +186,27 @@ def _validate_covariance(value: tuple[tuple[float, ...], ...], path: str) -> Non
         raise WorkspaceValidationError(path, "must be positive semidefinite")
 
 
+def _validate_fit_covariance_json(value: Any, path: str) -> None:
+    if not isinstance(value, Mapping) or value.get("type") != "fit_covariance":
+        return
+    names = value.get("parameter_names")
+    if (
+        not isinstance(names, (tuple, list))
+        or not names
+        or any(not isinstance(name, str) or not name for name in names)
+        or len(set(names)) != len(names)
+    ):
+        raise WorkspaceValidationError(f"{path}.parameter_names", "must contain unique names")
+    covariance = value.get("covariance")
+    if not isinstance(covariance, (tuple, list)) or len(covariance) != len(names):
+        raise WorkspaceValidationError(f"{path}.covariance", "size must match parameter names")
+    try:
+        rows = tuple(tuple(float(item) for item in row) for row in covariance)
+    except (TypeError, ValueError) as exc:
+        raise WorkspaceValidationError(f"{path}.covariance", "must be a numeric matrix") from exc
+    _validate_covariance(rows, f"{path}.covariance")
+
+
 def _validate_json_finite(value: Any, path: str) -> None:
     if isinstance(value, Mapping):
         for key, item in value.items():
@@ -983,6 +1004,28 @@ class EfficiencyModelState:
         _validate_json_finite(self.points, f"{path}.points")
         _validate_covariance(self.covariance, f"{path}.covariance")
         _validate_json_finite(self.uncertainty_model, f"{path}.uncertainty_model")
+        _validate_fit_covariance_json(self.uncertainty_model, f"{path}.uncertainty_model")
+        fit_result = self.parameters.get("fit_result")
+        if isinstance(fit_result, Mapping):
+            from fluxforge.analysis.detector_calibration import EfficiencyPoint
+
+            allowed = set(EfficiencyPoint.__dataclass_fields__)
+            for index, point in enumerate(self.points):
+                point_path = f"{path}.points[{index}]"
+                _reject_unknown(point, allowed, point_path)
+                try:
+                    measured = EfficiencyPoint(**dict(point))
+                    if not np.isfinite(measured.energy_keV) or measured.energy_keV <= 0:
+                        raise ValueError("energy must be finite and positive")
+                    measured.efficiency()
+                except (TypeError, ValueError) as exc:
+                    raise WorkspaceValidationError(point_path, str(exc)) from exc
+            curve = fit_result.get("curve")
+            if isinstance(curve, Mapping):
+                _validate_fit_covariance_json(
+                    curve.get("uncertainty_model", {}),
+                    f"{path}.parameters.fit_result.curve.uncertainty_model",
+                )
 
     def to_dict(self) -> dict[str, Any]:
         self.validate()

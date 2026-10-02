@@ -70,10 +70,13 @@ from fluxforge.gui.analysis_workspace import (
     AnalysisWorkspaceController,
     SpectrumSlot,
 )
+from fluxforge.gui.detector_profile_adapter import detector_calibration_from_profile
 from fluxforge.gui.workspace_undo import (
+    ApplyDetectorProfileCommand,
     ReplacePeakSetCommand,
     TogglePinnedNuclideCommand,
     UpdatePeakCommand,
+    UpdateWorkflowStateCommand,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, pyqtgraph_backend_status
 from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog
@@ -1190,6 +1193,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             selection_bus: SelectionBus,
             workspace_controller: AnalysisWorkspaceController,
             library_manager: DataLibraryManager,
+            undo_stack: QUndoStack | None = None,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -1198,6 +1202,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.library_manager = library_manager
+            self.undo_stack = undo_stack
             self._last_activity_review: ActivityReviewResult | None = None
 
             layout = QVBoxLayout(self)
@@ -1304,48 +1309,88 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._sync_state(self.workspace_controller.state)
 
         def _fit_efficiency(self) -> None:
+            profile = self.workspace_controller.active_detector_profile()
+            try:
+                points = self._seed_efficiency_points()
+            except (TypeError, ValueError, KeyError) as exc:
+                self.summary.setText(f"Saved efficiency points are invalid: {exc}")
+                return
             dialog = EfficiencyCalibrationDialog(
                 mode_manager=self.mode_manager,
-                points=self._seed_efficiency_points(),
+                points=points,
                 detector_calibration=(
-                    self.workspace_controller.state.detector_efficiency
+                    detector_calibration_from_profile(profile)
+                    if profile is not None
+                    else self.workspace_controller.state.detector_efficiency
                     or EfficiencyCalibration(relative_uncertainty=0.05)
                 ),
                 parent=self,
             )
-            if dialog.exec() != dialog.Accepted:
+            if dialog.exec() != QDialog.Accepted:
                 return
             fit = dialog.accepted_fit()
             if fit is None:
                 return
-            self._last_activity_review = None
-            self.workspace_controller.set_efficiency_fit(fit)
-            self.workspace_controller.set_detector_efficiency(
-                dialog.detector_calibration()
+            spectrum_id = self.workspace_controller.document.active_spectrum_id
+            if spectrum_id is None:
+                self.summary.setText("Select a spectrum before applying efficiency.")
+                return
+            try:
+                updated_profile = self.workspace_controller.proposed_efficiency_profile(
+                    fit,
+                    dialog.detector_calibration(),
+                    points=dialog.calibration_points(),
+                    spectrum_id=spectrum_id,
+                )
+            except (TypeError, ValueError) as exc:
+                self.summary.setText(str(exc))
+                return
+            command = ApplyDetectorProfileCommand(
+                self.workspace_controller,
+                spectrum_id=spectrum_id,
+                before=profile,
+                after=updated_profile,
+                description="Apply efficiency calibration",
             )
+            before_workflow = self.workspace_controller.document.workflow_state
+            after_workflow = dict(before_workflow)
+            legacy = dict(after_workflow.get("analysis_workspace_v1", {}))
+            legacy.update(
+                {
+                    "activity_results": [],
+                    "efficiency_fit": None,
+                    "detector_efficiency": None,
+                }
+            )
+            after_workflow["analysis_workspace_v1"] = legacy
+            after_workflow["analysis_invalidation"] = {
+                "reason": "efficiency calibration changed",
+                "requires_reanalysis": True,
+            }
+            invalidate = UpdateWorkflowStateCommand(
+                self.workspace_controller,
+                before=before_workflow,
+                after=after_workflow,
+                description="Invalidate activity results",
+            )
+            self._last_activity_review = None
+            if self.undo_stack is not None:
+                self.undo_stack.beginMacro("Apply efficiency calibration")
+                try:
+                    self.undo_stack.push(command)
+                    self.undo_stack.push(invalidate)
+                finally:
+                    self.undo_stack.endMacro()
+            else:
+                command.redo()
+                invalidate.redo()
 
         def _seed_efficiency_points(self) -> tuple[EfficiencyPoint, ...]:
-            peaks = self.workspace_controller.state.peaks
-            if not peaks:
+            profile = self.workspace_controller.active_detector_profile()
+            model = profile.efficiency_model if profile is not None else None
+            if model is None:
                 return ()
-            points: list[EfficiencyPoint] = []
-            for peak in peaks[:5]:
-                points.append(
-                    EfficiencyPoint(
-                        energy_keV=peak.energy_keV,
-                        net_counts=max(peak.net_counts, 1.0),
-                        live_time_s=max(
-                            float(
-                                self.workspace_controller.spectrum().live_time or 100.0
-                            ),
-                            1.0,
-                        ),
-                        activity_bq=1e5,
-                        emission_probability=1.0,
-                        count_uncertainty=max(np.sqrt(max(peak.net_counts, 1.0)), 1.0),
-                    )
-                )
-            return tuple(points)
+            return tuple(EfficiencyPoint(**dict(point)) for point in model.points)
 
         def _current_activity_source(self) -> tuple[str, str | None]:
             standard = (
@@ -1627,7 +1672,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _sync_state(self, state) -> None:
             has_spectrum = self.workspace_controller.spectrum() is not None
             has_peaks = has_spectrum and bool(state.peaks)
-            self.fit_efficiency_button.setEnabled(has_peaks)
+            self.fit_efficiency_button.setEnabled(has_spectrum)
             self.analyze_spectrum_button.setEnabled(has_spectrum)
             self.compute_activity_button.setEnabled(
                 has_peaks and state.efficiency_fit is not None
@@ -3248,6 +3293,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 selection_bus=self.selection_bus,
                 workspace_controller=self.workspace_controller,
                 library_manager=self.library_manager,
+                undo_stack=self.undo_stack,
                 parent=self,
             )
             self.addTab(self.activity_results_panel, "Activity Results")

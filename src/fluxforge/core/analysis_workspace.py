@@ -3,13 +3,20 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Sequence
 
 import numpy as np
+from scipy.optimize import least_squares
+from scipy.stats import chi2
 
-from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
+from fluxforge.analysis.detector_calibration import (
+    EfficiencyPoint,
+    efficiency_measurement_covariance,
+    fit_efficiency_curve,
+    fit_gray_efficiency_curve,
+)
 from fluxforge.analysis.efficiency_models import semi_empirical_efficiency
 from fluxforge.analysis.peak_finders import (
     PEAK_FINDER_METHODS,
@@ -100,6 +107,13 @@ class EfficiencyCalibrationFitResult:
     residuals: tuple[float, ...]
     rmse: float
     points_used: int
+    measured_efficiencies: tuple[float, ...] = ()
+    fitted_efficiencies: tuple[float, ...] = ()
+    percentage_residuals: tuple[float, ...] = ()
+    point_status: tuple[str, ...] = ()
+    covariance: tuple[tuple[float, ...], ...] | None = None
+    covariance_parameters: tuple[str, ...] = ()
+    fit_quality: dict[str, float | int | str | tuple[str, ...] | None] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -917,68 +931,99 @@ def fit_efficiency_model(
     if len(shared.calibration_models) == 0:
         register_builtin_efficiency_models(shared)
     definition: EfficiencyModelDefinition = shared.calibration_models.get(model_key)
+    if not points:
+        raise ValueError("Efficiency calibration requires measured points.")
+    energies = np.asarray([point.energy_keV for point in points], dtype=float)
+    if np.any(~np.isfinite(energies)) or np.any(energies <= 0):
+        raise ValueError("Calibration energy must be finite and positive (keV).")
+    measured_with_uncertainty = np.asarray([point.efficiency() for point in points], dtype=float)
+    measured = measured_with_uncertainty[:, 0]
+    measurement_covariance = efficiency_measurement_covariance(points)
 
     if definition.form == "semi_empirical_hpge":
-        energies = np.asarray([point.energy_keV for point in points], dtype=float)
-        values = np.asarray([point.efficiency()[0] for point in points], dtype=float)
-        coefficients = _fit_semi_empirical_coefficients(energies, values)
-        curve = EfficiencyCurve(
-            model_type="functional",
-            parameters={
-                "form": "semi_empirical_hpge",
-                "coefficients": coefficients,
-            },
-            energy_range=(float(np.min(energies)), float(np.max(energies))),
+        curve, covariance, parameter_names, quality = _fit_semi_empirical_coefficients(
+            energies, measured, measurement_covariance
         )
-        residuals = tuple(float(obs - pred) for obs, pred in zip(values, curve.efficiency(energies)))
-        rmse = math.sqrt(float(np.mean(np.square(residuals)))) if residuals else 0.0
-        return EfficiencyCalibrationFitResult(
-            model_key=definition.key,
-            model_label=definition.label,
-            curve=curve,
-            residuals=residuals,
-            rmse=float(rmse),
-            points_used=len(points),
-        )
+    elif definition.form == "gray":
+        fit = fit_gray_efficiency_curve(points)
+        curve = fit.curve
+        covariance = fit.covariance
+        parameter_names = ("a", "b", "c", "d")
+        quality = {"identifiability": "full", "estimated_parameters": parameter_names}
+    else:
+        degree = definition.degree if definition.degree is not None else 2
+        fit = fit_efficiency_curve(points, degree=degree)
+        curve = fit.curve
+        covariance = fit.covariance
+        parameter_names = tuple(f"a{index}" for index in range(degree + 1))
+        quality = {"identifiability": "full", "estimated_parameters": parameter_names}
 
-    degree = definition.degree if definition.degree is not None else 2
-    fit = fit_efficiency_curve(points, degree=degree)
-    if definition.form == "gray":
-        coefficients = list(fit.coefficients)
-        while len(coefficients) < 4:
-            coefficients.append(0.0)
-        curve = EfficiencyCurve(
-            model_type="functional",
-            parameters={
-                "form": "gray",
-                "a": coefficients[0],
-                "b": coefficients[1],
-                "c": coefficients[2],
-                "d": coefficients[3],
-            },
-            energy_range=fit.curve.energy_range,
+    predicted = np.atleast_1d(np.asarray(curve.efficiency(energies), dtype=float))
+    residuals = measured - predicted
+    percentage = 100.0 * residuals / measured
+    status = tuple("within_3_percent" if abs(value) <= 3 else "outside_3_percent" for value in percentage)
+    if definition.form == "semi_empirical_hpge":
+        diagnostic_residuals = residuals
+        diagnostic_covariance = measurement_covariance
+    else:
+        diagnostic_residuals = np.log(measured) - np.log(predicted)
+        diagnostic_covariance = efficiency_measurement_covariance(
+            points, log_space=True
         )
-        predicted = np.asarray(curve.efficiency([point.energy_keV for point in points]), dtype=float)
-        measured = np.asarray([point.efficiency()[0] for point in points], dtype=float)
-        residuals = tuple(float(obs - pred) for obs, pred in zip(measured, predicted))
-        rmse = math.sqrt(float(np.mean(np.square(residuals)))) if residuals else 0.0
-        return EfficiencyCalibrationFitResult(
-            model_key=definition.key,
-            model_label=definition.label,
-            curve=curve,
-            residuals=residuals,
-            rmse=float(rmse),
-            points_used=len(points),
-        )
-
-    rmse = math.sqrt(float(np.mean(np.square(fit.residuals)))) if len(fit.residuals) else 0.0
+    whitened_residuals = np.linalg.solve(
+        np.linalg.cholesky(diagnostic_covariance), diagnostic_residuals
+    )
+    chi_squared = float(np.sum(np.square(whitened_residuals)))
+    degrees_of_freedom = len(points) - len(parameter_names)
+    source_groups = {
+        point.activity_source_id for point in points
+        if point.activity_source_id is not None and (point.activity_rel_unc or 0.0) > 0
+    }
+    unspecified_activity_sources = any(
+        (point.activity_rel_unc or 0.0) > 0
+        and point.activity_source_id is None for point in points
+    )
+    chi_square_p_value = (
+        float(chi2.sf(chi_squared, degrees_of_freedom))
+        if degrees_of_freedom > 0 else None
+    )
+    review_status = (
+        "pass"
+        if all(value == "within_3_percent" for value in status)
+        and chi_square_p_value is not None
+        and chi_square_p_value >= 0.05
+        and not unspecified_activity_sources
+        else "review_required"
+    )
+    quality = {
+        **quality,
+        "chi_squared": chi_squared,
+        "degrees_of_freedom": degrees_of_freedom,
+        "reduced_chi_squared": chi_squared / degrees_of_freedom if degrees_of_freedom > 0 else None,
+        "chi_square_p_value": chi_square_p_value,
+        "chi_square_alpha": 0.05,
+        "activity_source_groups": len(source_groups),
+        "activity_correlation": (
+            "unspecified" if unspecified_activity_sources
+            else "grouped" if source_groups else "none"
+        ),
+        "max_absolute_percentage_residual": float(np.max(np.abs(percentage))),
+        "review_status": review_status,
+    }
     return EfficiencyCalibrationFitResult(
         model_key=definition.key,
         model_label=definition.label,
-        curve=fit.curve,
-        residuals=tuple(float(value) for value in fit.residuals),
-        rmse=float(rmse),
+        curve=curve,
+        residuals=tuple(float(value) for value in residuals),
+        rmse=float(np.sqrt(np.mean(np.square(residuals)))),
         points_used=len(points),
+        measured_efficiencies=tuple(float(value) for value in measured),
+        fitted_efficiencies=tuple(float(value) for value in predicted),
+        percentage_residuals=tuple(float(value) for value in percentage),
+        point_status=status,
+        covariance=None if covariance is None else tuple(tuple(float(value) for value in row) for row in covariance),
+        covariance_parameters=parameter_names if covariance is not None else (),
+        fit_quality=quality,
     )
 
 
@@ -1564,19 +1609,114 @@ def compute_cascade_sum_lines(
 def _fit_semi_empirical_coefficients(
     energies: np.ndarray,
     values: np.ndarray,
-) -> list[float]:
-    log_eff = np.log(np.clip(values, 1e-12, 1.0))
-    poly = np.polyfit(np.log(energies), log_eff, 2)
-    scale = float(np.clip(np.exp(poly[2]), 1e-9, 1.0))
-    length = float(np.clip(np.max(values) * 10.0, 0.2, 6.0))
-    alpha = 1.15
-    length0 = float(np.clip(np.mean(energies) / 1500.0, 0.2, 4.0))
-    kappa = float(np.clip(np.exp(poly[1]), 0.1, 3.0))
-    coefficients = [scale, length, alpha, length0, kappa]
-    predicted = semi_empirical_efficiency(energies, coefficients)
-    if np.any(~np.isfinite(predicted)) or np.max(predicted) <= 0:
-        coefficients = [1e-3, 2.0, 1.1, 1.0, 0.8]
-    return coefficients
+    measurement_covariance: np.ndarray,
+) -> tuple[EfficiencyCurve, np.ndarray, tuple[str, ...], dict]:
+    """Fit response terms with explicit conditional fallback for sparse spectra.
+
+    Lengths are Ge areal densities in g/cm². A five-coefficient fit is only
+    attempted for at least eight distinct lines. Otherwise length and length0
+    are fixed *assumptions*, not detector measurements.
+    """
+    names = ("scale", "length_g_cm2", "alpha", "length0_g_cm2", "kappa")
+    if len(energies) < 4 or len(np.unique(energies)) < 4:
+        raise ValueError("Semi-empirical HPGe fit needs at least four distinct energies.")
+    cholesky = np.linalg.cholesky(measurement_covariance)
+
+    def residual(coefficients: np.ndarray) -> np.ndarray:
+        prediction = semi_empirical_efficiency(energies, coefficients)
+        return np.linalg.solve(cholesky, prediction - values)
+
+    def identifiable(jacobian: np.ndarray) -> bool:
+        norms = np.linalg.norm(jacobian, axis=0)
+        if np.any(norms <= 0):
+            return False
+        scaled = jacobian / norms
+        return bool(np.linalg.matrix_rank(scaled) == scaled.shape[1] and np.linalg.cond(scaled) < 1e7)
+
+    full = None
+    if len(energies) >= 8 and len(np.unique(energies)) >= 8:
+        lower = np.array([1e-10, 0.01, 0.2, 0.01, 0.0])
+        upper = np.array([1.0, 30.0, 5.0, 20.0, 5.0])
+        starts = (
+            [0.02, 2.0, 1.5, 1.0, 0.5],
+            [0.02, 8.3, 2.1, 1.66, 0.4],
+            [min(float(np.max(values)), 0.5), 4.0, 1.0, 2.0, 1.0],
+        )
+        candidates = [
+            least_squares(residual, start, bounds=(lower, upper), x_scale="jac", max_nfev=4000)
+            for start in starts
+        ]
+        usable = [fit for fit in candidates if fit.success and identifiable(fit.jac)]
+        if usable:
+            full = min(usable, key=lambda fit: fit.cost)
+
+    if full is not None:
+        coefficients = full.x
+        jacobian = full.jac
+        estimated_indices = (0, 1, 2, 3, 4)
+        fixed = {}
+        identifiability = "full"
+    else:
+        # Conditional three-parameter response. These are declared reference
+        # assumptions, not zero-uncertainty estimates of a detector's geometry.
+        fixed = {"length_g_cm2": 8.3, "length0_g_cm2": 1.66}
+        estimated_indices = (0, 2, 4)
+
+        def conditional_coefficients(estimated: np.ndarray) -> np.ndarray:
+            return np.array([estimated[0], 8.3, estimated[1], 1.66, estimated[2]])
+
+        lower = [1e-10, 0.2, 0.0]
+        upper = [1.0, 5.0, 5.0]
+        starts = ([0.02, 2.1, 0.4], [min(float(np.max(values)), 0.5), 1.0, 1.0])
+        candidates = [
+            least_squares(
+                lambda estimated: residual(conditional_coefficients(estimated)),
+                start,
+                bounds=(lower, upper),
+                x_scale="jac",
+                max_nfev=4000,
+            )
+            for start in starts
+        ]
+        usable = [fit for fit in candidates if fit.success and identifiable(fit.jac)]
+        if not usable:
+            raise ValueError("Semi-empirical HPGe parameters are not identifiable from these calibration points.")
+        fitted = min(usable, key=lambda fit: fit.cost)
+        coefficients = conditional_coefficients(fitted.x)
+        jacobian = fitted.jac
+        identifiability = "conditional_sparse" if len(energies) < 8 else "conditional_weak_full_fit"
+
+    prediction = semi_empirical_efficiency(energies, coefficients)
+    if np.any(~np.isfinite(prediction)) or np.any(prediction <= 0) or np.any(prediction > 1):
+        raise ValueError("Semi-empirical HPGe fit predicts nonphysical efficiencies.")
+    covariance = np.linalg.inv(jacobian.T @ jacobian)
+    if np.any(~np.isfinite(covariance)):
+        raise ValueError("Semi-empirical HPGe covariance is not identifiable.")
+    estimated_names = tuple(names[index] for index in estimated_indices)
+    curve = EfficiencyCurve(
+        model_type="functional",
+        parameters={
+            "form": "semi_empirical_hpge",
+            "coefficients": coefficients.tolist(),
+            "coefficient_names": names,
+            "estimated_coefficients": estimated_names,
+            "fixed_coefficients": fixed,
+        },
+        energy_range=(float(np.min(energies)), float(np.max(energies))),
+        uncertainty_model={
+            "type": "conditional_covariance",
+            "covariance": covariance.tolist(),
+            "parameter_indices": estimated_indices,
+        },
+    )
+    quality = {
+        "identifiability": identifiability,
+        "estimated_parameters": estimated_names,
+        "fixed_parameters": tuple(fixed),
+        "assumption": "Fixed lengths are reference assumptions; covariance is conditional on them." if fixed else "All five response coefficients estimated.",
+        "geometry_support": "No detector dimensions, source distance, window, or dead-layer terms were estimated from these points.",
+    }
+    return curve, covariance, estimated_names, quality
 
 
 def _score_database_lines(

@@ -196,7 +196,8 @@ def test_efficiency_dialog_exposes_all_four_registered_models():
         "gray_functional",
         "semi_empirical_hpge",
     }.issubset(keys)
-    assert dialog.table.columnCount() == 9
+    assert dialog.table.columnCount() == 10
+    assert dialog.table.horizontalHeaderItem(9).text() == "Activity Source ID"
     assert dialog.detector_id_edit.text() == "South"
     assert dialog.detector_fields["detector_thickness_DI_cm"].value() == pytest.approx(
         6.45

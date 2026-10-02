@@ -1390,6 +1390,9 @@ def test_main_window_exposes_log_scale_and_peak_label_toggles():
     _qapp().processEvents()
 
     sidebar = window.left_dock.widget()
+    sidebar.nuclide_query.setText("co")
+    _qapp().processEvents()
+    assert sidebar.nuclides.count() >= 1
     sidebar.nuclides.setCurrentRow(0)
     _qapp().processEvents()
     QTest.mouseClick(sidebar.save_selected_nuclide_button, Qt.LeftButton)

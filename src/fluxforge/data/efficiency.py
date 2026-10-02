@@ -16,6 +16,13 @@ import numpy as np
 from scipy import interpolate, optimize
 
 
+def _physical_efficiency(values: np.ndarray) -> np.ndarray:
+    """Reject invalid model output instead of hiding it with clipping."""
+    if np.any(~np.isfinite(values)) or np.any(values <= 0) or np.any(values > 1):
+        raise ValueError("Efficiency model predicts values outside (0, 1].")
+    return values
+
+
 @dataclass
 class EfficiencyCurve:
     """
@@ -82,7 +89,9 @@ class EfficiencyCurve:
         float or np.ndarray
             Detection efficiency (fractional)
         """
-        energy = np.atleast_1d(energy)
+        energy = np.atleast_1d(np.asarray(energy, dtype=float))
+        if np.any(~np.isfinite(energy)) or np.any(energy <= 0):
+            raise ValueError("Gamma energy must be finite and positive (keV).")
 
         if self.model_type == "polynomial":
             return self._efficiency_polynomial(energy)
@@ -111,10 +120,7 @@ class EfficiencyCurve:
 
         efficiency = np.exp(log_eff)
 
-        # Clip to valid range
-        efficiency = np.clip(efficiency, 0.0, 1.0)
-
-        return efficiency.squeeze()
+        return _physical_efficiency(efficiency).squeeze()
 
     def _efficiency_empirical(self, energy: np.ndarray) -> np.ndarray:
         """
@@ -143,7 +149,7 @@ class EfficiencyCurve:
         log_result = self._interpolator(np.log(energy))
         efficiency = np.exp(log_result)
 
-        return np.clip(efficiency, 0.0, 1.0).squeeze()
+        return _physical_efficiency(efficiency).squeeze()
 
     def _efficiency_functional(self, energy: np.ndarray) -> np.ndarray:
         """
@@ -197,7 +203,7 @@ class EfficiencyCurve:
         else:
             raise ValueError(f"Unknown functional form: {form}")
 
-        return np.clip(efficiency, 0.0, 1.0).squeeze()
+        return _physical_efficiency(efficiency).squeeze()
 
     def efficiency_uncertainty(
         self, energy: Union[float, np.ndarray]
@@ -220,6 +226,78 @@ class EfficiencyCurve:
             return 0.05 * np.ones_like(np.atleast_1d(energy)).squeeze()
 
         model_type = self.uncertainty_model.get("type", "constant")
+
+        if model_type == "fit_covariance":
+            energies = np.atleast_1d(np.asarray(energy, dtype=float))
+            if np.any(~np.isfinite(energies)) or np.any(energies <= 0):
+                raise ValueError("Gamma energy must be finite and positive (keV).")
+            names = tuple(self.uncertainty_model.get("parameter_names", ()))
+            covariance = np.asarray(
+                self.uncertainty_model.get("covariance", ()), dtype=float
+            )
+            if not names or covariance.shape != (len(names), len(names)):
+                raise ValueError("Fit covariance dimensions do not match parameter names.")
+            if np.any(~np.isfinite(covariance)) or not np.allclose(
+                covariance, covariance.T, rtol=1e-10, atol=1e-12
+            ):
+                raise ValueError("Fit covariance must be finite and symmetric.")
+            symmetric = (covariance + covariance.T) / 2
+            tolerance = max(float(np.linalg.norm(symmetric, ord=2)), 1.0) * 1e-10
+            if np.min(np.linalg.eigvalsh(symmetric)) < -tolerance:
+                raise ValueError("Fit covariance must be positive semidefinite.")
+            systematic = float(
+                self.uncertainty_model.get("relative_systematic", 0.0)
+            )
+            if not np.isfinite(systematic) or systematic < 0:
+                raise ValueError("Relative detector uncertainty must be nonnegative.")
+            if self.model_type == "polynomial":
+                coefficients = self.parameters.get("coefficients", ())
+                expected = tuple(f"a{index}" for index in range(len(coefficients)))
+                basis = np.column_stack(
+                    [np.log(energies) ** index for index in range(len(coefficients))]
+                )
+            elif self.model_type == "functional" and self.parameters.get("form") == "gray":
+                log_energy = np.log(energies)
+                expected = ("a", "b", "c", "d")
+                basis = np.column_stack(
+                    (np.ones_like(energies), log_energy, log_energy**2, 1.0 / energies)
+                )
+            elif (
+                self.model_type == "functional"
+                and self.parameters.get("form") == "semi_empirical_hpge"
+            ):
+                from fluxforge.analysis.efficiency_models import (
+                    semi_empirical_efficiency_uncertainty,
+                )
+
+                expected = tuple(
+                    self.parameters.get(
+                        "coefficient_names",
+                        ("scale", "length_g_cm2", "alpha", "length0_g_cm2", "kappa"),
+                    )
+                )
+                if any(name not in expected for name in names):
+                    raise ValueError("Unknown semi-empirical covariance parameter.")
+                indices = tuple(expected.index(name) for name in names)
+                absolute = np.atleast_1d(
+                    semi_empirical_efficiency_uncertainty(
+                        energies,
+                        self.parameters.get("coefficients", ()),
+                        covariance,
+                        parameter_indices=indices,
+                    )
+                )
+                nominal = np.atleast_1d(np.asarray(self.efficiency(energies), dtype=float))
+                return np.sqrt((absolute / nominal) ** 2 + systematic**2).squeeze()
+            else:
+                raise ValueError("Fit covariance is unsupported for this efficiency model.")
+            if names != expected:
+                raise ValueError("Fit covariance parameter order does not match the model.")
+            variance_log = np.einsum("ij,jk,ik->i", basis, covariance, basis)
+            tolerance = max(float(np.max(np.abs(variance_log))), 1.0) * 1e-10
+            if np.any(variance_log < -tolerance):
+                raise ValueError("Fit covariance predicts negative variance.")
+            return np.sqrt(np.maximum(variance_log, 0.0) + systematic**2).squeeze()
 
         if model_type == "constant":
             value = self.uncertainty_model.get("value", 0.05)
@@ -251,7 +329,7 @@ class EfficiencyCurve:
             )
             return interp(np.atleast_1d(energy)).squeeze()
 
-        elif model_type == "covariance":
+        elif model_type in ("covariance", "conditional_covariance"):
             if (
                 self.model_type == "functional"
                 and self.parameters.get("form") == "semi_empirical_hpge"
@@ -263,13 +341,14 @@ class EfficiencyCurve:
                 coeffs = self.parameters.get("coefficients", [])
                 covariance = np.array(self.uncertainty_model.get("covariance", []))
                 abs_unc = semi_empirical_efficiency_uncertainty(
-                    energy, coeffs, covariance
+                    energy,
+                    coeffs,
+                    covariance,
+                    parameter_indices=self.uncertainty_model.get("parameter_indices")
+                    if model_type == "conditional_covariance" else None,
                 )
-                eff = self._efficiency_functional(np.atleast_1d(energy))
-                rel_unc = np.zeros_like(eff, dtype=float)
-                mask = eff > 0
-                rel_unc[mask] = abs_unc[mask] / eff[mask]
-                return rel_unc.squeeze()
+                eff = np.atleast_1d(self._efficiency_functional(np.atleast_1d(energy)))
+                return (np.atleast_1d(abs_unc) / eff).squeeze()
 
         return 0.05 * np.ones_like(np.atleast_1d(energy)).squeeze()
 
@@ -564,6 +643,26 @@ def calculate_efficiency_from_source(
     uncertainty : float
         Efficiency uncertainty
     """
+    quantities = {
+        "measured_counts": measured_counts,
+        "live_time": live_time,
+        "source_activity": source_activity,
+        "emission_probability": emission_probability,
+        "geometry_factor": geometry_factor,
+    }
+    for name, value in quantities.items():
+        if not np.isfinite(value) or value <= 0:
+            raise ValueError(f"{name} must be finite and positive.")
+    if emission_probability > 1:
+        raise ValueError("emission_probability cannot exceed 1.")
+    for name, value in (
+        ("count_uncertainty", count_uncertainty),
+        ("activity_uncertainty", activity_uncertainty),
+        ("probability_uncertainty", probability_uncertainty),
+    ):
+        if value is not None and (not np.isfinite(value) or value < 0):
+            raise ValueError(f"{name} must be finite and nonnegative.")
+
     # Count rate
     count_rate = measured_counts / live_time
 
@@ -572,6 +671,8 @@ def calculate_efficiency_from_source(
 
     # Efficiency
     efficiency = count_rate / (emission_rate * geometry_factor)
+    if not np.isfinite(efficiency) or not 0 < efficiency <= 1:
+        raise ValueError("Measured absolute efficiency must lie in (0, 1].")
 
     # Uncertainty propagation
     rel_unc_squared = 0.0
@@ -589,6 +690,8 @@ def calculate_efficiency_from_source(
         rel_unc_squared += (probability_uncertainty / emission_probability) ** 2
 
     uncertainty = efficiency * np.sqrt(rel_unc_squared)
+    if not np.isfinite(uncertainty) or uncertainty <= 0:
+        raise ValueError("Efficiency uncertainty must be finite and positive.")
 
     return efficiency, uncertainty
 
