@@ -2058,6 +2058,7 @@ def fit_hypermet_peak(
     enable_tail: bool = True,
     enable_step: bool = False,
     initial_sigma: Optional[float] = None,
+    max_evaluations: int = 500,
 ) -> Tuple[HypermetPeak, PeakFitResult]:
     """
     Fit Hypermet peak to spectrum region.
@@ -2081,6 +2082,8 @@ def fit_hypermet_peak(
         Enable step function fitting
     initial_sigma : float, optional
         Initial guess for sigma
+    max_evaluations : int
+        Bounded nonlinear evaluation budget. Exhaustion is a failed fit.
 
     Returns
     -------
@@ -2089,6 +2092,8 @@ def fit_hypermet_peak(
     result : PeakFitResult
         Full fitting result (uses Gaussian representation for compatibility)
     """
+    if max_evaluations < 1:
+        raise ValueError("max_evaluations must be positive.")
     # Extract fit region
     idx_peak = np.argmin(np.abs(channels - peak_channel))
     ch_lo = max(0, idx_peak - fit_width)
@@ -2098,7 +2103,7 @@ def fit_hypermet_peak(
     y = counts[ch_lo:ch_hi].astype(float)
 
     # Weights for chi-squared
-    weights = 1.0 / np.maximum(np.sqrt(y), 1.0)
+    weights = 1.0 / np.sqrt(np.maximum(y, 1.0))
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()
@@ -2150,18 +2155,43 @@ def fit_hypermet_peak(
         np.inf,  # bg_intercept
     ]
 
+    # Fit only enabled model terms. Disabled tail/step parameters have zero
+    # derivatives, making the old eight-parameter fit rank deficient even for
+    # a well-determined Gaussian. Keep the public covariance layout at 8x8.
+    active_indices = [0, 1, 2]
+    if enable_tail:
+        active_indices.extend([3, 4])
+    if enable_step:
+        active_indices.append(5)
+    active_indices.extend([6, 7])
+
+    def enabled_model(x_values, *parameters):
+        full = np.zeros(8)
+        full[active_indices] = parameters
+        return hypermet_with_linear_bg(x_values, *full)
+
     # Perform fit
     try:
-        popt, pcov = optimize.curve_fit(
-            hypermet_with_linear_bg,
+        active_popt, active_cov = optimize.curve_fit(
+            enabled_model,
             x,
             y,
-            p0=p0,
+            p0=np.asarray(p0)[active_indices],
             sigma=1.0 / weights,
             absolute_sigma=True,
-            bounds=(bounds_lower, bounds_upper),
-            maxfev=10000,
+            bounds=(
+                np.asarray(bounds_lower)[active_indices],
+                np.asarray(bounds_upper)[active_indices],
+            ),
+            maxfev=max_evaluations,
+            x_scale="jac",
         )
+        popt = np.zeros(8)
+        popt[active_indices] = active_popt
+        pcov = np.zeros((8, 8))
+        pcov[np.ix_(active_indices, active_indices)] = active_cov
+        if not np.all(np.isfinite(pcov)) or np.any(np.diag(pcov) < 0):
+            raise ValueError("Hypermet parameter covariance is unavailable.")
         perr = np.sqrt(np.diag(pcov))
         success = True
         message = "Fit converged"
@@ -2208,7 +2238,7 @@ def fit_hypermet_peak(
     y_fit = hypermet_with_linear_bg(x, *popt)
     residuals = y - y_fit
     chi_sq = np.sum((residuals * weights) ** 2)
-    dof = len(y) - len(popt)
+    dof = len(y) - len(active_indices)
 
     result = PeakFitResult(
         peak=gaussian_peak,
@@ -2221,6 +2251,7 @@ def fit_hypermet_peak(
         covariance=pcov,
         success=success,
         message=message,
+        area_parameter_indices=(0, 2),
     )
 
     return hypermet_peak, result

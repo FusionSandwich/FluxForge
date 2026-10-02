@@ -2,11 +2,16 @@ name: Quality Checks
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches:
       - main
       - add_gui
       - chore/folder-audit-native-gui-review-20260317
+      - registry-uncertainty-qualification
+      - 'JS/**'
+      - 'proposal/**'
+      - 'fix/**'
     paths:
       - 'src/fluxforge/**/*.py'
       - 'src/fluxforge_gui/**/*.py'

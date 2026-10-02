@@ -1944,7 +1944,12 @@ def analyze_raw_spectrum_targeted(
                         np.interp(fit_centroid, fit_x, fit.background)
                     )
 
-            if len(seeds) == 1 and not assignment_ambiguous:
+            if (
+                len(seeds) == 1
+                and not assignment_ambiguous
+                and peak_energy < 250.0
+                and _is_qg_counting_method(counting_method)
+            ):
                 try:
                     hypermet_width = int(max(8, round(3.5 * fwhm_ch)))
                     hypermet_peak, hypermet_result = fit_hypermet_peak(
@@ -2412,7 +2417,9 @@ def analyze_flux_wire_targeted(
                     "activity_reference"
                 ] = QG_REPORT_ACTIVITY_REFERENCE
         for activity_row in result.nuclide_activities.values():
-            activity_row.setdefault("activity_reference", "count_average_live_normalized")
+            activity_row.setdefault(
+                "activity_reference", "count_average_live_normalized"
+            )
 
     if reference_data is not None and reference_data.has_nuclides:
         for nuclide in reference_data.nuclides:
@@ -2528,7 +2535,9 @@ def combine_peak_activities(peaks: List[IdentifiedPeak]) -> Dict[str, Dict[str, 
         weighted_avg, weighted_unc, _, activities = _weighted_stats(selected_peaks)
         mean_activity = float(np.mean(activities))
         median_activity = float(np.median(activities))
-        variance_activity = float(np.var(activities, ddof=1 if len(activities) > 1 else 0))
+        variance_activity = float(
+            np.var(activities, ddof=1 if len(activities) > 1 else 0)
+        )
         std_activity = float(np.sqrt(max(variance_activity, 0.0)))
         mad_activity = float(np.median(np.abs(activities - median_activity)))
 
@@ -2537,9 +2546,7 @@ def combine_peak_activities(peaks: List[IdentifiedPeak]) -> Dict[str, Dict[str, 
             activity_value = float(peak.activity_bq)
             activity_unc = float(peak.activity_unc_bq)
 
-            combined_unc = float(
-                np.sqrt(max(activity_unc**2 + weighted_unc**2, 0.0))
-            )
+            combined_unc = float(np.sqrt(max(activity_unc**2 + weighted_unc**2, 0.0)))
             z_vs_all = (
                 float((activity_value - weighted_avg) / combined_unc)
                 if combined_unc > 0.0
@@ -2563,7 +2570,9 @@ def combine_peak_activities(peaks: List[IdentifiedPeak]) -> Dict[str, Dict[str, 
                 single_vs_leave_one_out_rel = _safe_rel_delta(activity_value, loo_avg)
 
             rel_delta_vs_all = _safe_rel_delta(activity_value, weighted_avg)
-            robust_mz = _robust_modified_z(activity_value, median_activity, mad_activity)
+            robust_mz = _robust_modified_z(
+                activity_value, median_activity, mad_activity
+            )
             is_outlier = bool(abs(robust_mz) >= 3.5 or abs(rel_delta_vs_all) > 0.25)
 
             single_peak_rows.append(

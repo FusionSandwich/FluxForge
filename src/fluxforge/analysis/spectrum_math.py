@@ -56,6 +56,20 @@ def _resample_background_to_sample_energy(
     if sample_energies is None or background_energies is None:
         return background, False
 
+    for energies, spectrum in (
+        (sample_energies, sample),
+        (background_energies, background),
+    ):
+        if (
+            energies.shape != spectrum.counts.shape
+            or energies.ndim != 1
+            or np.any(~np.isfinite(energies))
+            or np.any(np.diff(energies) <= 0)
+        ):
+            raise ValueError(
+                "Energy alignment requires finite, increasing channel centers."
+            )
+
     n_min = min(len(sample_energies), len(background_energies))
     if len(sample_energies) == len(background_energies) and np.allclose(
         sample_energies[:n_min], background_energies[:n_min], atol=atol_keV, rtol=rtol
@@ -82,54 +96,20 @@ def _resample_background_to_sample_energy(
             True,
         )
 
-    background_counts = np.asarray(background.counts, dtype=float)
-    if (
-        background_energies.size < 2
-        or np.any(~np.isfinite(background_energies))
-        or np.any(np.diff(background_energies) <= 0.0)
-        or np.any(~np.isfinite(sample_energies))
-    ):
-        raise ValueError(
-            "Energy alignment requires finite, increasing background energies."
-        )
-    resampled_counts = np.interp(
-        sample_energies, background_energies, background_counts, left=0.0, right=0.0
-    )
-    # Interpolated channels can share source counts. Preserve the complete
-    # covariance rather than just squared-weight diagonal variances.
-    upper = np.clip(
-        np.searchsorted(background_energies, sample_energies, side="right"),
-        1,
-        background_energies.size - 1,
-    )
-    lower = upper - 1
-    fraction = (sample_energies - background_energies[lower]) / (
-        background_energies[upper] - background_energies[lower]
-    )
-    within = (sample_energies >= background_energies[0]) & (
-        sample_energies <= background_energies[-1]
-    )
-    from scipy.sparse import coo_matrix
-
-    rows = np.arange(sample_energies.size)
-    interpolation = coo_matrix(
-        (
-            np.concatenate(
-                [np.where(within, 1.0 - fraction, 0.0), np.where(within, fraction, 0.0)]
-            ),
-            (np.concatenate([rows, rows]), np.concatenate([lower, upper])),
-        ),
-        shape=(sample_energies.size, background_energies.size),
-    ).tocsr()
+    rebin = _histogram_overlap_operator(sample_energies, background_energies)
+    resampled_counts = rebin @ np.asarray(background.counts, dtype=float)
     # W C W.T retains the covariance created when output channels share a
     # source count. Its diagonal alone is insufficient for peak/ROI sums.
     resampled_covariance = (
-        interpolation @ background.count_covariance_matrix() @ interpolation.T
+        rebin @ background.count_covariance_matrix() @ rebin.T
     ).tocsr()
     resampled_covariance.eliminate_zeros()
     resampled_variance = resampled_covariance.diagonal()
     metadata = dict(background.metadata)
     metadata["energy_resampled_to_sample_grid"] = True
+    metadata["energy_rebin_method"] = "integrated_counts_bin_overlap"
+    metadata["energy_bin_edge_policy"] = "midpoint_centers_exterior_half_spacing"
+    metadata["energy_coverage_policy"] = "source_target_overlap_only"
     metadata["resampled_from_energy_calibration"] = list(
         background.calibration.get("energy", [])
     )
@@ -150,6 +130,43 @@ def _resample_background_to_sample_energy(
         ),
         True,
     )
+
+
+def _histogram_overlap_operator(target_centers: np.ndarray, source_centers: np.ndarray):
+    """Sparse fractional source-bin overlap; no extrapolation or count-height interpolation."""
+    from scipy.sparse import coo_matrix
+
+    def edges(centers):
+        if len(centers) < 2:
+            raise ValueError(
+                "Rebinning requires at least two centers to infer bin widths."
+            )
+        midpoints = (centers[1:] + centers[:-1]) * 0.5
+        return np.concatenate(
+            (
+                [centers[0] - (centers[1] - centers[0]) * 0.5],
+                midpoints,
+                [centers[-1] + (centers[-1] - centers[-2]) * 0.5],
+            )
+        )
+
+    shape = (len(target_centers), len(source_centers))
+    if not all(shape):
+        return coo_matrix(shape, dtype=float).tocsr()
+    target, source = edges(target_centers), edges(source_centers)
+    rows, columns, fractions = [], [], []
+    i = j = 0
+    while i < shape[0] and j < shape[1]:
+        overlap = min(target[i + 1], source[j + 1]) - max(target[i], source[j])
+        if overlap > 0:
+            rows.append(i)
+            columns.append(j)
+            fractions.append(overlap / (source[j + 1] - source[j]))
+        if target[i + 1] <= source[j + 1]:
+            i += 1
+        else:
+            j += 1
+    return coo_matrix((fractions, (rows, columns)), shape=shape).tocsr()
 
 
 def _align_spectra(
@@ -328,8 +345,15 @@ def _resolve_scale_factor(
     if mode == "real":
         numerator = float(sample.real_time)
         denom = float(background.real_time)
-        if not np.isfinite(numerator) or numerator <= 0.0 or not np.isfinite(denom) or denom <= 0.0:
-            raise ValueError("Real-time background scaling requires positive finite sample and background real times.")
+        if (
+            not np.isfinite(numerator)
+            or numerator <= 0.0
+            or not np.isfinite(denom)
+            or denom <= 0.0
+        ):
+            raise ValueError(
+                "Real-time background scaling requires positive finite sample and background real times."
+            )
         return numerator / denom
 
     if mode == "manual":

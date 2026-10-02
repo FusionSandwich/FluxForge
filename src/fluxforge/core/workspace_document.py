@@ -196,14 +196,20 @@ def _validate_fit_covariance_json(value: Any, path: str) -> None:
         or any(not isinstance(name, str) or not name for name in names)
         or len(set(names)) != len(names)
     ):
-        raise WorkspaceValidationError(f"{path}.parameter_names", "must contain unique names")
+        raise WorkspaceValidationError(
+            f"{path}.parameter_names", "must contain unique names"
+        )
     covariance = value.get("covariance")
     if not isinstance(covariance, (tuple, list)) or len(covariance) != len(names):
-        raise WorkspaceValidationError(f"{path}.covariance", "size must match parameter names")
+        raise WorkspaceValidationError(
+            f"{path}.covariance", "size must match parameter names"
+        )
     try:
         rows = tuple(tuple(float(item) for item in row) for row in covariance)
     except (TypeError, ValueError) as exc:
-        raise WorkspaceValidationError(f"{path}.covariance", "must be a numeric matrix") from exc
+        raise WorkspaceValidationError(
+            f"{path}.covariance", "must be a numeric matrix"
+        ) from exc
     _validate_covariance(rows, f"{path}.covariance")
 
 
@@ -235,6 +241,7 @@ def _validate_spectrum_payload(value: Any, path: str) -> dict[str, Any]:
     allowed = {
         "counts",
         "counts_uncertainty",
+        "counts_covariance",
         "channels",
         "energies",
         "live_time",
@@ -254,7 +261,11 @@ def _validate_spectrum_payload(value: Any, path: str) -> dict[str, Any]:
         raise WorkspaceValidationError(f"{path}.counts", "is required")
     for name in ("counts", "channels"):
         for index, item in enumerate(_sequence(data.get(name, ()), f"{path}.{name}")):
-            minimum = 0.0 if name == "counts" else None
+            minimum = (
+                0.0
+                if name == "counts" and not _allows_signed_counts(data.get("metadata"))
+                else None
+            )
             _number(item, f"{path}.{name}[{index}]", minimum=minimum)
     for name in ("counts_uncertainty", "energies"):
         raw = data.get(name)
@@ -277,7 +288,47 @@ def _validate_spectrum_payload(value: Any, path: str) -> dict[str, Any]:
     for name in ("calibration", "gps", "metadata"):
         mapping = _mapping(data.get(name, {}), f"{path}.{name}")
         _validate_json_finite(mapping, f"{path}.{name}")
+    covariance = data.get("counts_covariance")
+    if covariance is not None:
+        covariance = _mapping(covariance, f"{path}.counts_covariance")
+        _reject_unknown(
+            covariance,
+            {"format", "shape", "row", "col", "data"},
+            f"{path}.counts_covariance",
+        )
+        if covariance.get("format") != "coo":
+            raise WorkspaceValidationError(
+                f"{path}.counts_covariance.format", "must be coo"
+            )
+        n = len(data["counts"])
+        if covariance.get("shape") != [n, n]:
+            raise WorkspaceValidationError(
+                f"{path}.counts_covariance.shape", "must match counts"
+            )
+        lengths = []
+        for key in ("row", "col", "data"):
+            values = _sequence(covariance.get(key), f"{path}.counts_covariance.{key}")
+            lengths.append(len(values))
+            for index, item in enumerate(values):
+                item_path = f"{path}.counts_covariance.{key}[{index}]"
+                if key == "data":
+                    _number(item, item_path)
+                elif _integer(item, item_path, minimum=0) >= n:
+                    raise WorkspaceValidationError(item_path, "outside count array")
+        if len(set(lengths)) != 1:
+            raise WorkspaceValidationError(
+                f"{path}.counts_covariance", "COO arrays must have equal lengths"
+            )
     return data
+
+
+def _allows_signed_counts(metadata: Any) -> bool:
+    return isinstance(metadata, Mapping) and metadata.get("operation") in {
+        "subtract_measured_background",
+        "subtract",
+        "add",
+        "moving_average",
+    }
 
 
 @dataclass(frozen=True)
@@ -314,7 +365,7 @@ class WorkspaceSpectrum:
             raise WorkspaceValidationError(
                 f"{path}.spectrum.counts", "must be a finite one-dimensional array"
             )
-        if np.any(counts < 0.0):
+        if np.any(counts < 0.0) and not _allows_signed_counts(self.spectrum.metadata):
             raise WorkspaceValidationError(
                 f"{path}.spectrum.counts", "must not contain negative counts"
             )
@@ -1004,7 +1055,9 @@ class EfficiencyModelState:
         _validate_json_finite(self.points, f"{path}.points")
         _validate_covariance(self.covariance, f"{path}.covariance")
         _validate_json_finite(self.uncertainty_model, f"{path}.uncertainty_model")
-        _validate_fit_covariance_json(self.uncertainty_model, f"{path}.uncertainty_model")
+        _validate_fit_covariance_json(
+            self.uncertainty_model, f"{path}.uncertainty_model"
+        )
         fit_result = self.parameters.get("fit_result")
         if isinstance(fit_result, Mapping):
             from fluxforge.analysis.detector_calibration import EfficiencyPoint

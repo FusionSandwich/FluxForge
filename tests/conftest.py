@@ -25,25 +25,30 @@ collect_ignore_glob = [
 
 @pytest.fixture
 def independent_background_sum_variance():
-    """Oracle based on np.interp of source basis vectors, without sparse W."""
+    """Direct source-bin overlap oracle, independent of the production sparse W."""
 
     def variance(sample, background, weights, scale):
         active = np.flatnonzero(weights)
         sample_variance = np.sum((weights * sample.counts_uncertainty) ** 2)
-        source_basis = np.zeros(len(background.counts))
+
+        def edges(centers):
+            return np.r_[
+                centers[0] - (centers[1] - centers[0]) / 2,
+                (centers[:-1] + centers[1:]) / 2,
+                centers[-1] + (centers[-1] - centers[-2]) / 2,
+            ]
+
+        target_edges = edges(sample.energies)
+        source_edges = edges(background.energies)
         background_variance = 0.0
         for source_channel, uncertainty in enumerate(background.counts_uncertainty):
-            source_basis[source_channel] = 1.0
-            mapped_basis = np.interp(
-                sample.energies[active],
-                background.energies,
-                source_basis,
-                left=0.0,
-                right=0.0,
-            )
+            mapped_basis = np.maximum(
+                0.0,
+                np.minimum(target_edges[active + 1], source_edges[source_channel + 1])
+                - np.maximum(target_edges[active], source_edges[source_channel]),
+            ) / (source_edges[source_channel + 1] - source_edges[source_channel])
             coefficient = weights[active] @ mapped_basis
             background_variance += (coefficient * uncertainty) ** 2
-            source_basis[source_channel] = 0.0
         return float(sample_variance + scale**2 * background_variance)
 
     return variance
