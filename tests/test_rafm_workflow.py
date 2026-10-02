@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -106,7 +107,7 @@ def test_workflow_profile_energy_calibration_supports_astm_inl_alias():
     assert workflow_profile_energy_calibration(astm_config) == pytest.approx(expected)
 
 
-def test_prune_generic_targeted_lines_drops_weak_nearby_nuisance_lines():
+def test_prune_generic_targeted_lines_preserves_different_isotope_candidates():
     lines = [
         GammaLine(energy_keV=1099.25, intensity=0.5659, isotope="Fe59"),
         GammaLine(energy_keV=1102.43, intensity=0.0027, isotope="Tb154m"),
@@ -122,9 +123,9 @@ def test_prune_generic_targeted_lines_drops_weak_nearby_nuisance_lines():
     assert ("Fe59", 1099.25) in got
     assert ("Co60", 1173.23) in got
     assert ("Ta182", 1231.02) in got
-    assert ("Tb154m", 1102.43) not in got
-    assert ("Tb154m", 1177.71) not in got
-    assert ("Tb154m", 1229.42) not in got
+    assert ("Tb154m", 1102.43) in got
+    assert ("Tb154m", 1177.71) in got
+    assert ("Tb154m", 1229.42) in got
 
 
 def test_select_generic_targeted_lines_keeps_supported_sets_and_limits_dense_unsupported_isotopes():
@@ -199,6 +200,72 @@ def test_resolve_measurement_timing_for_rafm_and_flux_wires():
     assert wire.compare_eoi is True
     assert wire.irradiation_time_s == 7200
     assert wire.irradiation_phase == "phase2_whale_tube"
+
+
+@pytest.mark.parametrize("sample_letter", ["A", "B", "C", "N"])
+def test_rafm4_committed_artifacts_use_phase2_whale_tube_timing(sample_letter):
+    metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
+    sample_id = f"RAFM4-{sample_letter}_15dEOI"
+    timing = resolve_measurement_timing(sample_id, None, metadata)
+    artifact = json.loads(
+        (EXAMPLE_ROOT / "results/analysis_json" / f"{sample_id}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    recorded = artifact["timing"]
+    phase2 = metadata.sample_schedules["schedules"][sample_letter]["phase2"]
+    expected_decay = next(
+        item["seconds"] for item in phase2["cooling_times"] if item["label"] == "15d"
+    )
+
+    assert (
+        timing.irradiation_phase == recorded["irradiation_phase"] == "phase2_whale_tube"
+    )
+    assert (
+        timing.schedule_source
+        == recorded["schedule_source"]
+        == "sample_schedules.phase2"
+    )
+    assert timing.irradiation_end.isoformat() == recorded["irradiation_end"]
+    assert recorded["irradiation_time_s"] == phase2["irradiation_seconds"] == 7200
+    assert timing.decay_time_s == recorded["decay_time_s"] == expected_decay
+    report = (
+        EXAMPLE_ROOT / "results/reports" / f"{sample_id}_comparison.txt"
+    ).read_text(encoding="utf-8")
+    assert "Irradiation phase: phase2_whale_tube" in report
+    assert "Schedule source: sample_schedules.phase2" in report
+
+
+def test_committed_rafm_samples_have_individual_reports_and_paired_plots():
+    raw_dir = EXAMPLE_ROOT / "raw_gamma_spec"
+    results = EXAMPLE_ROOT / "results"
+    raw_stems = {path.stem for path in raw_dir.rglob("*.ASC")}
+    artifacts = results / "analysis_json"
+    reports = results / "reports"
+    plots = results / "plots/comparisons"
+    assert raw_stems == {path.stem for path in artifacts.glob("*.json")}
+
+    required_sections = (
+        "QG peaks not identified by FluxForge",
+        "Matched energies with isotope mismatch",
+        "QG nuclides missing from FluxForge activity results",
+        "Peak count parity failures",
+        "FluxForge detected peaks still left unidentified",
+        "FluxForge identified peaks with no QG counterpart",
+    )
+    for stem in raw_stems:
+        artifact = json.loads((artifacts / f"{stem}.json").read_text(encoding="utf-8"))
+        report = (reports / f"{stem}_comparison.txt").read_text(encoding="utf-8")
+        assert f"Sample: {stem}" in report
+        if artifact["qg_file"]:
+            assert all(section in report for section in required_sections)
+            plot = plots / f"{stem}_vs_qg.png"
+            assert plot.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+        else:
+            assert "No paired QG processed file was found" in report
+
+    assert not (plots / "peak_counts_parity.png").exists()
+    assert not (plots / "isotope_activity_parity.png").exists()
 
 
 def test_estimate_rafm_sample_mass_from_geometry_metadata():
@@ -355,6 +422,11 @@ def test_analyze_flux_wire_sample_writes_reactions(tmp_path):
     )
 
     assert artifact["sample_group"] == "flux_wires"
+    assert artifact["validation"]["passed"] is None
+    assert artifact["validation"]["comparison_basis"] == "reference_reproduction"
+    assert artifact["validation"]["reference_used_for_analysis"] is True
+    report_text = Path(artifact["comparison_report_txt"]).read_text(encoding="utf-8")
+    assert "Raw comparison passed: not established" in report_text
     assert artifact["reaction_rate_mass_metadata"]["mass_basis"] == "element_mass"
     assert "sample_mass_g" not in artifact["isotopes"]["Co60"]
     assert "specific_activity_Bq_g" not in artifact["isotopes"]["Co60"]

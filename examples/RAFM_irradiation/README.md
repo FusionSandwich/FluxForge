@@ -33,12 +33,37 @@ Equivalent script:
 python examples/RAFM_irradiation/run_validation.py --no-fail
 ```
 
+See the [RAFM processing runbook](RAFM_processing_plan.md) for single-spectrum
+ingest, explicit overrides, output locations, and warning interpretation.
+
 Typical outputs:
 
 - analysis JSON bundles
 - comparison tables
 - validation summaries
 - text reports
+
+### Background subtraction and negative channels
+
+The RAFM runs use the measured `background.ASC` spectrum, scaled by acquisition
+time. A background-subtracted channel may be negative because the two measured
+counts fluctuate. In the default `hybrid` mode, FluxForge retains that signed
+value and the propagated uncertainty in the saved spectrum and ROI accounting.
+It does not mean a negative physical count rate. An algorithm that requires
+nonnegative input uses a separate working copy; when it clips negative channels,
+FluxForge issues a warning and leaves the saved signed spectrum unchanged.
+Inspect the `background_subtraction` metadata for the scale factor and number of
+negative channels before interpreting a result.
+
+### Calibration and efficiency overrides
+
+Genie `.ASC` and `.txt` readers use energy and efficiency coefficients from the
+file when present. A selected RAFM profile fills detector values that the file
+does not supply; it preserves the file's energy calibration. Explicit
+`--energy-calibration` and `--efficiency-coefficients` CLI values, or the
+corresponding reader arguments, take precedence over file and profile values.
+The saved spectrum records the effective coefficients, so check that artifact
+before comparing an analysis with a processed report.
 
 ## How to Run the Phase 6 Worked Example
 

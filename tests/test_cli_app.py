@@ -2436,6 +2436,141 @@ def test_cmd_ingest_applies_manual_background_scaling(monkeypatch, tmp_path):
     assert np.allclose(captured["counts"], [9.0, 18.0, 27.0])
 
 
+@pytest.mark.parametrize(
+    ("relative_input", "expected_channels"),
+    [
+        (
+            "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC",
+            8192,
+        ),
+        (
+            "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM1/RAFM1_Long_144h_EOI.txt",
+            8192,
+        ),
+        ("tests/data/spectrum_io/examples/eu_calib_7cm.Spe", 16384),
+    ],
+)
+def test_ingest_real_spectrum_formats_with_manual_background(
+    tmp_path, relative_input, expected_channels
+):
+    output = tmp_path / "spectrum.json"
+    args = app.build_parser().parse_args(
+        [
+            "ingest",
+            "--input",
+            str(ROOT / relative_input),
+            "--background-file",
+            str(ROOT / "examples/RAFM_irradiation/background.ASC"),
+            "--background-scale-mode",
+            "manual",
+            "--background-scale-factor",
+            "0.5",
+            "--energy-calibration",
+            "0,1",
+            "--efficiency-coefficients",
+            "1,2,3,4",
+            "--output",
+            str(output),
+        ]
+    )
+    args.func(args)
+    spectrum = json.loads(output.read_text(encoding="utf-8"))["spectrum"]
+    assert len(spectrum["counts"]) == expected_channels
+    assert len(spectrum["counts_uncertainty"]) == expected_channels
+    assert spectrum["metadata"]["background_subtraction"]["scale_factor"] == 0.5
+    assert spectrum["calibration"]["energy"] == [0.0, 1.0]
+    assert spectrum["metadata"]["efficiency"]["C1"] == 1.0
+
+
+def test_rafm_runbook_profile_ingest_uses_background_and_file_energy(tmp_path):
+    output = tmp_path / "co-cd-spectrum.json"
+    args = app.build_parser().parse_args(
+        [
+            "ingest",
+            "--input",
+            str(
+                ROOT
+                / "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC"
+            ),
+            "--profile",
+            "rafm_25cm",
+            "--output",
+            str(output),
+        ]
+    )
+    args.func(args)
+    spectrum = json.loads(output.read_text(encoding="utf-8"))["spectrum"]
+    assert spectrum["calibration"]["energy"] == pytest.approx([0.541, 0.498, 2.605e-07])
+    assert spectrum["metadata"]["efficiency"]["C1"] == pytest.approx(-20.26)
+    assert spectrum["metadata"]["background_subtraction"]["scale_factor"] == 9.0
+
+
+@pytest.mark.parametrize(
+    ("overrides", "expected_energy", "expected_c1"),
+    [
+        ([], [0.541, 0.498, 2.605e-07], -20.26),
+        (
+            ["--energy-calibration", "0,1", "--efficiency-coefficients", "1,2,3,4"],
+            [0.0, 1.0],
+            1.0,
+        ),
+    ],
+)
+def test_rafm_profile_batch_ingest_real_asc_preserves_file_and_user_precedence(
+    tmp_path, overrides, expected_energy, expected_c1
+):
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    (input_dir / "Co-Cd-RAFM-1_25cm.ASC").write_bytes(
+        (
+            ROOT
+            / "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC"
+        ).read_bytes()
+    )
+    output_dir = tmp_path / "output"
+    args = app.build_parser().parse_args(
+        [
+            "ingest-batch",
+            "--input-dir",
+            str(input_dir),
+            "--output-dir",
+            str(output_dir),
+            "--profile",
+            "rafm_25cm",
+            *overrides,
+        ]
+    )
+    args.func(args)
+
+    spectrum = json.loads(
+        (output_dir / "Co-Cd-RAFM-1_25cm.json").read_text(encoding="utf-8")
+    )["spectrum"]
+    assert len(spectrum["counts"]) == 8192
+    assert spectrum["calibration"]["energy"] == pytest.approx(expected_energy)
+    assert spectrum["metadata"]["efficiency"]["C1"] == pytest.approx(expected_c1)
+    assert spectrum["metadata"]["background_subtraction"]["scale_factor"] == 9.0
+
+
+def test_rafm_runbook_negative_efficiency_override_parses():
+    args = app.build_parser().parse_args(
+        [
+            "ingest",
+            "--input",
+            "examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC",
+            "--profile",
+            "rafm_25cm",
+            "--efficiency-coefficients=-3.743,2.167,-0.3724,0.02036,0.296",
+        ]
+    )
+    assert app._parse_efficiency_override(args.efficiency_coefficients) == {
+        "C1": -3.743,
+        "C2": 2.167,
+        "C3": -0.3724,
+        "C4": 0.02036,
+        "DetModel": 0.296,
+    }
+
+
 def test_cmd_ingest_writes_optional_adjusted_and_final_exports(
     monkeypatch, tmp_path, capsys
 ):
