@@ -15,7 +15,7 @@ import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 from urllib.request import urlopen
 
 from fluxforge.core.runtime import (
@@ -755,7 +755,10 @@ def _load_custom_gamma_source_from_locator(locator: str | Path) -> GammaDatabase
         return _build_gamma_database_from_rows(rows or [])
 
     if scheme == "sqlite":
-        db_path = Path(parsed.path)
+        local_path = unquote(parsed.path)
+        if os.name == "nt" and re.match(r"^/[A-Za-z]:[/\\]", local_path):
+            local_path = local_path[1:]
+        db_path = Path(local_path)
         params = parse_qs(parsed.query)
         table = params.get("table", ["gamma_lines"])[0]
         query = params.get("query", [""])[0]
