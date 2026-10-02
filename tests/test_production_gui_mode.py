@@ -403,12 +403,18 @@ def test_machine_readable_action_catalog_matches_all_production_controls():
         QSlider,
         QPlainTextEdit,
         QTextEdit,
+        QTableWidget,
     )
     actual_controls = []
     for control in window.findChildren(QWidget):
         if not isinstance(control, interactive_types):
             continue
         if is_developer_descendant(control):
+            continue
+        if (
+            isinstance(control, QTableWidget)
+            and control.editTriggers() == QTableWidget.NoEditTriggers
+        ):
             continue
         if isinstance(control, (QPlainTextEdit, QTextEdit)) and control.isReadOnly():
             continue

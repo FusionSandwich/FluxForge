@@ -150,6 +150,11 @@
       "surface": "unfolding-dialog",
       "test_ids": ["tests/test_unfolding_workspace_qt.py"],
       "object_names": ["LoadMeasuredRatesButton", "LoadResponseMatrixButton", "MaxedEntropyWeightSpin", "MethodAMethodSelectorCombo", "MethodBMethodSelectorCombo", "MlSeedThresholdSpin", "ReactionRatesPathInput", "ResetUnfoldingPlotsButton", "ResponsePathInput", "ResponseSourceCombo", "RmleAutoLambdaCheck", "RmleLambdaSlider", "RmlePenaltyCombo", "RmleRegularizationSpin", "RunComparisonUnfoldingButton", "RunSelectedUnfoldingButton", "UnfoldingCompareModeCheck", "UnfoldingLogEnergyCheck", "UnfoldingLogFluxCheck", "UnfoldingUncertaintyBandsCheck", "UseMlSeedCheck"]
+    },
+    {
+      "surface": "table-controls",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_module3_workflows_qt.py", "tests/test_calibration_workspace_qt.py", "tests/test_unfolding_workspace_qt.py"],
+      "object_names": ["BatchQueueResultsTable", "CalibrationDeviationPairsTable", "CalibrationEnergyPointsTable", "CalibrationFwhmPointsTable", "NuclideMixtureTable", "PeakTableWidget", "UnfoldingComparisonTable", "UnfoldingMeasurementsTable", "UnfoldingResultsTable"]
     }
   ],
   "tabs": [
