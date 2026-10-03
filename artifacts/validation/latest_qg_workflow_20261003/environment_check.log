@@ -1,0 +1,64 @@
+{
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "executable": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "imports": {
+    "numpy": {
+      "version": "2.5.1",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\numpy\\__init__.py"
+    },
+    "scipy": {
+      "version": "1.18.0",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\scipy\\__init__.py"
+    },
+    "pandas": {
+      "version": "2.3.3",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\pandas\\__init__.py"
+    },
+    "matplotlib": {
+      "version": "3.11.1",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\matplotlib\\__init__.py"
+    },
+    "PIL": {
+      "version": "12.3.0",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\PIL\\__init__.py"
+    },
+    "yaml": {
+      "version": "6.0.3",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\yaml\\__init__.py"
+    },
+    "h5py": {
+      "version": "3.16.0",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\h5py\\__init__.py"
+    },
+    "lxml.etree": {
+      "version": "6.1.1",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\lxml\\etree.cp312-win_amd64.pyd"
+    },
+    "tkinter": {
+      "version": "stdlib",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\tkinter\\__init__.py"
+    },
+    "pytest": {
+      "version": "8.4.2",
+      "path": "C:\\Users\\joshu\\AppData\\Roaming\\Python\\Python312\\site-packages\\pytest\\__init__.py"
+    },
+    "black": {
+      "version": "25.12.0",
+      "path": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\black\\__init__.cp312-win_amd64.pyd"
+    }
+  },
+  "errors": [
+    "The complete test environment requires Python 3.11",
+    "Expected NumPy 1.26.x, found 2.5.1",
+    "PySide6.QtWidgets: ModuleNotFoundError: No module named 'PySide6'",
+    "pyqtgraph: ModuleNotFoundError: No module named 'pyqtgraph'",
+    "tensorflow: ModuleNotFoundError: No module named 'tensorflow'",
+    "jinja2: ModuleNotFoundError: No module named 'jinja2'",
+    "weasyprint: ModuleNotFoundError: No module named 'weasyprint'",
+    "PyInstaller: ModuleNotFoundError: No module named 'PyInstaller'",
+    "pyunfold: ModuleNotFoundError: No module named 'pyunfold'",
+    "flake8: ModuleNotFoundError: No module named 'flake8'",
+    "Runtime smoke: ModuleNotFoundError: No module named 'tensorflow'"
+  ],
+  "passed": false
+}
