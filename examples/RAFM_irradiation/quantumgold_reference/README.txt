@@ -122,3 +122,10 @@ isolated Python interpreter from an unrelated folder, and challenge wrong paths,
 changed/missing source bytes, duplicate IDs, wrong source reports and altered
 cohort/routing/timing labels. The full replay is also exercised from a Git archive
 so the test covers committed bytes rather than only this Windows working tree.
+
+Recorded acceptance
+PORTABILITY_ACCEPTANCE.json records the source-bound Git-archive replay, eight
+focused tests, separately tested label reconciliation and supplemental input
+audit. It also records observed dependency versions and the limits of the
+software/example acceptance. Numerical replay requires the project runtime
+dependencies; the standard-library input audit can run independently.
