@@ -20,7 +20,26 @@ Micromamba root and the conda-forge Qt provider resolved them. The latter is
 encoded in the manifest; no system runtime, shell profile or other agent's
 environment was changed.
 
-The full suite will run against a frozen checkout using the existing isolated
-acceptance runner. Full-suite results remain pending; this issue is not yet
-declared complete. See `docs/TEST_ENVIRONMENT.md` for commands and the smoke
+Full collection at frozen commit `36ed262` contained **2,081 cases**. The first
+run was interrupted; its recorded cases were retained and only the unreported
+cases were resumed. Combined coverage is complete: **2,052 passed, 26 skipped,
+3 failed, 0 missing**. The result is not a passing full-suite receipt.
+
+Two failures shared a parity field-name bug: the manifest's declared
+`energy_keV_abs` tolerance was ignored for `energies_keV[]` and `first_peak_keV`.
+The comparator now honors that declaration, retains explicit-field precedence,
+and rejects changes beyond the declared tolerance. Follow-up parity/irradiation
+and production-catalog checks pass (21 tests) on the branch incorporating the
+other agent's published activation fixes.
+
+The third failure was a legacy desktop coordinate-click wait for a calibration
+button. A separate run using the driver's existing Windows CI widget-event mode
+passes. The original real-coordinate timeout is retained; this follow-up does
+not claim a passing physical mouse-input replay.
+
+Skips cover external transport/unfolding reference files, Linux-only CUDA library
+discovery, and a POSIX directory-fsync scenario. They do not skip TensorFlow or Qt due
+to a missing installation. The complete environment is supplied and usable;
+single-revision full-suite acceptance and scientific source qualification remain
+separate open work. See `docs/TEST_ENVIRONMENT.md` for commands and the smoke
 check's nonzero failure behavior.
