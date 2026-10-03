@@ -1568,6 +1568,7 @@ def fit_multiple_peaks(
     share_sigma: bool = False,
     counts_uncertainty: Optional[np.ndarray] = None,
     counts_covariance: Any = None,
+    max_evaluations: int = 2000,
 ) -> List[PeakFitResult]:
     """
     Fit multiple peaks simultaneously.
@@ -1586,12 +1587,21 @@ def fit_multiple_peaks(
         Background model
     share_sigma : bool
         If True, all peaks share same sigma
+    max_evaluations : int
+        Positive nonlinear evaluation budget. Exhaustion returns failed joint
+        components; it never substitutes overlapping independent peak areas.
 
     Returns
     -------
     list of PeakFitResult
         Fitting results for each peak
     """
+    if (
+        isinstance(max_evaluations, bool)
+        or not isinstance(max_evaluations, (int, np.integer))
+        or max_evaluations < 1
+    ):
+        raise ValueError("max_evaluations must be a positive integer")
     if not peak_channels:
         return []
 
@@ -1783,7 +1793,7 @@ def fit_multiple_peaks(
             sigma=fit_sigma,
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
-            maxfev=20000,
+            maxfev=max_evaluations,
             x_scale="jac",
         )
         perr = np.sqrt(np.diag(pcov))

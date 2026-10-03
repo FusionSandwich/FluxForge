@@ -3974,6 +3974,8 @@ def analyze_flux_wire_sample(
         "missing_peaks": [],
         "missing_nuclides": [],
     }
+    if qg_path is not None and reference_data is None:
+        validation["reference_state"] = "unavailable_no_nuclide_observations"
     if reference_data is not None:
         peak_rows, missing_peaks = build_peak_comparison_records(
             sample_id, analysis.peaks, reference_data, metadata.config

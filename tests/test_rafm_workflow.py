@@ -496,6 +496,30 @@ def test_analyze_flux_wire_sample_writes_reactions(tmp_path):
     assert "raw_gross_counts" in first_row
 
 
+def test_wire_empty_paired_report_preserves_raw_activity_and_unknown_comparison(
+    tmp_path,
+):
+    metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
+    paths = default_paths(EXAMPLE_ROOT, results_root=tmp_path / "results")
+    tree = ensure_results_tree(paths.results_root)
+    background = read_raw_asc(paths.background_path, profile_name="rafm_25cm").spectrum
+    raw_path = paths.raw_root / "flux_wires" / "Co-RAFM-1_25cm.ASC"
+    qg_path = tmp_path / "empty.txt"
+    qg_path.write_text("Acquisition Date: 28-Apr-2025 16:44\n0 12\n1 13\n")
+    key = normalize_pairing_key(raw_path.stem, metadata.pairing_aliases)
+    artifact = analyze_flux_wire_sample(
+        raw_path, metadata, paths, tree, background, qg_path, key
+    )
+    assert artifact["validation"]["passed"] is None
+    assert artifact["validation"]["reference_used_for_analysis"] is False
+    assert (
+        artifact["validation"]["reference_state"]
+        == "unavailable_no_nuclide_observations"
+    )
+    assert "Co60" in artifact["isotopes"]
+    assert artifact["isotopes"]["Co60"]["activity_bq"] > 0
+
+
 def test_flux_wire_count_parity_representative_lines(tmp_path):
     metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
     paths = default_paths(EXAMPLE_ROOT, results_root=tmp_path / "results")
