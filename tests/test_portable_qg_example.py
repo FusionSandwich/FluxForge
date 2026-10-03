@@ -22,7 +22,9 @@ class PortableQGExampleTests(unittest.TestCase):
         cls.tmp = tempfile.TemporaryDirectory(prefix='fluxforge portable QG ')
         cls.copy = Path(cls.tmp.name)/'relocated source with spaces'
         manifest = json.loads((REPO/MANIFEST).read_text(encoding='utf-8'))
-        for relative in [str(SCRIPT),str(MANIFEST)] + [r['path'] for r in manifest['resources']]:
+        supplement_path = MANIFEST.parent/'supplemental_inputs/manifest.json'
+        supplement = json.loads((REPO/supplement_path).read_text(encoding='utf-8'))
+        for relative in [str(SCRIPT),str(MANIFEST),str(supplement_path)] + [r['path'] for r in manifest['resources']+supplement['resources']]:
             src, target = REPO/relative, cls.copy/relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, target)
@@ -40,6 +42,8 @@ class PortableQGExampleTests(unittest.TestCase):
         self.assertEqual(receipt['counts'],self.manifest['completeness'])
         self.assertEqual(receipt['original_report_lines_verified'],376)
         self.assertEqual(receipt['required_external_data_paths'],[])
+        self.assertEqual(receipt['supplemental_audit']['older_report_ROI_rows'],12)
+        self.assertEqual(receipt['supplemental_audit']['older_report_summaries'],6)
 
     def check_bad_manifest(self, changed):
         tmp_manifest = Path(self.tmp.name)/'bad_manifest.json'
