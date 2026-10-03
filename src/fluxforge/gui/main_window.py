@@ -44,6 +44,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.dialogs import (
         CalibrationWorkspaceDialog,
         CovarianceDialog,
+        IrradiationHistoryDialog,
         PuIsotopicsDialog,
         QAHistoryDialog,
         ReportExportDialog,
@@ -185,6 +186,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._unfolding_dialog = None
             self._qa_history_dialog = None
             self._covariance_dialog = None
+            self._irradiation_history_dialog = None
+            self._irradiation_segments = ()
             self._report_dialog = None
             self._pu_isotopics_dialog = None
             self._standards_review_dialog = None
@@ -501,12 +504,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 object_name="OpenQaHistoryAction",
             )
             tools_menu.addAction(self._qa_history_action)
-            tools_menu.addAction(self._action(
-                "Covariance and Correlation",
-                enabled=True,
-                handler=self._open_covariance_view,
-                object_name="OpenCovarianceAction",
-            ))
+            tools_menu.addAction(
+                self._action(
+                    "Covariance and Correlation",
+                    enabled=True,
+                    handler=self._open_covariance_view,
+                    object_name="OpenCovarianceAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Irradiation History",
+                    enabled=True,
+                    handler=self._open_irradiation_history,
+                    object_name="OpenIrradiationHistoryAction",
+                )
+            )
             if self.developer_tools:
                 tools_menu.addAction(
                     self._unavailable_action(
@@ -1581,6 +1594,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._covariance_dialog.show()
             self._covariance_dialog.raise_()
             self._covariance_dialog.activateWindow()
+
+        def _open_irradiation_history(self) -> None:
+            if self._irradiation_history_dialog is None:
+                self._irradiation_history_dialog = IrradiationHistoryDialog(parent=self)
+                self._irradiation_history_dialog.historyChanged.connect(
+                    self._set_irradiation_history
+                )
+            self._irradiation_history_dialog.show()
+            self._irradiation_history_dialog.raise_()
+            self._irradiation_history_dialog.activateWindow()
+
+        def _set_irradiation_history(self, segments) -> None:
+            self._irradiation_segments = segments
 
         def _open_dashboard_tab(self) -> None:
             if hasattr(self, "central_tabs"):
