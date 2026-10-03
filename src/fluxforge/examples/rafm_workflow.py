@@ -253,6 +253,7 @@ def build_generic_gamma_library(
                     energy_keV=float(line["energy_keV"]),
                     intensity=float(line["intensity"]),
                     isotope=isotope,
+                    intensity_uncertainty=float(line.get("intensity_uncertainty", 0.0)),
                 )
             )
     deduped: List[GammaLine] = []
