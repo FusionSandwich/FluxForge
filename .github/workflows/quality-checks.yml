@@ -134,6 +134,15 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
+      - name: History, reaction-rate and spectrum queue contracts
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_irradiation_history_inputs.py \
+            tests/test_reaction_rate_view_inputs.py \
+            tests/test_spectrum_file_queue_conversion.py
+
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -225,6 +234,14 @@ jobs:
 
       - name: Predictive dashboard Qt tests
         run: pytest -q tests/test_predictive_dashboard_qt.py
+
+      - name: History, reaction-rate and spectrum queue Qt tests
+        run: |
+          pytest -q \
+            tests/test_irradiation_history_workspace_qt.py \
+            tests/test_reaction_rate_workspace_qt.py \
+            tests/test_spectrum_file_queue_workspace_qt.py \
+            tests/test_production_gui_mode.py
 
   native-desktop-gui-linux:
     if: github.event_name == 'workflow_dispatch'
