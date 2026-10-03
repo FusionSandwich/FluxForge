@@ -16,7 +16,6 @@ rate, following the Stoughton and Halperin convention used by ASTM E262.
 from __future__ import annotations
 
 import math
-from fluxforge.data.k0_library import get_k0_library_record
 from typing import Any, Sequence
 
 from fluxforge.analysis.astm_e261 import target_atom_count
@@ -78,6 +77,11 @@ def _measurement_from_row(
     key = lambda name: f"{prefix}{name}" if prefix else name
     return GammaLineMeasurement(
         net_counts=float(row.get(key("net_counts"), 0.0)),
+        net_counts_unc=(
+            float(row[key("net_counts_unc")])
+            if row.get(key("net_counts_unc")) is not None
+            else None
+        ),
         live_time_s=float(row.get(key("live_time_s"), 0.0)),
         efficiency=float(row.get(key("efficiency"), row.get("efficiency", 0.0))),
         gamma_intensity=float(
@@ -113,9 +117,7 @@ def _reaction_rate_from_measurement(
     measurement: GammaLineMeasurement, segments: Sequence[IrradiationSegment]
 ) -> tuple[float, float, float, float]:
     activity_eoi_bq = measurement.activity_at_reference()
-    activity_unc_bq = float(
-        activity_eoi_bq / math.sqrt(max(measurement.net_counts, 1.0))
-    )
+    activity_unc_bq = measurement.activity_uncertainty_at_reference()
     buildup_factor = irradiation_buildup_factor(segments, measurement.half_life_s)
     if buildup_factor <= 0.0:
         raise ValueError(
@@ -185,6 +187,14 @@ def _analyze_radiometric_measurement(
         or 0.0
     )
 
+    if not math.isfinite(sigma_0_unc_barn) or sigma_0_unc_barn < 0:
+        raise ValueError("sigma_0_unc_barn must be finite and nonnegative")
+
+    cross_section_uncertainty_source = (
+        "supplied"
+        if ("sigma_0_unc_barn" in row or "thermal_cross_section_unc_barn" in row)
+        else "unavailable"
+    )
     cross_section_supplied = (
         "sigma_0_barn" in row or "thermal_cross_section_barn" in row
     )
@@ -207,8 +217,14 @@ def _analyze_radiometric_measurement(
         record = get_k0_library_record(iso_fmt)
         if record and record.sigma_0_barn > 0.0:
             sigma_0_barn = float(record.sigma_0_barn)
-            if float(record.k0_unc_percent) > 0.0:
+            if (
+                cross_section_uncertainty_source == "unavailable"
+                and float(record.k0_unc_percent) > 0.0
+            ):
                 sigma_0_unc_barn = sigma_0_barn * (record.k0_unc_percent / 100.0)
+                cross_section_uncertainty_source = (
+                    "library k0 proxy; not a qualified sigma0 uncertainty"
+                )
 
     westcott_g = float(row.get("westcott_g", 1.0))
     thermal_self_shielding_factor = float(
@@ -234,6 +250,7 @@ def _analyze_radiometric_measurement(
             "ASTM E262 radiometric mode requires positive sigma_0_barn, Westcott g, and thermal self-shielding factor."
         )
 
+    unconstrained_thermal_rate_s = reaction_rate_s
     thermal_rate_s = reaction_rate_s
     thermal_rate_unc_s = reaction_rate_unc_s
     cadmium_payload: dict[str, Any] = {}
@@ -264,17 +281,14 @@ def _analyze_radiometric_measurement(
         )
         if not math.isfinite(cd_transmission_factor) or cd_transmission_factor < 0:
             raise ValueError("cd_transmission_factor must be finite and nonnegative")
-        thermal_rate_s = max(
+        unconstrained_thermal_rate_s = (
             reaction_rate_s
-            - cd_transmission_factor * cd_reaction_rate_s * cd_inventory_scale,
-            0.0,
+            - cd_transmission_factor * cd_reaction_rate_s * cd_inventory_scale
         )
-        thermal_rate_unc_s = float(
-            math.sqrt(
-                reaction_rate_unc_s * reaction_rate_unc_s
-                + (cd_transmission_factor * cd_reaction_rate_unc_s * cd_inventory_scale)
-                ** 2
-            )
+        thermal_rate_s = max(unconstrained_thermal_rate_s, 0.0)
+        thermal_rate_unc_s = math.hypot(
+            reaction_rate_unc_s,
+            cd_transmission_factor * cd_reaction_rate_unc_s * cd_inventory_scale,
         )
 
         cd_ratio, cd_ratio_unc = calculate_cd_ratio(
@@ -290,6 +304,7 @@ def _analyze_radiometric_measurement(
             cd_thickness=float(row.get("cd_thickness_mm", 1.0) or 1.0),
         )
         cadmium_payload = {
+            "cd_count_uncertainty": cd_measurement.count_uncertainty_metadata(),
             "cd_activity_eoi_Bq": float(cd_activity_bq),
             "cd_activity_eoi_unc_Bq": float(cd_activity_unc_bq),
             "cd_reaction_rate_s": float(cd_reaction_rate_s),
@@ -307,12 +322,9 @@ def _analyze_radiometric_measurement(
         }
 
     phi0_eq_cm2_s = float(thermal_rate_s / denominator)
-    rel_rate_unc = _relative_uncertainty(thermal_rate_s, thermal_rate_unc_s)
-    rel_sigma_unc = _relative_uncertainty(sigma_0_barn, sigma_0_unc_barn)
-    phi0_eq_unc_cm2_s = float(
-        phi0_eq_cm2_s
-        * math.sqrt(rel_rate_unc * rel_rate_unc + rel_sigma_unc * rel_sigma_unc)
-    )
+    count_effect = thermal_rate_unc_s / denominator
+    cross_section_effect = phi0_eq_cm2_s * sigma_0_unc_barn / sigma_0_barn
+    phi0_eq_unc_cm2_s = math.hypot(count_effect, cross_section_effect)
 
     neutron_temperature_K = float(
         row.get("neutron_temperature_K", default_neutron_temperature_K)
@@ -327,6 +339,30 @@ def _analyze_radiometric_measurement(
 
     result = {
         "mode": "radiometric",
+        "unconstrained_thermal_reaction_rate_s": unconstrained_thermal_rate_s,
+        "thermal_rate_clipped": unconstrained_thermal_rate_s < 0,
+        "uncertainty_budget": {
+            "uncertainty_scope": "conditional",
+            "scientific_admission": False,
+            "count": measurement.count_uncertainty_metadata(),
+            "fluence_rate_components_cm2_s": {
+                "counts": count_effect,
+                "cross_section": cross_section_effect,
+            },
+            "omitted_components": [
+                "target_inventory",
+                "correction_factors",
+                "efficiency",
+                "gamma_yield",
+                "timing",
+                "half_life",
+                "bare_cd_covariance",
+            ],
+            "clipping_interpretation": "count sigma propagated before clipping; not a censored posterior or detection limit",
+            "cross_section_uncertainty_source": cross_section_uncertainty_source,
+            "cross_section_uncertainty_supplied": "sigma_0_unc_barn" in row
+            or "thermal_cross_section_unc_barn" in row,
+        },
         "activity_eoi_Bq": float(activity_eoi_bq),
         "activity_eoi_unc_Bq": float(activity_unc_bq),
         "reaction_rate_s": float(reaction_rate_s),
@@ -397,7 +433,11 @@ def _analyze_standard_comparison_measurement(
         )
         or 0.0
     )
-    if known_phi0_cm2_s <= 0.0:
+    if not math.isfinite(known_phi0_unc_cm2_s) or known_phi0_unc_cm2_s < 0:
+        raise ValueError(
+            "known_reference_fluence_rate_unc_cm2_s must be finite and nonnegative"
+        )
+    if not math.isfinite(known_phi0_cm2_s) or known_phi0_cm2_s <= 0.0:
         raise ValueError(
             "ASTM E262 standard-comparison mode requires known_reference_fluence_rate_cm2_s > 0."
         )
@@ -423,12 +463,17 @@ def _analyze_standard_comparison_measurement(
         )
         * spectral_correction_factor
     )
-    rel_unc = math.sqrt(
-        _relative_uncertainty(known_phi0_cm2_s, known_phi0_unc_cm2_s) ** 2
-        + _relative_uncertainty(unknown_rate_s, unknown_rate_unc_s) ** 2
-        + _relative_uncertainty(standard_rate_s, standard_rate_unc_s) ** 2
+    unknown_effect = (
+        known_phi0_cm2_s
+        * standard_target_atoms
+        / unknown_target_atoms
+        * spectral_correction_factor
+        / standard_rate_s
+        * unknown_rate_unc_s
     )
-    phi0_eq_unc_cm2_s = float(abs(phi0_eq_cm2_s) * rel_unc)
+    standard_effect = phi0_eq_cm2_s * standard_rate_unc_s / standard_rate_s
+    reference_effect = phi0_eq_cm2_s * known_phi0_unc_cm2_s / known_phi0_cm2_s
+    phi0_eq_unc_cm2_s = math.hypot(unknown_effect, standard_effect, reference_effect)
 
     neutron_temperature_K = float(
         row.get("neutron_temperature_K", default_neutron_temperature_K)
@@ -443,6 +488,29 @@ def _analyze_standard_comparison_measurement(
 
     return {
         "mode": "standard_comparison",
+        "uncertainty_budget": {
+            "uncertainty_scope": "conditional",
+            "scientific_admission": False,
+            "unknown_count": unknown_measurement.count_uncertainty_metadata(),
+            "standard_count": standard_measurement.count_uncertainty_metadata(),
+            "fluence_rate_components_cm2_s": {
+                "unknown_counts": unknown_effect,
+                "standard_counts": standard_effect,
+                "reference_field": reference_effect,
+            },
+            "omitted_components": [
+                "target_inventory",
+                "spectral_correction",
+                "efficiency",
+                "gamma_yield",
+                "timing",
+                "half_life",
+                "unknown_standard_covariance",
+            ],
+            "reference_uncertainty_supplied": "known_reference_fluence_rate_unc_cm2_s"
+            in row
+            or "known_fluence_rate_unc_cm2_s" in row,
+        },
         "known_reference_fluence_rate_cm2_s": float(known_phi0_cm2_s),
         "known_reference_fluence_rate_unc_cm2_s": float(known_phi0_unc_cm2_s),
         "spectral_correction_factor": float(spectral_correction_factor),

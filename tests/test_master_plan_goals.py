@@ -224,9 +224,12 @@ def test_goal_2_reaction_rates():
         for reaction in measurements["reactions"]:
             gamma_lines = [GammaLineMeasurement(**gl) for gl in reaction["gamma_lines"]]
 
-            activity, _ = weighted_activity(gamma_lines)
+            activity, activity_sigma = weighted_activity(gamma_lines)
             rate_estimate = reaction_rate_from_activity(
-                activity, segments, reaction["half_life_s"]
+                activity,
+                segments,
+                reaction["half_life_s"],
+                activity_uncertainty_bq=activity_sigma,
             )
 
             # Verify the relationship: rate * buildup_factor = activity
@@ -627,9 +630,12 @@ def test_goal_7_complete_workflow():
 
         for reaction in measurements["reactions"]:
             gamma_lines = [GammaLineMeasurement(**gl) for gl in reaction["gamma_lines"]]
-            activity, _ = weighted_activity(gamma_lines)
+            activity, activity_sigma = weighted_activity(gamma_lines)
             rate_estimate = reaction_rate_from_activity(
-                activity, segments, reaction["half_life_s"]
+                activity,
+                segments,
+                reaction["half_life_s"],
+                activity_uncertainty_bq=activity_sigma,
             )
             measured_rates.append(rate_estimate.rate)
             rate_uncertainties.append(rate_estimate.uncertainty)

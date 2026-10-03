@@ -114,6 +114,11 @@ def _coerce_segments(payload: dict[str, Any]) -> list[IrradiationSegment]:
 def _build_measurement(row: dict[str, Any]) -> GammaLineMeasurement:
     return GammaLineMeasurement(
         net_counts=float(row.get("net_counts", 0.0)),
+        net_counts_unc=(
+            float(row["net_counts_unc"])
+            if row.get("net_counts_unc") is not None
+            else None
+        ),
         live_time_s=float(row.get("live_time_s", 0.0)),
         efficiency=float(row.get("efficiency", 0.0)),
         gamma_intensity=float(
@@ -173,9 +178,7 @@ def analyze_astm_e261_plan(plan: dict[str, Any]) -> dict[str, Any]:
     for index, row in enumerate(measurement_rows, start=1):
         measurement = _build_measurement(row)
         activity_eoi_bq = measurement.activity_at_reference()
-        activity_unc_bq = float(
-            activity_eoi_bq / math.sqrt(max(measurement.net_counts, 1.0))
-        )
+        activity_unc_bq = measurement.activity_uncertainty_at_reference()
         buildup_factor = irradiation_buildup_factor(segments, measurement.half_life_s)
         if buildup_factor <= 0.0:
             raise ValueError(
@@ -198,6 +201,13 @@ def analyze_astm_e261_plan(plan: dict[str, Any]) -> dict[str, Any]:
         effective_cross_section_unc_barn = float(
             row.get("effective_cross_section_unc_barn", 0.0) or 0.0
         )
+        if (
+            not math.isfinite(effective_cross_section_unc_barn)
+            or effective_cross_section_unc_barn < 0
+        ):
+            raise ValueError(
+                "effective_cross_section_unc_barn must be finite and nonnegative"
+            )
         correction_factor = 1.0
         for name in (
             "astm_correction_factor",
@@ -221,18 +231,36 @@ def analyze_astm_e261_plan(plan: dict[str, Any]) -> dict[str, Any]:
             )
 
         fluence_rate_cm2_s = float(reaction_rate_s / denominator)
-        rel_rate_unc = _relative_uncertainty(reaction_rate_s, reaction_rate_unc_s)
-        rel_sigma_unc = _relative_uncertainty(
-            effective_cross_section_barn, effective_cross_section_unc_barn
-        )
-        fluence_rate_unc_cm2_s = float(
+        count_effect = reaction_rate_unc_s / denominator
+        cross_section_effect = (
             fluence_rate_cm2_s
-            * math.sqrt(rel_rate_unc * rel_rate_unc + rel_sigma_unc * rel_sigma_unc)
+            * effective_cross_section_unc_barn
+            / effective_cross_section_barn
         )
+        fluence_rate_unc_cm2_s = math.hypot(count_effect, cross_section_effect)
         fluence_cm2 = float(fluence_rate_cm2_s * fluence_duration_s)
         fluence_unc_cm2 = float(fluence_rate_unc_cm2_s * fluence_duration_s)
 
         result = {
+            "uncertainty_budget": {
+                "uncertainty_scope": "conditional",
+                "scientific_admission": False,
+                "count": measurement.count_uncertainty_metadata(),
+                "fluence_rate_components_cm2_s": {
+                    "counts": count_effect,
+                    "cross_section": cross_section_effect,
+                },
+                "omitted_components": [
+                    "target_inventory",
+                    "correction_factors",
+                    "efficiency",
+                    "gamma_yield",
+                    "timing",
+                    "half_life",
+                ],
+                "cross_section_uncertainty_supplied": "effective_cross_section_unc_barn"
+                in row,
+            },
             "measurement_id": str(row.get("measurement_id") or f"measurement_{index}"),
             "reaction_id": str(
                 row.get("reaction_id")
