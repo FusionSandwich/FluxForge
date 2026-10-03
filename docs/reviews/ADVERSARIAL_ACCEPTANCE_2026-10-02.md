@@ -18,8 +18,9 @@ at `registry-uncertainty-qualification`, frozen at
 
 All 32 remote branches and tags were fetched and inventoried. This work tests
 the integrated feature selection above; it does not claim every historical
-branch has been tested or merged. Local fixes have not been pushed, and the
-changed GitHub workflow has not been executed remotely.
+branch has been tested or merged. The integration is published in
+[draft PR #216](https://github.com/FusionSandwich/FluxForge/pull/216). The PR
+retains the scientific blockers below; publication does not imply acceptance.
 
 Across 2,026 distinct collected test cases, consolidated terminal outcomes are
 **2,009 passed, 17 skipped, zero failed, and zero missing**. Core, GUI, optional
@@ -165,9 +166,42 @@ hashed. The dosimetry procedure reports a balance uncertainty of 5.7 micrograms
 and an HPGe efficiency uncertainty of 1.2% at one sigma for that program; the
 email describes its source-calibration approach. These are useful records to
 trace, not sample-specific qualification. The two original sample workbooks
-are unreadable OneDrive placeholders. Email search still requires an installed
-and connected Outlook Email plugin; no email was sent or altered.
+are unreadable OneDrive placeholders. At the initial audit, email search was
+unavailable. The record-access follow-up below supersedes that access status.
 
 The evidence bundle retains original failures, corrected-case observations,
 replay receipts, raw comparison exceptions, package tests, and record-search
 receipts separately. The earlier sealed adversarial audit remains unchanged.
+
+## Review and publication follow-up — 2026-10-03
+
+A `gpt-6-luna` subagent reviewed `5c4b852a` against the frozen integration base
+and reported no actionable regressions in the reviewed fixes. It ran 84 focused
+background/covariance/signed-fit/Hypermet/profile/transport/readiness checks,
+eight HPGe dialog/profile and readiness-CLI checks, and a four-case transport
+acceptance-runner smoke check, all passing. These repeat existing cases and are
+not added to the distinct-case totals above. The review did not qualify the
+remaining physical measurements or missing real transport fixtures.
+
+The first remote PR workflow passed CPU-ML, frozen external-reference parity,
+and both Linux and Windows modern-GUI jobs. Its core job exposed an optional-Qt
+test collection defect: `QApplication` was imported without checking whether
+Qt was installed. The same file also imported Qt-dependent shell helpers in an
+unmarked test. The follow-up guards the import and marks that runtime helper
+test with the existing optional-Qt condition; both checks remain exercised by
+the GUI jobs. Later workflow outcomes are visible in the PR Checks tab. Legacy
+desktop jobs are dispatch-only and were not executed by this PR event.
+
+Connected Outlook search located the original sample-workbook and South
+calibration-export attachments. Materialization succeeded at the connector,
+but downloading the returned links failed with HTTP 403, including one fresh
+retry. Their contents have not been read or qualified. The readable local
+six-page Quantum operations guide describes adjacent-channel continuum
+subtraction and resolution-based ROI sizing, but does not supply the original
+efficiency-error convention, calibration certificate, fit covariance, or
+sample-specific measurement uncertainty. Private email search results and
+attachment receipts remain local and are excluded from this PR.
+
+The original sealed evidence remains unchanged. Review and remote-check
+receipts are retained separately under `artifacts/validation/review_20261003`,
+and record-access receipts under `artifacts/validation/email_qualification_20261003`.
