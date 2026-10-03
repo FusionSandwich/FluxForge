@@ -1,0 +1,224 @@
+{
+  "git_head": "3ed85ee0ca9df39f0dbfe50499c485bca45d9d55",
+  "python": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete\\python.exe",
+  "prefix": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete",
+  "fixture_tolerances": {
+    "energy_keV_abs": 8.0,
+    "peak_count_abs": 2.0
+  },
+  "expected": {
+    "peak_count": 3,
+    "energies_keV": [
+      90.26297,
+      219.73355,
+      219.86546
+    ],
+    "channels": [
+      9.026,
+      21.973,
+      21.987
+    ],
+    "first_peak_keV": 90.26297
+  },
+  "observed": {
+    "peak_count": 3,
+    "energies_keV": [
+      90.26297,
+      219.733551,
+      219.86546
+    ],
+    "channels": [
+      9.026,
+      21.973,
+      21.987
+    ],
+    "first_peak_keV": 90.26297
+  },
+  "source_sha256": "6bdc8e7213ecd996601c3ada029de4a6e693b99cc83deba2431fffd03ef1facd",
+  "probe_sha256": "346bca21d0a18c6dec98ccc6e6ef865981d1cc6bd0bd05b3b0a3de7ed112d513",
+  "checks": [
+    {
+      "name": "actual fixture output",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "actual output without declared tolerance",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV[1]: numeric mismatch expected 219.73355 observed 219.733551"
+      ]
+    },
+    {
+      "name": "energies_keV delta -8.001",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV[0]: numeric mismatch expected 200.0 observed 191.999"
+      ]
+    },
+    {
+      "name": "energies_keV delta -8.0",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "energies_keV delta 6e-06",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "energies_keV delta 8.0",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "energies_keV delta 8.001",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV[0]: numeric mismatch expected 200.0 observed 208.001"
+      ]
+    },
+    {
+      "name": "energies_keV explicit abs precedence ['energy_keV_abs', 'energies_keV_abs']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV[0]: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "energies_keV explicit abs precedence ['energies_keV_abs', 'energy_keV_abs']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV[0]: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "energies_keV explicit rel precedence ['energy_keV_rel', 'energies_keV_rel']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV[0]: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "energies_keV explicit rel precedence ['energies_keV_rel', 'energy_keV_rel']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV[0]: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "energies_keV relative alias",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "first_peak_keV delta -8.001",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.first_peak_keV: numeric mismatch expected 200.0 observed 191.999"
+      ]
+    },
+    {
+      "name": "first_peak_keV delta -8.0",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "first_peak_keV delta 6e-06",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "first_peak_keV delta 8.0",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "first_peak_keV delta 8.001",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.first_peak_keV: numeric mismatch expected 200.0 observed 208.001"
+      ]
+    },
+    {
+      "name": "first_peak_keV explicit abs precedence ['energy_keV_abs', 'first_peak_keV_abs']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.first_peak_keV: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "first_peak_keV explicit abs precedence ['first_peak_keV_abs', 'energy_keV_abs']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.first_peak_keV: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "first_peak_keV explicit rel precedence ['energy_keV_rel', 'first_peak_keV_rel']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.first_peak_keV: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "first_peak_keV explicit rel precedence ['first_peak_keV_rel', 'energy_keV_rel']",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.first_peak_keV: numeric mismatch expected 200.0 observed 201.0"
+      ]
+    },
+    {
+      "name": "first_peak_keV relative alias",
+      "expected_match": true,
+      "observed_match": true,
+      "mismatches": []
+    },
+    {
+      "name": "channel perturbation cannot borrow energy tolerance",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.channels[0]: numeric mismatch expected 9.026 observed 9.027"
+      ]
+    },
+    {
+      "name": "energy array length is strict",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.energies_keV: list length mismatch expected 3 observed 2"
+      ]
+    },
+    {
+      "name": "peak count beyond declared tolerance",
+      "expected_match": false,
+      "observed_match": false,
+      "mismatches": [
+        "detected_peaks_expected.json.peak_count: numeric mismatch expected 3 observed 6"
+      ]
+    }
+  ],
+  "passed": true
+}

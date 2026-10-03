@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge\artifacts\validation\three_failures_20261003\diagnose_coordinate.py", line 36, in <module>
+    payload = driver.run_acceptance(output)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge\tests\gui_desktop_driver.py", line 657, in run_acceptance
+    _wait_for(
+  File "C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge\tests\gui_desktop_driver.py", line 253, in _wait_for
+    raise TimeoutError(f"Timed out waiting for {description}.")
+TimeoutError: Timed out waiting for calibration fit.
