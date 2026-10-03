@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fluxforge.analysis.astm_e261 import analyze_astm_e261_plan, target_atom_count
 from fluxforge.cli import app as cli_app
-from fluxforge_gui.app import build_gui_astm_e261_preview
+from fluxforge.reporting.standards_preview import build_gui_astm_e261_preview
 
 
 def test_target_atom_count_accounts_for_abundance_and_purity() -> None:

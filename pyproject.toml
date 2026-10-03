@@ -47,7 +47,6 @@ reporting = [
 [project.scripts]
 fluxforge = "fluxforge.cli.app:main"
 fluxforge-gui = "fluxforge.gui.app:main"
-fluxforge-gui-legacy = "fluxforge_gui.app:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
@@ -58,6 +57,7 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["fluxforge", "fluxforge.*"]
 
 [tool.setuptools.package-data]
 fluxforge = [
