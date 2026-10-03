@@ -1,0 +1,40 @@
+Sample: RAFM2_Long_144h_EOI
+Raw file: C:\Users\joshu\.codex\worktrees\issue-audit-9-up\Fluxforge_1\examples\RAFM_irradiation\raw_gamma_spec\RAFM2\RAFM2_Long_144h_EOI.ASC
+QG file: none
+Sample group: unknown
+Irradiation phase: n/a
+Schedule source: n/a
+Decay label: n/a
+Decay time (s): n/a
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+Comparison basis: not_evaluated
+Raw comparison passed: not established
+
+Ambiguous observed components; isotope activities withheld
+----------------------------------------------------------
+- 103.38 keV | net=102970.00 +/- 2796.14 | candidates=Ta182@100.11 | withheld_energy_mismatch
+- 139.70 keV | net=672525.00 +/- 3457.17 | candidates=W187@134.25 | withheld_energy_mismatch
+- 144.67 keV | net=906200.50 +/- 13686.72 | candidates=Fe59@142.65 | withheld_energy_mismatch
+- 202.97 keV | net=111671.50 +/- 2626.61 | candidates=W187@206.25 | withheld_energy_mismatch
+- 630.41 keV | net=45264.50 +/- 2459.74 | candidates=Sb124@632.40 | withheld_energy_mismatch
+- 646.42 keV | net=1320.00 +/- 345.99 | candidates=Sb124@645.86, Tb154m@649.44 | withheld_ambiguous_assignment
+- 739.65 keV | net=4680.00 +/- 839.96 | candidates=Sb124@735.66 | withheld_energy_mismatch
+- 1328.65 keV | net=5424.07 +/- 661.66 | candidates=Sb124@1325.51 | withheld_energy_mismatch
+- 1437.83 keV | net=191.00 +/- 76.78 | candidates=V52@1434.09, Sb124@1436.56 | withheld_ambiguous_assignment
+
+Unidentifiable joint fit: channels [480, 506] | observed signed window counts=1183924.86 +/- 1088.62; no net peak area or isotope activity estimated | candidates=[{'isotope': 'W187', 'energy_keV': 246.3, 'intensity': 0.001134}, {'isotope': 'Tb154m', 'energy_keV': 247.94, 'intensity': 0.22}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Measurement-time activity audit
+-------------------------------
+Categories: activity_evidence_incomplete, library_or_assignment_limited
+EOI parity: not_evaluated_no_independent_eoi_reference
+Accuracy qualified: no (calibration and systematic budgets remain incomplete)
+
+No paired QG processed file was found for this raw spectrum.
+
+Unidentified FluxForge peaks
+---------------------------
+- 564.44 keV | net=74626.86 +/- 543.39 | sig=137.34
+- 1460.71 keV | net=2976.70 +/- 133.74 | sig=22.26
+- 2614.05 keV | net=305.84 +/- 21.24 | sig=14.40

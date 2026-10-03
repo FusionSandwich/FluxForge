@@ -3,6 +3,10 @@
 This directory contains the main maintained replay data and workflow entrypoints
 for FluxForge.
 
+Start with the [feature guide](FEATURE_GUIDE.md) for the expanded 32-acquisition
+dataset, converted-format checks, material compositions, reproducible commands
+and the qualification limits of each feature example.
+
 The INL Co masses are already adjusted Co element masses, despite the wires
 containing 0.46 wt% Co. Do not apply the alloy fraction a second time. See the
 [source and replay review](../../docs/reviews/INL_MONITOR_MASS_REVIEW_2026-09-29.md)
