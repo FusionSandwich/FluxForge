@@ -5,6 +5,11 @@
   "policy": "Every production-owned QAction, interactive control, fixed tab, and renderer intent must have a stable ID and a behavioral test suite. Qt-internal chrome and read-only output widgets are excluded.",
   "action_groups": [
     {
+      "surface": "main-window.covariance",
+      "test_ids": ["tests/test_covariance_workspace_qt.py"],
+      "object_names": ["OpenCovarianceAction"]
+    },
+    {
       "surface": "main-window.menus",
       "test_ids": ["tests/test_modern_gui_shell.py"],
       "object_names": ["OpenAnalysisMenuAction", "OpenCalibrationMenuAction", "OpenEditMenuAction", "OpenFileMenuAction", "OpenHelpMenuAction", "OpenToolsMenuAction", "OpenViewMenuAction", "OpenWorkspacesMenuAction"]
@@ -86,6 +91,11 @@
     }
   ],
   "control_surfaces": [
+    {
+      "surface": "covariance-dialog",
+      "test_ids": ["tests/test_covariance_workspace_qt.py"],
+      "object_names": ["CovarianceLoadButton", "CovarianceViewCombo", "CovarianceExportButton"]
+    },
     {
       "surface": "activity-results",
       "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_calibration_workspace_qt.py"],

@@ -43,6 +43,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import available_renderer_status
     from fluxforge.gui.dialogs import (
         CalibrationWorkspaceDialog,
+        CovarianceDialog,
         PuIsotopicsDialog,
         QAHistoryDialog,
         ReportExportDialog,
@@ -183,6 +184,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._calibration_dialog = None
             self._unfolding_dialog = None
             self._qa_history_dialog = None
+            self._covariance_dialog = None
             self._report_dialog = None
             self._pu_isotopics_dialog = None
             self._standards_review_dialog = None
@@ -499,6 +501,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 object_name="OpenQaHistoryAction",
             )
             tools_menu.addAction(self._qa_history_action)
+            tools_menu.addAction(self._action(
+                "Covariance and Correlation",
+                enabled=True,
+                handler=self._open_covariance_view,
+                object_name="OpenCovarianceAction",
+            ))
             if self.developer_tools:
                 tools_menu.addAction(
                     self._unavailable_action(
@@ -1566,6 +1574,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             self._qa_history_dialog = QAHistoryDialog(self.qa_monitor, parent=self)
             self._qa_history_dialog.show()
+
+        def _open_covariance_view(self) -> None:
+            if self._covariance_dialog is None:
+                self._covariance_dialog = CovarianceDialog(parent=self)
+            self._covariance_dialog.show()
+            self._covariance_dialog.raise_()
+            self._covariance_dialog.activateWindow()
 
         def _open_dashboard_tab(self) -> None:
             if hasattr(self, "central_tabs"):
