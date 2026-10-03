@@ -1,0 +1,69 @@
+{
+  "review_status": "accepted",
+  "scope": "Targeted peak detection, fit weighting, continuum covariance, measured-background physical counts, and separate raw comparison counts",
+  "reviewer": "peak_antagonist",
+  "source_sha256": {
+    "src/fluxforge/analysis/flux_wire_analysis.py": "1196C4F2AE5502E77B90A2FA5498B7BB8F51164C4A2202984AD32DD137A4FEB0",
+    "src/fluxforge/analysis/peakfit.py": "E859A5249795D7CC8B26F3610A0870A69142A4820EA4E085B4B597C80EB3B581",
+    "tests/test_targeted_peak_regressions.py": "86930943A9631F89BFE2B4D61402A8198F4A4CA15CFB695FF3F38433EFFE81EC",
+    "tests/test_targeted_continuum_covariance.py": "F6DD7D5B925FFD8B27677FF2B3C4C9785555A866C352B5E4C7DBC362B2D91DB8"
+  },
+  "independent_tests": {
+    "result": "17 passed in 6.17s",
+    "files": [
+      "scratch/antagonist_peaks/test_adversarial_regressions.py",
+      "scratch/antagonist_peaks/test_continuum_covariance.py"
+    ]
+  },
+  "multiplet_comparison_evidence": {
+    "physical_counts": [
+      1503.9769647785708,
+      902.3861788671123
+    ],
+    "raw_comparison_counts": [
+      7519.884823892931,
+      3910.3401084243596
+    ],
+    "methods": [
+      "qg",
+      "iec_tiered"
+    ],
+    "result": "Both bases agree with independently known analytic Gaussian areas"
+  },
+  "rafm_evidence": {
+    "authentic_lines_retained": "10 of 10 across RAFM4-A and RAFM4-C: Cr51, W187685.74, Mn54, and both Co60 lines",
+    "off_energy_rejections": [
+      "RAFM4-C W187206.25",
+      "RAFM4-N Tb154m247.94",
+      "RAFM4-A V521434.09",
+      "RAFM4-A Mn562113.09"
+    ],
+    "reproductions": [
+      "scratch/antagonist_peaks/rafm_known_lines.py",
+      "scratch/antagonist_peaks/rafm_subset.py",
+      "scratch/antagonist_peaks/background_multiplet_comparison.py"
+    ]
+  },
+  "remaining_blocking_findings": [],
+  "sc47_followup": {
+    "cause": "Nearest-energy local maximum was noise at channel316; singleton fit failed or escaped2keV tolerance",
+    "fix_review": "Retries bounded in-tolerance alternatives only after unusable first fit; no tolerance broadening",
+    "fixtures": [
+      "Ti-RAFM-1_25cm",
+      "Ti-RAFM-1a_25cm",
+      "Ti-RAFM-1b_25cm"
+    ],
+    "physical_net_counts": [
+      36686.06766930375,
+      36284.06766930375,
+      306544.8120316449
+    ],
+    "raw_comparison_net_counts": [
+      36785.0,
+      36417.5,
+      308195.0
+    ],
+    "result": "All3 supported Sc47 fixture peaks recovered;4 off-energy RAFM assignments still rejected",
+    "reproduction": "scratch/antagonist_peaks/sc47_fixture_diagnosis.py"
+  }
+}

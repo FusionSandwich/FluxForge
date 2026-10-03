@@ -270,6 +270,9 @@ def test_assignment_energy_gate_uses_nominal_width_at_final_centroid(
         background_subtract=False,
         peak_threshold=0,
         counting_method="iec_tiered",
+        # Exercise the independent FWHM assignment gate inside an explicitly
+        # wider search tolerance. Production defaults reject these centroids.
+        energy_tolerance_keV=6.0,
     )
     unguarded = analyze_raw_spectrum_targeted(specimen(), **kwargs)[0]
     guarded = analyze_raw_spectrum_targeted(
@@ -315,6 +318,7 @@ def test_assignment_energy_gate_also_applies_after_failed_single_fit(monkeypatch
         peak_threshold=0,
         counting_method="iec_tiered",
         max_assignment_energy_delta_fwhm=1.0,
+        energy_tolerance_keV=6.0,
     )
     assert peaks
     assert peaks[0].assignment_ambiguous

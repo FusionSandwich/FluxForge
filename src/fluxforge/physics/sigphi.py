@@ -357,11 +357,8 @@ def calculate_saturation_rate(
     D = decay_factor(λ, history.cooling_time_s)
     C = counting_factor(λ, history.counting_time_s)
 
-    # For multi-segment, use BCF-like factor instead of simple S
-    if len(history.segments) > 1 or correction_type == CorrectionType.BCF:
-        F_BCF = flux_history_correction_factor(history, λ)
-    else:
-        F_BCF = S
+    # Relative power belongs to every history, including a single segment.
+    F_BCF = flux_history_correction_factor(history, λ)
 
     # Burnup correction (target depletion during irradiation)
     burnup_corr = 1.0

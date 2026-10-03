@@ -1,0 +1,303 @@
+{
+  "repository": "FusionSandwich/FluxForge",
+  "queried_at_utc": "2026-10-02",
+  "issues": {
+    "15": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/15",
+      "title": "[Analysis] Integrate measured background into flux-wire analysis",
+      "issue_number": 15,
+      "body": "# [Analysis] Integrate measured background into flux-wire analysis\n\n## Goal\nApply shared measured background to raw flux-wire/RAFM analysis before peak extraction.\n\n## Scope\n- Add background parameters to flux-wire analysis entrypoints.\n- Use propagated per-channel uncertainties in ROI uncertainty estimation.\n- Preserve compatibility with targeted parity workflows.\n\n## Acceptance Criteria\n- Flux-wire analysis supports shared background input and scale modes.\n- ROI uncertainty reflects subtraction variance contribution.\n- Existing parity workflows still execute.\n",
+      "state": "open",
+      "user": {
+        "login": "github-actions[bot]",
+        "name": "github-actions[bot]",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "assignees": null,
+      "labels": null,
+      "milestone": null,
+      "state_reason": null,
+      "comments": 1,
+      "created_at": "2026-03-08T16:35:12Z",
+      "updated_at": "2026-09-29T15:05:28Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/15",
+      "display_title": "[Analysis] Integrate measured background into flux-wire analysis"
+    },
+    "24": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/24",
+      "title": "Improve Generic RAFM Peak Recovery and Identification",
+      "issue_number": 24,
+      "body": "# Improve Generic RAFM Peak Recovery and Identification\n\n## Problem\nGeneric RAFM spectra are still missing some QG peaks and leaving some detected peaks unidentified.\n\n## Current mitigation\n- Use exploratory peak search plus targeted recovery from the committed RAFM gamma library.\n- Deduplicate near-duplicate gamma lines in the library before targeted recovery.\n- Preserve unidentified FluxForge peaks in per-sample reports so they can be reviewed.\n\n## Remaining work\n- Audit recurring misses in RAFM3 and RAFM4 discrepancy reports.\n- Tighten line matching and overlapping-peak handling for crowded low-energy regions.\n- Review FluxForge-only IDs such as `Sb124`, `Co58`, and `V52` in late-time RAFM spectra.\n\n## Acceptance\n- Per-sample reports show fewer missing QG peaks and fewer unidentified FluxForge peaks in known problem spectra.\n",
+      "state": "open",
+      "user": {
+        "login": "github-actions[bot]",
+        "name": "github-actions[bot]",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "assignees": null,
+      "labels": null,
+      "milestone": null,
+      "state_reason": null,
+      "comments": 3,
+      "created_at": "2026-03-08T16:35:19Z",
+      "updated_at": "2026-09-30T23:10:07Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/24",
+      "display_title": "Improve Generic RAFM Peak Recovery and Identification"
+    },
+    "25": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/25",
+      "title": "Audit RAFM Peak and Activity Uncertainty Propagation",
+      "issue_number": 25,
+      "body": "# Audit RAFM Peak and Activity Uncertainty Propagation\n\n## Problem\nBackground-adjusted targeted fits were under-reporting uncertainty when the Gaussian fit uncertainty was smaller than the propagated counting/background uncertainty.\n\n## Current mitigation\n- Keep the propagated ROI uncertainty when it exceeds the fit uncertainty.\n- Preserve subtraction uncertainty channel-by-channel in the background-adjusted spectrum.\n- Suppress overflowed EOI back-corrections for extremely short-lived isotopes counted long after irradiation.\n\n## Remaining work\n- Compare FluxForge line-by-line net-count uncertainties against QG for the worst RAFM3/RAFM4 parity failures.\n- Review whether efficiency and emission-probability uncertainty assumptions are still too optimistic.\n- Document any sample-specific systematic uncertainty terms that are missing from the current workflow.\n\n## Acceptance\n- Line and isotope uncertainty discrepancies are documented for the remaining failing samples.\n- No targeted-fit path can silently report smaller uncertainty than the propagated subtraction/statistical term.\n",
+      "state": "open",
+      "user": {
+        "login": "github-actions[bot]",
+        "name": "github-actions[bot]",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "assignees": null,
+      "labels": null,
+      "milestone": null,
+      "state_reason": null,
+      "comments": 3,
+      "created_at": "2026-03-08T16:35:20Z",
+      "updated_at": "2026-09-30T23:10:08Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/25",
+      "display_title": "Audit RAFM Peak and Activity Uncertainty Propagation"
+    },
+    "194": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/194",
+      "title": "GRAVEL and MLEM row weighting depends on the units of each reaction row",
+      "issue_number": 194,
+      "body": "## Problem\n`src/fluxforge/solvers/iterative.py:gravel` (`c297542`) weights each row as\n`W_ig = m_i · R_ig · φ_g / p_i · (1/σ_i²)`.\nUMG/Matzke GRAVEL uses `W_ig = (m_i²/σ_i²) · R_ig · φ_g / p_i`. With FluxForge's form, a row's weight scales as `1/m_i`. Expressing one reaction in different units (same information) changes the answer, and rows with small absolute rates dominate. Per-atom activation rates in one RAFM inversion span several orders of magnitude.\n\n`mlem` has the same property: it uses `1/σ²` weights on the numerator and denominator of the EM update.\n\n## Reproduction\n4 rows × 6 groups, known truth, 3% uncertainties. Row 0's response, measurement and uncertainty are all multiplied by 1e-6, which is a pure change of units:\n\n| Solver | Max relative change in unfolded flux |\n|---|---:|\n| FluxForge `gravel` | 0.266 |\n| FluxForge `mlem` | 0.259 |\n| Reference GRAVEL with `(m²/σ²)` weights | 5.6e-15 |\n\n## Expected behavior\n- Implement GRAVEL with the published weighting, and cite the reference used.\n- For MLEM on non-count data, either document and justify a scale-invariant weighting, or refuse dimensionful activation rates (compare #190 for PyUnfold).\n- Add a row-rescaling invariance test for every iterative solver. Add parity against the Neutron-Unfolding/UMG reference once the skipped reference-parity tests can run.\n\n\n---\nFound in a Claude Code review of the Paper 3 unfolding path (follow-up to #185–#192).\n",
+      "state": "open",
+      "user": {
+        "login": "FusionSandwich",
+        "name": "FusionSandwich",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/145234893?v=4",
+        "id": 145234893
+      },
+      "assignees": null,
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a",
+          "description": "Something isn't working"
+        },
+        {
+          "name": "area/unfolding",
+          "color": "5319e7",
+          "description": "Spectrum unfolding algorithms and workspaces."
+        },
+        {
+          "name": "type/bug",
+          "color": "d73a4a",
+          "description": "Defect or regression."
+        },
+        {
+          "name": "priority/p0-blocking",
+          "color": "b60205",
+          "description": "Blocking work required before dependent roadmap progress."
+        }
+      ],
+      "milestone": null,
+      "state_reason": null,
+      "comments": 0,
+      "created_at": "2026-09-28T14:04:37Z",
+      "updated_at": "2026-09-28T14:04:37Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/194",
+      "display_title": "GRAVEL and MLEM row weighting depends on the units of each reaction row"
+    },
+    "195": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/195",
+      "title": "Iterative unfolding: chi2/dof, \"converged\" and flux uncertainty are not meaningful for underdetermined problems",
+      "issue_number": 195,
+      "body": "## Problem\nIn `src/fluxforge/solvers/iterative.py` and `src/fluxforge/workflows/spectrum_unfolding.py` (`c297542`):\n- `chi2_per_dof = chi2 / max(n_meas - 1, 1)`, regardless of the number of groups (250 for `flux_wire`) or any regularization. It is not a degrees-of-freedom-corrected statistic.\n- `chi2_tolerance=0.01` stops the iteration and sets `converged=True` when chi2/dof < 0.01. That is a sign of overfitting noise, not convergence.\n- When a solver returns no uncertainties, `SpectrumUnfolder._estimate_flux_uncertainty` propagates rate errors through a ridge pseudo-inverse `(R^T R + 1e-10*tr/n*I)^-1 R^T`. That is unrelated to the GRAVEL/MLEM estimator and its prior dependence. For a 16×250 system, the result is governed by the arbitrary ridge. The `LinAlgError` fallback `flux * mean(rate_unc/flux)` divides a rate by a flux, which is dimensionally meaningless.\n\n## Expected behavior\n- Report postfit residuals and a statistic with a stated definition, and do not call it reduced chi-squared for an underdetermined or regularized fit.\n- Separate numerical stopping from fit quality. Never set `converged=True` because the fit residual is tiny.\n- Provide flux uncertainty consistent with the estimator (e.g. Monte Carlo over rates, response and prior), or return none and say so.\n\nRelated: #187 covers the GLS and discrete equivalents; this covers GRAVEL/MLEM/SpectrumUnfolder.\n\n\n---\nFound in a Claude Code review of the Paper 3 unfolding path (follow-up to #185–#192).\n",
+      "state": "open",
+      "user": {
+        "login": "FusionSandwich",
+        "name": "FusionSandwich",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/145234893?v=4",
+        "id": 145234893
+      },
+      "assignees": null,
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a",
+          "description": "Something isn't working"
+        },
+        {
+          "name": "area/unfolding",
+          "color": "5319e7",
+          "description": "Spectrum unfolding algorithms and workspaces."
+        },
+        {
+          "name": "type/bug",
+          "color": "d73a4a",
+          "description": "Defect or regression."
+        },
+        {
+          "name": "priority/p1-critical",
+          "color": "d93f0b",
+          "description": "Critical work with high roadmap impact."
+        }
+      ],
+      "milestone": null,
+      "state_reason": null,
+      "comments": 5,
+      "created_at": "2026-09-28T14:04:39Z",
+      "updated_at": "2026-10-01T17:23:40Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/195",
+      "display_title": "Iterative unfolding: chi2/dof, \"converged\" and flux uncertainty are not meaningful for underdetermined problems"
+    },
+    "197": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/197",
+      "title": "Activity-to-rate conversion treats missing irradiation time as saturation and silently falls back to measurement-time activity",
+      "issue_number": 197,
+      "body": "## Problem\nAt `c297542`:\n- `src/fluxforge/analysis/flux_unfold.py:activity_to_reaction_rate` sets `saturation = 1.0` when `irradiation_time_s <= 0` (\"assume saturated\"). `rafm_workflow.resolve_measurement_timing` returns `irradiation_time_s=None` for any sample not in the schedule, and `build_flux_wire_reactions` converts it to `0.0`. For Co-60 after a 2 h irradiation, this makes the rate **33,333× too low**, with no warning.\n- `build_flux_wire_reactions` uses `payload.get(\"activity_eoi_bq\") or payload.get(\"activity_bq\")` and passes `decay_time_s=0.0`. If EOI activity is missing (or exactly 0), measurement-time activity is silently treated as EOI activity.\n- Only a single constant-power interval is supported. There is no input for power history, multiple irradiation segments (e.g. whale-tube phase 1/phase 2), or product burnup, although ASTM E261 requires the history factor to be summed over segments.\n\n## Expected behavior\n- Missing or zero irradiation time must be an error unless saturation is explicitly requested.\n- Missing EOI activity must be an error, or be computed from measurement time with a stated decay time. No `or` fallback between different physical quantities.\n- Accept a piecewise power/flux history (segments with relative power) and compute the E261 history factor. Record it in the reaction-rate output.\n- Tests: missing-schedule rows raise; a two-segment history matches an analytic Bateman result; short-lived products (Cu-64, Sc-48, Ni-57) are sensitive to segment ordering.\n\nRelated: #22 (RAFM4 timing anchor).\n\n\n---\nFound in a Claude Code review of the Paper 3 unfolding path (follow-up to #185–#192).\n",
+      "state": "open",
+      "user": {
+        "login": "FusionSandwich",
+        "name": "FusionSandwich",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/145234893?v=4",
+        "id": 145234893
+      },
+      "assignees": null,
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a",
+          "description": "Something isn't working"
+        },
+        {
+          "name": "area/unfolding",
+          "color": "5319e7",
+          "description": "Spectrum unfolding algorithms and workspaces."
+        },
+        {
+          "name": "type/bug",
+          "color": "d73a4a",
+          "description": "Defect or regression."
+        },
+        {
+          "name": "priority/p0-blocking",
+          "color": "b60205",
+          "description": "Blocking work required before dependent roadmap progress."
+        }
+      ],
+      "milestone": null,
+      "state_reason": null,
+      "comments": 3,
+      "created_at": "2026-09-28T14:04:42Z",
+      "updated_at": "2026-10-01T05:58:29Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/197",
+      "display_title": "Activity-to-rate conversion treats missing irradiation time as saturation and silently falls back to measurement-time activity"
+    },
+    "198": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/198",
+      "title": "Decay-during-count correction uses live time and can double-correct processed-report activities",
+      "issue_number": 198,
+      "body": "## Problem\nAt `c297542`, `src/fluxforge/analysis/flux_unfold.py:activity_to_reaction_rate` applies `(1 - exp(-λ·t))/(λ·t)` with `t = live_time_s`. Decay during counting runs on clock (real) time, so live time is wrong whenever dead time is non-zero.\n\n`extract_reactions_from_processed` and `extract_reactions_from_raw` pass `data.live_time`. In `extract_reactions_from_processed`, the input is a Quantum Gold report activity. If that activity is already referenced to count start with decay-during-count applied (as processed reports typically are; this should be verified against the report settings), the correction is applied a second time. The effect is largest for short-lived products with long counts (Cu-64, In-116m, Ni-57).\n\nA related count-to-activity timing fix exists only as an uncommitted patch to `src/fluxforge/physics/activation.py` in a separate worktree (synthetic check: 1093.06 Bq unpatched vs 1000 Bq true). No issue tracks it, and `flux_unfold.py` has its own copy of the formula.\n\n## Expected behavior\n- Use real time for decay-during-count, with live/real acceptance handled separately and once. Consolidate on one tested implementation.\n- Require an explicit declaration of what reference time a supplied activity has (count start, EOI, or already count-decay-corrected), and refuse to re-apply corrections.\n- Tests: known-truth synthetic count with 10–30% dead time; a processed-report activity passes through unchanged.\n\n\n---\nFound in a Claude Code review of the Paper 3 unfolding path (follow-up to #185–#192).\n",
+      "state": "open",
+      "user": {
+        "login": "FusionSandwich",
+        "name": "FusionSandwich",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/145234893?v=4",
+        "id": 145234893
+      },
+      "assignees": null,
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a",
+          "description": "Something isn't working"
+        },
+        {
+          "name": "area/unfolding",
+          "color": "5319e7",
+          "description": "Spectrum unfolding algorithms and workspaces."
+        },
+        {
+          "name": "type/bug",
+          "color": "d73a4a",
+          "description": "Defect or regression."
+        },
+        {
+          "name": "priority/p1-critical",
+          "color": "d93f0b",
+          "description": "Critical work with high roadmap impact."
+        }
+      ],
+      "milestone": null,
+      "state_reason": null,
+      "comments": 0,
+      "created_at": "2026-09-28T14:04:44Z",
+      "updated_at": "2026-09-28T14:04:44Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/198",
+      "display_title": "Decay-during-count correction uses live time and can double-correct processed-report activities"
+    },
+    "204": {
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/204",
+      "title": "Silent physical defaults and unit fallbacks in the flux-wire reaction path",
+      "issue_number": 204,
+      "body": "## Problem\nAt `c297542`, several fallbacks can produce plausible-looking but wrong rates without any warning. They do not change the current saved RAFM table (its masses and report units resolve correctly), but they are unsafe for new data:\n- `flux_unfold.calculate_n_atoms`: element defaults to `\"Co\"` when the sample element is unknown. Mass defaults to the bundled default (10 mg for Co) when metadata lookup fails. Atomic mass defaults to 60. Purity defaults to 0.9999, and there is no way to specify alloy/dilute wires.\n- `flux_unfold.extract_reactions_from_processed`: `activity_unc * 3.7e4` assumes µCi even though `NuclideResult.activity_bq` is unit-aware (nCi, Bq, ...).\n- `SpectrumUnfolder.unfold`: when `reaction_rate_per_atom <= 0`, activity in Bq is silently used as the \"rate\" observable.\n- `rafm_workflow.flux_wire_mass_mg`: `float(rows[0].get(\"mass_mg\"))` raises `TypeError` rather than a clear error when mass is absent.\n\n## Expected behavior\nRaise on missing element, mass, composition or unit instead of defaulting. Convert uncertainties with the same unit logic as values. Record every applied assumption in the output.\n\n\n---\nFound in a Claude Code review of the Paper 3 unfolding path (follow-up to #185–#192).\n",
+      "state": "open",
+      "user": {
+        "login": "FusionSandwich",
+        "name": "FusionSandwich",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/145234893?v=4",
+        "id": 145234893
+      },
+      "assignees": null,
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a",
+          "description": "Something isn't working"
+        },
+        {
+          "name": "area/unfolding",
+          "color": "5319e7",
+          "description": "Spectrum unfolding algorithms and workspaces."
+        },
+        {
+          "name": "type/bug",
+          "color": "d73a4a",
+          "description": "Defect or regression."
+        },
+        {
+          "name": "priority/p2-normal",
+          "color": "fbca04",
+          "description": "Normal planned work."
+        }
+      ],
+      "milestone": null,
+      "state_reason": null,
+      "comments": 2,
+      "created_at": "2026-09-28T14:04:54Z",
+      "updated_at": "2026-09-30T22:54:30Z",
+      "closed_at": null,
+      "display_url": "https://github.com/FusionSandwich/FluxForge/issues/204",
+      "display_title": "Silent physical defaults and unit fallbacks in the flux-wire reaction path"
+    }
+  }
+}

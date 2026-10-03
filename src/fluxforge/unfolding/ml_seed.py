@@ -75,68 +75,108 @@ class MLSeedUnfolder(UnfoldingMethod):
         )
         floor = float(kwargs.get("floor", self.floor))
 
-        n_groups = response_array.shape[1]
-        if initial_flux is not None:
-            prior = np.maximum(np.asarray(initial_flux, dtype=float), floor)
-        else:
-            mean_response = max(float(np.mean(response_array)), floor)
-            mean_measurement = max(float(np.mean(measured_array)), 1.0)
-            prior = np.full(
-                n_groups,
-                mean_measurement / max(mean_response * n_groups, floor),
-                dtype=float,
+        if any(
+            not np.isfinite(value) or value < 0
+            for value in (regularization_strength, smoothing_strength)
+        ):
+            raise ValueError(
+                "Seed regularization and smoothing strengths must be finite and nonnegative"
             )
-            prior = np.maximum(prior, floor)
-
+        if not np.isfinite(floor) or floor <= 0:
+            raise ValueError("floor must be finite and positive (in flux units)")
         sigma = (
             np.asarray(uncertainty_array, dtype=float)
             if uncertainty_array is not None
             else np.sqrt(np.maximum(measured_array, 1.0))
         )
-        sigma = np.maximum(sigma, floor)
-        weighted_response = response_array / sigma.reshape(-1, 1)
+        if np.any(sigma <= 0):
+            raise ValueError("measurement_uncertainty must be strictly positive")
+        weighted_response = response_array / sigma[:, None]
         weighted_measurements = measured_array / sigma
+        if not np.all(np.isfinite(weighted_response)) or not np.all(
+            np.isfinite(weighted_measurements)
+        ):
+            raise ValueError("Whitened seed inputs must be finite")
+        n_groups = response_array.shape[1]
+        if initial_flux is not None:
+            prior = np.maximum(np.asarray(initial_flux, dtype=float), floor)
+        else:
+            mean_response = float(np.mean(weighted_response))
+            if mean_response <= 0:
+                raise ValueError("Seed response must have positive sensitivity")
+            mean_measurement = float(np.mean(weighted_measurements))
+            prior = np.full(
+                n_groups,
+                mean_measurement / (mean_response * n_groups),
+                dtype=float,
+            )
+            prior = np.maximum(prior, floor)
+
         smoothing = _second_difference_operator(n_groups)
 
-        lhs = weighted_response.T @ weighted_response
-        lhs = lhs + regularization_strength * np.eye(n_groups, dtype=float)
-        lhs = lhs + smoothing_strength * (smoothing.T @ smoothing)
-        rhs = weighted_response.T @ weighted_measurements
-        rhs = rhs + regularization_strength * prior
-
-        try:
-            flux = np.linalg.solve(lhs, rhs)
-        except np.linalg.LinAlgError:
-            flux = np.linalg.pinv(lhs) @ rhs
+        # Solve the augmented system without squaring its condition number or
+        # overflowing R.T @ R at large but finite weighted sensitivities.
+        augmented_response = np.vstack(
+            (
+                weighted_response,
+                np.sqrt(regularization_strength) * np.eye(n_groups),
+                np.sqrt(smoothing_strength) * smoothing,
+            )
+        )
+        augmented_measured = np.concatenate(
+            (
+                weighted_measurements,
+                np.sqrt(regularization_strength) * prior,
+                np.zeros(smoothing.shape[0]),
+            )
+        )
+        flux = np.linalg.lstsq(augmented_response, augmented_measured, rcond=None)[0]
+        if not np.all(np.isfinite(flux)):
+            raise ValueError("Seed solution must be finite")
         flux = np.maximum(np.asarray(flux, dtype=float), floor)
 
         convergence_history: list[float] = []
-        column_sums = np.maximum(np.sum(response_array, axis=0), floor)
+        column_sums = np.sum(weighted_response, axis=0)
+        supported = column_sums > 0
+        weighted_norm = np.hypot.reduce(weighted_measurements)
         for _ in range(max(warm_start_iterations, 0)):
-            predicted = response_array @ flux
-            ratio = measured_array / np.maximum(predicted, floor)
-            correction = response_array.T @ ratio
-            multiplicative = np.maximum(correction / column_sums, floor)
+            predicted = weighted_response @ flux
+            ratio = np.divide(
+                weighted_measurements,
+                predicted,
+                out=np.zeros_like(predicted),
+                where=predicted > 0,
+            )
+            correction = weighted_response.T @ ratio
+            multiplicative = np.divide(
+                correction, column_sums, out=np.ones_like(column_sums), where=supported
+            )
             flux = np.maximum(flux * np.power(multiplicative, 0.5), floor)
             refold_error = float(
-                np.linalg.norm((response_array @ flux) - measured_array)
-                / max(np.linalg.norm(measured_array), floor)
+                np.hypot.reduce((weighted_response @ flux) - weighted_measurements)
+                / (weighted_norm if weighted_norm > 0 else 1.0)
             )
             convergence_history.append(refold_error)
 
         predicted_measurements = response_array @ flux
         residuals = measured_array - predicted_measurements
-        chi_squared = float(
-            np.dot(residuals / sigma, residuals / sigma)
-            / max(measured_array.size - 1, 1)
-        )
+        chi_squared = float(np.dot(residuals / sigma, residuals / sigma))
+        if not np.isfinite(chi_squared):
+            raise ValueError(
+                "Seed residual statistic is not finite at this numerical scale"
+            )
         refold_error = float(
-            np.linalg.norm(residuals) / max(np.linalg.norm(measured_array), floor)
+            np.hypot.reduce(residuals / sigma)
+            / (weighted_norm if weighted_norm > 0 else 1.0)
         )
         confidence_score = float(
             np.clip(
                 1.0
-                / (1.0 + (4.0 * refold_error) + (0.5 * max(chi_squared - 1.0, 0.0))),
+                / (
+                    1.0
+                    + (4.0 * refold_error)
+                    + (0.5 * max(chi_squared / measured_array.size - 1.0, 0.0))
+                ),
                 0.0,
                 1.0,
             )
@@ -165,6 +205,10 @@ class MLSeedUnfolder(UnfoldingMethod):
                     measurement_uncertainty=uncertainty_array,
                 ),
                 "refold_error": refold_error,
+                "refold_error_definition": "norm of error-weighted residual / norm of error-weighted measurements",
+                "chi_squared_definition": "sum of squared error-weighted postfit residuals; no degrees-of-freedom correction",
+                "confidence_is_heuristic": True,
+                "seed_weighting": "measurement_error_whitened",
             },
             method_category=self.definition().method_category,
             predicted_measurements=predicted_measurements,

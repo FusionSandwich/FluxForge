@@ -1,0 +1,19 @@
+{
+  "review": "formatted final source unfolding antagonist acceptance",
+  "source_sha256": {
+    "src/fluxforge/unfolding/ml_seed.py": "59943bfad5ff6e2ce64b228b0392a7fe1bd5424efa9e4f3c31436a4d21217603",
+    "src/fluxforge/solvers/rmle.py": "2895566f090f1fd051f55fa76822a60a366fc360e76e8344e75f63e7fbbc2d51",
+    "src/fluxforge/unfolding/base.py": "038993e1ffdf6adb62ec0f8665b48a4e65ee38515941ac308216b2c0f7f954f7",
+    "src/fluxforge/unfolding/rmle.py": "377afd7faa73666d51c10c12af9a04021241f714e3afb17b776de5db4383479b"
+  },
+  "source_unchanged_during_tests": true,
+  "pytest_exit_code": 0,
+  "pytest_output": ".................                                                        [100%]\n17 passed in 3.17s\n",
+  "registry_uncertainty": "Unavailable with reason; uncertainty_qualified=False and supports_uncertainties=False for all four registry methods",
+  "remaining_rejections": [],
+  "scientific_admission": false,
+  "limitations": [
+    "ML seed confidence is a labelled heuristic",
+    "Frozen RAFM source/covariance admission gates are unchanged"
+  ]
+}

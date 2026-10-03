@@ -1088,6 +1088,7 @@ def calculate_peak_activity(
         ),
         gamma_intensity=max(float(gamma_intensity), 1e-6),
         half_life_s=max(float(half_life_s), 1e-6),
+        real_time_s=float(spectrum.real_time) if spectrum.real_time > 0.0 else None,
         dead_time_fraction=float(
             dead_time_fraction
             if dead_time_fraction is not None

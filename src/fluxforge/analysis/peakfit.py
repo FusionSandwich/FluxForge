@@ -1313,6 +1313,26 @@ def auto_find_peaks(
     return [(int(channels[p]), float(h)) for p, h in zip(peaks, heights)]
 
 
+def _fit_weights(counts, ch_lo, ch_hi, counts_uncertainty=None):
+    """Inverse channel sigmas, preserving measured subtraction variance."""
+    if counts_uncertainty is None:
+        sigma = np.maximum(np.sqrt(np.maximum(counts[ch_lo:ch_hi], 0.0)), 1.0)
+    else:
+        uncertainty = np.asarray(counts_uncertainty, dtype=float)
+        if (
+            uncertainty.shape != np.asarray(counts).shape
+            or not np.all(np.isfinite(uncertainty))
+            or np.any(uncertainty < 0)
+        ):
+            raise ValueError(
+                "counts_uncertainty must match counts and be finite and nonnegative"
+            )
+        # Zero-variance channels cannot be exact constraints in curve_fit.
+        # Retain the existing one-count floor only for those channels.
+        sigma = np.where(uncertainty[ch_lo:ch_hi] > 0, uncertainty[ch_lo:ch_hi], 1.0)
+    return 1.0 / sigma
+
+
 def fit_single_peak(
     channels: np.ndarray,
     counts: np.ndarray,
@@ -2059,6 +2079,7 @@ def fit_hypermet_peak(
     enable_step: bool = False,
     initial_sigma: Optional[float] = None,
     max_evaluations: int = 500,
+    counts_uncertainty: Optional[np.ndarray] = None,
 ) -> Tuple[HypermetPeak, PeakFitResult]:
     """
     Fit Hypermet peak to spectrum region.
@@ -2103,7 +2124,7 @@ def fit_hypermet_peak(
     y = counts[ch_lo:ch_hi].astype(float)
 
     # Weights for chi-squared
-    weights = 1.0 / np.sqrt(np.maximum(y, 1.0))
+    weights = _fit_weights(counts, ch_lo, ch_hi, counts_uncertainty)
 
     # Initial guesses
     amplitude_guess = y.max() - y.min()

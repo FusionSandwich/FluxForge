@@ -458,7 +458,9 @@ def poisson_rmle_unfolding(
 
     # Initial guess: small positive spectrum, background from low percentile
     if config.initial_solution is not None:
-        seeded = require_nonnegative("initial_solution", config.initial_solution).reshape(-1)
+        seeded = require_nonnegative(
+            "initial_solution", config.initial_solution
+        ).reshape(-1)
         if seeded.size != n_bins:
             raise ValueError(
                 "initial_solution length must match the response column count"
@@ -808,7 +810,10 @@ def rmle_unfolding(
     """
     d = require_nonnegative("counts", spectrum.counts).reshape(-1)
     sigma = require_nonnegative("uncertainty", spectrum.uncertainty).reshape(-1)
-    sigma = np.maximum(sigma, 1e-30)
+    if np.any(sigma <= 0):
+        raise ValueError(
+            "uncertainty must be strictly positive; exact constraints are unsupported"
+        )
     R = require_nonnegative("response", response.matrix)
     if R.ndim != 2:
         raise ValueError("response matrix must be a 2-D array")
@@ -835,26 +840,34 @@ def rmle_unfolding(
         L = tikhonov_matrix(n_bins, order=0)
 
     # Weight by uncertainties
-    W = np.diag(1.0 / sigma)
+    # Elementwise division also handles subnormal sigmas whose reciprocal
+    # overflows although the physical weighted observations remain finite.
+    weighted_response = R / sigma[:, None]
+    weighted_data = d / sigma
+    if not np.all(np.isfinite(weighted_response)) or not np.all(
+        np.isfinite(weighted_data)
+    ):
+        raise ValueError("Whitened Gaussian inputs must be finite")
+    W = np.eye(n_channels)
 
     # Automatic parameter selection
     if param_selection == ParameterSelection.L_CURVE:
-        reg_param = select_lambda_lcurve(d, R, W, L)
+        reg_param = select_lambda_lcurve(weighted_data, weighted_response, W, L)
     elif param_selection == ParameterSelection.GCV:
-        reg_param = select_lambda_gcv(d, R, W, L)
+        reg_param = select_lambda_gcv(weighted_data, weighted_response, W, L)
     elif param_selection == ParameterSelection.AUTOMATIC:
         # Use L-curve as default automatic method
-        reg_param = select_lambda_lcurve(d, R, W, L)
+        reg_param = select_lambda_lcurve(weighted_data, weighted_response, W, L)
 
     # Solve regularized least squares
     if enforce_positivity:
         solution, n_iter, converged = solve_nnls_regularized(
-            d, R, L, reg_param, W, max_iterations, tolerance
+            weighted_data, weighted_response, L, reg_param, W, max_iterations, tolerance
         )
     else:
         # Standard regularized least squares
-        A = np.vstack([W @ R, reg_param * L])
-        b = np.concatenate([W @ d, np.zeros(L.shape[0])])
+        A = np.vstack([weighted_response, reg_param * L])
+        b = np.concatenate([weighted_data, np.zeros(L.shape[0])])
         solution, residuals, rank, s = linalg.lstsq(A, b)
         n_iter = 1
         converged = True
@@ -867,15 +880,14 @@ def rmle_unfolding(
     # Calculate uncertainty via error propagation
     try:
         # Covariance of solution
-        RtWR = R.T @ W.T @ W @ R
+        RtWR = weighted_response.T @ weighted_response
         LtL = L.T @ L
         H = RtWR + reg_param**2 * LtL
         H_inv = linalg.inv(H)
 
         # Propagate input uncertainty
-        data_cov = np.diag(sigma**2)
-        G = H_inv @ R.T @ W.T @ W
-        solution_cov = G @ data_cov @ G.T
+        G = H_inv @ weighted_response.T
+        solution_cov = G @ G.T
         solution_unc = np.sqrt(np.diag(solution_cov))
         if not (
             np.all(np.isfinite(solution_cov)) and np.all(np.isfinite(solution_unc))
@@ -950,13 +962,20 @@ def solve_nnls_regularized(
 
     # Solve using scipy NNLS
     try:
-        solution, residual_norm = optimize.nnls(A, b)
+        solution, residual_norm = optimize.nnls(A, b, maxiter=max_iter)
         return solution, 1, True
-    except Exception:
-        # Fall back to regularized least squares without positivity
-        solution, _, _, _ = linalg.lstsq(A, b)
-        solution = np.maximum(solution, 0)
-        return solution, 1, True
+    except (RuntimeError, np.linalg.LinAlgError):
+        # Clipping an unconstrained fit does not solve NNLS. Use a bounded
+        # optimizer and preserve its numerical stopping result.
+        fallback = optimize.lsq_linear(
+            A,
+            b,
+            bounds=(0.0, np.inf),
+            method="bvls",
+            tol=tolerance,
+            max_iter=max_iter,
+        )
+        return fallback.x, int(fallback.nit), bool(fallback.success)
 
 
 def select_lambda_lcurve(
