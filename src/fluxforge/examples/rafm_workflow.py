@@ -4718,6 +4718,16 @@ def method_overlay_plot(results: Dict[str, UnfoldingResult], output_path: Path) 
     plt.close(fig)
 
 
+def _save_batch_unfolding_plot(plot, *args, **kwargs) -> None:
+    """Release only pyplot figures created by this batch export call."""
+    before = set(plt.get_fignums()) if HAS_MATPLOTLIB else set()
+    try:
+        plot(*args, **kwargs)
+    finally:
+        for number in (set(plt.get_fignums()) - before) if HAS_MATPLOTLIB else ():
+            plt.close(number)
+
+
 def save_unfolding_artifacts(
     result: UnfoldingResult,
     prior_flux: np.ndarray,
@@ -4755,7 +4765,8 @@ def save_unfolding_artifacts(
     write_rows_csv(table_rows, output_root / f"{slug}_measured_vs_predicted.csv")
 
     plots_root = output_root.parent / "plots" / "unfolding"
-    plot_spectrum_comparison(
+    _save_batch_unfolding_plot(
+        plot_spectrum_comparison,
         result,
         reference_flux=prior_flux,
         reference_label=reference_label or result.initial_guess_source,
@@ -4763,17 +4774,20 @@ def save_unfolding_artifacts(
         save_path=plots_root / f"{slug}_spectrum.png",
     )
     if np.any(result.flux_uncertainty > 0):
-        plot_spectrum_uncertainty_bands(
+        _save_batch_unfolding_plot(
+            plot_spectrum_uncertainty_bands,
             result,
             title=f"{result.method} uncertainty bands",
             save_path=plots_root / f"{slug}_uncertainty.png",
         )
-    plot_measured_vs_predicted(
+    _save_batch_unfolding_plot(
+        plot_measured_vs_predicted,
         result,
         title=f"{result.method} measured vs predicted reaction rates",
         save_path=plots_root / f"{slug}_measured_vs_predicted.png",
     )
-    plot_response_matrix(
+    _save_batch_unfolding_plot(
+        plot_response_matrix,
         result.response_matrix,
         result.energy_edges,
         result.reactions_used,
