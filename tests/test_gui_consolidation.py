@@ -21,6 +21,27 @@ from fluxforge.io.artifacts import write_response_bundle
 ROOT = Path(__file__).resolve().parents[1]
 
 
+@pytest.fixture(autouse=True)
+def dispose_closed_windows():
+    """Keep application-wide theme changes independent of earlier test windows."""
+    def cleanup():
+        if not QT_AVAILABLE:
+            return
+        app = QApplication.instance()
+        if app is None:
+            return
+        from PySide6.QtCore import QCoreApplication, QEvent
+
+        for widget in app.topLevelWidgets():
+            if not widget.isVisible():
+                widget.deleteLater()
+        QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+
+    cleanup()
+    yield
+    cleanup()
+
+
 class MemorySettings:
     def __init__(self):
         self.values = {}

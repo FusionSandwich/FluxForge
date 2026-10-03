@@ -45,6 +45,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         CalibrationWorkspaceDialog,
         CovarianceDialog,
         IrradiationHistoryDialog,
+        ReactionRateDialog,
+        SpectrumFileQueueDialog,
         PuIsotopicsDialog,
         QAHistoryDialog,
         ReportExportDialog,
@@ -188,6 +190,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._qa_history_dialog = None
             self._covariance_dialog = None
             self._irradiation_history_dialog = None
+            self._reaction_rate_dialog = None
+            self._spectrum_file_queue_dialog = None
             self._irradiation_segments = ()
             self._report_dialog = None
             self._pu_isotopics_dialog = None
@@ -517,6 +521,22 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     enabled=True,
                     handler=self._open_irradiation_history,
                     object_name="OpenIrradiationHistoryAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Activity to Reaction Rate",
+                    enabled=True,
+                    handler=self._open_reaction_rate,
+                    object_name="OpenReactionRateAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Spectrum Summing and Conversion",
+                    enabled=True,
+                    handler=self._open_spectrum_file_queue,
+                    object_name="OpenSpectrumFileQueueAction",
                 )
             )
             if self.developer_tools:
@@ -1666,6 +1686,26 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _set_irradiation_history(self, segments) -> None:
             self._irradiation_segments = segments
+            if self._reaction_rate_dialog is not None:
+                self._reaction_rate_dialog._mark_pending()
+
+        def _open_reaction_rate(self) -> None:
+            if self._reaction_rate_dialog is None:
+                self._reaction_rate_dialog = ReactionRateDialog(
+                    history_provider=lambda: self._irradiation_segments,
+                    activity_provider=lambda: self.analysis_workspace.state.activity_results,
+                    parent=self,
+                )
+            self._reaction_rate_dialog.show()
+            self._reaction_rate_dialog.raise_()
+            self._reaction_rate_dialog.activateWindow()
+
+        def _open_spectrum_file_queue(self) -> None:
+            if self._spectrum_file_queue_dialog is None:
+                self._spectrum_file_queue_dialog = SpectrumFileQueueDialog(parent=self)
+            self._spectrum_file_queue_dialog.show()
+            self._spectrum_file_queue_dialog.raise_()
+            self._spectrum_file_queue_dialog.activateWindow()
 
         def _open_dashboard_tab(self) -> None:
             if hasattr(self, "central_tabs"):
@@ -2097,6 +2137,15 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def closeEvent(self, event) -> None:
+            if (
+                self._spectrum_file_queue_dialog is not None
+                and self._spectrum_file_queue_dialog.worker is not None
+            ):
+                self.statusBar().showMessage(
+                    "Spectrum conversion is running. Close after it finishes."
+                )
+                event.ignore()
+                return
             self._save_layout()
             super().closeEvent(event)
 

@@ -71,8 +71,8 @@
       "number": 21,
       "title": "[Environment] Provide one full Conda environment for FluxForge tests",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/21",
-      "status": "in_progress",
-      "notes": "Final imports, TensorFlow CPU execution and PDF smoke passed. Targeted environment suite: 22 passed, 2 CUDA-discovery skips. Full suite pending."
+      "status": "implemented_pending_integration",
+      "notes": "Complete Conda environment and runtime smoke supplied; frozen coverage 2052 passed, 26 skipped, 3 failed, no missing. Targeted follow-ups passed; full acceptance caveats retained."
     },
     {
       "number": 24,
@@ -225,22 +225,22 @@
       "number": 46,
       "title": "Issue: GUI Pipeline: Activity to Reaction Rate Translator UI",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/46",
-      "status": "queued",
-      "notes": ""
+      "status": "implemented_pending_integration",
+      "notes": "Activity/SigPhi workspace reuses integrated owner engine; 50 focused checks and 21 integration checks pass. Draft PR 217."
     },
     {
       "number": 47,
       "title": "Issue: GUI Pipeline: Unfolding Solver Launch Config",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/47",
       "status": "queued",
-      "notes": ""
+      "notes": "Existing solver workspace audited; real-time solver progress requires owner unfolding APIs. Preserve active ownership."
     },
     {
       "number": 48,
       "title": "Issue: GUI Batch: Spectrum Summing and Conversion",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/48",
-      "status": "queued",
-      "notes": ""
+      "status": "implemented_pending_integration",
+      "notes": "Background folder queue with append/sum and covariance-preserving .ffs conversion; draft PR 217."
     },
     {
       "number": 49,
@@ -888,7 +888,7 @@
     },
     {
       "number": 141,
-      "title": "ADR: renderer abstraction â€” PyQtGraph first, Vispy optional",
+      "title": "ADR: renderer abstraction \u00e2\u20ac\u201d PyQtGraph first, Vispy optional",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/141",
       "status": "queued",
       "notes": ""
@@ -902,14 +902,14 @@
     },
     {
       "number": 143,
-      "title": "ADR: plugin/registry architecture â€” fitters, unfolding, calibration, ID",
+      "title": "ADR: plugin/registry architecture \u00e2\u20ac\u201d fitters, unfolding, calibration, ID",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/143",
       "status": "queued",
       "notes": ""
     },
     {
       "number": 144,
-      "title": "Scaffold `MainWindow` with dockable zones Aâ€“F",
+      "title": "Scaffold `MainWindow` with dockable zones A\u00e2\u20ac\u201cF",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/144",
       "status": "queued",
       "notes": ""
