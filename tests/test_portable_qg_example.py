@@ -127,6 +127,23 @@ class PortableQGExampleTests(unittest.TestCase):
                             south['selected_raw_activities']['Co60']['activity_bq'])
         self.assertEqual(north['QG_reference_activities_Bq'], south['QG_reference_activities_Bq'])
 
+    def test_south_native_source_tamper_is_rejected(self):
+        path = self.copy/'examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/South 4hr Background Terminal.ANS'
+        original = path.read_bytes()
+        try:
+            path.write_bytes(original[:-1] + bytes([original[-1] ^ 1]))
+            with self.assertRaisesRegex(ValueError, 'Supplemental source hash/size mismatch'):
+                driver.verify_inputs(self.copy, self.copy/MANIFEST)
+        finally:
+            path.write_bytes(original)
+
+    def test_south_background_mode_cannot_be_silently_ignored_by_replay(self):
+        result = subprocess.run([sys.executable, str(REPO/SCRIPT), '--verify-only',
+                                 '--background-mode', 'south_native'],
+                                capture_output=True, text=True, timeout=60)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('requires --raw-sample', result.stderr)
+
     def test_recovered_curve_must_match_original_percent_export(self):
         original = Path(self.tmp.name)/'original_export.csv'
         derived = Path(self.tmp.name)/'derived_curve.csv'
