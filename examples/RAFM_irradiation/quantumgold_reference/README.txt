@@ -114,6 +114,22 @@ background used by the legacy diagnostic replay. Both detector/source roles are
 explicit; this package does not assert that the North background is a South
 measurement. The input audit verifies these supplementary bytes and extraction.
 
+Opt-in South background sensitivity
+The independent raw 25 cm monitor comparison can use the hash-bound native South
+background instead of the historical North ASC:
+
+  python examples/RAFM_irradiation/run_portable_qg_example.py --raw-sample Co-Cd-RAFM-1 --background-mode south_native --output south_probe
+
+Use a fresh output directory. The receipt records the background source SHA256,
+native live/real time, polynomial, and detector. The South file starts on Oct 3,
+2025, later than some campaign counts; its applicability and the background used
+by QG remain unknown. It is an explicit sensitivity scenario, not the default.
+The current core aligns unequal energy grids by linear interpolation of channel
+counts, which is not generally count conserving (issue #228). Background source
+qualification is tracked in issue #229. This mode excludes near-contact, missing
+ASC and Ti/Sc48 ambiguity cases. QG reported activities remain separate reference
+values and do not drive raw activity estimation in this mode.
+
 Tests
   python -m unittest discover -s tests -p test_portable_qg_example.py -v
 

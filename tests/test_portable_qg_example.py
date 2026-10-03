@@ -108,6 +108,25 @@ class PortableQGExampleTests(unittest.TestCase):
             driver.run_raw_comparison(self.copy,output,'Ti-RAFM-1')
         self.assertFalse(output.exists())
 
+    def test_south_native_background_is_source_bound_and_changes_raw_result(self):
+        north = driver.run_raw_comparison(
+            REPO, Path(self.tmp.name)/'north_background', 'Co-Cd-RAFM-1',
+            background_mode='north_historical')
+        south = driver.run_raw_comparison(
+            REPO, Path(self.tmp.name)/'south_background', 'Co-Cd-RAFM-1',
+            background_mode='south_native')
+        self.assertEqual(south['background_details']['detector'], 'South')
+        self.assertEqual(south['background_details']['source_sha256'],
+                         '96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344')
+        self.assertEqual(south['background_details']['live_time_s'], 14400.0)
+        self.assertEqual(south['background_details']['total_counts'], 543427)
+        self.assertEqual(south['background_details']['QG_background_match'], 'UNKNOWN')
+        self.assertEqual(north['background_details']['detector'], 'North')
+        self.assertNotEqual(north['background_source_sha256'], south['background_source_sha256'])
+        self.assertNotEqual(north['selected_raw_activities']['Co60']['activity_bq'],
+                            south['selected_raw_activities']['Co60']['activity_bq'])
+        self.assertEqual(north['QG_reference_activities_Bq'], south['QG_reference_activities_Bq'])
+
     def test_recovered_curve_must_match_original_percent_export(self):
         original = Path(self.tmp.name)/'original_export.csv'
         derived = Path(self.tmp.name)/'derived_curve.csv'
