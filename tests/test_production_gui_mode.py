@@ -7,6 +7,7 @@ import pytest
 from fluxforge.gui import QT_AVAILABLE, FluxForgeMainWindow, ModeManager, SelectionBus
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE
 from fluxforge.gui.dialogs.calibration_dialog import CalibrationWorkspaceDialog
+from fluxforge.gui.dialogs.covariance_dialog import CovarianceDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.dialogs.unfolding_dialog import UnfoldingWorkspaceDialog
 from fluxforge.gui.panels.modern_shell_shared import build_demo_spectrum
@@ -329,6 +330,7 @@ def test_machine_readable_action_catalog_matches_all_production_controls():
     window = _window()
     window.show()
     dialogs = (
+        CovarianceDialog(parent=window),
         CalibrationWorkspaceDialog(
             spectrum=build_demo_spectrum(),
             mode_manager=window.mode_manager,

@@ -3,70 +3,215 @@
     "description": "Bundled flux-wire reaction catalog for FluxForge. Nuclear decay data and emission probabilities are loaded separately from rafm_decay_data.json.",
     "source_notes": [
       "Reaction/product expectations are committed metadata for the RAFM flux-wire workflow.",
-      "Peak line energies are target search lines only; branching ratios come from the bundled decay-data subset."
+      "Peak line energies are target search lines only; branching ratios come from the bundled decay-data subset.",
+      "Per-element reaction IDs unify spectroscopy and unfolding metadata; no measured sample mass or cross section is inferred from this catalog."
     ]
   },
   "isotopes": {
     "Co60": {
       "parent_element": "Co",
       "reaction": "Co59(n,g)",
-      "target_lines_keV": [1173.23, 1332.49]
+      "target_lines_keV": [
+        1173.23,
+        1332.49
+      ],
+      "reaction_ids_by_element": {
+        "Co": "Co-59(n,g)Co-60"
+      },
+      "reactions_by_element": {
+        "Co": "Co59(n,g)"
+      },
+      "expected_elements": [
+        "Co"
+      ]
     },
     "Sc46": {
       "parent_element": "Sc",
       "reaction": "Sc45(n,g)",
-      "target_lines_keV": [889.271, 1120.54],
-      "expected_elements": ["Sc", "Ti"]
+      "target_lines_keV": [
+        889.271,
+        1120.54
+      ],
+      "expected_elements": [
+        "Sc",
+        "Ti"
+      ],
+      "reaction_ids_by_element": {
+        "Sc": "Sc-45(n,g)Sc-46",
+        "Ti": "Ti-46(n,p)Sc-46"
+      },
+      "reactions_by_element": {
+        "Sc": "Sc45(n,g)",
+        "Ti": "Ti46(n,p)"
+      }
     },
     "Sc47": {
       "parent_element": "Ti",
       "reaction": "Ti47(n,p)",
-      "target_lines_keV": [159.391]
+      "target_lines_keV": [
+        159.391
+      ],
+      "reaction_ids_by_element": {
+        "Ti": "Ti-47(n,p)Sc-47"
+      },
+      "reactions_by_element": {
+        "Ti": "Ti47(n,p)"
+      },
+      "expected_elements": [
+        "Ti"
+      ]
     },
     "Sc48": {
       "parent_element": "Ti",
       "reaction": "Ti48(n,p)",
-      "target_lines_keV": [175.35, 983.5, 1037.5, 1312.1]
+      "target_lines_keV": [
+        175.35,
+        983.5,
+        1037.5,
+        1312.1
+      ],
+      "reaction_ids_by_element": {
+        "Ti": "Ti-48(n,p)Sc-48"
+      },
+      "reactions_by_element": {
+        "Ti": "Ti48(n,p)"
+      },
+      "expected_elements": [
+        "Ti"
+      ]
     },
     "Co58": {
       "parent_element": "Ni",
       "reaction": "Ni58(n,p)",
-      "target_lines_keV": [810.775]
+      "target_lines_keV": [
+        810.775
+      ],
+      "reaction_ids_by_element": {
+        "Ni": "Ni-58(n,p)Co-58"
+      },
+      "reactions_by_element": {
+        "Ni": "Ni58(n,p)"
+      },
+      "expected_elements": [
+        "Ni"
+      ]
     },
     "Cu64": {
       "parent_element": "Cu",
       "reaction": "Cu63(n,g)",
-      "target_lines_keV": [1345.77]
+      "target_lines_keV": [
+        1345.77
+      ],
+      "reaction_ids_by_element": {
+        "Cu": "Cu-63(n,g)Cu-64"
+      },
+      "reactions_by_element": {
+        "Cu": "Cu63(n,g)"
+      },
+      "expected_elements": [
+        "Cu"
+      ]
     },
     "In114m": {
       "parent_element": "In",
       "reaction": "In113(n,g)",
-      "target_lines_keV": [190.34, 558.46, 725.28]
+      "target_lines_keV": [
+        190.34,
+        558.46,
+        725.28
+      ],
+      "reaction_ids_by_element": {
+        "In": "In-113(n,g)In-114m"
+      },
+      "reactions_by_element": {
+        "In": "In113(n,g)"
+      },
+      "expected_elements": [
+        "In"
+      ]
     },
     "In115m": {
       "parent_element": "In",
       "reaction": "In115(n,n')",
-      "target_lines_keV": [336.241]
+      "target_lines_keV": [
+        336.241
+      ],
+      "reaction_ids_by_element": {
+        "In": "In-115(n,n')In-115m"
+      },
+      "reactions_by_element": {
+        "In": "In115(n,n')"
+      },
+      "expected_elements": [
+        "In"
+      ]
     },
     "Ni57": {
       "parent_element": "Ni",
       "reaction": "Ni58(n,2n)",
-      "target_lines_keV": [127.164, 1377.62, 1919.62]
+      "target_lines_keV": [
+        127.164,
+        1377.62,
+        1919.62
+      ],
+      "reaction_ids_by_element": {
+        "Ni": "Ni-58(n,2n)Ni-57"
+      },
+      "reactions_by_element": {
+        "Ni": "Ni58(n,2n)"
+      },
+      "expected_elements": [
+        "Ni"
+      ]
     },
     "Fe59": {
       "parent_element": "Fe",
       "reaction": "Fe58(n,g)",
-      "target_lines_keV": [1099.25, 1291.59]
+      "target_lines_keV": [
+        1099.25,
+        1291.59
+      ],
+      "reaction_ids_by_element": {
+        "Fe": "Fe-58(n,g)Fe-59"
+      },
+      "reactions_by_element": {
+        "Fe": "Fe58(n,g)"
+      },
+      "expected_elements": [
+        "Fe"
+      ]
     },
     "Mn54": {
       "parent_element": "Fe",
       "reaction": "Fe54(n,p)",
-      "target_lines_keV": [834.838]
+      "target_lines_keV": [
+        834.838
+      ],
+      "reaction_ids_by_element": {
+        "Fe": "Fe-54(n,p)Mn-54"
+      },
+      "reactions_by_element": {
+        "Fe": "Fe54(n,p)"
+      },
+      "expected_elements": [
+        "Fe"
+      ]
     },
     "Ti51": {
       "parent_element": "Ti",
       "reaction": "Ti50(n,g)",
-      "target_lines_keV": [320.085]
+      "target_lines_keV": [
+        320.085
+      ],
+      "reaction_ids_by_element": {
+        "Ti": "Ti-50(n,g)Ti-51"
+      },
+      "reactions_by_element": {
+        "Ti": "Ti50(n,g)"
+      },
+      "expected_elements": [
+        "Ti"
+      ]
     }
   }
 }
