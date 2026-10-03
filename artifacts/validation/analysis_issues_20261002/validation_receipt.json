@@ -1,5 +1,5 @@
 {
-  "created_at_utc": "2026-10-02T22:35:26.148696+00:00",
+  "created_at_utc": "2026-10-03T04:34:24.210294+00:00",
   "repository": "FusionSandwich/FluxForge",
   "branch": "codex/rafm-analysis-issues",
   "baseline_commit": "1148e18a53a156d74029e84ed528e5fcd9cfd263",
@@ -21,6 +21,15 @@
       "source_hashes_match": true,
       "receipt": "antagonist/unfolding/review_receipt.json"
     }
+  },
+  "independent_luna_audit": {
+    "model": "gpt-6-luna",
+    "result": "accepted",
+    "receipt": "antagonist/luna/audit_receipt.json",
+    "command_result_log": "antagonist/luna/audit.log",
+    "relevant_path_tests_passed": 161,
+    "preserved_antagonist_tests_passed": 74,
+    "source_changes_since_audit": false
   },
   "test_runs": {
     "final_suite.xml": {
@@ -64,7 +73,7 @@
     "tools/summarize_analysis_issues_rafm.py": "bf06688dec192da4a9a1a453d286aebb20d37beb4c9e9ec71cdb53f1aa3648ea"
   },
   "artifact_sha256": {
-    "REPORT.md": "651ace038612acd034aeb422109eaad8fc041da62fb424039ec99a67cb6c7c95",
+    "REPORT.md": "935deec8b95a01924114197d30c7e313f08c7b9643c264b3eede15ec3f315880",
     "affected_final_suite.log": "c090e6e15074168a591f2d61140bc9061eb9dbf425a75b0e432165358812086b",
     "affected_final_suite.xml": "e92006d02693877ec6c5d97b06c81fdf9cf0605202054a340e6de68ff6480dda",
     "antagonist/activation/pytest_output.txt": "af7c42ba37a9b64c60a4ad175d716aeb94feaa4f871f2ea8756faedbafd078b8",
@@ -74,6 +83,8 @@
     "antagonist/activation/test_e262_inventory_repro.py": "44d87b7cf89db1f4d6c5e7f3e6e4fcda64f72892f1ab10d10bb8fd67df960787",
     "antagonist/activation/test_e262_paired_truth.py": "c5e14049d653e7b9363f0e61448c1887557e684780323d782d0feafb36013c09",
     "antagonist/activation/test_final_input_boundaries.py": "fbfb9cc555e0a74fe93ff9dad605e5a0f0c4d0b8781b5a599e8c8e3d8be52c50",
+    "antagonist/luna/audit.log": "a08d10e1cc96f2be87ca15f34d6ef52d5848660cfaab9d50b4612f4b4a041d5c",
+    "antagonist/luna/audit_receipt.json": "1a70baa503cb43761df182f1ca29095182e0fc00ad8ed07fefdfb1f1a04e156f",
     "antagonist/peaks/review_receipt.json": "c1a60728c8b44ec94dfbd1f3ba7c9a4773b6027d1c51d65e136a8148ab8fa91c",
     "antagonist/peaks/test_adversarial_regressions.py": "b93a1cd90b0d0195408277d1053aca9091b185459977266f6acaa71e7dcff15a",
     "antagonist/peaks/test_continuum_covariance.py": "9db7ade4a4b7215a290fe986efa926e85e9e555decf61be399400a8e5f7cf740",

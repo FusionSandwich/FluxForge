@@ -32,6 +32,8 @@ Issue snapshots are preserved in [issue_snapshot.json](issue_snapshot.json). The
 
 All three antagonist agents accepted their reviewed final source hashes. Their [receipts and independent test sources](antagonist/) are preserved. Activation review also independently tested different bare/Cd/standard inventories, count clocks and cooling times. Known-truth E262 tests recover a `1e10 cm^-2 s^-1` input flux, including comparisons with unequal monitor inventories. Explicit zero/negative/NaN/infinite supplied cross-sections are rejected; only absent cross-section fields use the governed library fallback.
 
+On 3 October, a separate **gpt-6-luna** subagent independently accepted the implementation with no concrete correctness blockers. It reran 161 relevant-path tests and the 74 preserved antagonist checks, all passing, and independently verified the original 32 artifact hashes, 2 tool hashes, 247 runtime source hashes, 64 input hashes and the 520-check reconciliation. These reruns overlap the existing checks and are not added to the distinct total. Its [audit receipt](antagonist/luna/audit_receipt.json) and [command/result log](antagonist/luna/audit.log) are preserved. No implementation source changed during this follow-up audit.
+
 The legacy reference-conditioned parity test copies supplied QG report activities. Its passing result establishes compatibility, not an independent activity validation. [reference_conditioned_parity.csv](reference_conditioned_parity.csv) is labelled accordingly. An earlier silent combined run was interrupted and is excluded from passing evidence.
 
 ## RAFM replay

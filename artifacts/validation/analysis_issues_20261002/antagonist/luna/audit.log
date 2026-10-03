@@ -1,0 +1,16 @@
+Luna independent verification log
+
+Checkout: C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge
+HEAD: 92c3859484007bcd07b008539ef8f3be638af811
+Baseline: 1148e18a53a156d74029e84ed528e5fcd9cfd263
+
+Commands reproduced (Python 3.12.14; PYTHONPATH=isolated src; QT_QPA_PLATFORM=offscreen; MPLBACKEND=Agg):
+1. python -m pytest tests/test_flux_wire_analysis.py tests/test_flux_wire_parity.py tests/test_peak_background.py tests/test_peak_finders.py tests/test_peak_finder_methods.py tests/test_targeted_peak_regressions.py tests/test_targeted_continuum_covariance.py tests/test_rafm_workflow.py tests/test_activation_count_clock.py tests/test_material_count_validation.py tests/test_irradiation_history.py tests/test_count_decay_time.py tests/test_no_silent_defaults.py -q -p no:cacheprovider
+   Result: 161 passed in 139.53s.
+2. python -m pytest artifacts/validation/analysis_issues_20261002/antagonist -q -p no:cacheprovider
+   Result: 74 passed in 3.60s.
+
+Reconciled saved XML identities: 444 latest-pass repository test identities + 2 GUI helper checks + 74 independent antagonist checks = 520 distinct final passes.
+Hashes: 32 receipt artifacts, 2 tool hashes, 247 final runtime source files, 64 equal raw input hashes, and accepted antagonist source hashes verified with no mismatches.
+Review result: ACCEPTED; no concrete correctness blocker found. QG comparisons remain reference-conditioned diagnostics, and scientific_admission remains false.
+Source edits and pushes: none.
