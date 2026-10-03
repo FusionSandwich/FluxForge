@@ -1,0 +1,142 @@
+South HPGe working comparison baseline — 2026-10-03
+
+Decision
+Use the recovered South small-vial 25 cm export as the first working efficiency
+curve. Its native ANH file is not needed to interpolate the exported table.
+Use QG-conditioned line response for reanalysis of the SAME physical count, and
+the pooled QG response knots as a fallback shape if the export is unavailable.
+This implements the user's assumption that QuantumGold is mostly correct.
+
+What is saved and how to reproduce
+Run python build_baseline.py from this folder; no installation is needed.
+All inputs are copied byte-for-byte, with original locations and SHA256 in
+provenance.json. The 31 original QG report hashes were checked on preparation.
+The pre-existing chronology receipt retains all source evidence and flags.
+The outputs are study data within FluxForge; no production calibration gate or
+reactor model was changed. Existing issue-197 calibration/source recovery and
+QG-yield QC provide the context; this package adds an explicit working scenario.
+
+Recovered curve
+South Small Vial 25cm.csv was attached by Robert on April 30, 2025. Preserve all
+raw values, including negative low-energy rows. Working units are percent:
+epsilon_fraction = exported_value/100. This assumption is supported by the
+nominal long-lived QG comparisons, but source units were not declared. Use only
+positive adjacent table brackets; no extrapolation or bridging invalid rows.
+The numeric Error field is preserved, not interpreted as a standard uncertainty.
+Do not multiply the recovered table by the median QG/table ratio: it is a
+consistency diagnostic, not an independently established correction factor.
+
+QG-conditioned reconstruction
+For each positive reported line:
+epsilon_effective = N_QG / (A_line_uCi * 37000 * live_seconds * (RAD_INT/100)).
+This is a line-specific effective response, which can include historical
+attenuation, dead-time/processing, decay and activity-reference conventions.
+It is not an independently identified intrinsic detector efficiency.
+For a refitted line in the SAME spectrum, at the SAME reference convention:
+A_new_Bq = N_new * (A_QG_uCi * 37000 / N_QG).
+build_baseline.refit_qg_activity(row, N_new) supplies this working conversion.
+This lets FluxForge improve net-area extraction while keeping QG's response
+assumptions. It does not recreate QG's multi-line isotope-combination algorithm.
+Keep signed new net areas and their fit uncertainties; never turn an upper limit
+or failed fit into a positive detection. With an exact working response, the
+conditional counting-only standard error is abs(A_QG_Bq/N_QG)*sigma_N_new;
+shared response uncertainty remains unspecified, not zero or independently
+inferred from correlated QG counts/activity. Report that condition in results.
+
+Fallback curve when the recovered table is unavailable
+qg_conditioned_response_knots.csv pools South 25 cm lines only when coefficients
+match the recovered profile at printed precision, RAD_INT>1 and the simple
+count-window average-decay factor exceeds 0.99. At each exact energy use median
+effective response. Minimum/maximum are descriptive spread, not uncertainty.
+Interpolate linearly within the knot energy range only. This curve is a working
+comparison of similar 25 cm geometries, not a geometry-transfer calibration.
+The raw effective points and every exclusion are retained in the line lookup.
+No forced polynomial smoothing, invented covariance or uncertainty floor.
+The median response/export ratio is 1.019 across the 156 pooled rows, but the
+100.1 keV ratio reaches about 1.28 and the 113.7 keV ratio about 1.20. Preserve
+this energy dependence: a single global rescaling would hide it. The empirical
+curve may embed historical attenuation/processing differences, especially at
+low energy. Prefer a same-count anchor when comparing refitted low-energy lines.
+
+Known exceptions
+Sc48 983.5 and 1312.1 keV printed RAD_INT=1.00 is the established ~100x display/
+yield issue. These points are excluded from accepted anchors and pooled fits.
+All RAD_INT<=1 points remain ambiguous and are likewise excluded. Values are
+preserved; independent yield substitutions belong to the separate Sc48 study.
+sc48_corrected_yield_scenario.csv reproduces that study's central-yield working
+alternative using the recovered curve, ENSDF probabilities and QG net counts.
+It provides count-average and simple-decay count-start activities separately;
+no QG value is overwritten and no independent yield covariance is invented.
+Fe-Cd's near-contact geometry remains separate: no 25 cm response substitution,
+inverse-square transfer or pooling. Its otherwise accepted same-count QG line
+anchor can be used to compare a refit of that SAME count.
+RAFM-A-2hr has no QG report; retain its raw identity and use the recovered curve
+with explicitly assumed nominal South 25 cm geometry for a new reduction.
+The supplied package does not assign it a fictitious QG response or activity.
+
+Identity and timing
+measurement_identity_and_timing.csv exports the existing 32-count hash-bound
+joins, live/real durations, QG/ANS working clocks and maintained irradiation
+schedule candidates. All 31 available QG acquisition times/durations match the
+empirical ANS fields; 30 ASC arrays match ANS arrays. Use QG/ANS clocks as the
+working measurement clock. Do not silently shift ASC timestamps by 1 or 3 h.
+irradiation_timing_scenarios.csv records elapsed cooling time for each available
+EOI candidate under a shared local naive-clock assumption. For RAFM4 the
+advisor-correspondence Aug 5 10:28–12:28 E8 interval is the preferred working
+scenario because it explicitly names Hirst-RAFM4; retain Aug 4 13:00–15:00 as
+the maintained-schedule alternative. Do not apply the RAFM4 correspondence
+automatically to all monitors. Original labels bind early counts to RAFM3 and
+15d counts to RAFM4; repeated A/B/C/N labels do not establish one specimen.
+Count-reference activity comparison can proceed without resolving EOI. For EOI
+activity use the selected time scenario and explicit nuclide half-life; test
+simple-decay/feeding assumptions separately. Do not infer reactor power from
+these dates or cumulative logs.
+
+Finite count duration
+If a new reduction assumes simple decay and uniform live fraction, the
+count-start response integral is S=(L/R)*[-expm1(-lambda*R)]/lambda;
+A_start=N/(epsilon*p*S), while A_count_average=N/(epsilon*p*L).
+Do not additionally apply that correction to a QG-reference line anchor unless
+the QG activity-time convention is deliberately changed. The historical output
+retains both effective and hypothetical count-start response as separate fields.
+
+Attenuation and what detector information can help
+For same-count QG response anchoring, preserve the empirical combined response;
+do not add another attenuation or coincidence correction over it. For a fresh
+recovered-curve activity estimate, unresolved sample attenuation can be set to
+unity as an explicit working scenario, not asserted to be physically absent.
+A later attenuation calculation needs emitting material/composition, density,
+thickness/path distribution and container geometry. Compare energy dependence
+and matched lines first, especially low-energy lines and Cu inside V capillary.
+Do not impose arbitrary percentage errors on all peaks for missing information.
+
+The existing workbook identifies South serial 31-TP20602A: crystal diameter
+6.0 cm, length 6.45 cm, end-cap thickness 0.1 cm, crystal gap 0.4 cm, outer
+contact layer 0.07 cm. Workbook explanations distinguish manual, measured,
+borrowed and guessed values; preserve them. QG headers identify HpGe(P),
+coaxial, 6.0 cm diameter. The workbook supports detector-specific modeling;
+it does not establish the 2025 active calibration or settle CSV DI semantics.
+geomEffUWHPGe.xlsx is geometric solid-angle information, not full-energy peak
+efficiency. Generic manufacturer relative efficiency likewise is not a usable
+absolute energy curve. Best later transfer: use the actual detector geometry,
+validate photon transport against the recovered 25 cm response, then compute
+target/reference geometry ratios. NIST demonstrates measured-vs-computed
+efficiency comparisons for complex geometries. No new simulation is run here.
+
+Readiness and comparison meaning
+Ready for conditional line/activity comparisons and improved peak fitting using
+the declared QG working reference. Such agreement is not an independent test of
+absolute efficiency. It can test FluxForge extraction and expose suspect QG
+lines; it cannot by itself validate absolute neutron flux or transport C/E.
+This distinction does not block the user-authorized empirical comparison.
+
+References and provenance
+PGT Quantum manual v4.04 (report-field context; installed 2025 version unknown):
+https://ludlums.com/images/product_manuals/QTMmanual.pdf
+NIST, Using Monte Carlo Methods to Estimate Efficiencies of Gamma-Ray Emitters
+With Complex Geometries:
+https://www.nist.gov/publications/using-monte-carlo-methods-estimate-efficiencies-gamma-ray-emitters-complex-geometries
+All local/source hashes and the original reconstruction are in inputs and
+provenance.json. BUILD_RECEIPT.json records replay results; algebraic agreement
+is labeled as such. The original reports, uncertainty fields, timing conflicts
+and previously stricter scientific-admission receipts are unchanged.
