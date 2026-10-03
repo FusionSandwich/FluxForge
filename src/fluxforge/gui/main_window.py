@@ -45,6 +45,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         CalibrationWorkspaceDialog,
         CovarianceDialog,
         IrradiationHistoryDialog,
+        ReactionRateDialog,
         PuIsotopicsDialog,
         QAHistoryDialog,
         ReportExportDialog,
@@ -187,6 +188,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._qa_history_dialog = None
             self._covariance_dialog = None
             self._irradiation_history_dialog = None
+            self._reaction_rate_dialog = None
             self._irradiation_segments = ()
             self._report_dialog = None
             self._pu_isotopics_dialog = None
@@ -518,6 +520,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     enabled=True,
                     handler=self._open_irradiation_history,
                     object_name="OpenIrradiationHistoryAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Activity to Reaction Rate",
+                    enabled=True,
+                    handler=self._open_reaction_rate,
+                    object_name="OpenReactionRateAction",
                 )
             )
             if self.developer_tools:
@@ -1607,6 +1617,19 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _set_irradiation_history(self, segments) -> None:
             self._irradiation_segments = segments
+            if self._reaction_rate_dialog is not None:
+                self._reaction_rate_dialog._mark_pending()
+
+        def _open_reaction_rate(self) -> None:
+            if self._reaction_rate_dialog is None:
+                self._reaction_rate_dialog = ReactionRateDialog(
+                    history_provider=lambda: self._irradiation_segments,
+                    activity_provider=lambda: self.analysis_workspace.state.activity_results,
+                    parent=self,
+                )
+            self._reaction_rate_dialog.show()
+            self._reaction_rate_dialog.raise_()
+            self._reaction_rate_dialog.activateWindow()
 
         def _open_dashboard_tab(self) -> None:
             if hasattr(self, "central_tabs"):

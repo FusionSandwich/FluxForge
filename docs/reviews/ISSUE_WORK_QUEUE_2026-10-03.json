@@ -225,15 +225,15 @@
       "number": 46,
       "title": "Issue: GUI Pipeline: Activity to Reaction Rate Translator UI",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/46",
-      "status": "queued",
-      "notes": ""
+      "status": "implemented_pending_integration",
+      "notes": "Activity/SigPhi workspace reuses integrated owner engine; 50 focused checks and 21 integration checks pass. Draft PR 217."
     },
     {
       "number": 47,
       "title": "Issue: GUI Pipeline: Unfolding Solver Launch Config",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/47",
       "status": "queued",
-      "notes": ""
+      "notes": "Existing solver workspace audited; real-time solver progress requires owner unfolding APIs. Preserve active ownership."
     },
     {
       "number": 48,
