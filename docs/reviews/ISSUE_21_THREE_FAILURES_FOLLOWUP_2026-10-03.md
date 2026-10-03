@@ -67,7 +67,8 @@ The first guarded run launched with the modified driver while HEAD was still
 labels this explicitly as a modified-source run and records its exact source
 hashes. The subsequent event-mode and final focused runs used committed
 `51654ce` source. Final focused verification is **17 passed, 0 skipped**;
-Black checks, scoped Flake8 and `git diff --check` also pass. The earlier geometry
+Black checks, scoped Flake8 and source/docs `git diff --check` also pass. Raw
+pytest log/XML whitespace is preserved verbatim. The earlier geometry
 test attempt lacked foreground placement; the final tests explicitly raise
 their test windows, as the desktop driver does.
 
