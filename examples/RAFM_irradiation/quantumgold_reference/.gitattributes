@@ -1,0 +1,4 @@
+* -text whitespace=cr-at-eol
+originals/** -diff
+runtime/background.ASC -diff
+runtime/calibration/** -diff

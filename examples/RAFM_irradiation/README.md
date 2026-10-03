@@ -7,6 +7,21 @@ Start with the [feature guide](FEATURE_GUIDE.md) for the expanded 32-acquisition
 dataset, converted-format checks, material compositions, reproducible commands
 and the qualification limits of each feature example.
 
+For the complete, source-bound 2025 QuantumGold campaign, use the
+[portable reference example](quantumgold_reference/README.txt). It bundles the
+32 native spectra, 30 available ASC exports, 31 original reports and all extracted
+peak/nuclide rows, with explicit cohort, timing, geometry and missing-file labels.
+It needs no files from the original computer or QuantumGold installation:
+
+```bash
+python examples/RAFM_irradiation/run_portable_qg_example.py --verify-only
+python examples/RAFM_irradiation/run_portable_qg_example.py --output replay_output
+```
+
+The portable replay audits all 32 counts, performs 30 available ASC reductions,
+and runs the 12-monitor QG report benchmark. Software completion and physical
+agreement are recorded separately; the native-only counts remain explicit.
+
 The INL Co masses are already adjusted Co element masses, despite the wires
 containing 0.46 wt% Co. Do not apply the alloy fraction a second time. See the
 [source and replay review](../../docs/reviews/INL_MONITOR_MASS_REVIEW_2026-09-29.md)

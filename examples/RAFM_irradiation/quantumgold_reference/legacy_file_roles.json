@@ -1,0 +1,200 @@
+[
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Co-Cd-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Co-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Cu-Cd-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Cu-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Fe-Cd-RAFM-1_0cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/In-Cd-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ni-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Sc-Cd-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Sc-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1a_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1b_25cm.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM1/RAFM1_Long_144h_EOI.txt",
+    "format": "raw_ASC_with_txt_extension",
+    "cohort": "RAFM1_older_example",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM1/RAFM1_Long_70d_EOI.txt",
+    "format": "QG_report",
+    "cohort": "RAFM1_older_example",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-A_24hrEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-A_300sEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-A_4dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-B_24hrEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-B_2hrEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-B_300sEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-B_4dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-C_24hrEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-C_2hrEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-C_300sEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-C_4dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-N_24hrEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-N_2hrEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-N_300sEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM3/RAFM3-N_4dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM4/RAFM4-A_15dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM4/RAFM4-B_15dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM4/RAFM4-C_15dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  },
+  {
+    "path": "examples/RAFM_irradiation/QG_processed_gamma_data/RAFM4/RAFM4-N_15dEOI.txt",
+    "format": "QG_report",
+    "cohort": "campaign_2025_32count",
+    "role": "historical_existing_example_separate_from_canonical_manifest"
+  }
+]
