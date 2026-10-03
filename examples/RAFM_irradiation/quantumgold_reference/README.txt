@@ -57,6 +57,10 @@ Workflow stages and outputs
    flux-wire reference workflow for all 12 monitor reports, including native-only
    Cu-Cd and Fe-Cd. REPLAY_RECEIPT.json records both workflow summaries, source
    manifest identity and missing-file policy.
+6. Reconcile exported sample_group labels against the source roster. The legacy
+   benchmark infers RAFM1 for some RAFM-1 monitor names; these become flux_wires,
+   with legacy_sample_group retained and OUTPUT_LABEL_RECONCILIATION.json saved.
+   No measured values, rates, timing assumptions or numerical results change.
 
 Exact limits and labels
 RAFM-A-2hr has native+ASC data but no recovered QG report. It is analyzed as raw

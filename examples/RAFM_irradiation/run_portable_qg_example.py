@@ -139,6 +139,78 @@ def dump(path: Path, value) -> None:
     path.write_text(json.dumps(value, indent=2, allow_nan=False)+'\n', encoding='utf-8')
 
 
+def label_replay_outputs(output: Path, manifest: dict) -> dict:
+    """Bind exported group labels to the source roster, preserving legacy labels.
+
+    The maintained workflow may infer RAFM1 from a monitor's RAFM-1 filename.
+    Only group-label fields are corrected here; all numerical results and timing
+    assumptions are unchanged. Source inputs and older RAFM1 results are untouched.
+    """
+    roster = {r['workflow_stem']:r for r in manifest['measurements']}
+    corrections = []
+
+    def walk(value, inherited_id=None, source=''):
+        if isinstance(value, list):
+            for item in value:
+                walk(item, inherited_id, source)
+        elif isinstance(value, dict):
+            sample = value.get('sample_id', inherited_id)
+            r = roster.get(sample)
+            if r is not None and 'sample_group' in value:
+                expected = 'flux_wires' if r['sample_kind']=='monitor' else r['cohort']
+                if value['sample_group'] != expected:
+                    corrections.append(dict(file=source, measurement_id=r['measurement_id'],
+                                            legacy_group=value['sample_group'], group=expected))
+                    value['legacy_sample_group'] = value['sample_group']
+                    value['sample_group'] = expected
+                    value['sample_group_label_basis'] = 'source_bound_campaign_manifest'
+            for item in list(value.values()):
+                if isinstance(item, (dict,list)):
+                    walk(item, sample, source)
+
+    for folder in ('raw_replay','qg_report_replay'):
+        for path in (output/folder).rglob('*_comparison.txt'):
+            r = roster.get(path.stem.removesuffix('_comparison'))
+            if r is None:
+                continue
+            expected = 'flux_wires' if r['sample_kind']=='monitor' else r['cohort']
+            lines = path.read_text(encoding='utf-8').splitlines()
+            for i,line in enumerate(lines):
+                if line.startswith('Sample group: ') and line != 'Sample group: '+expected:
+                    old = line.removeprefix('Sample group: ')
+                    lines[i:i+1] = ['Sample group: '+expected,'Legacy sample group: '+old]
+                    corrections.append(dict(file=path.relative_to(output).as_posix(),
+                                            measurement_id=r['measurement_id'],legacy_group=old,group=expected))
+                    path.write_text('\n'.join(lines)+'\n',encoding='utf-8')
+                    break
+        for path in (output/folder).rglob('*.json'):
+            value = json.loads(path.read_text(encoding='utf-8'))
+            before = len(corrections)
+            walk(value, source=path.relative_to(output).as_posix())
+            if len(corrections) != before:
+                dump(path,value)
+        for path in (output/folder).rglob('*.csv'):
+            with path.open(encoding='utf-8',newline='') as f:
+                reader = csv.DictReader(f)
+                fields = reader.fieldnames
+                if not fields or 'sample_group' not in fields or 'sample_id' not in fields:
+                    continue
+                rows = list(reader)
+            before = len(corrections)
+            for r in rows:
+                walk(r,source=path.relative_to(output).as_posix())
+            if len(corrections) != before:
+                fields += [name for name in ('legacy_sample_group','sample_group_label_basis') if name not in fields]
+                with path.open('w',encoding='utf-8',newline='') as f:
+                    writer = csv.DictWriter(f,fieldnames=fields)
+                    writer.writeheader()
+                    writer.writerows(rows)
+    result = dict(basis='source_bound_campaign_manifest', numerical_results_changed=False,
+                  corrections=corrections)
+    dump(output/'OUTPUT_LABEL_RECONCILIATION.json',result)
+    return result
+
+
 def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
     checked = verify_inputs(repo, repo/'examples/RAFM_irradiation/quantumgold_reference/manifest.json')
     manifest = checked['manifest']
@@ -195,6 +267,8 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
     # failures and admission exclusions; do not turn --no-fail into validation.
     raw = run_rafm_validation(staged, output/'raw_replay', enforce_thresholds=False)
     report = run_qg_benchmark(staged, output/'qg_report_replay')
+    label_receipt = label_replay_outputs(output,manifest)
+    report = json.loads((output/'qg_report_replay/qg_benchmark_summary.json').read_text(encoding='utf-8'))
     receipt.update(status='SOFTWARE_REPLAY_COMPLETED',
                    source_input_completeness=checked['observed'],
                    raw_workflow_summary=raw, qg_report_workflow_summary=report,
@@ -203,6 +277,7 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
                    native_only_policy='arrays exported; no fictitious ASC export or wrong-geometry raw activity',
                    scientific_status='QG-conditioned example/diagnostics; preserve threshold failures and admission exclusions',
                    software_python=sys.version, source_manifest_sha256=checked['manifest_sha256'])
+    receipt['output_label_reconciliation'] = label_receipt
     dump(output/'REPLAY_RECEIPT.json', receipt)
     return receipt
 

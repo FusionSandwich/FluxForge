@@ -95,6 +95,28 @@ class PortableQGExampleTests(unittest.TestCase):
         cohorts = {r['measurement_id']:r['physical_specimen_id'] for r in self.manifest['measurements']}
         self.assertNotEqual(cohorts['RAFM-A-15d'],cohorts['RAFM-A-24hr'])
 
+    def test_monitor_output_labels_do_not_become_older_RAFM1(self):
+        target = Path(self.tmp.name)/'label_reconciliation_fixture'
+        folder = target/'qg_report_replay'
+        folder.mkdir(parents=True,exist_ok=True)
+        path = folder/'summary.json'
+        value = {'samples':[{'sample_id':'Cu-Cd-RAFM-1_25cm','sample_group':'RAFM1',
+                             'activity_Bq':247,'timing':{'sample_group':'RAFM1','live_s':3600}},
+                            {'sample_id':'RAFM1_Long_70d_EOI','sample_group':'RAFM1','activity_Bq':42}]}
+        path.write_text(json.dumps(value),encoding='utf-8')
+        report = folder/'Cu-Cd-RAFM-1_25cm_comparison.txt'
+        report.write_text('Sample group: RAFM1\nNet counts: 247\n',encoding='utf-8')
+        driver.label_replay_outputs(target,self.manifest)
+        fixed = json.loads(path.read_text(encoding='utf-8'))
+        self.assertEqual(fixed['samples'][0]['sample_group'],'flux_wires')
+        self.assertEqual(fixed['samples'][0]['legacy_sample_group'],'RAFM1')
+        self.assertEqual(fixed['samples'][0]['timing']['sample_group'],'flux_wires')
+        self.assertEqual(fixed['samples'][0]['activity_Bq'],247)
+        self.assertEqual(fixed['samples'][1],value['samples'][1])
+        self.assertIn('Sample group: flux_wires',report.read_text(encoding='utf-8'))
+        self.assertIn('Legacy sample group: RAFM1',report.read_text(encoding='utf-8'))
+        self.assertIn('Net counts: 247',report.read_text(encoding='utf-8'))
+
 
 if __name__ == '__main__':
     unittest.main()
