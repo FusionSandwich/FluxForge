@@ -863,14 +863,21 @@ def _values_close(
     return False
 
 
-def _resolve_tolerance(path: str, tolerances: dict[str, float], *, suffix: str) -> float | None:
+def _resolve_tolerance(
+    path: str, tolerances: dict[str, float], *, suffix: str
+) -> float | None:
     lowered_path = path.lower()
+    field = lowered_path.rsplit(".", 1)[-1].split("[", 1)[0]
     selected: float | None = None
     for key, value in tolerances.items():
         if not key.lower().endswith(suffix):
             continue
         token = key[: -len(suffix)].lower()
-        if token and token in lowered_path:
+        energy_alias = token == "energy_kev" and field in {
+            "energies_kev",
+            "first_peak_kev",
+        }
+        if token and (token in lowered_path or energy_alias):
             selected = float(value)
             break
     return selected
