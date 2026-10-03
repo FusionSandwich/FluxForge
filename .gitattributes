@@ -1,0 +1,13 @@
+# Preserve measured spectra, archive extracts and hash receipts byte for byte.
+examples/RAFM_irradiation/raw_gamma_spec/** -text whitespace=-blank-at-eol,cr-at-eol
+examples/RAFM_irradiation/converted_gamma_spec/** -text whitespace=-blank-at-eol,cr-at-eol
+examples/RAFM_irradiation/reference_data/** -text whitespace=cr-at-eol
+examples/RAFM_irradiation/background.ASC -text whitespace=-blank-at-eol,cr-at-eol
+examples/RAFM_irradiation/metadata/archive_manifest.json -text whitespace=cr-at-eol
+examples/RAFM_irradiation/metadata/material_compositions.json -text whitespace=cr-at-eol
+examples/RAFM_irradiation/results/analysis_json/RAFM2*.json -text whitespace=cr-at-eol
+docs/reviews/*2026-10-03.json -text whitespace=cr-at-eol
+src/fluxforge/examples/rafm_feature_example.py -text
+src/fluxforge/io/spectrum_csv.py -text
+src/fluxforge/workflows/phase6_ldrd_worked_example.py -text
+tools/audit_rafm_raw_recovery.py -text

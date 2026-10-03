@@ -8,7 +8,15 @@
       "xs": 74.0,
       "unit": "b",
       "e_start": 4.57e-08,
-      "e_end": 0.000381
+      "e_end": 0.000381,
+      "mass_basis": "element_mass",
+      "element_mass_fraction": 1.0,
+      "alloy_co_mass_fraction": 0.0046,
+      "mass_source": "INL CCN 257311, RAFM-1 designation table, 2025-07-29",
+      "mass_source_sha256": "e6e0697f7e9fbba457a9700a4a4831efb5fad68b7eb1e6e47ef72866b981b652",
+      "mass_source_note": "Wire (0.46 wt% Co), mass adjusted accordingly",
+      "qa_number": "376298, 368486",
+      "composition_uncertainty": null
     }
   ],
   "co-rafm-1": [
@@ -20,7 +28,15 @@
       "xs": 37.18,
       "unit": "b",
       "e_start": 2.23e-09,
-      "e_end": 0.000186
+      "e_end": 0.000186,
+      "mass_basis": "element_mass",
+      "element_mass_fraction": 1.0,
+      "alloy_co_mass_fraction": 0.0046,
+      "mass_source": "INL CCN 257311, RAFM-1 designation table, 2025-07-29",
+      "mass_source_sha256": "e6e0697f7e9fbba457a9700a4a4831efb5fad68b7eb1e6e47ef72866b981b652",
+      "mass_source_note": "Wire (0.46 wt% Co), mass adjusted accordingly",
+      "qa_number": "376298",
+      "composition_uncertainty": null
     }
   ],
   "cu-cd-rafm-1": [
@@ -28,11 +44,16 @@
       "sample": "Cu-Cd-RAFM-1",
       "iso": "cu63",
       "prod": "cu64",
-      "mass_mg": 1.3748,
+      "mass_mg": 12.9738,
       "xs": 4.97,
       "unit": "b",
       "e_start": 2.57e-08,
-      "e_end": 1.51
+      "e_end": 1.51,
+      "mass_basis": "sample_mass",
+      "mass_source": "INL CCN 257311, Cu-Cd-RAFM-1 designation row, 2025-07-30",
+      "mass_source_sha256": "e6e0697f7e9fbba457a9700a4a4831efb5fad68b7eb1e6e47ef72866b981b652",
+      "qa_number": "376301, 368486",
+      "composition_note": "Cu purity remains the bundled 0.9999 assumption; not certified by the designation row."
     }
   ],
   "cu-rafm-1": [

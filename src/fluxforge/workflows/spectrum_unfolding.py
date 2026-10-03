@@ -149,6 +149,7 @@ class FluxWireMeasurement:
     sample_id: Optional[str] = None
     cover: Optional[str] = None
     response_spec: Optional[MonitorResponseSpec] = None
+    element_mass_fraction: float = 1.0
 
     @property
     def row_key(self) -> Tuple[str, str, str]:
@@ -172,6 +173,8 @@ class FluxWireMeasurement:
     @property
     def effective_isotope_abundance(self) -> float:
         """Resolved target-isotope abundance fraction."""
+        if not np.isfinite(self.isotope_abundance) or not 0 < self.isotope_abundance <= 1:
+            raise ValueError(f"{self.reaction}: isotope_abundance must be finite and in (0, 1]")
         if self.isotope_abundance > 0.0 and not np.isclose(self.isotope_abundance, 1.0):
             return float(self.isotope_abundance)
 
@@ -198,12 +201,14 @@ class FluxWireMeasurement:
         """Number of target atoms in the measured wire."""
         if self.sample_mass_g is None:
             raise ValueError(f"{self.reaction}: sample_mass_g is required to normalize per atom")
-        if self.sample_mass_g <= 0.0:
-            return 0.0
+        if not np.isfinite(self.sample_mass_g) or self.sample_mass_g <= 0.0:
+            raise ValueError(f"{self.reaction}: sample_mass_g must be finite and positive")
+        if not np.isfinite(self.element_mass_fraction) or not 0 < self.element_mass_fraction <= 1:
+            raise ValueError(f"{self.reaction}: element_mass_fraction must be finite and in (0, 1]")
 
         target = self.target_isotope
         if target is None:
-            return 0.0
+            raise ValueError(f"{self.reaction}: target isotope cannot be resolved")
 
         element = target.split("-", 1)[0]
         atomic_mass = None
@@ -217,13 +222,13 @@ class FluxWireMeasurement:
                 atomic_mass = Isotope.from_string(canonical_target).atomic_mass
 
         if atomic_mass is None or atomic_mass <= 0.0:
-            return 0.0
+            raise ValueError(f"{self.reaction}: target atomic mass is unavailable")
 
         abundance = self.effective_isotope_abundance
-        if abundance <= 0.0:
-            return 0.0
+        if not np.isfinite(abundance) or not 0 < abundance <= 1:
+            raise ValueError(f"{self.reaction}: isotope_abundance must be finite and in (0, 1]")
 
-        return float((self.sample_mass_g / atomic_mass) * _AVOGADRO * abundance)
+        return float((self.sample_mass_g / atomic_mass) * _AVOGADRO * abundance * self.element_mass_fraction)
 
     @property
     def effective_saturation_factor(self) -> float:
@@ -262,13 +267,17 @@ class FluxWireMeasurement:
     def reaction_rate_per_atom(self) -> float:
         """Calculate reaction rate per target atom per second."""
         if self.rate_per_atom is not None:
+            if not np.isfinite(self.rate_per_atom) or self.rate_per_atom < 0:
+                raise ValueError(f"{self.reaction}: rate_per_atom must be finite and nonnegative")
             return float(self.rate_per_atom)
+        if not np.isfinite(self.activity_Bq) or self.activity_Bq < 0:
+            raise ValueError(f"{self.reaction}: activity_Bq must be finite and nonnegative")
         n_target_atoms = self.target_atom_count
         saturation = self.effective_saturation_factor
         decay = self.effective_decay_factor
         denominator = n_target_atoms * saturation * decay
-        if denominator <= 0.0:
-            return 0.0
+        if not np.isfinite(denominator) or denominator <= 0.0:
+            raise ValueError(f"{self.reaction}: rate normalization must be finite and positive")
         return self.activity_Bq / denominator
 
     @property
@@ -661,9 +670,14 @@ class SpectrumUnfolder:
         self._response_row_metadata = []
         for index, m in enumerate(self.measurements):
             if m.response_spec is None:
+                reaction_xs = self.irdff_db.get_cross_section(m.reaction)
                 self._response_row_metadata.append(
                     {"sample_id": m.sample_id, "reaction": m.reaction, "cover": None,
-                     "self_shielding": None}
+                     "self_shielding": None,
+                     "reaction_source": reaction_xs.source,
+                     "reaction_evaluation_key": reaction_xs.evaluation_key,
+                     "reaction_source_sha256": reaction_xs.source_sha256,
+                     "reaction_interpolation": reaction_xs.interpolation}
                 )
                 continue
             row = build_monitor_response(m.response_spec, self.energy_edges, self.irdff_db)
