@@ -1491,6 +1491,7 @@ def fit_single_peak(
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
             maxfev=5000,
+            x_scale="jac",
         )
 
         perr = np.sqrt(np.diag(pcov))
@@ -1783,6 +1784,7 @@ def fit_multiple_peaks(
             absolute_sigma=True,
             bounds=(bounds_lower, bounds_upper),
             maxfev=20000,
+            x_scale="jac",
         )
         perr = np.sqrt(np.diag(pcov))
         success = bool(
