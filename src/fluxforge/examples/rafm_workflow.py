@@ -13,6 +13,8 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 import numpy as np
 
+from fluxforge.analysis.qg_peak_ids import corrected_reference_ids
+
 from fluxforge.analysis.flux_unfold import (
     FluxWireReaction,
     activity_to_reaction_rate,
@@ -85,6 +87,7 @@ class RAFMMetadata:
     flux_wire_metadata: Dict[str, List[Dict[str, Any]]]
     pairing_aliases: Dict[str, str]
     sample_gamma_library: Dict[str, Dict[str, Any]]
+    qg_peak_id_corrections: Optional[List[Dict[str, Any]]] = None
 
 
 @dataclass
@@ -146,6 +149,13 @@ def load_rafm_example_metadata(example_root: Path) -> RAFMMetadata:
         flux_wire_metadata=load_json(metadata_root / "flux_wire_metadata.json"),
         pairing_aliases=load_json(metadata_root / "pairing_aliases.json"),
         sample_gamma_library=load_json(metadata_root / "sample_gamma_library.json"),
+        qg_peak_id_corrections=(
+            load_json(metadata_root / "qg_peak_id_corrections.json").get(
+                "corrections", []
+            )
+            if (metadata_root / "qg_peak_id_corrections.json").exists()
+            else []
+        ),
     )
 
 
@@ -1270,7 +1280,7 @@ def _qg_line_activity_bq(nuclide, peak):
     try:
         return replace(nuclide, activity=float(peak.get("activity", 0.0)),
                        activity_unit=unit).activity_bq
-    except ValueError:
+    except (TypeError, ValueError):
         return None
 
 
@@ -1298,12 +1308,24 @@ def qg_reference_peaks(reference_data: FluxWireData) -> List[Dict[str, Any]]:
                     ),
                     "assignment": str(peak.get("assignment", "")),
                     "line_activity_bq": _qg_line_activity_bq(nuclide, peak),
-                    "reported_line_activity": float(peak.get("activity", 0.0)),
-                    "reported_line_activity_unit": peak.get("activity_unit", nuclide.activity_unit),
-                    "line_activity_unit_basis": "ROI_column_header" if "activity_unit" in peak else "summary_unit_assumption",
+                    "reported_line_activity": (
+                        float(peak["activity"])
+                        if peak.get("activity") is not None
+                        else None
+                    ),
+                    "reported_line_activity_unit": peak.get(
+                        "activity_unit", nuclide.activity_unit
+                    ),
+                    "line_activity_unit_basis": (
+                        "ROI_column_header"
+                        if "activity_unit" in peak
+                        else "summary_unit_assumption"
+                    ),
                     "reported_rad_int_text": peak.get("reported_rad_int_text"),
                     "reported_line_activity_text": peak.get("reported_activity_text"),
-                    "report_source_file": peak.get("source_file", reference_data.source_file),
+                    "report_source_file": peak.get(
+                        "source_file", reference_data.source_file
+                    ),
                     "report_source_sha256": peak.get("source_file_sha256"),
                     "report_source_line_number": peak.get("source_line_number"),
                     "report_source_line_text": peak.get("source_line_text"),
@@ -1318,13 +1340,23 @@ def apply_generic_qg_report_parity(
     raw_peaks: Sequence[IdentifiedPeak],
     reference_data: Optional[FluxWireData],
     config: Dict[str, Any],
+    *,
+    reference_identity_rows: Optional[Sequence[Dict[str, Any]]] = None,
 ) -> List[IdentifiedPeak]:
     """Force generic-sample QG count parity for the dedicated QG workflow."""
     if reference_data is None:
         return list(raw_peaks)
 
     peaks = list(raw_peaks)
-    for ref_peak in qg_reference_peaks(reference_data):
+    for ref_peak in (
+        qg_reference_peaks(reference_data)
+        if reference_identity_rows is None
+        else reference_identity_rows
+    ):
+        # A corrected misassignment cannot supply nuclide activity or fabricate
+        # a native peak. Keep its independently fitted result untouched.
+        if "identity_correction" in ref_peak:
+            continue
         match, _ = match_peak(ref_peak, peaks, config)
         if match is None:
             net_counts = float(ref_peak.get("net_counts") or 0.0)
@@ -1519,34 +1551,134 @@ def match_peak(
     return best, best.isotope == reference_peak["isotope"]
 
 
+def match_peak_set(
+    reference_peaks: Sequence[Dict[str, Any]],
+    raw_peaks: Sequence[IdentifiedPeak],
+    config: Dict[str, Any],
+) -> List[Tuple[Optional[IdentifiedPeak], bool]]:
+    """Assign source rows to physical channels once, independently of input order.
+
+    Optimize matched-row count first, same-isotope count second, then total
+    absolute energy displacement. Multiple isotope labels on one channel are
+    competing assignments, not additional detected peaks: their identity is
+    ambiguous and never reported as an isotope agreement.
+    """
+    from scipy.optimize import linear_sum_assignment
+
+    references = list(reference_peaks)
+    if not references:
+        return []
+    groups: Dict[int, List[IdentifiedPeak]] = defaultdict(list)
+    for peak in raw_peaks:
+        if not math.isfinite(float(peak.energy_keV)):
+            raise ValueError("Detected peak energies must be finite")
+        groups[int(peak.channel)].append(peak)
+    order = sorted(
+        range(len(references)),
+        key=lambda i: (
+            float(references[i]["energy_keV"]),
+            str(references[i]["isotope"]),
+            str(references[i].get("report_source_file", "")),
+            int(references[i].get("report_source_line_number") or 0),
+        ),
+    )
+    channels = sorted(groups)
+    n = len(references)
+    candidates = {}
+    largest_delta = 0.0
+    for row, index in enumerate(order):
+        ref = references[index]
+        energy = float(ref["energy_keV"])
+        if not math.isfinite(energy):
+            raise ValueError("Reference peak energies must be finite")
+        tolerance = energy_tolerance(energy, config)
+        if not math.isfinite(tolerance) or tolerance < 0:
+            raise ValueError("Peak matching tolerances must be finite and nonnegative")
+        for column, channel in enumerate(channels):
+            supported = [
+                peak
+                for peak in groups[channel]
+                if abs(float(peak.energy_keV) - energy) <= tolerance
+            ]
+            if not supported:
+                continue
+            ambiguous = len({peak.isotope for peak in groups[channel]}) > 1
+            supported.sort(
+                key=lambda peak: (
+                    not (peak.isotope == ref["isotope"] and not ambiguous),
+                    abs(float(peak.energy_keV) - energy),
+                    float(peak.energy_keV),
+                    str(peak.isotope),
+                    float(peak.net_counts),
+                )
+            )
+            best = supported[0]
+            agreement = best.isotope == ref["isotope"] and not ambiguous
+            delta = abs(float(best.energy_keV) - energy)
+            candidates[row, column] = (best, agreement, delta)
+            largest_delta = max(largest_delta, delta)
+    # All energy costs sum below one; all ID costs sum below one dummy cost.
+    unmatched_cost = float(n + 1)
+    costs = np.full((n, len(channels) + n), 4 * unmatched_cost**2)
+    costs[:, len(channels) :] = unmatched_cost
+    energy_scale = n * largest_delta + 1.0
+    for (row, column), (_, agreement, delta) in candidates.items():
+        costs[row, column] = float(not agreement) + delta / energy_scale
+    assigned_rows, assigned_columns = linear_sum_assignment(costs)
+    result: List[Tuple[Optional[IdentifiedPeak], bool]] = [(None, False)] * n
+    for row, column in zip(assigned_rows, assigned_columns):
+        candidate = candidates.get((int(row), int(column)))
+        if candidate is not None:
+            result[order[int(row)]] = (candidate[0], candidate[1])
+    return result
+
+
 def build_peak_comparison_records(
     sample_id: str,
     raw_peaks: Sequence[IdentifiedPeak],
     reference_data: FluxWireData,
     config: Dict[str, Any],
+    *,
+    reference_identity_rows: Optional[Sequence[Dict[str, Any]]] = None,
 ) -> Tuple[List[Dict[str, Any]], List[str]]:
     records: List[Dict[str, Any]] = []
     missing: List[str] = []
     min_energy = float(config.get("min_peak_energy_keV", 0.0))
     max_energy = float(config.get("max_peak_energy_keV", 1.0e9))
     min_counts = float(config.get("minimum_qg_net_counts", 1.0))
-    for ref_peak in qg_reference_peaks(reference_data):
+    identity_rows = (
+        qg_reference_peaks(reference_data)
+        if reference_identity_rows is None
+        else reference_identity_rows
+    )
+    reference_peaks = [
+        peak
+        for peak in identity_rows
+        if min_energy <= peak["energy_keV"] <= max_energy
+        and peak["net_counts"] >= min_counts
+    ]
+    assignments = match_peak_set(reference_peaks, raw_peaks, config)
+    channel_labels: Dict[int, set] = defaultdict(set)
+    for peak in raw_peaks:
+        channel_labels[int(peak.channel)].add(peak.isotope)
+    for ref_peak, (match, isotope_match) in zip(reference_peaks, assignments):
         energy = ref_peak["energy_keV"]
-        if (
-            energy < min_energy
-            or energy > max_energy
-            or ref_peak["net_counts"] < min_counts
-        ):
-            continue
-        match, isotope_match = match_peak(ref_peak, raw_peaks, config)
         record: Dict[str, Any] = {
             "sample_id": sample_id,
             "reference_isotope": ref_peak["isotope"],
+            "reported_reference_isotope": ref_peak.get(
+                "reported_isotope", ref_peak["isotope"]
+            ),
+            "identity_correction": ref_peak.get("identity_correction"),
             "reference_energy_keV": energy,
             "reference_net_counts": ref_peak["net_counts"],
             "reference_net_unc": ref_peak["net_unc"],
             "matched": match is not None,
             "isotope_match": isotope_match,
+            "raw_assignment_ambiguous": (
+                match is not None and len(channel_labels[int(match.channel)]) > 1
+            ),
+            "raw_channel": None if match is None else int(match.channel),
         }
         if match is None:
             missing.append(f"{sample_id}:{ref_peak['isotope']}@{energy:.2f}")
@@ -2659,9 +2791,11 @@ def analyze_generic_sample(
         list(gamma_library),
         metadata.config,
     )
+    low_significance_candidates: List[IdentifiedPeak] = []
     targeted_peaks = analyze_raw_spectrum_targeted(
         data=raw_data,
         expected_lines=targeted_gamma_library,
+        low_significance_candidates=low_significance_candidates,
         peak_threshold=float(
             metadata.config.get(
                 "targeted_peak_significance_sigma",
@@ -2758,6 +2892,11 @@ def analyze_generic_sample(
         "qg_comparison_stage": "raw_fluxforge_activity_pre_cd_compensation",
     }
 
+    native_peaks = [replace(peak) for peak in peaks]
+    native_id_rows: List[Dict[str, Any]] = []
+    native_missing: List[str] = []
+    reference_identity_rows: List[Dict[str, Any]] = []
+    excluded_reference_isotopes: set[str] = set()
     reference_data = None
     peak_rows: List[Dict[str, Any]] = []
     isotope_rows: List[Dict[str, Any]] = []
@@ -2795,6 +2934,33 @@ def analyze_generic_sample(
             qg_path, profile_name=metadata.config["profile_name"]
         )
         reference_data.sample_id = reference_data.sample_id or qg_path.stem
+        report_key = (
+            qg_path.resolve().relative_to(paths.qg_root.resolve()).as_posix()
+            if qg_path.resolve().is_relative_to(paths.qg_root.resolve())
+            else str(qg_path.resolve())
+        )
+        reference_identity_rows = corrected_reference_ids(
+            report_key,
+            qg_reference_peaks(reference_data),
+            metadata.qg_peak_id_corrections or [],
+        )
+        corrected_originals = {
+            row["reported_isotope"]
+            for row in reference_identity_rows
+            if "identity_correction" in row
+        }
+        excluded_reference_isotopes = {
+            isotope
+            for isotope in corrected_originals
+            if not any(row["isotope"] == isotope for row in reference_identity_rows)
+        }
+        native_id_rows, native_missing = build_peak_comparison_records(
+            sample_id,
+            native_peaks,
+            reference_data,
+            metadata.config,
+            reference_identity_rows=reference_identity_rows,
+        )
         if generic_method_key in {
             "qg",
             "qg_hybrid",
@@ -2803,7 +2969,10 @@ def analyze_generic_sample(
             "quantum_gold",
         }:
             peaks = apply_generic_qg_report_parity(
-                peaks, reference_data, metadata.config
+                peaks,
+                reference_data,
+                metadata.config,
+                reference_identity_rows=reference_identity_rows,
             )
             isotope_payload = reference_isotope_payload(
                 reference_data,
@@ -2811,11 +2980,29 @@ def analyze_generic_sample(
                 report_count_real_time_s(metadata.config, reference_data),
                 sample_mass_g=estimate_rafm_sample_mass_g(sample_id, metadata),
             )
+            # Never reinterpret the misassigned nuclide's reported activity as
+            # activity of its corrected isotope. Valid QG isotope rows remain.
+            for isotope in excluded_reference_isotopes:
+                isotope_payload.pop(isotope, None)
         peak_rows, missing_peaks = build_peak_comparison_records(
-            sample_id, peaks, reference_data, metadata.config
+            sample_id,
+            peaks,
+            reference_data,
+            metadata.config,
+            reference_identity_rows=reference_identity_rows,
         )
         isotope_rows, missing_nuclides = build_isotope_comparison_records(
-            sample_id, timing.sample_group, isotope_payload, reference_data
+            sample_id,
+            timing.sample_group,
+            isotope_payload,
+            replace(
+                reference_data,
+                nuclides=[
+                    nuclide
+                    for nuclide in reference_data.nuclides
+                    if nuclide.isotope not in excluded_reference_isotopes
+                ],
+            ),
         )
         line_rows, qg_consistency_rows = build_line_diagnostic_records(
             sample_id, timing.sample_group, peaks, reference_data, metadata.config
@@ -2901,6 +3088,43 @@ def analyze_generic_sample(
         "analysis_configuration": analysis_configuration,
         "timing": timing.to_dict(),
         "counts_csv": str(counts_csv),
+        "qg_peak_identity_corrections": [
+            row["identity_correction"]
+            for row in reference_identity_rows
+            if "identity_correction" in row
+        ],
+        "excluded_misassigned_report_activity_isotopes": sorted(
+            excluded_reference_isotopes
+        ),
+        "tentative_peak_identifications": [
+            {
+                "channel": peak.channel,
+                "energy_keV": float(peak.energy_keV),
+                "isotope": peak.isotope,
+                "significance": float(peak.significance),
+                "status": "below_detection_threshold",
+                "included_in_activity": False,
+            }
+            for peak in low_significance_candidates
+        ],
+        "native_peak_identifications": [
+            {
+                "channel": peak.channel,
+                "energy_keV": float(peak.energy_keV),
+                "isotope": peak.isotope,
+                "significance": float(peak.significance),
+            }
+            for peak in native_peaks
+        ],
+        "peak_id_comparison": native_id_rows,
+        "peak_id_validation": {
+            "stage": "before_qg_reference_overlay",
+            "reference_peaks": len(native_id_rows),
+            "same_id": sum(bool(row.get("isotope_match")) for row in native_id_rows),
+            "missing": native_missing,
+            "passed": all(bool(row.get("isotope_match")) for row in native_id_rows),
+            "scientific_admission": False,
+        },
         "n_detected_peaks": len(peaks),
         "n_unidentified_peaks": len(unidentified_peaks),
         "comparison_report_txt": str(report_path),

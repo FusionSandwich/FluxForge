@@ -106,8 +106,8 @@ PEAK_LINE_RE = re.compile(
     r"([\d.]+)\s+"  # Center energy (keV)
     r"([\d,]+)\s*[±�\s]+([\d,]+)\s+"  # Gross counts ± unc
     r"([\d,]+)\s*[±�\s]+([\d,]+)\s+"  # Net counts ± unc
-    r"(\w+@\s*[\d.]+)\s+"  # Assignment (nuclide@energy)
-    r"([0-9.E+-]+)",  # Activity
+    r"(\w+@\s*[\d.]+)"  # Assignment (nuclide@energy)
+    r"(?:\s+([0-9.E+-]+))?\s*$",  # Activity may be blank for a nondetection
     re.IGNORECASE,
 )
 
@@ -825,7 +825,10 @@ def read_processed_txt(
                 "net_counts": _parse_number(match.group(6)) or 0,
                 "net_unc": int(_parse_number(match.group(7)) or 0),
                 "assignment": match.group(8).replace(" ", ""),
-                "activity": float(match.group(9)),
+                "activity": (
+                    float(match.group(9)) if match.group(9) is not None else None
+                ),
+                "activity_available": match.group(9) is not None,
                 "activity_unit": peak_activity_unit,
                 "reported_activity_text": match.group(9),
                 "reported_rad_int_text": match.group(2),

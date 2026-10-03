@@ -1,0 +1,15 @@
+{
+  "schema": "fluxforge.qg_peak_id_corrections.v1",
+  "corrections": [
+    {
+      "report": "RAFM4/RAFM4-N_15dEOI.txt",
+      "source_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+      "source_line_number": 92,
+      "reported_isotope": "Tb154m",
+      "reported_energy_keV": 264.28,
+      "corrected_isotope": "Ta182",
+      "library_energy_keV": 264.076,
+      "reason": "The user-designated erroneous Tb assignment; the reported 264.28-keV peak is consistent with the bundled Ta182 264.076-keV line. Preserve the original QG assignment and apply this exception only to this source row."
+    }
+  ]
+}

@@ -56,7 +56,7 @@
     "Fe59": {
       "parent_element": "Fe",
       "reaction": "Fe58(n,g)",
-      "target_lines_keV": [1099.25, 1291.59]
+      "target_lines_keV": [142.651, 192.349, 1099.25, 1291.59]
     },
     "Mn54": {
       "parent_element": "Fe",

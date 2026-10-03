@@ -1,0 +1,978 @@
+{
+  "scope": "QG native identity acceptance; not full physical uncertainty qualification",
+  "status": "implemented_and_tested; all-reports acceptance incomplete due missing acquisitions and subthreshold fits",
+  "validation_metrics": {
+    "reports": 33,
+    "roi_rows": 300,
+    "status_counts": {
+      "same_id": 239,
+      "missing_raw_spectrum": 47,
+      "tentative_native_same_id": 3,
+      "reference_nondetection": 6,
+      "tentative_same_id": 4,
+      "corrected_reference_id": 1
+    },
+    "paired_identity_labels_agree": true,
+    "tentative_candidates_are_confirmed_detections": false,
+    "matched_native_fits": 243,
+    "confirmed_detections": 240,
+    "detection_significance_threshold": 2.0
+  },
+  "all_reports_acceptance": false,
+  "test_runs": [
+    {
+      "file": "final_tests.xml",
+      "cases": 162
+    },
+    {
+      "file": "final_validator_tests.xml",
+      "cases": 24
+    }
+  ],
+  "distinct_passing_cases": 163,
+  "test_case_ids": [
+    [
+      "tests.test_flux_wire_analysis",
+      "test_combine_peak_activities_emits_single_vs_all_diagnostics"
+    ],
+    [
+      "tests.test_flux_wire_analysis",
+      "test_window_metrics_linear_background_matches_constant_sum_on_linear_background"
+    ],
+    [
+      "tests.test_flux_wire_analysis",
+      "test_window_metrics_linear_background_tracks_linear_continuum"
+    ],
+    [
+      "tests.test_qg_native_id_artifact",
+      "test_corrected_tb_activity_is_not_copied_to_ta_in_artifact"
+    ],
+    [
+      "tests.test_qg_native_id_artifact",
+      "test_qg_compatibility_overlay_cannot_create_native_peak_identifications"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_all_qg_identity_library_coverage_and_off_energy_reference_are_explicit"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_altered_source_or_invalid_correction_rejected[corrected_isotope-]"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_altered_source_or_invalid_correction_rejected[reported_energy_keV-265.0]"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_altered_source_or_invalid_correction_rejected[reported_isotope-Ta182]"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_altered_source_or_invalid_correction_rejected[source_line_number-93]"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_altered_source_or_invalid_correction_rejected[source_sha256-changed-report]"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_corrected_row_never_injects_peak_or_reuses_wrong_activity"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_duplicate_exception_rejected"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_exception_does_not_apply_to_other_report"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_exception_does_not_exempt_all_tb_peaks"
+    ],
+    [
+      "tests.test_qg_peak_id_corrections",
+      "test_single_tb_correction_is_source_bound_and_preserves_original"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_assignment_objective_matches_exhaustive_small_cases"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_comparison_records_expose_physical_channel_ambiguity"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_duplicate_same_isotope_entries_at_one_channel_do_not_double_recover"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_energy_minimization_and_input_order_invariance"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_exact_ties_are_stable_under_peak_order_reversal"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_global_assignment_maximizes_recovery_before_isotope_agreement"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_global_assignment_prefers_identity_before_energy"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_one_channel_with_two_isotope_labels_is_ambiguous_and_used_once"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_rejects_invalid_tolerances[-1]"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_rejects_invalid_tolerances[inf]"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_rejects_invalid_tolerances[nan]"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_rejects_nonfinite_reference_and_detected_energies[-inf]"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_rejects_nonfinite_reference_and_detected_energies[inf]"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_rejects_nonfinite_reference_and_detected_energies[nan]"
+    ],
+    [
+      "tests.test_qg_peak_matching",
+      "test_tolerance_boundary_and_missing"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_distant_or_absent_line_cannot_qualify_a_unit[Sc48-10000.0]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_distant_or_absent_line_cannot_qualify_a_unit[Sc48-900.0]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_distant_or_absent_line_cannot_qualify_a_unit[Unknown-983.5]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_import_preserves_printed_units_and_exact_source_location"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_invalid_yield_stays_unqualified[-1.0]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_invalid_yield_stays_unqualified[0.0]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_invalid_yield_stays_unqualified[inf]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_invalid_yield_stays_unqualified[nan]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_legitimate_cu64_low_percent_is_not_promoted_to_fraction"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_line_column_unit_is_separate_from_summary_unit"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_matched_unknown_line_unit_has_no_zero_reference_score[None]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_matched_unknown_line_unit_has_no_zero_reference_score[widgets]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_missing_column_header_does_not_inherit_summary_unit"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_reference_hash_binds_file_values_not_mutated_cached_entry"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_report_and_csv_reference_same_source_flags[Cu-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_report_and_csv_reference_same_source_flags[Ti-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_sc48_keeps_both_conventions_and_explicit_bundled_source[1311.79]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_sc48_keeps_both_conventions_and_explicit_bundled_source[983.36]"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_source_flags_do_not_replace_raw_parity_bucket_or_correct_activity"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_source_flags_survive_missing_raw_match_without_mutation"
+    ],
+    [
+      "tests.test_qg_report_qc",
+      "test_unknown_line_unit_remains_unknown_not_assumed_uci"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_all_bundled_roi_counts_and_blank_activity_nondetections"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_blank_activity_differs_from_reported_zero"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Co-Cd-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Co-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Cu-Cd-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Cu-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Fe-Cd-RAFM-1_0cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[In-Cd-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Ni-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM1_Long_144h_EOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM1_Long_70d_EOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-A_24hrEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-A_300sEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-A_4dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-B_24hrEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-B_2hrEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-B_300sEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-B_4dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-C_24hrEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-C_2hrEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-C_300sEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-C_4dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-N_24hrEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-N_2hrEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-N_300sEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM3-N_4dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM4-A_15dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM4-B_15dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM4-C_15dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[RAFM4-N_15dEOI]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Sc-Cd-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Sc-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Ti-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Ti-RAFM-1a_25cm]"
+    ],
+    [
+      "tests.test_qg_roi_inventory",
+      "test_every_report_assignment_has_exact_source_provenance[Ti-RAFM-1b_25cm]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_below_threshold_returned_native_fit_is_explicitly_tentative"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_complete_bound_sources_and_alias_normalization_pass"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_explicit_invalid_canonical_count_cannot_be_hidden_by_valid_alias[net_counts]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_explicit_invalid_canonical_count_cannot_be_hidden_by_valid_alias[net_counts_unc]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_preserves_zero_uncertainty_without_inventing_floor"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[-1-net]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[-1-sigma]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[None-net]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[None-sigma]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[inf-net]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[inf-sigma]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[nan-net]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_native_normalization_rejects_missing_negative_or_nonfinite_counts[nan-sigma]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_rejects_invalid_cache_provenance[changed_hash-Native input changed]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_rejects_invalid_cache_provenance[duplicate_report-cover every paired report]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_rejects_invalid_cache_provenance[incomplete-incomplete]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_rejects_invalid_cache_provenance[missing_report-cover every paired report]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_rejects_invalid_cache_provenance[partial_hashes-hash every paired]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_rejects_invalid_cache_provenance[reference_overlay-precede all reference overlays]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_rejects_invalid_cache_provenance[swapped_raw-pairing changed]"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_tentative_peak_cannot_reuse_confirmed_physical_channel"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_tentative_same_identity_does_not_pass_as_confirmed"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_unknown_correction_report_rejected"
+    ],
+    [
+      "tests.test_qg_validation_tool",
+      "test_wrong_tentative_identity_remains_missing"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_adjusted_element_mass_rejects_second_composition_correction[0.0046]"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_adjusted_element_mass_rejects_second_composition_correction[0.0]"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_adjusted_element_mass_rejects_second_composition_correction[nan]"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_analyze_flux_wire_sample_writes_reactions"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_analyze_generic_sample_writes_artifacts"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_build_flux_wire_reactions_applies_ti48_and_cd_uncertainty_guards"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_cu_cd_mass_uses_its_own_inl_designation_row"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_estimate_rafm_sample_mass_from_geometry_metadata"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_flux_wire_count_parity_representative_lines"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_fluxforge_line_consistency_rows_include_single_vs_all_metrics"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_generic_targeted_selection_recovers_known_rafm4_missing_lines"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_inl_adjusted_co_mass_is_not_diluted_again[Co-Cd-RAFM-1-3.6703]"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_inl_adjusted_co_mass_is_not_diluted_again[Co-RAFM-1-4.0661]"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_metadata_and_pairing_aliases_load"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_prune_generic_targeted_lines_drops_weak_nearby_nuisance_lines"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_raw_loader_uses_file_energy_calibration_and_profile_efficiency"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_resolve_measurement_timing_for_rafm_and_flux_wires"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_run_rafm_validation_subset_generates_summary"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_select_generic_targeted_lines_keeps_supported_sets_and_limits_dense_unsupported_isotopes"
+    ],
+    [
+      "tests.test_rafm_workflow",
+      "test_workflow_profile_energy_calibration_supports_astm_inl_alias"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_absent_neighbor_does_not_erase_real_supported_line"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_background_corrected_sample_net_is_separate_from_raw_comparison[covell]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_background_corrected_sample_net_is_separate_from_raw_comparison[gilmore]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_background_corrected_sample_net_is_separate_from_raw_comparison[iec_tiered]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_background_corrected_sample_net_is_separate_from_raw_comparison[qg]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_custom_counting_sigma_is_preserved[covell]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_custom_counting_sigma_is_preserved[gilmore]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_custom_counting_sigma_is_preserved[iec_tiered]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_custom_counting_sigma_is_preserved[qg]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_declared_high_variance_bin_does_not_bias_peak_fit"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_gross_sigma_retains_supplied_channel_variance[covell]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_gross_sigma_retains_supplied_channel_variance[gilmore]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_gross_sigma_retains_supplied_channel_variance[iec_tiered]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_gross_sigma_retains_supplied_channel_variance[qg]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_measured_background_peak_with_insignificant_residual_is_not_sample_activity[covell]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_measured_background_peak_with_insignificant_residual_is_not_sample_activity[gilmore]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_measured_background_peak_with_insignificant_residual_is_not_sample_activity[iec_tiered]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_measured_background_peak_with_insignificant_residual_is_not_sample_activity[qg]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_multiplet_custom_counting_sigma_is_preserved"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_multiplet_raw_comparison_and_physical_counts_use_their_own_spectra[iec_tiered]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_multiplet_raw_comparison_and_physical_counts_use_their_own_spectra[qg]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_nearby_strong_line_does_not_satisfy_wrong_expected_identity"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_resolved_weak_neighbor_is_recovered_without_biasing_strong_peak"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_titanium_sc47_recovery_retries_closer_noise_maximum[Ti-RAFM-1_25cm]"
+    ],
+    [
+      "tests.test_targeted_peak_regressions",
+      "test_titanium_sc47_recovery_retries_closer_noise_maximum[Ti-RAFM-1b_25cm]"
+    ],
+    [
+      "tests.test_tentative_peak_ids",
+      "test_bundled_weak_candidates_do_not_enter_detected_activity[RAFM3-C_300sEOI-W187-772.91]"
+    ],
+    [
+      "tests.test_tentative_peak_ids",
+      "test_bundled_weak_candidates_do_not_enter_detected_activity[RAFM3-C_4dEOI-Fe59-1099.25]"
+    ],
+    [
+      "tests.test_tentative_peak_ids",
+      "test_bundled_weak_candidates_do_not_enter_detected_activity[RAFM3-N_24hrEOI-Mn56-2113.09]"
+    ],
+    [
+      "tests.test_tentative_peak_ids",
+      "test_bundled_weak_candidates_do_not_enter_detected_activity[RAFM3-N_4dEOI-Fe59-1099.25]"
+    ],
+    [
+      "tests.test_tentative_peak_ids",
+      "test_strong_peak_is_not_reclassified_as_tentative"
+    ],
+    [
+      "tests.test_tentative_peak_ids",
+      "test_tentative_collection_does_not_bypass_energy_support[RAFM4-C_15dEOI-W187-206.25]"
+    ],
+    [
+      "tests.test_tentative_peak_ids",
+      "test_tentative_collection_does_not_bypass_energy_support[RAFM4-N_15dEOI-Tb154m-247.94]"
+    ]
+  ],
+  "source_format_check": "rafm_workflow changed lines formatted with unchanged AST",
+  "review": "Independent antagonist and user-requested gpt-6-luna review; see reviewer evidence",
+  "source_sha256": {
+    "src/fluxforge/k0_physics.py": "7f7a7b6c47d1979161e858c540e353fe87b9aa2ca7d12c0c3d5682524e5d90f8",
+    "src/fluxforge/_tensorflow_env.py": "1ebd68a2fccaeb81506c0f0a644f15832a65c0b33d9e9ac757f4af4b3a267b06",
+    "src/fluxforge/__init__.py": "4b7e29b92b3412575b75175b07e597ae459209f369de789ceea3d3fc99bb097c",
+    "src/fluxforge/analysis/astm_e2005.py": "b0536b608a10c9e8266a9091a916d5c03c88d3e0c79ff535d99795037781be0d",
+    "src/fluxforge/analysis/astm_e261.py": "7299cade47c94beee92a342006674b6dde25c653535d02dbf1e1b72a3dc5ca9a",
+    "src/fluxforge/analysis/astm_e262.py": "717fedc21290bd1e75f933aa9ae323a6c3832eaeaae620a61775b63a377e1751",
+    "src/fluxforge/analysis/astm_e3376.py": "f15f0e53ce54765c0c2bb1a38340af775574048e5549abab7aea6111acc4dfa9",
+    "src/fluxforge/analysis/attenuation_tools.py": "b4672cdb4451caa2ad935aae63644f3d11505eaba1aeb5e55f9db876c15c9051",
+    "src/fluxforge/analysis/auto_calibration.py": "87b9cd78b0c84e02823eb696f006a2ffb88cb655075afd024de69a5c617ebb63",
+    "src/fluxforge/analysis/detector_calibration.py": "9e5e6945416ce5b3882c3b0b8b5bf3b52ff6c46aa63b5ebe852ad4d2e77e7cbb",
+    "src/fluxforge/analysis/efficiency_models.py": "308a9e0a93ef327b2f95be2ec4e794a512f41d33b55789155f35583a02be23ed",
+    "src/fluxforge/analysis/ensdf_matching.py": "8c2bf0ceea78a3f6ff03212502230b457f8ea67e546956072ce2df52036f7291",
+    "src/fluxforge/analysis/flux_unfold.py": "b722b57c9ea3e86d0e9c381eb5d714bb86cccfe4e93c2865082810b359981a20",
+    "src/fluxforge/analysis/flux_wire_analysis.py": "306a65d453c33c656789be57d97ce73faf32608a12f3a072aebd3f366f10c33b",
+    "src/fluxforge/analysis/flux_wire_selection.py": "a7862b262897b3387338a6cf74f1ccd7f91eb468fd0edd5e3d1d74d8f37d9349",
+    "src/fluxforge/analysis/holdout_validation.py": "a5be0838b05ee4519f72eb7e15947380451acc144f2ee0319bc7e83d8a90441a",
+    "src/fluxforge/analysis/hpge_processor.py": "1075b4e2f851fbce200f98719fe84f02f62b9ea58ea19ba848686b69bc74086e",
+    "src/fluxforge/analysis/isotope_priority.py": "79c44dcfbb79b917724b14504129f454a034eb3c09596d78faa2d2e33f4ba2db",
+    "src/fluxforge/analysis/k0_naa.py": "b31b030cdddfb2f83fffd60bb912641c68463b8ca1f32e20bc110e5949601590",
+    "src/fluxforge/analysis/k0_physics.py": "d56ffe2c8dcbdae3ab855486c6585288f9f540dbe5a728c842ac7544db7932c3",
+    "src/fluxforge/analysis/k0_workflow.py": "8943688b14f61af8b4db6c39bcabf07b073cb927aee0c8c841bcd88322bc8bb0",
+    "src/fluxforge/analysis/line_search.py": "7d7a2b63cebffef00b98fa3f9a844ac1afb00d3af581bac2e1ee3dd466e2fe11",
+    "src/fluxforge/analysis/masking_review.py": "c05ff85c276edd3d467efc2b5abc39d9370ca65536d0426e96de4b10b6cd9c5d",
+    "src/fluxforge/analysis/method_comparison.py": "42b94557b16fd2535cf67ba7f20a71d08bd89cf60cf9ef854d77ebd21eb2ac18",
+    "src/fluxforge/analysis/naa_ann.py": "1b8809d596fc383f62356449ef8307dfdef6c65cfc9a41ce32fb3b68a85feb9d",
+    "src/fluxforge/analysis/optimization_bassd.py": "ff8b02f289f1fda6851c35484ea6ee6352c46e70cd0671d11d2ed8bacd729be2",
+    "src/fluxforge/analysis/optimization_difom.py": "a561e33be99f2415ff3ad9f7827f6db58c7dd02762f1833a754551139b00aee3",
+    "src/fluxforge/analysis/optimization_fim.py": "36e9881d5f56770bb0e1dd919a9cb15522a0cad7e1d83aebff761b89fd9e116a",
+    "src/fluxforge/analysis/optimization_mwdcs.py": "d46afb016c32b8a3bbf77f6a32e71b37f61ad2b1c4f06a8e7dd31630e13839ad",
+    "src/fluxforge/analysis/optimization_schedule_builder.py": "dd58ee4b42410f00e37b61242cbc79c72df385b724fc3f026f4cc8b4fe4280b3",
+    "src/fluxforge/analysis/optimization_stbdmr.py": "37ccf511481afaa65e3d255cba1ecdbc2be1c5973c34efcea2d6724e236be12b",
+    "src/fluxforge/analysis/peakfit.py": "e859a5249795d7cc8b26f3610a0870a69142a4820ea4e085b4b597c80eb3b581",
+    "src/fluxforge/analysis/peak_finders.py": "0b2f39c6dfdffb75f81afd955127f9542cab89eb3dd77734a1b0bfcd65b556ba",
+    "src/fluxforge/analysis/physical_gls.py": "bf4e7db794aa920f3a1cc3e08051c532a1413c4a344a8930852006763a1f56e5",
+    "src/fluxforge/analysis/qg_calibration.py": "189342c706cc15eefb5b3eb8caaf8b313c3cf0e5f1662e2ad8d71c522a2d35be",
+    "src/fluxforge/analysis/qg_peak_ids.py": "14cfded7dbec4f591f94a89890963ce1225cd2a79b3ed42d0f449296e7f0c47a",
+    "src/fluxforge/analysis/qg_report_qc.py": "7ed90522de4ef57f36fe5ae899816a5d04d495b270c7cbbf17c4f12451be4122",
+    "src/fluxforge/analysis/robustness.py": "4a1fac1cfaf4f016e0c7c2aa1bb569aee2813f04a4a6071f024fddbc3b531297",
+    "src/fluxforge/analysis/segmented_detection.py": "e2d722629d17078a6fd31bcd6c717fc08e8b63ba8eacdc6e4b28c0bbed1f82df",
+    "src/fluxforge/analysis/spectroscopy_tools.py": "fa790bd39cd6afc45e54e64e601cb5d3bbc0ece16f2e776d81cdc18123f19628",
+    "src/fluxforge/analysis/spectrum_math.py": "c15da9c47898b3496d8f63cc5cd63a0fced0824373810cb4eccd27e399ed118c",
+    "src/fluxforge/analysis/stopping_tools.py": "a32a1ed50d74d86881f3d829a1699cfdbd4428a6fd7c7a21e00bbf41c64e6fcf",
+    "src/fluxforge/analysis/__init__.py": "35ccecdb611f6c8fcbe81ab7feb81a52a4ef028df69b04136abaacdba37a46ff",
+    "src/fluxforge/cli/app.py": "7d4fa7174dfa11fc49d2fab07e2fa7ecedd7cd24ccf190e53e27b6ce05fe1a67",
+    "src/fluxforge/cli/command_catalog.py": "991e49efd225d14ce2a3fc68333de9669c2ce17780d83c710eb144e79ef796c5",
+    "src/fluxforge/cli/__init__.py": "4935a5bb52c9fca31b3d0e2ae30e8eec08748af5bef1f3743532cd05699f4980",
+    "src/fluxforge/core/activity_review.py": "782e490c26b116e907ef85c3e894892c2db296f6ff87866a3cc92e1859b746c3",
+    "src/fluxforge/core/analysis_workspace.py": "ba823b276e3aa59d478d574822a6065673368ecc988bac221ba0bf3ba3a26da8",
+    "src/fluxforge/core/batch_analysis.py": "6e549c403dc79e13fe4d3b851aa8f9f340d747c59e2a26ed77d3e6977b491eb3",
+    "src/fluxforge/core/calibration.py": "cb5f76d4bcbf87c04da27a637221c695b859974d45a63997bdb7300944b48446",
+    "src/fluxforge/core/inventory_timeline.py": "efdc9805b5d7d1a17101b295171605219326a1fd6dae3187280cb46fb940d26a",
+    "src/fluxforge/core/linalg.py": "a793152b5d0c43247ddeaadff8ee2eedc57760a6bc3e93958a82882e4259fe0b",
+    "src/fluxforge/core/peak_fitting.py": "0e36e7ea03aff1179e42899cf71f497314fa23319a6847fe281a786c33494805",
+    "src/fluxforge/core/planning_models.py": "9864427794eebfee27fc0127b5b1f8c2e570976ec27a4c2b2d4d9de7c47c5792",
+    "src/fluxforge/core/predictive.py": "adefc7a24b91b56ef881fec3b5691afde110c3e403706c228dfd49133e14825e",
+    "src/fluxforge/core/prior_covariance.py": "b1feba01c33343e02c963167bf0fb0add85205695ce02185953a3a2cc9722c12",
+    "src/fluxforge/core/provenance.py": "3b74d6b61c5b32d1a195fcc3f93ba136891233dc34dafd7efcdb80a45dcbcc84",
+    "src/fluxforge/core/response.py": "5ed7a096197c07ae7707bbb695f243f389a112dffc26fc8e0697dc15c8dc075d",
+    "src/fluxforge/core/runtime.py": "2b28e4c5790ef0993f76aa5f6270ca51e406422a772f527b3c4fdb069f084d03",
+    "src/fluxforge/core/sample.py": "61f8ff66fd1dc633fc4b91242585bdda525cf813371b26d33065fc7e5a941ec8",
+    "src/fluxforge/core/schemas.py": "fe703a47c4de7155ac52709e00a1d9626ee7b10699bab7e3696bef4244294425",
+    "src/fluxforge/core/spectrum_ops.py": "13a6b6b70a59ec78a3f54b5bda53a7f9bfbc57ce954508dabd162e5db53fa4f5",
+    "src/fluxforge/core/unfolding_diagnostics.py": "669ffebdf8e398502660e096bcca842eb8b925e46350d64aff00902b5b28c29c",
+    "src/fluxforge/core/unfolding_inputs.py": "e8483cbebf2e12703819f4f1b94781fe6aa0a848986c1b4d378f10332599fd7f",
+    "src/fluxforge/core/validation.py": "16467520774d6a1a10f3e071ec5275aec6acefdd54204410bdec3050c7daedf1",
+    "src/fluxforge/core/workspace_document.py": "955d7638261aa16ea119c0b0d6f6705c7a601c1cedfa694bd1c67eae6224b31c",
+    "src/fluxforge/core/__init__.py": "87967c5772da9cff20745a097d4624f926b30b115fd4fa4414d0736f815c6e8b",
+    "src/fluxforge/corrections/coincidence.py": "9c574611c8d14a012762ed7dcbb4d55cc04ac77bdd9d5fa4c887ae105575a53d",
+    "src/fluxforge/corrections/covers.py": "621880c1c34479c0bb6c12b5bf99db958d32b0ca7892d5e48b22c4664acbf84c",
+    "src/fluxforge/corrections/gamma_attenuation.py": "4f374e64d4062f0e4781a2a0f5a49fd758a9bf6f9189ecd95d18fdafbeaf63f3",
+    "src/fluxforge/corrections/self_shielding.py": "440ef9d135d9457b21d63d3b08d923595eb6d6030178f8a68669692986c8e5a7",
+    "src/fluxforge/corrections/__init__.py": "b4628d89e880a80487835c3a050f5f7b455617915c0d271ec24d632b9dfa553f",
+    "src/fluxforge/data/attenuation_components.py": "07e3f2a94efaf4331aa8180b0d41b78121a362e4810fef47968f98eb39247117",
+    "src/fluxforge/data/crosssections.py": "4035ea5d961ef8acfb87e03ebcd599d0a9d698bcb864b057a3af623db24d3ef4",
+    "src/fluxforge/data/efficiency.py": "0450b353f8f82c0a800b5badc214bf68f8b0f977c1b70698e6823ce1577855f8",
+    "src/fluxforge/data/efficiency_models.py": "874e1a1e2517f17dbb92d70be47c94b65a92ebf5359282323e144f432128d46f",
+    "src/fluxforge/data/elements.py": "048fc284d53f2b78aa22c20594387353bc93a14a8cd70fc27e8abef302e514fd",
+    "src/fluxforge/data/endf_covariance.py": "56e4fe3318cf0151aad5f06705d2e4e6bb8917747d37744d1c1dac6242e8cc15",
+    "src/fluxforge/data/flux_wire_catalog.py": "177422f6e077c9d96039ab760338fc5cbbd874300e3027082944c1d7ec293dad",
+    "src/fluxforge/data/flux_wire_unfolding.py": "5648301fefdeb201e5993561c52232e7151cd518658283672766da2ce993ae72",
+    "src/fluxforge/data/gamma_database.py": "a8bc45c35108a92fb86b97008dc792bef618d5d574b16505394affc90c2cc798",
+    "src/fluxforge/data/group_structures.py": "724053b1cef68769e5a2bcfcf93391f34ec340c969b31b59a2bba693f3e429a3",
+    "src/fluxforge/data/irdff.py": "fc955cbe2ee53ceb6259975b965cd5aacecb8c8e065b87637912fa6d8abb1e4f",
+    "src/fluxforge/data/irdff_access.py": "5cdf2abd13942b73e390ed53401539cc41b0dacba19b5893aeef39ded933ba06",
+    "src/fluxforge/data/isotope_names.py": "a888197d36fa92048990ae0905a7cfaf3fa37aa21036d6edb78ca15d9279c74d",
+    "src/fluxforge/data/k0_library.py": "3d4931c9246219b2ef434f67dc5177970854023f78b4d91a10386140f74fe909",
+    "src/fluxforge/data/kayzero_k0.py": "00e14cb6d8c675a9bb1dd1bfcbb120718cd7d1cd444ac1846f806fdfa6e4105f",
+    "src/fluxforge/data/materials.py": "131e5c34333c8c65f40dbcb84726a8d9373091253866e3470faa8879b0846617",
+    "src/fluxforge/data/njoy.py": "7a5eef2c84d38419c8195c5954e980810563f6223913983409e2ff3e6d230b60",
+    "src/fluxforge/data/nndc.py": "137c43d2dfd4177e35c8ee0ee00ae1ab79c313f21a3939f1febfdf77007437ad",
+    "src/fluxforge/data/nuclear_data.py": "277483d840d8f4add61dd258fa7fc43b6d2cf886d245554f0dc31a03473b483c",
+    "src/fluxforge/data/nuclear_data_sources.py": "ad99bae367fcea20a523732fcfc85f007e242dd7857a22e9440a97895a160b2f",
+    "src/fluxforge/data/nuclide_library.py": "a3c83a396f469abbf4c6c196ab3c179c625f44909a2b5fefa95af5c7f4489f76",
+    "src/fluxforge/data/rafm_decay.py": "5c5a4573a1df8f0617f038d5a2ba866b23dad737ef80036f766d79c1dbb73e1c",
+    "src/fluxforge/data/rafm_profile.py": "4b47de67e254b6017e0ab77b2620e534612a6859d1eb93e106767492ff83d960",
+    "src/fluxforge/data/thermal_scattering.py": "34147825034a0474ea8fbe397fc3005f0027018b354890c1214525448b940502",
+    "src/fluxforge/data/xcom.py": "4d49c413ab8b9bbb4f77e5ae686b1dd9413e02f1a54d7409a5967880d2ef8a3b",
+    "src/fluxforge/data/__init__.py": "b564029a6a0f08b786405a38767017c67ea120c9f56ee7685195fa36f7741968",
+    "src/fluxforge/evaluation/gma_workflow.py": "aec8ca6b7f10d44ec88fb39b3c70b32078a12a76d312d6270135a402250415fc",
+    "src/fluxforge/examples/rafm_workflow.py": "3dd8cfbc28f820ff06af36fede503fdcccea857074203b8615e4abd4c7667219",
+    "src/fluxforge/examples/__init__.py": "d25fd4c487cbaae6f1e00549b4740865262c947973ba6e0471e9469c9d511a47",
+    "src/fluxforge/gui/analysis_workspace.py": "9fb58166a015b2b04a300a0e0bc2d1ef2ce04840d3905910b614648015a7f34e",
+    "src/fluxforge/gui/app.py": "a27a3c2b3cb27c55631242ccaecfdb174c25ef42b11cb6d89b5137ac30874b6b",
+    "src/fluxforge/gui/canvas_controller.py": "77e85d4048755ab83ea41f31cac91434242de2bb8666bfca2ab6dfcc8daeb780",
+    "src/fluxforge/gui/canvas_intents.py": "432928df82f5bc52cc0232f4b6e79bbc0c0c65161e39a5d83250a6c21ecc42fd",
+    "src/fluxforge/gui/file_workflow.py": "9a914be1bcf298b5fa5d013f9eab9163f05aa0cd814170ae453b99e1b910d51a",
+    "src/fluxforge/gui/library_manager.py": "48a2480aff68a9d650b9c5aa7644f8e926b431f52e4793cd917882d9b97c42ef",
+    "src/fluxforge/gui/main_window.py": "ed0599a5f45af3728f678a7e4dbd6aa93461177e09e6bc1c844379be85f76584",
+    "src/fluxforge/gui/mode_manager.py": "31fe970f7a1c3c92c58552536700731f394a1dcc2bf8a4465e5ad265cf120b34",
+    "src/fluxforge/gui/nuclide_search.py": "a63d763a028f9e74c078dc25fbb70927209e91a9d27ec6adfdecc90517b921cc",
+    "src/fluxforge/gui/production_contract.py": "9d210a81abbd555e6d993f5aad71ff99e787c257b594638608f9b5bbea3ab146",
+    "src/fluxforge/gui/qt_compat.py": "75cda4c32cf53ee7f501bd72a2be7537c9b003150563bab49910c7e715362ceb",
+    "src/fluxforge/gui/selection_bus.py": "d90039d20de3a404024eec268e8e23181b305d6d6d5e8654a11b6bf6f4b4af8b",
+    "src/fluxforge/gui/spectrum_canvas.py": "6badcf2d38307885f7db11db33a82953a3a158b6326d38984e95f20a52d606f2",
+    "src/fluxforge/gui/theme_manager.py": "0015b4b861c6fb65762bbc75a96d0259aeef80fa4778d3d5dd38aab34252e82b",
+    "src/fluxforge/gui/workflow_presets.py": "005a2365d9af71a6a0bf75ee7649889cdc6472aebe842703555783288fd00e85",
+    "src/fluxforge/gui/workspace_undo.py": "b3c7234222aad5f2df6bbb38b2e38b49d1d5805459397f29ba99ff34968ad3ae",
+    "src/fluxforge/gui/__init__.py": "aca4321c0ce4946ca72297b06d6748b9fb4812f0f42842f7c57706d29c5ef1fd",
+    "src/fluxforge/hal/base.py": "473ad4122a7458f22930a0cee2dc3e02fdfad678af9225c6a1e53fce9733a80c",
+    "src/fluxforge/hal/__init__.py": "07423699e0a9e45859512bba30a08b1b361bdc84e273efc351b68c3ac581aa65",
+    "src/fluxforge/io/alara.py": "a9d8eef520130793c6cbdf6b16e37e4498fd78f7a6ac35a9839ee425207638c4",
+    "src/fluxforge/io/artifacts.py": "1c2c154ed3356c4735dc0b492581291522a474839012054046ff04099dbeec91",
+    "src/fluxforge/io/atomic.py": "94f98d5e7311170ed09392faafafad1355c5add8765e22f7c438fb75c6a27e70",
+    "src/fluxforge/io/calibration_text.py": "380d608e9400bd1062d4f75993a9ce7a5ad501f6ed2b370da62d7f3d2e41efff",
+    "src/fluxforge/io/cnf.py": "65c2f1c9f6181bf3b2954fcaa17c6f9a5f5d87d93f574ec4f49d46f55484c8e4",
+    "src/fluxforge/io/csv_readers.py": "98ec9ebb0120469fd7563e5d5355fc53f8c4a45cde156c7f464897772c2cbe0d",
+    "src/fluxforge/io/flux_wire.py": "baa2e2ac2006b703b89d9d68aaeff4a0c2da7332e2d7f801b1c005a8ca212e20",
+    "src/fluxforge/io/genie.py": "5affc994a8a3518fe8206e4aa5b413f5d145e8b03afcae72427a35a9d9867ea6",
+    "src/fluxforge/io/hpge.py": "3aa0cbae15e6e2c7568eef116febcdba2160abff163824da248a9f2b75aa5180",
+    "src/fluxforge/io/iec.py": "2198c2f92f13d2a61e7c81e94e122d54c81b80e5cee865119d28276210a0d9e9",
+    "src/fluxforge/io/interop.py": "3c6bec1b24f96601b1918645d36715f46d13da1c3915932eec94211fd6cf4ae5",
+    "src/fluxforge/io/mcnp.py": "5dd97c5e83adda1432a7d894d2389a5c2a4a441c439faf2a30658b8eae88d146",
+    "src/fluxforge/io/metadata.py": "50298f5b6c155446af8dc8004babd3310dd5736aed69408a5f9eb34b092fa38e",
+    "src/fluxforge/io/n42.py": "062e2217d54646f61ea848a553ea9599a9bf9a56774cd7b841c98ebd59e8cdee",
+    "src/fluxforge/io/openmc.py": "0dcc9d5c3afd123aba04eb89258ddb5d8aa59df20e8dd67429199d679b341f4a",
+    "src/fluxforge/io/pra.py": "be9cdf90c5c26089674ef9c93cd70e1ddc5f81a86ab8e512195e23e0a2d8e73c",
+    "src/fluxforge/io/reader_factory.py": "028d5409b71d7f36f3c80516dd36e7dd9372e2a4389b3b58b429f784ce70ea61",
+    "src/fluxforge/io/session.py": "1a30b1ccb1629687046648a3d79340a6af437fe369edf2e9c930a5b059af4a8f",
+    "src/fluxforge/io/spc.py": "96a0c331338e97fe6e1050a2c2f135b6a1b255977a1c6da9fc259dfdb95e2fd6",
+    "src/fluxforge/io/spe.py": "87e09d8cc853a0c216f66246fc068c38676f0700f6bee4c566aae6d9d9a7135d",
+    "src/fluxforge/io/spectrum_csv.py": "fb62ea6c39ef63c07b72d8ebeb544644eb2bff0601362f74d7ba9f15b07391da",
+    "src/fluxforge/io/spectrum_export.py": "a2cd30c303ea51029b926c03b21c7f7dead7b3db87ad52bfb9e031dd84e4245f",
+    "src/fluxforge/io/__init__.py": "a9866137a173a693ca8b34ccebaec82509141fb182d6e32b159e627faa41a6b3",
+    "src/fluxforge/ml/peak_analysis.py": "a1d8a3744b9b1950be927ce89c17b0c6b27014017a59916c2f1627c438c89a48",
+    "src/fluxforge/ml/__init__.py": "af68d3df956fc46a4d30e24d43d3faf8a9b889f4eae2aa3d7480f2cdec37045d",
+    "src/fluxforge/physics/activation.py": "d527f4b7ad32e44fc7de8a20b6a954492a45b43ca1840cb702e7eff7f8768859",
+    "src/fluxforge/physics/attenuation.py": "35ca0faa434953f0fa01248cfefea2e2a245628944b3cf22e80c451e9a528ac9",
+    "src/fluxforge/physics/decay_chain.py": "b25c239e0cf38b752c4cc0990363bc2a861f55651e1cf7b2b490bef3b8d1d451",
+    "src/fluxforge/physics/decay_inventory.py": "c20b99d20870d94d927191e2fb2c5af4ee9befcca8ac4ba23a9c11702783a937",
+    "src/fluxforge/physics/decay_library.py": "d6c3d6cb4fbb6c6732a0b0c2d2c4f0f117e3173d0164abc0494b0f45ce5405c5",
+    "src/fluxforge/physics/dose.py": "5afc6dcf3bbcffafb7b71ed57626fded062e745ef7e0955072acb8b1dc0f7714",
+    "src/fluxforge/physics/gamma_spectrum.py": "203c08247f33e574fad3155447b9bd9a167e4588d687089234af5919d52794ce",
+    "src/fluxforge/physics/monitor_response.py": "33d3c41e1b56a648ba75f6bcc0493912ed67953b2b58876b2fff43f6530a6748",
+    "src/fluxforge/physics/neutron_corrections.py": "d6be4227d0fd6942c58465eefa0babca9955cdf458fe0b5a87dd59216358df23",
+    "src/fluxforge/physics/nuclides.py": "7e471a910f30ddecec3a5109aa2b84d5df5c714dbaea852adf86b92b76fcb386",
+    "src/fluxforge/physics/operating_history.py": "98f3f03f04c9a299e4785118b605291c71cfbf4fc6b7bfd9d1a85f744bc2a583",
+    "src/fluxforge/physics/sigphi.py": "f8116d9809108e2ad7bf0795ba53d67eb9988887d1e6f7d956b46e25c1fa757e",
+    "src/fluxforge/physics/stacked_target.py": "42748365ba13991fbe97245ba9373f702ba8acfac1459380b53ec1f9bf0df4a0",
+    "src/fluxforge/physics/stopping_power.py": "36266636b9a85b8a572d1ae93ed541dc540cb9bd0e56dbd32f0d4ba80190e2d5",
+    "src/fluxforge/physics/__init__.py": "69071de6691dc82ceca8a5971af9027fcac11d74cbbe88b29bb2cd51aa3a3645",
+    "src/fluxforge/plots/activation.py": "62160adbc8599899ae950447767dd3d50baccb3dca38c43c8ceffcb8a70d3597",
+    "src/fluxforge/plots/master_suite.py": "542021c0eca8c2d0b1993cc9eb7f8dbbaa967eb1a6368659e010d1d7f8e91bfd",
+    "src/fluxforge/plots/spectrum_inspection.py": "39bfa8cddb41a1457f2b5554b60f32686604ed9189f2959734825378a863bede",
+    "src/fluxforge/plots/unfolding.py": "b8885624df1669cbb9ce050c91474ae717c9fbaa2848079a39b41e942f2f2216",
+    "src/fluxforge/plots/__init__.py": "a0a0dfc9f2aeb328d52e1db150c43cfbc295d3c57379a8413c8a84e8fd7dcefb",
+    "src/fluxforge/plugins/registry.py": "03ce9726d5e78e9e0eeeb95e2c9ae072f8ed3085bb6ded9b16af51aa12d8f93e",
+    "src/fluxforge/plugins/__init__.py": "c2e6a7a594796789e2eb6c891c8905a7b23fca008c0cff8bd79bf08815acce5e",
+    "src/fluxforge/reporting/engine.py": "72a542805dd7ac399ab0678ed47daa9911fbff0448118020efde49d0f517d910",
+    "src/fluxforge/reporting/__init__.py": "8f3128de097505f484c575dcb02694adb3cff553ef6c4fe42505b24fdf74bab8",
+    "src/fluxforge/solvers/advanced.py": "2f0593baa6b411bfff9c8970b08bbcf8133cf0293189ac12db15957559e15061",
+    "src/fluxforge/solvers/advanced_unfolding.py": "1c658b116ae4e647e511dcd5bb2ccb45fdeaa25636b0c77782b4e84c3f4ce78c",
+    "src/fluxforge/solvers/gls.py": "219a26d181c4b610d6b657e858f68bf3a7701f5f20971a58facbbbd53dd7f207",
+    "src/fluxforge/solvers/iterative.py": "a4c2a5476ade99b44f0a102a812432b770a9b701d6e8eb08bb92f8dc38ceb47b",
+    "src/fluxforge/solvers/mcmc.py": "1541935ad0f97bb2a9f4340fbc4de0483e8631a801e02b72e2b27c6a6acba8ac",
+    "src/fluxforge/solvers/regularized.py": "11d5fa848c9190c5e1124a424435d29859e18925467fbbb3b790793d4fb404be",
+    "src/fluxforge/solvers/rmle.py": "2895566f090f1fd051f55fa76822a60a366fc360e76e8344e75f63e7fbbc2d51",
+    "src/fluxforge/solvers/test_statistics.py": "d18f9f8e4662c34a03dcbc72f5afe4306579a9d0532ea823326ed4bc760866f3",
+    "src/fluxforge/solvers/__init__.py": "2b58e17609ee05374b5977a9edee285d442b81841943ba2350f6a40c947f23ff",
+    "src/fluxforge/standards/base.py": "e1f480c9c8a2e320de51c724d641d00b88ec21f3cece25f61137e5a58e20bca3",
+    "src/fluxforge/standards/c1030.py": "f70852a26dc43fdcd16acb65f5561d832a64d7deb9b43d3869c915159e790aca",
+    "src/fluxforge/standards/c1232.py": "301f88800f10d2354719bbb873b79a5d6829cf111ec327dfc0ce760d923c00f2",
+    "src/fluxforge/standards/e1218.py": "714500fdb0e0ce15320175a1c221614cc9c659df0da77120cea8de747cfdae0e",
+    "src/fluxforge/standards/e1297.py": "f7b1bfea7e59bc8df2da06b0fb5af5760231b15dc157d09d9091dd20f777292c",
+    "src/fluxforge/standards/e181.py": "857af87247154d8e0586097c89e368424a21c2768fd43b470493e38be62bfd05",
+    "src/fluxforge/standards/e261.py": "4e7cf302d99d545c53bb99cc71ea6deb09318f5693329eb59f96bdffc8447c74",
+    "src/fluxforge/standards/qa_monitor.py": "8d69225293bd94dc94b6fe9f974b114bb50f1a1e7d544dd634196c3dff4c7038",
+    "src/fluxforge/standards/__init__.py": "05d7cf540094698444560fe33bed5083eeb09334ba0c0d230d50f24e760603e5",
+    "src/fluxforge/triga/cd_ratio.py": "14956d76e09febf66f59e7c035c4cc78337eed4d1ec16f42441e18fdee163cb9",
+    "src/fluxforge/triga/k0.py": "3f22ab5c65af4af8fa0cb3827079aa8b829c6746bbbb627d3e9dac04c78a9214",
+    "src/fluxforge/triga/reconcile.py": "30703c44a5fb90c5a7e686ea42eed88fa4dd4d591e1a1c224d5e0310dd252691",
+    "src/fluxforge/triga/__init__.py": "99929ea3b548fd69a6db0324486dcb60d86ed3dfab20be11db534b41c8bac91c",
+    "src/fluxforge/uncertainty/budget.py": "1a5c31cf1a9d28a3f8ceb61179fa674ff0e8aee07a2b3227aee2e7a9af9ea0d9",
+    "src/fluxforge/uncertainty/covariance.py": "e2109b61ceff9eae3735ad006fc7bccf15a16265832df6c7c7c085f4cf74f9ed",
+    "src/fluxforge/uncertainty/mc.py": "d028877ed24b8ec56c225712d3d11d957e08355cdb186d884442ab31352f1172",
+    "src/fluxforge/uncertainty/reaction_rate_budget.py": "303370d3a42f0ab419fed0ba72921797e5d30c1b6ad730c0002c1c7ed78c74f8",
+    "src/fluxforge/uncertainty/__init__.py": "4935a5bb52c9fca31b3d0e2ae30e8eec08748af5bef1f3743532cd05699f4980",
+    "src/fluxforge/unfold/gamma_rmle.py": "c27808e5e21b08a769ff86b4a0f4f5474efa2fea2db13aae5ca04bd85f9514be",
+    "src/fluxforge/unfold/neutron_ibu.py": "c8991b59ed1c2c1e170aa9aa54f26909319246a2e41a7f6d03b6b595109dd3b0",
+    "src/fluxforge/unfold/_types.py": "bffd7dae70645d0a5d8fb548ff36ab721d7ece499901d0d308e4f901c5557672",
+    "src/fluxforge/unfold/__init__.py": "7fe8dea461d1b1f243c3ce9e9e4de097d653177074dfa339045001700ad6e6e2",
+    "src/fluxforge/unfolding/base.py": "038993e1ffdf6adb62ec0f8665b48a4e65ee38515941ac308216b2c0f7f954f7",
+    "src/fluxforge/unfolding/gpu_backend.py": "7475d16724ce994eb58f04a0108e3e9d0c837dd8b29b84e4719722d80354ef6c",
+    "src/fluxforge/unfolding/gravel.py": "e63bf83d9f9a012c590bf9d4358006bfc44cb425c16da494815b1e854e41d6a2",
+    "src/fluxforge/unfolding/maxed.py": "e0bcb25cf6e156259d0071bad1a01b0928509ffaeb9371135796dde099a16969",
+    "src/fluxforge/unfolding/ml_seed.py": "59943bfad5ff6e2ce64b228b0392a7fe1bd5424efa9e4f3c31436a4d21217603",
+    "src/fluxforge/unfolding/response_matrix.py": "3501ec5bc86276e7ca7254fb3e5984759b50a05a46d3ee0f8d930023860d798e",
+    "src/fluxforge/unfolding/rmle.py": "377afd7faa73666d51c10c12af9a04021241f714e3afb17b776de5db4383479b",
+    "src/fluxforge/unfolding/__init__.py": "44b97b70ea2693a97d151f6e78666ff7bbdfbcd7e44de73ba3c2a59c2bd9fc42",
+    "src/fluxforge/validation/metrics.py": "ee2209d4d3deaecf15f56f41bf947be4818434ddd25e129cc4b7c2e2f6cd97b2",
+    "src/fluxforge/validation/phase5_crosswalk.py": "bf410dcd7a76cd029d813b09c97a9db59df1a08b91ffbf9adda3746bfe0e6fc3",
+    "src/fluxforge/validation/reference_parity.py": "23f92a70c06b1a70f6b445ced7edf68333608ce4b233b4eff34003f8f62b5925",
+    "src/fluxforge/validation/transport_comparison.py": "35860765d2fbaf8194fc87952b67c545296a8f498c1252038467d55393ae0039",
+    "src/fluxforge/validation/__init__.py": "ee9b7cfa0d75e9c610aaa300415171c36a501d6f0c6a2eda29607a1848aab778",
+    "src/fluxforge/workflows/activation_pipeline.py": "fd30ed4bcea8bab2443711c8527b3c11b6ba5cfb593eac120806dc56cc766f15",
+    "src/fluxforge/workflows/astm_inl_dosimetry.py": "a6181d1849b883d6fa8899ab9f5df2fdaf2cf44eaf7d7190ebafeb4470e15153",
+    "src/fluxforge/workflows/batch_processing.py": "d363e625396c55f5b741baa8c3709788d3f62844d14e3ecc31a5cf0eb731e7cf",
+    "src/fluxforge/workflows/irradiation_optimization.py": "91df8a51d1c125d516bf3d2be61a71696c41777f2112c00dba0e080905aa534f",
+    "src/fluxforge/workflows/phase6_ldrd_worked_example.py": "4abe0aa2631754b9347211eab903be5734c565b22f83e9a1068c95d406d65b24",
+    "src/fluxforge/workflows/spectrum_unfolding.py": "d2a887bf26b0c09736739ce41f323973f2130f1c841f0203c7efddeec7ebca44",
+    "src/fluxforge/workflows/__init__.py": "803208a45bc80f1cdb873bc36ad07c65fea1796c0e82a3e885a8130305105d8c",
+    "src/fluxforge/examples/flux_wire/batch_compare_spectra.py": "2fcb6884757e593a545f6ca42b178a86dbd52bef111183ecba8d4a43bba5fa8f",
+    "src/fluxforge/examples/flux_wire/flux_wire_spectrum_analysis.py": "18dd8ec3d598e55852f260b077c7683964060de9e5aa236b9a3aa9d0ecda6f11",
+    "src/fluxforge/gui/backends/pyqtgraph_backend.py": "3073392daecbc71ced4fa7c16b3d152555d41112eb94adb3103fdf5f68d9d76b",
+    "src/fluxforge/gui/backends/vispy_backend.py": "cc5d4a4831ea05c7264f4b455b25bd4bbf19df5c36cd7bd7c4169487ccfee271",
+    "src/fluxforge/gui/backends/__init__.py": "ad75592a876a0a06be1df66a33c3e918e92691401ac6a4aeb2a5f29c9bfef49d",
+    "src/fluxforge/gui/dialogs/auto_peak_review_dialog.py": "2d53dca2ebb1715ae93ca85395ec349af38e6a4a2a5a4da02671cdc2223e4807",
+    "src/fluxforge/gui/dialogs/calibration_dialog.py": "b3eaefd2d3929451d304fb115d936e877458566b787b4c5104bc9c858e9f30a5",
+    "src/fluxforge/gui/dialogs/efficiency_dialog.py": "247e8c5afb67c19f2481c66a0b3b48fcc727461955571ecaa1d79ba78a54024c",
+    "src/fluxforge/gui/dialogs/pu_isotopics_dialog.py": "cfe4a356745e4e8887ab779ba3e7ad955aacd00bdfcf7bdc197af33424920ea8",
+    "src/fluxforge/gui/dialogs/qa_history_dialog.py": "d2df1677ba3681858615cf1aa8c4cec3f967934c70691ed1fc5b1cf4cf9e988d",
+    "src/fluxforge/gui/dialogs/report_export_dialog.py": "70e2866c46b9e73a41bab8d470225b15316844c2186fd3972e325d2230b59538",
+    "src/fluxforge/gui/dialogs/standards_review_dialog.py": "16ee995304e9d4d9c55e7602c25798c4eb4ac1c4e53e8402b91e904dbbcebf95",
+    "src/fluxforge/gui/dialogs/unfolding_dialog.py": "583199b9776691e8a256b5bd17c98a30fc275d82a8a64669ee1521e96d8c3bbe",
+    "src/fluxforge/gui/dialogs/__init__.py": "20f1a9f0bb7603d48ccd10eb8d9e041dc9e7333ce3feb99cdec9a74518636b0b",
+    "src/fluxforge/gui/panels/modern_shell.py": "71bf20f04d43be5cb323f41b451c91cc41a45fd6c2acd473d24d961784278c98",
+    "src/fluxforge/gui/panels/modern_shell_center.py": "d17b2c7e4f94bae5a9ebf74074875d80ca03a81f4dd11ab2496fdb4785c9aa47",
+    "src/fluxforge/gui/panels/modern_shell_context.py": "6f74da7f715837740cf310501e226ad4dc73c9dbbda6ca7251e1f837ca1664c6",
+    "src/fluxforge/gui/panels/modern_shell_shared.py": "464168be6e4b95f037ae7e1e201dc45b5d547b3de5d5d9526565f73177f482d1",
+    "src/fluxforge/gui/panels/modern_shell_sidebar.py": "90152d6f349bb148021c85ef329f2c01ce05d87b78507433d98333fdb1496dfa",
+    "src/fluxforge/gui/panels/phase5.py": "0b93d079afab742fb9ce59e27b1c88097415a41cfc9f204ef714d85956b693c7",
+    "src/fluxforge/gui/panels/phase6.py": "8d8121bc476969331874d7f30be564e614bf31584780a8c6d6f466081bdc75e3",
+    "src/fluxforge/gui/panels/__init__.py": "362a119db00b2875f1df555de045ad8d4cb2c4f46571e8df002daad841f2b659",
+    "src/fluxforge/gui/themes/color_tokens.py": "624f5912e278a6990aae4930b01cc719b9d72e0ad3a5f47662b490c0f4de639d",
+    "src/fluxforge/gui/themes/__init__.py": "3610b460a84321912f7c8d4654a34acff8ea1de4d1b2fa1f434a4f8cdbe24c0f",
+    "src/fluxforge/gui/widgets/hardware_led.py": "bb7b8275d0e5d3a5edb9f42128709f517bc0d2e4044cb3c83d81d9c74cf521b2",
+    "src/fluxforge/gui/widgets/method_selector.py": "c2e45f9ff7e1b166a8598f8b1ad46a4f18e038b854c03f4562c9183d656aad37",
+    "src/fluxforge/gui/widgets/mode_switcher.py": "7dba7e8bd0529fdf4ce8f70aa88f0f2d91dcce1c9da83eaf9b79c98c182cff45",
+    "src/fluxforge/gui/widgets/__init__.py": "a9d51fa4c03a031e90444e52e60e7bb0f3f998fd2363d2531a2b39f4cf4340b2",
+    "tools/extract_rafm_native_peaks.py": "9e2ad6e9d35e7e1a7ff5d711bbfd0644ec6f1615e6e3e794add0aad58a30eca0",
+    "tools/validate_qg_peak_identifications.py": "a6ac7752d031201f5b08c366755c7bf0594981c1aa67229036c74e61a57ca0da",
+    "src/fluxforge/data/flux_wire_catalog.json": "3ef31f26d4ceaf5a852300e0cc4aa12ac82c7639534d05b08bf13fe9acaea63f",
+    "examples/RAFM_irradiation/metadata/qg_peak_id_corrections.json": "7969953ea1e90442a9d3bb2322057ab470dde4500f24e7de80c42b36339975b6"
+  },
+  "artifact_sha256": {
+    "all_roi_identifications.csv": "18f1084cba604e421474659ef06b9e8bb97de860d21f404958ac361b34097619",
+    "antagonist_review.md": "f679e9f41fa8ec4ab738f07d2031c50cb08b1b240329d9a060bc723f9d83c300",
+    "antagonist_validator_tests.log": "6215a897c49f79e5150f0a6d2264fd0dae5357a5519c6af8012e89545d293575",
+    "antagonist_validator_tests.xml": "1c301e399623624c90d3196ed0f39b0dfc1c34453cb3db3634a057bbe8a8032d",
+    "baseline_validation.json": "b39abaa5810c9fb11caf4ab51cc84cb90edddaff48fc784785e2a7198f3e737e",
+    "candidate_replay.json": "a6585be5fcaee4a8654c3b4d7de08e3a01d1f87b109492c65af6fafcf80bcc0b",
+    "candidate_replay.log": "0c4c396053849ee7d98f4c5e687e5fcd297d6fddd9673be38a72d1981c6a2a65",
+    "final_tests.log": "20accc08f7d81685b295d876c0e9b8e8e1e208799f7f8bc8a2fb848550c79f71",
+    "final_tests.xml": "e4f835802ab708ab33a37495be997cb0a7054c049d338e5b2a2e07cf8f5bc8c9",
+    "final_validation.json": "d9719ada7c1c0d07753b3827237edc7dc97f92ae10b12f0f8f6d1da471c577ef",
+    "final_validator_tests.log": "f27c394d1569be2ecef99ef65cffb9e0dbda4b93159ec1722c41b02e1253b4fc",
+    "final_validator_tests.xml": "1e3e24b8aa87ceb080db904e939974d37c2bd6d3cae0dec9def6832e50fa6e1f",
+    "independent_inventory_summary.json": "e9b7c7bb4387d70656a1d2611c5f1eac8be64bb9c1233b6948e3bbf20a93ab34",
+    "independent_source_inventory.csv": "7c07bfd692d0fa45114f8fbebd5b597cee81573a75f7364aaf492cf166929bcb",
+    "luna_final_review.md": "c8a476dd4558ad2bd28835e833e4407e8d2f00f4ef216bfda79dc9faeb4cb863",
+    "luna_final_review_tests.log": "80631f3dee65308880d6c2e806a3eb9175e01dda27e2fdaf4d6a196d747afe7d",
+    "luna_final_review_tests.xml": "d50f77d1336c47f7ed84f435a3c855db6a0460ee3e552909cf004d218a83edec",
+    "luna_final_validator_tests.log": "711de9e091317daa45d5282a28d1128a2ca451f7f3214fab21b5b841f9b44d29",
+    "luna_final_validator_tests.xml": "f47be5002dc8b38d2b655e28b246cf4cd2079bcf102b3c99ca2378a403179a3a",
+    "luna_native_tb_artifact_tests.log": "a94fdea9414a03c3356601520a1cbe396c776593e22c4f4421d5e0c3bdc5645c",
+    "luna_native_tb_artifact_tests.xml": "aa5de2954c74e325f84b6167af0037e74fedfc58a6b13fc81142ca3370b322ab",
+    "native_baseline.json": "8d9d3af64bedbcb6ae3c8dba8810b024aba891e6af8e194d7ee189934e7939f2",
+    "native_baseline_extractor.py": "ab06805546cb29ffdb8b5617b17e24a2fb76e40f4cd6b1707f863224b2cad7d0",
+    "native_final.json": "20048bd8e76d43a1fe3ed703f9da21452e3b8aff01c7def41d6df3e6cac22584",
+    "report.md": "60f818ecd798027efb7c1f49d3dadae86a554ee1578278a8d52db5dca66f8393"
+  },
+  "luna_final_review": {
+    "model": "gpt-6-luna",
+    "tests_passed": 24,
+    "elapsed_seconds": 7.31,
+    "independently_reproduced_status_totals": true,
+    "implementation_review_passed": true,
+    "all_reports_acceptance": false
+  }
+}

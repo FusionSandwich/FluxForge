@@ -1658,6 +1658,7 @@ def analyze_raw_spectrum_targeted(
     comparison_background_model: str = "constant",
     counting_method: str = "qg",
     energy_tolerance_keV: float = 2.0,
+    low_significance_candidates: Optional[List[IdentifiedPeak]] = None,
 ) -> List[IdentifiedPeak]:
     """
     Analyze raw spectrum by targeting known gamma lines.
@@ -1666,6 +1667,10 @@ def analyze_raw_spectrum_targeted(
     - locking to expected line energies,
     - using resolution-based ROI widths,
     - optionally falling back to Gaussian fitting when ROI sums fail.
+
+    An optional candidate collector retains supported, positive-net fits below
+    the detection threshold for tentative identity review. Those candidates
+    never enter the returned detections or activity calculations.
     """
     if data.spectrum is None:
         return []
@@ -2250,29 +2255,29 @@ def analyze_raw_spectrum_targeted(
                 continue
 
             significance = net / net_unc if net_unc > 0 else 0.0
-            if significance < peak_threshold:
-                continue
-
-            results.append(
-                IdentifiedPeak(
-                    channel=int(round(peak_channel)),
-                    energy_keV=float(peak_energy),
-                    net_counts=float(net),
-                    net_counts_unc=float(net_unc),
-                    gross_counts=float(stored_gross),
-                    background=float(background_at_peak),
-                    fwhm=float(peak_fwhm_keV),
-                    significance=float(significance),
-                    isotope=line.isotope,
-                    gamma_line=line,
-                    gross_counts_unc=float(stored_gross_unc),
-                    background_adjusted_gross_counts=float(adjusted_gross),
-                    comparison_net_counts=float(comparison_net),
-                    comparison_net_counts_unc=float(comparison_unc),
-                    comparison_gross_counts=float(comparison_gross),
-                    comparison_gross_counts_unc=float(comparison_gross_unc),
-                )
+            peak = IdentifiedPeak(
+                channel=int(round(peak_channel)),
+                energy_keV=float(peak_energy),
+                net_counts=float(net),
+                net_counts_unc=float(net_unc),
+                gross_counts=float(stored_gross),
+                background=float(background_at_peak),
+                fwhm=float(peak_fwhm_keV),
+                significance=float(significance),
+                isotope=line.isotope,
+                gamma_line=line,
+                gross_counts_unc=float(stored_gross_unc),
+                background_adjusted_gross_counts=float(adjusted_gross),
+                comparison_net_counts=float(comparison_net),
+                comparison_net_counts_unc=float(comparison_unc),
+                comparison_gross_counts=float(comparison_gross),
+                comparison_gross_counts_unc=float(comparison_gross_unc),
             )
+            if significance < peak_threshold:
+                if low_significance_candidates is not None:
+                    low_significance_candidates.append(peak)
+                continue
+            results.append(peak)
 
     # Compute activities directly from the raw analysis result.
     for peak in results:
@@ -2647,7 +2652,11 @@ def _reference_peak_rows(reference_data: FluxWireData) -> List[Dict[str, Any]]:
             energy = float(peak.get("energy_keV") or peak.get("center_keV") or 0.0)
             if energy <= 0.0:
                 continue
-            peak_activity = float(peak.get("activity") or 0.0)
+            # A zero-net ROI is a reported nondetection, not a recovered peak.
+            if float(peak.get("net_counts") or 0.0) <= 0.0:
+                continue
+            activity_available = peak.get("activity") is not None
+            peak_activity = float(peak["activity"]) if activity_available else 0.0
             if unit == "uci":
                 peak_activity_bq = peak_activity * 3.7e4
             elif unit == "nci":
@@ -2676,7 +2685,8 @@ def _reference_peak_rows(reference_data: FluxWireData) -> List[Dict[str, Any]]:
                     "net_unc": float(
                         peak.get("net_uncertainty") or peak.get("net_unc") or 0.0
                     ),
-                    "activity_bq": float(peak_activity_bq),
+                    "activity_bq": float(peak_activity_bq) if activity_available else None,
+                    "activity_available": activity_available,
                 }
             )
     return rows
