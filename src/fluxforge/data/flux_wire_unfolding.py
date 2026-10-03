@@ -9,10 +9,12 @@ from typing import Any, Dict, Optional, Tuple
 from fluxforge.data.flux_wire_catalog import load_flux_wire_catalog
 
 
-def _load_payload() -> Dict[str, Any]:
+def _load_payload(
+    filename: str = "flux_wire_unfolding_defaults.json",
+) -> Dict[str, Any]:
     with (
         resources.files("fluxforge.data")
-        .joinpath("flux_wire_unfolding_defaults.json")
+        .joinpath(filename)
         .open(
             "r",
             encoding="utf-8",
@@ -24,13 +26,34 @@ def _load_payload() -> Dict[str, Any]:
 def load_flux_wire_unfolding_defaults() -> Dict[str, Any]:
     """Load the bundled flux-wire unfolding defaults payload."""
     payload = _load_payload()
+    payload["sample_defaults"] = load_flux_wire_sample_defaults()
     payload["product_reactions"] = load_flux_wire_product_reactions()
     return payload
 
 
 def load_flux_wire_sample_defaults() -> Dict[str, Dict[str, Any]]:
-    """Return bundled sample-property defaults keyed by wire element."""
-    return dict(_load_payload().get("sample_defaults", {}))
+    """Return the compatibility view of reference and nominal example properties.
+
+    Nominal masses, dimensions and purity are not measured RAFM metadata.
+    Physical callers must use specimen inputs; accepting a nominal mass remains
+    an explicit opt-in at the analytical boundary.
+    """
+    references = load_flux_wire_sample_reference()
+    examples = load_flux_wire_nominal_samples()
+    return {
+        element: {**properties, **examples.get(element, {})}
+        for element, properties in references.items()
+    }
+
+
+def load_flux_wire_sample_reference() -> Dict[str, Dict[str, Any]]:
+    """Return elemental properties and nominal natural target fractions."""
+    return dict(_load_payload("flux_wire_sample_reference.json")["elements"])
+
+
+def load_flux_wire_nominal_samples() -> Dict[str, Dict[str, Any]]:
+    """Return example-only wire properties; never measured specimen metadata."""
+    return dict(_load_payload("flux_wire_nominal_samples.json")["samples"])
 
 
 def load_flux_wire_reaction_defaults() -> Dict[str, Dict[str, Any]]:

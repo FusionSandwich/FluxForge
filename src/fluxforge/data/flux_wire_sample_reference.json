@@ -1,0 +1,64 @@
+{
+  "_metadata": {
+    "description": "Historical bundled elemental reference properties and nominal natural target-isotope fractions. These are reference defaults, not sample certificates.",
+    "titanium_fraction_source": "https://www.ciaaw.org/titanium.htm",
+    "scientific_admission": false
+  },
+  "elements": {
+    "Co": {
+      "atomic_mass": 58.9332,
+      "density_g_cm3": 8.9,
+      "reaction_target_fractions": {
+        "Co-59(n,g)Co-60": 1.0
+      }
+    },
+    "Cu": {
+      "atomic_mass": 63.546,
+      "density_g_cm3": 8.96,
+      "reaction_target_fractions": {
+        "Cu-63(n,g)Cu-64": 0.6917
+      }
+    },
+    "Sc": {
+      "atomic_mass": 44.9559,
+      "density_g_cm3": 2.99,
+      "reaction_target_fractions": {
+        "Sc-45(n,g)Sc-46": 1.0
+      }
+    },
+    "In": {
+      "atomic_mass": 114.818,
+      "density_g_cm3": 7.31,
+      "reaction_target_fractions": {
+        "In-113(n,g)In-114m": 0.0429,
+        "In-115(n,n')In-115m": 0.9571
+      }
+    },
+    "Ti": {
+      "atomic_mass": 47.867,
+      "density_g_cm3": 4.54,
+      "reaction_target_fractions": {
+        "Ti-46(n,p)Sc-46": 0.0825,
+        "Ti-47(n,p)Sc-47": 0.0744,
+        "Ti-48(n,p)Sc-48": 0.7372,
+        "Ti-50(n,g)Ti-51": 0.0518
+      }
+    },
+    "Ni": {
+      "atomic_mass": 58.693,
+      "density_g_cm3": 8.91,
+      "reaction_target_fractions": {
+        "Ni-58(n,p)Co-58": 0.6808,
+        "Ni-58(n,2n)Ni-57": 0.6808
+      }
+    },
+    "Fe": {
+      "atomic_mass": 55.845,
+      "density_g_cm3": 7.87,
+      "reaction_target_fractions": {
+        "Fe-54(n,p)Mn-54": 0.0585,
+        "Fe-58(n,g)Fe-59": 0.00282
+      }
+    }
+  }
+}
