@@ -81,6 +81,46 @@ class PortableQGExampleTests(unittest.TestCase):
         self.assertEqual(receipt['packages']['numpy']['status'],'INCOMPATIBLE')
         self.assertEqual(receipt['packages']['scipy']['status'],'COMPATIBLE')
 
+    def test_recovered_percent_curve_rejects_invalid_brackets_and_extrapolation(self):
+        path = Path(self.tmp.name)/'curve.csv'
+        path.write_text('energy_keV,efficiency_fraction,original_efficiency_value,source_line,status\n'
+                        '40,-0.01,-1,1,excluded_nonpositive\n'
+                        '100,0.001,0.1,2,working_percent_assumption\n'
+                        '200,0.002,0.2,3,working_percent_assumption\n'
+                        '300,-0.01,-1,4,excluded_nonpositive\n'
+                        '400,0.003,0.3,5,working_percent_assumption\n'
+                        '500,0.004,0.4,6,working_percent_assumption\n',encoding='utf-8')
+        curve = driver.SouthWorkingCurve(path)
+        self.assertAlmostEqual(curve.efficiency(150),0.0015)
+        for energy in (50,300,350,550):
+            with self.subTest(energy=energy),self.assertRaises(ValueError):
+                curve.efficiency(energy)
+        self.assertEqual(curve.to_dict()['positive_bracket_segments'],2)
+        path.write_text(path.read_text().replace('100,0.001,0.1','100,0.1,0.1'),encoding='utf-8')
+        with self.assertRaisesRegex(ValueError,'percent interpretation'):
+            driver.SouthWorkingCurve(path)
+
+    def test_raw_mode_excludes_near_contact_and_ti_produced_sc48(self):
+        output = Path(self.tmp.name)/'must not exist'
+        with self.assertRaisesRegex(ValueError,'near-contact'):
+            driver.run_raw_comparison(self.copy,output,'Fe-Cd-RAFM-1')
+        with self.assertRaisesRegex(ValueError,'Sc-48'):
+            driver.run_raw_comparison(self.copy,output,'Ti-RAFM-1')
+        self.assertFalse(output.exists())
+
+    def test_recovered_curve_must_match_original_percent_export(self):
+        original = Path(self.tmp.name)/'original_export.csv'
+        derived = Path(self.tmp.name)/'derived_curve.csv'
+        original.write_text('Energy, Efficiency\n100,0.1\n200,0.2\n',encoding='utf-8')
+        derived.write_text('energy_keV,efficiency_fraction,original_efficiency_value,source_line,status\n'
+                           '100,0.001,0.1,2,working_percent_assumption\n'
+                           '200,0.002,0.2,3,working_percent_assumption\n',encoding='utf-8')
+        driver.SouthWorkingCurve(derived).verify_source_export(original)
+        derived.write_text(derived.read_text().replace('200,0.002,0.2','200,0.003,0.3'),
+                           encoding='utf-8')
+        with self.assertRaisesRegex(ValueError,'source-bound original'):
+            driver.SouthWorkingCurve(derived).verify_source_export(original)
+
     def check_bad_manifest(self, changed):
         tmp_manifest = Path(self.tmp.name)/'bad_manifest.json'
         tmp_manifest.write_text(json.dumps(changed),encoding='utf-8')

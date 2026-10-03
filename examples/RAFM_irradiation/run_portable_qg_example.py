@@ -323,7 +323,9 @@ def label_replay_outputs(output: Path, manifest: dict) -> dict:
 def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
     checked = verify_inputs(repo, repo/'examples/RAFM_irradiation/quantumgold_reference/manifest.json')
     manifest = checked['manifest']
-    receipt = dict(status='INPUT_AUDIT_PASS', counts=checked['observed'],
+    receipt = dict(status='INPUT_AUDIT_PASS', mode='reference_reproduction',
+                   comparison_basis='QG report reproduction; not independent raw activity agreement',
+                   counts=checked['observed'],
                    resources_hash_checked=checked['resource_count'],
                    original_report_lines_verified=checked['source_lines_verified'],
                    supplemental_audit=checked['supplemental_audit'],
@@ -385,6 +387,9 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
     label_receipt = label_replay_outputs(output,manifest)
     report = json.loads((output/'qg_report_replay/qg_benchmark_summary.json').read_text(encoding='utf-8'))
     receipt.update(status='SOFTWARE_REPLAY_COMPLETED',
+                   comparison_modes=dict(reference_reproduction='executed',
+                                         raw_vs_report='not_run',
+                                         same_count_QG_derived='baseline_artifact_only'),
                    source_input_completeness=checked['observed'],
                    raw_workflow_summary=raw, qg_report_workflow_summary=report,
                    native_only_counts=[r['measurement_id'] for r in manifest['measurements'] if not r['files']['ASC']],
@@ -397,12 +402,268 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
     return receipt
 
 
+class SouthWorkingCurve:
+    """Positive, adjacent brackets of the recovered South 25 cm percent export."""
+
+    relative_uncertainty = 0.0  # Not a calibration uncertainty estimate.
+
+    def __init__(self, path: Path):
+        import numpy as np
+
+        self.path = path
+        self.source_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        segments, segment = [], []
+        with path.open(encoding='utf-8', newline='') as handle:
+            for row in csv.DictReader(handle):
+                energy = float(row['energy_keV'])
+                fraction = float(row['efficiency_fraction'])
+                original = float(row['original_efficiency_value'])
+                valid = (row['status'] == 'working_percent_assumption' and
+                         np.isfinite(fraction) and 0 < fraction <= 1 and
+                         np.isclose(fraction, original/100, rtol=1e-12, atol=1e-15))
+                if row['status'] == 'working_percent_assumption' and not valid:
+                    raise ValueError('Recovered curve violates its percent interpretation')
+                if valid:
+                    if segment and energy <= segment[-1][0]:
+                        raise ValueError('Recovered curve energies must increase')
+                    segment.append((energy, fraction))
+                elif segment:
+                    segments.append(segment)
+                    segment = []
+        if segment:
+            segments.append(segment)
+        if not segments:
+            raise ValueError('Recovered curve has no positive adjacent brackets')
+        self.segments = segments
+        self.energy_min_keV = min(part[0][0] for part in segments)
+        self.energy_max_keV = max(part[-1][0] for part in segments)
+
+    def verify_source_export(self, original_path: Path) -> None:
+        """Reject a derived table that differs from the hash-bound raw export."""
+        expected = []
+        with original_path.open(encoding='utf-8-sig', newline='') as handle:
+            for line, cells in enumerate(csv.reader(handle), 1):
+                try:
+                    energy, value = float(cells[0]), float(cells[1])
+                except (ValueError, IndexError):
+                    continue
+                expected.append((energy, value/100, value, line,
+                                 'working_percent_assumption' if value > 0 else 'excluded_nonpositive'))
+        with self.path.open(encoding='utf-8', newline='') as handle:
+            actual = [(float(row['energy_keV']), float(row['efficiency_fraction']),
+                       float(row['original_efficiency_value']), int(row['source_line']), row['status'])
+                      for row in csv.DictReader(handle)]
+        if actual != expected:
+            raise ValueError('Recovered curve differs from source-bound original percent export')
+
+    def efficiency(self, energy_keV):
+        import numpy as np
+
+        scalar = np.isscalar(energy_keV)
+        energies = np.atleast_1d(np.asarray(energy_keV, dtype=float))
+        values = np.full(energies.shape, np.nan)
+        for segment in self.segments:
+            x, y = np.asarray(segment, dtype=float).T
+            inside = np.isfinite(energies) & (energies >= x[0]) & (energies <= x[-1])
+            values[inside] = np.interp(energies[inside], x, y)
+        if scalar:
+            if not np.isfinite(values[0]):
+                raise ValueError('Energy is outside positive adjacent South 25 cm curve brackets')
+            return float(values[0])
+        return values
+
+    def to_dict(self):
+        return dict(model='recovered_South_small_vial_25cm',
+                    source_sha256=self.source_sha256,
+                    source_path=self.path.name,
+                    export_unit_assumption='percent', applied_unit='fraction',
+                    energy_range_keV=[self.energy_min_keV, self.energy_max_keV],
+                    positive_bracket_segments=len(self.segments),
+                    interpolation='linear within positive adjacent brackets only',
+                    calibration_uncertainty='unknown; not treated as zero')
+
+
+def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
+                       efficiency_mode: str = 'south_recovered',
+                       counting_method: str = 'iec_tiered') -> dict:
+    """One source-bound South 25 cm monitor reduction, independent of QG activity."""
+    if counting_method not in ('iec_tiered', 'covell', 'gilmore'):
+        raise ValueError('Raw comparison requires iec_tiered, covell, or gilmore counting')
+    if efficiency_mode not in ('south_recovered', 'legacy_profile'):
+        raise ValueError('Unknown raw efficiency mode')
+    checked = verify_inputs(repo, repo/'examples/RAFM_irradiation/quantumgold_reference/manifest.json')
+    manifest = checked['manifest']
+    rows = [row for row in manifest['measurements'] if row['measurement_id'] == measurement_id]
+    if len(rows) != 1:
+        raise ValueError('Unknown measurement identity')
+    row = rows[0]
+    if row['sample_kind'] != 'monitor' or not row['workflow_stem'].endswith('_25cm'):
+        raise ValueError('Only source-labeled South 25 cm monitors are eligible; near-contact is excluded')
+    if row['measurement_id'] in {'Ti-RAFM-1', 'Ti-RAFM-1a', 'Ti-RAFM-1b'}:
+        raise ValueError('Ti-produced Sc-48 printed intensity ambiguity needs a separate declared scenario')
+    if not row['files']['ASC']:
+        raise ValueError('Raw comparison requires an original source-bound ASC spectrum')
+    output = output.resolve()
+    if output.exists():
+        raise FileExistsError('Choose a new output directory; existing data are not overwritten')
+
+    import copy
+    sys.path.insert(0, str(repo/'src'))
+    from fluxforge.analysis.flux_wire_analysis import (
+        analyze_flux_wire_targeted, build_gamma_library, get_expected_isotopes)
+    from fluxforge.examples import rafm_workflow as workflow
+    from fluxforge.io.flux_wire import read_processed_txt, read_raw_asc
+
+    runtime = bound_path(repo, manifest['runtime_root'])
+    metadata = workflow.load_rafm_example_metadata(runtime)
+    energy_override = workflow.workflow_profile_energy_calibration(metadata.config)
+    raw_path = bound_path(repo, row['files']['ASC'])
+    raw_data = read_raw_asc(raw_path, energy_calibration_override=energy_override,
+                            profile_name=metadata.config['profile_name'])
+    if raw_data.spectrum is None:
+        raise ValueError('ASC spectrum could not be parsed')
+    raw_data.sample_id = row['workflow_stem']
+    raw_data.spectrum.spectrum_id = row['workflow_stem']
+    background = read_raw_asc(runtime/'background.ASC',
+                              energy_calibration_override=energy_override,
+                              profile_name=metadata.config['profile_name']).spectrum
+    if background is None:
+        raise ValueError('Historical North background could not be parsed')
+    curve_path = bound_path(repo, manifest['baseline_root'])/'south_25cm_recovered_curve.csv'
+    curve = SouthWorkingCurve(curve_path)
+    curve.verify_source_export(bound_path(repo, manifest['baseline_root'] +
+                                         '/inputs/South Small Vial 25cm.csv'))
+    config = metadata.config
+    energy_low = max(float(config.get('min_peak_energy_keV', 80)), curve.energy_min_keV)
+    energy_high = min(float(config.get('max_peak_energy_keV', 3000)), curve.energy_max_keV)
+    expected_lines = build_gamma_library(
+        isotope_filter=get_expected_isotopes(row['workflow_stem']))
+    excluded_expected_lines = [dict(isotope=line.isotope, energy_keV=line.energy_keV,
+                                    reason='outside positive South 25 cm curve energy range')
+                               for line in expected_lines
+                               if not energy_low <= line.energy_keV <= energy_high]
+
+    def analyze(calibration):
+        data = copy.deepcopy(raw_data)
+        data.efficiency = calibration
+        return analyze_flux_wire_targeted(
+            data=data, reference_data=None, background_spectrum=background,
+            profile_name=config['profile_name'], counting_method=counting_method,
+            peak_threshold=0.0,
+            min_energy_keV=energy_low,
+            max_energy_keV=energy_high,
+            roi_width_fwhm=float(config.get('flux_wire_roi_width_fwhm', 4.0)),
+            background_width_channels=int(config.get('flux_wire_background_width_channels', 1)),
+            background_gap_fwhm=float(config.get('flux_wire_background_gap_fwhm', 0.0)),
+            comparison_capture_range_channels=int(config.get('flux_wire_comparison_capture_range_channels', 32)),
+            broad_peak_ratio_threshold=float(config.get('flux_wire_broad_peak_ratio_threshold', 1.2)),
+            broad_peak_net_threshold=float(config.get('flux_wire_broad_peak_net_threshold', 5000)),
+            compact_window_edge_penalty=float(config.get('flux_wire_compact_window_edge_penalty', 80)),
+            compact_window_asymmetry_penalty=float(config.get('flux_wire_compact_window_asymmetry_penalty', 10)),
+            compact_window_width_penalty=float(config.get('flux_wire_compact_window_width_penalty', 120)),
+            broad_window_net_agreement_tolerance=float(config.get('flux_wire_broad_window_net_agreement_tolerance', .12)),
+            broad_window_max_raw_gross_ratio=float(config.get('flux_wire_broad_window_max_raw_gross_ratio', 1.35)),
+            comparison_background_model=str(config.get('flux_wire_comparison_background_model', 'constant')),
+        )
+
+    legacy = analyze(raw_data.efficiency)
+    selected = analyze(curve if efficiency_mode == 'south_recovered' else raw_data.efficiency)
+    def peak_counts(result):
+        return {(p.isotope, round(p.energy_keV, 2)): (p.net_counts, p.net_counts_unc)
+                for p in result.peaks}
+    if peak_counts(legacy) != peak_counts(selected):
+        raise ValueError('Efficiency selection changed raw peak counts')
+    qg = read_processed_txt(bound_path(repo, row['files']['QG_report']),
+                            profile_name=config['profile_name']) if row['files']['QG_report'] else None
+    reference = ({n.isotope: n.activity_bq for n in qg.nuclides} if qg else {})
+    selected_activities = selected.nuclide_activities
+    legacy_activities = legacy.nuclide_activities
+    activity_differences = {}
+    for isotope in sorted(set(selected_activities) | set(legacy_activities)):
+        selected_bq = selected_activities.get(isotope, {}).get('activity_bq')
+        legacy_bq = legacy_activities.get(isotope, {}).get('activity_bq')
+        activity_differences[isotope] = dict(
+            selected_Bq=selected_bq, legacy_Bq=legacy_bq,
+            selected_minus_legacy_Bq=(selected_bq-legacy_bq if selected_bq is not None
+                                      and legacy_bq is not None else None),
+            selected_over_legacy=(selected_bq/legacy_bq if selected_bq is not None
+                                  and legacy_bq else None),
+            QG_reference_Bq=reference.get(isotope),
+            selected_activity_reference=selected_activities.get(isotope, {}).get('activity_reference'),
+            QG_activity_reference='reported_measurement_date_count_start',
+            QG_comparison_status='UNHARMONIZED_REFERENCE_TIME')
+    line_witnesses = []
+    for peak in selected.peaks:
+        if peak.isotope and curve.energy_min_keV <= peak.energy_keV <= curve.energy_max_keV:
+            line_witnesses.append(dict(isotope=peak.isotope, energy_keV=peak.energy_keV,
+                                       net_counts=peak.net_counts, efficiency_used=peak.efficiency,
+                                       curve_efficiency=curve.efficiency(peak.energy_keV)))
+    receipt = dict(status='RAW_COMPARISON_COMPLETED', mode='raw_comparison',
+                   comparison_basis='raw counts vs separate QG report; reference activity not used for analysis',
+                   comparison_modes=dict(reference_reproduction='not_run',
+                                         raw_vs_report='executed',
+                                         same_count_QG_derived='not_run'),
+                   reference_used_for_analysis=False, independent_absolute_qualification=False,
+                   measurement_id=measurement_id, sample_id=row['workflow_stem'],
+                   counting_method=counting_method, efficiency_mode=efficiency_mode,
+                   selected_curve=curve.to_dict(),
+                   original_export_sha256=next(item['sha256'] for item in manifest['resources']
+                                               if item['path'] == manifest['baseline_root'] +
+                                               '/inputs/South Small Vial 25cm.csv'),
+                   baseline_builder_sha256=next(item['sha256'] for item in manifest['resources']
+                                                if item['path'] == manifest['baseline_root'] +
+                                                '/build_baseline.py'),
+                   selected_efficiency_source=(curve.to_dict() if efficiency_mode == 'south_recovered'
+                                               else dict(model='legacy_profile', profile=config['profile_name'])),
+                   raw_source_sha256=next(item['sha256'] for item in manifest['resources']
+                                          if item['path'] == row['files']['ASC']),
+                   channel_array_sha256=row['channel_array_sha256'],
+                   background_source_sha256=hashlib.sha256((runtime/'background.ASC').read_bytes()).hexdigest(),
+                   background_basis='historical bundled North background; South applicability unresolved',
+                   energy_scope_keV=[curve.energy_min_keV, curve.energy_max_keV],
+                   unsupported_energy_policy='outside positive adjacent brackets excluded from line analysis',
+                   excluded_expected_lines=excluded_expected_lines,
+                   QG_reference_activities_Bq=reference,
+                   QG_reference_time_basis='reported Measurement Date; count-start convention not harmonized with raw count-average',
+                   selected_raw_activities=selected_activities,
+                   legacy_raw_activities=legacy_activities,
+                   selected_vs_legacy_activity=activity_differences,
+                   selected_curve_line_witnesses=line_witnesses,
+                   counts_same_under_efficiency_selection=True,
+                   dataset_identity=dict(status='SOURCE_BOUND',
+                                         source_manifest_sha256=checked['manifest_sha256'],revision=None),
+                   engine_identity=engine_identity(repo),
+                   runtime_compatibility=runtime_compatibility(repo),
+                   conditional_calibration=True,
+                   uncertainty_basis='activity_unc_bq is conditional on the selected response; calibration uncertainty is unquantified',
+                   calibration_limits=['export percent unit is a documented assumption',
+                                       'same-count QG agreement is not independent absolute calibration',
+                                       'calibration covariance and 2025 active applicability unknown',
+                                       'no Sc-48 intensity or timing scenario substitution'])
+    output.mkdir(parents=True)
+    dump(output/'RAW_SELECTED_ANALYSIS.json', selected.to_dict())
+    dump(output/'RAW_LEGACY_ANALYSIS.json', legacy.to_dict())
+    dump(output/'REPLAY_RECEIPT.json', receipt)
+    return receipt
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--verify-only', action='store_true', help='Stdlib-only source completeness/identity audit')
     parser.add_argument('--output', type=Path, help='Fresh output directory for the complete software example')
+    parser.add_argument('--raw-sample', help='Source-bound monitor measurement ID for one independent raw comparison')
+    parser.add_argument('--efficiency-mode', choices=['south_recovered','legacy_profile'],
+                        default='south_recovered')
+    parser.add_argument('--counting-method', choices=['iec_tiered','covell','gilmore'],
+                        default='iec_tiered')
     args = parser.parse_args()
-    result = run(REPO, args.output, args.verify_only)
+    if args.raw_sample and args.verify_only:
+        parser.error('--raw-sample and --verify-only are separate modes')
+    if args.raw_sample and not args.output:
+        parser.error('--raw-sample requires --output')
+    result = (run_raw_comparison(REPO, args.output, args.raw_sample,
+                                 args.efficiency_mode, args.counting_method)
+              if args.raw_sample else run(REPO, args.output, args.verify_only))
     print(json.dumps({k:v for k,v in result.items() if not k.endswith('workflow_summary')}, indent=2))
     return 0
 
