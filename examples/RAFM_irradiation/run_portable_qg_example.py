@@ -9,16 +9,102 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+from importlib import metadata as distribution_metadata
 import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import struct
 import sys
+import tomllib
 
 REPO = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = REPO / 'examples/RAFM_irradiation/quantumgold_reference/manifest.json'
+
+
+def engine_identity(repo: Path) -> dict:
+    """Hash executable FluxForge sources independently of the input dataset.
+
+    Git metadata is deliberately unnecessary: a relocated source archive has
+    the same identity, while an edited analysis file receives a new identity.
+    """
+    package = repo/'src/fluxforge'
+    required = [repo/'pyproject.toml', repo/'examples/RAFM_irradiation/run_portable_qg_example.py']
+    if not package.is_dir() or any(not path.is_file() for path in required):
+        return dict(status='UNKNOWN', source_sha256=None, revision=None,
+                    reason='Complete engine source tree or pyproject.toml is unavailable')
+    files = required + [path for path in package.rglob('*') if path.is_file()
+                        and '__pycache__' not in path.parts and path.suffix not in ('.pyc', '.pyo')]
+    digest = hashlib.sha256()
+    for path in sorted(files, key=lambda item: item.relative_to(repo).as_posix()):
+        name = path.relative_to(repo).as_posix().encode('utf-8')
+        payload = path.read_bytes()
+        digest.update(len(name).to_bytes(4, 'big'))
+        digest.update(name)
+        digest.update(len(payload).to_bytes(8, 'big'))
+        digest.update(payload)
+    return dict(status='IDENTIFIED_BY_CONTENT', source_sha256=digest.hexdigest(),
+                revision=None, file_count=len(files),
+                scope='pyproject.toml, portable replay driver, complete src/fluxforge tree',
+                algorithm='SHA-256 over sorted relative path and file bytes, length-prefixed')
+
+
+def _numeric_version(value: str):
+    return tuple(int(piece) for piece in value.split('.')) if re.fullmatch(r'\d+(?:\.\d+)*', value) else None
+
+
+def _declared_range_status(installed: str, specifier: str) -> str:
+    actual = _numeric_version(installed)
+    if actual is None:
+        return 'UNKNOWN'
+    for constraint in specifier.split(','):
+        match = re.fullmatch(r'\s*(>=|<=|==|!=|>|<)\s*(\d+(?:\.\d+)*)\s*', constraint)
+        if match is None:
+            return 'UNKNOWN'
+        operator, expected_text = match.groups()
+        expected = _numeric_version(expected_text)
+        width = max(len(actual), len(expected))
+        left, right = actual + (0,)*(width-len(actual)), expected + (0,)*(width-len(expected))
+        accepted = {'>=':left >= right, '<=':left <= right, '==':left == right,
+                    '!=':left != right, '>':left > right, '<':left < right}[operator]
+        if not accepted:
+            return 'INCOMPATIBLE'
+    return 'COMPATIBLE'
+
+
+def runtime_compatibility(repo: Path) -> dict:
+    """Report installed core distributions against this source's declarations.
+
+    This uses only the standard library, so --verify-only keeps its light gate.
+    Optional GUI, ML, reporting and development extras are outside the core run.
+    """
+    project_file = repo/'pyproject.toml'
+    if not project_file.is_file():
+        return dict(status='UNKNOWN', reason='pyproject.toml is unavailable', packages={})
+    project = tomllib.loads(project_file.read_text(encoding='utf-8'))['project']
+    python_spec = project['requires-python']
+    python_version = '.'.join(str(value) for value in sys.version_info[:3])
+    python_status = _declared_range_status(python_version, python_spec)
+    packages = {}
+    for requirement in project['dependencies']:
+        match = re.fullmatch(r'([A-Za-z0-9_.-]+)(.*)', requirement)
+        name, specifier = match.groups()
+        try:
+            installed = distribution_metadata.version(name)
+            status = _declared_range_status(installed, specifier)
+        except distribution_metadata.PackageNotFoundError:
+            installed, status = None, 'MISSING'
+        packages[name.lower()] = dict(installed_version=installed, declared=specifier,
+                                      status=status)
+    statuses = [python_status] + [value['status'] for value in packages.values()]
+    overall = ('INCOMPATIBLE' if 'INCOMPATIBLE' in statuses else
+               'UNKNOWN' if any(value != 'COMPATIBLE' for value in statuses) else 'COMPATIBLE')
+    return dict(status=overall, python=dict(version=python_version, declared=python_spec,
+                                           status=python_status, executable=sys.executable),
+                packages=packages, version_source='importlib.metadata in executing interpreter',
+                scope='declared core dependencies only')
 
 
 def bound_path(repo: Path, relative: str) -> Path:
@@ -242,7 +328,12 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
                    original_report_lines_verified=checked['source_lines_verified'],
                    supplemental_audit=checked['supplemental_audit'],
                    required_external_data_paths=[], requires_quantumgold_installation=False,
-                   independent_absolute_qualification=False)
+                   independent_absolute_qualification=False,
+                   dataset_identity=dict(status='SOURCE_BOUND',
+                                         source_manifest_sha256=checked['manifest_sha256'],
+                                         revision=None),
+                   engine_identity=engine_identity(repo),
+                   runtime_compatibility=runtime_compatibility(repo))
     if verify_only:
         return receipt
     if output is None:
