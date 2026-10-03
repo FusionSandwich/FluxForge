@@ -1,0 +1,3 @@
+* -text whitespace=cr-at-eol
+inputs/** -diff
+south_efficiency_comparison.svg -diff
