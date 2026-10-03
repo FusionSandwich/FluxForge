@@ -1,0 +1,13 @@
+{
+  "before": [],
+  "after": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "figures_retained": 4,
+  "expected_retained": 0,
+  "png_files": 4,
+  "code_commit": "4615e61bbb262d974e0326a44107bc952e4cb903"
+}

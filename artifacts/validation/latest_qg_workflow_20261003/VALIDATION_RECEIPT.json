@@ -1,0 +1,142 @@
+{
+  "schema": "fluxforge-latest-qg-validation-v1",
+  "date": "2026-10-03",
+  "status": "CORE_FULL_WORKFLOW_COMPLETED_WITH_OPEN_FINDINGS",
+  "source_identities": {
+    "refs": {
+      "github_main": {
+        "commit": "52759a9b74fe6c5c386c74ce1105ff951cbc05cc",
+        "branch": "origin/main",
+        "source_archive_sha256": "7362faa59f136fd95a1fa8628a422ab31dc35af429fd7233b707b0ebba05eb88",
+        "dataset_overlay_sha256": "e4e27e067fe26c083336ba5e92783df006a0276c99de20df812a4672a4b2ad6d",
+        "source": "D:\\FluxForge_validation_20261003\\github_main"
+      },
+      "latest_integrated": {
+        "commit": "4615e61bbb262d974e0326a44107bc952e4cb903",
+        "branch": "origin/codex/validation-three-failures-20261003",
+        "source_archive_sha256": "f4d317165c0bbf5dd90d33ceb381f1a608f8cfe4efeb4bf414d889a66c2a3c3b",
+        "dataset_overlay_sha256": "e4e27e067fe26c083336ba5e92783df006a0276c99de20df812a4672a4b2ad6d",
+        "source": "D:\\FluxForge_validation_20261003\\latest_integrated"
+      }
+    },
+    "bundle_commit": "68e2c7a8bc497a4165725a3f23dd557df2a31c66",
+    "overlay_policy": "Only source-bound dataset, baseline builder and portable replay driver/tests from PR221; no production src changes. main and latest development production source are separate frozen Git archives."
+  },
+  "execution": {
+    "exit": {
+      "ExitCode": 0,
+      "Finished": "2026-10-03T18:34:04.3458965-04:00"
+    },
+    "receipt_status": "SOFTWARE_REPLAY_COMPLETED",
+    "primary_resources": 122,
+    "supplemental_resources": 3,
+    "raw_spectra": 30,
+    "matched_raw_QG_pairs": 29,
+    "native_arrays": 32,
+    "QG_monitor_reports": 12,
+    "monitor_reaction_rows": 19,
+    "methods": [
+      "GLS",
+      "GRAVEL",
+      "MLEM"
+    ],
+    "raw_validation_overall_passed": null,
+    "comparison_bases": {
+      "reference_reproduction": 29,
+      "not_evaluated": 1
+    },
+    "independent_absolute_qualification": false
+  },
+  "focused_tests": {
+    "passed": 149,
+    "failures": 0,
+    "seconds": 94.0
+  },
+  "environment": {
+    "full_declared_environment_passed": false,
+    "software_acquired_or_modified": false,
+    "scope": "Existing Python3.12.10 core packages, NumPy2.5.1 outside declared<2. Full optional GUI/ML/reporting dependencies absent. See existing issue21."
+  },
+  "main_checkout": {
+    "exit_code": 1,
+    "reason": "Default main lacks fluxforge.examples.rafm_workflow; prerequisite PR chain not integrated. Data overlay alone cannot provide analysis engine."
+  },
+  "raw_independent_probe": {
+    "sample_id": "Co-Cd-RAFM-1_25cm",
+    "counting_method": "iec_tiered",
+    "validation": {
+      "passed": false,
+      "comparison_passed": false,
+      "comparison_basis": "raw_estimate_vs_report",
+      "reference_used_for_analysis": false,
+      "incomplete_comparison_rows": 0,
+      "ambiguous_reference_assignments": 0,
+      "unidentifiable_fit_groups": 0,
+      "required_comparison_domains": [
+        "counts",
+        "activities"
+      ],
+      "available_comparison_domains": [
+        "counts",
+        "activities"
+      ],
+      "missing_comparison_domains": [],
+      "count_failures": 0,
+      "activity_failures": 1,
+      "line_consistency_failures": 0,
+      "measurement_qc_flags": 0,
+      "missing_peaks": [],
+      "missing_nuclides": []
+    },
+    "scope": "One representative raw-independent monitor reduction; not full campaign raw admission",
+    "code_commit": "4615e61bbb262d974e0326a44107bc952e4cb903"
+  },
+  "figure_ownership_probe": {
+    "before": [],
+    "after": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "figures_retained": 4,
+    "expected_retained": 0,
+    "png_files": 4,
+    "code_commit": "4615e61bbb262d974e0326a44107bc952e4cb903"
+  },
+  "issues": {
+    "new": [
+      222,
+      223,
+      224
+    ],
+    "updated_existing": [
+      21,
+      220,
+      26,
+      27
+    ],
+    "repair_task_id": "01a103df-5eda-7cd3-b276-2ad70d21decc",
+    "repair_project": "Fluxforge_1"
+  },
+  "evidence_hashes": {
+    "SOURCE_IDENTITIES.json": "1796ace0b35de4171e167151c35c2c5741cc2df666bc03e7ebfc89bc863603ae",
+    "latest_exit.json": "75f0250fafb7d57374ae652790b237bd52c3a1d28569a1723983cd61dab69f57",
+    "latest_replay/REPLAY_RECEIPT.json": "45d7b1e6f94e84cf4c2eee8ccf7a625b4ac6e4c947e27a40680ea4dcce7ee0b0",
+    "focused_tests.xml": "01c8a982dc38a40f8eec87547d9b0e34b63448f20bd27ad2fc1996129b1d5e43",
+    "environment_check.log": "2b84f6f503761b3cd784b7a7f7b27fe04fd39952b860061a5574dd6843ce93c9",
+    "environment_exit.json": "b9868bab82ad173a8b70609d3636ce4794dd10287e28a12a508ca4ca2bed8612",
+    "main_replay.log": "82b49075a1bf2f3f35aeba37d0b33537331702967e97f5dea74b6c1377c628b8",
+    "main_exit.json": "b8395402329d64f5c1de2193770b82e824488862c22be7e351b01adff4576c20",
+    "figure_ownership_probe/RECEIPT.json": "0aa1edcea53c1e440268a5dbd501e87cc57da280d6e4695133efdd2eaf0a958d",
+    "probe_figure_ownership.py": "7f08dee748d9acaa1b810c24d97ff5a12465c51c6569901a31ace9a6f603a1b6",
+    "raw_independence_probe/PROBE_RECEIPT.json": "026afec6dd0ff666ae668c490950a29c9bbb9a62cceb21b7c2ff9f193c5521b7",
+    "probe_raw_independence.py": "b5ba89363c61bc381ec73d05dd675159b8f98d766bd14b6b5143a7a0bb1a5aba"
+  },
+  "historical_local_evidence_root": "D:\\FluxForge_validation_20261003",
+  "independent_review": {
+    "status": "ACCEPT_SOFTWARE_REPLAY_COMPLETED_WITH_OPEN_FINDINGS",
+    "reviewer": "Independent Sol south_baseline_acceptance",
+    "evidence": "Recomputed all12evidence hashes with0mismatches; SOURCE_IDENTITIES equal; JUnit149/149;30analysis JSON independently counted29reference_reproduction+1not_evaluated, all validation.passed=null; source/runtime/calibration/figure/main limitations retained."
+  }
+}

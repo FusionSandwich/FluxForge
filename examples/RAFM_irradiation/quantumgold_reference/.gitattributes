@@ -1,0 +1,6 @@
+* -text whitespace=cr-at-eol
+originals/** -diff
+runtime/background.ASC -diff
+runtime/calibration/** -diff
+supplemental_inputs/*.ANS -diff
+supplemental_inputs/*.txt -diff

@@ -1,0 +1,447 @@
+[
+  {
+    "measurement_id": "Co-Cd-RAFM-1",
+    "physical_specimen_id": "Co-Cd-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Co-Cd-RAFM-1_25cm.ANS",
+      "ASC": "Co-Cd-RAFM-1_25cm.ASC",
+      "QG_report": "Co-Cd-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Co-Cd-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Co-RAFM-1",
+    "physical_specimen_id": "Co-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Co-RAFM-1_25cm.ANS",
+      "ASC": "Co-RAFM-1_25cm.ASC",
+      "QG_report": "Co-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Co-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Cu-Cd-RAFM-1",
+    "physical_specimen_id": "Cu-Cd-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Cu-Cd-RAFM-1_25cm.ANS",
+      "QG_report": "Cu-Cd-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Cu-Cd-RAFM-1_25cm",
+    "raw_workflow_role": "native_only_QG_report_comparison",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Cu-RAFM-1",
+    "physical_specimen_id": "Cu-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Cu-RAFM-1_25cm.ANS",
+      "ASC": "CU-RAFM-1.ASC",
+      "QG_report": "Cu-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Cu-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Fe-Cd-RAFM-1",
+    "physical_specimen_id": "Fe-Cd-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Fe-Cd-RAFM-1_0cm.ANS",
+      "QG_report": "Fe-Cd-RAFM-1_0cm.txt"
+    },
+    "workflow_stem": "Fe-Cd-RAFM-1_0cm",
+    "raw_workflow_role": "native_only_QG_report_comparison",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "In-Cd-RAFM-1",
+    "physical_specimen_id": "In-Cd-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "In-Cd-RAFM-1_25cm.ANS",
+      "ASC": "In-Cd-RAFM-1_25cm.ASC",
+      "QG_report": "In-Cd-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "In-Cd-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Ni-RAFM-1",
+    "physical_specimen_id": "Ni-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Ni-RAFM-1_25cm.ANS",
+      "ASC": "Ni-RAFM-1_25cm.ASC",
+      "QG_report": "Ni-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Ni-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-A-15d",
+    "physical_specimen_id": "RAFM4-A",
+    "cohort": "RAFM4",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM4-A_15dEOI.ANS",
+      "ASC": "RAFM4-A_15dEOI.ASC",
+      "QG_report": "RAFM4-A_15dEOI.txt"
+    },
+    "workflow_stem": "RAFM4-A_15dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-A-24hr",
+    "physical_specimen_id": "RAFM3-A",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-A_24hrEOI.ANS",
+      "ASC": "RAFM3-A_24hrEOI.ASC",
+      "QG_report": "RAFM3-A_24hrEOI.txt"
+    },
+    "workflow_stem": "RAFM3-A_24hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-A-2hr",
+    "physical_specimen_id": "RAFM3-A",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-A_2hrEOI.ANS",
+      "ASC": "RAFM3-A_2hrEOI.ASC"
+    },
+    "workflow_stem": "RAFM3-A_2hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": true
+  },
+  {
+    "measurement_id": "RAFM-A-300s",
+    "physical_specimen_id": "RAFM3-A",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-A_300sEOI.ANS",
+      "ASC": "RAFM3-A_300sEOI.ASC",
+      "QG_report": "RAFM3-A_300sEOI.txt"
+    },
+    "workflow_stem": "RAFM3-A_300sEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-A-4d",
+    "physical_specimen_id": "RAFM3-A",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-A_4dEOI.ANS",
+      "ASC": "RAFM3-A_4dEOI.ASC",
+      "QG_report": "RAFM3-A_4dEOI.txt"
+    },
+    "workflow_stem": "RAFM3-A_4dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-B-15d",
+    "physical_specimen_id": "RAFM4-B",
+    "cohort": "RAFM4",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM4-B_15dEOI.ANS",
+      "ASC": "RAFM4-B_15dEOI.ASC",
+      "QG_report": "RAFM4-B_15dEOI.txt"
+    },
+    "workflow_stem": "RAFM4-B_15dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-B-24hr",
+    "physical_specimen_id": "RAFM3-B",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-B_24hrEOI.ANS",
+      "ASC": "RAFM3-B_24hrEOI.ASC",
+      "QG_report": "RAFM3-B_24hrEOI.txt"
+    },
+    "workflow_stem": "RAFM3-B_24hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-B-2hr",
+    "physical_specimen_id": "RAFM3-B",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-B_2hrEOI.ANS",
+      "ASC": "RAFM3-B_2hrEOI.ASC",
+      "QG_report": "RAFM3-B_2hrEOI.txt"
+    },
+    "workflow_stem": "RAFM3-B_2hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-B-300s",
+    "physical_specimen_id": "RAFM3-B",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-B_300sEOI.ANS",
+      "ASC": "RAFM3-B_300sEOI.ASC",
+      "QG_report": "RAFM3-B_300sEOI.txt"
+    },
+    "workflow_stem": "RAFM3-B_300sEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-B-4d",
+    "physical_specimen_id": "RAFM3-B",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-B_4dEOI.ANS",
+      "ASC": "RAFM3-B_4dEOI.ASC",
+      "QG_report": "RAFM3-B_4dEOI.txt"
+    },
+    "workflow_stem": "RAFM3-B_4dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-C-15d",
+    "physical_specimen_id": "RAFM4-C",
+    "cohort": "RAFM4",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM4-C_15dEOI.ANS",
+      "ASC": "RAFM4-C_15dEOI.ASC",
+      "QG_report": "RAFM4-C_15dEOI.txt"
+    },
+    "workflow_stem": "RAFM4-C_15dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-C-24hr",
+    "physical_specimen_id": "RAFM3-C",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-C_24hrEOI.ANS",
+      "ASC": "RAFM3-C_24hrEOI.ASC",
+      "QG_report": "RAFM3-C_24hrEOI.txt"
+    },
+    "workflow_stem": "RAFM3-C_24hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-C-2hr",
+    "physical_specimen_id": "RAFM3-C",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-C_2hrEOI.ANS",
+      "ASC": "RAFM3-C_2hrEOI.ASC",
+      "QG_report": "RAFM3-C_2hrEOI.txt"
+    },
+    "workflow_stem": "RAFM3-C_2hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-C-300s",
+    "physical_specimen_id": "RAFM3-C",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-C_300sEOI.ANS",
+      "ASC": "RAFM3-C_300sEOI.ASC",
+      "QG_report": "RAFM3-C_300sEOI.txt"
+    },
+    "workflow_stem": "RAFM3-C_300sEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-C-4d",
+    "physical_specimen_id": "RAFM3-C",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-C_4dEOI.ANS",
+      "ASC": "RAFM3-C_4dEOI.ASC",
+      "QG_report": "RAFM3-C_4dEOI.txt"
+    },
+    "workflow_stem": "RAFM3-C_4dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-N-15d",
+    "physical_specimen_id": "RAFM4-N",
+    "cohort": "RAFM4",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM4-N_15dEOI.ANS",
+      "ASC": "RAFM4-N_15dEOI.ASC",
+      "QG_report": "RAFM4-N_15dEOI.txt"
+    },
+    "workflow_stem": "RAFM4-N_15dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-N-24hr",
+    "physical_specimen_id": "RAFM3-N",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-N_24hrEOI.ANS",
+      "ASC": "RAFM3-N_24hrEOI.ASC",
+      "QG_report": "RAFM3-N_24hrEOI.txt"
+    },
+    "workflow_stem": "RAFM3-N_24hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-N-2hr",
+    "physical_specimen_id": "RAFM3-N",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-N_2hrEOI.ANS",
+      "ASC": "RAFM3-N_2hrEOI.ASC",
+      "QG_report": "RAFM3-N_2hrEOI.txt"
+    },
+    "workflow_stem": "RAFM3-N_2hrEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-N-300s",
+    "physical_specimen_id": "RAFM3-N",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-N_300sEOI.ANS",
+      "ASC": "RAFM3-N_300sEOI.ASC",
+      "QG_report": "RAFM3-N_300sEOI.txt"
+    },
+    "workflow_stem": "RAFM3-N_300sEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "RAFM-N-4d",
+    "physical_specimen_id": "RAFM3-N",
+    "cohort": "RAFM3",
+    "sample_kind": "specimen",
+    "original_filenames": {
+      "ANS": "RAFM3-N_4dEOI.ANS",
+      "ASC": "RAFM3-N_4dEOI.ASC",
+      "QG_report": "RAFM3-N_4dEOI.txt"
+    },
+    "workflow_stem": "RAFM3-N_4dEOI",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Sc-Cd-RAFM-1",
+    "physical_specimen_id": "Sc-Cd-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Sc-Cd-RAFM-1_25cm.ANS",
+      "ASC": "Sc-Cd-RAFM-1_25cm.ASC",
+      "QG_report": "Sc-Cd-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Sc-Cd-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Sc-RAFM-1",
+    "physical_specimen_id": "Sc-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Sc-RAFM-1_25cm.ANS",
+      "ASC": "Sc-RAFM-1_25cm.ASC",
+      "QG_report": "Sc-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Sc-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Ti-RAFM-1",
+    "physical_specimen_id": "Ti-RAFM-1",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Ti-RAFM-1_25cm.ANS",
+      "ASC": "Ti-RAFM-1_25cm.ASC",
+      "QG_report": "Ti-RAFM-1_25cm.txt"
+    },
+    "workflow_stem": "Ti-RAFM-1_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Ti-RAFM-1a",
+    "physical_specimen_id": "Ti-RAFM-1a",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Ti-RAFM-1a_25cm.ANS",
+      "ASC": "Ti-RAFM-1a_25cm.ASC",
+      "QG_report": "Ti-RAFM-1a_25cm.txt"
+    },
+    "workflow_stem": "Ti-RAFM-1a_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  },
+  {
+    "measurement_id": "Ti-RAFM-1b",
+    "physical_specimen_id": "Ti-RAFM-1b",
+    "cohort": "monitor",
+    "sample_kind": "monitor",
+    "original_filenames": {
+      "ANS": "Ti-RAFM-1b_25cm.ANS",
+      "ASC": "Ti-RAFM-1b_25cm.ASC",
+      "QG_report": "Ti-RAFM-1b_25cm.txt"
+    },
+    "workflow_stem": "Ti-RAFM-1b_25cm",
+    "raw_workflow_role": "ASC_replay",
+    "missing_report": false
+  }
+]

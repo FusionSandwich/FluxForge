@@ -1,0 +1,30 @@
+{
+  "sample_id": "Co-Cd-RAFM-1_25cm",
+  "counting_method": "iec_tiered",
+  "validation": {
+    "passed": false,
+    "comparison_passed": false,
+    "comparison_basis": "raw_estimate_vs_report",
+    "reference_used_for_analysis": false,
+    "incomplete_comparison_rows": 0,
+    "ambiguous_reference_assignments": 0,
+    "unidentifiable_fit_groups": 0,
+    "required_comparison_domains": [
+      "counts",
+      "activities"
+    ],
+    "available_comparison_domains": [
+      "counts",
+      "activities"
+    ],
+    "missing_comparison_domains": [],
+    "count_failures": 0,
+    "activity_failures": 1,
+    "line_consistency_failures": 0,
+    "measurement_qc_flags": 0,
+    "missing_peaks": [],
+    "missing_nuclides": []
+  },
+  "scope": "One representative raw-independent monitor reduction; not full campaign raw admission",
+  "code_commit": "4615e61bbb262d974e0326a44107bc952e4cb903"
+}

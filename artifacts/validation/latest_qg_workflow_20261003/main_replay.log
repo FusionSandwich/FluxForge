@@ -1,0 +1,34 @@
+{
+  "schema": "south-working-baseline-v1",
+  "physical_counts": 32,
+  "roi_rows": 288,
+  "reconstructible_effective_response_rows": 282,
+  "same_count_usable_QG_anchors": 268,
+  "excluded_ambiguous_RAD_INT": 14,
+  "recovered_curve_rows": 1960,
+  "recovered_curve_nonpositive_rows": 17,
+  "empirical_anchor_rows": 156,
+  "empirical_knots": 34,
+  "sc48_corrected_yield_scenario_rows": 12,
+  "empirical_energy_range_keV": [
+    100.1,
+    1332.5
+  ],
+  "median_QG_to_recovered_curve_ratio": 1.0190186171979767,
+  "maximum_QG_algebraic_replay_relative_error": 2.220446049250313e-16,
+  "replay_is_independent_validation": false,
+  "added_arbitrary_uncertainty": false,
+  "input_hash_checks_passed": true,
+  "working_comparison_ready": true,
+  "independently_calibrated": false
+}
+Traceback (most recent call last):
+  File "D:\FluxForge_validation_20261003\github_main\examples\RAFM_irradiation\run_portable_qg_example.py", line 320, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "D:\FluxForge_validation_20261003\github_main\examples\RAFM_irradiation\run_portable_qg_example.py", line 314, in main
+    result = run(REPO, args.output, args.verify_only)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\FluxForge_validation_20261003\github_main\examples\RAFM_irradiation\run_portable_qg_example.py", line 289, in run
+    from fluxforge.examples.rafm_workflow import run_rafm_validation, run_qg_benchmark
+ModuleNotFoundError: No module named 'fluxforge.examples.rafm_workflow'

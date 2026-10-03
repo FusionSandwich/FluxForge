@@ -1,0 +1,3 @@
+* -text
+*.log -diff
+*.xml -diff

@@ -1,0 +1,20 @@
+{
+  "refs": {
+    "github_main": {
+      "commit": "52759a9b74fe6c5c386c74ce1105ff951cbc05cc",
+      "branch": "origin/main",
+      "source_archive_sha256": "7362faa59f136fd95a1fa8628a422ab31dc35af429fd7233b707b0ebba05eb88",
+      "dataset_overlay_sha256": "e4e27e067fe26c083336ba5e92783df006a0276c99de20df812a4672a4b2ad6d",
+      "source": "D:\\FluxForge_validation_20261003\\github_main"
+    },
+    "latest_integrated": {
+      "commit": "4615e61bbb262d974e0326a44107bc952e4cb903",
+      "branch": "origin/codex/validation-three-failures-20261003",
+      "source_archive_sha256": "f4d317165c0bbf5dd90d33ceb381f1a608f8cfe4efeb4bf414d889a66c2a3c3b",
+      "dataset_overlay_sha256": "e4e27e067fe26c083336ba5e92783df006a0276c99de20df812a4672a4b2ad6d",
+      "source": "D:\\FluxForge_validation_20261003\\latest_integrated"
+    }
+  },
+  "bundle_commit": "68e2c7a8bc497a4165725a3f23dd557df2a31c66",
+  "overlay_policy": "Only source-bound dataset, baseline builder and portable replay driver/tests from PR221; no production src changes. main and latest development production source are separate frozen Git archives."
+}

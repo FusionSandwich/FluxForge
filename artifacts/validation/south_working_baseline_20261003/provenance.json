@@ -1,0 +1,149 @@
+{
+  "created_date": "2026-10-03",
+  "repository": "FusionSandwich/FluxForge",
+  "base_commit": "f672374e9a0dcf82e47d9d8a0bd11d4b3808d142",
+  "authorization": "User requested treating QuantumGold as mostly correct, reconstructing missing response, reusing existing timing and saving methods/data in FluxForge.",
+  "inputs": [
+    {
+      "package_path": "inputs/South Small Vial 25cm.csv",
+      "original_local_path": "D:\\UWNR_document_intake_2026-10-01\\mail_attachments\\South Small Vial 25cm.csv",
+      "sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+      "bytes": 64635,
+      "source_kind": "historical_efficiency_export"
+    },
+    {
+      "package_path": "inputs/QG_EFFECTIVE_EFFICIENCY.json",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\uwnr_rafm\\paper3_unfolding_audit_20260927\\publication_validation_20260930\\QG_EFFECTIVE_EFFICIENCY.json",
+      "sha256": "a88082b1bcf68142824e94a91f00c682bfe1db550b5be362492df35eb24bc3df",
+      "bytes": 422935,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/chronology_join_receipt.json",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\uwnr_rafm\\paper3_unfolding_audit_20260927\\publication_validation_20260930\\chronology_recovery_20261001\\chronology_join_receipt.json",
+      "sha256": "18f8d8669f53f0595f9bb12d7e3f1dcd17c23d8f6194da0c795b01fc6edb1ced",
+      "bytes": 126557,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/count_metadata_matrix_32_2026-09-27.json",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\analysis\\count_metadata_matrix_32_2026-09-27.json",
+      "sha256": "afe9f0411990c38340592930d7507737febe1a3bc20f2854f20159e2eb967b9b",
+      "bytes": 126354,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/report_roi_rows.csv",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\data\\measurement_reconciliation_2026-09-16\\report_roi_rows.csv",
+      "sha256": "62d6ae249bed9d396339bfa4af9ac7e36e75c8fe7e4e74e1b622cc1e0df15f3a",
+      "bytes": 72934,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/reported_summary_rows.json",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\inl_rafm_2025\\data\\measurement_reconciliation_2026-09-16\\reported_summary_rows.json",
+      "sha256": "ec738337831083fe2e1691f14438dc26a317a375f6018ba47a2c191b484c331f",
+      "bytes": 45003,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/reconstruct_qg_efficiency_original.py",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\uwnr_rafm\\paper3_unfolding_audit_20260927\\publication_validation_20260930\\reconstruct_qg_efficiency.py",
+      "sha256": "8b72f92eb09724c8ba6a30ef13558c0f89d9f41c61f6e31fb41926c826749f68",
+      "bytes": 7436,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/SC48_QUANTITATIVE_DIAGNOSTIC.json",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\rafm-publication\\studies\\uwnr_rafm\\paper3_m1_mcnp\\sc48_diagnosis_20261001\\SC48_QUANTITATIVE_DIAGNOSTIC.json",
+      "sha256": "12a2e2fa97acf109005c9058a22786ae0f422a0af66eeca37122a3fd006ba404",
+      "bytes": 54590,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/uwHPGeDimensions.xlsx.txt",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\Thesis_github_local_2026-09-15\\publication\\archive_completion_028\\content_reviews\\measurements\\uwHPGeDimensions.xlsx.txt",
+      "sha256": "0afbceafe95876ea06b44dc7cb74524d1e9e52b27f081e8a8b67aeb0f3314464",
+      "bytes": 4723,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/geomEffUWHPGe.xlsx.txt",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\Thesis_github_local_2026-09-15\\publication\\archive_completion_028\\content_reviews\\measurements\\geomEffUWHPGe.xlsx.txt",
+      "sha256": "f82a793563d84a44a184ac5facfb1798cdf59b57ebcb9c014d09a005d7d23aa4",
+      "bytes": 2492,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/uwHPGeModeling.pptx.txt",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\Thesis_github_local_2026-09-15\\publication\\archive_completion_028\\content_reviews\\measurements\\uwHPGeModeling.pptx.txt",
+      "sha256": "466eacda84ec8f26b2cfdd6022c6aa29d88c44768a231ec0397072e7bce79125",
+      "bytes": 8604,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/detector_archive_inventory.json",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\Thesis_github_local_2026-09-15\\publication\\archive_completion_028\\content_reviews\\measurements\\inventory.json",
+      "sha256": "6537327102745f7ded7c81e71847464a967cd0f671e12a69a3e8722a984b95bd",
+      "bytes": 289024,
+      "source_kind": "preserved_existing_evidence"
+    },
+    {
+      "package_path": "inputs/uwHPGeDimensions.xlsx",
+      "original_local_path": "C:\\Users\\joshu\\Documents\\UWNR_archive_intake_2026-09-17\\archives\\HPGeModeling-20260710T235338Z-2-001.zip__c92d6bfdcbe0f3be\\HPGeModeling\\uwHPGeDimensions.xlsx",
+      "sha256": "ab42b9f1a3dbb7cc037cb410c010625bc92602382633081acb2ca98913d45591",
+      "bytes": 6751,
+      "source_kind": "preserved_existing_evidence"
+    }
+  ],
+  "original_QG_report_hashes_verified": {
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Co-Cd-RAFM-1_25cm.txt": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Co-RAFM-1_25cm.txt": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Cu-Cd-RAFM-1_25cm.txt": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Cu-RAFM-1_25cm.txt": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Fe-Cd-RAFM-1_0cm.txt": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\In-Cd-RAFM-1_25cm.txt": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Ni-RAFM-1_25cm.txt": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Sc-Cd-RAFM-1_25cm.txt": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Sc-RAFM-1_25cm.txt": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Ti-RAFM-1_25cm.txt": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Ti-RAFM-1a_25cm.txt": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+    "C:\\Users\\joshu\\Downloads\\flux_wires\\Ti-RAFM-1b_25cm.txt": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-A_24hrEOI.txt": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-A_300sEOI.txt": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-A_4dEOI.txt": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_24hrEOI.txt": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_2hrEOI.txt": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_300sEOI.txt": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-B_4dEOI.txt": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_24hrEOI.txt": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_2hrEOI.txt": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_300sEOI.txt": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-C_4dEOI.txt": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_24hrEOI.txt": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_2hrEOI.txt": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_300sEOI.txt": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM3-N_4dEOI.txt": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-A_15dEOI.txt": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-B_15dEOI.txt": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-C_15dEOI.txt": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+    "C:\\Users\\joshu\\Downloads\\spectra\\Gamma Spec\\Analysis\\RAFM Samples\\RAFM4-N_15dEOI.txt": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc"
+  },
+  "efficiency_email": {
+    "sender": "Robert Agasie",
+    "date": "2025-04-30",
+    "subject": "Spectra and Efficiency Curve",
+    "export_profile_identifier": "N:\\EffCalCurrent\\South sm vl 0.5ml 25cm.ANH"
+  },
+  "source_relationship": "QG-derived response, ROI rows and chronology share source reports; not independent evidence.",
+  "primary_references": [
+    {
+      "url": "https://ludlums.com/images/product_manuals/QTMmanual.pdf",
+      "title": "PGT Quantum Software User Manual v4.04; context for report fields, not proof of installed 2025 version"
+    },
+    {
+      "url": "https://www.nist.gov/publications/using-monte-carlo-methods-estimate-efficiencies-gamma-ray-emitters-complex-geometries",
+      "title": "NIST: Monte Carlo efficiency in complex geometries; motivation for measured-anchor geometry transfer"
+    }
+  ]
+}
