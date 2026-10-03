@@ -102,6 +102,8 @@ def _build_flux_wire_nuclides() -> Dict[str, Dict[str, Any]]:
             "half_life_s": float(entry["half_life_seconds"]),
             "parent_element": meta.parent_element,
             "reaction": meta.reaction,
+            "reactions_by_element": dict(meta.reactions_by_element),
+            "reaction_ids_by_element": dict(meta.reaction_ids_by_element),
             "gamma_lines": _select_authoritative_lines(
                 isotope, list(meta.target_lines_keV)
             ),

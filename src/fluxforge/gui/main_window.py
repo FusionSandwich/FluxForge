@@ -43,6 +43,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import available_renderer_status
     from fluxforge.gui.dialogs import (
         CalibrationWorkspaceDialog,
+        CovarianceDialog,
+        IrradiationHistoryDialog,
+        ReactionRateDialog,
         PuIsotopicsDialog,
         QAHistoryDialog,
         ReportExportDialog,
@@ -183,6 +186,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._calibration_dialog = None
             self._unfolding_dialog = None
             self._qa_history_dialog = None
+            self._covariance_dialog = None
+            self._irradiation_history_dialog = None
+            self._reaction_rate_dialog = None
+            self._irradiation_segments = ()
             self._report_dialog = None
             self._pu_isotopics_dialog = None
             self._standards_review_dialog = None
@@ -499,6 +506,30 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 object_name="OpenQaHistoryAction",
             )
             tools_menu.addAction(self._qa_history_action)
+            tools_menu.addAction(
+                self._action(
+                    "Covariance and Correlation",
+                    enabled=True,
+                    handler=self._open_covariance_view,
+                    object_name="OpenCovarianceAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Irradiation History",
+                    enabled=True,
+                    handler=self._open_irradiation_history,
+                    object_name="OpenIrradiationHistoryAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Activity to Reaction Rate",
+                    enabled=True,
+                    handler=self._open_reaction_rate,
+                    object_name="OpenReactionRateAction",
+                )
+            )
             if self.developer_tools:
                 tools_menu.addAction(
                     self._unavailable_action(
@@ -1566,6 +1597,39 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             self._qa_history_dialog = QAHistoryDialog(self.qa_monitor, parent=self)
             self._qa_history_dialog.show()
+
+        def _open_covariance_view(self) -> None:
+            if self._covariance_dialog is None:
+                self._covariance_dialog = CovarianceDialog(parent=self)
+            self._covariance_dialog.show()
+            self._covariance_dialog.raise_()
+            self._covariance_dialog.activateWindow()
+
+        def _open_irradiation_history(self) -> None:
+            if self._irradiation_history_dialog is None:
+                self._irradiation_history_dialog = IrradiationHistoryDialog(parent=self)
+                self._irradiation_history_dialog.historyChanged.connect(
+                    self._set_irradiation_history
+                )
+            self._irradiation_history_dialog.show()
+            self._irradiation_history_dialog.raise_()
+            self._irradiation_history_dialog.activateWindow()
+
+        def _set_irradiation_history(self, segments) -> None:
+            self._irradiation_segments = segments
+            if self._reaction_rate_dialog is not None:
+                self._reaction_rate_dialog._mark_pending()
+
+        def _open_reaction_rate(self) -> None:
+            if self._reaction_rate_dialog is None:
+                self._reaction_rate_dialog = ReactionRateDialog(
+                    history_provider=lambda: self._irradiation_segments,
+                    activity_provider=lambda: self.analysis_workspace.state.activity_results,
+                    parent=self,
+                )
+            self._reaction_rate_dialog.show()
+            self._reaction_rate_dialog.raise_()
+            self._reaction_rate_dialog.activateWindow()
 
         def _open_dashboard_tab(self) -> None:
             if hasattr(self, "central_tabs"):

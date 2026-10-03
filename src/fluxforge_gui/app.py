@@ -960,12 +960,12 @@ class FluxForgeGui(UiBuilderMixin, CommandsMixin):
                 if entry is None:
                     continue
                 haystack = (
-                    f"{entry.isotope} {entry.parent_element} {entry.reaction}".lower()
+                    f"{entry.isotope} {entry.reactions_by_element}".lower()
                 )
                 if target_filter and target_filter not in haystack:
                     continue
                 lines.append(
-                    f"{entry.isotope}: parent={entry.parent_element} | reaction={entry.reaction} | lines={', '.join(f'{value:.1f}' for value in entry.target_lines_keV)}"
+                    f"{entry.isotope}: reactions={'; '.join(f'{element}: {reaction}' for element, reaction in entry.reactions_by_element.items())} | lines={', '.join(f'{value:.1f}' for value in entry.target_lines_keV)}"
                 )
         else:
             lines.append(

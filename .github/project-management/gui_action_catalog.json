@@ -5,6 +5,21 @@
   "policy": "Every production-owned QAction, interactive control, fixed tab, and renderer intent must have a stable ID and a behavioral test suite. Qt-internal chrome and read-only output widgets are excluded.",
   "action_groups": [
     {
+      "surface": "main-window.reaction-rate",
+      "test_ids": ["tests/test_reaction_rate_workspace_qt.py"],
+      "object_names": ["OpenReactionRateAction"]
+    },
+    {
+      "surface": "main-window.irradiation-history",
+      "test_ids": ["tests/test_irradiation_history_workspace_qt.py"],
+      "object_names": ["OpenIrradiationHistoryAction"]
+    },
+    {
+      "surface": "main-window.covariance",
+      "test_ids": ["tests/test_covariance_workspace_qt.py"],
+      "object_names": ["OpenCovarianceAction"]
+    },
+    {
       "surface": "main-window.menus",
       "test_ids": ["tests/test_modern_gui_shell.py"],
       "object_names": ["OpenAnalysisMenuAction", "OpenCalibrationMenuAction", "OpenEditMenuAction", "OpenFileMenuAction", "OpenHelpMenuAction", "OpenToolsMenuAction", "OpenViewMenuAction", "OpenWorkspacesMenuAction"]
@@ -86,6 +101,21 @@
     }
   ],
   "control_surfaces": [
+    {
+      "surface": "reaction-rate-dialog",
+      "test_ids": ["tests/test_reaction_rate_workspace_qt.py"],
+      "object_names": ["ReactionRateInputTable", "ReactionRateAddButton", "ReactionRateRemoveButton", "ReactionRateFoundButton", "ReactionRateConvertButton", "ReactionRateExportButton"]
+    },
+    {
+      "surface": "irradiation-history-dialog",
+      "test_ids": ["tests/test_irradiation_history_workspace_qt.py"],
+      "object_names": ["IrradiationHistoryTable", "IrradiationAddButton", "IrradiationRemoveButton", "IrradiationLoadButton", "IrradiationExportButton", "IrradiationApplyButton"]
+    },
+    {
+      "surface": "covariance-dialog",
+      "test_ids": ["tests/test_covariance_workspace_qt.py"],
+      "object_names": ["CovarianceLoadButton", "CovarianceViewCombo", "CovarianceExportButton"]
+    },
     {
       "surface": "activity-results",
       "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_calibration_workspace_qt.py"],
