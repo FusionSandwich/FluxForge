@@ -1,0 +1,323 @@
+ppt/notesSlides/notesSlide1.xml
+
+ppt/notesSlides/notesSlide2.xml
+
+ppt/notesSlides/notesSlide3.xml
+
+ppt/notesSlides/notesSlide4.xml
+
+ppt/notesSlides/notesSlide5.xml
+
+ppt/notesSlides/notesSlide6.xml
+
+ppt/notesSlides/notesSlide7.xml
+
+ppt/notesSlides/notesSlide8.xml
+
+ppt/notesSlides/notesSlide9.xml
+
+ppt/notesSlides/notesSlide10.xml
+
+ppt/notesSlides/notesSlide11.xml
+
+ppt/notesSlides/notesSlide12.xml
+
+ppt/notesSlides/notesSlide13.xml
+
+ppt/notesSlides/notesSlide14.xml
+
+ppt/notesSlides/notesSlide15.xml
+
+ppt/notesSlides/notesSlide16.xml
+
+ppt/notesSlides/notesSlide17.xml
+
+ppt/notesSlides/notesSlide18.xml
+
+ppt/notesSlides/notesSlide19.xml
+
+ppt/notesSlides/notesSlide20.xml
+
+ppt/notesSlides/notesSlide21.xml
+
+ppt/slides/slide1.xml
+UW HPGe Detector Information and Modeling
+‹#›
+Tim Bohm
+Department of Nuclear Engineering and Engineering Physics
+
+ppt/slides/slide2.xml
+Overview
+‹#›
+Introduction
+Schematic of typical HPGe detector 
+Model (simple based on journal paper)
+Results
+Bare point source
+Bulletizing impact
+Addition of lead vault around detector
+Addition of dead layers
+UW Specific Model
+Future Work
+
+
+ppt/slides/slide3.xml
+Introduction: UW-HPGe
+‹#›
+Need dimensions, materials for detector and housing to model
+
+
+Plastic Cover ?
+Beryllium Window
+Crystal
+Outside Contact Layer (dead)
+Aluminum Housing
+Crystal Holder
+Bulletizing
+Radius
+Contact Pin
+Hole 
+Contact Layer (dead)
+Central Hole Bottom 
+Radius
+Figure adapted from Conti2013
+Each detector is slightly different. Waiting on these for our detector…expected soon.
+ppt/slides/slide4.xml
+Simple Model
+‹#›
+Bare cylindrical Ge crystal (Carson2010)
+Central Hole modeled
+Bare point, monoenergetic, isotropic photon source
+Source to crystal front face 10.84 cm
+MCNP-6.2 settings:
+Transport photons and electrons
+1 keV cutoff for electron 
+transport
+ 
+XS libraries: eprdata14, el03
+F8:p,e tally on detector volume
+Energy deposition with pulse height energy bins
+Quick plots with MCNP tally plotter
+
+ppt/slides/slide5.xml
+Results (1.2495 MeV bare point source)
+‹#›
+Bare Ge crystal
+
+
+Pair production
+Double escape peak
+Ephot-2*0.511 MeV
+Pair production
+Single
+ escape peak
+Ephot-1*0.511 MeV
+Compton edge Ephot-Ephot/(1+2Ephot/0.511)
+Characteristic/Fluor. Escape peak
+Ephot-Ekshell(Ge)
+Ephot-0.011
+Full energy peak (photopeak)
+Ephot
+Lshell? .0011
+ppt/slides/slide6.xml
+Results (0.0295 MeV bare point source)
+‹#›
+Bare Ge crystal
+
+
+Full energy peak (photopeak)
+Ephot
+Characteristic/Fluor. Escape peak
+Ephot-Ekshell(Ge)
+Ephot-0.011
+Compton edge Ephot-Ephot/(1+2Ephot/0.511)
+ppt/slides/slide7.xml
+Ge crystal bulletizing study
+‹#›
+Bare Ge crystal (Case 1-4)
+
+
+Add copper contact pin (Case 5)
+
+
+ppt/slides/slide8.xml
+Results 
+(1.2495 MeV bare point source)
+‹#›
+F18 total (counts per source particle)
+Approximate geometric efficiency:
+~ (front surface area of detector)/(4pi (source to 
+detector
+ distance)
+2
+)
+=pi*(4.45cm)
+2
+/(4pi (20.0-9.16cm)
+2
+)
+=4.21e-02
+
+
+ppt/slides/slide9.xml
+Model update: add lead safe
+‹#›
+Roughly based on dimensions from pictures of UW detector system
+Slows calculation significantly due to having large amount of electron 
+transport
+ in lead walls
+Implement electron low energy cutoff in Pb walls (elpt card), range for 20 keV electron in Pb is 0.7e-6 m
+
+
+ppt/slides/slide10.xml
+Results (1.2495 MeV bare point source, Pb walls, Ecut Pb=.010 MeV)
+‹#›
+4 new peaks
+
+
+Compton backscatter “hump” from Pb walls Ephot/(1+2Ephot/0.511)
+Characteristic/Fluor. Escape peak
+Ekshell(Pb)-Ekshell(Ge)
+0.088-0.011
+Annihilation photons from pair production in Pb walls 0.511 MeV
+Pb Kshell f
+ull energy peak (photopeak)
+0.088 MeV
+ppt/slides/slide11.xml
+Model update: add contact (dead) layers
+‹#›
+Add 2 dead layers (outer radial layer and base layer)
+Use 0.07 cm thickness (based on Carson2010)
+1 MeV electron has range of 0.1 cm in Ge
+Expect low impact due to small volume
+
+
+ppt/slides/slide12.xml
+UW-HPGE (dimensions)
+‹#›
+ppt/slides/slide13.xml
+Results (1.2495 MeV bare point source)
+‹#›
+F18 total (counts per source particle)
+Note: UW detector much smaller in radius and length than Carson2010
+UW detector intercepts fewer photons
+UW detector has larger source to detector distance (in these models)
+Volume 
+176.992 vs. 562.38 cm
+3
+Approximate geometric efficiency:
+~ (front surface area of detector)/(4pi (source to detector distance)
+2
+)
+=pi*(3.00cm)
+2
+/(4pi (20.0-6.45cm)
+2
+)
+=1.225e-02      
+(vs. 4.21e-02 for Carson2010)
+
+
+ppt/slides/slide14.xml
+Model update: add lead safe
+‹#›
+Roughly based on dimensions from pictures of UW detector system
+Will get actual dimensions soon
+Slows calculation significantly due to having large amount of electron transport in lead walls
+Implement electron low energy cutoff in Pb walls (elpt card), range for 20 keV electron in Pb is 0.7e-6 m
+
+
+ppt/slides/slide15.xml
+Model update: add contact (dead) layers
+‹#›
+Add 3 dead layers 
+outer radial layer, base layer, front layer
+Use 0.07 cm thickness for each 
+based on: manual, Carson2010, guess
+0.03 MeV photon has mfp of 0.014 cm in Ge
+1 MeV electron has range of 0.1 cm in Ge
+Expect low impact at 
+higher photon energies and 
+due to small volume of layer 
+Expect bigger impact at low photon energies (and especially the front layer)
+
+
+ppt/slides/slide16.xml
+Model update: add crystal holder/mount cup
+‹#›
+Add 3 parts: 
+Aluminum base, 
+Al outer radial layer, very thin mylar front layer
+Use XX cm thickness (proprietary?)
+based on: manual
+0.02 MeV photon has mfp of 0.1 cm in Al
+0.05 MeV photon has mfp of 1.0 cm in Al
+Expect no impact at 
+higher photon energies
+See little change to f8:p,e Total tallies at 0.0295 MeV and 1.2495 MeV
+See some aluminum K shell fluorescence in event log (but hard to see in spectra plot due to other fluorescence nearby Ge L shell, Pb M shell) 
+
+
+ppt/slides/slide17.xml
+Model update: add aluminum housing/end cap
+‹#›
+Add 2 parts: 
+Aluminum outer radial layer, aluminum front layer
+Use XX cm thickness (proprietary? from manual)
+0.02 MeV photon has mfp of 0.1 cm in Al
+0.03 MeV photon has mfp of 0.33 cm in Al
+0.05 MeV photon has mfp of 1.0 cm in Al
+See some aluminum K shell fluorescence in event log (but hard to see in spectra plot due to other fluorescence nearby Ge L shell, Pb M shell)
+Expect some impact at low photon energies but little impact at 
+higher photon energies
+
+
+F8:p,e 
+Full energy peak (photopeak)
+F8:p,e total
+ppt/slides/slide18.xml
+Determine detector response for a range of photon source energies:
+0.020-2.0, (3.0) MeV
+ 
+Determine detector response for a few source to detector end cap distances:
+10-30 cm
+
+
+Results of 
+parametric study: Source Energy
+‹#›
+Photon mfp in aluminum
+F8:p,e total
+ppt/slides/slide19.xml
+Assume radial dead layer (0.07 cm)
+
+
+Results of parametric study: (vs. Geometric Efficiency)
+‹#›
+F8:p,e total
+
+Source to end cap distance
+ppt/slides/slide20.xml
+Future Work
+‹#›
+*
+Model details of specimen: geometry, encapsulation, orientation, actual decay photon energies, etc.
+*Add other objects in lead vault, lab room walls (if count outside lead vault)?
+Add more details to the UW detector model
+dead layer around contact pin
+Explore impact of electron low energy cutoff in Ge (speed vs. physics)
+10 keV electron has a range of 0.9e-6 m in Ge
+
+
+*=expected to have biggest impact
+ppt/slides/slide21.xml
+References
+‹#›
+Monte Carlo modeling related papers
+Conti2013 
+https://doi.org/10.1016/j.pnucene.2013.03.003
+Ahl2024 Corey Ahl, Madison Andrews, Cameron Bates, Tyler Borgwardt, Krista Meierbachtol, Surafel Woldegiorgis, Eric Lukosi, “High-purity germanium semiconductor modeling in the detector response function toolkit”, Nuclear Instruments and Methods in Physics Research Section A: Accelerators, Spectrometers, Detectors and Associated Equipment, Volume 1063,2024, 
+https://doi.org/10.1016/j.nima.2024.169313
+Carson2010 S. Carson et al., “Ratio of germanium detector peak efficiencies at photon energies of 4.4 and 11.7 MeV: Experiment versus simulation”,  Nuclear Instruments and Methods in Physics Research A 618 190–198, 2010. doi:10.1016/j.nima.2010.02.128
+Uyar2021 Uyar et al., “Investigation of the effect of copper contact pin on efficiency in HPGe detectors using Monte Carlo method”, JINST 16 T11003, 2021. 
+https://doi.org/10.1088/1748-0221/16/11/T11003
