@@ -5,6 +5,7 @@ import warnings
 
 import numpy as np
 import pytest
+import numpy as np
 
 from fluxforge.analysis.flux_wire_analysis import (
     _snip_background_from_signed_counts,
@@ -21,6 +22,8 @@ from fluxforge.analysis.spectrum_math import (
 from fluxforge.data.rafm_profile import list_rafm_profiles, load_rafm_profile
 from fluxforge.io.flux_wire import read_raw_asc
 from fluxforge.io.genie import read_genie_spectrum
+from fluxforge.io.spe import GammaSpectrum
+from fluxforge.examples.rafm_workflow import run_rafm_validation
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -53,6 +56,16 @@ def test_signed_snip_offsets_working_copy_and_preserves_signed_input():
     assert background == pytest.approx(
         np.maximum(snip_background(original + offset, n_iterations=2) - offset, 0.0)
     )
+
+
+@pytest.mark.parametrize("live,real", [(0.0, 1.0), (float("nan"), 1.0), (2.0, 1.0)])
+def test_rafm_rejects_invalid_background_override_before_writing(tmp_path, live, real):
+    background = GammaSpectrum(counts=np.array([1.0]), live_time=live, real_time=real)
+    output = tmp_path / "must_not_exist"
+    with pytest.raises(ValueError, match="Background override requires"):
+        run_rafm_validation(tmp_path, results_root=output,
+                            background_spectrum_override=background)
+    assert not output.exists()
 
 
 @pytest.mark.skipif(

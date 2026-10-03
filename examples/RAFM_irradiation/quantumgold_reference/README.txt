@@ -122,3 +122,14 @@ isolated Python interpreter from an unrelated folder, and challenge wrong paths,
 changed/missing source bytes, duplicate IDs, wrong source reports and altered
 cohort/routing/timing labels. The full replay is also exercised from a Git archive
 so the test covers committed bytes rather than only this Windows working tree.
+
+Opt-in South background sensitivity
+Use --raw-sample Co-Cd-RAFM-1 --background-mode south_native with a fresh
+--output directory to compare the source-bound native South background against
+the historical North input. The receipt retains source identity, live/real
+time, energy polynomial and detector. The South count starts October 3, 2025,
+after the August campaign; temporal applicability and QG background settings
+remain unresolved. This is a conditional sensitivity scenario, not a default
+calibration or source qualification. Unequal grids use the current engine's
+histogram overlap and full covariance propagation. Earlier background studies
+on the portable historical engine are separately scoped evidence.
