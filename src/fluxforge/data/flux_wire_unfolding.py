@@ -6,6 +6,8 @@ from importlib import resources
 import json
 from typing import Any, Dict, Optional, Tuple
 
+from fluxforge.data.flux_wire_catalog import load_flux_wire_catalog
+
 
 def _load_payload() -> Dict[str, Any]:
     with (
@@ -21,7 +23,9 @@ def _load_payload() -> Dict[str, Any]:
 
 def load_flux_wire_unfolding_defaults() -> Dict[str, Any]:
     """Load the bundled flux-wire unfolding defaults payload."""
-    return _load_payload()
+    payload = _load_payload()
+    payload["product_reactions"] = load_flux_wire_product_reactions()
+    return payload
 
 
 def load_flux_wire_sample_defaults() -> Dict[str, Dict[str, Any]]:
@@ -35,8 +39,12 @@ def load_flux_wire_reaction_defaults() -> Dict[str, Dict[str, Any]]:
 
 
 def load_flux_wire_product_reactions() -> Dict[str, Dict[str, str]]:
-    """Return bundled element/isotope -> reaction-id mappings."""
-    return dict(_load_payload().get("product_reactions", {}))
+    """Return element/product reactions from the shared spectroscopy catalog."""
+    mappings: Dict[str, Dict[str, str]] = {}
+    for isotope, entry in load_flux_wire_catalog().items():
+        for element, reaction_id in entry.reaction_ids_by_element.items():
+            mappings.setdefault(element, {})[isotope] = reaction_id
+    return mappings
 
 
 def get_flux_wire_reaction_id(
@@ -45,21 +53,28 @@ def get_flux_wire_reaction_id(
     """Resolve the default reaction id for a product isotope in one wire context."""
     product_reactions = load_flux_wire_product_reactions()
     if sample_element:
-        mapping = product_reactions.get(sample_element, {})
-        if isotope in mapping:
-            return str(mapping[isotope])
-    for mapping in product_reactions.values():
-        if isotope in mapping:
-            return str(mapping[isotope])
+        mapping = product_reactions.get(sample_element.strip().capitalize(), {})
+        return str(mapping.get(isotope, f"Unknown({isotope})"))
+    reactions = {
+        mapping[isotope] for mapping in product_reactions.values() if isotope in mapping
+    }
+    if len(reactions) > 1:
+        raise ValueError(f"Wire element is required to resolve {isotope}")
+    if reactions:
+        return str(next(iter(reactions)))
     return f"Unknown({isotope})"
 
 
 def get_flux_wire_isotope_fraction(reaction_id: str, element: str) -> float:
     """Return the bundled target-isotope fraction for a reaction in one wire element."""
     sample_defaults = load_flux_wire_sample_defaults()
-    element_defaults = sample_defaults.get(element, {})
+    element_defaults = sample_defaults.get(element.strip().capitalize(), {})
     fractions = element_defaults.get("reaction_target_fractions", {})
-    return float(fractions.get(reaction_id, 1.0))
+    if reaction_id not in fractions:
+        raise ValueError(
+            f"No target-isotope fraction for {reaction_id!r} in {element!r}"
+        )
+    return float(fractions[reaction_id])
 
 
 def get_flux_wire_reaction_cross_section_defaults() -> Dict[str, Dict[str, float]]:

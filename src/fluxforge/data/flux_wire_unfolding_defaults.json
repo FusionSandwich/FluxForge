@@ -3,7 +3,8 @@
     "description": "Bundled sample-property and simplified reaction metadata for FluxForge flux-wire unfolding defaults.",
     "notes": [
       "These are committed defaults used by the current simplified flux-wire unfolding path.",
-      "Example-specific sample masses should eventually be sourced from RAFM metadata where available."
+      "Example-specific sample masses should eventually be sourced from RAFM metadata where available.",
+      "Product/reaction mappings are resolved from flux_wire_catalog.json by the public loader."
     ]
   },
   "sample_defaults": {
@@ -62,7 +63,8 @@
       "reaction_target_fractions": {
         "Ti-46(n,p)Sc-46": 0.0825,
         "Ti-47(n,p)Sc-47": 0.0744,
-        "Ti-48(n,p)Sc-48": 0.7372
+        "Ti-48(n,p)Sc-48": 0.7372,
+        "Ti-50(n,g)Ti-51": 0.0518
       }
     },
     "Ni": {
@@ -88,34 +90,6 @@
         "Fe-54(n,p)Mn-54": 0.0585,
         "Fe-58(n,g)Fe-59": 0.00282
       }
-    }
-  },
-  "product_reactions": {
-    "Co": {
-      "Co60": "Co-59(n,g)Co-60"
-    },
-    "Cu": {
-      "Cu64": "Cu-63(n,g)Cu-64"
-    },
-    "Sc": {
-      "Sc46": "Sc-45(n,g)Sc-46"
-    },
-    "In": {
-      "In114m": "In-113(n,g)In-114m",
-      "In115m": "In-115(n,n')In-115m"
-    },
-    "Ti": {
-      "Sc46": "Ti-46(n,p)Sc-46",
-      "Sc47": "Ti-47(n,p)Sc-47",
-      "Sc48": "Ti-48(n,p)Sc-48"
-    },
-    "Ni": {
-      "Co58": "Ni-58(n,p)Co-58",
-      "Ni57": "Ni-58(n,2n)Ni-57"
-    },
-    "Fe": {
-      "Fe59": "Fe-58(n,g)Fe-59",
-      "Mn54": "Fe-54(n,p)Mn-54"
     }
   },
   "reaction_defaults": {
