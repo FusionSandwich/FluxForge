@@ -59,9 +59,12 @@ def test_stage0_templates_and_adrs_exist():
     assert expected_templates.issubset({path.name for path in template_dir.iterdir()})
 
     adr_files = sorted(path for path in adr_dir.iterdir() if path.name.startswith("ADR-"))
-    assert len(adr_files) == 7
+    assert {f"ADR-{number:03d}" for number in range(1, 9)}.issubset(
+        {path.name[:7] for path in adr_files}
+    )
     for path in adr_files:
-        assert "**Status:** Accepted" in path.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8")
+        assert "**Status:** Accepted" in text or "**Status:** Superseded by ADR-" in text
 
 
 def test_gui_scaffold_has_six_dock_zones():

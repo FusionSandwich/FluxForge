@@ -18,7 +18,6 @@ MODULES = {
     "yaml": "PyYAML",
     "h5py": "h5py",
     "lxml.etree": "lxml",
-    "tkinter": None,
     "PySide6.QtWidgets": "PySide6",
     "pyqtgraph": "pyqtgraph",
     "tensorflow": "tensorflow",

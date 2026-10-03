@@ -29,7 +29,7 @@ supported.
 
 ## Consequences
 
-- Existing GUI and analytical surfaces remain until parity exists.
+- Existing analytical capabilities remain available. Explicitly approved retirement of a GUI shell may preserve it as source-only history, as recorded in ADR-008.
 - Registry, mode, and reporting designs must preserve method provenance.
 - PR review must check whether new work removes an existing valid path.
 

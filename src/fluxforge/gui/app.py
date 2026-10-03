@@ -31,7 +31,7 @@ def describe_gui_scaffold() -> dict[str, object]:
         "qt_available": QT_AVAILABLE,
         "renderer_backends": list(available_renderer_status()),
         "modern_entrypoint": "fluxforge-gui",
-        "legacy_entrypoint": "fluxforge-gui-legacy",
+        "archived_gui_source": "archive/legacy_gui",
     }
 
 

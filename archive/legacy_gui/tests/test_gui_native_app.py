@@ -10,7 +10,7 @@ import sys
 import pytest
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _run_gui_probe(
@@ -21,7 +21,7 @@ def _run_gui_probe(
     if env_overrides:
         env.update(env_overrides)
 
-    command = [sys.executable, str(REPO_ROOT / "tests" / "gui_probe.py"), *args]
+    command = [sys.executable, str(REPO_ROOT / "archive/legacy_gui/tests/gui_probe.py"), *args]
     if sys.platform != "win32" and not env.get("DISPLAY"):
         xvfb_run = shutil.which("xvfb-run")
         if xvfb_run is None:
