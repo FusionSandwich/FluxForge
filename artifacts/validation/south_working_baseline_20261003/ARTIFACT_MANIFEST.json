@@ -1,6 +1,11 @@
 {
   "files": [
     {
+      "path": ".gitattributes",
+      "bytes": 83,
+      "sha256": "3876b064ca63d31951e66c09d1dcaf11df151fb6c17d8ded72b066c6c2169cca"
+    },
+    {
       "path": "build_baseline.py",
       "bytes": 12453,
       "sha256": "471ffff7240509c52cd74fa8222fae027fab5db830dbbb4ce72c355ae68903fb"
@@ -9,6 +14,11 @@
       "path": "BUILD_RECEIPT.json",
       "bytes": 798,
       "sha256": "a24542edb03cc383cef872b89d25ec2c474c8bb3aafcaf6c4e584ca89d22803d"
+    },
+    {
+      "path": "GIT_BYTE_VERIFICATION.json",
+      "bytes": 701,
+      "sha256": "b9dbf8a2ddfb9805bd2ed4e887456b772987a7f4101ac3420edc52d1375e0722"
     },
     {
       "path": "INDEPENDENT_ACCEPTANCE.json",
@@ -151,5 +161,5 @@
       "sha256": "2247b0624e5bbf2f0fbd2a9dc986d1c08e7c537065bf11a87fd4a4f0a4cb3687"
     }
   ],
-  "bytes": 1992014
+  "bytes": 1992798
 }
