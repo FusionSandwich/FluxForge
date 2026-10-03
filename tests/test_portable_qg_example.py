@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = Path('examples/RAFM_irradiation/run_portable_qg_example.py')
@@ -44,6 +45,41 @@ class PortableQGExampleTests(unittest.TestCase):
         self.assertEqual(receipt['required_external_data_paths'],[])
         self.assertEqual(receipt['supplemental_audit']['older_report_ROI_rows'],12)
         self.assertEqual(receipt['supplemental_audit']['older_report_summaries'],6)
+        self.assertEqual(receipt['dataset_identity']['status'],'SOURCE_BOUND')
+        self.assertEqual(receipt['dataset_identity']['source_manifest_sha256'],
+                         driver.hashlib.sha256((self.copy/MANIFEST).read_bytes()).hexdigest())
+        self.assertEqual(receipt['engine_identity']['status'],'UNKNOWN')
+        self.assertIsNone(receipt['engine_identity']['source_sha256'])
+
+    def test_engine_content_identity_survives_relocation_and_exposes_tampering(self):
+        roots = [Path(self.tmp.name)/name for name in ('engine A','engine B')]
+        for root in roots:
+            for name, content in [('pyproject.toml','[project]\nname="fluxforge"\n'),
+                                  (str(SCRIPT),'print("driver")\n'),
+                                  ('src/fluxforge/analysis.py','VALUE = 1\n')]:
+                path = root/name
+                path.parent.mkdir(parents=True,exist_ok=True)
+                path.write_text(content,encoding='utf-8')
+        first, relocated = [driver.engine_identity(root) for root in roots]
+        self.assertEqual(first['status'],'IDENTIFIED_BY_CONTENT')
+        self.assertEqual(first['source_sha256'],relocated['source_sha256'])
+        self.assertIsNone(first['revision'])
+        (roots[1]/'src/fluxforge/analysis.py').write_text('VALUE = 2\n',encoding='utf-8')
+        changed = driver.engine_identity(roots[1])
+        self.assertNotEqual(first['source_sha256'],changed['source_sha256'])
+
+    def test_declared_core_runtime_mismatch_is_explicit(self):
+        root = Path(self.tmp.name)/'compatibility fixture'
+        root.mkdir()
+        (root/'pyproject.toml').write_text(
+            '[project]\nrequires-python=">=3.11,<3.13"\n'
+            'dependencies=["numpy>=1.26,<2.0", "scipy>=1.11"]\n',encoding='utf-8')
+        with patch.object(driver.distribution_metadata,'version',
+                          side_effect=lambda name: {'numpy':'2.5.1','scipy':'1.18.0'}[name]):
+            receipt = driver.runtime_compatibility(root)
+        self.assertEqual(receipt['status'],'INCOMPATIBLE')
+        self.assertEqual(receipt['packages']['numpy']['status'],'INCOMPATIBLE')
+        self.assertEqual(receipt['packages']['scipy']['status'],'COMPATIBLE')
 
     def check_bad_manifest(self, changed):
         tmp_manifest = Path(self.tmp.name)/'bad_manifest.json'
