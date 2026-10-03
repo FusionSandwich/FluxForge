@@ -46,6 +46,8 @@ def _build_target(
         str(SRC_DIR),
         "--add-data",
         _add_data_arg(SRC_DIR / "fluxforge" / "data", "fluxforge/data"),
+        "--collect-data",
+        "fluxforge",
         str(launcher),
     ]
     if windowed:

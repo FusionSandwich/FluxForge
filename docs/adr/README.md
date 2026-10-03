@@ -48,3 +48,4 @@ alternatives considered, and consequences.
 - ADR-005: Three-mode GUI and standards locking
 - ADR-006: HAL-first architecture
 - ADR-007: Offline-first delivery
+- ADR-008: Single supported Qt desktop GUI and Tk source archive

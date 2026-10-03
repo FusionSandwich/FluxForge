@@ -5,6 +5,11 @@
   "policy": "Every production-owned QAction, interactive control, fixed tab, and renderer intent must have a stable ID and a behavioral test suite. Qt-internal chrome and read-only output widgets are excluded.",
   "action_groups": [
     {
+      "surface": "main-window.analysis-workflow",
+      "test_ids": ["tests/test_gui_consolidation.py"],
+      "object_names": ["ReviewPeaksAction", "ToggleAnalysisWorkflowToolbarAction"]
+    },
+    {
       "surface": "main-window.irradiation-history",
       "test_ids": ["tests/test_irradiation_history_workspace_qt.py"],
       "object_names": ["OpenIrradiationHistoryAction"]
@@ -21,7 +26,7 @@
     },
     {
       "surface": "main-window.files-and-examples",
-      "test_ids": ["tests/test_production_gui_mode.py", "tests/test_gui_app.py", "tests/test_workspace_session_qt.py"],
+      "test_ids": ["tests/test_production_gui_mode.py", "tests/test_workspace_session_qt.py"],
       "object_names": ["OpenExampleAction", "OpenSessionAction", "OpenSpectrumAction", "SaveSessionAction", "SaveSessionAsAction"]
     },
     {

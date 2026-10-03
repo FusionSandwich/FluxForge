@@ -201,12 +201,12 @@ following overlays were adopted additively and do not replace that map.
 ## GUI Direction
 
 - The Qt redesign under `src/fluxforge/gui/` is now the primary GUI implementation path.
-- The prior Tk application under `src/fluxforge_gui/` is intentionally retained as a
-  legacy/archive fallback while the redesign reaches feature parity.
+- The prior Tk application is source-only under `archive/legacy_gui/` as of
+  2026-10-03. Qt is the sole shipped GUI; see ADR-008.
 - Older planning references are archived under
   `docs/archive/planning_snapshot_2026-04-06/`.
-- CI keeps lightweight modern-shell checks in the regular push path and limits the
-  old desktop automation flow to manual dispatch.
+- CI runs the Qt shell and workflow regressions on Windows and Linux. The old
+  desktop automation flow is archived and excluded from active CI.
 
 ## Verification
 
