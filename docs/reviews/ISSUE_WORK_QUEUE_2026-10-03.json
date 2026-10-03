@@ -7,7 +7,7 @@
     "excluded": [
       {
         "chat": "Complete analysis issues",
-        "branch": "codex/activation-uncertainty-budget at e794af6 (completed by owner; avoid reimplementation)",
+        "branch": "codex/activation-uncertainty-budget; owner actively auditing peak identification and QG zero-count rows",
         "scope": "activation uncertainty, unfolding, peak detection and material counting"
       },
       {
@@ -218,8 +218,8 @@
       "number": 45,
       "title": "Issue: GUI Pipeline: Irradiation History Inputs",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/45",
-      "status": "queued",
-      "notes": ""
+      "status": "implemented_pending_integration",
+      "notes": "Validated GUI history editor; draft PR 217."
     },
     {
       "number": 46,
@@ -267,22 +267,22 @@
       "number": 52,
       "title": "Issue: Implementation: ASTM E261 Radioactivation Rate Math & Uncertainty Prop",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/52",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 53,
       "title": "Issue: Testing: E261 Fraction Uncertainty & E844 Schema Rules",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/53",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 54,
       "title": "Issue: Example: End-to-End E844 Sensor Set to E261 Reaction Rate Matrix",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/54",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 55,
@@ -344,15 +344,15 @@
       "number": 63,
       "title": "Keep Main RAFM Workflow Automatic",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/63",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 64,
       "title": "Generic flux-wire comparison-window scoring",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/64",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 65,
@@ -365,15 +365,15 @@
       "number": 66,
       "title": "Generic RAFM count-parity background model",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/66",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 67,
       "title": "Issue: AA1.12 - Analysis report bundle + checklist export",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/67",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 68,
@@ -449,22 +449,22 @@
       "number": 78,
       "title": "Issue: B1.10 - Multicomponent deconvolution",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/78",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 79,
       "title": "Issue: B1.11 - Library-directed multiplet seeding",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/79",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 80,
       "title": "Issue: B1.12 - Linear continuum background",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/80",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 81,
@@ -491,8 +491,8 @@
       "number": 84,
       "title": "Issue: B1.9 - Dynamic ROI sizing",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/84",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 85,
@@ -540,8 +540,8 @@
       "number": 91,
       "title": "Issue: C14 - Expanded peak-finding algorithms",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/91",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 92,
@@ -888,7 +888,7 @@
     },
     {
       "number": 141,
-      "title": "ADR: renderer abstraction \u00e2\u20ac\u201d PyQtGraph first, Vispy optional",
+      "title": "ADR: renderer abstraction â€” PyQtGraph first, Vispy optional",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/141",
       "status": "queued",
       "notes": ""
@@ -902,14 +902,14 @@
     },
     {
       "number": 143,
-      "title": "ADR: plugin/registry architecture \u00e2\u20ac\u201d fitters, unfolding, calibration, ID",
+      "title": "ADR: plugin/registry architecture â€” fitters, unfolding, calibration, ID",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/143",
       "status": "queued",
       "notes": ""
     },
     {
       "number": 144,
-      "title": "Scaffold `MainWindow` with dockable zones A\u00e2\u20ac\u201cF",
+      "title": "Scaffold `MainWindow` with dockable zones Aâ€“F",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/144",
       "status": "queued",
       "notes": ""
@@ -1072,8 +1072,8 @@
       "number": 167,
       "title": "Implement peak-search, background, and ROI parity",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/167",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 168,
@@ -1086,8 +1086,8 @@
       "number": 169,
       "title": "Implement identification, activity, and reference-data parity",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/169",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 170,
@@ -1114,15 +1114,15 @@
       "number": 173,
       "title": "Add algorithm-level parity tests",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/173",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 174,
       "title": "Add workflow-level parity tests",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/174",
-      "status": "queued",
-      "notes": ""
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
     },
     {
       "number": 175,
