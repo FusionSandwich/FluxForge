@@ -1,0 +1,140 @@
+{
+  "status": "COMPLETED",
+  "eligible_measurements": 7,
+  "comparisons": [
+    {
+      "measurement_id": "Co-Cd-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Co60",
+          "north_Bq": 233.2020484727521,
+          "south_Bq": 224.19851938885932,
+          "QG_report_Bq": 234.95,
+          "south_over_north": 0.9613917238598152,
+          "south_over_QG": 0.9542392823530935,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    },
+    {
+      "measurement_id": "Co-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Co60",
+          "north_Bq": 2054.8185726654438,
+          "south_Bq": 2051.0119234287363,
+          "QG_report_Bq": 2035.0,
+          "south_over_north": 0.9981474523895462,
+          "south_over_QG": 1.007868267041148,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    },
+    {
+      "measurement_id": "Cu-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Cu64",
+          "north_Bq": 3210834.193244286,
+          "south_Bq": 3210840.011466946,
+          "QG_report_Bq": 3172380.0,
+          "south_over_north": 1.0000018120595178,
+          "south_over_QG": 1.0121233936246434,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    },
+    {
+      "measurement_id": "In-Cd-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "In114m",
+          "north_Bq": 209907.2769682267,
+          "south_Bq": 209907.34914976996,
+          "QG_report_Bq": 219706.0,
+          "south_over_north": 1.0000003438734677,
+          "south_over_QG": 0.9554010775753505,
+          "QG_time_and_background_harmonized": false
+        },
+        {
+          "isotope": "In115m",
+          "north_Bq": 12456.666897659918,
+          "south_Bq": 12456.656071720263,
+          "QG_report_Bq": 11988.0,
+          "south_over_north": 0.9999991309120053,
+          "south_over_QG": 1.039093766409765,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    },
+    {
+      "measurement_id": "Ni-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Co58",
+          "north_Bq": 46749.86145461942,
+          "south_Bq": 46749.89050754603,
+          "QG_report_Bq": 45880.0,
+          "south_over_north": 1.0000006214548172,
+          "south_over_QG": 1.0189601244016135,
+          "QG_time_and_background_harmonized": false
+        },
+        {
+          "isotope": "Ni57",
+          "north_Bq": 126.73009042912774,
+          "south_Bq": 121.22519747457412,
+          "QG_report_Bq": null,
+          "south_over_north": 0.956562068756416,
+          "south_over_QG": null,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    },
+    {
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Sc46",
+          "north_Bq": 161092.23910791456,
+          "south_Bq": 161092.2123548267,
+          "QG_report_Bq": 159063.0,
+          "south_over_north": 0.9999998339268981,
+          "south_over_QG": 1.01275728708013,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    },
+    {
+      "measurement_id": "Sc-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Sc46",
+          "north_Bq": 1593121.285143126,
+          "south_Bq": 1593121.3088955933,
+          "QG_report_Bq": 1607650.0,
+          "south_over_north": 1.0000000149093904,
+          "south_over_QG": 0.9909627772808717,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    }
+  ],
+  "scope": "source-bound original ASC 25cm monitors, excluding missing ASC and Ti/Sc48 ambiguity",
+  "reference_used_for_analysis": false,
+  "QG_background_match": "UNKNOWN",
+  "QG_time_harmonized": false
+}
