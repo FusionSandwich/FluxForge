@@ -2,13 +2,21 @@ name: Quality Checks
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches:
       - main
       - add_gui
       - chore/folder-audit-native-gui-review-20260317
+      - registry-uncertainty-qualification
+      - 'JS/**'
+      - 'proposal/**'
+      - 'fix/**'
+      - 'codex/**'
     paths:
       - 'src/fluxforge/**/*.py'
+      - 'src/fluxforge/data/**'
+      - 'tools/run_acceptance.py'
       - 'src/fluxforge_gui/**/*.py'
       - 'tests/**/*.py'
       - '.flake8'
@@ -101,6 +109,21 @@ jobs:
             tests/test_genie_overrides.py \
             tests/test_pipeline_validation.py
 
+      - name: Adversarial scientific contracts
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_histogram_background.py \
+            tests/test_background_covariance.py \
+            tests/test_signed_peak_fit_covariance.py \
+            tests/test_joint_peak_covariance.py \
+            tests/test_rafm_validation_independence.py \
+            tests/test_registry_uncertainty_qualification.py \
+            tests/test_nuclear_data_sources.py \
+            tests/test_run_readiness_manifest.py \
+            tests/test_transport_contracts.py
+
       - name: CLI and standards regression tests
         env:
           PYTHONPATH: src
@@ -110,6 +133,15 @@ jobs:
             tests/test_astm_e262.py \
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
+
+      - name: History, reaction-rate and spectrum queue contracts
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_irradiation_history_inputs.py \
+            tests/test_reaction_rate_view_inputs.py \
+            tests/test_spectrum_file_queue_conversion.py
 
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
@@ -181,8 +213,18 @@ jobs:
             tests/test_analysis_workspace_qt.py::test_main_window_activity_background_and_survey_map_workflows \
             tests/test_analysis_workspace_qt.py::test_main_window_background_selector_updates_subtracted_foreground_and_overlay
 
+      - name: Saved overlay label visibility test
+        run: pytest -q tests/test_analysis_workspace_qt.py::test_main_window_exposes_log_scale_and_peak_label_toggles
+
       - name: Calibration workspace Qt tests
         run: pytest -q tests/test_calibration_workspace_qt.py
+
+      - name: HPGe efficiency calibration and profile tests
+        run: |
+          pytest -q tests/test_hpge_efficiency_models.py
+          pytest -q tests/test_hpge_efficiency_dialog_qt.py
+          pytest -q tests/test_hpge_profile_persistence.py
+          pytest -q tests/test_hpge_profile_integration_qt.py
 
       - name: Unfolding workspace Qt tests
         run: pytest -q tests/test_unfolding_workspace_qt.py
@@ -192,6 +234,14 @@ jobs:
 
       - name: Predictive dashboard Qt tests
         run: pytest -q tests/test_predictive_dashboard_qt.py
+
+      - name: History, reaction-rate and spectrum queue Qt tests
+        run: |
+          pytest -q \
+            tests/test_irradiation_history_workspace_qt.py \
+            tests/test_reaction_rate_workspace_qt.py \
+            tests/test_spectrum_file_queue_workspace_qt.py \
+            tests/test_production_gui_mode.py
 
   native-desktop-gui-linux:
     if: github.event_name == 'workflow_dispatch'
@@ -270,3 +320,43 @@ jobs:
         with:
           name: fluxforge-gui-legacy-review-windows
           path: artifacts/gui_review/windows
+
+  external-reference-parity:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      MPLBACKEND: Agg
+      FLUXFORGE_REFERENCE_ROOT: ${{ github.workspace }}/.reference-inputs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Fetch pinned algorithm references
+        run: |
+          git clone https://github.com/tylerdolezal/Neutron-Unfolding.git .reference-inputs/Neutron-Unfolding
+          git -C .reference-inputs/Neutron-Unfolding checkout d5e377b7bc3f6ac01d59a9ebcdd1bdc32f4ab85b
+          git clone https://github.com/jrbourbeau/pyunfold.git .reference-inputs/pyunfold
+          git -C .reference-inputs/pyunfold checkout 0b50d43d17380d2663c3d1a8c3356fadde4917aa
+      - name: Check independent reference parity
+        run: pytest -q tests/test_unfolding_reference_parity.py
+
+  optional-ml-cpu:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      MPLBACKEND: Agg
+      OMP_NUM_THREADS: '1'
+      TF_NUM_INTRAOP_THREADS: '1'
+      TF_NUM_INTEROP_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install ML test dependencies
+        run: python -m pip install -e '.[dev,ml]'
+      - name: Check ANN construction, inference, training and persistence
+        run: pytest -q tests/test_naa_ann.py tests/test_naa_ann_4e_dataset.py

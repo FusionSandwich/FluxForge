@@ -5,6 +5,26 @@
   "policy": "Every production-owned QAction, interactive control, fixed tab, and renderer intent must have a stable ID and a behavioral test suite. Qt-internal chrome and read-only output widgets are excluded.",
   "action_groups": [
     {
+      "surface": "main-window.spectrum-file-queue",
+      "test_ids": ["tests/test_spectrum_file_queue_workspace_qt.py"],
+      "object_names": ["OpenSpectrumFileQueueAction"]
+    },
+    {
+      "surface": "main-window.reaction-rate",
+      "test_ids": ["tests/test_reaction_rate_workspace_qt.py"],
+      "object_names": ["OpenReactionRateAction"]
+    },
+    {
+      "surface": "main-window.irradiation-history",
+      "test_ids": ["tests/test_irradiation_history_workspace_qt.py"],
+      "object_names": ["OpenIrradiationHistoryAction"]
+    },
+    {
+      "surface": "main-window.covariance",
+      "test_ids": ["tests/test_covariance_workspace_qt.py"],
+      "object_names": ["OpenCovarianceAction"]
+    },
+    {
       "surface": "main-window.menus",
       "test_ids": ["tests/test_modern_gui_shell.py"],
       "object_names": ["OpenAnalysisMenuAction", "OpenCalibrationMenuAction", "OpenEditMenuAction", "OpenFileMenuAction", "OpenHelpMenuAction", "OpenToolsMenuAction", "OpenViewMenuAction", "OpenWorkspacesMenuAction"]
@@ -75,12 +95,37 @@
       "object_names": ["ExportCalibrationEnergyResidualPlotAction", "ExportCalibrationFwhmPlotAction", "ExportCalibrationRoiFitPlotAction", "ExportCalibrationRoiResidualPlotAction", "ExportCalibrationSpectrumPlotAction"]
     },
     {
+      "surface": "efficiency-dialog.context-export",
+      "test_ids": ["tests/test_hpge_efficiency_dialog_qt.py"],
+      "object_names": ["ExportEfficiencyMeasuredFittedPlotAction", "ExportEfficiencyPercentResidualPlotAction"]
+    },
+    {
       "surface": "unfolding-dialog.context-export",
       "test_ids": ["tests/test_unfolding_workspace_qt.py"],
       "object_names": ["ExportUnfoldingConvergencePlotAction", "ExportUnfoldingFluxPlotAction", "ExportUnfoldingResponseMatrixPlotAction"]
     }
   ],
   "control_surfaces": [
+    {
+      "surface": "spectrum-file-queue-dialog",
+      "test_ids": ["tests/test_spectrum_file_queue_workspace_qt.py"],
+      "object_names": ["SpectrumQueueFilesButton", "SpectrumQueueFolderButton", "SpectrumQueueRemoveButton", "SpectrumQueueRecursiveCheck", "SpectrumQueueModeCombo", "SpectrumQueueIndependentCheck", "SpectrumQueueOutputInput", "SpectrumQueueOutputButton", "SpectrumQueueRunButton"]
+    },
+    {
+      "surface": "reaction-rate-dialog",
+      "test_ids": ["tests/test_reaction_rate_workspace_qt.py"],
+      "object_names": ["ReactionRateInputTable", "ReactionRateAddButton", "ReactionRateRemoveButton", "ReactionRateFoundButton", "ReactionRateConvertButton", "ReactionRateExportButton"]
+    },
+    {
+      "surface": "irradiation-history-dialog",
+      "test_ids": ["tests/test_irradiation_history_workspace_qt.py"],
+      "object_names": ["IrradiationHistoryTable", "IrradiationAddButton", "IrradiationRemoveButton", "IrradiationLoadButton", "IrradiationExportButton", "IrradiationApplyButton"]
+    },
+    {
+      "surface": "covariance-dialog",
+      "test_ids": ["tests/test_covariance_workspace_qt.py"],
+      "object_names": ["CovarianceLoadButton", "CovarianceViewCombo", "CovarianceExportButton"]
+    },
     {
       "surface": "activity-results",
       "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_calibration_workspace_qt.py"],
@@ -138,13 +183,18 @@
     },
     {
       "surface": "efficiency-dialog",
-      "test_ids": ["tests/test_calibration_workspace_qt.py"],
-      "object_names": ["AcceptEfficiencyCalibrationButton", "CancelEfficiencyCalibrationButton", "EfficiencyModelMethodSelectorCombo", "FitEfficiencyModelButton", "HpgeC1Spin", "HpgeC2Spin", "HpgeC3Spin", "HpgeC4Spin", "HpgeDetectorIdEdit", "Hpgeal_window_T1_umSpin", "Hpgedetector_diameter_cmSpin", "Hpgedetector_thickness_DI_cmSpin", "Hpgedead_layer_DL_umSpin", "Hpgegeometry_factor_ASpin", "Hpgeincident_angle_AI_degSpin", "Hpgerelative_uncertaintySpin", "Hpgesource_distance_cmSpin", "SeedEfficiencyExamplePointsButton"]
+      "test_ids": ["tests/test_calibration_workspace_qt.py", "tests/test_hpge_efficiency_dialog_qt.py"],
+      "object_names": ["AcceptEfficiencyCalibrationButton", "AddEfficiencyPointButton", "CancelEfficiencyCalibrationButton", "DeleteEfficiencyPointsButton", "EfficiencyCalibrationTable", "EfficiencyModelMethodSelectorCombo", "FitEfficiencyModelButton", "HpgeC1Spin", "HpgeC2Spin", "HpgeC3Spin", "HpgeC4Spin", "HpgeDetectorIdEdit", "Hpgeal_window_T1_umSpin", "Hpgedetector_diameter_cmSpin", "Hpgedetector_thickness_DI_cmSpin", "Hpgedead_layer_DL_umSpin", "Hpgegeometry_factor_ASpin", "Hpgeincident_angle_AI_degSpin", "Hpgerelative_uncertaintySpin", "Hpgesource_distance_cmSpin", "ImportEfficiencyCsvButton", "SeedEfficiencyExamplePointsButton"]
     },
     {
       "surface": "unfolding-dialog",
       "test_ids": ["tests/test_unfolding_workspace_qt.py"],
       "object_names": ["LoadMeasuredRatesButton", "LoadResponseMatrixButton", "MaxedEntropyWeightSpin", "MethodAMethodSelectorCombo", "MethodBMethodSelectorCombo", "MlSeedThresholdSpin", "ReactionRatesPathInput", "ResetUnfoldingPlotsButton", "ResponsePathInput", "ResponseSourceCombo", "RmleAutoLambdaCheck", "RmleLambdaSlider", "RmlePenaltyCombo", "RmleRegularizationSpin", "RunComparisonUnfoldingButton", "RunSelectedUnfoldingButton", "UnfoldingCompareModeCheck", "UnfoldingLogEnergyCheck", "UnfoldingLogFluxCheck", "UnfoldingUncertaintyBandsCheck", "UseMlSeedCheck"]
+    },
+    {
+      "surface": "table-controls",
+      "test_ids": ["tests/test_analysis_workspace_qt.py", "tests/test_module3_workflows_qt.py", "tests/test_calibration_workspace_qt.py", "tests/test_unfolding_workspace_qt.py"],
+      "object_names": ["BatchQueueResultsTable", "CalibrationDeviationPairsTable", "CalibrationEnergyPointsTable", "CalibrationFwhmPointsTable", "NuclideMixtureTable", "PeakTableWidget", "UnfoldingComparisonTable", "UnfoldingMeasurementsTable", "UnfoldingResultsTable"]
     }
   ],
   "tabs": [

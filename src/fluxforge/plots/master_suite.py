@@ -260,8 +260,13 @@ def load_plot_inputs_from_artifacts(
         )
 
     measured_rates = _as_vector([float(r["rate"]) for r in rates], "measured_rates")
+    if any(r.get("uncertainty") is None for r in rates):
+        raise ValueError(
+            "Scientific plots require supplied reaction-rate uncertainties; "
+            "one or more are unavailable."
+        )
     measured_unc = _as_vector(
-        [float(r.get("uncertainty", 0.0)) for r in rates], "measured_uncertainties"
+        [float(r["uncertainty"]) for r in rates], "measured_uncertainties"
     )
 
     if boundaries.size != posterior_flux.size + 1:
@@ -313,8 +318,13 @@ def load_example_plot_inputs() -> MasterPlotInputs:
     measured_uncertainties: List[float] = []
     for reaction in dict(measurements)["reactions"]:
         gamma_lines = [GammaLineMeasurement(**line) for line in reaction["gamma_lines"]]
-        activity, _ = weighted_activity(gamma_lines)
-        rate = reaction_rate_from_activity(activity, segments, reaction["half_life_s"])
+        activity, activity_sigma = weighted_activity(gamma_lines)
+        rate = reaction_rate_from_activity(
+            activity,
+            segments,
+            reaction["half_life_s"],
+            activity_uncertainty_bq=activity_sigma,
+        )
         measured_rates.append(float(rate.rate))
         measured_uncertainties.append(float(rate.uncertainty))
 

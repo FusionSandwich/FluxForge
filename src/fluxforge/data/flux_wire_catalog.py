@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from importlib import resources
 import json
 from typing import Any, Dict, List, Optional
@@ -17,6 +17,8 @@ class FluxWireCatalogEntry:
     reaction: str
     target_lines_keV: List[float]
     expected_elements: List[str]
+    reactions_by_element: Dict[str, str] = field(default_factory=dict)
+    reaction_ids_by_element: Dict[str, str] = field(default_factory=dict)
 
 
 def _load_catalog_payload() -> Dict[str, Any]:
@@ -46,6 +48,8 @@ def load_flux_wire_catalog() -> Dict[str, FluxWireCatalogEntry]:
                 str(value)
                 for value in entry.get("expected_elements", [entry["parent_element"]])
             ],
+            reactions_by_element=dict(entry.get("reactions_by_element", {})),
+            reaction_ids_by_element=dict(entry.get("reaction_ids_by_element", {})),
         )
         for isotope, entry in payload.items()
     }
@@ -56,9 +60,23 @@ def list_flux_wire_isotopes() -> List[str]:
     return list(load_flux_wire_catalog().keys())
 
 
-def get_flux_wire_catalog_entry(isotope: str) -> Optional[FluxWireCatalogEntry]:
-    """Return reaction metadata for one flux-wire isotope."""
-    return load_flux_wire_catalog().get(isotope)
+def get_flux_wire_catalog_entry(
+    isotope: str, sample_element: Optional[str] = None
+) -> Optional[FluxWireCatalogEntry]:
+    """Return product metadata, optionally resolved for a specific wire element.
+
+    Without a context, the historical primary parent/reaction fields remain
+    available. The per-element maps carry all supported production reactions.
+    An explicit incompatible element never falls back to the primary parent.
+    """
+    entry = load_flux_wire_catalog().get(isotope)
+    if entry is None or sample_element is None:
+        return entry
+    element = sample_element.strip().capitalize()
+    reaction = entry.reactions_by_element.get(element)
+    if reaction is None:
+        return None
+    return replace(entry, parent_element=element, reaction=reaction)
 
 
 def get_flux_wire_isotopes_for_element(element: str) -> List[str]:

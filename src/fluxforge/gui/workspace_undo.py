@@ -160,6 +160,10 @@ class WorkspaceLeafController(Protocol):
 
     def upsert_detector_profile(self, profile: DetectorProfile) -> object: ...
 
+    def apply_detector_profile(
+        self, spectrum_id: str, profile: DetectorProfile
+    ) -> object: ...
+
     def delete_detector_profile(self, profile_id: str) -> object: ...
 
     def upsert_viewport(self, viewport: CanvasViewport) -> object: ...
@@ -739,6 +743,35 @@ class UpdateDetectorProfileCommand(_WorkspaceLeafCommand):
         self.controller.upsert_detector_profile(self.after)
 
 
+class ApplyDetectorProfileCommand(_WorkspaceLeafCommand):
+    """Attach an edited detector profile without copying a spectrum container."""
+
+    def __init__(
+        self,
+        controller: WorkspaceLeafController,
+        *,
+        spectrum_id: str,
+        before: DetectorProfile | None,
+        after: DetectorProfile,
+        description: str = "Apply detector profile",
+    ) -> None:
+        super().__init__(controller, description)
+        self.spectrum_id = spectrum_id
+        self.before = before
+        self.after = after
+
+    def undo(self) -> None:
+        if self.before is None:
+            self.controller.delete_detector_profile(self.after.detector_profile_id)
+        else:
+            self.controller.apply_detector_profile(self.spectrum_id, self.before)
+            if self.before.detector_profile_id != self.after.detector_profile_id:
+                self.controller.delete_detector_profile(self.after.detector_profile_id)
+
+    def redo(self) -> None:
+        self.controller.apply_detector_profile(self.spectrum_id, self.after)
+
+
 class UpdateCanvasViewportCommand(_WorkspaceLeafCommand):
     """Add or replace one persisted canvas viewport leaf."""
 
@@ -816,6 +849,7 @@ class ApplyCalibrationCommand(_WorkspaceLeafCommand):
 
 __all__ = [
     "ApplyCalibrationCommand",
+    "ApplyDetectorProfileCommand",
     "AssignSpectrumRoleCommand",
     "CalibrationUndoState",
     "DeletePeakCommand",

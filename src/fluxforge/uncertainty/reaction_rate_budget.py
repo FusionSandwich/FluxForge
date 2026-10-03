@@ -82,7 +82,7 @@ class UncertaintyComponent:
                 raise ValueError(
                     "Covariance needs aligned named/unit inputs, finite sensitivities and source group"
                 )
-            expected = float(np.linalg.norm(sensitivities @ covariance_factor(raw_cov)))
+            expected = math.hypot(*(sensitivities @ covariance_factor(raw_cov)))
             if not math.isclose(self.relative, expected, rel_tol=1e-12, abs_tol=0.0):
                 raise ValueError(
                     "Component relative uncertainty disagrees with input covariance"
@@ -172,7 +172,7 @@ class UncertaintyComponent:
         ):
             raise ValueError("Covariance sensitivity must align with named inputs")
         relative = float(
-            np.linalg.norm(sensitivity @ covariance_factor(input_covariance))
+            math.hypot(*(sensitivity @ covariance_factor(input_covariance)))
         )
         return cls(
             name,
@@ -285,7 +285,7 @@ class RateUncertaintyBudget:
 
     @property
     def total_relative(self) -> float:
-        return math.sqrt(sum(c.relative**2 for c in self.components))
+        return math.hypot(*(c.relative for c in self.components))
 
     @property
     def total_absolute(self) -> float:

@@ -12,6 +12,10 @@ FluxForge has two primary user entrypoints:
 If you are new to the project, start with the installation steps below, then
 run `fluxforge commands` to see the grouped CLI surface.
 
+The [October 2026 adversarial acceptance follow-up](docs/reviews/ADVERSARIAL_ACCEPTANCE_2026-10-02.md)
+documents the integrated fixes, reproducible test runner, full RAFM replay
+results, and remaining scientific qualification requirements.
+
 ## What FluxForge Covers
 
 | Capability family | Typical use | Main entry points |
@@ -125,6 +129,10 @@ Example** for the bundled deterministic HPGe example, or open your own spectrum
 with **File > Open Spectrum**. The equivalent one-command example launch is
 `fluxforge gui --project-dir . --open-example`.
 
+For measured detector calibration points, model review, CSV import, and the
+limits of fitted uncertainty and geometry metadata, see
+[HPGe efficiency calibration](docs/HPGE_EFFICIENCY_CALIBRATION.md).
+
 Recommended first files:
 
 - foreground spectrum: `examples/RAFM_irradiation/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC`
@@ -201,6 +209,16 @@ Workflow-specific references:
 - `docs/ASTM_standards/`
 
 ## Testing and QA
+
+Reaction-rate conversion propagates the supplied activity standard uncertainty:
+`reaction_rate_from_activity(activity, segments, half_life_s, activity_uncertainty_bq=sigma)`.
+If sigma is absent, the returned uncertainty and exported JSON uncertainty are
+`None`/`null` with an unavailable reason. Zero sigma remains explicit zero, and
+zero activity can retain a nonzero sigma. The CLI `rates` command reads
+`activity_unc_Bq`; unfolding and scientific plots require supplied rate uncertainties.
+This conversion treats irradiation history and half-life as fixed. A supplied
+activity sigma can include an unknown mixture of contributions; conversion does
+not resolve that mixture or qualify a complete activation uncertainty budget.
 
 Run the standard test suite:
 

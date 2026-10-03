@@ -195,6 +195,26 @@ class TestHypermetFunction:
 class TestFitHypermetPeak:
     """Test fit_hypermet_peak function."""
 
+    @pytest.fixture(autouse=True)
+    def deterministic_counting_noise(self):
+        np.random.seed(7349)
+
+    def test_disabled_terms_have_fixed_covariance_and_correct_degrees_of_freedom(self):
+        channels = np.arange(80)
+        counts = 500 * np.exp(-0.5 * ((channels - 40) / 2) ** 2) + 20
+        _, result = fit_hypermet_peak(
+            channels, counts, 40, fit_width=12, enable_tail=False, enable_step=False
+        )
+        assert result.success
+        assert result.dof == 25 - 5
+        np.testing.assert_array_equal(result.covariance[3:6], 0)
+
+    def test_exhausted_budget_is_not_a_successful_fit(self):
+        channels = np.arange(80)
+        counts = 500 * np.exp(-0.5 * ((channels - 40) / 2) ** 2) + 20
+        _, result = fit_hypermet_peak(channels, counts, 40, max_evaluations=1)
+        assert not result.success and result.covariance is None
+
     def test_fit_pure_gaussian_recovery(self):
         """Fit should recover pure Gaussian parameters."""
         # Create synthetic Gaussian spectrum

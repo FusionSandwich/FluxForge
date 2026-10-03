@@ -23,6 +23,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
+from fluxforge.physics.activation import count_decay_factor
 from fluxforge.analysis.flux_wire_analysis import (
     FLUX_WIRE_NUCLIDES,
     QG_REPORT_ACTIVITY_REFERENCE,
@@ -94,7 +95,8 @@ def calculate_n_atoms(
         Fraction of target isotope (e.g., 0.6917 for Cu-63 in natural Cu)
     element_mass_fraction : float, optional
         Mass fraction of ``element`` in the monitor (dilute alloy wires such as
-        Co-Al). Defaults to the bundled purity for pure-element wires, else 1.
+        Co-Al). An explicit mass is treated as element mass unless this fraction
+        is supplied. Bundled example purity applies only to nominal mass.
     allow_default_mass : bool
         Explicitly accept the bundled nominal mass when ``mass_mg`` is None.
 
@@ -106,6 +108,7 @@ def calculate_n_atoms(
     if not element:
         raise ValueError("Monitor element is required to count target atoms")
     params = FLUX_WIRE_SAMPLES.get(element, {})
+    using_nominal_mass = mass_mg is None
     if mass_mg is None:
         if not allow_default_mass or "mass_mg" not in params:
             raise ValueError(
@@ -126,10 +129,12 @@ def calculate_n_atoms(
             atomic_mass = element_atomic_mass(element)
         except (KeyError, ValueError) as exc:
             raise ValueError(f"No atomic mass for element {element!r}") from exc
+    if not np.isfinite(atomic_mass) or atomic_mass <= 0:
+        raise ValueError(f"No finite positive atomic mass for element {element!r}")
     fraction = (
         float(element_mass_fraction)
         if element_mass_fraction is not None
-        else float(params.get("purity", 1.0))
+        else float(params.get("purity", 1.0)) if using_nominal_mass else 1.0
     )
     if not np.isfinite(fraction) or not 0 < fraction <= 1:
         raise ValueError("element_mass_fraction must be finite and in (0, 1]")
@@ -211,14 +216,23 @@ def irradiation_history_factor(
     decay_const = np.log(2) / half_life_s
     if irradiation_history is not None:
         segments = [(float(d), float(p)) for d, p in irradiation_history]
-        if not segments or any(not np.isfinite(d) or not np.isfinite(p) or d < 0 or p < 0 for d, p in segments):
-            raise ValueError("irradiation_history needs non-negative (duration_s, relative_power) segments")
+        if not segments or any(
+            not np.isfinite(d) or not np.isfinite(p) or d < 0 or p < 0
+            for d, p in segments
+        ):
+            raise ValueError(
+                "irradiation_history needs non-negative (duration_s, relative_power) segments"
+            )
         if not any(d > 0 and p > 0 for d, p in segments):
             raise ValueError("irradiation_history has no irradiating segment")
         factor = 0.0
         time_after = 0.0
         for duration, power in reversed(segments):
-            factor += power * -np.expm1(-decay_const * duration) * np.exp(-decay_const * time_after)
+            factor += (
+                power
+                * -np.expm1(-decay_const * duration)
+                * np.exp(-decay_const * time_after)
+            )
             time_after += duration
         return float(factor)
     if irradiation_time_s is not None and irradiation_time_s > 0:
@@ -314,12 +328,7 @@ def activity_to_reaction_rate(
     decay_factor = np.exp(-decay_const * decay_time_s) if decay_time_s > 0 else 1.0
 
     # Decay during the count: count-averaged activity -> count-start activity
-    if count_real_time_s > 0:
-        live_correction = -np.expm1(-decay_const * count_real_time_s) / (
-            decay_const * count_real_time_s
-        )
-    else:
-        live_correction = 1.0
+    live_correction = count_decay_factor(half_life_s, count_real_time_s)
 
     # Solve for reaction rate
     # A = R * N * saturation * decay_factor * live_correction
@@ -331,14 +340,20 @@ def activity_to_reaction_rate(
     return activity_bq / denominator
 
 
-def _report_count_time(includes_count_decay: Optional[bool], data: FluxWireData) -> float:
+def _report_count_time(
+    includes_count_decay: Optional[bool], data: FluxWireData
+) -> float:
     """Count real time to apply to report activities, from an explicit declaration."""
     if type(includes_count_decay) is not bool:
         raise ValueError(
             "Declare report_includes_count_decay: whether the processed report's "
             "count-start activities already correct decay during acquisition"
         )
-    return 0.0 if includes_count_decay else float(data.real_time)
+    if includes_count_decay:
+        return 0.0
+    if not np.isfinite(data.real_time) or data.real_time <= 0:
+        raise ValueError("Uncorrected report activity requires positive real_time")
+    return float(data.real_time)
 
 
 def get_isotope_fraction(reaction_id: str, element: str) -> float:
@@ -404,6 +419,7 @@ def extract_reactions_from_processed(
     irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
     report_includes_count_decay: Optional[bool] = None,
     allow_default_mass: bool = False,
+    element_mass_fraction: Optional[float] = None,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from processed flux wire data.
@@ -451,6 +467,12 @@ def extract_reactions_from_processed(
 
         # Get reaction ID
         reaction_id = get_reaction_id(isotope, sample_element)
+        if not sample_element or isotope not in PRODUCT_REACTIONS.get(
+            sample_element, {}
+        ):
+            raise ValueError(
+                f"No supported reaction for product {isotope!r} in element {sample_element!r}"
+            )
 
         # Calculate number of target atoms
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
@@ -459,6 +481,7 @@ def extract_reactions_from_processed(
             mass_mg=sample_mass_mg,
             isotope_fraction=isotope_fraction,
             allow_default_mass=allow_default_mass,
+            element_mass_fraction=element_mass_fraction,
         )
 
         # Calculate reaction rate
@@ -524,6 +547,7 @@ def extract_reactions_from_raw(
     irradiation_history: Optional[Sequence[Tuple[float, float]]] = None,
     report_includes_count_decay: Optional[bool] = None,
     allow_default_mass: bool = False,
+    element_mass_fraction: Optional[float] = None,
 ) -> List[FluxWireReaction]:
     """
     Extract reaction information from raw flux wire spectra.
@@ -560,6 +584,12 @@ def extract_reactions_from_raw(
 
         # Get reaction ID
         reaction_id = get_reaction_id(isotope, sample_element)
+        if not sample_element or isotope not in PRODUCT_REACTIONS.get(
+            sample_element, {}
+        ):
+            raise ValueError(
+                f"No supported reaction for product {isotope!r} in element {sample_element!r}"
+            )
 
         # Calculate number of target atoms
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
@@ -568,6 +598,7 @@ def extract_reactions_from_raw(
             mass_mg=sample_mass_mg,
             isotope_fraction=isotope_fraction,
             allow_default_mass=allow_default_mass,
+            element_mass_fraction=element_mass_fraction,
         )
 
         # Calculate reaction rate
@@ -581,7 +612,8 @@ def extract_reactions_from_raw(
                 irradiation_history=irradiation_history,
                 count_real_time_s=(
                     _report_count_time(report_includes_count_decay, raw_data)
-                    if activity.get("activity_reference") == QG_REPORT_ACTIVITY_REFERENCE
+                    if activity.get("activity_reference")
+                    == QG_REPORT_ACTIVITY_REFERENCE
                     else float(raw_data.real_time)
                 ),
             )
@@ -1124,7 +1156,9 @@ def unfold_flux_wires(
     if irradiation_time_s is None or irradiation_time_s <= 0:
         raise ValueError("irradiation_time_s is required for flux-wire unfolding")
     if report_includes_count_decay is None:
-        raise ValueError("report_includes_count_decay must be declared for processed reports")
+        raise ValueError(
+            "report_includes_count_decay must be declared for processed reports"
+        )
 
     if verbose:
         print("=" * 80)

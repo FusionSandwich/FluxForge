@@ -20,13 +20,15 @@ from fluxforge.gui import (
     register_builtin_render_backends,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, PyQtGraphSpectrumCanvas
-from fluxforge.gui.qt_compat import QApplication
 from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
 from fluxforge.plugins import PluginRegistries
 
 ROOT = Path(__file__).resolve().parents[1]
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+if QT_AVAILABLE:
+    from fluxforge.gui.qt_compat import QApplication
 
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:
     from PySide6.QtCore import QPoint, Qt
@@ -642,6 +644,7 @@ def test_spectrum_context_export_action_is_registered_with_stable_id():
     window.close()
 
 
+@pytest.mark.skipif(not QT_AVAILABLE, reason="Qt GUI dependencies are unavailable.")
 def test_modern_shell_reuses_shared_demo_and_selection_helpers():
     modern_shell_path = (
         ROOT / "src" / "fluxforge" / "gui" / "panels" / "modern_shell.py"

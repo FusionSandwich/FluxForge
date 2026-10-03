@@ -256,7 +256,8 @@ def test_analysis_workspace_tracks_loaded_spectra_and_role_assignments():
     assert background_key == "sample-spe-2"
     assert controller.slot("foreground").source_label == "sample.spe"
     assert controller.slot("background").source_path == "/tmp/background.spe"
-    assert controller.describe()["loaded_spectrum_count"] == 2
+    # The canonical inventory retains the two original slot spectra as well.
+    assert controller.describe()["loaded_spectrum_count"] == 4
     assert controller.describe()["slot_sources"]["background"] == "sample.spe"
     assert controller.describe()["bayesian_source_id"] == "fluxforge_bundled_gamma"
     assert controller.describe()["ml_source_id"] == "fluxforge_bundled_gamma"
@@ -1390,6 +1391,9 @@ def test_main_window_exposes_log_scale_and_peak_label_toggles():
     _qapp().processEvents()
 
     sidebar = window.left_dock.widget()
+    sidebar.nuclide_query.setText("co")
+    _qapp().processEvents()
+    assert sidebar.nuclides.count() >= 1
     sidebar.nuclides.setCurrentRow(0)
     _qapp().processEvents()
     QTest.mouseClick(sidebar.save_selected_nuclide_button, Qt.LeftButton)

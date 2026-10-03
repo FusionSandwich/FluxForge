@@ -3,20 +3,31 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Sequence
 
 import numpy as np
+from scipy.optimize import least_squares
+from scipy.stats import chi2
 
-from fluxforge.analysis.detector_calibration import EfficiencyPoint, fit_efficiency_curve
+from fluxforge.analysis.detector_calibration import (
+    EfficiencyPoint,
+    efficiency_measurement_covariance,
+    fit_efficiency_curve,
+    fit_gray_efficiency_curve,
+)
 from fluxforge.analysis.efficiency_models import semi_empirical_efficiency
 from fluxforge.analysis.peak_finders import (
     PEAK_FINDER_METHODS,
     find_peaks_multi_method,
     get_peak_finder,
 )
-from fluxforge.analysis.peakfit import auto_find_peaks, estimate_background, fit_multiple_peaks
+from fluxforge.analysis.peakfit import (
+    auto_find_peaks,
+    estimate_background,
+    fit_multiple_peaks,
+)
 from fluxforge.data.efficiency import EfficiencyCurve
 from fluxforge.data.gamma_database import FLUXFORGE_GAMMA_DATA, GammaDatabase
 from fluxforge.data.nuclear_data_sources import load_gamma_identification_source
@@ -100,6 +111,15 @@ class EfficiencyCalibrationFitResult:
     residuals: tuple[float, ...]
     rmse: float
     points_used: int
+    measured_efficiencies: tuple[float, ...] = ()
+    fitted_efficiencies: tuple[float, ...] = ()
+    percentage_residuals: tuple[float, ...] = ()
+    point_status: tuple[str, ...] = ()
+    covariance: tuple[tuple[float, ...], ...] | None = None
+    covariance_parameters: tuple[str, ...] = ()
+    fit_quality: dict[str, float | int | str | tuple[str, ...] | None] = field(
+        default_factory=dict
+    )
 
 
 @dataclass(frozen=True)
@@ -493,7 +513,12 @@ def apply_ml_peak_predictions(
                 ),
                 nuclide=predicted_nuclide or peak.nuclide,
                 candidate_nuclides=(
-                    (predicted_nuclide,) + tuple(item for item in peak.candidate_nuclides if item != predicted_nuclide)
+                    (predicted_nuclide,)
+                    + tuple(
+                        item
+                        for item in peak.candidate_nuclides
+                        if item != predicted_nuclide
+                    )
                     if predicted_nuclide
                     else peak.candidate_nuclides
                 ),
@@ -703,7 +728,9 @@ def detect_peak_candidates(
     ordered = sorted(peaks, key=lambda item: item[1], reverse=True)[:max_peaks]
 
     candidates: list[PeakCandidate] = []
-    for index, (channel, significance) in enumerate(sorted(ordered, key=lambda item: item[0])):
+    for index, (channel, significance) in enumerate(
+        sorted(ordered, key=lambda item: item[0])
+    ):
         half_width = max(
             estimate_local_fwhm_channels(counts, int(round(channel))) * 3.0,
             10.0,
@@ -717,9 +744,9 @@ def detect_peak_candidates(
             float(spectrum.channel_to_energy(roi_bounds_ch[0])),
             float(spectrum.channel_to_energy(roi_bounds_ch[1])),
         )
-        normalized_residuals = (
-            fit.observed_counts - fit.fit_counts
-        ) / np.sqrt(np.clip(fit.fit_counts, 1.0, None))
+        normalized_residuals = (fit.observed_counts - fit.fit_counts) / np.sqrt(
+            np.clip(fit.fit_counts, 1.0, None)
+        )
         energy_keV = float(spectrum.channel_to_energy(fit.centroid_channel))
         candidates.append(
             PeakCandidate(
@@ -730,7 +757,9 @@ def detect_peak_candidates(
                 roi_bounds_keV=tuple(sorted(roi_bounds_keV)),
                 net_counts=float(fit.area_counts),
                 fit_quality=float(fit.peak_result.reduced_chi_squared),
-                normalized_residuals=tuple(float(value) for value in normalized_residuals),
+                normalized_residuals=tuple(
+                    float(value) for value in normalized_residuals
+                ),
                 residual_channels=tuple(float(value) for value in fit.channels),
             )
         )
@@ -815,7 +844,13 @@ def _detect_peak_method_results(
     resolved: list[tuple[float, float]] = []
     for peak in found:
         if getattr(peak, "centroid", None) is not None:
-            centroid = float(np.interp(float(peak.centroid), np.arange(len(channels), dtype=float), channels))
+            centroid = float(
+                np.interp(
+                    float(peak.centroid),
+                    np.arange(len(channels), dtype=float),
+                    channels,
+                )
+            )
         else:
             index = int(np.clip(int(round(float(peak.index))), 0, len(channels) - 1))
             centroid = float(channels[index])
@@ -872,11 +907,15 @@ def bayesian_match_peak_candidates(
             )
             if not strong_lines:
                 continue
-            nearest = min(strong_lines, key=lambda energy: abs(energy - peak.energy_keV))
+            nearest = min(
+                strong_lines, key=lambda energy: abs(energy - peak.energy_keV)
+            )
             delta = abs(nearest - peak.energy_keV)
             if delta > tolerance_keV:
                 continue
-            score = evidence[nuclide] * math.exp(-0.5 * (delta / max(tolerance_keV, 1e-6)) ** 2)
+            score = evidence[nuclide] * math.exp(
+                -0.5 * (delta / max(tolerance_keV, 1e-6)) ** 2
+            )
             peak_scores.append((nuclide, score, strong_lines[:overlay_limit]))
 
         peak_scores.sort(key=lambda item: item[1], reverse=True)
@@ -917,68 +956,113 @@ def fit_efficiency_model(
     if len(shared.calibration_models) == 0:
         register_builtin_efficiency_models(shared)
     definition: EfficiencyModelDefinition = shared.calibration_models.get(model_key)
+    if not points:
+        raise ValueError("Efficiency calibration requires measured points.")
+    energies = np.asarray([point.energy_keV for point in points], dtype=float)
+    if np.any(~np.isfinite(energies)) or np.any(energies <= 0):
+        raise ValueError("Calibration energy must be finite and positive (keV).")
+    measured_with_uncertainty = np.asarray(
+        [point.efficiency() for point in points], dtype=float
+    )
+    measured = measured_with_uncertainty[:, 0]
+    measurement_covariance = efficiency_measurement_covariance(points)
 
     if definition.form == "semi_empirical_hpge":
-        energies = np.asarray([point.energy_keV for point in points], dtype=float)
-        values = np.asarray([point.efficiency()[0] for point in points], dtype=float)
-        coefficients = _fit_semi_empirical_coefficients(energies, values)
-        curve = EfficiencyCurve(
-            model_type="functional",
-            parameters={
-                "form": "semi_empirical_hpge",
-                "coefficients": coefficients,
-            },
-            energy_range=(float(np.min(energies)), float(np.max(energies))),
+        curve, covariance, parameter_names, quality = _fit_semi_empirical_coefficients(
+            energies, measured, measurement_covariance
         )
-        residuals = tuple(float(obs - pred) for obs, pred in zip(values, curve.efficiency(energies)))
-        rmse = math.sqrt(float(np.mean(np.square(residuals)))) if residuals else 0.0
-        return EfficiencyCalibrationFitResult(
-            model_key=definition.key,
-            model_label=definition.label,
-            curve=curve,
-            residuals=residuals,
-            rmse=float(rmse),
-            points_used=len(points),
-        )
+    elif definition.form == "gray":
+        fit = fit_gray_efficiency_curve(points)
+        curve = fit.curve
+        covariance = fit.covariance
+        parameter_names = ("a", "b", "c", "d")
+        quality = {"identifiability": "full", "estimated_parameters": parameter_names}
+    else:
+        degree = definition.degree if definition.degree is not None else 2
+        fit = fit_efficiency_curve(points, degree=degree)
+        curve = fit.curve
+        covariance = fit.covariance
+        parameter_names = tuple(f"a{index}" for index in range(degree + 1))
+        quality = {"identifiability": "full", "estimated_parameters": parameter_names}
 
-    degree = definition.degree if definition.degree is not None else 2
-    fit = fit_efficiency_curve(points, degree=degree)
-    if definition.form == "gray":
-        coefficients = list(fit.coefficients)
-        while len(coefficients) < 4:
-            coefficients.append(0.0)
-        curve = EfficiencyCurve(
-            model_type="functional",
-            parameters={
-                "form": "gray",
-                "a": coefficients[0],
-                "b": coefficients[1],
-                "c": coefficients[2],
-                "d": coefficients[3],
-            },
-            energy_range=fit.curve.energy_range,
+    predicted = np.atleast_1d(np.asarray(curve.efficiency(energies), dtype=float))
+    residuals = measured - predicted
+    percentage = 100.0 * residuals / measured
+    status = tuple(
+        "within_3_percent" if abs(value) <= 3 else "outside_3_percent"
+        for value in percentage
+    )
+    if definition.form == "semi_empirical_hpge":
+        diagnostic_residuals = residuals
+        diagnostic_covariance = measurement_covariance
+    else:
+        diagnostic_residuals = np.log(measured) - np.log(predicted)
+        diagnostic_covariance = efficiency_measurement_covariance(
+            points, log_space=True
         )
-        predicted = np.asarray(curve.efficiency([point.energy_keV for point in points]), dtype=float)
-        measured = np.asarray([point.efficiency()[0] for point in points], dtype=float)
-        residuals = tuple(float(obs - pred) for obs, pred in zip(measured, predicted))
-        rmse = math.sqrt(float(np.mean(np.square(residuals)))) if residuals else 0.0
-        return EfficiencyCalibrationFitResult(
-            model_key=definition.key,
-            model_label=definition.label,
-            curve=curve,
-            residuals=residuals,
-            rmse=float(rmse),
-            points_used=len(points),
-        )
-
-    rmse = math.sqrt(float(np.mean(np.square(fit.residuals)))) if len(fit.residuals) else 0.0
+    whitened_residuals = np.linalg.solve(
+        np.linalg.cholesky(diagnostic_covariance), diagnostic_residuals
+    )
+    chi_squared = float(np.sum(np.square(whitened_residuals)))
+    degrees_of_freedom = len(points) - len(parameter_names)
+    source_groups = {
+        point.activity_source_id
+        for point in points
+        if point.activity_source_id is not None and (point.activity_rel_unc or 0.0) > 0
+    }
+    unspecified_activity_sources = any(
+        (point.activity_rel_unc or 0.0) > 0 and point.activity_source_id is None
+        for point in points
+    )
+    chi_square_p_value = (
+        float(chi2.sf(chi_squared, degrees_of_freedom))
+        if degrees_of_freedom > 0
+        else None
+    )
+    review_status = (
+        "pass"
+        if all(value == "within_3_percent" for value in status)
+        and chi_square_p_value is not None
+        and chi_square_p_value >= 0.05
+        and not unspecified_activity_sources
+        else "review_required"
+    )
+    quality = {
+        **quality,
+        "chi_squared": chi_squared,
+        "degrees_of_freedom": degrees_of_freedom,
+        "reduced_chi_squared": (
+            chi_squared / degrees_of_freedom if degrees_of_freedom > 0 else None
+        ),
+        "chi_square_p_value": chi_square_p_value,
+        "chi_square_alpha": 0.05,
+        "activity_source_groups": len(source_groups),
+        "activity_correlation": (
+            "unspecified"
+            if unspecified_activity_sources
+            else "grouped" if source_groups else "none"
+        ),
+        "max_absolute_percentage_residual": float(np.max(np.abs(percentage))),
+        "review_status": review_status,
+    }
     return EfficiencyCalibrationFitResult(
         model_key=definition.key,
         model_label=definition.label,
-        curve=fit.curve,
-        residuals=tuple(float(value) for value in fit.residuals),
-        rmse=float(rmse),
+        curve=curve,
+        residuals=tuple(float(value) for value in residuals),
+        rmse=float(np.sqrt(np.mean(np.square(residuals)))),
         points_used=len(points),
+        measured_efficiencies=tuple(float(value) for value in measured),
+        fitted_efficiencies=tuple(float(value) for value in predicted),
+        percentage_residuals=tuple(float(value) for value in percentage),
+        point_status=status,
+        covariance=(
+            None
+            if covariance is None
+            else tuple(tuple(float(value) for value in row) for row in covariance)
+        ),
+        covariance_parameters=parameter_names if covariance is not None else (),
+        fit_quality=quality,
     )
 
 
@@ -998,10 +1082,13 @@ def calculate_peak_activity(
         net_counts=float(peak.net_counts),
         live_time_s=max(float(spectrum.live_time or 1.0), 1e-6),
         efficiency=float(
-            np.asarray(efficiency_curve.efficiency(peak.energy_keV), dtype=float).reshape(-1)[0]
+            np.asarray(
+                efficiency_curve.efficiency(peak.energy_keV), dtype=float
+            ).reshape(-1)[0]
         ),
         gamma_intensity=max(float(gamma_intensity), 1e-6),
         half_life_s=max(float(half_life_s), 1e-6),
+        real_time_s=float(spectrum.real_time) if spectrum.real_time > 0.0 else None,
         dead_time_fraction=float(
             dead_time_fraction
             if dead_time_fraction is not None
@@ -1023,7 +1110,8 @@ def calculate_peak_activity(
     )
 
     background_counts = max(
-        float(np.mean(spectrum.counts)) * max(peak.roi_bounds_keV[1] - peak.roi_bounds_keV[0], 1.0),
+        float(np.mean(spectrum.counts))
+        * max(peak.roi_bounds_keV[1] - peak.roi_bounds_keV[0], 1.0),
         1.0,
     )
     detection_limit_counts = 2.71 + 4.65 * math.sqrt(background_counts)
@@ -1066,7 +1154,10 @@ def build_decay_chain_summary(
     chain = DecayChain(
         nuclide,
         nuclide_data={
-            nuclide: {"half_life_s": float(half_life_s), "decay_products": {daughter: 1.0}},
+            nuclide: {
+                "half_life_s": float(half_life_s),
+                "decay_products": {daughter: 1.0},
+            },
             daughter: {"half_life_s": float("inf"), "decay_products": {}},
         },
     )
@@ -1088,26 +1179,14 @@ def subtract_background_counts(
 ) -> np.ndarray:
     """Subtract background counts using the requested analysis mode."""
 
-    foreground_counts = np.asarray(foreground.counts, dtype=float)
-    if background is None:
-        return foreground_counts.copy()
-
-    background_counts = np.asarray(background.counts, dtype=float)
-    if background_counts.shape != foreground_counts.shape:
-        background_counts = np.resize(background_counts, foreground_counts.shape)
-
-    if mode == "simple":
-        factor = 1.0
-    elif mode == "scaled":
-        factor = float(scale)
-    elif mode == "statistical":
-        factor = (
-            max(float(foreground.live_time or 1.0), 1.0)
-            / max(float(background.live_time or 1.0), 1.0)
-        )
-    else:
-        raise ValueError(f"Unsupported background-subtraction mode: {mode}")
-    return np.clip(foreground_counts - factor * background_counts, 0.0, None)
+    # The canvas may show a nonnegative copy, while scientific calculations use
+    # background_adjusted_spectrum's signed counts and complete covariance.
+    return np.maximum(
+        background_adjusted_spectrum(
+            foreground, background, mode=mode, scale=scale
+        ).counts,
+        0.0,
+    )
 
 
 def background_adjusted_spectrum(
@@ -1119,53 +1198,28 @@ def background_adjusted_spectrum(
 ) -> GammaSpectrum:
     """Return a spectrum copy with the selected external background workflow applied."""
 
-    adjusted = subtract_background_counts(
-        foreground,
-        background,
-        mode=mode,
-        scale=scale,
-    )
+    from fluxforge.analysis.spectrum_math import subtract_measured_background
+
     factor = _background_subtraction_factor(
+        foreground, background, mode=mode, scale=scale
+    )
+    corrected = subtract_measured_background(
         foreground,
         background,
-        mode=mode,
-        scale=scale,
+        mode="manual",
+        manual_scale=factor,
+        negative_policy="preserve",
+        warn_missing=False,
     )
-    foreground_unc = np.asarray(foreground.counts_uncertainty, dtype=float)
-    if background is None:
-        adjusted_unc = foreground_unc.copy()
-    else:
-        background_unc = np.asarray(background.counts_uncertainty, dtype=float)
-        if background_unc.shape != foreground_unc.shape:
-            background_unc = np.resize(background_unc, foreground_unc.shape)
-        adjusted_unc = np.sqrt(np.maximum(foreground_unc**2 + (factor * background_unc) ** 2, 0.0))
-    metadata = dict(getattr(foreground, "metadata", {}) or {})
-    metadata["background_subtraction"] = {
-        "mode": mode,
-        "scale": float(factor),
-        "source": background.spectrum_id if background is not None else None,
-    }
-    return GammaSpectrum(
-        counts=np.asarray(adjusted, dtype=float),
-        counts_uncertainty=np.asarray(adjusted_unc, dtype=float),
-        channels=np.asarray(foreground.channels, dtype=float),
-        energies=(
-            np.asarray(foreground.energies, dtype=float)
-            if foreground.energies is not None
-            else None
-        ),
-        live_time=float(foreground.live_time),
-        real_time=float(foreground.real_time),
-        start_time=foreground.start_time,
-        spectrum_id=foreground.spectrum_id,
-        detector_id=foreground.detector_id,
-        calibration=dict(foreground.calibration),
-        source_type=foreground.source_type,
-        device_id=foreground.device_id,
-        device_label=foreground.device_label,
-        gps=dict(getattr(foreground, "gps", {}) or {}),
-        metadata=metadata,
-    )
+    corrected.source_type = foreground.source_type
+    corrected.device_id = foreground.device_id
+    corrected.device_label = foreground.device_label
+    corrected.gps = dict(foreground.gps)
+    if background is not None:
+        corrected.metadata["background_subtraction"].update(
+            mode=mode, scale=factor, source=background.spectrum_id
+        )
+    return corrected
 
 
 def analyze_roi_region(
@@ -1208,7 +1262,7 @@ def analyze_roi_region(
     counts = np.asarray(working.counts, dtype=float)
     counts_unc = np.asarray(working.counts_uncertainty, dtype=float)
     gross_counts = float(np.sum(counts[roi_mask]))
-    gross_unc = float(np.sqrt(np.sum(np.square(counts_unc[roi_mask]))))
+    gross_unc = float(np.sqrt(working.weighted_counts_variance(roi_mask.astype(float))))
 
     background_curve, sideband_bounds = _estimate_roi_background_curve(
         working,
@@ -1217,20 +1271,40 @@ def analyze_roi_region(
         sideband_width_keV=sideband_width_keV,
     )
     background_counts = float(np.sum(background_curve[roi_mask]))
-    background_unc = float(np.sqrt(np.sum(np.clip(background_curve[roi_mask], 0.0, None))))
+    background_unc = float(
+        np.sqrt(np.sum(np.clip(background_curve[roi_mask], 0.0, None)))
+    )
     net_curve = counts - background_curve
     net_counts = float(np.sum(net_curve[roi_mask]))
     net_unc = float(np.sqrt(max(gross_unc**2 + background_unc**2, 0.0)))
+    if background_method == "roi_sideband":
+        continuum_weights = np.zeros_like(counts)
+        roi_channels = working.channels[roi_mask]
+        fractions = np.interp(roi_channels, [roi_lo_ch, roi_hi_ch], [0.0, 1.0])
+        for bounds, coefficient, fallback in (
+            (sideband_bounds[0], float(np.sum(1.0 - fractions)), max(roi_lo_ch - 1, 0)),
+            (
+                sideband_bounds[1],
+                float(np.sum(fractions)),
+                min(roi_hi_ch, len(counts) - 1),
+            ),
+        ):
+            lo, hi = _roi_channel_bounds(working, bounds)
+            mask = (working.channels >= lo) & (working.channels <= hi)
+            if np.any(mask):
+                continuum_weights[mask] += coefficient / np.count_nonzero(mask)
+            else:
+                continuum_weights[fallback] += coefficient
+        background_unc = np.sqrt(working.weighted_counts_variance(continuum_weights))
+        net_unc = np.sqrt(
+            working.weighted_counts_variance(roi_mask.astype(float) - continuum_weights)
+        )
     centroid_keV, centroid_unc_keV = _weighted_centroid_keV(
         working,
         net_curve,
         roi_mask,
     )
-    significance = float(
-        net_counts / max(net_unc, 1.0e-12)
-        if net_unc > 0.0
-        else 0.0
-    )
+    significance = float(net_counts / max(net_unc, 1.0e-12) if net_unc > 0.0 else 0.0)
 
     notes: list[str] = []
     if background_spectrum is not None:
@@ -1289,7 +1363,9 @@ def compute_roi_statistics(
             sample_label, spectrum = item
         else:
             spectrum = item
-            sample_label = getattr(spectrum, "spectrum_id", None) or f"spectrum-{index + 1}"
+            sample_label = (
+                getattr(spectrum, "spectrum_id", None) or f"spectrum-{index + 1}"
+            )
         result = analyze_roi_region(
             spectrum,
             roi_bounds_keV=roi_bounds_keV,
@@ -1313,14 +1389,18 @@ def compute_roi_statistics(
         raise ValueError("At least one spectrum is required for ROI statistics.")
 
     net_values = np.asarray([sample.net_counts for sample in samples], dtype=float)
-    centroid_values = np.asarray([sample.centroid_keV for sample in samples], dtype=float)
+    centroid_values = np.asarray(
+        [sample.centroid_keV for sample in samples], dtype=float
+    )
     sample_count = len(samples)
     stdev_net = float(np.std(net_values, ddof=1)) if sample_count > 1 else 0.0
     stdev_centroid = float(np.std(centroid_values, ddof=1)) if sample_count > 1 else 0.0
     mean_net = float(np.mean(net_values))
     return ROIStatisticsResult(
         label=str(label),
-        roi_bounds_keV=tuple(sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))),
+        roi_bounds_keV=tuple(
+            sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))
+        ),
         sample_count=sample_count,
         mean_net_counts=mean_net,
         stdev_net_counts=stdev_net,
@@ -1345,12 +1425,16 @@ def _background_subtraction_factor(
     if mode == "simple":
         return 1.0
     if mode == "scaled":
+        if not np.isfinite(scale) or scale < 0:
+            raise ValueError("Background scale must be finite and nonnegative.")
         return float(scale)
     if mode == "statistical":
-        return (
-            max(float(foreground.live_time or 1.0), 1.0)
-            / max(float(background.live_time or 1.0), 1.0)
-        )
+        times = (foreground.live_time, background.live_time)
+        if not all(np.isfinite(t) and t > 0 for t in times):
+            raise ValueError(
+                "Statistical background normalization requires positive finite live times."
+            )
+        return float(foreground.live_time / background.live_time)
     raise ValueError(f"Unsupported background-subtraction mode: {mode}")
 
 
@@ -1375,7 +1459,9 @@ def _estimate_roi_background_curve(
     channels = np.asarray(spectrum.channels, dtype=float)
     counts = np.asarray(spectrum.counts, dtype=float)
     roi_lo_ch, roi_hi_ch = _roi_channel_bounds(spectrum, roi_bounds_keV)
-    roi_lo_keV, roi_hi_keV = sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))
+    roi_lo_keV, roi_hi_keV = sorted(
+        (float(roi_bounds_keV[0]), float(roi_bounds_keV[1]))
+    )
     width_keV = max(roi_hi_keV - roi_lo_keV, 1.0)
     sideband_width_keV = float(sideband_width_keV or max(width_keV * 0.5, 3.0))
 
@@ -1386,8 +1472,16 @@ def _estimate_roi_background_curve(
         right_lo_ch, right_hi_ch = _roi_channel_bounds(spectrum, right_keV)
         left_mask = (channels >= left_lo_ch) & (channels <= left_hi_ch)
         right_mask = (channels >= right_lo_ch) & (channels <= right_hi_ch)
-        left_rate = float(np.mean(counts[left_mask])) if np.any(left_mask) else float(counts[max(roi_lo_ch - 1, 0)])
-        right_rate = float(np.mean(counts[right_mask])) if np.any(right_mask) else float(counts[min(roi_hi_ch, len(counts) - 1)])
+        left_rate = (
+            float(np.mean(counts[left_mask]))
+            if np.any(left_mask)
+            else float(counts[max(roi_lo_ch - 1, 0)])
+        )
+        right_rate = (
+            float(np.mean(counts[right_mask]))
+            if np.any(right_mask)
+            else float(counts[min(roi_hi_ch, len(counts) - 1)])
+        )
         roi_channels = channels[(channels >= roi_lo_ch) & (channels <= roi_hi_ch)]
         if roi_channels.size:
             interp = np.interp(
@@ -1436,9 +1530,16 @@ def _weighted_centroid_keV(
         return (center_keV, 0.0)
     centroid_channel = float(np.average(roi_channels, weights=roi_weights))
     centroid_keV = float(spectrum.channel_to_energy(centroid_channel))
-    variance = float(np.average((roi_channels - centroid_channel) ** 2, weights=roi_weights))
+    variance = float(
+        np.average((roi_channels - centroid_channel) ** 2, weights=roi_weights)
+    )
     centroid_unc_keV = float(
-        abs(spectrum.channel_to_energy(centroid_channel + math.sqrt(max(variance, 0.0) / max(np.sum(roi_weights), 1.0))))
+        abs(
+            spectrum.channel_to_energy(
+                centroid_channel
+                + math.sqrt(max(variance, 0.0) / max(np.sum(roi_weights), 1.0))
+            )
+        )
         - centroid_keV
     )
     return centroid_keV, centroid_unc_keV
@@ -1452,7 +1553,9 @@ def _fit_roi_overlap_components(
     max_components: int,
     registries: PluginRegistries | None = None,
 ) -> tuple[ROIComponentFit, ...]:
-    roi_lo_keV, roi_hi_keV = sorted((float(roi_bounds_keV[0]), float(roi_bounds_keV[1])))
+    roi_lo_keV, roi_hi_keV = sorted(
+        (float(roi_bounds_keV[0]), float(roi_bounds_keV[1]))
+    )
     roi_lo_ch, roi_hi_ch = _roi_channel_bounds(spectrum, (roi_lo_keV, roi_hi_keV))
     channels = np.asarray(spectrum.channels, dtype=float)
     counts = np.asarray(spectrum.counts, dtype=float)
@@ -1470,13 +1573,18 @@ def _fit_roi_overlap_components(
         min_distance=max(int(max((roi_hi_ch - roi_lo_ch) / 6.0, 1.0)), 1),
         registries=registries,
     )
-    peak_channels = [int(round(channel)) for channel, _significance in local_peaks[:max_components]]
+    peak_channels = [
+        int(round(channel)) for channel, _significance in local_peaks[:max_components]
+    ]
     minimum_distance = max(int(max((roi_hi_ch - roi_lo_ch) / 8.0, 1.0)), 1)
     if len(peak_channels) < min(2, max_components):
         ranked_indices = np.argsort(local_counts)[::-1]
         for index in ranked_indices:
             candidate_channel = int(round(local_channels[int(index)]))
-            if any(abs(candidate_channel - existing) < minimum_distance for existing in peak_channels):
+            if any(
+                abs(candidate_channel - existing) < minimum_distance
+                for existing in peak_channels
+            ):
                 continue
             if local_counts[int(index)] <= np.median(local_counts):
                 continue
@@ -1492,6 +1600,8 @@ def _fit_roi_overlap_components(
         fit_width=max(int((roi_hi_ch - roi_lo_ch) / 2), 4),
         background_model="linear",
         share_sigma=True,
+        counts_uncertainty=spectrum.counts_uncertainty,
+        counts_covariance=spectrum.counts_covariance,
     )
     components: list[ROIComponentFit] = []
     for result in fit_results[:max_components]:
@@ -1564,19 +1674,133 @@ def compute_cascade_sum_lines(
 def _fit_semi_empirical_coefficients(
     energies: np.ndarray,
     values: np.ndarray,
-) -> list[float]:
-    log_eff = np.log(np.clip(values, 1e-12, 1.0))
-    poly = np.polyfit(np.log(energies), log_eff, 2)
-    scale = float(np.clip(np.exp(poly[2]), 1e-9, 1.0))
-    length = float(np.clip(np.max(values) * 10.0, 0.2, 6.0))
-    alpha = 1.15
-    length0 = float(np.clip(np.mean(energies) / 1500.0, 0.2, 4.0))
-    kappa = float(np.clip(np.exp(poly[1]), 0.1, 3.0))
-    coefficients = [scale, length, alpha, length0, kappa]
-    predicted = semi_empirical_efficiency(energies, coefficients)
-    if np.any(~np.isfinite(predicted)) or np.max(predicted) <= 0:
-        coefficients = [1e-3, 2.0, 1.1, 1.0, 0.8]
-    return coefficients
+    measurement_covariance: np.ndarray,
+) -> tuple[EfficiencyCurve, np.ndarray, tuple[str, ...], dict]:
+    """Fit response terms with explicit conditional fallback for sparse spectra.
+
+    Lengths are Ge areal densities in g/cm². A five-coefficient fit is only
+    attempted for at least eight distinct lines. Otherwise length and length0
+    are fixed *assumptions*, not detector measurements.
+    """
+    names = ("scale", "length_g_cm2", "alpha", "length0_g_cm2", "kappa")
+    if len(energies) < 4 or len(np.unique(energies)) < 4:
+        raise ValueError(
+            "Semi-empirical HPGe fit needs at least four distinct energies."
+        )
+    cholesky = np.linalg.cholesky(measurement_covariance)
+
+    def residual(coefficients: np.ndarray) -> np.ndarray:
+        prediction = semi_empirical_efficiency(energies, coefficients)
+        return np.linalg.solve(cholesky, prediction - values)
+
+    def identifiable(jacobian: np.ndarray) -> bool:
+        norms = np.linalg.norm(jacobian, axis=0)
+        if np.any(norms <= 0):
+            return False
+        scaled = jacobian / norms
+        return bool(
+            np.linalg.matrix_rank(scaled) == scaled.shape[1]
+            and np.linalg.cond(scaled) < 1e7
+        )
+
+    full = None
+    if len(energies) >= 8 and len(np.unique(energies)) >= 8:
+        lower = np.array([1e-10, 0.01, 0.2, 0.01, 0.0])
+        upper = np.array([1.0, 30.0, 5.0, 20.0, 5.0])
+        starts = (
+            [0.02, 2.0, 1.5, 1.0, 0.5],
+            [0.02, 8.3, 2.1, 1.66, 0.4],
+            [min(float(np.max(values)), 0.5), 4.0, 1.0, 2.0, 1.0],
+        )
+        candidates = [
+            least_squares(
+                residual, start, bounds=(lower, upper), x_scale="jac", max_nfev=4000
+            )
+            for start in starts
+        ]
+        usable = [fit for fit in candidates if fit.success and identifiable(fit.jac)]
+        if usable:
+            full = min(usable, key=lambda fit: fit.cost)
+
+    if full is not None:
+        coefficients = full.x
+        jacobian = full.jac
+        estimated_indices = (0, 1, 2, 3, 4)
+        fixed = {}
+        identifiability = "full"
+    else:
+        # Conditional three-parameter response. These are declared reference
+        # assumptions, not zero-uncertainty estimates of a detector's geometry.
+        fixed = {"length_g_cm2": 8.3, "length0_g_cm2": 1.66}
+        estimated_indices = (0, 2, 4)
+
+        def conditional_coefficients(estimated: np.ndarray) -> np.ndarray:
+            return np.array([estimated[0], 8.3, estimated[1], 1.66, estimated[2]])
+
+        lower = [1e-10, 0.2, 0.0]
+        upper = [1.0, 5.0, 5.0]
+        starts = ([0.02, 2.1, 0.4], [min(float(np.max(values)), 0.5), 1.0, 1.0])
+        candidates = [
+            least_squares(
+                lambda estimated: residual(conditional_coefficients(estimated)),
+                start,
+                bounds=(lower, upper),
+                x_scale="jac",
+                max_nfev=4000,
+            )
+            for start in starts
+        ]
+        usable = [fit for fit in candidates if fit.success and identifiable(fit.jac)]
+        if not usable:
+            raise ValueError(
+                "Semi-empirical HPGe parameters are not identifiable from these calibration points."
+            )
+        fitted = min(usable, key=lambda fit: fit.cost)
+        coefficients = conditional_coefficients(fitted.x)
+        jacobian = fitted.jac
+        identifiability = (
+            "conditional_sparse" if len(energies) < 8 else "conditional_weak_full_fit"
+        )
+
+    prediction = semi_empirical_efficiency(energies, coefficients)
+    if (
+        np.any(~np.isfinite(prediction))
+        or np.any(prediction <= 0)
+        or np.any(prediction > 1)
+    ):
+        raise ValueError("Semi-empirical HPGe fit predicts nonphysical efficiencies.")
+    covariance = np.linalg.inv(jacobian.T @ jacobian)
+    if np.any(~np.isfinite(covariance)):
+        raise ValueError("Semi-empirical HPGe covariance is not identifiable.")
+    estimated_names = tuple(names[index] for index in estimated_indices)
+    curve = EfficiencyCurve(
+        model_type="functional",
+        parameters={
+            "form": "semi_empirical_hpge",
+            "coefficients": coefficients.tolist(),
+            "coefficient_names": names,
+            "estimated_coefficients": estimated_names,
+            "fixed_coefficients": fixed,
+        },
+        energy_range=(float(np.min(energies)), float(np.max(energies))),
+        uncertainty_model={
+            "type": "conditional_covariance",
+            "covariance": covariance.tolist(),
+            "parameter_indices": estimated_indices,
+        },
+    )
+    quality = {
+        "identifiability": identifiability,
+        "estimated_parameters": estimated_names,
+        "fixed_parameters": tuple(fixed),
+        "assumption": (
+            "Fixed lengths are reference assumptions; covariance is conditional on them."
+            if fixed
+            else "All five response coefficients estimated."
+        ),
+        "geometry_support": "No detector dimensions, source distance, window, or dead-layer terms were estimated from these points.",
+    }
+    return curve, covariance, estimated_names, quality
 
 
 def _score_database_lines(

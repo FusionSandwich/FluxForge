@@ -283,7 +283,7 @@ def test_gaussian_failed_covariance_does_not_fabricate_ten_percent(monkeypatch):
     assert "percentage" in result.diagnostics["uncertainty_unavailable_reason"]
 
 
-def test_gaussian_nonfinite_covariance_is_unavailable_despite_finite_flux():
+def test_gaussian_whitening_preserves_finite_covariance_at_extreme_units():
     from fluxforge.solvers import rmle
 
     with np.errstate(over="ignore", invalid="ignore"):
@@ -297,8 +297,10 @@ def test_gaussian_nonfinite_covariance_is_unavailable_despite_finite_flux():
             enforce_positivity=False,
         )
     np.testing.assert_allclose(result.solution, [1, 2])
-    assert result.uncertainty is None and result.covariance is None
-    assert result.diagnostics["uncertainty_status"] == "unavailable"
+    np.testing.assert_allclose(result.uncertainty, [1, 1])
+    np.testing.assert_allclose(result.covariance, np.eye(2))
+    assert result.diagnostics["uncertainty_status"] == "conditional_linear_proxy"
+    assert result.diagnostics["uncertainty_qualified"] is False
 
 
 @pytest.mark.parametrize("response_scale", [1e-200, 1e200])

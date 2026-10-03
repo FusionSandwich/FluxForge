@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import importlib.util
 import io
+import os
 import sys
 import warnings
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
@@ -19,7 +20,12 @@ from fluxforge.unfolding import GravelUnfolder
 
 
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-REFERENCE_ROOT = WORKSPACE_ROOT / "testing"
+REFERENCE_ROOT_OVERRIDE = os.environ.get("FLUXFORGE_REFERENCE_ROOT")
+REFERENCE_ROOT = (
+    Path(REFERENCE_ROOT_OVERRIDE).expanduser().resolve()
+    if REFERENCE_ROOT_OVERRIDE
+    else WORKSPACE_ROOT / "testing"
+)
 NEUTRON_REFERENCE_ROOT = REFERENCE_ROOT / "Neutron-Unfolding"
 PYUNFOLD_REFERENCE_ROOT = REFERENCE_ROOT / "pyunfold"
 
@@ -74,17 +80,25 @@ def _prepend_sys_path(path: Path) -> Iterator[None]:
             sys.path.remove(path_str)
 
 
-def _load_neutron_reference_inputs() -> tuple[np.ndarray, np.ndarray, dict[str, np.ndarray]]:
+def _load_neutron_reference_inputs() -> (
+    tuple[np.ndarray, np.ndarray, dict[str, np.ndarray]]
+):
     inputs_root = NEUTRON_REFERENCE_ROOT / "unfolding_inputs"
     response = np.loadtxt(inputs_root / "response-matrix.txt", delimiter=",").T
-    with (inputs_root / "reduced_data.csv").open(newline="", encoding="utf-8") as handle:
+    with (inputs_root / "reduced_data.csv").open(
+        newline="", encoding="utf-8"
+    ) as handle:
         rows = list(csv.DictReader(handle))
     measurements = np.asarray([float(row["NEUTRON 1"]) for row in rows], dtype=float)
     energy_spectrum = np.loadtxt(inputs_root / "energy-spectrum.txt")
-    return response, measurements, {
-        "constant": np.ones(response.shape[1], dtype=float),
-        "true": np.asarray(energy_spectrum[0], dtype=float),
-    }
+    return (
+        response,
+        measurements,
+        {
+            "constant": np.ones(response.shape[1], dtype=float),
+            "true": np.asarray(energy_spectrum[0], dtype=float),
+        },
+    )
 
 
 def _load_local_pyunfold_symbols():
@@ -186,7 +200,7 @@ def _pyunfold_reference_cases():
 
 
 @pytest.mark.skipif(
-    not NEUTRON_REFERENCE_ROOT.exists(),
+    not NEUTRON_REFERENCE_ROOT.exists() and not REFERENCE_ROOT_OVERRIDE,
     reason="Local Neutron-Unfolding reference repo is unavailable.",
 )
 @pytest.mark.parametrize(
@@ -199,7 +213,9 @@ def test_gravel_matches_neutron_reference_with_same_tolerance(
 ) -> None:
     response, measurements, guesses = _load_neutron_reference_inputs()
     initial_flux = guesses[initial_key]
-    reference_gravel = _load_module("reference_gravel", NEUTRON_REFERENCE_ROOT / "gravel.py")
+    reference_gravel = _load_module(
+        "reference_gravel", NEUTRON_REFERENCE_ROOT / "gravel.py"
+    )
 
     with _silence_external_output():
         reference_flux, reference_history = reference_gravel.gravel(
@@ -231,7 +247,7 @@ def test_gravel_matches_neutron_reference_with_same_tolerance(
 
 
 @pytest.mark.skipif(
-    not NEUTRON_REFERENCE_ROOT.exists(),
+    not NEUTRON_REFERENCE_ROOT.exists() and not REFERENCE_ROOT_OVERRIDE,
     reason="Local Neutron-Unfolding reference repo is unavailable.",
 )
 @pytest.mark.parametrize(
@@ -276,14 +292,16 @@ def test_mlem_matches_neutron_reference_with_same_tolerance(
 
 
 @pytest.mark.skipif(
-    not NEUTRON_REFERENCE_ROOT.exists(),
+    not NEUTRON_REFERENCE_ROOT.exists() and not REFERENCE_ROOT_OVERRIDE,
     reason="Local Neutron-Unfolding reference repo is unavailable.",
 )
 def test_gravel_unfolder_matches_neutron_reference() -> None:
     response, measurements, guesses = _load_neutron_reference_inputs()
     tolerance = 0.2
     initial_flux = guesses["constant"]
-    reference_gravel = _load_module("reference_gravel_adapter", NEUTRON_REFERENCE_ROOT / "gravel.py")
+    reference_gravel = _load_module(
+        "reference_gravel_adapter", NEUTRON_REFERENCE_ROOT / "gravel.py"
+    )
 
     with _silence_external_output():
         reference_flux, reference_history = reference_gravel.gravel(
@@ -318,7 +336,7 @@ def test_gravel_unfolder_matches_neutron_reference() -> None:
 
 
 @pytest.mark.skipif(
-    not PYUNFOLD_REFERENCE_ROOT.exists(),
+    not PYUNFOLD_REFERENCE_ROOT.exists() and not REFERENCE_ROOT_OVERRIDE,
     reason="Local pyunfold reference repo is unavailable.",
 )
 @pytest.mark.parametrize("case_index", range(5))
