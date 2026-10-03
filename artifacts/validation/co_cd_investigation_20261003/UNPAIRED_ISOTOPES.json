@@ -1,0 +1,26 @@
+[
+  {
+    "sample": "Ni-RAFM-1_25cm",
+    "isotope": "Ni57",
+    "activity_Bq": 90.17550204110809,
+    "status": "NO_QG_SUMMARY_TARGET"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Ti51",
+    "activity_Bq": 12.992222956558583,
+    "status": "NO_QG_SUMMARY_TARGET"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Ti51",
+    "activity_Bq": 15.383874772991005,
+    "status": "NO_QG_SUMMARY_TARGET"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Ti51",
+    "activity_Bq": 5.603643808544208,
+    "status": "NO_QG_SUMMARY_TARGET"
+  }
+]

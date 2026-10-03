@@ -1,0 +1,73 @@
+Co-Cd activity investigation — 2026-10-03
+
+The Co-Cd deficit is selective. The leading explanation is a measured-background input/convention difference, rather than a general Co-60 isotope error or arithmetic error. This investigation changed no production code or inputs.
+
+Coverage
+All 12 recovered monitor counts were inspected: 10 original ASC reductions and two original native ANS diagnostics. Native counts were hash-bound; live-time offsets were cross-checked against 30 ASC files. Cu-Cd uses its report's 25 cm calibration parameters without importing QG peak counts or activities. Fe-Cd retains its separate near-contact calibration and is excluded from the 25 cm population. No ASC files were invented.
+
+There are 19 paired measurement/isotope results. Excluding three Sc-48 report-convention cases and one near-contact case leaves 15 diagnostic comparisons; seven exceed a 20% difference screen across six count files. The three Ti counts are repeated measurements, not independent specimens.
+
+These are current-code N/(LT * efficiency * yield) outputs versus printed QG summaries, before harmonizing activity time references. They are diagnostic differences, not certified absolute errors.
+
+Sample | Isotope | FluxForge Bq | QG Bq | Difference % | Scope
+Co-Cd-RAFM-1_25cm | Co60 | 156.2311 | 234.9500 | -33.505 | 25 cm diagnostic
+Co-RAFM-1_25cm | Co60 | 2093.2962 | 2035.0000 | +2.865 | 25 cm diagnostic
+Cu-RAFM-1_25cm | Cu64 | 3200184.1685 | 3172380.0000 | +0.876 | 25 cm diagnostic
+In-Cd-RAFM-1_25cm | In114m | 324026.9594 | 219706.0000 | +47.482 | 25 cm diagnostic
+In-Cd-RAFM-1_25cm | In115m | 17880.7947 | 11988.0000 | +49.156 | 25 cm diagnostic
+Ni-RAFM-1_25cm | Co58 | 56763.2901 | 45880.0000 | +23.721 | 25 cm diagnostic
+Sc-Cd-RAFM-1_25cm | Sc46 | 183427.9039 | 159063.0000 | +15.318 | 25 cm diagnostic
+Sc-RAFM-1_25cm | Sc46 | 1628526.9721 | 1607650.0000 | +1.299 | 25 cm diagnostic
+Ti-RAFM-1a_25cm | Sc47 | 3917.7159 | 2282.9000 | +71.611 | 25 cm diagnostic
+Ti-RAFM-1a_25cm | Sc48 | 294.6202 | 15096.0000 | -98.048 | Unqualified report intensity/summary convention
+Ti-RAFM-1a_25cm | Sc46 | 480.5146 | 484.7000 | -0.863 | 25 cm diagnostic
+Ti-RAFM-1b_25cm | Sc47 | 2761.1741 | 1605.8000 | +71.950 | 25 cm diagnostic
+Ti-RAFM-1b_25cm | Sc48 | 156.8644 | 8658.0000 | -98.188 | Unqualified report intensity/summary convention
+Ti-RAFM-1b_25cm | Sc46 | 471.3435 | 466.2000 | +1.103 | 25 cm diagnostic
+Ti-RAFM-1_25cm | Sc47 | 3961.0041 | 2271.8000 | +74.355 | 25 cm diagnostic
+Ti-RAFM-1_25cm | Sc48 | 292.9309 | 15688.0000 | -98.133 | Unqualified report intensity/summary convention
+Ti-RAFM-1_25cm | Sc46 | 466.2085 | 473.6000 | -1.561 | 25 cm diagnostic
+Cu-Cd-RAFM-1_25cm | Cu64 | 1118733.7984 | 1090982.0000 | +2.544 | 25 cm diagnostic
+Fe-Cd-RAFM-1_0cm | Fe59 | 71.8874 | 61.4200 | +17.042 | Conditional near-contact model; excluded from 25 cm population
+
+Cobalt calculation
+At 1173/1332 keV, activity uses 6,989.5/6,974.5 physical net counts, while the exported raw comparison uses 10,522/11,020. QG reports 11,202/11,439. Thus the earlier observation that counts agree referred to a different count field from the one feeding activity.
+
+For the first line:
+  6989.5 / (129600 * 0.0003554891539202694 * 0.9985) = 151.938097 Bq.
+The second line gives 159.138099 Bq. Their inverse-variance average is 156.231075 Bq; QG's summary is 234.95 Bq. The conversion arithmetic closes exactly.
+
+The implementation deliberately preserves raw-spectrum comparison counts separately from physical counts after measured-background subtraction and local residual-continuum estimation. Two workflow calls compute adjusted data for export and analysis separately from the original spectrum; this is not sequential double subtraction. Local continuum subtraction is a separate operation, not proof that the measured background was subtracted twice.
+
+Holding the legacy efficiency fixed, Co-Cd controls give:
+  Historical North background:       156.231 Bq
+  Native North energy calibration:   160.181 Bq
+  No separate measured background:   246.194 Bq
+  Zero-valued background-route test: 246.194 Bq
+  Source-bound South background:     134.325 Bq
+  QG report summary:                 234.950 Bq
+
+For bare Co, historical North gives 2,093.296 Bq, no measured background gives 2,188.852 Bq, and QG gives 2,035 Bq. The measured-background operation changes both cobalt estimates by about 90–96 Bq, a much larger fraction of the weaker Cd-covered signal. South substitution alone does not resolve the discrepancy.
+
+The North file is labeled North and dated March 2026; the native South file is dated October 3, 2025, after the August measurements. Both contain Co-60 peaks. QG reports do not identify a separate background file. Neither later background nor the no-background control is accepted here as the correct physical background. The controls support a convention/applicability difference, not a claim that QG omitted every ambient correction.
+
+Math and timing checks
+All 41 checked line calculations close exactly with recorded inputs; 21 isotope combinations close within 2.22e-16 relative error. Live times match QG/native inputs. For Co-Cd, live versus real normalization changes by 0.071%, and count-average to count-start correction by 0.027%. Clock discrepancies and EOI/activation/mass calculations cannot explain the 33.5% measurement-time deficit. Co-60 yields agree. Legacy efficiencies are about 6–11% below QG-effective values, which pushes activity upward at fixed counts, opposite to this deficit. No global efficiency multiplier is justified.
+
+Other families
+Cu-64 agrees within about 1–3% in both bare and Cd counts. Sc-46 pooled results remain within 20% across five counts, although individual line effects and weighted cancellation matter.
+
+Indium, Co-58 in Ni, and Sc-47 in Ti show positive differences. Their dominant physical peak counts are mostly near QG, while the legacy efficiency is lower. Recovered-curve/legacy efficiency ratios are about 1.57 at 159 keV, 1.56 at 190 keV, 1.44 at 336 keV, 1.32 at 558 keV and 1.22 at 810 keV, compared with 1.09/1.05 at the cobalt lines. These are conditional comparisons using the recovered export's documented percent interpretation, not independently certified efficiencies.
+
+In-114m also has different gamma inputs: QG prints 15.56%, 4.40%, 4.40% at 190/558/725 keV; the bundled analysis uses 18.6%, 3.50%, 3.50%. A source-library qualification is needed before choosing a winner.
+
+Sc-48's roughly 98% summary differences are the existing printed intensity/line-summary problem. Those three cases are excluded from clean incidence and need the saved declared intensity scenarios. Additional inferred Ni-57, Ti-51 and Mn-54 outputs lack QG summary targets and are not newly accepted identifications.
+
+Short-lived time references remain relevant: count-start/count-average factors are about 1.08 for In-115m, and 1.017 or 1.221 for Sc-47's four-hour or 48-hour counts. Under the count-start interpretation these corrections increase the positive differences. No automatic timezone adjustment was made.
+
+Reporting and next work
+The line CSV labels comparison_net_counts as raw_net_counts alongside activity calculated from physical net_counts. This can misclassify measured-background loss as efficiency_or_activity_conversion_bias. Both counts and their bases must be explicit, with an algebraically consistent conversion audit.
+
+IEC/Covell/Gilmore controls leave Co-Cd activity at 156.231 Bq under North while the comparison candidate changes. The residual ROI/fit drives activity in this branch; selected comparison methods must not be mistaken for activity-method selection. This behavior requires documentation/review, not blindly substituting ambient-containing comparison counts into activity.
+
+Resolve background applicability/QG background settings first, make count bases explicit, and then compare source-bound efficiency, yield and time-reference scenarios. Retain the historical and no-background controls. The existing FluxForge repair task owns implementation. SOURCE_PROVENANCE.json binds the frozen engine and original files; the companion JSON/CSV files preserve the witnesses.

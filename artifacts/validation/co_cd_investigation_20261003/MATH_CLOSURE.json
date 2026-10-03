@@ -1,0 +1,488 @@
+{
+  "activity_formula": "N_activity / (live_time * efficiency * photons_per_decay), followed by recorded correction factor",
+  "line_checks": 41,
+  "max_relative_line_error": 0.0,
+  "combination_formula": "inverse variance weighted mean over explicitly selected lines",
+  "isotope_checks": 21,
+  "max_relative_pool_error": 2.220446049250313e-16,
+  "line_witnesses": [
+    {
+      "sample": "Co-Cd-RAFM-1_25cm",
+      "isotope": "Co60",
+      "energy": 1173.2312153498783,
+      "calculated_Bq": 151.9380973607045,
+      "stored_Bq": 151.9380973607045,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Co-Cd-RAFM-1_25cm",
+      "isotope": "Co60",
+      "energy": 1332.5455350389266,
+      "calculated_Bq": 159.13809929159203,
+      "stored_Bq": 159.13809929159203,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Co-RAFM-1_25cm",
+      "isotope": "Co60",
+      "energy": 1173.1491363801185,
+      "calculated_Bq": 2162.6923391830296,
+      "stored_Bq": 2162.6923391830296,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Co-RAFM-1_25cm",
+      "isotope": "Co60",
+      "energy": 1332.4168353813495,
+      "calculated_Bq": 2038.7285739644199,
+      "stored_Bq": 2038.7285739644199,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Cu-RAFM-1_25cm",
+      "isotope": "Cu64",
+      "energy": 1345.4744204161175,
+      "calculated_Bq": 3200184.168496631,
+      "stored_Bq": 3200184.168496631,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In114m",
+      "energy": 190.17863903121298,
+      "calculated_Bq": 309512.8426577573,
+      "stored_Bq": 309512.8426577573,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In115m",
+      "energy": 336.16513563402845,
+      "calculated_Bq": 17880.79466012842,
+      "stored_Bq": 17880.79466012842,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In114m",
+      "energy": 558.2368507641241,
+      "calculated_Bq": 357503.6260982341,
+      "stored_Bq": 357503.6260982341,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In114m",
+      "energy": 724.9588128104051,
+      "calculated_Bq": 350325.6128981546,
+      "stored_Bq": 350325.6128981546,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Ni57",
+      "energy": 127.05746466327379,
+      "calculated_Bq": 12.576195924056982,
+      "stored_Bq": 12.576195924056982,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Co58",
+      "energy": 810.4649972716744,
+      "calculated_Bq": 56763.290053073695,
+      "stored_Bq": 56763.290053073695,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Ni57",
+      "energy": 1377.1696833971207,
+      "calculated_Bq": 123.33066764780646,
+      "stored_Bq": 123.33066764780646,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Ni57",
+      "energy": 1920.2478479629344,
+      "calculated_Bq": 34.5596674863582,
+      "stored_Bq": 34.5596674863582,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Sc-Cd-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "energy": 889.1158082647779,
+      "calculated_Bq": 186142.7603565401,
+      "stored_Bq": 186142.7603565401,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Sc-Cd-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "energy": 1120.3107119319038,
+      "calculated_Bq": 181300.48676204606,
+      "stored_Bq": 181300.48676204606,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Sc-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "energy": 889.6163263241466,
+      "calculated_Bq": 1652224.625853489,
+      "stored_Bq": 1652224.625853489,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Sc-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "energy": 1120.835584577764,
+      "calculated_Bq": 1610176.5996319111,
+      "stored_Bq": 1610176.5996319111,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc47",
+      "energy": 159.31730441454172,
+      "calculated_Bq": 3917.7158529868234,
+      "stored_Bq": 3917.7158529868234,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc48",
+      "energy": 175.21998042298154,
+      "calculated_Bq": 397.0004957010639,
+      "stored_Bq": 397.0004957010639,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Ti51",
+      "energy": 319.91101289797035,
+      "calculated_Bq": 12.992222956558583,
+      "stored_Bq": 12.992222956558583,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc46",
+      "energy": 889.0886281992525,
+      "calculated_Bq": 377.0531178572665,
+      "stored_Bq": 377.0531178572665,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc48",
+      "energy": 983.361143514081,
+      "calculated_Bq": 305.2934710557572,
+      "stored_Bq": 305.2934710557572,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc48",
+      "energy": 1037.3253726545609,
+      "calculated_Bq": 297.3224142368999,
+      "stored_Bq": 297.3224142368999,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc46",
+      "energy": 1120.29296341164,
+      "calculated_Bq": 620.9847035917512,
+      "stored_Bq": 620.9847035917512,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc48",
+      "energy": 1311.815315110399,
+      "calculated_Bq": 283.6387443424336,
+      "stored_Bq": 283.6387443424336,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc47",
+      "energy": 159.33101356149865,
+      "calculated_Bq": 2761.17413286652,
+      "stored_Bq": 2761.17413286652,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc48",
+      "energy": 175.26067356069856,
+      "calculated_Bq": 32.39751291336318,
+      "stored_Bq": 32.39751291336318,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Ti51",
+      "energy": 320.205576793239,
+      "calculated_Bq": 15.383874772991005,
+      "stored_Bq": 15.383874772991005,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc46",
+      "energy": 889.1670452475089,
+      "calculated_Bq": 346.5584760007582,
+      "stored_Bq": 346.5584760007582,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc48",
+      "energy": 983.3489305570163,
+      "calculated_Bq": 164.11593033370045,
+      "stored_Bq": 164.11593033370045,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc48",
+      "energy": 1037.3797972534464,
+      "calculated_Bq": 149.363550198152,
+      "stored_Bq": 149.363550198152,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc46",
+      "energy": 1120.328440093643,
+      "calculated_Bq": 609.5680124574267,
+      "stored_Bq": 609.5680124574267,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc48",
+      "energy": 1311.857242054092,
+      "calculated_Bq": 158.3930360088002,
+      "stored_Bq": 158.3930360088002,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc47",
+      "energy": 159.29462871216532,
+      "calculated_Bq": 3961.004125153134,
+      "stored_Bq": 3961.004125153134,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc48",
+      "energy": 175.25832771890194,
+      "calculated_Bq": 116.82476985125068,
+      "stored_Bq": 116.82476985125068,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Ti51",
+      "energy": 320.1465914458538,
+      "calculated_Bq": 5.603643808544208,
+      "stored_Bq": 5.603643808544208,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "energy": 888.9953638630335,
+      "calculated_Bq": 381.969419785564,
+      "stored_Bq": 381.969419785564,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc48",
+      "energy": 983.3016145149826,
+      "calculated_Bq": 308.9328269641668,
+      "stored_Bq": 308.9328269641668,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc48",
+      "energy": 1037.1919591162366,
+      "calculated_Bq": 303.7011157242719,
+      "stored_Bq": 303.7011157242719,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "energy": 1120.1299233417546,
+      "calculated_Bq": 565.1421470895793,
+      "stored_Bq": 565.1421470895793,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc48",
+      "energy": 1311.7266963813317,
+      "calculated_Bq": 268.5162017615825,
+      "stored_Bq": 268.5162017615825,
+      "relative_error": 0.0
+    }
+  ],
+  "pool_witnesses": [
+    {
+      "sample": "Co-Cd-RAFM-1_25cm",
+      "isotope": "Co60",
+      "calculated_Bq": 156.2310754782869,
+      "stored_Bq": 156.2310754782869,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Co-RAFM-1_25cm",
+      "isotope": "Co60",
+      "calculated_Bq": 2093.296232636004,
+      "stored_Bq": 2093.296232636004,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Cu-RAFM-1_25cm",
+      "isotope": "Cu64",
+      "calculated_Bq": 3200184.168496631,
+      "stored_Bq": 3200184.168496631,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In114m",
+      "calculated_Bq": 324026.9594471649,
+      "stored_Bq": 324026.9594471649,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In115m",
+      "calculated_Bq": 17880.79466012842,
+      "stored_Bq": 17880.79466012842,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Ni57",
+      "calculated_Bq": 90.17550204110809,
+      "stored_Bq": 90.17550204110809,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Co58",
+      "calculated_Bq": 56763.290053073695,
+      "stored_Bq": 56763.290053073695,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Sc-Cd-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "calculated_Bq": 183427.9038660119,
+      "stored_Bq": 183427.9038660119,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Sc-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "calculated_Bq": 1628526.972109233,
+      "stored_Bq": 1628526.972109233,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc47",
+      "calculated_Bq": 3917.715852986823,
+      "stored_Bq": 3917.715852986823,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc48",
+      "calculated_Bq": 294.62020604275045,
+      "stored_Bq": 294.6202060427504,
+      "relative_error": 2.220446049250313e-16
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Ti51",
+      "calculated_Bq": 12.992222956558583,
+      "stored_Bq": 12.992222956558583,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc46",
+      "calculated_Bq": 480.51463817557726,
+      "stored_Bq": 480.51463817557726,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc47",
+      "calculated_Bq": 2761.17413286652,
+      "stored_Bq": 2761.17413286652,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc48",
+      "calculated_Bq": 156.86439983339952,
+      "stored_Bq": 156.86439983339952,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Ti51",
+      "calculated_Bq": 15.383874772991005,
+      "stored_Bq": 15.383874772991005,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc46",
+      "calculated_Bq": 471.34346562007494,
+      "stored_Bq": 471.34346562007494,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc47",
+      "calculated_Bq": 3961.0041251531334,
+      "stored_Bq": 3961.0041251531334,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc48",
+      "calculated_Bq": 292.93087885246507,
+      "stored_Bq": 292.9308788524651,
+      "relative_error": 2.220446049250313e-16
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Ti51",
+      "calculated_Bq": 5.603643808544208,
+      "stored_Bq": 5.603643808544208,
+      "relative_error": 0.0
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "calculated_Bq": 466.20850534134684,
+      "stored_Bq": 466.20850534134684,
+      "relative_error": 0.0
+    }
+  ],
+  "scope": "Checks implementation algebra with recorded inputs; does not validate background/calibration applicability or QG physical truth"
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "study": "Co-Cd activity discrepancy and recovered monitor incidence",
+  "date": "2026-10-03",
+  "engine_commit": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "dataset_commit": "68e2c7a8bc497a4165725a3f23dd557df2a31c66",
+  "scope": "Diagnostic investigation; no production code or input changes. Source data already reside at repository-relative paths in SOURCE_PROVENANCE.json. Local execution paths in receipts are provenance, not portable runtime requirements.",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 29,
+      "sha256": "730a35ae3d558080083c3103d9ac8100c3f6561678092abe341701dfa331eb1d"
+    },
+    {
+      "path": "ALL_MONITOR_INCIDENCE.csv",
+      "bytes": 3460,
+      "sha256": "8f92581fbf1f3c7d3eb5ca1b82c13273f44a7ae04003a68c85426767bcb336d0"
+    },
+    {
+      "path": "COBALT_COUNTERFACTUALS.json",
+      "bytes": 76656,
+      "sha256": "94d628c9e8912a11883ec37fb06a1c6a9b88ad784d4893e590eb6b0f7310f36b"
+    },
+    {
+      "path": "EFFICIENCY_INPUT_COMPARISON.json",
+      "bytes": 15239,
+      "sha256": "4bb6ff71629261dea383116943a9c04f4ed4ac557c78092867ab0cf394e6f424"
+    },
+    {
+      "path": "FINDINGS.txt",
+      "bytes": 8240,
+      "sha256": "c36581746b1ad90f31bbb7179a5665fa7532dc13ddf9a023cd1292c62bb2a439"
+    },
+    {
+      "path": "INVESTIGATION_RECEIPT.json",
+      "bytes": 18260,
+      "sha256": "634b2b5de923e9ac37ffb4911936945199a41e344f3e803ccf6c9008628a08aa"
+    },
+    {
+      "path": "ISOTOPE_INCIDENCE.csv",
+      "bytes": 1491,
+      "sha256": "6c1e4cc3085a247db5457b68551e59966ec2931d13f3524f626b520278af316a"
+    },
+    {
+      "path": "LINE_COUNT_PATHS.csv",
+      "bytes": 6065,
+      "sha256": "6bb61b090b38707f75c88154e5d02d3390725205940e9db27e4e186bdb774113"
+    },
+    {
+      "path": "LINE_FACTORS.json",
+      "bytes": 14063,
+      "sha256": "d624c939c467313d0f23235b873ff8727d29dd1fc39f7cf82c57e3ebbe07fb4f"
+    },
+    {
+      "path": "MATH_CLOSURE.json",
+      "bytes": 13786,
+      "sha256": "4a0d8d201c47890edfb2febb25435a64212cbcefb16ee44821b6b2c0bbb2ba76"
+    },
+    {
+      "path": "MATRIX_RUN_RECEIPT.json",
+      "bytes": 9567,
+      "sha256": "1090eb284c176a66adeed52e37aa4ac220cded13bd23c4711b41456ab6615c6d"
+    },
+    {
+      "path": "NATIVE_ONLY_MONITOR_DIAGNOSTICS.json",
+      "bytes": 13014,
+      "sha256": "cec4b2fc7076bdc0d11cf926fcd663fd5e5053c5481da71d909115bac49b1653"
+    },
+    {
+      "path": "NATIVE_TIME_CROSSCHECK.json",
+      "bytes": 1940,
+      "sha256": "bf5ee9ccab0b26654a432d8a21e00ea2447e59f3516048a9c6f86f63d585ff3b"
+    },
+    {
+      "path": "SOURCE_PROVENANCE.json",
+      "bytes": 11756,
+      "sha256": "b62e5e5ab68c143f86ea1ab013249b9dfc7dac7dfb9ad14cbccdd042200c7e01"
+    },
+    {
+      "path": "TIME_REFERENCE_AUDIT.json",
+      "bytes": 5645,
+      "sha256": "e4dc97da3c13911c1fd5db3e9b154472fcf19fc1e6c09a71de1520bd779d2681"
+    },
+    {
+      "path": "UNPAIRED_ISOTOPES.json",
+      "bytes": 589,
+      "sha256": "28a7f0199c51527d941935449fa343380df9226e0cec4d76924878be55b5c354"
+    }
+  ]
+}
