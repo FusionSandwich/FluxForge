@@ -130,7 +130,30 @@ def verify_inputs(repo: Path, manifest_path: Path) -> dict:
                     extracted_nuclide_summaries=len(summaries))
     if observed != manifest['completeness']:
         raise ValueError('Manifest completeness disagrees with its actual sources')
+    supplement_path = repo/'examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/manifest.json'
+    supplement = json.loads(supplement_path.read_text(encoding='utf-8'))
+    supplemental_blobs = {}
+    for pin in supplement['resources']:
+        blob = bound_path(repo,pin['path']).read_bytes()
+        if len(blob)!=pin['bytes'] or hashlib.sha256(blob).hexdigest()!=pin['sha256']:
+            raise ValueError('Supplemental source hash/size mismatch')
+        supplemental_blobs[pin['role']] = blob
+    older = json.loads(supplemental_blobs['source_bound_older_QG_extraction'].decode('utf-8'))
+    original = supplemental_blobs['older_RAFM1_unpaired_QG_report']
+    if hashlib.sha256(original).hexdigest()!=older['source_sha256']:
+        raise ValueError('Older report/extraction binding mismatch')
+    lines = original.decode('cp1252').splitlines()
+    if len(lines)!=len(older['rows']) or any(lines[r['line_number']-1]!=r['original_line'] for r in older['rows']):
+        raise ValueError('Older report extraction incomplete or misbound')
+    supplemental_audit = dict(resources_hash_checked=len(supplement['resources']),
+                              older_report_ROI_rows=sum(r['classification']=='ROI' for r in older['rows']),
+                              older_report_summaries=sum(r['classification']=='nuclide_summary' for r in older['rows']),
+                              South_native_background_preserved=True, primary_workflow_background_changed=False,
+                              manifest_sha256=hashlib.sha256(supplement_path.read_bytes()).hexdigest())
+    if supplemental_audit['older_report_ROI_rows']!=12 or supplemental_audit['older_report_summaries']!=6:
+        raise ValueError('Older report extraction completeness changed')
     return dict(manifest=manifest, arrays=arrays, observed=observed,
+                supplemental_audit=supplemental_audit,
                 manifest_sha256=hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
                 resource_count=len(resources), source_lines_verified=len(seen))
 
@@ -217,6 +240,7 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
     receipt = dict(status='INPUT_AUDIT_PASS', counts=checked['observed'],
                    resources_hash_checked=checked['resource_count'],
                    original_report_lines_verified=checked['source_lines_verified'],
+                   supplemental_audit=checked['supplemental_audit'],
                    required_external_data_paths=[], requires_quantumgold_installation=False,
                    independent_absolute_qualification=False)
     if verify_only:

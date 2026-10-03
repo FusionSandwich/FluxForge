@@ -103,6 +103,16 @@ export with a misleading historical extension, not a QG activity report. Its
 bytes and historical paths/results are preserved, and it is excluded here.
 RAFM1_Long_70d_EOI.txt is an older QG report outside the 32-count campaign. The
 older maintained example files remain available; do not mix them into RAFM3/4.
+The older July 1 QG report is also byte-pinned in supplemental_inputs, with all
+12 ROI rows, 6 nuclide summaries and every original text line extracted and
+verified separately. Its blank ID/truncated File label and unmatched native/ASC
+identity remain explicit. Its 3600 s live/3848.07 s real time is retained as
+printed; no 70-day EOI or previous inferred-table duration is substituted.
+The recovered South 4hr native background ANS is preserved there too. It has no
+corroborating ASC and is not silently substituted for the maintained North 4hr
+background used by the legacy diagnostic replay. Both detector/source roles are
+explicit; this package does not assert that the North background is a South
+measurement. The input audit verifies these supplementary bytes and extraction.
 
 Tests
   python -m unittest discover -s tests -p test_portable_qg_example.py -v
