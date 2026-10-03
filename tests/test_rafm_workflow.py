@@ -45,6 +45,38 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE_ROOT = REPO_ROOT / "examples" / "RAFM_irradiation"
 
 
+@pytest.mark.parametrize("yield_uncertainty", [None, 0.05])
+def test_generic_gamma_metadata_uncertainty_reaches_activity(yield_uncertainty):
+    from math import hypot
+
+    from fluxforge.analysis.peakfit import calculate_activity
+
+    metadata = load_rafm_example_metadata(EXAMPLE_ROOT)
+    metadata.config["generic_rafm_isotopes"] = ["Co60"]
+    line = {"energy_keV": 1173.23, "intensity": 0.5}
+    if yield_uncertainty is not None:
+        line["intensity_uncertainty"] = yield_uncertainty
+    metadata.sample_gamma_library = {
+        "Co60": {"half_life_seconds": 166337000.0, "gamma_lines": [line]}
+    }
+    library, _ = build_generic_gamma_library(metadata)
+    activity, uncertainty = calculate_activity(
+        net_counts=1000.0,
+        net_counts_unc=10.0,
+        live_time=100.0,
+        efficiency=0.1,
+        efficiency_unc=0.0,
+        emission_probability=library[0].intensity,
+        emission_probability_unc=library[0].intensity_uncertainty,
+    )
+    # A = N / (t * efficiency * yield) = 200 Bq. Independent counting and
+    # yield errors contribute 2 Bq and 20 Bq respectively when supplied.
+    assert activity == pytest.approx(200.0)
+    assert uncertainty == pytest.approx(
+        hypot(2.0, 20.0 if yield_uncertainty is not None else 0.0)
+    )
+
+
 @pytest.mark.parametrize(
     "sample,mass", [("Co-RAFM-1", 4.0661), ("Co-Cd-RAFM-1", 3.6703)]
 )

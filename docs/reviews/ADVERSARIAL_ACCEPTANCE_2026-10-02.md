@@ -183,6 +183,19 @@ acceptance-runner smoke check, all passing. These repeat existing cases and are
 not added to the distinct-case totals above. The review did not qualify the
 remaining physical measurements or missing real transport fixtures.
 
+Tracing the uncertainty gaps also exposed an adapter defect: generic gamma
+metadata could supply `intensity_uncertainty`, but constructing the analysis
+library discarded it. The adapter now preserves that absolute emission-
+probability uncertainty. Two additional analytic activity contracts cover the
+provided and absent-field cases: 1,000 counts with a 10-count uncertainty,
+100-second live time, 0.1 efficiency, and 0.5 yield give 200 Bq; supplying a
+0.05 yield uncertainty gives 20.099751 Bq uncertainty rather than the previous
+2 Bq. These two new cases are separate from the 2,026-case historical evidence.
+All 209 lines and half-lives produced from the current example metadata are
+identical before and after this fix, because that metadata omits the uncertainty
+field. Thus the recorded sample replay results are unaffected. Missing values
+remain unqualified; the change does not manufacture source uncertainties.
+
 The first remote PR workflow passed CPU-ML, frozen external-reference parity,
 and both Linux and Windows modern-GUI jobs. Its core job exposed an optional-Qt
 test collection defect: `QApplication` was imported without checking whether
