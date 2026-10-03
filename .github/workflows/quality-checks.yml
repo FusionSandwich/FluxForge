@@ -172,7 +172,10 @@ jobs:
         run: pytest -q tests/test_modern_gui_shell.py tests/test_project_tracker_assets.py
 
       - name: Supported GUI workflow regressions
-        run: pytest -q tests/test_production_gui_mode.py tests/test_gui_consolidation.py
+        run: pytest -q tests/test_production_gui_mode.py
+
+      - name: GUI consolidation regressions
+        run: pytest -q tests/test_gui_consolidation.py
 
       - name: Analysis workspace core helper tests
         run: |

@@ -2,6 +2,10 @@
 
 This document tracks the current folder-by-folder cleanup queue for the active branch.
 
+As of 2026-10-03, the Tk paths in the historical inventory below refer to
+`archive/legacy_gui/src/fluxforge_gui/`. They are source-only reference material;
+all active GUI cleanup and improvements target `src/fluxforge/gui/` (ADR-008).
+
 - Total reviewed files: `474`
 - CSV inventory: `docs/REPO_CLEANUP_WORKSTREAM.csv`
 

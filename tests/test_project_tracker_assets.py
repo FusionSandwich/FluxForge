@@ -1,7 +1,13 @@
 import json
 from pathlib import Path
 
-from fluxforge.gui import GUIMode, MainWindowScaffold, ModeManager, SelectionBus, SelectionState
+from fluxforge.gui import (
+    GUIMode,
+    MainWindowScaffold,
+    ModeManager,
+    SelectionBus,
+    SelectionState,
+)
 from fluxforge.hal import AcquisitionState, MockMCADevice
 
 
@@ -58,13 +64,17 @@ def test_stage0_templates_and_adrs_exist():
 
     assert expected_templates.issubset({path.name for path in template_dir.iterdir()})
 
-    adr_files = sorted(path for path in adr_dir.iterdir() if path.name.startswith("ADR-"))
+    adr_files = sorted(
+        path for path in adr_dir.iterdir() if path.name.startswith("ADR-")
+    )
     assert {f"ADR-{number:03d}" for number in range(1, 9)}.issubset(
         {path.name[:7] for path in adr_files}
     )
     for path in adr_files:
         text = path.read_text(encoding="utf-8")
-        assert "**Status:** Accepted" in text or "**Status:** Superseded by ADR-" in text
+        assert (
+            "**Status:** Accepted" in text or "**Status:** Superseded by ADR-" in text
+        )
 
 
 def test_gui_scaffold_has_six_dock_zones():
