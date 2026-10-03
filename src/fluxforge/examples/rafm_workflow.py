@@ -45,7 +45,7 @@ from fluxforge.data.rafm_decay import get_rafm_decay_entry
 from fluxforge.data.rafm_profile import load_rafm_profile
 from fluxforge.io.flux_wire import FluxWireData, read_processed_txt, read_raw_asc
 from fluxforge.io.spe import GammaSpectrum
-from fluxforge.physics.activation import activation_study_metrics
+from fluxforge.physics.activation import activation_study_metrics, count_decay_factor
 from fluxforge.physics.monitor_response import CoverLayer, MonitorResponseSpec
 from fluxforge.physics.operating_history import load_operating_history, history_rate_jacobian
 from fluxforge.uncertainty.reaction_rate_budget import (
@@ -597,7 +597,11 @@ def report_count_real_time_s(config: Dict[str, Any], report: FluxWireData) -> fl
             "Set qg_report_activity_includes_count_decay in the workflow config "
             "(true if Quantum Gold already corrected decay during acquisition)"
         )
-    return 0.0 if declared else float(report.real_time)
+    if declared:
+        return 0.0
+    if not math.isfinite(report.real_time) or report.real_time <= 0:
+        raise ValueError("Uncorrected report activity requires positive real_time")
+    return float(report.real_time)
 
 
 def decay_correction_factor(
@@ -614,11 +618,7 @@ def decay_correction_factor(
     if half_life_s <= 0:
         return 1.0
     decay_constant = math.log(2.0) / half_life_s
-    live_term = 1.0
-    if count_real_time_s > 0:
-        denominator = -math.expm1(-decay_constant * count_real_time_s)
-        if denominator > 0:
-            live_term = decay_constant * count_real_time_s / denominator
+    live_term = 1.0 / count_decay_factor(half_life_s, count_real_time_s)
     exponent = decay_constant * (decay_time_s or 0.0)
     if exponent > 700.0:
         return float("inf")

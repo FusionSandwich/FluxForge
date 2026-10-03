@@ -100,9 +100,15 @@ def read_saturation_rates_csv(
 
             # Uncertainty (required)
             try:
-                unc = float(row.get(unc_col, 0))
-            except (ValueError, TypeError):
-                unc = 0.0
+                unc = float(row[unc_col])
+            except (KeyError, ValueError, TypeError) as exc:
+                raise ValueError(
+                    f"{reaction_id}: supplied rate uncertainty is required"
+                ) from exc
+            if not np.isfinite(unc) or unc < 0:
+                raise ValueError(
+                    f"{reaction_id}: rate uncertainty must be finite and nonnegative"
+                )
 
             # Optional fields
             half_life = 0.0
@@ -501,7 +507,16 @@ def import_staysl_bundle(
             if rxn in rxn_to_idx:
                 idx = rxn_to_idx[rxn]
                 measured_rates[idx] = float(row["rate"])
-                meas_unc[idx] = float(row["uncertainty"])
+                try:
+                    meas_unc[idx] = float(row["uncertainty"])
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"{rxn}: supplied rate uncertainty is required"
+                    ) from exc
+                if not np.isfinite(meas_unc[idx]) or meas_unc[idx] < 0:
+                    raise ValueError(
+                        f"{rxn}: rate uncertainty must be finite and nonnegative"
+                    )
 
     # Read measurement covariance
     meas_cov_file = input_dir / f"{prefix}_meas_cov.txt"

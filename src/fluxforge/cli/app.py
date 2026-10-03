@@ -440,28 +440,20 @@ def _build_reaction_rate_rows_from_activity_review(
         )
 
     rows: list[dict[str, Any]] = []
-    segment_factor_cache: dict[float, float] = {}
 
     for row in isotope_rows:
         nuclide = str(row.get("nuclide") or "").strip()
         if not nuclide:
             continue
-        activity_eoi = _safe_float(row.get("irradiation_time_activity_Bq"), default=0.0)
-        activity_unc = _safe_float(
-            row.get("irradiation_time_activity_unc_Bq"),
-            default=0.0,
+        activity_eoi = float(row["irradiation_time_activity_Bq"])
+        supplied_unc = row.get("irradiation_time_activity_unc_Bq")
+        activity_unc = float(supplied_unc) if supplied_unc is not None else None
+        half_life_s = float(row["half_life_s"])
+        estimate = reaction_rate_from_activity(
+            activity_eoi, segments, half_life_s, activity_uncertainty_bq=activity_unc
         )
-        half_life_s = max(_safe_float(row.get("half_life_s"), default=0.0), 0.0)
-        if activity_eoi <= 0.0 or half_life_s <= 0.0:
-            continue
-
-        if half_life_s not in segment_factor_cache:
-            buildup = irradiation_buildup_factor(segments, half_life_s)
-            segment_factor_cache[half_life_s] = max(float(buildup), 1.0e-12)
-        factor = segment_factor_cache[half_life_s]
-
-        rate = activity_eoi / factor
-        rate_unc = activity_unc / factor
+        rate = estimate.rate
+        rate_unc = estimate.uncertainty
         rows.append(
             {
                 "reaction_id": nuclide,
@@ -472,10 +464,15 @@ def _build_reaction_rate_rows_from_activity_review(
                     _safe_float(row.get("cooling_time_s"), default=0.0)
                 ),
                 "activity_eoi_Bq": float(activity_eoi),
-                "activity_eoi_unc_Bq": float(activity_unc),
+                "activity_eoi_unc_Bq": activity_unc,
                 "reaction_rate_s": float(rate),
-                "reaction_rate_unc_s": float(rate_unc),
-                "relative_uncertainty": float(rate_unc / max(rate, 1.0e-12)),
+                "reaction_rate_unc_s": rate_unc,
+                "relative_uncertainty": (
+                    rate_unc / rate if rate_unc is not None and rate > 0 else None
+                ),
+                "uncertainty_scope": estimate.uncertainty_scope,
+                "uncertainty_unavailable_reason": estimate.uncertainty_unavailable_reason,
+                "scientific_admission": False,
             }
         )
 
@@ -3087,6 +3084,11 @@ def cmd_activity_review(args: argparse.Namespace) -> None:
         ),
         energy_tolerance_keV=float(args.energy_tolerance_keV),
         dead_time_fraction=float(getattr(args, "dead_time_fraction", 0.0) or 0.0),
+        real_time_s=(
+            peak_report.get("real_time_s")
+            if peak_report.get("real_time_s") is not None
+            else getattr(args, "real_time_s", None)
+        ),
         sample_mass_g=getattr(args, "sample_mass_g", None),
     )
 
@@ -3997,7 +3999,10 @@ def cmd_rates(args: argparse.Namespace) -> None:
     for idx, line in enumerate(line_payload["lines"]):
         half_life_s = line.get("half_life_s", args.half_life_s)
         rate_estimate = reaction_rate_from_activity(
-            line["activity_Bq"], segment_objs, half_life_s
+            line["activity_Bq"],
+            segment_objs,
+            half_life_s,
+            activity_uncertainty_bq=line.get("activity_unc_Bq"),
         )
         reaction_id = (
             line.get("reaction_id") or line.get("isotope") or f"reaction_{idx + 1}"
@@ -4008,6 +4013,13 @@ def cmd_rates(args: argparse.Namespace) -> None:
                 "rate": rate_estimate.rate,
                 "uncertainty": rate_estimate.uncertainty,
                 "half_life_s": half_life_s,
+                "uncertainty_scope": getattr(
+                    rate_estimate, "uncertainty_scope", "activity_only_conditional"
+                ),
+                "uncertainty_unavailable_reason": getattr(
+                    rate_estimate, "uncertainty_unavailable_reason", ""
+                ),
+                "scientific_admission": False,
             }
         )
 
@@ -4458,6 +4470,11 @@ def cmd_unfold(args: argparse.Namespace) -> None:
     rates_payload = read_reaction_rates(args.rates_file)
     if args.validate:
         validate_or_raise(rates_payload)
+    if any(rx.get("uncertainty") is None for rx in rates_payload["rates"]):
+        raise ValueError(
+            "Unfolding requires supplied reaction-rate uncertainties; "
+            "one or more are unavailable."
+        )
     measured_rates = (
         require_nonnegative(
             "measurements",
@@ -5045,7 +5062,11 @@ def _build_standard_report_text(
                     [
                         row.get("reaction_id"),
                         _safe_float(row.get("rate")),
-                        _safe_float(row.get("uncertainty")),
+                        (
+                            row["uncertainty"]
+                            if row.get("uncertainty") is not None
+                            else "unavailable"
+                        ),
                         _safe_float(row.get("half_life_s")),
                     ]
                     for row in rates
@@ -6961,6 +6982,12 @@ def build_parser() -> argparse.ArgumentParser:
     activity_review.add_argument("--live-time-s", type=float)
     activity_review.add_argument("--cooling-time-s", type=float, default=0.0)
     activity_review.add_argument("--dead-time-fraction", type=float, default=0.0)
+    activity_review.add_argument(
+        "--real-time-s",
+        type=float,
+        default=None,
+        help="Clock duration for count decay; live time accounts for acceptance separately",
+    )
     activity_review.add_argument("--energy-tolerance-keV", type=float, default=2.0)
     activity_review.add_argument(
         "--source-id",

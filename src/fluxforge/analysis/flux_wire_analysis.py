@@ -529,11 +529,16 @@ def _roi_gross_counts(
     counts: np.ndarray,
     peak_channel: int,
     fwhm_channels: float,
+    spectrum_uncertainty: Optional[np.ndarray] = None,
 ) -> Tuple[float, float]:
     """Compute raw gross counts and Poisson uncertainty for a peak ROI."""
     ch_min, ch_max = _roi_bounds(peak_channel, fwhm_channels, len(counts))
     gross = float(np.sum(np.asarray(counts[ch_min : ch_max + 1], dtype=float)))
-    gross_unc = float(np.sqrt(max(gross, 0.0)))
+    gross_unc = (
+        float(np.hypot.reduce(spectrum_uncertainty[ch_min : ch_max + 1]))
+        if spectrum_uncertainty is not None
+        else float(np.sqrt(max(gross, 0.0)))
+    )
     return gross, gross_unc
 
 
@@ -833,20 +838,19 @@ def _qg_style_linear_continuum_counts(
         bg_sum = 0.5 * (left_val + right_val)
     net = gross - bg_sum
     if spectrum_uncertainty is not None and len(spectrum_uncertainty) >= ch_max + 1:
-        gross_var = float(
-            np.sum(
-                np.asarray(spectrum_uncertainty[ch_min : ch_max + 1], dtype=float) ** 2
-            )
+        variances = (
+            np.asarray(spectrum_uncertainty[ch_min : ch_max + 1], dtype=float) ** 2
         )
     else:
-        gross_var = max(gross, 0.0)
-    left_var = max(left_val, 1.0)
-    right_var = max(right_val, 1.0)
-    if n > 1:
-        bg_var = float(np.sum((1.0 - t) ** 2) * left_var + np.sum(t**2) * right_var)
-    else:
-        bg_var = 0.25 * (left_var + right_var)
-    net_unc = float(np.sqrt(max(gross_var + bg_var, 0.0)))
+        variances = np.maximum(values[ch_min : ch_max + 1], 0.0)
+    # Each continuum endpoint is reused in all n bins and also belongs to
+    # the gross sum. Propagate the net's linear coefficients, including that
+    # covariance, rather than treating interpolated bins as independent.
+    coefficients = np.ones(n)
+    coefficients[0] -= n / 2.0
+    coefficients[-1] -= n / 2.0
+    net_var = float(np.dot(coefficients**2, variances))
+    net_unc = float(np.sqrt(max(net_var, 0.0)))
     return net, net_unc, gross, bg_sum
 
 
@@ -885,7 +889,7 @@ def _qg_adjacent_linear_continuum_counts(
         w_left = np.array([0.5], dtype=float)
         w_right = np.array([0.5], dtype=float)
         bg_sum = 0.5 * (left_bg + right_bg)
-    if spectrum_uncertainty is not None and len(spectrum_uncertainty) >= roi_hi + 1:
+    if spectrum_uncertainty is not None and len(spectrum_uncertainty) >= roi_hi + 2:
         gross_var = float(
             np.sum(
                 np.asarray(spectrum_uncertainty[roi_lo : roi_hi + 1], dtype=float) ** 2
@@ -899,9 +903,7 @@ def _qg_adjacent_linear_continuum_counts(
         gross_var = max(gross, 0.0)
         left_var = max(left_bg, 1.0)
         right_var = max(right_bg, 1.0)
-    bg_var = float(
-        np.sum(np.square(w_left)) * left_var + np.sum(np.square(w_right)) * right_var
-    )
+    bg_var = float(np.sum(w_left) ** 2 * left_var + np.sum(w_right) ** 2 * right_var)
     net = gross - bg_sum
     net_unc = float(np.sqrt(max(gross_var + bg_var, 0.0)))
     return net, net_unc, gross, bg_sum
@@ -1643,7 +1645,9 @@ def analyze_raw_spectrum(
             spectrum_uncertainty=working_spectrum.counts_uncertainty,
             spectrum_data=working_spectrum,
         )
-        raw_gross, raw_gross_unc = _roi_gross_counts(raw_counts, ch, fwhm_ch)
+        raw_gross, raw_gross_unc = _roi_gross_counts(
+            raw_counts, ch, fwhm_ch, spectrum.counts_uncertainty
+        )
 
         # Skip peaks with negative net counts
         if net <= 0:
@@ -1741,6 +1745,7 @@ def analyze_raw_spectrum_targeted(
     counting_method: str = "qg",
     fit_diagnostics: Optional[List[Dict[str, Any]]] = None,
     max_assignment_energy_delta_fwhm: Optional[float] = None,
+    energy_tolerance_keV: float = 2.0,
 ) -> List[IdentifiedPeak]:
     """
     Analyze raw spectrum by targeting known gamma lines.
@@ -1757,6 +1762,9 @@ def analyze_raw_spectrum_targeted(
         raise ValueError("Assignment energy tolerance must be finite and positive.")
     if data.spectrum is None:
         return []
+
+    if not np.isfinite(energy_tolerance_keV) or energy_tolerance_keV <= 0:
+        raise ValueError("energy_tolerance_keV must be finite and positive")
 
     analysis_data = _prepare_flux_wire_data_with_profile(data, profile_name)
     if background_spectrum is None and profile_name:
@@ -1776,6 +1784,9 @@ def analyze_raw_spectrum_targeted(
     )
     signed_counts = np.asarray(spectrum.counts, dtype=float)
     raw_counts = np.asarray(analysis_data.spectrum.counts, dtype=float)
+    raw_counts_uncertainty = np.asarray(
+        analysis_data.spectrum.counts_uncertainty, dtype=float
+    )
     background, counts_for_search, _ = _snip_background_from_signed_counts(
         signed_counts, n_iterations=24
     )
@@ -1791,6 +1802,7 @@ def analyze_raw_spectrum_targeted(
 
     for group in fit_groups:
         seeds: List[Tuple[GammaLine, int, float, float, float]] = []
+        candidate_channels_by_line: dict[int, list[int]] = {}
         fit_peak_channels: List[int] = []
         max_fwhm_ch = 1.0
 
@@ -1811,7 +1823,38 @@ def analyze_raw_spectrum_targeted(
             search_half = int(max(3, round(1.5 * fwhm_ch)))
             ch_lo = max(0, ch_est - search_half)
             ch_hi = min(len(counts_for_search) - 1, ch_est + search_half)
-            peak_channel = ch_lo + int(np.argmax(counts_for_search[ch_lo : ch_hi + 1]))
+            # Prefer a supported local maximum near the requested energy.
+            # A stronger neighboring peak's wing can otherwise steal a weak
+            # but resolved doublet component.
+            local_maxima, _ = find_peaks(counts_for_search[ch_lo : ch_hi + 1])
+            candidates = [ch_lo + int(index) for index in local_maxima]
+            candidates = [
+                channel
+                for channel in candidates
+                if abs(analysis_data.channel_to_energy(channel) - energy)
+                <= energy_tolerance_keV
+            ]
+            candidate_channels_by_line[id(line)] = sorted(
+                candidates,
+                key=lambda channel: abs(
+                    analysis_data.channel_to_energy(channel) - energy
+                ),
+            )
+            peak_channel = (
+                min(
+                    candidates,
+                    key=lambda channel: abs(
+                        analysis_data.channel_to_energy(channel) - energy
+                    ),
+                )
+                if candidates
+                else ch_lo + int(np.argmax(counts_for_search[ch_lo : ch_hi + 1]))
+            )
+            if (
+                abs(analysis_data.channel_to_energy(peak_channel) - energy)
+                > energy_tolerance_keV
+            ):
+                continue
             fit_peak_channels.append(int(peak_channel))
             seeds.append(
                 (line, int(peak_channel), float(slope), float(fwhm_keV), float(fwhm_ch))
@@ -1853,6 +1896,73 @@ def analyze_raw_spectrum_targeted(
                     initial_sigma=max(seeds[0][4] / 2.355, 0.8),
                     counts_uncertainty=spectrum.counts_uncertainty,
                     counts_covariance=spectrum.count_covariance_matrix(),
+                )
+                # A tiny local maximum can be closer to the library energy
+                # than a supported, slightly shifted peak. Retry the other
+                # in-tolerance maxima if the closest seed cannot support a fit.
+                first_fit = fit_results[0]
+                line = seeds[0][0]
+                if not (
+                    first_fit.success
+                    and first_fit.net_counts > 0
+                    and abs(
+                        analysis_data.channel_to_energy(first_fit.peak.centroid)
+                        - line.energy_keV
+                    )
+                    <= energy_tolerance_keV
+                ):
+                    for candidate in candidate_channels_by_line[id(line)]:
+                        if candidate == fit_peak_channels[0]:
+                            continue
+                        retry = fit_single_peak(
+                            channels=channels,
+                            counts=signed_counts,
+                            peak_channel=candidate,
+                            fit_width=fit_width,
+                            background_model="linear",
+                            counts_uncertainty=spectrum.counts_uncertainty,
+                            counts_covariance=spectrum.count_covariance_matrix(),
+                            initial_sigma=max(seeds[0][4] / 2.355, 0.8),
+                        )
+                        if (
+                            retry.success
+                            and retry.net_counts > 0
+                            and abs(
+                                analysis_data.channel_to_energy(retry.peak.centroid)
+                                - line.energy_keV
+                            )
+                            <= energy_tolerance_keV
+                        ):
+                            fit_results[0] = retry
+                            fit_peak_channels[0] = candidate
+                            seeds[0] = (line, candidate, *seeds[0][2:])
+                            break
+
+        # Reference comparisons are computed on the raw spectrum, including
+        # fitted multiplets. Physical sample fits use the measured residual.
+        comparison_fit_results = fit_results
+        if use_fit_fallback and "background_subtraction" in spectrum.metadata:
+            comparison_fit_results = [None] * len(seeds)
+            if len(seeds) > 1:
+                raw_results = fit_multiple_peaks(
+                    channels=channels,
+                    counts=raw_counts,
+                    peak_channels=fit_peak_channels,
+                    fit_width=fit_width,
+                    background_model="linear",
+                    share_sigma=True,
+                    counts_uncertainty=raw_counts_uncertainty,
+                )
+                if len(raw_results) == len(seeds):
+                    comparison_fit_results = raw_results
+            else:
+                comparison_fit_results[0] = fit_single_peak(
+                    channels=channels,
+                    counts=raw_counts,
+                    peak_channel=fit_peak_channels[0],
+                    fit_width=fit_width,
+                    background_model="linear",
+                    counts_uncertainty=raw_counts_uncertainty,
                 )
 
         joint_unidentifiable = (
@@ -1920,6 +2030,18 @@ def analyze_raw_spectrum_targeted(
 
             fit_net = 0.0
             fit_unc = 0.0
+            comparison_fit_net = 0.0
+            comparison_fit_unc = 0.0
+            comparison_fit = comparison_fit_results[seed_idx]
+            if (
+                comparison_fit is not None
+                and comparison_fit.success
+                and comparison_fit.net_counts > 0
+            ):
+                comparison_fit_net = float(comparison_fit.net_counts)
+                comparison_fit_unc = float(
+                    max(comparison_fit.net_counts_uncertainty, 0.0)
+                )
             hypermet_net = 0.0
             hypermet_unc = 0.0
             hypermet_success = False
@@ -1946,6 +2068,9 @@ def analyze_raw_spectrum_targeted(
                         np.interp(fit_centroid, fit_x, fit.background)
                     )
 
+            if abs(peak_energy - line.energy_keV) > energy_tolerance_keV:
+                continue
+
             if (
                 len(seeds) == 1
                 and not assignment_ambiguous
@@ -1956,12 +2081,13 @@ def analyze_raw_spectrum_targeted(
                     hypermet_width = int(max(8, round(3.5 * fwhm_ch)))
                     hypermet_peak, hypermet_result = fit_hypermet_peak(
                         channels=channels,
-                        counts=counts_for_search,
+                        counts=raw_counts,
                         peak_channel=int(round(peak_channel)),
                         fit_width=hypermet_width,
                         enable_tail=True,
                         enable_step=True,
                         initial_sigma=max(fwhm_ch / 2.355, 0.8),
+                        counts_uncertainty=raw_counts_uncertainty,
                     )
                     if hypermet_result.success and hypermet_peak.area > 0.0:
                         hypermet_success = True
@@ -1990,9 +2116,12 @@ def analyze_raw_spectrum_targeted(
             roi_lo, roi_hi = roi_bounds
             adjusted_gross = float(gross)
             raw_gross = float(np.sum(raw_counts[roi_lo : roi_hi + 1]))
-            raw_gross_unc = float(np.sqrt(max(raw_gross, 0.0)))
+            raw_gross_unc = float(
+                np.hypot.reduce(
+                    analysis_data.spectrum.counts_uncertainty[roi_lo : roi_hi + 1]
+                )
+            )
             background_at_peak = float(background_sum / max(roi_hi - roi_lo + 1, 1))
-            raw_counts_uncertainty = np.sqrt(np.maximum(raw_counts, 0.0))
             qg_auto_roi = _qg_propose_auto_roi(
                 raw_counts,
                 float(line.energy_keV),
@@ -2048,7 +2177,7 @@ def analyze_raw_spectrum_targeted(
                 spectrum_uncertainty=raw_counts_uncertainty,
             )
 
-            covell_net, covell_unc, covell_gross, _, _ = (
+            covell_net, covell_unc, covell_gross, _, covell_bounds = (
                 _covell_style_local_continuum_counts(
                     raw_counts,
                     peak_channel,
@@ -2059,7 +2188,7 @@ def analyze_raw_spectrum_targeted(
                     spectrum_uncertainty=raw_counts_uncertainty,
                 )
             )
-            gilmore_net, gilmore_unc, gilmore_gross, _, _ = (
+            gilmore_net, gilmore_unc, gilmore_gross, _, gilmore_bounds = (
                 _gilmore_moving_minimum_counts(
                     raw_counts,
                     peak_channel,
@@ -2069,29 +2198,33 @@ def analyze_raw_spectrum_targeted(
                     spectrum_uncertainty=raw_counts_uncertainty,
                 )
             )
-            standards_net, standards_unc, standards_gross, _ = _standards_tiered_counts(
-                raw_counts=raw_counts,
-                raw_counts_uncertainty=raw_counts_uncertainty,
-                peak_channel=peak_channel,
-                fwhm_channels=fwhm_ch,
-                group_size=len(seeds),
-                fit_net=fit_net,
-                fit_unc=fit_unc,
-                roi_width_fwhm=roi_width_fwhm,
-                background_width_channels=background_width_channels,
-                background_gap_fwhm=background_gap_fwhm,
+            standards_net, standards_unc, standards_gross, standards_policy = (
+                _standards_tiered_counts(
+                    raw_counts=raw_counts,
+                    raw_counts_uncertainty=raw_counts_uncertainty,
+                    peak_channel=peak_channel,
+                    fwhm_channels=fwhm_ch,
+                    group_size=len(seeds),
+                    fit_net=comparison_fit_net,
+                    fit_unc=comparison_fit_unc,
+                    roi_width_fwhm=roi_width_fwhm,
+                    background_width_channels=background_width_channels,
+                    background_gap_fwhm=background_gap_fwhm,
+                )
             )
 
             # Assign hybrid matching based on peak strength and group length
-            if len(seeds) > 1 and fit_net > 0.0:
-                comparison_net = fit_net
-                comparison_unc = fit_unc
+            comparison_bounds = (tight_lo_gross, tight_hi_gross)
+            if len(seeds) > 1 and comparison_fit_net > 0.0:
+                comparison_net = comparison_fit_net
+                comparison_unc = comparison_fit_unc
                 comparison_gross = float(c_gross_tight)
             else:
                 if c_net_exp > 50000.0:
                     comparison_net = float(c_net_exp)
                     comparison_unc = float(c_unc_exp)
                     comparison_gross = float(c_gross_exp)
+                    comparison_bounds = (comp_lo_exp, comp_hi_exp)
                 else:
                     comparison_net = float(c_net_tight)
                     comparison_unc = float(c_unc_tight)
@@ -2107,6 +2240,7 @@ def analyze_raw_spectrum_targeted(
                     comparison_net = float(c_net_exp)
                     comparison_unc = float(c_unc_exp)
                     comparison_gross = float(c_gross_exp)
+                    comparison_bounds = (comp_lo_exp, comp_hi_exp)
 
                 if qg_auto_net > 0.0:
                     min_net = min(float(c_net_tight), float(c_net_exp))
@@ -2132,17 +2266,25 @@ def analyze_raw_spectrum_targeted(
                         comparison_net = float(qg_auto_net)
                         comparison_unc = float(qg_auto_unc)
                         comparison_gross = float(qg_auto_gross)
+                        comparison_bounds = (
+                            int(qg_auto_roi["roi_lo"]),
+                            int(qg_auto_roi["roi_hi"]),
+                        )
 
                 fit_ratio = (
-                    float(fit_net / max(comparison_net, 1.0)) if fit_net > 0.0 else 0.0
+                    float(comparison_fit_net / max(comparison_net, 1.0))
+                    if comparison_fit_net > 0.0
+                    else 0.0
                 )
                 if (
-                    fit_net > 0.0
+                    comparison_fit_net > 0.0
                     and comparison_net < 4000.0
                     and 1.15 <= fit_ratio <= 2.25
                 ):
-                    comparison_net = float(fit_net)
-                    comparison_unc = float(max(fit_unc, comparison_unc))
+                    comparison_net = float(comparison_fit_net)
+                    comparison_unc = float(max(comparison_fit_unc, comparison_unc))
+                    if c_gross_tight > comparison_gross:
+                        comparison_bounds = (tight_lo_gross, tight_hi_gross)
                     comparison_gross = float(max(comparison_gross, c_gross_tight))
 
                 hypermet_ratio = (
@@ -2158,6 +2300,8 @@ def analyze_raw_spectrum_targeted(
                 ):
                     comparison_net = float(hypermet_net)
                     comparison_unc = float(max(hypermet_unc, comparison_unc))
+                    if c_gross_tight > comparison_gross:
+                        comparison_bounds = (tight_lo_gross, tight_hi_gross)
                     comparison_gross = float(max(comparison_gross, c_gross_tight))
 
             method_key = str(counting_method).strip().lower()
@@ -2178,21 +2322,37 @@ def analyze_raw_spectrum_targeted(
                 selected_net = float(covell_net)
                 selected_unc = float(covell_unc)
                 selected_gross = float(covell_gross)
+                comparison_bounds = covell_bounds
             elif method_key in {"gilmore", "gilmore_minimum", "moving_minimum"}:
                 selected_net = float(gilmore_net)
                 selected_unc = float(gilmore_unc)
                 selected_gross = float(gilmore_gross)
+                comparison_bounds = gilmore_bounds
             elif method_key in {"iec_tiered", "standards_tiered", "iec_61452_tiered"}:
                 selected_net = float(standards_net)
                 selected_unc = float(standards_unc)
                 selected_gross = float(standards_gross)
+                comparison_bounds = (
+                    gilmore_bounds
+                    if standards_policy == "gilmore_minimum"
+                    else covell_bounds
+                )
             else:
                 raise ValueError(f"Unknown counting_method: {counting_method}")
 
             comparison_net = selected_net
+            # Raw-reference diagnostics use the raw candidate's variance.
+            # The measured-subtraction ROI floor belongs to physical sample
+            # counts below; adding it here mixes two different observations.
             comparison_unc = selected_unc
             comparison_gross = selected_gross
-            comparison_gross_unc = float(np.sqrt(max(comparison_gross, 0.0)))
+            comparison_gross_unc = float(
+                np.hypot.reduce(
+                    raw_counts_uncertainty[
+                        comparison_bounds[0] : comparison_bounds[1] + 1
+                    ]
+                )
+            )
 
             use_fit_net = False
             if fit_net > 0.0:
@@ -2203,12 +2363,16 @@ def analyze_raw_spectrum_targeted(
                 elif roi_unc > 0.0 and (roi_net / roi_unc) < peak_threshold:
                     use_fit_net = True
 
-            net = float(comparison_net)
-            # The selected counting method can fit a narrower window than the
-            # measured-background ROI. Keep its estimate for QG comparison,
-            # but do not report a physical uncertainty below the propagated
-            # sample/background counting term.
-            net_unc = float(max(comparison_unc, roi_unc))
+            if "background_subtraction" in spectrum.metadata:
+                # Physical sample counts must come from the signed residual.
+                # Raw QG comparison counts remain available separately.
+                net = float(fit_net if use_fit_net else roi_net)
+                net_unc = max(
+                    float(fit_unc if use_fit_net else roi_unc), float(roi_unc)
+                )
+            else:
+                net = float(comparison_net)
+                net_unc = float(max(comparison_unc, roi_unc))
 
             stored_gross = float(
                 comparison_gross if _is_qg_counting_method(method_key) else raw_gross

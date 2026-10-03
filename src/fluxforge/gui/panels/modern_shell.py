@@ -1483,6 +1483,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 review = review_spectrum_activation(
                     peaks,
                     live_time_s=max(float(spectrum.live_time or 1.0), 1.0),
+                    real_time_s=(
+                        float(spectrum.real_time) if spectrum.real_time > 0 else None
+                    ),
                     efficiency_curve=fit.curve,
                     cooling_time_s=float(self.source_age_hours.value()) * 3600.0,
                     source_id=source_id,

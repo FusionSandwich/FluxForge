@@ -1,0 +1,1655 @@
+{
+  "schema_version": 1,
+  "canonical_raw_count": 32,
+  "converted_sample_count": 29,
+  "accuracy_qualified": false,
+  "archives": [
+    {
+      "name": "UWNR_Eurofer97_shared.zip",
+      "sha256": "09ba7fabd140c625d71c3b8512f796d25d1289cdba011f6847bff0afa38d803d",
+      "members": 982,
+      "expanded_bytes": 120535360,
+      "status": "extracted_local"
+    },
+    {
+      "name": "OneDrive_2_10-1-2026.zip",
+      "sha256": "8d1b8c234a41709227f28fbf8cb0dc3e939991b32e8a99a0c49e2b64cded7d96",
+      "members": 5,
+      "expanded_bytes": 863,
+      "status": "download_errors_only"
+    },
+    {
+      "name": "OneDrive_1_10-1-2026.zip",
+      "sha256": "6854c4dd2bc2fd96dd3eb6cce90cf57c8cda32128613642d118ab0c0ecd057cc",
+      "members": 101,
+      "expanded_bytes": 5661973,
+      "status": "extracted_local"
+    },
+    {
+      "name": "06_uwnr_reference.zip",
+      "sha256": "f30783eb407749aec645abbf227016560cebe5ae3052d62760f48925ba5cb4e2",
+      "members": 3,
+      "expanded_bytes": 16213662,
+      "status": "extracted_local"
+    },
+    {
+      "name": "Experimental_RAFM_Data.zip",
+      "sha256": "0059188f74053539ff5f4c98bfc5473d272a0d5e2fcd099357e89cbe304cafd4",
+      "members": 35,
+      "expanded_bytes": 99414,
+      "status": "extracted_local"
+    },
+    {
+      "name": "RE__UWNR_reactor_information.zip",
+      "sha256": "75b1f041d250c7197840e126e4d3d7aae3117549e59b58f7a47974ab5450ca44",
+      "members": 4,
+      "expanded_bytes": 2289989,
+      "status": "extracted_local"
+    },
+    {
+      "name": "tables-20261001T171053Z-1-001.zip",
+      "sha256": "946c710b36542a6033c852d44a16b94dd7ed79ac303d93a179a1f2f5aa3e57b7",
+      "members": 7,
+      "expanded_bytes": 0,
+      "status": "empty_tables_only"
+    },
+    {
+      "name": "Fw__Radioactivity_Primers.zip",
+      "sha256": "bc6fe740a1a5d6e4e79217e9c7849e457d8228beba7dc418fad846479ad6a757",
+      "members": 8,
+      "expanded_bytes": 13472924,
+      "status": "extracted_local"
+    },
+    {
+      "name": "Fw__UWNR_Flow_wire_questions.zip",
+      "sha256": "bf8bd46fdd738912272781c77ae12b17120e09bb4f439bc5b34c5a1fd6eb9b5b",
+      "members": 3,
+      "expanded_bytes": 1387852,
+      "status": "extracted_local"
+    },
+    {
+      "name": "Fw__UW_RAFM_LDRD_irradiation_data.zip",
+      "sha256": "a8a3c9d14619b21c8a6cb101e78f2a5334e216a67506d2bc35780938de912eab",
+      "members": 3,
+      "expanded_bytes": 2112150,
+      "status": "extracted_local"
+    },
+    {
+      "name": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "sha256": "480c9b1d0f0180e14a686135d0d5bc46380928f435d2e49da6342dd01dfb2bd3",
+      "members": 89,
+      "expanded_bytes": 5178690,
+      "status": "extracted_local"
+    }
+  ],
+  "assets": [
+    {
+      "path": "raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC",
+      "sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+      "source_sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/Co-RAFM-1_25cm.ASC",
+      "sha256": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+      "source_sha256": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Co-RAFM-1_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/CU-RAFM-1.ASC",
+      "sha256": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+      "source_sha256": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/CU-RAFM-1.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/In-Cd-RAFM-1_25cm.ASC",
+      "sha256": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+      "source_sha256": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/In-Cd-RAFM-1_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/Ni-RAFM-1_25cm.ASC",
+      "sha256": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+      "source_sha256": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Ni-RAFM-1_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/Sc-Cd-RAFM-1_25cm.ASC",
+      "sha256": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+      "source_sha256": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Sc-Cd-RAFM-1_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/Sc-RAFM-1_25cm.ASC",
+      "sha256": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+      "source_sha256": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Sc-RAFM-1_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/Ti-RAFM-1_25cm.ASC",
+      "sha256": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7",
+      "source_sha256": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Ti-RAFM-1_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC",
+      "sha256": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919",
+      "source_sha256": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/flux_wires/Ti-RAFM-1b_25cm.ASC",
+      "sha256": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5",
+      "source_sha256": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/flux_wires/Ti-RAFM-1b_25cm.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM1/RAFM1.ASC",
+      "sha256": "61591a1481467e7a7ea795e5ce3fd0a30e0df7365ca23d7e3a1e7dc763f1385f",
+      "source_sha256": "61591a1481467e7a7ea795e5ce3fd0a30e0df7365ca23d7e3a1e7dc763f1385f",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM1/RAFM1.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM1/RAFM1_Long_144h_EOI.ASC",
+      "sha256": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+      "source_sha256": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM1/RAFM1_Long_144h_EOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM1/RAFM1_Long_72h_EOI.ASC",
+      "sha256": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+      "source_sha256": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM1/RAFM1_Long_72h_EOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM2/RAFM2_Long_144h_EOI.ASC",
+      "sha256": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+      "source_sha256": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM2/RAFM2_Long_144h_EOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM2/RAFM2_Long_70d_EOI.ASC",
+      "sha256": "3292b08d6107ed13157d70801b1d691569ff08bc6480e66debdaf3692c36014e",
+      "source_sha256": "3292b08d6107ed13157d70801b1d691569ff08bc6480e66debdaf3692c36014e",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM2/RAFM2_Long_70d_EOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM2/RAFM2_Long_72h_EOI.ASC",
+      "sha256": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+      "source_sha256": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM2/RAFM2_Long_72h_EOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_24hrEOI.ASC",
+      "sha256": "236b954098010357f140a6858d0df43bdd415f7d4d94f0fe4fe2c9ff5b4de1d8",
+      "source_sha256": "63630480fcf4ae53b1ea4536c8673b501df0a966c14adb7bef41239705fbe185",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_24hrEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_2hrEOI.ASC",
+      "sha256": "55b92986f8ea0459ff79daf51ed6716498fbbc26bebee9860efda57ebaaf0b5d",
+      "source_sha256": "62bed58620cec3c725719dcc9751d6b7cda8565bc564f303e2e22760e96204f9",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_2hrEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_300sEOI.ASC",
+      "sha256": "5952e0a90f323d2b6dbf7270cf61f23440af3e8d56dfa483442cc675d22f05ca",
+      "source_sha256": "8e4f6b63970dc3201fd3248f05ee8876024d3f4ea89c2307db944ba0d92bbf31",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_300sEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_4dEOI.ASC",
+      "sha256": "1767c3fc9f277d2c05a7201dfc51632fe6e5ca8e3c4af5bb686cc09d404adb5f",
+      "source_sha256": "2d98bb8a0eedf3bebc079ca4caa7498ed19bd90c4ef49887aec5009da97d6b40",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_4dEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_24hrEOI.ASC",
+      "sha256": "7f375c0942c6b92fba7d1a3a185823c033dbc409b137b95d55cbe5daddd48e0a",
+      "source_sha256": "89d4e662cf0cf5ac584c621fcda61535d63b81f0b44ae7f5d5417d3bbdc7c82c",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_24hrEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_2hrEOI.ASC",
+      "sha256": "b1ea0c56e3b6a4621d98729b812c20013d9166a4234ad3cd19ca5e166e2d518a",
+      "source_sha256": "c8080b9b42d84ec0479b688a743003b30ea7f0b46ddc3400a2b501fdd713fe78",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_2hrEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_300sEOI.ASC",
+      "sha256": "c816ea0cb7bbd6a32e8f7a57aec384f90e75f95a4c810f1e24012de224e8e25d",
+      "source_sha256": "15ea5a1bbaa9974d1e50a1b4c4e9fa38cb39984e66cdf116cd3366d6ed565663",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_300sEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_4dEOI.ASC",
+      "sha256": "cfe869dfcbaa830a3d608c9ef75c960f9d45c6c23545d3d3098994343a1a0a96",
+      "source_sha256": "73a16c19c40468ff7ef703357b09ef8c07374e47dfbf0a2ed0c14bf112625768",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_4dEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_24hrEOI.ASC",
+      "sha256": "954d43edbb255201adc0202aac328dac0ef1a182fe95e7516e08cf72faf902be",
+      "source_sha256": "891b071615d0abff32858cc2d7b13bad57649633d8b9c230cf5a30097046f3ee",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_24hrEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_2hrEOI.ASC",
+      "sha256": "5032fb8d6603aee0adf9ecb4d79ad1da88d3ef6b226df85258a177e89ba22274",
+      "source_sha256": "c154246cd7c591c8d838bdb8cd3fe67bc427f0b50614b2e392c93bdf587c955d",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_2hrEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_300sEOI.ASC",
+      "sha256": "a0e357e249a5830e2b7c1a4022619a0f8079b3c0157423307a51e6092415e2dd",
+      "source_sha256": "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_300sEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_4dEOI.ASC",
+      "sha256": "e6a7d3ea0dd42e2e1da0645f3c5f0a84e21ef84e4b7cb1a4d08fca31c5897561",
+      "source_sha256": "70a6812f3275722e3daafb165bf5383181fe5857cd46c3aa349160b5ca3b7823",
+      "bytes": 164326,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_4dEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-A_15dEOI.ASC",
+      "sha256": "4c20d9ccef0030c0f6069ab0de65e7dbd1f6127b8035c5b36996660cba4b11b2",
+      "source_sha256": "0239355ca97609f0b0d5a9696ef95722a67ab14eae6f873b2bca8bf60df04eeb",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-A_15dEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC",
+      "sha256": "f63df89e055a4c46af65c90e973bdb25289c774670205738f1940427bc9cf177",
+      "source_sha256": "4c3913b1e9b0446cb1b5a5a6bb1911d00d4bbac7d736dda230856904fa84ecad",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-C_15dEOI.ASC",
+      "sha256": "9a3f4693dc22418a30839ce1f98d7158d35f844741aa528934857f41f181f02d",
+      "source_sha256": "18b41618567a7fface768e453ef0e47d179c3c8f1042101f8f85d1c6e80338d4",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-C_15dEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-N_15dEOI.ASC",
+      "sha256": "568631002907e5c455ce9d627ffd07367135f93d6de90113751a3981cec4a6f9",
+      "source_sha256": "6815d2373fa3a98cc23f9eebc0914ff87509af29dca69c59cac8a4a1702f4cb8",
+      "bytes": 164327,
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-N_15dEOI.ASC",
+      "role": "canonical_raw"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Co-Cd-RAFM-1_25cm.CHN",
+      "sha256": "9c744a3705199d6712f1878d969ca6938cabca5c158773b642ad5b705f16f3ba",
+      "source_sha256": "9c744a3705199d6712f1878d969ca6938cabca5c158773b642ad5b705f16f3ba",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Co-Cd-RAFM-1_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Co-RAFM-1_25cm.CHN",
+      "sha256": "9223ce300e6367461585adc2c47789687999d621de03dcaae5350980d94e2f5b",
+      "source_sha256": "9223ce300e6367461585adc2c47789687999d621de03dcaae5350980d94e2f5b",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Co-RAFM-1_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/CU-RAFM-1.CHN",
+      "sha256": "9b4882fdfeaaff7eb7ba640ac8f094bf8d3a71f64f6afc360549f981f9d3faca",
+      "source_sha256": "9b4882fdfeaaff7eb7ba640ac8f094bf8d3a71f64f6afc360549f981f9d3faca",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/CU-RAFM-1.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/In-Cd-RAFM-1_25cm.CHN",
+      "sha256": "913e68dbaec52522b8a150d119297bf90019ba4e1e1f9778bf3cc49ee5ecb5fd",
+      "source_sha256": "913e68dbaec52522b8a150d119297bf90019ba4e1e1f9778bf3cc49ee5ecb5fd",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/In-Cd-RAFM-1_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Ni-RAFM-1_25cm.CHN",
+      "sha256": "c70e51f7b215b8f65472e7c3a861ae80d67e4fe57b6fb73083daa5823baa8446",
+      "source_sha256": "c70e51f7b215b8f65472e7c3a861ae80d67e4fe57b6fb73083daa5823baa8446",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Ni-RAFM-1_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Sc-Cd-RAFM-1_25cm.CHN",
+      "sha256": "9739cab990be7f39d826662794c4be534d3140b17de88525ed56f842c2c4a643",
+      "source_sha256": "9739cab990be7f39d826662794c4be534d3140b17de88525ed56f842c2c4a643",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Sc-Cd-RAFM-1_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Sc-RAFM-1_25cm.CHN",
+      "sha256": "578ff7d135a96dc88c62aae56bf5455127e6f9d50561b805d3c987fc9749d136",
+      "source_sha256": "578ff7d135a96dc88c62aae56bf5455127e6f9d50561b805d3c987fc9749d136",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Sc-RAFM-1_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Ti-RAFM-1_25cm.CHN",
+      "sha256": "f85846f364e2d0a7287afbd589b6acd7571f62b0e084de85e18e1bcee8838775",
+      "source_sha256": "f85846f364e2d0a7287afbd589b6acd7571f62b0e084de85e18e1bcee8838775",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Ti-RAFM-1_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Ti-RAFM-1a_25cm.CHN",
+      "sha256": "00ba3a3b08081b85ce56f3b8a854c128f247f23554932135579a0bc5e65c40bd",
+      "source_sha256": "00ba3a3b08081b85ce56f3b8a854c128f247f23554932135579a0bc5e65c40bd",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Ti-RAFM-1a_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/flux_wires/Ti-RAFM-1b_25cm.CHN",
+      "sha256": "f2c85774c3f6193fd5948632b18fb2e5eec2ac8a8ee357fcd68c078628c302bd",
+      "source_sha256": "f2c85774c3f6193fd5948632b18fb2e5eec2ac8a8ee357fcd68c078628c302bd",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/flux_wires/Ti-RAFM-1b_25cm.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM1/RAFM1.CHN",
+      "sha256": "7ce6e4f5e944e83e5ca3d37192942f8adfa78526a5aeba5dc3198fb17e1b5bca",
+      "source_sha256": "7ce6e4f5e944e83e5ca3d37192942f8adfa78526a5aeba5dc3198fb17e1b5bca",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM1/RAFM1.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM1/RAFM1_Long_144h_EOI.CHN",
+      "sha256": "fd48a07d83f518d086a1da318a23f0dce2af8bf6a1cf65d5212a65eee83d83d9",
+      "source_sha256": "fd48a07d83f518d086a1da318a23f0dce2af8bf6a1cf65d5212a65eee83d83d9",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM1/RAFM1_Long_144h_EOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM1/RAFM1_Long_72h_EOI.CHN",
+      "sha256": "835b64caf818716b429e249a491ae2c30139312b4bd99ed92d251826c952e266",
+      "source_sha256": "835b64caf818716b429e249a491ae2c30139312b4bd99ed92d251826c952e266",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM1/RAFM1_Long_72h_EOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-B_24hrEOI.CHN",
+      "sha256": "266c2ebbdefa0a3d84fc95bd5d7ec061e540865d35f19c60f680f39af29eeaa2",
+      "source_sha256": "266c2ebbdefa0a3d84fc95bd5d7ec061e540865d35f19c60f680f39af29eeaa2",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-B_24hrEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-B_2hrEOI.CHN",
+      "sha256": "31b825516ccd6f8850508dafb9c5d75fce3d653953d2b31825e1e0e4fe76e902",
+      "source_sha256": "31b825516ccd6f8850508dafb9c5d75fce3d653953d2b31825e1e0e4fe76e902",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-B_2hrEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-B_300sEOI.CHN",
+      "sha256": "fd47bd47e9995a4a74a467c89388215460bd82ce9ff201655bd2d379b8111a05",
+      "source_sha256": "fd47bd47e9995a4a74a467c89388215460bd82ce9ff201655bd2d379b8111a05",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-B_300sEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-B_4dEOI.CHN",
+      "sha256": "8fe9160d04142266f252f861d09853c5b8e0344f13e5812d68ce392755047364",
+      "source_sha256": "8fe9160d04142266f252f861d09853c5b8e0344f13e5812d68ce392755047364",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-B_4dEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-C_24hrEOI.CHN",
+      "sha256": "7b538a570e6e9587d8739e6e64a8ad217a992869f9cc61a320ff33c8a97d112e",
+      "source_sha256": "7b538a570e6e9587d8739e6e64a8ad217a992869f9cc61a320ff33c8a97d112e",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-C_24hrEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-C_2hrEOI.CHN",
+      "sha256": "3bbf076580ee983f9afa8d9680e88a962bf9a58f0c6abee32898741faffde6e4",
+      "source_sha256": "3bbf076580ee983f9afa8d9680e88a962bf9a58f0c6abee32898741faffde6e4",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-C_2hrEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-C_300sEOI.CHN",
+      "sha256": "66a731c82b3e3a75b3fa417fb3673a85db199cb1643e3ed556026966530f6b48",
+      "source_sha256": "66a731c82b3e3a75b3fa417fb3673a85db199cb1643e3ed556026966530f6b48",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-C_300sEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-C_4dEOI.CHN",
+      "sha256": "dee81698ce12fc6102c3eb11c8b0a6e392502e687abf91fc343bd6cc3fa36498",
+      "source_sha256": "dee81698ce12fc6102c3eb11c8b0a6e392502e687abf91fc343bd6cc3fa36498",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-C_4dEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-N_24hrEOI.CHN",
+      "sha256": "bcd2ac760cf599579e594faf1f937486686913bc0341ca73d53100a73b7643b9",
+      "source_sha256": "bcd2ac760cf599579e594faf1f937486686913bc0341ca73d53100a73b7643b9",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-N_24hrEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-N_2hrEOI.CHN",
+      "sha256": "a79e55532def2d2e5b42ea510a9d7f4918be9a5a71a567463f8a7043887f15da",
+      "source_sha256": "a79e55532def2d2e5b42ea510a9d7f4918be9a5a71a567463f8a7043887f15da",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-N_2hrEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-N_300sEOI.CHN",
+      "sha256": "5183f9754cc5c772b729b8c2e87cab8c25a7c027cf6d7dcb96c386a3c2041b50",
+      "source_sha256": "5183f9754cc5c772b729b8c2e87cab8c25a7c027cf6d7dcb96c386a3c2041b50",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-N_300sEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM3/RAFM3-N_4dEOI.CHN",
+      "sha256": "005b852b472dd92eabe85e11c478944d78dbdba76fab9769c1fa49bfa5fe599e",
+      "source_sha256": "005b852b472dd92eabe85e11c478944d78dbdba76fab9769c1fa49bfa5fe599e",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM3/RAFM3-N_4dEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM4/RAFM4-A_15dEOI.CHN",
+      "sha256": "face6357bd0eee6d98a268da6536b7d6336a8b9e6793a132760a24b0578ba833",
+      "source_sha256": "face6357bd0eee6d98a268da6536b7d6336a8b9e6793a132760a24b0578ba833",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM4/RAFM4-A_15dEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM4/RAFM4-B_15dEOI.CHN",
+      "sha256": "364c27c972f1f4fa1c994ec37f3a2f6ec73db2c8b032aafb1fda611dce91e8ae",
+      "source_sha256": "364c27c972f1f4fa1c994ec37f3a2f6ec73db2c8b032aafb1fda611dce91e8ae",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM4/RAFM4-B_15dEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM4/RAFM4-C_15dEOI.CHN",
+      "sha256": "4777a650ea304f4549b5cd2a94e29ad99b481a5d2ad764b0e1976f4eaeb8ef3c",
+      "source_sha256": "4777a650ea304f4549b5cd2a94e29ad99b481a5d2ad764b0e1976f4eaeb8ef3c",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM4/RAFM4-C_15dEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/CHN/RAFM4/RAFM4-N_15dEOI.CHN",
+      "sha256": "ee14e1b8a6a232db1ca9113e8a9e068b67e3eeddc64445e28eecbd43ae3a2685",
+      "source_sha256": "ee14e1b8a6a232db1ca9113e8a9e068b67e3eeddc64445e28eecbd43ae3a2685",
+      "bytes": 33312,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/CHN/RAFM4/RAFM4-N_15dEOI.CHN",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Co-Cd-RAFM-1_25cm.SPE",
+      "sha256": "bdd663f1de44df19e2b881f34fd67cb5e122351f8f8830f7b30310f593972cc9",
+      "source_sha256": "bdd663f1de44df19e2b881f34fd67cb5e122351f8f8830f7b30310f593972cc9",
+      "bytes": 114255,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Co-Cd-RAFM-1_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Co-RAFM-1_25cm.SPE",
+      "sha256": "bf87d50c11f9eda9a552dc342e3f0daa2d978261b83ba44f63c6c887900e5aea",
+      "source_sha256": "bf87d50c11f9eda9a552dc342e3f0daa2d978261b83ba44f63c6c887900e5aea",
+      "bytes": 112516,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Co-RAFM-1_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/CU-RAFM-1.SPE",
+      "sha256": "e4405ad53aa10c2328e0999b2499de8d35edf0327a3d3c0e07a874fd675bd5eb",
+      "source_sha256": "e4405ad53aa10c2328e0999b2499de8d35edf0327a3d3c0e07a874fd675bd5eb",
+      "bytes": 110852,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/CU-RAFM-1.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/In-Cd-RAFM-1_25cm.SPE",
+      "sha256": "8319f67c6202e49b5ab7a558ec868d1160060cce7dd0fbc643aede503fa263a2",
+      "source_sha256": "8319f67c6202e49b5ab7a558ec868d1160060cce7dd0fbc643aede503fa263a2",
+      "bytes": 108409,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/In-Cd-RAFM-1_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Ni-RAFM-1_25cm.SPE",
+      "sha256": "584b1dbb647a65630c2c4ca0b257f7800f5dc3d752ce1841d0706e612f687c1e",
+      "source_sha256": "584b1dbb647a65630c2c4ca0b257f7800f5dc3d752ce1841d0706e612f687c1e",
+      "bytes": 108413,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Ni-RAFM-1_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Sc-Cd-RAFM-1_25cm.SPE",
+      "sha256": "e3314461b5d7d8702af7aa33195c48bccd78a225bbc84c32bcb997debd996a45",
+      "source_sha256": "e3314461b5d7d8702af7aa33195c48bccd78a225bbc84c32bcb997debd996a45",
+      "bytes": 110775,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Sc-Cd-RAFM-1_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Sc-RAFM-1_25cm.SPE",
+      "sha256": "9da63a56ea63e2ac5846182d009b0f1943da7a4fde1eb48be84dbbde5ab1e4c6",
+      "source_sha256": "9da63a56ea63e2ac5846182d009b0f1943da7a4fde1eb48be84dbbde5ab1e4c6",
+      "bytes": 116106,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Sc-RAFM-1_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Ti-RAFM-1_25cm.SPE",
+      "sha256": "3ab2dbd30aa7c4527ccdda51ba6e384656e36ad711c39130cec2a54be8b0108e",
+      "source_sha256": "3ab2dbd30aa7c4527ccdda51ba6e384656e36ad711c39130cec2a54be8b0108e",
+      "bytes": 109643,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Ti-RAFM-1_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Ti-RAFM-1a_25cm.SPE",
+      "sha256": "01cd8d4dd2328fef71b0487f3b8658fab9dd72e34c68545123f9bf0243b1c18e",
+      "source_sha256": "01cd8d4dd2328fef71b0487f3b8658fab9dd72e34c68545123f9bf0243b1c18e",
+      "bytes": 109577,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Ti-RAFM-1a_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/flux_wires/Ti-RAFM-1b_25cm.SPE",
+      "sha256": "a80facb36e458cbaacae829c50df55ce3dd1481b93e1011132699e441564fede",
+      "source_sha256": "a80facb36e458cbaacae829c50df55ce3dd1481b93e1011132699e441564fede",
+      "bytes": 114998,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/flux_wires/Ti-RAFM-1b_25cm.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM1/RAFM1.SPE",
+      "sha256": "e322d15e3fb78460e25796e760e99f6811c96b1576c9239ad48efd800a13b22b",
+      "source_sha256": "e322d15e3fb78460e25796e760e99f6811c96b1576c9239ad48efd800a13b22b",
+      "bytes": 111722,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM1/RAFM1.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM1/RAFM1_Long_144h_EOI.SPE",
+      "sha256": "2ec40a8454c9af125dfdd04e27464199c03cbafe8c04071deb9f7334069a4e93",
+      "source_sha256": "2ec40a8454c9af125dfdd04e27464199c03cbafe8c04071deb9f7334069a4e93",
+      "bytes": 115365,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM1/RAFM1_Long_144h_EOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM1/RAFM1_Long_72h_EOI.SPE",
+      "sha256": "9e41785f61767f608bf65a0e978d5e270c786824c918d14180767b64398ce1e2",
+      "source_sha256": "9e41785f61767f608bf65a0e978d5e270c786824c918d14180767b64398ce1e2",
+      "bytes": 116673,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM1/RAFM1_Long_72h_EOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-B_24hrEOI.SPE",
+      "sha256": "a343021d631d541898703689f0e5648b8f1ea94df964994c929aae327ba22f84",
+      "source_sha256": "a343021d631d541898703689f0e5648b8f1ea94df964994c929aae327ba22f84",
+      "bytes": 108044,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-B_24hrEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-B_2hrEOI.SPE",
+      "sha256": "36b657b5a2233133b3b6c4b6e3f2f8081af73216e522c84f1f9e3f6e9e219d5b",
+      "source_sha256": "36b657b5a2233133b3b6c4b6e3f2f8081af73216e522c84f1f9e3f6e9e219d5b",
+      "bytes": 110931,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-B_2hrEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-B_300sEOI.SPE",
+      "sha256": "fbe61d8b9fa0aa4b6d639bdb74d661d18d1a9b62cbc15c446416351a2b02692a",
+      "source_sha256": "fbe61d8b9fa0aa4b6d639bdb74d661d18d1a9b62cbc15c446416351a2b02692a",
+      "bytes": 111844,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-B_300sEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-B_4dEOI.SPE",
+      "sha256": "1535dbc95ea99054e3d766129846f850a7f6f9213d01f545978f32259aea962b",
+      "source_sha256": "1535dbc95ea99054e3d766129846f850a7f6f9213d01f545978f32259aea962b",
+      "bytes": 107591,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-B_4dEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-C_24hrEOI.SPE",
+      "sha256": "39e31eb15863b1aa847cafabb203342143edf7daa3adecbb8b0531a40aa85035",
+      "source_sha256": "39e31eb15863b1aa847cafabb203342143edf7daa3adecbb8b0531a40aa85035",
+      "bytes": 108032,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-C_24hrEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-C_2hrEOI.SPE",
+      "sha256": "db21303d596026041a082e009ade27fa9cb65325828c27142e9881ac62fd139c",
+      "source_sha256": "db21303d596026041a082e009ade27fa9cb65325828c27142e9881ac62fd139c",
+      "bytes": 110338,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-C_2hrEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-C_300sEOI.SPE",
+      "sha256": "a059d9bc611cf7f3be62401bdb7d1a60de9e381af67bb290ad3fb9c801adab93",
+      "source_sha256": "a059d9bc611cf7f3be62401bdb7d1a60de9e381af67bb290ad3fb9c801adab93",
+      "bytes": 111716,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-C_300sEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-C_4dEOI.SPE",
+      "sha256": "30361939f66c066c13038d55bbdb1eda20a5a705b7593798ed50c9b216d00432",
+      "source_sha256": "30361939f66c066c13038d55bbdb1eda20a5a705b7593798ed50c9b216d00432",
+      "bytes": 107595,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-C_4dEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-N_24hrEOI.SPE",
+      "sha256": "19c6e8cbf0e7f38fac2d7cc022e0a8ca70d6b2760fbaf1b59b1d66eb1140e994",
+      "source_sha256": "19c6e8cbf0e7f38fac2d7cc022e0a8ca70d6b2760fbaf1b59b1d66eb1140e994",
+      "bytes": 108059,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-N_24hrEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-N_2hrEOI.SPE",
+      "sha256": "728869d2d5e2047fbe3e8341565e415fea5c3e283a63cf419ba8fcf79112cc2d",
+      "source_sha256": "728869d2d5e2047fbe3e8341565e415fea5c3e283a63cf419ba8fcf79112cc2d",
+      "bytes": 110577,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-N_2hrEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-N_300sEOI.SPE",
+      "sha256": "cb303368a13ffeac8f29decb678b2f2854427b898ca3740d54e822822325c7d6",
+      "source_sha256": "cb303368a13ffeac8f29decb678b2f2854427b898ca3740d54e822822325c7d6",
+      "bytes": 111121,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-N_300sEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM3/RAFM3-N_4dEOI.SPE",
+      "sha256": "ee22e67965b28f53312beee5b36a17e13a9ba972af4b38262ef7513b31c9f3db",
+      "source_sha256": "ee22e67965b28f53312beee5b36a17e13a9ba972af4b38262ef7513b31c9f3db",
+      "bytes": 107582,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM3/RAFM3-N_4dEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM4/RAFM4-A_15dEOI.SPE",
+      "sha256": "4525994462e3bf4a5aff48267afc98dc7ffa4f700ec309a458683001bb23587d",
+      "source_sha256": "4525994462e3bf4a5aff48267afc98dc7ffa4f700ec309a458683001bb23587d",
+      "bytes": 114908,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM4/RAFM4-A_15dEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM4/RAFM4-B_15dEOI.SPE",
+      "sha256": "83503c06236d85c719e5d605d96d3c000268c5d9853d78a45ab8f208b0ffd0d8",
+      "source_sha256": "83503c06236d85c719e5d605d96d3c000268c5d9853d78a45ab8f208b0ffd0d8",
+      "bytes": 114738,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM4/RAFM4-B_15dEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM4/RAFM4-C_15dEOI.SPE",
+      "sha256": "41bd7ba3bc70316eed1581bdf9bd6ca55d2199c3f6b1ffa47076a298fae3c5f6",
+      "source_sha256": "41bd7ba3bc70316eed1581bdf9bd6ca55d2199c3f6b1ffa47076a298fae3c5f6",
+      "bytes": 114626,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM4/RAFM4-C_15dEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPE/RAFM4/RAFM4-N_15dEOI.SPE",
+      "sha256": "c502c6dd3879e2c8370ca86b5624bb97a9cec662bb410a7a5b680fe830c05bd6",
+      "source_sha256": "c502c6dd3879e2c8370ca86b5624bb97a9cec662bb410a7a5b680fe830c05bd6",
+      "bytes": 114214,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPE/RAFM4/RAFM4-N_15dEOI.SPE",
+      "role": "converted_counts_only"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Co-Cd-RAFM-1_25cm.SPC",
+      "sha256": "687c2ed4783a604c91a2e2cb002e50b33cacb580602e15ac3c798848921c8993",
+      "source_sha256": "687c2ed4783a604c91a2e2cb002e50b33cacb580602e15ac3c798848921c8993",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Co-Cd-RAFM-1_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Co-RAFM-1_25cm.SPC",
+      "sha256": "2264f7a760eb8db3a8ac0db88ec0fb77f4a8689871f5d6664de75c1dfebeb17d",
+      "source_sha256": "2264f7a760eb8db3a8ac0db88ec0fb77f4a8689871f5d6664de75c1dfebeb17d",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Co-RAFM-1_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/CU-RAFM-1.SPC",
+      "sha256": "61d7db37f6fc91e3d12d50e742f0a78c872dae2cdf7b1a3a0347b73c0822da71",
+      "source_sha256": "61d7db37f6fc91e3d12d50e742f0a78c872dae2cdf7b1a3a0347b73c0822da71",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/CU-RAFM-1.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/In-Cd-RAFM-1_25cm.SPC",
+      "sha256": "81edda592ae0e826df39ff9e9fde49eaba2eaa12a339fb9b53bea65d553f25a3",
+      "source_sha256": "81edda592ae0e826df39ff9e9fde49eaba2eaa12a339fb9b53bea65d553f25a3",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/In-Cd-RAFM-1_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Ni-RAFM-1_25cm.SPC",
+      "sha256": "cc9dba60f7fd4499a16a1226cdeb468edafa0faaa9af7ec744525b7a2a78416f",
+      "source_sha256": "cc9dba60f7fd4499a16a1226cdeb468edafa0faaa9af7ec744525b7a2a78416f",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Ni-RAFM-1_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Sc-Cd-RAFM-1_25cm.SPC",
+      "sha256": "ed6f8b06b7da43d08b1ae8922c905f92f43aeef19462ded6bb26e665621a2d8d",
+      "source_sha256": "ed6f8b06b7da43d08b1ae8922c905f92f43aeef19462ded6bb26e665621a2d8d",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Sc-Cd-RAFM-1_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Sc-RAFM-1_25cm.SPC",
+      "sha256": "205025331003bc8f8c8e8e13cbe06f4f393a8ab2f808bc8620849c28636df4b1",
+      "source_sha256": "205025331003bc8f8c8e8e13cbe06f4f393a8ab2f808bc8620849c28636df4b1",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Sc-RAFM-1_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Ti-RAFM-1_25cm.SPC",
+      "sha256": "bd0dd961c13565238e83752caf20c43d2df965f082947edfa5ed0ac779095def",
+      "source_sha256": "bd0dd961c13565238e83752caf20c43d2df965f082947edfa5ed0ac779095def",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Ti-RAFM-1_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Ti-RAFM-1a_25cm.SPC",
+      "sha256": "3a85f3dd2e96c9f77490b4a2d5dffed0e1a11f55721dc3e60fc6a24426abc102",
+      "source_sha256": "3a85f3dd2e96c9f77490b4a2d5dffed0e1a11f55721dc3e60fc6a24426abc102",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Ti-RAFM-1a_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/flux_wires/Ti-RAFM-1b_25cm.SPC",
+      "sha256": "4e996868eb2c4d9f4c37524aef653a4a51361d6102dd09fdb4f72a89ef0cddda",
+      "source_sha256": "4e996868eb2c4d9f4c37524aef653a4a51361d6102dd09fdb4f72a89ef0cddda",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/flux_wires/Ti-RAFM-1b_25cm.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM1/RAFM1.SPC",
+      "sha256": "865685edd0e55f42c0ac9dd971ba058cb39fe6836eadb45e45057d96ca933a19",
+      "source_sha256": "865685edd0e55f42c0ac9dd971ba058cb39fe6836eadb45e45057d96ca933a19",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM1/RAFM1.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM1/RAFM1_Long_144h_EOI.SPC",
+      "sha256": "2b7dff738d5887a09497825d9b4de6aa6656041934678f7886b52350a72e537b",
+      "source_sha256": "2b7dff738d5887a09497825d9b4de6aa6656041934678f7886b52350a72e537b",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM1/RAFM1_Long_144h_EOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM1/RAFM1_Long_72h_EOI.SPC",
+      "sha256": "0690c7d21ffb322ba620e49317603713a8250aaec6fb66c45cf0b14d608f8f60",
+      "source_sha256": "0690c7d21ffb322ba620e49317603713a8250aaec6fb66c45cf0b14d608f8f60",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM1/RAFM1_Long_72h_EOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-B_24hrEOI.SPC",
+      "sha256": "ae349a8e41122cab2315afa2f611c637c501b3925e4f21eac04cb3d51a75e1b4",
+      "source_sha256": "ae349a8e41122cab2315afa2f611c637c501b3925e4f21eac04cb3d51a75e1b4",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-B_24hrEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-B_2hrEOI.SPC",
+      "sha256": "c2db083a2e74664271d5a7e59a07e6385f6ffee78ed3f6dd6e87db3fc4962e81",
+      "source_sha256": "c2db083a2e74664271d5a7e59a07e6385f6ffee78ed3f6dd6e87db3fc4962e81",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-B_2hrEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-B_300sEOI.SPC",
+      "sha256": "374a3fd95c6114919272d3942f3981d2e755c7ec016477d84d3b637d01d61d59",
+      "source_sha256": "374a3fd95c6114919272d3942f3981d2e755c7ec016477d84d3b637d01d61d59",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-B_300sEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-B_4dEOI.SPC",
+      "sha256": "bdcd9da43ec8a301064a3b0ac1c571d9bb2c2446ae71d2e58d51e5117730a6b5",
+      "source_sha256": "bdcd9da43ec8a301064a3b0ac1c571d9bb2c2446ae71d2e58d51e5117730a6b5",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-B_4dEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-C_24hrEOI.SPC",
+      "sha256": "e4a56a1c22b30431998e30c369ca503b23f7529b05729fd3042a9824ee254107",
+      "source_sha256": "e4a56a1c22b30431998e30c369ca503b23f7529b05729fd3042a9824ee254107",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-C_24hrEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-C_2hrEOI.SPC",
+      "sha256": "79e60639f352fa14343d3d1534d6d90e7b2807e2cfb0c8b9d247a5d3dbb4d932",
+      "source_sha256": "79e60639f352fa14343d3d1534d6d90e7b2807e2cfb0c8b9d247a5d3dbb4d932",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-C_2hrEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-C_300sEOI.SPC",
+      "sha256": "3e72ea9e1ae8c7b11eea0569332a39ea347ed982fc670b45d7cde555ebe05ffe",
+      "source_sha256": "3e72ea9e1ae8c7b11eea0569332a39ea347ed982fc670b45d7cde555ebe05ffe",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-C_300sEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-C_4dEOI.SPC",
+      "sha256": "1b1abb60f76a23f62e9517fd24ae4aaf930de1cfd8750078a114143eaff66088",
+      "source_sha256": "1b1abb60f76a23f62e9517fd24ae4aaf930de1cfd8750078a114143eaff66088",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-C_4dEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-N_24hrEOI.SPC",
+      "sha256": "3fdacc65647370a034f04cc8515b2a15418fd164db8db6fd6f44af2cdf706db9",
+      "source_sha256": "3fdacc65647370a034f04cc8515b2a15418fd164db8db6fd6f44af2cdf706db9",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-N_24hrEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-N_2hrEOI.SPC",
+      "sha256": "d205671e9f14dae7d6ddb6088ae4b95680941c5238d1b674523ada9010982702",
+      "source_sha256": "d205671e9f14dae7d6ddb6088ae4b95680941c5238d1b674523ada9010982702",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-N_2hrEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-N_300sEOI.SPC",
+      "sha256": "d4c33bab7e70fc087fd67decc5ece4fc2e55ba7e63a79c17af573729f9653966",
+      "source_sha256": "d4c33bab7e70fc087fd67decc5ece4fc2e55ba7e63a79c17af573729f9653966",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-N_300sEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM3/RAFM3-N_4dEOI.SPC",
+      "sha256": "6c9c1dde7b3f3cef2a6a6986d36e011cfa976d0d6a9ead3213962d276700fcd0",
+      "source_sha256": "6c9c1dde7b3f3cef2a6a6986d36e011cfa976d0d6a9ead3213962d276700fcd0",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM3/RAFM3-N_4dEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM4/RAFM4-A_15dEOI.SPC",
+      "sha256": "f9acb443f2334ab7a7ac127ed1feabd19f172b6fc69d98c18d650d87c6eea457",
+      "source_sha256": "f9acb443f2334ab7a7ac127ed1feabd19f172b6fc69d98c18d650d87c6eea457",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM4/RAFM4-A_15dEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM4/RAFM4-B_15dEOI.SPC",
+      "sha256": "398dcfbe496599786e9e100e412a750eee035d885dcd874b61559e2d64bbc61f",
+      "source_sha256": "398dcfbe496599786e9e100e412a750eee035d885dcd874b61559e2d64bbc61f",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM4/RAFM4-B_15dEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM4/RAFM4-C_15dEOI.SPC",
+      "sha256": "66d5e5f9a181a52bf7d6fd74c7f5281973470427802a73ddc65d95bdf6aa38ea",
+      "source_sha256": "66d5e5f9a181a52bf7d6fd74c7f5281973470427802a73ddc65d95bdf6aa38ea",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM4/RAFM4-C_15dEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "converted_gamma_spec/SPC/RAFM4/RAFM4-N_15dEOI.SPC",
+      "sha256": "876e5604851f2a9e416cee246462b529ec33974ddf7abbb88115cdef9f983b50",
+      "source_sha256": "876e5604851f2a9e416cee246462b529ec33974ddf7abbb88115cdef9f983b50",
+      "bytes": 33792,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip!raw_gamma_spec_cambio_converted.zip",
+      "member": "raw_gamma_spec_cambio_converted/SPC/RAFM4/RAFM4-N_15dEOI.SPC",
+      "role": "unsupported_binary_spc"
+    },
+    {
+      "path": "reference_data/qg_activation_by_isotope.csv",
+      "sha256": "1c3ddf6b710a52fad284219700889269d15fe9444255a01910e3afc6f34b047b",
+      "source_sha256": "1c3ddf6b710a52fad284219700889269d15fe9444255a01910e3afc6f34b047b",
+      "bytes": 40145,
+      "archive": "Fw__UW_RAFM_LDRD_irradiation_data.zip",
+      "member": "qg_activation_by_isotope.csv",
+      "role": "historical_derived_qg_reference"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_Chromium.csv",
+      "sha256": "7b4ae09d42abf59fa5430866ddd1043e296dde51715992c3b9381f14121ba2ad",
+      "source_sha256": "7b4ae09d42abf59fa5430866ddd1043e296dde51715992c3b9381f14121ba2ad",
+      "bytes": 2240,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_Chromium.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_CNA.csv",
+      "sha256": "327ccac47d3a9c8bbe49d34fe11da3fa320ad5868f6e87cd3b46c3b7d9709824",
+      "source_sha256": "327ccac47d3a9c8bbe49d34fe11da3fa320ad5868f6e87cd3b46c3b7d9709824",
+      "bytes": 42448,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_CNA.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_EUROFER97_2.csv",
+      "sha256": "e92b1c1998df7488c12fea1599762cfca671851f54fe3fdd3d343b47bbc4a1f3",
+      "source_sha256": "e92b1c1998df7488c12fea1599762cfca671851f54fe3fdd3d343b47bbc4a1f3",
+      "bytes": 37756,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_EUROFER97_2.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_EUROFER97_3.csv",
+      "sha256": "0f843d9604e527ea51a8389ddd41ac86c435e23bc7b5680993830b2820d98d9e",
+      "source_sha256": "0f843d9604e527ea51a8389ddd41ac86c435e23bc7b5680993830b2820d98d9e",
+      "bytes": 39820,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_EUROFER97_3.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_EUROFER97_4.csv",
+      "sha256": "b3b66ca7eb671c44796a64650997795533d122484338d2f82d559e6e5bf03fd0",
+      "source_sha256": "b3b66ca7eb671c44796a64650997795533d122484338d2f82d559e6e5bf03fd0",
+      "bytes": 39820,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_EUROFER97_4.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_HDPE.csv",
+      "sha256": "30e6797fe495da3958eb5df3211ece67210f59f1c677f260513d70b705b39126",
+      "source_sha256": "30e6797fe495da3958eb5df3211ece67210f59f1c677f260513d70b705b39126",
+      "bytes": 9581,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_HDPE.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_Iron.csv",
+      "sha256": "5309aafb962dbb12bd5ee7baeb4f574b7aca5fdb6eaf288a66fe3a5ace238981",
+      "source_sha256": "5309aafb962dbb12bd5ee7baeb4f574b7aca5fdb6eaf288a66fe3a5ace238981",
+      "bytes": 2236,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_Iron.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_SS420.csv",
+      "sha256": "0ebad5636adf544e4cf4a61ab809c5fd57cd3d65807edf47589d820efcd6be69",
+      "source_sha256": "0ebad5636adf544e4cf4a61ab809c5fd57cd3d65807edf47589d820efcd6be69",
+      "bytes": 14733,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_SS420.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_Tantalum.csv",
+      "sha256": "dca65a9ed982070f56e18ddcef3f6c9ee58a670c0a1356a834abc6761983acb8",
+      "source_sha256": "dca65a9ed982070f56e18ddcef3f6c9ee58a670c0a1356a834abc6761983acb8",
+      "bytes": 2182,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_Tantalum.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_Titanium.csv",
+      "sha256": "851b1c298a24423d726d1afef515c35630330679541894ba93d75037abce7d7e",
+      "source_sha256": "851b1c298a24423d726d1afef515c35630330679541894ba93d75037abce7d7e",
+      "bytes": 2763,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_Titanium.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "reference_data/simulated_activation/activation_Vanadium.csv",
+      "sha256": "2381566f19abea7ed8fe0dbcb317b68e6b1cae564561e98bc7b97741ad4a280d",
+      "source_sha256": "2381566f19abea7ed8fe0dbcb317b68e6b1cae564561e98bc7b97741ad4a280d",
+      "bytes": 1180,
+      "archive": "UWNR_Eurofer97_shared.zip",
+      "member": "UWNR_Eurofer97_shared/02_extracted/activation_results/activation_Vanadium.csv",
+      "role": "historical_simulation_not_measurement"
+    },
+    {
+      "path": "metadata/material_compositions.json",
+      "sha256": "bc466933786184422669437ad5c59943d8bd962869de51de7afb9903a29c557f",
+      "bytes": 4059,
+      "archive": "Fw__UWNR_Flow_wire_questions.zip",
+      "member": "RAFM_Composition.xlsx!isotopics D:G rows4:30",
+      "role": "derived_element_composition"
+    },
+    {
+      "path": "background.ASC",
+      "sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "bytes": 164326,
+      "archive": "existing_repository",
+      "member": "background.ASC",
+      "role": "runtime_example_input"
+    },
+    {
+      "path": "metadata/flux_wire_metadata.json",
+      "sha256": "9a31e5fee69c62f25a37ffaeef18d56f0ff118512624795ec7d760282677411f",
+      "bytes": 4616,
+      "archive": "existing_repository",
+      "member": "metadata/flux_wire_metadata.json",
+      "role": "runtime_example_input",
+      "hash_basis": "lf_normalized"
+    },
+    {
+      "path": "metadata/pairing_aliases.json",
+      "sha256": "94589989a176e4bf445c2702c1e54ce041861ef821f3e359b0752d64be6cf8f1",
+      "bytes": 473,
+      "archive": "existing_repository",
+      "member": "metadata/pairing_aliases.json",
+      "role": "runtime_example_input",
+      "hash_basis": "lf_normalized"
+    },
+    {
+      "path": "metadata/sample_gamma_library.json",
+      "sha256": "db424d6fde16806c27b1765197b7c35d01d284cd54f875137ff91123ed1cc8ca",
+      "bytes": 18159,
+      "archive": "existing_repository",
+      "member": "metadata/sample_gamma_library.json",
+      "role": "runtime_example_input",
+      "hash_basis": "lf_normalized"
+    },
+    {
+      "path": "metadata/sample_schedule.json",
+      "sha256": "d9d380ef1a9410e6112f656852e076f03bce842ea5bfa152fb8c58e7d02e0a5b",
+      "bytes": 11369,
+      "archive": "existing_repository",
+      "member": "metadata/sample_schedule.json",
+      "role": "runtime_example_input",
+      "hash_basis": "lf_normalized"
+    },
+    {
+      "path": "metadata/sample_schedules.json",
+      "sha256": "e374434f95110c0971684aab88ba61d899d3eabc934b0d3924bc0fbeeeff7a76",
+      "bytes": 5686,
+      "archive": "existing_repository",
+      "member": "metadata/sample_schedules.json",
+      "role": "runtime_example_input",
+      "hash_basis": "lf_normalized"
+    },
+    {
+      "path": "metadata/workflow_config.json",
+      "sha256": "3c7cbf63f1b151199d33a16c9992a2a760116437e213644a34cae8659d9cc0ea",
+      "bytes": 3380,
+      "archive": "existing_repository",
+      "member": "metadata/workflow_config.json",
+      "role": "runtime_example_input",
+      "hash_basis": "lf_normalized"
+    }
+  ],
+  "header_variants": [
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_24hrEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_24hrEOI.ASC",
+      "archive_sha256": "63630480fcf4ae53b1ea4536c8673b501df0a966c14adb7bef41239705fbe185",
+      "canonical_sha256": "236b954098010357f140a6858d0df43bdd415f7d4d94f0fe4fe2c9ff5b4de1d8",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_2hrEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_2hrEOI.ASC",
+      "archive_sha256": "62bed58620cec3c725719dcc9751d6b7cda8565bc564f303e2e22760e96204f9",
+      "canonical_sha256": "55b92986f8ea0459ff79daf51ed6716498fbbc26bebee9860efda57ebaaf0b5d",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_300sEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_300sEOI.ASC",
+      "archive_sha256": "8e4f6b63970dc3201fd3248f05ee8876024d3f4ea89c2307db944ba0d92bbf31",
+      "canonical_sha256": "5952e0a90f323d2b6dbf7270cf61f23440af3e8d56dfa483442cc675d22f05ca",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-B_4dEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-B_4dEOI.ASC",
+      "archive_sha256": "2d98bb8a0eedf3bebc079ca4caa7498ed19bd90c4ef49887aec5009da97d6b40",
+      "canonical_sha256": "1767c3fc9f277d2c05a7201dfc51632fe6e5ca8e3c4af5bb686cc09d404adb5f",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_24hrEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_24hrEOI.ASC",
+      "archive_sha256": "89d4e662cf0cf5ac584c621fcda61535d63b81f0b44ae7f5d5417d3bbdc7c82c",
+      "canonical_sha256": "7f375c0942c6b92fba7d1a3a185823c033dbc409b137b95d55cbe5daddd48e0a",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_2hrEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_2hrEOI.ASC",
+      "archive_sha256": "c8080b9b42d84ec0479b688a743003b30ea7f0b46ddc3400a2b501fdd713fe78",
+      "canonical_sha256": "b1ea0c56e3b6a4621d98729b812c20013d9166a4234ad3cd19ca5e166e2d518a",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_300sEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_300sEOI.ASC",
+      "archive_sha256": "15ea5a1bbaa9974d1e50a1b4c4e9fa38cb39984e66cdf116cd3366d6ed565663",
+      "canonical_sha256": "c816ea0cb7bbd6a32e8f7a57aec384f90e75f95a4c810f1e24012de224e8e25d",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-C_4dEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-C_4dEOI.ASC",
+      "archive_sha256": "73a16c19c40468ff7ef703357b09ef8c07374e47dfbf0a2ed0c14bf112625768",
+      "canonical_sha256": "cfe869dfcbaa830a3d608c9ef75c960f9d45c6c23545d3d3098994343a1a0a96",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_24hrEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_24hrEOI.ASC",
+      "archive_sha256": "891b071615d0abff32858cc2d7b13bad57649633d8b9c230cf5a30097046f3ee",
+      "canonical_sha256": "954d43edbb255201adc0202aac328dac0ef1a182fe95e7516e08cf72faf902be",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_2hrEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_2hrEOI.ASC",
+      "archive_sha256": "c154246cd7c591c8d838bdb8cd3fe67bc427f0b50614b2e392c93bdf587c955d",
+      "canonical_sha256": "5032fb8d6603aee0adf9ecb4d79ad1da88d3ef6b226df85258a177e89ba22274",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_300sEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_300sEOI.ASC",
+      "archive_sha256": "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3",
+      "canonical_sha256": "a0e357e249a5830e2b7c1a4022619a0f8079b3c0157423307a51e6092415e2dd",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM3/RAFM3-N_4dEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM3/RAFM3-N_4dEOI.ASC",
+      "archive_sha256": "70a6812f3275722e3daafb165bf5383181fe5857cd46c3aa349160b5ca3b7823",
+      "canonical_sha256": "e6a7d3ea0dd42e2e1da0645f3c5f0a84e21ef84e4b7cb1a4d08fca31c5897561",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-A_15dEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-A_15dEOI.ASC",
+      "archive_sha256": "0239355ca97609f0b0d5a9696ef95722a67ab14eae6f873b2bca8bf60df04eeb",
+      "canonical_sha256": "4c20d9ccef0030c0f6069ab0de65e7dbd1f6127b8035c5b36996660cba4b11b2",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC",
+      "archive_sha256": "4c3913b1e9b0446cb1b5a5a6bb1911d00d4bbac7d736dda230856904fa84ecad",
+      "canonical_sha256": "f63df89e055a4c46af65c90e973bdb25289c774670205738f1940427bc9cf177",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-C_15dEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-C_15dEOI.ASC",
+      "archive_sha256": "18b41618567a7fface768e453ef0e47d179c3c8f1042101f8f85d1c6e80338d4",
+      "canonical_sha256": "9a3f4693dc22418a30839ce1f98d7158d35f844741aa528934857f41f181f02d",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    },
+    {
+      "path": "raw_gamma_spec/RAFM4/RAFM4-N_15dEOI.ASC",
+      "archive": "OneDrive_1_10-1-2026.zip",
+      "member": "rafm_irradiation_ldrd/raw_gamma_spec/RAFM4/RAFM4-N_15dEOI.ASC",
+      "archive_sha256": "6815d2373fa3a98cc23f9eebc0914ff87509af29dca69c59cac8a4a1702f4cb8",
+      "canonical_sha256": "568631002907e5c455ce9d627ffd07367135f93d6de90113751a3981cec4a6f9",
+      "archive_energy_coefficients": [
+        0.541,
+        0.498,
+        2.605e-07
+      ],
+      "canonical_energy_coefficients": [
+        -1.694,
+        0.4995,
+        9.917e-08
+      ],
+      "counts_and_acquisition_times_identical": true,
+      "decision": "Preserve committed header; conflicting archive calibration recorded, not silently overwritten."
+    }
+  ],
+  "source_notes": {
+    "Co": "0.46 wt% alloy; 4.0661/3.6703 mg already Co element mass; no second dilution.",
+    "metrology": "INL CCN257311 memo explicitly informal, balance uncertainty0.0057mg; calibration-expiration field blank; original retained locally.",
+    "RAFM2": "New raw spectra only: irradiation schedule, mass/material and independent QG reference absent; EOI withheld.",
+    "renamed_reports": "Experimental RAFM3-{A,B,C,N}_15dEOI reports byte-identical to existing RAFM4 reports; do not create duplicate acquisitions.",
+    "reactor_background": "South4hrBackgroundTerminal.ANS preserved locally; no evidence same detector/configuration as committed background.ASC; no substitution.",
+    "converted": "Counts-only derivatives; source timing/calibration not preserved. SPC binary unsupported.",
+    "reference_documents": "PDFs/DOCX/workbooks retained locally; curated numerical data committed; archive/source hashes recorded."
+  },
+  "runtime_data_sha256": {
+    "rafm_profiles.json": "7fb3ab63f303bd8bacc3117257ff518834d5845669e8bcc9c2dc7adf6587acea"
+  },
+  "runtime_data_hash_basis": "lf_normalized UTF8 bytes; archive/measured data hashes remain exact bytes"
+}

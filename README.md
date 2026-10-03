@@ -210,6 +210,16 @@ Workflow-specific references:
 
 ## Testing and QA
 
+Reaction-rate conversion propagates the supplied activity standard uncertainty:
+`reaction_rate_from_activity(activity, segments, half_life_s, activity_uncertainty_bq=sigma)`.
+If sigma is absent, the returned uncertainty and exported JSON uncertainty are
+`None`/`null` with an unavailable reason. Zero sigma remains explicit zero, and
+zero activity can retain a nonzero sigma. The CLI `rates` command reads
+`activity_unc_Bq`; unfolding and scientific plots require supplied rate uncertainties.
+This conversion treats irradiation history and half-life as fixed. A supplied
+activity sigma can include an unknown mixture of contributions; conversion does
+not resolve that mixture or qualify a complete activation uncertainty budget.
+
 Run the standard test suite:
 
 ```bash

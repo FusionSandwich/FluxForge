@@ -102,7 +102,6 @@ LINE_ACTIVITIES_SCHEMA: Dict[str, Any] = {
                     "energy_keV",
                     "net_counts",
                     "activity_Bq",
-                    "activity_unc_Bq",
                 ],
                 "properties": {
                     "energy_keV": {"type": "number"},
@@ -110,7 +109,7 @@ LINE_ACTIVITIES_SCHEMA: Dict[str, Any] = {
                     "reaction_id": {"type": "string"},
                     "net_counts": {"type": "number"},
                     "activity_Bq": {"type": "number"},
-                    "activity_unc_Bq": {"type": "number"},
+                    "activity_unc_Bq": {"type": ["number", "null"], "minimum": 0},
                     "efficiency": {"type": "number"},
                     "emission_probability": {"type": "number"},
                     "half_life_s": {"type": "number"},
@@ -147,9 +146,32 @@ REACTION_RATES_SCHEMA: Dict[str, Any] = {
                 "properties": {
                     "reaction_id": {"type": "string"},
                     "rate": {"type": "number"},
-                    "uncertainty": {"type": "number"},
+                    "uncertainty": {"type": ["number", "null"], "minimum": 0},
                     "half_life_s": {"type": "number"},
+                    "uncertainty_scope": {"type": "string"},
+                    "uncertainty_unavailable_reason": {"type": "string"},
+                    "scientific_admission": {"type": "boolean"},
                 },
+                "allOf": [
+                    {
+                        "if": {"properties": {"uncertainty": {"type": "null"}}},
+                        "then": {
+                            "required": [
+                                "uncertainty_scope",
+                                "uncertainty_unavailable_reason",
+                                "scientific_admission",
+                            ],
+                            "properties": {
+                                "uncertainty_scope": {"const": "unavailable"},
+                                "uncertainty_unavailable_reason": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                },
+                                "scientific_admission": {"const": False},
+                            },
+                        },
+                    }
+                ],
             },
         },
         "provenance": {"type": "object"},
@@ -427,6 +449,20 @@ def validate_artifact(
             errors.append(
                 "Unavailable unfolding covariance requires a recorded reason."
             )
+
+    if schema_id == _schema_id("reaction_rates"):
+        for index, row in enumerate(payload.get("rates", [])):
+            if isinstance(row, dict) and row.get("uncertainty") is None:
+                reason = row.get("uncertainty_unavailable_reason")
+                if (
+                    row.get("uncertainty_scope") != "unavailable"
+                    or not isinstance(reason, str)
+                    or not reason.strip()
+                    or row.get("scientific_admission") is not False
+                ):
+                    errors.append(
+                        f"Rate row {index}: unavailable uncertainty requires scope, reason and scientific_admission=false."
+                    )
 
     provenance = payload.get("provenance")
     if provenance is None:

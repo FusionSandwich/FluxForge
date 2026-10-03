@@ -167,7 +167,7 @@ def main():
     assert len(selected) == 16, "Expected the committed 12 RAFM3 and 4 RAFM4 specimens"
     if args.all_raw:
         selected = [(raw, qg) for raw, qg, _ in pairs]
-        assert len(selected) == 29, "Expected all 29 committed raw spectra"
+        assert len(selected) == len(files["raw"]), "Every discovered raw spectrum must be paired or explicitly unmatched"
     if args.sample:
         requested = set(args.sample)
         available = {raw.stem for raw, _ in selected}
@@ -331,7 +331,8 @@ def main():
     receipt["all_committed_rafm3_rafm4_replayed"] = (
         sum(raw.parent.name in {"RAFM3", "RAFM4"} for raw, _ in selected) == 16
     )
-    receipt["all_committed_raw_replayed"] = len(selected) == 29
+    receipt["all_committed_raw_replayed"] = len(selected) == len(files["raw"])
+    receipt["discovered_raw_count"] = len(files["raw"])
     receipt["comparison_summary"] = workflow.summarize_validation_artifacts(
         [
             {"sample_id": row["sample"], "validation": row["validation"]}

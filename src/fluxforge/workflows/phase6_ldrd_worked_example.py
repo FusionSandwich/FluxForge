@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -135,7 +136,9 @@ def _build_activity_review_payload(sample_id: str) -> dict[str, Any]:
             {
                 "nuclide": nuclide,
                 "line_count": int(payload.get("n_peaks") or len(peak_energies)),
-                "peak_energies_keV": ", ".join(f"{value:.3f}" for value in peak_energies),
+                "peak_energies_keV": ", ".join(
+                    f"{value:.3f}" for value in peak_energies
+                ),
                 "matched_line_energies_keV": ", ".join(
                     f"{value:.3f}" for value in peak_energies
                 ),
@@ -167,8 +170,12 @@ def _build_activity_review_payload(sample_id: str) -> dict[str, Any]:
         )
         count_time_activity = max(_safe_float(peak.get("activity_bq")), 0.0)
         count_time_unc = max(_safe_float(peak.get("activity_unc_bq")), 0.0)
-        irradiation_activity = max(_safe_float(peak.get("eoi_activity_bq")), count_time_activity)
-        irradiation_unc = max(_safe_float(peak.get("eoi_activity_unc_bq")), count_time_unc)
+        irradiation_activity = max(
+            _safe_float(peak.get("eoi_activity_bq")), count_time_activity
+        )
+        irradiation_unc = max(
+            _safe_float(peak.get("eoi_activity_unc_bq")), count_time_unc
+        )
         line_results.append(
             {
                 "peak_id": f"{sample_id}-peak-{index}",
@@ -198,6 +205,8 @@ def _build_activity_review_payload(sample_id: str) -> dict[str, Any]:
 
     return {
         "schema": "fluxforge.activity_review.v1",
+        "accuracy_qualified": False,
+        "example_basis": "historical_bundled_analysis_planning_demonstration",
         "source_id": "fluxforge_bundled_gamma",
         "custom_gamma_path": None,
         "spectrum_id": sample_id,
@@ -213,7 +222,9 @@ def _build_activity_review_payload(sample_id: str) -> dict[str, Any]:
     }
 
 
-def _build_second_irradiation_inputs(sample_id: str) -> tuple[dict[str, Any], dict[str, Any]]:
+def _build_second_irradiation_inputs(
+    sample_id: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     schedule_entry = _load_schedule_entry(sample_id)
     phase1 = schedule_entry.get("phase1") or {}
     phase2 = schedule_entry.get("phase2") or {}
@@ -258,7 +269,7 @@ def _run_cli(args: list[str]) -> None:
     env["PYTHONPATH"] = (
         repo_pythonpath
         if not existing_pythonpath
-        else f"{repo_pythonpath}:{existing_pythonpath}"
+        else f"{repo_pythonpath}{os.pathsep}{existing_pythonpath}"
     )
     command = [sys.executable, "-m", "fluxforge.cli.app", *args]
     result = subprocess.run(
@@ -298,7 +309,9 @@ def _write_summary(
         top = ranked[0]
         score = top.get(
             "difom_score",
-            top.get("objective_score", top.get("total_score", top.get("total_utility"))),
+            top.get(
+                "objective_score", top.get("total_score", top.get("total_utility"))
+            ),
         )
         top_rows.append((objective, str(top.get("label")), score))
 
@@ -312,6 +325,10 @@ def _write_summary(
         "",
         f"Sample: {sample_id}",
         f"Output root: {output_dir}",
+        "",
+        "Planning demonstration using historical bundled analysis. Absolute activities,",
+        "inferred half-lives and spectrum-dependent objectives are not independently qualified.",
+        "See qualification_receipt.json for source and output hashes.",
         "",
         "## Objective Winners",
     ]
@@ -343,6 +360,32 @@ def _write_summary(
 
     summary_path = output_dir / "WORKED_EXAMPLE_SUMMARY.md"
     summary_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    files = sorted(
+        p
+        for p in output_dir.iterdir()
+        if p.is_file() and p.name != "qualification_receipt.json"
+    )
+    sources = [ANALYSIS_ROOT / f"{sample_id}.json", SCHEDULES_PATH, UNFOLD_PATH]
+    receipt = {
+        "sample": sample_id,
+        "accuracy_qualified": False,
+        "basis": "historical_bundled_analysis_planning_demonstration",
+        "limits": [
+            "Historical analysis may reproduce QG values; not fresh raw extraction.",
+            "Half-lives are inferred by this existing demonstrator from reported activity ratios.",
+            "Bundled unfolding results are demonstration inputs, not independent neutron-spectrum qualification.",
+        ],
+        "source_sha256": {
+            str(p.relative_to(REPO_ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sources
+        },
+        "output_sha256": {
+            p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in files
+        },
+    }
+    (output_dir / "qualification_receipt.json").write_text(
+        json.dumps(receipt, indent=2) + "\n", encoding="utf-8"
+    )
     return summary_path
 
 
@@ -351,7 +394,9 @@ def run_phase6_ldrd_worked_example(
     sample_id: str = DEFAULT_SAMPLE_ID,
     output_root: Path | None = None,
 ) -> Path:
-    output_dir = Path(output_root) if output_root is not None else default_output_root(sample_id)
+    output_dir = (
+        Path(output_root) if output_root is not None else default_output_root(sample_id)
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
 
     activity_review_payload = _build_activity_review_payload(sample_id)
@@ -434,7 +479,9 @@ def run_phase6_ldrd_worked_example(
         if objective in {"bass-d", "stbd-mr"}:
             cli_args.append("--enable-advanced-objectives")
         if objective == "mwdcs":
-            cli_args.extend(["--mwdcs-full-spectrum-mode", "--mwdcs-overlap-penalty", "0.1"])
+            cli_args.extend(
+                ["--mwdcs-full-spectrum-mode", "--mwdcs-overlap-penalty", "0.1"]
+            )
         if objective == "stbd-mr":
             cli_args.extend(
                 [
@@ -463,7 +510,9 @@ def run_phase6_ldrd_worked_example(
     second_schedule, second_candidates = _build_second_irradiation_inputs(sample_id)
     second_schedule_path = output_dir / "second_irradiation_schedule.json"
     second_candidates_path = output_dir / "second_irradiation_candidates.json"
-    second_schedule_path.write_text(json.dumps(second_schedule, indent=2), encoding="utf-8")
+    second_schedule_path.write_text(
+        json.dumps(second_schedule, indent=2), encoding="utf-8"
+    )
     second_candidates_path.write_text(
         json.dumps(second_candidates, indent=2),
         encoding="utf-8",
