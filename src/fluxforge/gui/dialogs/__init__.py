@@ -5,6 +5,7 @@ from fluxforge.gui.dialogs.calibration_dialog import CalibrationWorkspaceDialog
 from fluxforge.gui.dialogs.covariance_dialog import CovarianceDialog
 from fluxforge.gui.dialogs.irradiation_history_dialog import IrradiationHistoryDialog
 from fluxforge.gui.dialogs.reaction_rate_dialog import ReactionRateDialog
+from fluxforge.gui.dialogs.spectrum_file_queue_dialog import SpectrumFileQueueDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.dialogs.pu_isotopics_dialog import PuIsotopicsDialog
 from fluxforge.gui.dialogs.qa_history_dialog import QAHistoryDialog
@@ -18,6 +19,7 @@ __all__ = [
     "CovarianceDialog",
     "IrradiationHistoryDialog",
     "ReactionRateDialog",
+    "SpectrumFileQueueDialog",
     "EfficiencyCalibrationDialog",
     "PuIsotopicsDialog",
     "QAHistoryDialog",

@@ -10,6 +10,7 @@ from fluxforge.gui.dialogs.calibration_dialog import CalibrationWorkspaceDialog
 from fluxforge.gui.dialogs.covariance_dialog import CovarianceDialog
 from fluxforge.gui.dialogs.irradiation_history_dialog import IrradiationHistoryDialog
 from fluxforge.gui.dialogs.reaction_rate_dialog import ReactionRateDialog
+from fluxforge.gui.dialogs.spectrum_file_queue_dialog import SpectrumFileQueueDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.dialogs.unfolding_dialog import UnfoldingWorkspaceDialog
 from fluxforge.gui.panels.modern_shell_shared import build_demo_spectrum
@@ -335,6 +336,7 @@ def test_machine_readable_action_catalog_matches_all_production_controls():
         CovarianceDialog(parent=window),
         IrradiationHistoryDialog(parent=window),
         ReactionRateDialog(history_provider=lambda: (), parent=window),
+        SpectrumFileQueueDialog(parent=window),
         CalibrationWorkspaceDialog(
             spectrum=build_demo_spectrum(),
             mode_manager=window.mode_manager,

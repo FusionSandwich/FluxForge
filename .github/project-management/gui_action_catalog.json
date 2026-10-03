@@ -5,6 +5,11 @@
   "policy": "Every production-owned QAction, interactive control, fixed tab, and renderer intent must have a stable ID and a behavioral test suite. Qt-internal chrome and read-only output widgets are excluded.",
   "action_groups": [
     {
+      "surface": "main-window.spectrum-file-queue",
+      "test_ids": ["tests/test_spectrum_file_queue_workspace_qt.py"],
+      "object_names": ["OpenSpectrumFileQueueAction"]
+    },
+    {
       "surface": "main-window.reaction-rate",
       "test_ids": ["tests/test_reaction_rate_workspace_qt.py"],
       "object_names": ["OpenReactionRateAction"]
@@ -101,6 +106,11 @@
     }
   ],
   "control_surfaces": [
+    {
+      "surface": "spectrum-file-queue-dialog",
+      "test_ids": ["tests/test_spectrum_file_queue_workspace_qt.py"],
+      "object_names": ["SpectrumQueueFilesButton", "SpectrumQueueFolderButton", "SpectrumQueueRemoveButton", "SpectrumQueueRecursiveCheck", "SpectrumQueueModeCombo", "SpectrumQueueIndependentCheck", "SpectrumQueueOutputInput", "SpectrumQueueOutputButton", "SpectrumQueueRunButton"]
+    },
     {
       "surface": "reaction-rate-dialog",
       "test_ids": ["tests/test_reaction_rate_workspace_qt.py"],
