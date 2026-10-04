@@ -1,0 +1,86 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_________ test_apply_after_selection_switch_updates_original_and_undo _________
+
+window = <fluxforge.gui.main_window.FluxForgeMainWindow(0x212611bfa20, name="FluxForgeMainWindow") at 0x0000021262CAE300>
+
+    def test_apply_after_selection_switch_updates_original_and_undo(window):
+        controller = window.analysis_workspace
+        original_id = controller.document.active_spectrum_id
+        other = next(item for item in controller.document.spectra
+                     if item.spectrum_id != original_id)
+        original = controller.document.spectrum_by_id(original_id).spectrum
+        window._open_energy_fwhm_workspace()
+        dialog = window._calibration_dialog
+        _fit(dialog)
+        controller.select_spectrum(other.spectrum_id)
+        selection = window.selection_bus.state
+        label = window.file_label.text()
+        dialog._apply_workspace_results()
+>       assert controller.document.spectrum_by_id(original_id).spectrum.calibration["energy"] == [0.5, 2.0]
+E       assert [0.0, 1.0] == [0.5, 2.0]
+E         
+E         At index 0 diff: 0.0 != 0.5
+E         Use -v to get more diff
+
+tests\test_gui_calibration_target.py:71: AssertionError
+_______ test_stale_dialog_cannot_change_reloaded_example_with_same_ids ________
+
+window = <fluxforge.gui.main_window.FluxForgeMainWindow(0x21203abd860, name="FluxForgeMainWindow") at 0x00000212662B6B80>
+
+    def test_stale_dialog_cannot_change_reloaded_example_with_same_ids(window):
+        window._open_energy_fwhm_workspace()
+        dialog = window._calibration_dialog
+        _fit(dialog)
+        window._load_example_workspace()
+        before = window.analysis_workspace.document.to_dict()
+        selection = window.selection_bus.state
+        dialog._apply_workspace_results()
+>       assert window.analysis_workspace.document.to_dict() == before
+E       AssertionError: assert {'schema': 'f...tle': '', ...} == {'schema': 'f...tle': '', ...}
+E         
+E         Omitting 18 identical items, use -vv to show
+E         Differing items:
+E         {'detector_profiles': [{'detector_profile_id': 'demo-foreground-detector-profile', 'detector_id': 'demo-hpge', 'energy...1', 'coefficients': [0.5, 2.0], 'calibration_points': [], 'deviation_pairs': [], ...}, 'fwhm_calibration': None, ...}]} != {'detector_profiles': []}
+E         {'spectra': [{'spectrum_id': 'demo-foreground', 'label': 'Demo Foreground', 'source_path': None, 'source_hash': None, ...: None, ...}, {'spectrum_id': 'demo-overlay', 'label': 'Demo Overlay', 'source_path': None, 'source_hash': None, ...}]} != {'s...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests\test_gui_calibration_target.py:91: AssertionError
+___________ test_replaced_acquisition_under_same_id_rejects_old_fit ___________
+
+window = <fluxforge.gui.main_window.FluxForgeMainWindow(0x21203f58d20, name="FluxForgeMainWindow") at 0x0000021268E10880>
+
+    def test_replaced_acquisition_under_same_id_rejects_old_fit(window):
+        controller = window.analysis_workspace
+        original_id = controller.document.active_spectrum_id
+        original = controller.document.spectrum_by_id(original_id)
+        window._open_energy_fwhm_workspace()
+        dialog = window._calibration_dialog
+        _fit(dialog)
+        replacement = replace(original, spectrum=replace(
+            original.spectrum, counts=original.spectrum.counts.copy(), energies=None,
+        ))
+        controller.set_document(replace(controller.document, spectra=tuple(
+            replacement if item.spectrum_id == original_id else item
+            for item in controller.document.spectra
+        )))
+        before = controller.document.to_dict()
+        dialog._apply_workspace_results()
+>       assert controller.document.to_dict() == before
+E       AssertionError: assert {'schema': 'f...tle': '', ...} == {'schema': 'f...tle': '', ...}
+E         
+E         Omitting 17 identical items, use -vv to show
+E         Differing items:
+E         {'detector_profiles': [{'detector_profile_id': 'demo-foreground-detector-profile', 'detector_id': 'demo-hpge', 'energy...1', 'coefficients': [0.5, 2.0], 'calibration_points': [], 'deviation_pairs': [], ...}, 'fwhm_calibration': None, ...}]} != {'detector_profiles': []}
+E         {'updated_at': '2026-10-04T06:39:47+00:00'} != {'updated_at': '2026-10-04T06:39:43+00:00'}
+E         {'spectra': [{'spectrum_id': 'demo-foreground', 'label': 'Demo Foreground', 'source_path': None, 'source_hash': None, ...: None, ...}, {'spectrum_id': 'demo-...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests\test_gui_calibration_target.py:113: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_gui_calibration_target.py::test_apply_after_selection_switch_updates_original_and_undo
+FAILED tests/test_gui_calibration_target.py::test_stale_dialog_cannot_change_reloaded_example_with_same_ids
+FAILED tests/test_gui_calibration_target.py::test_replaced_acquisition_under_same_id_rejects_old_fit
+3 failed in 18.72s

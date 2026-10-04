@@ -1,0 +1,21 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_calibration_fits_laptop_height_with_visible_actions ___________
+
+window = <fluxforge.gui.main_window.FluxForgeMainWindow(0x223a2f6e340, name="FluxForgeMainWindow") at 0x00000223A86C9FC0>
+
+    def test_calibration_fits_laptop_height_with_visible_actions(window):
+        app = QApplication.instance()
+        window._open_energy_fwhm_workspace()
+        dialog = window._calibration_dialog
+        dialog.resize(1280, 800)
+        app.processEvents()
+>       assert dialog.height() <= 800
+E       assert 960 <= 800
+E        +  where 960 = <built-in method height of CalibrationWorkspaceDialog object at 0x00000223A7C87B80>()
+E        +    where <built-in method height of CalibrationWorkspaceDialog object at 0x00000223A7C87B80> = <fluxforge.gui.dialogs.calibration_dialog.CalibrationWorkspaceDialog(0x223aa15e2e0, name="CalibrationWorkspaceDialog") at 0x00000223A7C87B80>.height
+
+tests\test_gui_calibration_target.py:123: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_gui_calibration_target.py::test_calibration_fits_laptop_height_with_visible_actions
+1 failed, 3 deselected in 17.69s

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="17.696" timestamp="2026-10-04T02:47:18.126106-04:00" hostname="DESKTOP-RE6EJEJ"><testcase classname="tests.test_gui_calibration_target" name="test_calibration_fits_laptop_height_with_visible_actions" time="2.726"><failure message="assert 960 &lt;= 800&#10; +  where 960 = &lt;built-in method height of CalibrationWorkspaceDialog object at 0x00000223A7C87B80&gt;()&#10; +    where &lt;built-in method height of CalibrationWorkspaceDialog object at 0x00000223A7C87B80&gt; = &lt;fluxforge.gui.dialogs.calibration_dialog.CalibrationWorkspaceDialog(0x223aa15e2e0, name=&quot;CalibrationWorkspaceDialog&quot;) at 0x00000223A7C87B80&gt;.height">window = &lt;fluxforge.gui.main_window.FluxForgeMainWindow(0x223a2f6e340, name="FluxForgeMainWindow") at 0x00000223A86C9FC0&gt;
+
+    def test_calibration_fits_laptop_height_with_visible_actions(window):
+        app = QApplication.instance()
+        window._open_energy_fwhm_workspace()
+        dialog = window._calibration_dialog
+        dialog.resize(1280, 800)
+        app.processEvents()
+&gt;       assert dialog.height() &lt;= 800
+E       assert 960 &lt;= 800
+E        +  where 960 = &lt;built-in method height of CalibrationWorkspaceDialog object at 0x00000223A7C87B80&gt;()
+E        +    where &lt;built-in method height of CalibrationWorkspaceDialog object at 0x00000223A7C87B80&gt; = &lt;fluxforge.gui.dialogs.calibration_dialog.CalibrationWorkspaceDialog(0x223aa15e2e0, name="CalibrationWorkspaceDialog") at 0x00000223A7C87B80&gt;.height
+
+tests\test_gui_calibration_target.py:123: AssertionError</failure></testcase></testsuite></testsuites>

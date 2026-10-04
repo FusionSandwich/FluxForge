@@ -1,0 +1,108 @@
+FFFFF                                                                    [100%]
+================================== FAILURES ===================================
+__________________ test_shipped_gui_and_native_bundle_use_qt __________________
+
+    def test_shipped_gui_and_native_bundle_use_qt():
+        config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        scripts = config["project"]["scripts"]
+        assert scripts["fluxforge-gui"] == "fluxforge.gui.app:main"
+>       assert "fluxforge-gui-legacy" not in scripts
+E       AssertionError: assert 'fluxforge-gui-legacy' not in {'fluxforge': 'fluxforge.cli.app:main', 'fluxforge-gui': 'fluxforge.gui.app:main', 'fluxforge-gui-legacy': 'fluxforge_gui.app:main'}
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:42: AssertionError
+______ test_workflow_shortcuts_reveal_peak_review_and_follow_loaded_data ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C1F85FD910>
+
+    @pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_workflow_shortcuts_reveal_peak_review_and_follow_loaded_data(monkeypatch):
+        from PySide6.QtWidgets import QToolButton
+        from PySide6.QtTest import QTest
+        from PySide6.QtCore import Qt
+        from PySide6.QtWidgets import QDialog
+        from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog
+    
+        monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    
+        app = QApplication.instance() or QApplication([])
+        settings = MemorySettings()
+        window = FluxForgeMainWindow(
+            mode_manager=ModeManager(settings=settings),
+            selection_bus=SelectionBus(),
+            settings=settings,
+        )
+        window.resize(1280, 800)
+        window.show()
+        app.processEvents()
+        buttons = {
+            b.defaultAction().objectName(): b
+>           for b in window.analysis_workflow_toolbar.findChildren(QToolButton)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            if b.defaultAction()
+        }
+E       AttributeError: 'FluxForgeMainWindow' object has no attribute 'analysis_workflow_toolbar'
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:73: AttributeError
+__________ test_analysis_forms_scroll_without_forcing_a_tall_window ___________
+
+    @pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_analysis_forms_scroll_without_forcing_a_tall_window():
+        from PySide6.QtWidgets import QScrollArea
+    
+        app = QApplication.instance() or QApplication([])
+        settings = MemorySettings()
+        window = FluxForgeMainWindow(
+            mode_manager=ModeManager(settings=settings),
+            selection_bus=SelectionBus(),
+            settings=settings,
+        )
+        window.show()
+        app.processEvents()
+        bottom = window.bottom_dock.widget()
+>       assert bottom.minimumSizeHint().height() < 300
+E       assert 799 < 300
+E        +  where 799 = <built-in method height of PySide6.QtCore.QSize object at 0x000001C1FC3933C0>()
+E        +    where <built-in method height of PySide6.QtCore.QSize object at 0x000001C1FC3933C0> = PySide6.QtCore.QSize(1638, 799).height
+E        +      where PySide6.QtCore.QSize(1638, 799) = <built-in method minimumSizeHint of BottomWorkspaceTabs object at 0x000001C1FC3C78C0>()
+E        +        where <built-in method minimumSizeHint of BottomWorkspaceTabs object at 0x000001C1FC3C78C0> = <fluxforge.gui.panels.modern_shell.BottomWorkspaceTabs(0x1c19630cb00, name="BottomWorkspaceTabs") at 0x000001C1FC3C78C0>.minimumSizeHint
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:115: AssertionError
+______ test_measured_data_unfolding_requires_matching_physical_response _______
+
+tmp_path = WindowsPath('C:/Users/Josh/AppData/Local/Temp/pytest-of-Josh/pytest-342/test_measured_data_unfolding_r0')
+
+    @pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_measured_data_unfolding_requires_matching_physical_response(tmp_path):
+        app = QApplication.instance() or QApplication([])
+>       dialog = UnfoldingWorkspaceDialog(
+            start_empty=True, mode_manager=ModeManager(settings=MemorySettings())
+        )
+E       TypeError: UnfoldingWorkspaceDialog.__init__() got an unexpected keyword argument 'start_empty'
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:131: TypeError
+______________ test_empty_unfolding_imports_committed_rafm_rates ______________
+
+    @pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_empty_unfolding_imports_committed_rafm_rates():
+        app = QApplication.instance() or QApplication([])
+>       dialog = UnfoldingWorkspaceDialog(
+            start_empty=True, mode_manager=ModeManager(settings=MemorySettings())
+        )
+E       TypeError: UnfoldingWorkspaceDialog.__init__() got an unexpected keyword argument 'start_empty'
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:202: TypeError
+=========================== short test summary info ===========================
+FAILED artifacts/validation/qt_gui_review_20261004/test_consolidation_reproduction.py::test_shipped_gui_and_native_bundle_use_qt
+FAILED artifacts/validation/qt_gui_review_20261004/test_consolidation_reproduction.py::test_workflow_shortcuts_reveal_peak_review_and_follow_loaded_data
+FAILED artifacts/validation/qt_gui_review_20261004/test_consolidation_reproduction.py::test_analysis_forms_scroll_without_forcing_a_tall_window
+FAILED artifacts/validation/qt_gui_review_20261004/test_consolidation_reproduction.py::test_measured_data_unfolding_requires_matching_physical_response
+FAILED artifacts/validation/qt_gui_review_20261004/test_consolidation_reproduction.py::test_empty_unfolding_imports_committed_rafm_rates
+5 failed in 32.88s

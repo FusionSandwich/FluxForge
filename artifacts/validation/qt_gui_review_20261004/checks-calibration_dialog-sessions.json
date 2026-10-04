@@ -1,0 +1,18 @@
+[
+  {
+    "group": "calibration_dialog",
+    "exit_code": 0,
+    "tests": [
+      "tests/test_calibration_workspace_qt.py"
+    ],
+    "elapsed_seconds": 24.73
+  },
+  {
+    "group": "sessions",
+    "exit_code": 0,
+    "tests": [
+      "tests/test_workspace_session_qt.py"
+    ],
+    "elapsed_seconds": 35.28
+  }
+]

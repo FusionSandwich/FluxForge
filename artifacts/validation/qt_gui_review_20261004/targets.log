@@ -1,0 +1,16 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Josh\.codex\environments\fluxforge-issue21-complete\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge
+configfile: pyproject.toml
+plugins: platformdirs-4.12.2
+collecting ... collected 5 items
+
+tests/test_gui_calibration_target.py::test_apply_after_selection_switch_updates_original_and_undo PASSED [ 20%]
+tests/test_gui_calibration_target.py::test_stale_dialog_cannot_change_reloaded_example_with_same_ids PASSED [ 40%]
+tests/test_gui_calibration_target.py::test_replaced_acquisition_under_same_id_rejects_old_fit PASSED [ 60%]
+tests/test_gui_calibration_target.py::test_calibration_fits_laptop_height_with_visible_actions PASSED [ 80%]
+tests/test_gui_calibration_target.py::test_main_window_can_shrink_to_laptop_width PASSED [100%]
+
+- generated xml file: C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge\artifacts\validation\qt_gui_review_20261004\targets.xml -
+============================= 5 passed in 53.30s ==============================

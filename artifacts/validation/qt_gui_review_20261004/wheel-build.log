@@ -1,0 +1,9 @@
+Processing .\.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: fluxforge
+  Building wheel for fluxforge (pyproject.toml): started
+  Building wheel for fluxforge (pyproject.toml): finished with status 'done'
+  Created wheel for fluxforge: filename=fluxforge-0.1.0-py3-none-any.whl size=2686467 sha256=079af8b3275cf2da8a6896cc68f450366b1066f25277d5d0a5fc8166989a60f9
+  Stored in directory: C:\Users\Josh\AppData\Local\Temp\pip-ephem-wheel-cache-8jdm9xhw\wheels\2a\57\a3\dcde0777847e76fff3a31a82627ac68e989b2ad130137d6bcc
+Successfully built fluxforge

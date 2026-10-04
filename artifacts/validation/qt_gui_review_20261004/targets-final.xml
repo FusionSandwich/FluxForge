@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="101.276" timestamp="2026-10-04T02:52:10.221003-04:00" hostname="DESKTOP-RE6EJEJ"><testcase classname="tests.test_gui_calibration_target" name="test_apply_after_selection_switch_updates_original_and_undo" time="27.111" /><testcase classname="tests.test_gui_calibration_target" name="test_stale_dialog_cannot_change_reloaded_example_with_same_ids" time="8.197" /><testcase classname="tests.test_gui_calibration_target" name="test_replaced_acquisition_under_same_id_rejects_old_fit" time="10.226" /><testcase classname="tests.test_gui_calibration_target" name="test_calibration_fits_laptop_height_with_visible_actions" time="13.939" /><testcase classname="tests.test_gui_calibration_target" name="test_main_window_can_shrink_to_laptop_width" time="16.330"><failure message="assert 1822 &lt;= 1280&#10; +  where 1822 = &lt;built-in method width of FluxForgeMainWindow object at 0x000002102F13C380&gt;()&#10; +    where &lt;built-in method width of FluxForgeMainWindow object at 0x000002102F13C380&gt; = &lt;fluxforge.gui.main_window.FluxForgeMainWindow(0x2104dfd6000, name=&quot;FluxForgeMainWindow&quot;) at 0x000002102F13C380&gt;.width">window = &lt;fluxforge.gui.main_window.FluxForgeMainWindow(0x2104dfd6000, name="FluxForgeMainWindow") at 0x000002102F13C380&gt;
+
+    def test_main_window_can_shrink_to_laptop_width(window):
+        window.resize(1280, 850)
+        window.show()
+        QApplication.instance().processEvents()
+&gt;       assert window.width() &lt;= 1280
+E       assert 1822 &lt;= 1280
+E        +  where 1822 = &lt;built-in method width of FluxForgeMainWindow object at 0x000002102F13C380&gt;()
+E        +    where &lt;built-in method width of FluxForgeMainWindow object at 0x000002102F13C380&gt; = &lt;fluxforge.gui.main_window.FluxForgeMainWindow(0x2104dfd6000, name="FluxForgeMainWindow") at 0x000002102F13C380&gt;.width
+
+tests\test_gui_calibration_target.py:135: AssertionError</failure></testcase></testsuite></testsuites>
