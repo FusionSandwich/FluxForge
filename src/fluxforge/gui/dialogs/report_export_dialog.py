@@ -209,21 +209,62 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
                 provenance = instrument_provenance(
                     workspace,
                     self._instrument_overrides,
-                    require_complete=self.instructional_check.isChecked(),
+                    require_complete=False,
                 )
                 snapshot["instrument_provenance"] = provenance
                 snapshot["instructional_report"] = self.instructional_check.isChecked()
                 context["instrument_provenance_json"] = json.dumps(provenance, indent=2)
                 missing = provenance["missing_required"]
+                active_record = next(
+                    (
+                        record
+                        for record in provenance["records"]
+                        if record["spectrum_id"] == active
+                    ),
+                    None,
+                )
+                incomplete = sum(
+                    bool(record["missing_required"]) for record in provenance["records"]
+                )
+                labels = {
+                    "amplifier_gain": "amplifier gain",
+                    "shaping_time_us": "shaping time",
+                    "high_voltage_v": "high voltage",
+                    "count_geometry": "count geometry",
+                    "live_time_s": "live time",
+                    "real_time_s": "real time",
+                    "counting_time_order": "valid live/real time order",
+                    "mca_calibration": "MCA calibration",
+                }
+                active_missing = (
+                    active_record["missing_required"] if active_record else []
+                )
+                current_label = (
+                    (active_record.get("label") or active) if active_record else "none"
+                )
                 self.instrument_status.setText(
-                    f"Active spectrum: {active or 'none'}. "
+                    f"Current spectrum: {current_label}. "
                     + (
                         "All loaded spectra have the required recorded settings."
                         if not missing
-                        else f"Missing: {', '.join(missing)}. "
+                        else (
+                            "Missing here: "
+                            + ", ".join(
+                                labels.get(name, name) for name in active_missing
+                            )
+                            + ". "
+                            if active_missing
+                            else ""
+                        )
+                        + f"{incomplete} acquisitions need recorded settings. "
                         "Select each spectrum in the workspace to enter its settings."
                     )
                 )
+                if self.instructional_check.isChecked() and missing:
+                    raise ValueError(
+                        "Instructional report needs complete recorded acquisition settings. "
+                        "Review the current spectrum's missing settings above."
+                    )
             return context
 
         def _bind_instrument_inputs(self, active) -> None:

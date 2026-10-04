@@ -114,6 +114,48 @@ def test_recorded_high_voltage_preserves_signed_bias_and_zero(voltage):
     assert result["scientific_admission"] is False
 
 
+def test_qt_large_campaign_keeps_missing_settings_readable_and_complete(tmp_path):
+    pytest.importorskip("PySide6")
+    from fluxforge.gui.qt_compat import QApplication
+    from fluxforge.gui.dialogs.report_export_dialog import ReportExportDialog
+    from fluxforge.reporting.engine import ReportingEngine
+
+    app = QApplication.instance() or QApplication([])
+    workspace = _workspace()
+    workspace["spectra"][0]["spectrum"]["metadata"] = {}
+    base = workspace["spectra"][0]
+    workspace["spectra"] = [
+        dict(deepcopy(base), spectrum_id=f"acquisition-{index}", label=f"Foil {index}")
+        for index in range(30)
+    ]
+    workspace["active_spectrum_id"] = "acquisition-0"
+    context = {
+        key: ""
+        for key in ReportingEngine().templates["standard_lab"].required_context_keys
+    }
+    context["run_snapshot"] = {"workspace": workspace}
+    dialog = ReportExportDialog(context_factory=lambda _name: context)
+    try:
+        captured = dialog._capture_context()
+        assert (
+            len(captured["run_snapshot"]["instrument_provenance"]["missing_required"])
+            == 120
+        )
+        message = dialog.instrument_status.text()
+        assert "Foil 0" in message and "30 acquisitions" in message
+        assert len(message) < 400
+        assert "acquisition-29" not in message
+        dialog.instructional_check.setChecked(True)
+        dialog.path_input.setText(str(tmp_path / "blocked.html"))
+        dialog.export_html()
+        assert dialog.last_export_path is None
+        assert len(dialog.export_status.text()) < 300
+        assert not (tmp_path / "blocked.html").exists()
+    finally:
+        dialog.close()
+        app.processEvents()
+
+
 def test_qt_instructional_bundle_requires_all_spectra_and_preserves_settings_on_switch(
     tmp_path,
 ):

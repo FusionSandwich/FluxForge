@@ -54,7 +54,8 @@ Amplifier gain (dimensionless), shaping time (microseconds), high voltage
 ```
 
 Place this mapping in the spectrum's `metadata`. Numeric units are fixed by the
-key names; ambiguous keys or unit conversions are not guessed. Missing fields
+key names; high voltage preserves the recorded sign, and explicit 0 V records
+an off setting. Ambiguous keys or unit conversions are not guessed. Missing fields
 stay null with an explicit missing-settings list. Invalid/nonfinite values fail
 capture. The Qt export dialog accepts explicit user entries for the active
 spectrum and labels their source `user_entered`; a blank entry uses imported

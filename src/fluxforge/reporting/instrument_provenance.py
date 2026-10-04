@@ -106,7 +106,13 @@ def instrument_provenance(workspace, overrides=None, *, require_complete=False):
         missing.append("loaded_spectrum")
     if require_complete and missing:
         raise ValueError(
-            "Instructional report needs recorded settings: " + ", ".join(missing)
+            "Instructional report needs recorded settings: "
+            + ", ".join(missing[:5])
+            + (
+                f"; and {len(missing) - 5} more missing fields."
+                if len(missing) > 5
+                else ""
+            )
         )
     return {
         "schema": "fluxforge.instrument_provenance.v1",
