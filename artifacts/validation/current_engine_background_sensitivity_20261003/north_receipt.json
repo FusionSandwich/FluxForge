@@ -1,0 +1,1988 @@
+{
+  "status": "COMPLETED",
+  "mode": "north",
+  "engine_commit": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "engine_base": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "original_source_sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+  "source_path": "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\background.ASC",
+  "South_background_injection_count": 0,
+  "counting_methods": [
+    "iec_tiered",
+    "iec_tiered"
+  ],
+  "QG_reference_used_for_activity": false,
+  "QG_reference_line_library_independence": "NOT_ESTABLISHED",
+  "South_temporal_applicability": "UNRESOLVED",
+  "QG_background_match": "UNKNOWN",
+  "numerical_status": "conditional; integrated-bin-overlap rebinning with covariance; background applicability and profile efficiency unqualified",
+  "input_identity": {
+    "input_root": "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs",
+    "input_tree_sha256": "45803d05cfe2c49aa541c9bfc2079d441feb9c7978e81a6a68a732fedc0fdfe1",
+    "input_file_count": 69,
+    "input_total_bytes": 5325000,
+    "hash_scheme": "SHA-256 sorted POSIX relative path and bytes, length prefixed",
+    "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+    "supplement_manifest_sha256": "cbdc5672eb87d404af92a72f4d52d59221b80c01d3989cec0f4a03f6b5932dc3",
+    "python_version": "3.12.10",
+    "python_executable": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "runtime_versions": {
+      "numpy": "2.5.1",
+      "scipy": "1.18.0",
+      "pandas": "2.3.3",
+      "matplotlib": "3.11.1"
+    }
+  },
+  "summary": {
+    "overall_passed": false,
+    "failing_samples": [
+      "Co-Cd-RAFM-1_25cm",
+      "In-Cd-RAFM-1_25cm",
+      "Ni-RAFM-1_25cm",
+      "Sc-RAFM-1_25cm",
+      "Ti-RAFM-1_25cm",
+      "Ti-RAFM-1a_25cm",
+      "Ti-RAFM-1b_25cm",
+      "RAFM3-A_24hrEOI",
+      "RAFM3-A_300sEOI",
+      "RAFM3-A_4dEOI",
+      "RAFM3-B_24hrEOI",
+      "RAFM3-B_2hrEOI",
+      "RAFM3-B_300sEOI",
+      "RAFM3-B_4dEOI",
+      "RAFM3-C_24hrEOI",
+      "RAFM3-C_2hrEOI",
+      "RAFM3-C_300sEOI",
+      "RAFM3-C_4dEOI",
+      "RAFM3-N_24hrEOI",
+      "RAFM3-N_2hrEOI",
+      "RAFM3-N_300sEOI",
+      "RAFM3-N_4dEOI",
+      "RAFM4-A_15dEOI",
+      "RAFM4-B_15dEOI",
+      "RAFM4-C_15dEOI",
+      "RAFM4-N_15dEOI"
+    ],
+    "unvalidated_samples": [
+      "RAFM3-A_2hrEOI"
+    ],
+    "unvalidated_reference_files": [
+      "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\QG_processed_gamma_data\\flux_wires\\Cu-Cd-RAFM-1_25cm.txt",
+      "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\QG_processed_gamma_data\\flux_wires\\Fe-Cd-RAFM-1_0cm.txt"
+    ],
+    "reference_reproduction_samples": [],
+    "n_raw_analyzed": 30,
+    "n_matched_pairs": 29,
+    "n_unmatched_raw": 1,
+    "n_unmatched_qg": 2,
+    "unmatched_raw": [
+      "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\raw_gamma_spec\\RAFM3\\RAFM3-A_2hrEOI.ASC"
+    ],
+    "unmatched_qg": [
+      "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\QG_processed_gamma_data\\flux_wires\\Cu-Cd-RAFM-1_25cm.txt",
+      "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\QG_processed_gamma_data\\flux_wires\\Fe-Cd-RAFM-1_0cm.txt"
+    ],
+    "line_diagnostic_buckets": {
+      "assignment_ambiguous": 1,
+      "count_parity_failure": 167,
+      "efficiency_or_activity_conversion_bias": 68,
+      "gamma_library_mismatch": 8,
+      "isotope_mismatch": 1,
+      "matched": 23,
+      "missing_in_fluxforge": 9
+    },
+    "qg_source_qc_buckets": {
+      "line_summary_inconsistency": 32,
+      "no_flag_under_report_assumptions": 127,
+      "yield_convention_discrepancy": 6,
+      "yield_convention_discrepancy;line_summary_inconsistency": 6,
+      "yield_reference_or_convention_unqualified": 1,
+      "yield_reference_or_convention_unqualified;line_summary_inconsistency": 1,
+      "yield_value_discrepancy": 87,
+      "yield_value_discrepancy;line_summary_inconsistency": 17
+    },
+    "measurement_time_audits": {
+      "Co-Cd-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Co60",
+            "energy_keV": 1173.13,
+            "activity_conversion_ratio_raw_over_report": 0.7359965617129164
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1332.44,
+            "activity_conversion_ratio_raw_over_report": 0.67035473121986
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Co-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Co60",
+            "energy_keV": 1173.16,
+            "activity_conversion_ratio_raw_over_report": 1.068996746866486
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1332.41,
+            "activity_conversion_ratio_raw_over_report": 1.0003286685391382
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Cu-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "no_flagged_discrepancy"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Cu64",
+            "energy_keV": 1345.48,
+            "activity_conversion_ratio_raw_over_report": 1.0018744111075737
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "In-Cd-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "In114m",
+            "energy_keV": 190.17,
+            "activity_conversion_ratio_raw_over_report": 1.3793821208863914
+          },
+          {
+            "isotope": "In114m",
+            "energy_keV": 558.27,
+            "activity_conversion_ratio_raw_over_report": 1.6995773062627388
+          },
+          {
+            "isotope": "In114m",
+            "energy_keV": 724.98,
+            "activity_conversion_ratio_raw_over_report": 1.6014081944811953
+          },
+          {
+            "isotope": "In115m",
+            "energy_keV": 336.17,
+            "activity_conversion_ratio_raw_over_report": 1.4808452258005027
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Ni-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Co58",
+            "energy_keV": 810.5,
+            "activity_conversion_ratio_raw_over_report": 1.2331784371196695
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Sc-Cd-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Sc46",
+            "energy_keV": 889.16,
+            "activity_conversion_ratio_raw_over_report": 1.2075473256621543
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 1120.33,
+            "activity_conversion_ratio_raw_over_report": 1.1134906037559156
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Sc-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Sc46",
+            "energy_keV": 889.36,
+            "activity_conversion_ratio_raw_over_report": 1.0723463893222323
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 1120.41,
+            "activity_conversion_ratio_raw_over_report": 1.0062967611239668
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Ti-RAFM-1_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Sc47",
+            "energy_keV": 159.29,
+            "activity_conversion_ratio_raw_over_report": 1.7186212668488208
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 175.23,
+            "activity_conversion_ratio_raw_over_report": 0.6029947521368862
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 983.36,
+            "activity_conversion_ratio_raw_over_report": 0.012038344491449752
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 1037.25,
+            "activity_conversion_ratio_raw_over_report": 1.1509095299037622
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 1311.79,
+            "activity_conversion_ratio_raw_over_report": 0.01104390119776424
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 889.04,
+            "activity_conversion_ratio_raw_over_report": 1.2683542751083088
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 1120.1,
+            "activity_conversion_ratio_raw_over_report": 1.0429914389612749
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Ti-RAFM-1a_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Sc47",
+            "energy_keV": 159.3,
+            "activity_conversion_ratio_raw_over_report": 1.718870365066197
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 175.28,
+            "activity_conversion_ratio_raw_over_report": 1.4314947631836528
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 983.4,
+            "activity_conversion_ratio_raw_over_report": 0.01204663644895106
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 1037.36,
+            "activity_conversion_ratio_raw_over_report": 1.1509570572847962
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 1311.88,
+            "activity_conversion_ratio_raw_over_report": 0.011022688707658542
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 889.11,
+            "activity_conversion_ratio_raw_over_report": 1.2223895414996575
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 1120.28,
+            "activity_conversion_ratio_raw_over_report": 1.0484364297441668
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "Ti-RAFM-1b_25cm": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Sc47",
+            "energy_keV": 159.32,
+            "activity_conversion_ratio_raw_over_report": 1.7197740705188032
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 175.26,
+            "activity_conversion_ratio_raw_over_report": 0.16411662783077405
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 983.39,
+            "activity_conversion_ratio_raw_over_report": 0.012323573169624775
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 1037.42,
+            "activity_conversion_ratio_raw_over_report": 1.1484779472039157
+          },
+          {
+            "isotope": "Sc48",
+            "energy_keV": 1311.93,
+            "activity_conversion_ratio_raw_over_report": 0.01148431976736019
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 889.19,
+            "activity_conversion_ratio_raw_over_report": 1.1841270919491516
+          },
+          {
+            "isotope": "Sc46",
+            "energy_keV": 1120.33,
+            "activity_conversion_ratio_raw_over_report": 1.0471325183186349
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-A_24hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.16,
+            "activity_conversion_ratio_raw_over_report": 2.0567910272146928
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.54,
+            "activity_conversion_ratio_raw_over_report": 1.7062996141923876
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.5,
+            "activity_conversion_ratio_raw_over_report": 1.6477781214367573
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.3,
+            "activity_conversion_ratio_raw_over_report": 1.6146168615532666
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 625.38,
+            "activity_conversion_ratio_raw_over_report": 1.6113498195257994
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.72,
+            "activity_conversion_ratio_raw_over_report": 1.5905711728394263
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.82,
+            "activity_conversion_ratio_raw_over_report": 1.536096172505283
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.22,
+            "activity_conversion_ratio_raw_over_report": 1.4985725397857177
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.66,
+            "activity_conversion_ratio_raw_over_report": 1.222413284766667
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.71,
+            "activity_conversion_ratio_raw_over_report": 0.9209936427003136
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-A_2hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_evidence_incomplete",
+          "library_or_assignment_limited"
+        ],
+        "conversion_diagnostics": [],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "not_evaluated"
+      },
+      "RAFM3-A_300sEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 133.71,
+            "activity_conversion_ratio_raw_over_report": 2.056365129011661
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.67,
+            "activity_conversion_ratio_raw_over_report": 1.705720058440323
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.79,
+            "activity_conversion_ratio_raw_over_report": 1.5889363389516569
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.2,
+            "activity_conversion_ratio_raw_over_report": 0.9202682469188084
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.49,
+            "activity_conversion_ratio_raw_over_report": 0.8519265891423201
+          },
+          {
+            "isotope": "V52",
+            "energy_keV": 1433.6,
+            "activity_conversion_ratio_raw_over_report": 0.010317566737034312
+          },
+          {
+            "isotope": "Al28",
+            "energy_keV": 1778.42,
+            "activity_conversion_ratio_raw_over_report": 0.015791149159682206
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-A_4dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.16,
+            "activity_conversion_ratio_raw_over_report": 2.0564877443526863
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.49,
+            "activity_conversion_ratio_raw_over_report": 1.7068960695118371
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.52,
+            "activity_conversion_ratio_raw_over_report": 1.6494610392859799
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.25,
+            "activity_conversion_ratio_raw_over_report": 1.5892294756411176
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.65,
+            "activity_conversion_ratio_raw_over_report": 1.5885876808178798
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.95,
+            "activity_conversion_ratio_raw_over_report": 1.5363499796010456
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.07,
+            "activity_conversion_ratio_raw_over_report": 1.4995779725679175
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-B_24hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.14,
+            "activity_conversion_ratio_raw_over_report": 2.058116969760293
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.52,
+            "activity_conversion_ratio_raw_over_report": 1.7047168489956437
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.5,
+            "activity_conversion_ratio_raw_over_report": 1.6477383911853787
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.28,
+            "activity_conversion_ratio_raw_over_report": 1.6146168615532666
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 625.5,
+            "activity_conversion_ratio_raw_over_report": 1.6109810296182279
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.73,
+            "activity_conversion_ratio_raw_over_report": 1.587764845313968
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.79,
+            "activity_conversion_ratio_raw_over_report": 1.5362785712822167
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.18,
+            "activity_conversion_ratio_raw_over_report": 1.501947482197868
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.68,
+            "activity_conversion_ratio_raw_over_report": 1.2266328984208899
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.59,
+            "activity_conversion_ratio_raw_over_report": 0.9201212014408309
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.67,
+            "activity_conversion_ratio_raw_over_report": 0.960564424884492
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-B_2hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 133.57,
+            "activity_conversion_ratio_raw_over_report": 2.0588411073038806
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.46,
+            "activity_conversion_ratio_raw_over_report": 1.7061793504355436
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.49,
+            "activity_conversion_ratio_raw_over_report": 1.6468244429208236
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.13,
+            "activity_conversion_ratio_raw_over_report": 1.6139953363786848
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.7,
+            "activity_conversion_ratio_raw_over_report": 1.5882543634696202
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.7,
+            "activity_conversion_ratio_raw_over_report": 1.535636931315929
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.6,
+            "activity_conversion_ratio_raw_over_report": 1.22520172704304
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.31,
+            "activity_conversion_ratio_raw_over_report": 0.9202706000350298
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.69,
+            "activity_conversion_ratio_raw_over_report": 0.8520487482340403
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2522.6,
+            "activity_conversion_ratio_raw_over_report": 0.8163214552164088
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-B_300sEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 133.52,
+            "activity_conversion_ratio_raw_over_report": 1.1591600419221504
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.73,
+            "activity_conversion_ratio_raw_over_report": 1.7056887361115418
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.55,
+            "activity_conversion_ratio_raw_over_report": 1.6536399570040687
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.33,
+            "activity_conversion_ratio_raw_over_report": 3.656542310666922
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.79,
+            "activity_conversion_ratio_raw_over_report": 1.588779092072299
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 773.15,
+            "activity_conversion_ratio_raw_over_report": 0.9057826364806542
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.64,
+            "activity_conversion_ratio_raw_over_report": 1.225161370564581
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.21,
+            "activity_conversion_ratio_raw_over_report": 0.9202900987041597
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.52,
+            "activity_conversion_ratio_raw_over_report": 0.8519266697995082
+          },
+          {
+            "isotope": "V52",
+            "energy_keV": 1433.7,
+            "activity_conversion_ratio_raw_over_report": 0.01031757291353642
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-B_4dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.14,
+            "activity_conversion_ratio_raw_over_report": 2.0560981934812155
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.48,
+            "activity_conversion_ratio_raw_over_report": 1.7056291723387773
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.4,
+            "activity_conversion_ratio_raw_over_report": 1.6461355129970972
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.24,
+            "activity_conversion_ratio_raw_over_report": 1.6710144651601215
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.69,
+            "activity_conversion_ratio_raw_over_report": 1.588584506907414
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 773.03,
+            "activity_conversion_ratio_raw_over_report": 1.5358627460443959
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.0,
+            "activity_conversion_ratio_raw_over_report": 1.500124419141133
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1098.93,
+            "activity_conversion_ratio_raw_over_report": 1.2930825157847168
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-C_24hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.16,
+            "activity_conversion_ratio_raw_over_report": 2.0547111818732615
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.52,
+            "activity_conversion_ratio_raw_over_report": 1.7061560207910214
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.54,
+            "activity_conversion_ratio_raw_over_report": 1.6472347455361003
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.3,
+            "activity_conversion_ratio_raw_over_report": 1.613111887866049
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 625.42,
+            "activity_conversion_ratio_raw_over_report": 1.6112039711690997
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.72,
+            "activity_conversion_ratio_raw_over_report": 1.589035497654242
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.87,
+            "activity_conversion_ratio_raw_over_report": 1.535636931315929
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.16,
+            "activity_conversion_ratio_raw_over_report": 1.5011337438870582
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.79,
+            "activity_conversion_ratio_raw_over_report": 1.2255126135707033
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.38,
+            "activity_conversion_ratio_raw_over_report": 1.1838866072294179
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.81,
+            "activity_conversion_ratio_raw_over_report": 0.8200175391226316
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-C_2hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 133.65,
+            "activity_conversion_ratio_raw_over_report": 2.056563178698112
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.48,
+            "activity_conversion_ratio_raw_over_report": 1.705204114496693
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.5,
+            "activity_conversion_ratio_raw_over_report": 1.6467059961669186
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.17,
+            "activity_conversion_ratio_raw_over_report": 1.6122632179708762
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.6,
+            "activity_conversion_ratio_raw_over_report": 1.5879656009378385
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.73,
+            "activity_conversion_ratio_raw_over_report": 1.5350171572926268
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.6,
+            "activity_conversion_ratio_raw_over_report": 1.225252620465229
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.37,
+            "activity_conversion_ratio_raw_over_report": 0.9202606137440795
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.75,
+            "activity_conversion_ratio_raw_over_report": 0.8519345101579731
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2522.62,
+            "activity_conversion_ratio_raw_over_report": 0.816289787914615
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-C_300sEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 133.69,
+            "activity_conversion_ratio_raw_over_report": 2.0582525393423015
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.51,
+            "activity_conversion_ratio_raw_over_report": 1.705104052640958
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.27,
+            "activity_conversion_ratio_raw_over_report": 1.6193965358497806
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.77,
+            "activity_conversion_ratio_raw_over_report": 1.5888599514539905
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.68,
+            "activity_conversion_ratio_raw_over_report": 1.2251519467145218
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.25,
+            "activity_conversion_ratio_raw_over_report": 0.920259373365456
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.6,
+            "activity_conversion_ratio_raw_over_report": 0.8520281848268695
+          },
+          {
+            "isotope": "V52",
+            "energy_keV": 1433.68,
+            "activity_conversion_ratio_raw_over_report": 0.010317840484999558
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-C_4dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.18,
+            "activity_conversion_ratio_raw_over_report": 2.0580108429635233
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.48,
+            "activity_conversion_ratio_raw_over_report": 1.7068205631830078
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.33,
+            "activity_conversion_ratio_raw_over_report": 1.6485066281537448
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.26,
+            "activity_conversion_ratio_raw_over_report": 1.6739086648651902
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.67,
+            "activity_conversion_ratio_raw_over_report": 1.5901216554291864
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.84,
+            "activity_conversion_ratio_raw_over_report": 1.535663114830248
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.07,
+            "activity_conversion_ratio_raw_over_report": 1.500593387245594
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-N_24hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.15,
+            "activity_conversion_ratio_raw_over_report": 2.0543669555618025
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.53,
+            "activity_conversion_ratio_raw_over_report": 1.707278461171551
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.52,
+            "activity_conversion_ratio_raw_over_report": 1.6486209063287887
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.23,
+            "activity_conversion_ratio_raw_over_report": 1.6131455669843116
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 625.4,
+            "activity_conversion_ratio_raw_over_report": 1.6106862503749804
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.73,
+            "activity_conversion_ratio_raw_over_report": 1.5903963768036262
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.85,
+            "activity_conversion_ratio_raw_over_report": 1.5347679807844519
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.17,
+            "activity_conversion_ratio_raw_over_report": 1.1717509518245288
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.73,
+            "activity_conversion_ratio_raw_over_report": 1.2257731237047875
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.44,
+            "activity_conversion_ratio_raw_over_report": 0.9252846200796683
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-N_2hrEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 133.62,
+            "activity_conversion_ratio_raw_over_report": 2.0586149814504044
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.52,
+            "activity_conversion_ratio_raw_over_report": 1.705742713644853
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.48,
+            "activity_conversion_ratio_raw_over_report": 1.6478265322472612
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.19,
+            "activity_conversion_ratio_raw_over_report": 1.6130528397171777
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.71,
+            "activity_conversion_ratio_raw_over_report": 1.588474962981272
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.82,
+            "activity_conversion_ratio_raw_over_report": 1.5359572970406898
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.64,
+            "activity_conversion_ratio_raw_over_report": 1.2252178186437137
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.42,
+            "activity_conversion_ratio_raw_over_report": 0.9202784771823076
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.81,
+            "activity_conversion_ratio_raw_over_report": 0.8519072023353764
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2522.67,
+            "activity_conversion_ratio_raw_over_report": 0.8161324205599771
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-N_300sEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 133.67,
+            "activity_conversion_ratio_raw_over_report": 2.0583246005856743
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.55,
+            "activity_conversion_ratio_raw_over_report": 1.706504832951842
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.16,
+            "activity_conversion_ratio_raw_over_report": 2.865404067120232
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.67,
+            "activity_conversion_ratio_raw_over_report": 1.5878846301457623
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.82,
+            "activity_conversion_ratio_raw_over_report": 1.5329205069139324
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 846.54,
+            "activity_conversion_ratio_raw_over_report": 1.2247213477759933
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 1810.16,
+            "activity_conversion_ratio_raw_over_report": 0.9202859693895429
+          },
+          {
+            "isotope": "Mn56",
+            "energy_keV": 2112.43,
+            "activity_conversion_ratio_raw_over_report": 0.8519741847949426
+          },
+          {
+            "isotope": "V52",
+            "energy_keV": 1433.64,
+            "activity_conversion_ratio_raw_over_report": 0.010318043535894786
+          },
+          {
+            "isotope": "Al28",
+            "energy_keV": 1778.61,
+            "activity_conversion_ratio_raw_over_report": 0.009506506727472861
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM3-N_4dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "W187",
+            "energy_keV": 134.18,
+            "activity_conversion_ratio_raw_over_report": 2.0580108429635238
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.5,
+            "activity_conversion_ratio_raw_over_report": 1.7066668656123505
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 551.49,
+            "activity_conversion_ratio_raw_over_report": 1.6481824635593856
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 618.23,
+            "activity_conversion_ratio_raw_over_report": 1.6539348324501046
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.69,
+            "activity_conversion_ratio_raw_over_report": 1.5889116721555354
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 772.83,
+            "activity_conversion_ratio_raw_over_report": 0.8598229998801876
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.05,
+            "activity_conversion_ratio_raw_over_report": 1.5001790712391758
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM4-A_15dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Ta182",
+            "energy_keV": 99.58,
+            "activity_conversion_ratio_raw_over_report": 1.5669666863306317
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 113.18,
+            "activity_conversion_ratio_raw_over_report": 1.6037946478638831
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 152.1,
+            "activity_conversion_ratio_raw_over_report": 1.6309353385992613
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 156.27,
+            "activity_conversion_ratio_raw_over_report": 1.7131685324575057
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 179.53,
+            "activity_conversion_ratio_raw_over_report": 1.6672012488210195
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 198.59,
+            "activity_conversion_ratio_raw_over_report": 1.7004347081167208
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 222.33,
+            "activity_conversion_ratio_raw_over_report": 1.6354995139455744
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 229.55,
+            "activity_conversion_ratio_raw_over_report": 2.173276741278414
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 264.31,
+            "activity_conversion_ratio_raw_over_report": 1.5945291340995464
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1001.71,
+            "activity_conversion_ratio_raw_over_report": 1.195320214841359
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1121.29,
+            "activity_conversion_ratio_raw_over_report": 1.14506857482794
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1189.01,
+            "activity_conversion_ratio_raw_over_report": 1.1273779522384813
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1221.36,
+            "activity_conversion_ratio_raw_over_report": 1.1083323839712358
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1231.0,
+            "activity_conversion_ratio_raw_over_report": 1.1368390918186304
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1257.34,
+            "activity_conversion_ratio_raw_over_report": 1.1099730349503145
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 192.49,
+            "activity_conversion_ratio_raw_over_report": 1.7530865087768002
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1099.25,
+            "activity_conversion_ratio_raw_over_report": 1.067623385298887
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1291.43,
+            "activity_conversion_ratio_raw_over_report": 1.071559889189561
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.33,
+            "activity_conversion_ratio_raw_over_report": 1.499750114488851
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.79,
+            "activity_conversion_ratio_raw_over_report": 1.9714607581800108
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.92,
+            "activity_conversion_ratio_raw_over_report": 1.589172639602355
+          },
+          {
+            "isotope": "Mn54",
+            "energy_keV": 834.92,
+            "activity_conversion_ratio_raw_over_report": 1.2293750217873796
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1173.17,
+            "activity_conversion_ratio_raw_over_report": 1.0928460310903256
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1332.43,
+            "activity_conversion_ratio_raw_over_report": 1.0599833820484414
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM4-B_15dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Ta182",
+            "energy_keV": 99.59,
+            "activity_conversion_ratio_raw_over_report": 1.566952098999601
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 113.18,
+            "activity_conversion_ratio_raw_over_report": 1.603545416340379
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 152.19,
+            "activity_conversion_ratio_raw_over_report": 1.6308483997417582
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 156.48,
+            "activity_conversion_ratio_raw_over_report": 1.7132361159152962
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 179.54,
+            "activity_conversion_ratio_raw_over_report": 2.063592695382197
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 198.62,
+            "activity_conversion_ratio_raw_over_report": 1.7005179501574863
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 222.34,
+            "activity_conversion_ratio_raw_over_report": 1.6355020231037596
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 229.54,
+            "activity_conversion_ratio_raw_over_report": 2.0744261611697983
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 264.32,
+            "activity_conversion_ratio_raw_over_report": 1.5945708165671098
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1001.76,
+            "activity_conversion_ratio_raw_over_report": 1.1953347669162464
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1121.35,
+            "activity_conversion_ratio_raw_over_report": 1.1450452004854257
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1189.1,
+            "activity_conversion_ratio_raw_over_report": 1.127415166881043
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1221.42,
+            "activity_conversion_ratio_raw_over_report": 1.1083277555614535
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1231.05,
+            "activity_conversion_ratio_raw_over_report": 1.1213216358686797
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1257.45,
+            "activity_conversion_ratio_raw_over_report": 1.1099608610868283
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 192.55,
+            "activity_conversion_ratio_raw_over_report": 1.75302436034904
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1099.3,
+            "activity_conversion_ratio_raw_over_report": 1.0613661175170448
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1291.52,
+            "activity_conversion_ratio_raw_over_report": 1.0715549743704615
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.34,
+            "activity_conversion_ratio_raw_over_report": 1.499382810894672
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.57,
+            "activity_conversion_ratio_raw_over_report": 1.7085276233335804
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.94,
+            "activity_conversion_ratio_raw_over_report": 1.589435079035545
+          },
+          {
+            "isotope": "Mn54",
+            "energy_keV": 834.96,
+            "activity_conversion_ratio_raw_over_report": 1.2305784130439685
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1173.36,
+            "activity_conversion_ratio_raw_over_report": 1.2746726463664948
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1332.47,
+            "activity_conversion_ratio_raw_over_report": 1.0602518817256517
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM4-C_15dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Ta182",
+            "energy_keV": 99.6,
+            "activity_conversion_ratio_raw_over_report": 1.5668628205624608
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 113.16,
+            "activity_conversion_ratio_raw_over_report": 1.6037337243787961
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 152.22,
+            "activity_conversion_ratio_raw_over_report": 1.6308180132654526
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 156.5,
+            "activity_conversion_ratio_raw_over_report": 1.713069815373961
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 179.55,
+            "activity_conversion_ratio_raw_over_report": 2.044799360544843
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 198.62,
+            "activity_conversion_ratio_raw_over_report": 1.7005528609708744
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 222.33,
+            "activity_conversion_ratio_raw_over_report": 1.635514680169456
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 229.55,
+            "activity_conversion_ratio_raw_over_report": 2.220118693494309
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 264.32,
+            "activity_conversion_ratio_raw_over_report": 1.5945482345759692
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1001.8,
+            "activity_conversion_ratio_raw_over_report": 1.1953163198715842
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1121.38,
+            "activity_conversion_ratio_raw_over_report": 1.145050152249013
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1189.13,
+            "activity_conversion_ratio_raw_over_report": 1.1274308111020268
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1221.45,
+            "activity_conversion_ratio_raw_over_report": 1.1083515230265082
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1231.09,
+            "activity_conversion_ratio_raw_over_report": 1.1217377012682928
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1257.46,
+            "activity_conversion_ratio_raw_over_report": 1.1099144050764977
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 192.51,
+            "activity_conversion_ratio_raw_over_report": 1.7530177902159019
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1099.34,
+            "activity_conversion_ratio_raw_over_report": 1.0764262771760147
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1291.57,
+            "activity_conversion_ratio_raw_over_report": 1.0716489586329447
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.34,
+            "activity_conversion_ratio_raw_over_report": 1.4998874005628244
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.75,
+            "activity_conversion_ratio_raw_over_report": 1.7063365696976263
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 686.01,
+            "activity_conversion_ratio_raw_over_report": 1.5882436133524314
+          },
+          {
+            "isotope": "Mn54",
+            "energy_keV": 834.98,
+            "activity_conversion_ratio_raw_over_report": 1.23111657715945
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1173.28,
+            "activity_conversion_ratio_raw_over_report": 1.0784504070963763
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1332.58,
+            "activity_conversion_ratio_raw_over_report": 1.0603269022267754
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      },
+      "RAFM4-N_15dEOI": {
+        "comparison_stage": "measurement_time",
+        "categories": [
+          "activity_conversion_or_efficiency_limited",
+          "activity_evidence_incomplete",
+          "export_data_limited",
+          "library_or_assignment_limited",
+          "peak_area_limited"
+        ],
+        "conversion_diagnostics": [
+          {
+            "isotope": "Ta182",
+            "energy_keV": 99.59,
+            "activity_conversion_ratio_raw_over_report": 1.566880349704549
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 113.16,
+            "activity_conversion_ratio_raw_over_report": 1.6035206023806239
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 152.32,
+            "activity_conversion_ratio_raw_over_report": 1.630595968185178
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 156.45,
+            "activity_conversion_ratio_raw_over_report": 1.7131017067696874
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 179.52,
+            "activity_conversion_ratio_raw_over_report": 2.365742765237844
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 198.58,
+            "activity_conversion_ratio_raw_over_report": 1.994506027344112
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 222.3,
+            "activity_conversion_ratio_raw_over_report": 1.635547850154925
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 229.5,
+            "activity_conversion_ratio_raw_over_report": 2.054570244122158
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1001.78,
+            "activity_conversion_ratio_raw_over_report": 1.1953088865266177
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1121.35,
+            "activity_conversion_ratio_raw_over_report": 1.1450293977220252
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1189.1,
+            "activity_conversion_ratio_raw_over_report": 1.1274096008753847
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1221.42,
+            "activity_conversion_ratio_raw_over_report": 1.1083665098850675
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1231.07,
+            "activity_conversion_ratio_raw_over_report": 1.1240839964643445
+          },
+          {
+            "isotope": "Ta182",
+            "energy_keV": 1257.43,
+            "activity_conversion_ratio_raw_over_report": 1.1096734851577497
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 192.48,
+            "activity_conversion_ratio_raw_over_report": 1.5071273036251818
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1099.31,
+            "activity_conversion_ratio_raw_over_report": 1.129791605332253
+          },
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1291.58,
+            "activity_conversion_ratio_raw_over_report": 1.0715952296146605
+          },
+          {
+            "isotope": "Cr51",
+            "energy_keV": 320.31,
+            "activity_conversion_ratio_raw_over_report": 1.4993165076613015
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 479.68,
+            "activity_conversion_ratio_raw_over_report": 1.7081674328323928
+          },
+          {
+            "isotope": "W187",
+            "energy_keV": 685.94,
+            "activity_conversion_ratio_raw_over_report": 1.5854466166335683
+          },
+          {
+            "isotope": "Mn54",
+            "energy_keV": 834.95,
+            "activity_conversion_ratio_raw_over_report": 1.2289911719640132
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1173.27,
+            "activity_conversion_ratio_raw_over_report": 1.0357469132249346
+          },
+          {
+            "isotope": "Co60",
+            "energy_keV": 1332.43,
+            "activity_conversion_ratio_raw_over_report": 1.0595152619158241
+          }
+        ],
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": false,
+        "limitations": [
+          "Categories describe differences against a processed report, not unique causal attribution.",
+          "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+          "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified."
+        ],
+        "comparison_basis": "raw_estimate_vs_report"
+      }
+    },
+    "qg_internal_consistency_flags": 26,
+    "fluxforge_line_consistency_flags": 225,
+    "measurement_qc_flags": 0,
+    "cd_ratio_review_flags": 0,
+    "results_root": "D:\\FluxForge_current_engine_north_20261003",
+    "unfolding_methods": [
+      "GLS",
+      "GRAVEL",
+      "MLEM"
+    ]
+  }
+}

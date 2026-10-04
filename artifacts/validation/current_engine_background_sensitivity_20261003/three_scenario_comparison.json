@@ -1,0 +1,2501 @@
+{
+  "status": "COMPLETED",
+  "engine_commit": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "input_tree_sha256": "45803d05cfe2c49aa541c9bfc2079d441feb9c7978e81a6a68a732fedc0fdfe1",
+  "audit_sha256": "c63f9f6e095da6dcc0a86d4e4d8a36e150a45299122ac2304258d82a29942c4d",
+  "interpretation": "zero ambient is a counterfactual protocol control, not a measured physical background",
+  "QG_final_report_ambient_state": "UNKNOWN",
+  "South_temporal_applicability": "UNRESOLVED",
+  "sample_group_correction": "Cu-RAFM-1_25cm is source-manifest flux wire; workflow table calls it RAFM1",
+  "pairwise": {
+    "north_vs_south": {
+      "common_finite_rows": 81,
+      "median_abs_QG_relative_error": {
+        "north": 0.4170686606145289,
+        "south": 0.3844604366308824
+      },
+      "second_better": 41,
+      "first_better": 40
+    },
+    "north_vs_zero_ambient": {
+      "common_finite_rows": 81,
+      "median_abs_QG_relative_error": {
+        "north": 0.4170686606145289,
+        "zero_ambient": 0.3827944549005119
+      },
+      "second_better": 46,
+      "first_better": 35
+    },
+    "south_vs_zero_ambient": {
+      "common_finite_rows": 81,
+      "median_abs_QG_relative_error": {
+        "south": 0.3844604366308824,
+        "zero_ambient": 0.3827944549005119
+      },
+      "second_better": 44,
+      "first_better": 37
+    }
+  },
+  "triple_common_finite_rows": 81,
+  "group_summary": {
+    "RAFM3": {
+      "common_finite_rows": 40,
+      "median_abs_QG_relative_error": {
+        "north": 0.6189822331362158,
+        "south": 0.6084662605998888,
+        "zero_ambient": 0.6089187984063356
+      }
+    },
+    "RAFM4": {
+      "common_finite_rows": 24,
+      "median_abs_QG_relative_error": {
+        "north": 0.24428341419047456,
+        "south": 0.244051316965886,
+        "zero_ambient": 0.24425629952041705
+      }
+    },
+    "flux_wires": {
+      "common_finite_rows": 17,
+      "median_abs_QG_relative_error": {
+        "north": 0.33504543316328195,
+        "south": 0.42828214723473146,
+        "zero_ambient": 0.23729511337014858
+      }
+    }
+  },
+  "triple_median_abs_QG_relative_error": {
+    "north": 0.4170686606145289,
+    "south": 0.3844604366308824,
+    "zero_ambient": 0.3827944549005119
+  },
+  "CoCd_isotope_activity_Bq": {
+    "north": 156.2310754782869,
+    "south": 134.32510950719984,
+    "zero_ambient": 246.1944545969775
+  },
+  "CoCd_QG_report_Bq": 234.95,
+  "overall_passed": {
+    "north": false,
+    "south": false,
+    "zero_ambient": false
+  },
+  "failing_sample_count": {
+    "north": 26,
+    "south": 26,
+    "zero_ambient": 25
+  },
+  "qg_internal_consistency_flags": {
+    "north": 26,
+    "south": 26,
+    "zero_ambient": 26
+  },
+  "fluxforge_line_consistency_flags": {
+    "north": 225,
+    "south": 159,
+    "zero_ambient": 224
+  },
+  "reaction_rate_rows": [
+    {
+      "sample_id": "Co-Cd-RAFM-1_25cm",
+      "reaction_id": "Co-59(n,g)Co-60",
+      "reaction_rate_per_atom_s": {
+        "north": 1.4007766564124981e-13,
+        "south": 1.2043665269006524e-13,
+        "zero_ambient": 2.2073934003327147e-13
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.8597848353535046,
+      "zero_over_north": 1.5758353697769543
+    },
+    {
+      "sample_id": "Co-RAFM-1_25cm",
+      "reaction_id": "Co-59(n,g)Co-60",
+      "reaction_rate_per_atom_s": {
+        "north": 1.693320273070996e-12,
+        "south": 1.6935774027876504e-12,
+        "zero_ambient": 1.7706179146150439e-12
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 1.000151849429044,
+      "zero_over_north": 1.0456485655863916
+    },
+    {
+      "sample_id": "Cu-RAFM-1_25cm",
+      "reaction_id": "Cu-63(n,g)Cu-64",
+      "reaction_rate_per_atom_s": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "exclusion_reason": {
+        "north": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "south": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "zero_ambient": "no end-of-irradiation activity (decay timing missing or non-finite)"
+      },
+      "south_over_north": null,
+      "zero_over_north": null
+    },
+    {
+      "sample_id": "In-Cd-RAFM-1_25cm",
+      "reaction_id": "In-113(n,g)In-114m",
+      "reaction_rate_per_atom_s": {
+        "north": 7.463666361690928e-11,
+        "south": 7.462417788574482e-11,
+        "zero_ambient": 7.461624946675466e-11
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9998327131658973,
+      "zero_over_north": 0.9997264862982167
+    },
+    {
+      "sample_id": "In-Cd-RAFM-1_25cm",
+      "reaction_id": "In-115(n,n')In-115m",
+      "reaction_rate_per_atom_s": {
+        "north": 2.1244494491323278e-11,
+        "south": 2.1222008480855788e-11,
+        "zero_ambient": 2.1263461569871472e-11
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9989415605781219,
+      "zero_over_north": 1.0008927997112824
+    },
+    {
+      "sample_id": "Ni-RAFM-1_25cm",
+      "reaction_id": "Ni-58(n,2n)Ni-57",
+      "reaction_rate_per_atom_s": {
+        "north": 3.18652525016812e-13,
+        "south": 4.4757349201755374e-14,
+        "zero_ambient": 2.5348008101564005e-13
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.1404581658324973,
+      "zero_over_north": 0.7954748860134295
+    },
+    {
+      "sample_id": "Ni-RAFM-1_25cm",
+      "reaction_id": "Ni-58(n,p)Co-58",
+      "reaction_rate_per_atom_s": {
+        "north": 2.991543701178571e-13,
+        "south": 2.9939359257193144e-13,
+        "zero_ambient": 2.9917444828574524e-13
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 1.0007996622412039,
+      "zero_over_north": 1.0000671164117718
+    },
+    {
+      "sample_id": "Sc-Cd-RAFM-1_25cm",
+      "reaction_id": "Sc-45(n,g)Sc-46",
+      "reaction_rate_per_atom_s": {
+        "north": 6.277072133510288e-12,
+        "south": 6.275264045871625e-12,
+        "zero_ambient": 6.27796477883793e-12
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9997119536624391,
+      "zero_over_north": 1.000142207275726
+    },
+    {
+      "sample_id": "Sc-RAFM-1_25cm",
+      "reaction_id": "Sc-45(n,g)Sc-46",
+      "reaction_rate_per_atom_s": {
+        "north": 2.213680083837142e-10,
+        "south": 2.2135827320611728e-10,
+        "zero_ambient": 2.2137043838999083e-10
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9999560226535533,
+      "zero_over_north": 1.000010977224281
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "reaction_id": "Ti-46(n,p)Sc-46",
+      "reaction_rate_per_atom_s": {
+        "north": 5.1559205233767293e-14,
+        "south": 3.799394409030922e-14,
+        "zero_ambient": 5.2160685936243755e-14
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.7368993357839062,
+      "zero_over_north": 1.011665825719178
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "reaction_id": "Ti-47(n,p)Sc-47",
+      "reaction_rate_per_atom_s": {
+        "north": 9.43955121959021e-14,
+        "south": 9.373170975862308e-14,
+        "zero_ambient": 9.450075367342576e-14
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9929678602103307,
+      "zero_over_north": 1.0011148991628462
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "reaction_id": "Ti-48(n,p)Sc-48",
+      "reaction_rate_per_atom_s": {
+        "north": 1.5294837069834571e-15,
+        "south": 1.4987319188557857e-15,
+        "zero_ambient": 1.5025728161200239e-15
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9798940073782663,
+      "zero_over_north": 0.982405245155237
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "reaction_id": "Ti-50(n,g)Ti-51",
+      "reaction_rate_per_atom_s": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "exclusion_reason": {
+        "north": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "south": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "zero_ambient": "no end-of-irradiation activity (decay timing missing or non-finite)"
+      },
+      "south_over_north": null,
+      "zero_over_north": null
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "reaction_id": "Ti-46(n,p)Sc-46",
+      "reaction_rate_per_atom_s": {
+        "north": 5.3215595006161184e-14,
+        "south": 4.083297158345264e-14,
+        "zero_ambient": 5.181207934137894e-14
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.7673121305648295,
+      "zero_over_north": 0.9736258578971118
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "reaction_id": "Ti-47(n,p)Sc-47",
+      "reaction_rate_per_atom_s": {
+        "north": 9.668037066212188e-14,
+        "south": 9.599298944436011e-14,
+        "zero_ambient": 9.678934862279446e-14
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9928901677449705,
+      "zero_over_north": 1.0011271984160408
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "reaction_id": "Ti-48(n,p)Sc-48",
+      "reaction_rate_per_atom_s": {
+        "north": 1.6404388869529657e-15,
+        "south": 1.6108603095425374e-15,
+        "zero_ambient": 1.609548251392777e-15
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9819691073860307,
+      "zero_over_north": 0.981169285972264
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "reaction_id": "Ti-50(n,g)Ti-51",
+      "reaction_rate_per_atom_s": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "exclusion_reason": {
+        "north": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "south": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "zero_ambient": "no end-of-irradiation activity (decay timing missing or non-finite)"
+      },
+      "south_over_north": null,
+      "zero_over_north": null
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "reaction_id": "Ti-46(n,p)Sc-46",
+      "reaction_rate_per_atom_s": {
+        "north": 5.2955352286368474e-14,
+        "south": 4.2063463084202875e-14,
+        "zero_ambient": 5.3891093464075394e-14
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.7943193892231108,
+      "zero_over_north": 1.0176703796180353
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "reaction_id": "Ti-47(n,p)Sc-47",
+      "reaction_rate_per_atom_s": {
+        "north": 9.693321934671544e-14,
+        "south": 9.595536546872976e-14,
+        "zero_ambient": 9.708824406525983e-14
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.9899120870577088,
+      "zero_over_north": 1.0015992940251979
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "reaction_id": "Ti-48(n,p)Sc-48",
+      "reaction_rate_per_atom_s": {
+        "north": 1.6534624545448083e-15,
+        "south": 1.6393239413986629e-15,
+        "zero_ambient": 1.5895994682081245e-15
+      },
+      "exclusion_reason": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "south_over_north": 0.991449147752171,
+      "zero_over_north": 0.9613762101696678
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "reaction_id": "Ti-50(n,g)Ti-51",
+      "reaction_rate_per_atom_s": {
+        "north": null,
+        "south": null,
+        "zero_ambient": null
+      },
+      "exclusion_reason": {
+        "north": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "south": "no end-of-irradiation activity (decay timing missing or non-finite)",
+        "zero_ambient": "no end-of-irradiation activity (decay timing missing or non-finite)"
+      },
+      "south_over_north": null,
+      "zero_over_north": null
+    }
+  ],
+  "activity_rows": [
+    {
+      "sample_id": "Co-Cd-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Co60",
+      "QG_report_Bq": 234.95,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 156.2310754782869,
+          "QG_relative_error": -0.33504543316328195
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 134.32510950719984,
+          "QG_relative_error": -0.42828214723473146
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 246.1944545969775,
+          "QG_relative_error": 0.04785892571601407
+        }
+      }
+    },
+    {
+      "sample_id": "Co-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Co60",
+      "QG_report_Bq": 2035.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2093.296232636004,
+          "QG_relative_error": 0.02864679736412967
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2093.6140984737494,
+          "QG_relative_error": 0.028802996792997266
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2188.852203003235,
+          "QG_relative_error": 0.07560304815883784
+        }
+      }
+    },
+    {
+      "sample_id": "Cu-RAFM-1_25cm",
+      "reported_sample_group": "RAFM1",
+      "sample_group": "flux_wires",
+      "isotope": "Cu64",
+      "QG_report_Bq": 3172380.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 3200184.168496631,
+          "QG_relative_error": 0.008764450821348982
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 3203297.0534982923,
+          "QG_relative_error": 0.0097456967634055
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 3201810.1573192826,
+          "QG_relative_error": 0.009276996236038131
+        }
+      }
+    },
+    {
+      "sample_id": "In-Cd-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "In114m",
+      "QG_report_Bq": 219706.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 324026.9594471649,
+          "QG_relative_error": 0.47482071243919105
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 323972.7540029551,
+          "QG_relative_error": 0.4745739943513382
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 323938.33363400894,
+          "QG_relative_error": 0.4744173287666652
+        }
+      }
+    },
+    {
+      "sample_id": "In-Cd-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "In115m",
+      "QG_report_Bq": 11988.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 17880.79466012842,
+          "QG_relative_error": 0.49155777945682516
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 17861.86892216563,
+          "QG_relative_error": 0.489979055903039
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 17896.75862843848,
+          "QG_relative_error": 0.49288944181168515
+        }
+      }
+    },
+    {
+      "sample_id": "Ni-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Co58",
+      "QG_report_Bq": 45880.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 56763.290053073695,
+          "QG_relative_error": 0.2372120761349977
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 56808.68151281564,
+          "QG_relative_error": 0.23820142791664423
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 56767.09980142242,
+          "QG_relative_error": 0.23729511337014858
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 1398.6,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2002.1263898493735,
+          "QG_relative_error": 0.4315218002641024
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 1936.306366671952,
+          "QG_relative_error": 0.3844604366308824
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 1934.263029452282,
+          "QG_relative_error": 0.38299944905783073
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 684.5,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 797.163043999572,
+          "QG_relative_error": 0.16459173703370633
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 864.4529658860055,
+          "QG_relative_error": 0.2628969552753915
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 817.8929167626756,
+          "QG_relative_error": 0.19487643062479992
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 19203.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 31498.16662521467,
+          "QG_relative_error": 0.6402732190394559
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 31425.870911076796,
+          "QG_relative_error": 0.6365084055135549
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 31430.296270279654,
+          "QG_relative_error": 0.636738856963998
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Al28",
+      "QG_report_Bq": 248381.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 4482.538765064029,
+          "QG_relative_error": -0.9819529723889346
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 4478.132925780272,
+          "QG_relative_error": -0.9819707106188467
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 4487.330143020788,
+          "QG_relative_error": -0.9819336819522396
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 588559.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 495139.032842926,
+          "QG_relative_error": -0.15872659692074034
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 506976.2240702216,
+          "QG_relative_error": -0.13861443955453642
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 506959.9036297443,
+          "QG_relative_error": -0.13864216904380985
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "V52",
+      "QG_report_Bq": 95937300.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 947146.627528844,
+          "QG_relative_error": -0.9901274412816616
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 947129.2430911249,
+          "QG_relative_error": -0.9901276224879049
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 947147.5689142393,
+          "QG_relative_error": -0.990127431469155
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 27639.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 50710.68335719283,
+          "QG_relative_error": 0.834751016939572
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 50734.08342729329,
+          "QG_relative_error": 0.8355976492381523
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 50716.22145335514,
+          "QG_relative_error": 0.8349513894625398
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 2090.5,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 3526.7126985943837,
+          "QG_relative_error": 0.6870187508224749
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2766.625056226566,
+          "QG_relative_error": 0.32342743660682416
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2764.5670425522458,
+          "QG_relative_error": 0.32244297658562343
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Fe59",
+      "QG_report_Bq": 0.0,
+      "modes": {
+        "north": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "south": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "zero_ambient": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-A_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 2593.7,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 4393.529147399568,
+          "QG_relative_error": 0.6939234095691745
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 4448.24532939966,
+          "QG_relative_error": 0.7150192117051547
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 4407.810796645948,
+          "QG_relative_error": 0.6994296937371125
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 969.4000000000001,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2920.590716118671,
+          "QG_relative_error": 2.0127818404360127
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2854.7747383667493,
+          "QG_relative_error": 1.9448883209890129
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2852.7292273288226,
+          "QG_relative_error": 1.9427782415193133
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 510.59999999999997,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 590.5148018378497,
+          "QG_relative_error": 0.15651155863268662
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 547.0771124728864,
+          "QG_relative_error": 0.07143970323714534
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 323.59995474459345,
+          "QG_relative_error": -0.36623588965022824
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 19388.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 32018.589238664903,
+          "QG_relative_error": 0.6514642685509028
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 31979.711434575493,
+          "QG_relative_error": 0.6494590176694601
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 32004.32040174908,
+          "QG_relative_error": 0.6507283062589787
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_2hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 363784.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 430446.5106099968,
+          "QG_relative_error": 0.18324750569018097
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 430457.24188582733,
+          "QG_relative_error": 0.18327700472210798
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 430457.5756439283,
+          "QG_relative_error": 0.183277922184396
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_2hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 35779.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 61598.13174265553,
+          "QG_relative_error": 0.7216280986795476
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 61586.12421907796,
+          "QG_relative_error": 0.7212924961311932
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 61579.67676077216,
+          "QG_relative_error": 0.7211122938252092
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 589114.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 670755.7104928629,
+          "QG_relative_error": 0.1385838912211607
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 670763.1606955661,
+          "QG_relative_error": 0.1385965376744842
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 670766.4869541973,
+          "QG_relative_error": 0.13860218387985565
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "V52",
+      "QG_report_Bq": 94864300.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 958435.2024009455,
+          "QG_relative_error": -0.9898967767389739
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 958417.8179857294,
+          "QG_relative_error": -0.9898969599945846
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 958436.1438179631,
+          "QG_relative_error": -0.9898967668151458
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 36408.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 59046.5039030494,
+          "QG_relative_error": 0.6218002610154197
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 59288.25526086232,
+          "QG_relative_error": 0.6284403224802879
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 59033.04336330442,
+          "QG_relative_error": 0.6214305472232593
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 1979.5,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2805.08741368646,
+          "QG_relative_error": 0.4170686606145289
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2739.284570120595,
+          "QG_relative_error": 0.3838265067545315
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2737.2416234755633,
+          "QG_relative_error": 0.3827944549005119
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Fe59",
+      "QG_report_Bq": 0.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 179.8936395959698,
+          "QG_relative_error": null
+        },
+        "south": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "zero_ambient": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-B_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 2553.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 4361.703638957626,
+          "QG_relative_error": 0.708462059912897
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 4278.942191470612,
+          "QG_relative_error": 0.6760447283472824
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 4340.378932817845,
+          "QG_relative_error": 0.7001092568812556
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 2057.2,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2944.076003404816,
+          "QG_relative_error": 0.4311083042022246
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2878.2660332443056,
+          "QG_relative_error": 0.3991182350983404
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2876.213906625883,
+          "QG_relative_error": 0.39812070125699156
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 365.56,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 369.555065742522,
+          "QG_relative_error": 0.010928618400596349
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 392.2868259067145,
+          "QG_relative_error": 0.07311200871735012
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 390.1421962690283,
+          "QG_relative_error": 0.06724531203914082
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 17649.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 29534.52560273407,
+          "QG_relative_error": 0.6734390391939525
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 29492.911286173832,
+          "QG_relative_error": 0.6710811539562487
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 29465.209881491952,
+          "QG_relative_error": 0.6695115803440395
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_2hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 260073.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 308809.29228164663,
+          "QG_relative_error": 0.18739466335085392
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 308819.9499063481,
+          "QG_relative_error": 0.1874356427093473
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 308820.35279942054,
+          "QG_relative_error": 0.1874371918631328
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_2hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 36038.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 58243.32562905219,
+          "QG_relative_error": 0.6161642052570118
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 58217.693643278115,
+          "QG_relative_error": 0.6154529564148431
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 58229.5411836243,
+          "QG_relative_error": 0.6157817077425024
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 481592.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 568555.2478579779,
+          "QG_relative_error": 0.18057452752117534
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 377033.21412681456,
+          "QG_relative_error": -0.21711072001442183
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 414314.1294248433,
+          "QG_relative_error": -0.13969889569419072
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "V52",
+      "QG_report_Bq": 104417700.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 1023870.2806634504,
+          "QG_relative_error": -0.990194475834428
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 1023852.8962496181,
+          "QG_relative_error": -0.9901946423235752
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 1023871.2220626321,
+          "QG_relative_error": -0.9901944668187229
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 37074.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 57353.56702336517,
+          "QG_relative_error": 0.5470024012344276
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 53897.15263210034,
+          "QG_relative_error": 0.453772256354867
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 53878.54792726901,
+          "QG_relative_error": 0.4532704301469767
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 2249.6,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2656.6305045712948,
+          "QG_relative_error": 0.1809346126294874
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2867.1860626611647,
+          "QG_relative_error": 0.2745315001160939
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2865.1334984193745,
+          "QG_relative_error": 0.27361908713521277
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Fe59",
+      "QG_report_Bq": 0.0,
+      "modes": {
+        "north": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "south": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "zero_ambient": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-C_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 2353.2000000000003,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 3976.7071109117296,
+          "QG_relative_error": 0.6899146315280168
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 3873.5473330907457,
+          "QG_relative_error": 0.646076548143271
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 3957.8803221263624,
+          "QG_relative_error": 0.6819141263498054
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 2105.3,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2129.727286319073,
+          "QG_relative_error": 0.011602757953295332
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2063.91025037283,
+          "QG_relative_error": -0.019659787026632878
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2061.864965496764,
+          "QG_relative_error": -0.020631280341631232
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 314.87,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 312.0257579328058,
+          "QG_relative_error": -0.009033067828609317
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 321.15640844257416,
+          "QG_relative_error": 0.019965091760326983
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 316.78232229672733,
+          "QG_relative_error": 0.006073370904587052
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_24hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 20128.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 33323.220283423165,
+          "QG_relative_error": 0.6555653956390682
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 33299.484397492546,
+          "QG_relative_error": 0.6543861485240733
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 33252.8991146442,
+          "QG_relative_error": 0.6520716968722277
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_2hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 297073.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 353617.37815794465,
+          "QG_relative_error": 0.19033832814811394
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 353627.56078165537,
+          "QG_relative_error": 0.19037260465156836
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 353627.32869868784,
+          "QG_relative_error": 0.19037182341945527
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_2hrEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 40811.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 69104.96401868864,
+          "QG_relative_error": 0.6932925931412766
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 69052.49530809761,
+          "QG_relative_error": 0.6920069419543166
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 69035.15471735006,
+          "QG_relative_error": 0.6915820420315616
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Al28",
+      "QG_report_Bq": 555888.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 3337.701759913456,
+          "QG_relative_error": -0.993995729787451
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 3980.896227865542,
+          "QG_relative_error": -0.9928386721284402
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 3342.4931453199424,
+          "QG_relative_error": -0.9939871104515299
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Mn56",
+      "QG_report_Bq": 595256.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 699022.3450559838,
+          "QG_relative_error": 0.17432221608179296
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 699016.1721481686,
+          "QG_relative_error": 0.17431184590859825
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 699017.7170671597,
+          "QG_relative_error": 0.17431444129443419
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "V52",
+      "QG_report_Bq": 31557300.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 325753.8563913853,
+          "QG_relative_error": -0.9896773850617326
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 325746.6502777595,
+          "QG_relative_error": -0.9896776134118648
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 325754.7979065005,
+          "QG_relative_error": -0.9896773552266354
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_300sEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 40330.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 64664.00671540368,
+          "QG_relative_error": 0.6033723460303417
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 64587.67084777641,
+          "QG_relative_error": 0.6014795647849346
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 64610.914006199906,
+          "QG_relative_error": 0.6020558890701687
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Cr51",
+      "QG_report_Bq": 1598.4,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 1919.558986801214,
+          "QG_relative_error": 0.20092529204280143
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 1933.9260540344578,
+          "QG_relative_error": 0.20991369746900507
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 1912.3681561654553,
+          "QG_relative_error": 0.19642652412753703
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "Fe59",
+      "QG_report_Bq": 110.26,
+      "modes": {
+        "north": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "south": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "zero_ambient": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM3-N_4dEOI",
+      "reported_sample_group": "RAFM3",
+      "sample_group": "RAFM3",
+      "isotope": "W187",
+      "QG_report_Bq": 2527.1,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 4529.419782279035,
+          "QG_relative_error": 0.7923389586003857
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 4403.692664365476,
+          "QG_relative_error": 0.7425874181336221
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 4537.942855501699,
+          "QG_relative_error": 0.7957116281515173
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-A_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Co60",
+      "QG_report_Bq": 3811.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 4183.404471641729,
+          "QG_relative_error": 0.09771830796161882
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 4122.393807898071,
+          "QG_relative_error": 0.08170921225349538
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 4208.759582784944,
+          "QG_relative_error": 0.10437144654551132
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-A_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Cr51",
+      "QG_report_Bq": 6845000.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 10288793.409647487,
+          "QG_relative_error": 0.5031107976110281
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 10288807.751418082,
+          "QG_relative_error": 0.5031128928295225
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 10288786.229547055,
+          "QG_relative_error": 0.503109748655523
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-A_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Fe59",
+      "QG_report_Bq": 334961.00000000006,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 374354.09972087125,
+          "QG_relative_error": 0.11760503378265286
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 374309.6340507131,
+          "QG_relative_error": 0.11747228498455949
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 374329.49162089016,
+          "QG_relative_error": 0.11753156821507606
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-A_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Mn54",
+      "QG_report_Bq": 20128.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 24133.981131793495,
+          "QG_relative_error": 0.19902529470357186
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 24155.67042427838,
+          "QG_relative_error": 0.20010286289141405
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 24159.73174230151,
+          "QG_relative_error": 0.2003046374354883
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-A_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Ta182",
+      "QG_report_Bq": 736966.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 951022.5784688836,
+          "QG_relative_error": 0.29045651830462144
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 950850.3102638886,
+          "QG_relative_error": 0.29022276504464056
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 950999.2559296029,
+          "QG_relative_error": 0.2904248716081921
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-A_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "W187",
+      "QG_report_Bq": 6734.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 9438.00193267422,
+          "QG_relative_error": 0.40154468854681025
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 9437.939793150063,
+          "QG_relative_error": 0.4015354608182451
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 9483.256153317283,
+          "QG_relative_error": 0.40826494703256355
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-B_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Co60",
+      "QG_report_Bq": 1949.8999999999999,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 1956.9793719074605,
+          "QG_relative_error": 0.0036306333183551234
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2184.83907443222,
+          "QG_relative_error": 0.12048775549116376
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2278.185309981458,
+          "QG_relative_error": 0.1683600748661255
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-B_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Cr51",
+      "QG_report_Bq": 6830200.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 10259557.031715576,
+          "QG_relative_error": 0.5020873520124705
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 10259571.376925975,
+          "QG_relative_error": 0.5020894522746003
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 10259549.850802457,
+          "QG_relative_error": 0.5020863006650548
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-B_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Fe59",
+      "QG_report_Bq": 321863.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 359058.58399349917,
+          "QG_relative_error": 0.11556340428536106
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 359052.7715604454,
+          "QG_relative_error": 0.11554534556766521
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 359037.1885597608,
+          "QG_relative_error": 0.11549693055666792
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-B_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Mn54",
+      "QG_report_Bq": 18241.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 23278.29706192126,
+          "QG_relative_error": 0.2761524621413991
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 23299.98719181332,
+          "QG_relative_error": 0.2773415488083614
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 23304.048852541273,
+          "QG_relative_error": 0.27756421536874476
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-B_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Ta182",
+      "QG_report_Bq": 675879.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 840118.7154124463,
+          "QG_relative_error": 0.2430016547524724
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 839968.9137730948,
+          "QG_relative_error": 0.24278001502205981
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 840102.8927586778,
+          "QG_relative_error": 0.2429782442695776
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-B_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "W187",
+      "QG_report_Bq": 4181.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 8593.421716752142,
+          "QG_relative_error": 1.0553508052504526
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 8761.941774442712,
+          "QG_relative_error": 1.0956569659035427
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 8656.153589484287,
+          "QG_relative_error": 1.070354840823795
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-C_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Co60",
+      "QG_report_Bq": 2449.3999999999996,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 1926.7631148090659,
+          "QG_relative_error": -0.2133734323470784
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2380.142765904865,
+          "QG_relative_error": -0.028275183349038408
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2479.5369357643654,
+          "QG_relative_error": 0.012303803284218878
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-C_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Cr51",
+      "QG_report_Bq": 6745100.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 10144280.670594638,
+          "QG_relative_error": 0.5039481505974172
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 10144295.016072083,
+          "QG_relative_error": 0.5039502773972341
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 10144273.490159156,
+          "QG_relative_error": 0.5039470860564196
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-C_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Fe59",
+      "QG_report_Bq": 335294.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 374358.9760444706,
+          "QG_relative_error": 0.11650961855705924
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 374353.2120474842,
+          "QG_relative_error": 0.11649242768282218
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 374337.54801893467,
+          "QG_relative_error": 0.11644571038830002
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-C_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Mn54",
+      "QG_report_Bq": 18130.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 22357.824107646364,
+          "QG_relative_error": 0.23319493147525447
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 22379.5147838269,
+          "QG_relative_error": 0.23439132839640928
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 22383.576530883383,
+          "QG_relative_error": 0.23461536298308788
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-C_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Ta182",
+      "QG_report_Bq": 633773.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 789405.5767860406,
+          "QG_relative_error": 0.24556517362847669
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 789251.852154265,
+          "QG_relative_error": 0.24532261890971221
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 789386.0446264435,
+          "QG_relative_error": 0.24553435477125649
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-C_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "W187",
+      "QG_report_Bq": 5106.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 8022.690381017281,
+          "QG_relative_error": 0.5712280417190131
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 7892.678702273721,
+          "QG_relative_error": 0.545765511608641
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 7934.608718535533,
+          "QG_relative_error": 0.5539774223532183
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-N_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Co60",
+      "QG_report_Bq": 1383.8000000000002,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 1244.316663852131,
+          "QG_relative_error": -0.10079732341947484
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 1157.1679851525682,
+          "QG_relative_error": -0.16377512273986986
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 1156.1307012303005,
+          "QG_relative_error": -0.16452471366505253
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-N_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Cr51",
+      "QG_report_Bq": 6671100.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 10013946.443646174,
+          "QG_relative_error": 0.5010937392103512
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 10013960.79430449,
+          "QG_relative_error": 0.5010958903785717
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 10013939.26039839,
+          "QG_relative_error": 0.5010926624392363
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-N_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Fe59",
+      "QG_report_Bq": 339882.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 377038.7831314673,
+          "QG_relative_error": 0.10932259764114396
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 377035.63880810357,
+          "QG_relative_error": 0.10931334642053292
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 377002.2851434806,
+          "QG_relative_error": 0.10921521334898752
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-N_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Mn54",
+      "QG_report_Bq": 20128.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 24504.45382409867,
+          "QG_relative_error": 0.217431131960387
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 24530.73001566776,
+          "QG_relative_error": 0.21873658662896261
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 24522.559317555926,
+          "QG_relative_error": 0.21833064971959093
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-N_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Ta182",
+      "QG_report_Bq": 456136.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 569428.8439064141,
+          "QG_relative_error": 0.24837514229618823
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 569280.3891250725,
+          "QG_relative_error": 0.24804968063268962
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 569424.020134185,
+          "QG_relative_error": 0.24836456700235232
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-N_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "Tb154m",
+      "QG_report_Bq": 332334.0,
+      "modes": {
+        "north": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "south": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        },
+        "zero_ambient": {
+          "matched": false,
+          "activity_Bq": null,
+          "QG_relative_error": null
+        }
+      }
+    },
+    {
+      "sample_id": "RAFM4-N_15dEOI",
+      "reported_sample_group": "RAFM4",
+      "sample_group": "RAFM4",
+      "isotope": "W187",
+      "QG_report_Bq": 6400.999999999999,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 11259.142992389632,
+          "QG_relative_error": 0.7589662540836797
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 11250.941155287144,
+          "QG_relative_error": 0.757684917245297
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 11110.073702187441,
+          "QG_relative_error": 0.7356778163079898
+        }
+      }
+    },
+    {
+      "sample_id": "Sc-Cd-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc46",
+      "QG_report_Bq": 159063.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 183427.9038660119,
+          "QG_relative_error": 0.1531776960450382
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 183375.06813009683,
+          "QG_relative_error": 0.15284552743313548
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 183453.98864851284,
+          "QG_relative_error": 0.1533416863036208
+        }
+      }
+    },
+    {
+      "sample_id": "Sc-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc46",
+      "QG_report_Bq": 1607650.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 1628526.972109233,
+          "QG_relative_error": 0.012986018168900588
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 1628455.3538143828,
+          "QG_relative_error": 0.012941469731833922
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 1628544.8488150535,
+          "QG_relative_error": 0.012997137943615506
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc46",
+      "QG_report_Bq": 473.6,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 466.20850534134684,
+          "QG_relative_error": -0.01560704108668325
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 343.5487379228462,
+          "QG_relative_error": -0.27460148242642274
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 471.6472125134575,
+          "QG_relative_error": -0.0041232843888145
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc47",
+      "QG_report_Bq": 2271.8,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 3961.0041251531334,
+          "QG_relative_error": 0.7435531847667634
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 3933.1497904376,
+          "QG_relative_error": 0.7312922750407606
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 3965.4202453362977,
+          "QG_relative_error": 0.745497070752838
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc48",
+      "QG_report_Bq": 15688.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 292.9308788524651,
+          "QG_relative_error": -0.9813277104250087
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 287.0412127635795,
+          "QG_relative_error": -0.9817031353414343
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 287.776831852595,
+          "QG_relative_error": -0.9816562447824709
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc46",
+      "QG_report_Bq": 484.70000000000005,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 480.51463817557726,
+          "QG_relative_error": -0.008634953217294789
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 368.70471078609035,
+          "QG_relative_error": -0.2393135737856606
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 467.84147682581664,
+          "QG_relative_error": -0.03478135583697834
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc47",
+      "QG_report_Bq": 2282.9,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 3917.715852986823,
+          "QG_relative_error": 0.7161136506140535
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 3889.8615504492163,
+          "QG_relative_error": 0.7039123704276211
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 3922.131896090808,
+          "QG_relative_error": 0.7180480512027718
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc48",
+      "QG_report_Bq": 15095.999999999998,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 294.6202060427504,
+          "QG_relative_error": -0.9804835581582703
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 289.3079407456881,
+          "QG_relative_error": -0.9808354570253254
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 289.07229719596677,
+          "QG_relative_error": -0.9808510666934309
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc46",
+      "QG_report_Bq": 466.2,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 471.34346562007494,
+          "QG_relative_error": 0.011032744787805552
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 374.39725372564226,
+          "QG_relative_error": -0.19691708767558502
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 479.67228358806193,
+          "QG_relative_error": 0.02889807719447006
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc47",
+      "QG_report_Bq": 1605.8,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 2761.17413286652,
+          "QG_relative_error": 0.7195006432099389
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 2733.3196485956564,
+          "QG_relative_error": 0.7021544704170236
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 2765.5900621597443,
+          "QG_relative_error": 0.7222506303149485
+        }
+      }
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "reported_sample_group": "flux_wires",
+      "sample_group": "flux_wires",
+      "isotope": "Sc48",
+      "QG_report_Bq": 8658.0,
+      "modes": {
+        "north": {
+          "matched": true,
+          "activity_Bq": 156.86439983339952,
+          "QG_relative_error": -0.981882143701386
+        },
+        "south": {
+          "matched": true,
+          "activity_Bq": 155.52307552747973,
+          "QG_relative_error": -0.9820370668136428
+        },
+        "zero_ambient": {
+          "matched": true,
+          "activity_Bq": 150.8057022223731,
+          "QG_relative_error": -0.9825819239752399
+        }
+      }
+    }
+  ]
+}
