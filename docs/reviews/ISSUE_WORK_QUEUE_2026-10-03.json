@@ -257,7 +257,7 @@
       "title": "Issue: GUI Export: Run Bundle PDF/HTML Report Generator",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/49",
       "status": "implemented_pending_integration",
-      "notes": "Qt report bundles and acquisition provenance on codex/next-issue-batch-20261003, based on published Qt-only migration b618f5e with acceptance a4d1b24 integrated. See docs/GUI_REPORT_BUNDLES.md. Pending final checks and draft review."
+      "notes": "Implemented in draft PR #233 on the Qt-only GUI; 132 targeted checks passed, real PDF and clean isolated wheel verified. Based on PR #218 with acceptance fixes from PR #216. See docs/reviews/ISSUES_49_68_QT_REPORTS_2026-10-03.md. Pending integration; issue remains open."
     },
     {
       "number": 50,
@@ -390,7 +390,7 @@
       "title": "Issue: AA1.13 - Instrument-settings provenance capture",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/68",
       "status": "implemented_pending_integration",
-      "notes": "Qt report bundles and acquisition provenance on codex/next-issue-batch-20261003, based on published Qt-only migration b618f5e with acceptance a4d1b24 integrated. See docs/GUI_REPORT_BUNDLES.md. Pending final checks and draft review."
+      "notes": "Implemented in draft PR #233 on the Qt-only GUI; 132 targeted checks passed, real PDF and clean isolated wheel verified. Based on PR #218 with acceptance fixes from PR #216. See docs/reviews/ISSUES_49_68_QT_REPORTS_2026-10-03.md. Pending integration; issue remains open."
     },
     {
       "number": 69,
