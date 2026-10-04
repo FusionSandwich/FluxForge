@@ -124,9 +124,9 @@ Use a fresh output directory. The receipt records the background source SHA256,
 native live/real time, polynomial, and detector. The South file starts on Oct 3,
 2025, later than some campaign counts; its applicability and the background used
 by QG remain unknown. It is an explicit sensitivity scenario, not the default.
-This portable branch aligns unequal energy grids by linear interpolation of channel
-counts, which is not generally count conserving (issue #228); the separate
-`4615e61` validation engine uses integrated overlap and covariance. Background source
+The current integrated engine aligns unequal energy grids with count-conserving
+bin overlap and carries the induced covariance. The older portable-only branch
+used linear interpolation (historical issue #228). Background source
 qualification is tracked in issue #229. This mode excludes near-contact, missing
 ASC and Ti/Sc48 ambiguity cases. QG reported activities remain separate reference
 values and do not drive raw activity estimation in this mode.
@@ -140,9 +140,56 @@ changed/missing source bytes, duplicate IDs, wrong source reports and altered
 cohort/routing/timing labels. The full replay is also exercised from a Git archive
 so the test covers committed bytes rather than only this Windows working tree.
 
-Recorded acceptance
-PORTABILITY_ACCEPTANCE.json records the source-bound Git-archive replay, eight
+Recorded historical acceptance
+PORTABILITY_ACCEPTANCE.json records the earlier source-bound Git-archive replay, eight
 focused tests, separately tested label reconciliation and supplemental input
 audit. It also records observed dependency versions and the limits of the
 software/example acceptance. Numerical replay requires the project runtime
 dependencies; the standard-library input audit can run independently.
+
+Current integrated workflow (2026-10-04)
+Run the six advanced-method examples and two independent raw campaigns with:
+
+  python examples/RAFM_irradiation/run_integrated_qg_methods.py --output new_integrated_output
+
+This runs the historical QG protocol controls, efficiency source audit, fixed-line
+activity combination, joint sample/background Poisson pilot, overlap qualification
+and repeated-count validation. Component results retain rejected fits and unknown
+qualification rather than converting them to accepted physical results.
+Use --skip-campaigns to run just these bounded examples and native-only controls.
+
+The full campaigns select IEC raw counting explicitly. One uses the recovered
+South native background conditionally; the other uses a synthetic zero ambient
+control with local continuum retained, motivated by the saved ANS header setting.
+Saved headers do not prove the settings used for the printed reports. Each campaign
+also reproduces the QG report workflow separately. Report activities do not set
+the independent raw activities. The campaign response uses the declared nominal
+profile; the efficiency audit and working baseline expose the recovered South
+curve separately. This does not silently replace or independently qualify that
+nominal absolute calibration.
+
+Native-only Cu-Cd receives a conditional 25 cm raw count analysis directly from its
+hash-bound ANS array. Fe-Cd near-contact remains excluded from this response. No
+ASC files are fabricated and no native-only reaction rate is created. Original
+measurement arrays, reports and all extracted rows remain preserved.
+
+CURRENT_LINE_COMBINATIONS.json freezes each IEC monitor's physically selected
+activity lines for historical, inverse-variance and GLS comparisons. Count-average
+activity references are checked, report targets are excluded, and unknown shared
+calibration covariance is retained. CAMPAIGN_ACTIVITY_COMPARISONS.csv compares all
+available isotope rows across both background controls; missing/empty campaign
+tables fail the integrated run. INTEGRATED_METHODS_RECEIPT.json binds the source
+dataset, engine content, runtime and component executions. Git-free source folders
+are supported; absent Git revision/ancestry stays unknown while content is hashed.
+
+Cu's 25 cm filename is joined to its unique source irradiation schedule alias.
+Missing EOI reaction rates export null/UNAVAILABLE rather than measured zero.
+Matched rows without usable comparison values also report unavailable summary
+metrics. QG report activity and live-normalized count-average activity references
+remain distinct through recombination and EOI correction. The declared report
+count-decay setting remains a conditional input, not recovered vendor behavior.
+
+The integrated receipt explicitly separates software completion from scientific
+admission and exact vendor parity. Reaction-rate and unfolding admission reviews,
+efficiency covariance, historical background applicability, timing alternatives,
+Sc48 yield ambiguity and near-contact geometry still control physical use.

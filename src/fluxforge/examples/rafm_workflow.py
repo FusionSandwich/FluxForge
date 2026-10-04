@@ -1432,6 +1432,7 @@ def reference_isotope_payload(
         )
         result = {
             "activity_bq": activity_bq,
+            "activity_reference": QG_REPORT_ACTIVITY_REFERENCE,
             "activity_unc_bq": abs(activity_bq) * rel_unc,
             "activity_uci": activity_bq / 3.7e4,
             "activity_unc_uci": (abs(activity_bq) * rel_unc) / 3.7e4,
@@ -3069,8 +3070,11 @@ def analyze_generic_sample(
         .strip()
         .lower()
     )
+    generic_activities = combine_peak_activities(targeted_peaks)
+    for activity_row in generic_activities.values():
+        activity_row["activity_reference"] = "count_average_live_normalized"
     isotope_payload = aggregate_isotope_results(
-        combine_peak_activities(targeted_peaks),
+        generic_activities,
         half_lives,
         timing,
         adjusted.real_time,
@@ -4290,6 +4294,7 @@ def _qg_isotope_activity_payload(
         activity_bq = float(getattr(nuclide, "activity_bq", 0.0) or 0.0)
         payload[nuclide.isotope] = {
             "activity_bq": activity_bq,
+            "activity_reference": QG_REPORT_ACTIVITY_REFERENCE,
             "activity_unc_bq": (
                 activity_unc_uci * 3.7e4 if activity_unc_uci > 0.0 else 0.0
             ),

@@ -140,6 +140,40 @@ def test_actual_flux_wire_recombination_preserves_time_reference(tmp_path, monke
         assert seen == {}
 
 
+def test_qg_benchmark_payload_carries_report_time_reference():
+    from fluxforge.examples.rafm_workflow import (
+        _qg_isotope_activity_payload, reference_isotope_payload, QG_REPORT_ACTIVITY_REFERENCE, TimingInfo)
+    from fluxforge.io.flux_wire import read_processed_txt
+    report = read_processed_txt(ROOT/'examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Co-Cd-RAFM-1_25cm.txt')
+    payload = _qg_isotope_activity_payload(report)
+    assert payload and all(row['activity_reference'] == QG_REPORT_ACTIVITY_REFERENCE for row in payload.values())
+    timing = resolve_measurement_timing('Co-Cd-RAFM-1_25cm', None,
+        load_rafm_example_metadata(ROOT/'examples/RAFM_irradiation/quantumgold_reference/runtime'))
+    generic_report_payload = reference_isotope_payload(report, timing, report.real_time)
+    assert generic_report_payload and all(row['activity_reference'] == QG_REPORT_ACTIVITY_REFERENCE for row in generic_report_payload.values())
+
+
+def test_actual_generic_raw_activity_carries_count_average_reference(tmp_path):
+    import fluxforge.examples.rafm_workflow as workflow
+    portable = driver.load_driver()
+    checked = portable.verify_inputs(ROOT, portable.MANIFEST_PATH)
+    background, _ = portable.background_scenario(ROOT, checked, 'south_native')
+    metadata = load_rafm_example_metadata(ROOT/'examples/RAFM_irradiation/quantumgold_reference/runtime')
+    metadata.config['generic_targeted_counting_method'] = 'iec_tiered'
+    paths = workflow.default_paths(ROOT/'examples/RAFM_irradiation', results_root=tmp_path/'results')
+    library, half_lives = workflow.build_generic_gamma_library(metadata)
+    row = next(r for r in checked['manifest']['measurements'] if r['workflow_stem'] == 'RAFM3-A_24hrEOI')
+    raw = tmp_path/'RAFM3-A_24hrEOI.ASC'
+    report = tmp_path/'RAFM3-A_24hrEOI.txt'
+    raw.write_bytes(portable.bound_path(ROOT, row['files']['ASC']).read_bytes())
+    report.write_bytes(portable.bound_path(ROOT, row['files']['QG_report']).read_bytes())
+    artifact = workflow.analyze_generic_sample(raw,
+        metadata, paths, workflow.ensure_results_tree(paths.results_root), library, half_lives,
+        background, report)
+    assert artifact['isotopes']
+    assert all(row['activity_reference'] == 'count_average_live_normalized' for row in artifact['isotopes'].values())
+
+
 def test_native_only_count_is_read_without_asc_and_wrong_geometry_is_excluded(tmp_path):
     portable = driver.load_driver()
     checked = portable.verify_inputs(ROOT, portable.MANIFEST_PATH)
