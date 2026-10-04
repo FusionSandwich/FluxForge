@@ -1,0 +1,14 @@
+# Integration follow-up review
+
+Read-only review of the current working-tree integration at base `c8a996e` (uncommitted integration changes). Scope: RAFM timing alias resolution and activity-reference labels, null-preserving reaction exports, portable campaign/background modes, isolated component execution, source identity and ancestry reporting, and the new integrated driver. Parent reports 298 focused tests passed; I did not rerun them.
+
+## Findings
+
+No concrete integration blocker found. The flux-wire timing resolver compares normalized aliases against the schedule and rejects multiple matching candidates. The activity payload marks raw count-window averages separately from report-date activities, and EOI calculation uses report live-window duration only when the configured QG count-decay declaration requires it. Missing EOI rate values serialize as JSON/CSV null with an explicit status; documented round trips retain the reason and re-emit null. Valid numerical zero remains distinct.
+
+The portable `south_native` mode verifies the pinned source before constructing its spectrum, labels temporal applicability unresolved, and does not silently claim an independent calibration. `ambient_off` is clearly synthetic and retains the modeled local continuum. Both are passed as explicit overrides, while the default North comparison remains separate. The integrated driver pins `PYTHONPATH` to this checkout for component subprocesses, records their script hashes, and compares source identity before and after execution. The example identity helper reports source hashes independently from Git ancestry; the changed examples no longer need an old Git base to execute in an archive/selected-cherry-pick checkout.
+
+One qualification watch item: `reaction_rows_to_dicts` detects unavailable EOI values by matching the current exact `rate_note` sentence. That is correct for the present producer and covered by the focused regression, but it couples data status to prose; a later edit to the reason string could make an unavailable placeholder export as a diagnostic zero. A typed status on the reaction model would be more durable. This is not a blocker for the current bytes.
+
+The QG report activity reference remains conditional on the declared count-decay setting and report measurement date. These changes do not establish QG processing semantics, calibration accuracy, or scientific admission. Existing scenario labels and receipt-level `scientific_admission=false` / `exact_vendor_parity=false` remain appropriately conservative. Some historical provenance fields retain names such as `engine_base` or `required_engine_ancestor`; their adjacent source identity/hash fields and documentation make clear they refer to prior-source history, but renaming them to `historical_*` would further reduce ambiguity in future receipts.
+

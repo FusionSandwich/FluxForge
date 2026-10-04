@@ -1,0 +1,170 @@
+{
+  "status": "BOUNDED_COMPONENTS_COMPLETED",
+  "source_counts": {
+    "physical_counts": 32,
+    "original_ANS": 32,
+    "original_ASC": 30,
+    "original_QG_reports": 31,
+    "extracted_ROI_rows": 288,
+    "extracted_nuclide_summaries": 88
+  },
+  "dataset_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+  "engine": {
+    "status": "IDENTIFIED_BY_CONTENT",
+    "source_sha256": "b7f74817d250eb42c16f1437bf88d565a2bf56a3e5ce9cb2a7b712e0c2361019",
+    "revision": null,
+    "file_count": 312,
+    "scope": "pyproject.toml, replay drivers present in this source, complete src/fluxforge tree",
+    "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+  },
+  "runtime": {
+    "status": "COMPATIBLE",
+    "python": {
+      "version": "3.12.14",
+      "declared": ">=3.11,<3.13",
+      "status": "COMPATIBLE",
+      "executable": "primary_checkout/.venv/Scripts/python.exe"
+    },
+    "packages": {
+      "numpy": {
+        "installed_version": "1.26.4",
+        "declared": ">=1.26,<2.0",
+        "status": "COMPATIBLE"
+      },
+      "scipy": {
+        "installed_version": "1.17.1",
+        "declared": ">=1.11",
+        "status": "COMPATIBLE"
+      },
+      "pandas": {
+        "installed_version": "3.0.6",
+        "declared": ">=2.1",
+        "status": "COMPATIBLE"
+      },
+      "matplotlib": {
+        "installed_version": "3.11.2",
+        "declared": ">=3.8",
+        "status": "COMPATIBLE"
+      },
+      "pillow": {
+        "installed_version": "12.3.0",
+        "declared": ">=10.0",
+        "status": "COMPATIBLE"
+      },
+      "pyyaml": {
+        "installed_version": "6.0.3",
+        "declared": ">=6.0",
+        "status": "COMPATIBLE"
+      },
+      "h5py": {
+        "installed_version": "3.16.0",
+        "declared": ">=3.10",
+        "status": "COMPATIBLE"
+      },
+      "lxml": {
+        "installed_version": "6.1.3",
+        "declared": ">=5.0",
+        "status": "COMPATIBLE"
+      }
+    },
+    "version_source": "importlib.metadata in executing interpreter",
+    "scope": "declared core dependencies only"
+  },
+  "components": [
+    {
+      "component": "qg_protocol",
+      "script": "examples/qg_protocol/run_example.py",
+      "returncode": 0,
+      "script_sha256": "17bc85c2cf174218d383162d09d7a885b9b7f9b907a0bbb4ebe49050eafe4e56",
+      "output": "components/qg_protocol.json"
+    },
+    {
+      "component": "efficiency",
+      "script": "examples/efficiency_audit/run_audit.py",
+      "returncode": 0,
+      "script_sha256": "7527ace376d23d02e1d0e2041458ab5e45d87487f865023064e9f89d156c8078",
+      "output": "components/efficiency"
+    },
+    {
+      "component": "combination",
+      "script": "examples/activity_combination/compare_same_lines.py",
+      "returncode": 0,
+      "script_sha256": "68a09afe63390e92ffb591fbcdcf94c302f8f3bb972b1275545589648df7e2c4",
+      "output": "components/combination.json"
+    },
+    {
+      "component": "joint_poisson",
+      "script": "examples/RAFM_irradiation/joint_poisson_pilot.py",
+      "returncode": 0,
+      "script_sha256": "23d0039d8010c41209860367140368a2d555ae216711d042c2012a2c249d0c92",
+      "output": "components/joint_poisson.json"
+    },
+    {
+      "component": "multiplet",
+      "script": "examples/validation/multiplet_240/run_example.py",
+      "returncode": 0,
+      "script_sha256": "9dca79f5173033b6fa6c9b9cef899336758ddc5684a46441767c10a5cafd5ff9",
+      "output": "components/multiplet.json"
+    },
+    {
+      "component": "repeated_counts",
+      "script": "examples/RAFM_irradiation/repeated_count_validation/run_example.py",
+      "returncode": 0,
+      "script_sha256": "11c4e66e7cd0fb186e25d1b6e4595591fdb1fa81d810a5f79f2cfb1137eecf57",
+      "output": "components/repeated_counts.json"
+    }
+  ],
+  "native_only": [
+    {
+      "measurement_id": "Cu-Cd-RAFM-1",
+      "native_sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+      "count_basis": "original_dataset_bound_ANS_integer_counts",
+      "geometry_cm_printed": 25.0,
+      "independent_absolute_qualification": false,
+      "creates_ASC": false,
+      "background": {
+        "mode": "south_native",
+        "detector": "South",
+        "source_sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+        "start_time_unzoned": "2025-10-03T15:49:14",
+        "live_time_s": 14400.0,
+        "temporal_applicability": "UNRESOLVED",
+        "calibration": "native polynomial; count-conserving bin overlap and covariance"
+      },
+      "reaction_rate": null,
+      "reaction_rate_status": "UNAVAILABLE: irradiation/timing qualification pending",
+      "status": "CONDITIONAL_NATIVE_RAW_DIAGNOSTIC",
+      "calibration": "native energy; conditional nominal 25 cm efficiency/resolution"
+    },
+    {
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "native_sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+      "count_basis": "original_dataset_bound_ANS_integer_counts",
+      "geometry_cm_printed": 0.01,
+      "independent_absolute_qualification": false,
+      "creates_ASC": false,
+      "background": {
+        "mode": "south_native",
+        "detector": "South",
+        "source_sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+        "start_time_unzoned": "2025-10-03T15:49:14",
+        "live_time_s": 14400.0,
+        "temporal_applicability": "UNRESOLVED",
+        "calibration": "native polynomial; count-conserving bin overlap and covariance"
+      },
+      "reaction_rate": null,
+      "reaction_rate_status": "UNAVAILABLE: irradiation/timing qualification pending",
+      "status": "EXCLUDED_GEOMETRY",
+      "reason": "25 cm efficiency is inapplicable; native counts remain exported by campaign replay"
+    }
+  ],
+  "campaigns": {},
+  "scientific_admission": false,
+  "exact_vendor_parity": false,
+  "limitations": [
+    "South temporal applicability unresolved; ambient-off is a saved-state reproduction control",
+    "QG error/library/model details unknown; raw count-average vs report time references remain distinct",
+    "Advanced component results retain failure, conditional and non-identifiability states",
+    "Calibration covariance unavailable; method comparisons do not qualify neutron-flux inversions"
+  ]
+}

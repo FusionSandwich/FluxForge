@@ -1,0 +1,75 @@
+{
+  "git_head": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
+  "files": {
+    ".gitattributes": {
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    "ci_d017a71.json": {
+      "bytes": 916,
+      "sha256": "87a77abab5d49e859c68b6f2ebe38c57b9f22307ff3de9b9b02e8f77f018126a"
+    },
+    "current_method_examples.json": {
+      "bytes": 6439,
+      "sha256": "2340d4fcad1bc605561bda3c84407d0428f3c414c5f0c9f8d40ff2ed61e0deb4"
+    },
+    "current_native_gui.json": {
+      "bytes": 1050,
+      "sha256": "e82bdbdc36b5a200d744822e6f6a528bcda6daab79692bada26dd26cdec7e8bb"
+    },
+    "current_original_campaign.json": {
+      "bytes": 213285,
+      "sha256": "bef20b027775f5779b9479d5a70996fc61ee94c875a6d275b666f46ec2c5706e"
+    },
+    "current_test_receipts.json": {
+      "bytes": 1182,
+      "sha256": "5e2cf0cf799d1eeb2500ff95cdfb071a7403af6fdb6f24fa480932fda3a38552"
+    },
+    "inl_and_planning_receipt.json": {
+      "bytes": 810,
+      "sha256": "5e98e05cf602cdc224ba4d12dbccdf51cfd707c2914109d7f82f7dc14ecb6573"
+    },
+    "luna_integration_review.md": {
+      "bytes": 2843,
+      "sha256": "3e8f405a3ee559799d4dddc3b9b7fa97aca151afc25dd9959c32c5f9704a7e42"
+    },
+    "luna_scientific_methods_review.md": {
+      "bytes": 3140,
+      "sha256": "d53c953e734db88e3a4653f9633d94521d378b2dfa6a42024f31c635c054cde7"
+    },
+    "luna_south_poisson_review.md": {
+      "bytes": 2574,
+      "sha256": "290e1d372e60fe57f18cee036d02a513d55fa1b420d919dedf1b26494eb4170e"
+    },
+    "measured_unfolding_start.png": {
+      "bytes": 83825,
+      "sha256": "afdcdeff7bcd7c3c1cf4b9eb7e0082a77614d7bc625512ffc05026780ea0a8f6"
+    },
+    "new_gui_source_campaign.png": {
+      "bytes": 169524,
+      "sha256": "716eab230bd0e676c269dac60607b165199fc709fb4afddcede8f142abd05d2a"
+    },
+    "phase6_qualification.json": {
+      "bytes": 6665,
+      "sha256": "9bd43f8c4382b4be0588de356ccfbcf6ba2952a1a23190e0a51b130aa44a1b53"
+    },
+    "report_bundle_manifest.json": {
+      "bytes": 608,
+      "sha256": "42337fb28fea4128b59d6824cfa83f4361f26a46100f495903d54cdc5f9fdf0a"
+    },
+    "source_campaign_report_preview.png": {
+      "bytes": 95277,
+      "sha256": "db929ad9e45c2593229e137c7be4f4d73e9d5c794714740aa7b483970d7f6361"
+    },
+    "source_stage_bindings.json": {
+      "bytes": 17482,
+      "sha256": "82060ef9ecf0b2fcc4c9045921efa971ee0a331566777028bfc792d7ab662a9b"
+    },
+    "south_poisson_receipt.json": {
+      "bytes": 4378,
+      "sha256": "8f97c6e6d5fea69d73488c969a2dbcc90838bd7a575317025ce0f62c30e3d7b4"
+    }
+  },
+  "scientific_admission": false,
+  "note": "Public compact receipts; original local evidence and source inputs are retained"
+}

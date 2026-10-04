@@ -1,0 +1,37 @@
+{
+  "commit": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
+  "run_id": 37183685135,
+  "url": "https://github.com/FusionSandwich/FluxForge/actions/runs/37183685135",
+  "jobs": [
+    {
+      "id": 111381139198,
+      "name": "core-analysis",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 111381139260,
+      "name": "optional-ml-cpu",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 111381139276,
+      "name": "external-reference-parity",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 111381139304,
+      "name": "Modern GUI Smoke (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 111381139309,
+      "name": "Modern GUI Smoke (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}
