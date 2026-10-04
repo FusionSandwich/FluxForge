@@ -12,6 +12,20 @@ REFERENCE_ROOT = REPO_ROOT / "tests" / "spectra" / "reference_parity"
 ACTIVATION_ROOT = REPO_ROOT / "tests" / "activation_inventory" / "fixtures"
 
 
+@pytest.mark.parametrize("field", ["energy_keV", "energies_keV[0]", "first_peak_keV"])
+def test_declared_energy_tolerance_applies_to_energy_output_aliases(field):
+    from fluxforge.validation.reference_parity import _values_close
+
+    tolerances = {"energy_keV_abs": 8.0}
+    assert _values_close(100.0, 107.99, path=f"output.{field}", tolerances=tolerances)
+    assert not _values_close(
+        100.0, 108.01, path=f"output.{field}", tolerances=tolerances
+    )
+    assert not _values_close(
+        100.0, 100.1, path="output.channels[0]", tolerances=tolerances
+    )
+
+
 def test_reference_parity_suite_runs_all_fixture_families() -> None:
     payload = run_reference_parity_suite(
         reference_root=REFERENCE_ROOT,
@@ -121,7 +135,9 @@ def test_reference_parity_suite_runs_phase5_npat_activation_bundle() -> None:
     assert "dominant_contributors_expected.csv" in result["compared_outputs"]
 
 
-def test_reference_parity_suite_runs_phase5_irrad_spectroscopy_activation_bundle() -> None:
+def test_reference_parity_suite_runs_phase5_irrad_spectroscopy_activation_bundle() -> (
+    None
+):
     payload = run_reference_parity_suite(
         reference_root=REFERENCE_ROOT,
         activation_root=ACTIVATION_ROOT,

@@ -17,6 +17,7 @@ on:
       - 'src/fluxforge/**/*.py'
       - 'src/fluxforge/data/**'
       - 'tools/run_acceptance.py'
+      - 'src/fluxforge_gui/**/*.py'
       - 'tests/**/*.py'
       - '.flake8'
       - 'pyproject.toml'
@@ -42,6 +43,8 @@ jobs:
 
       - name: Install tooling and runtime deps
         run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
 
@@ -131,15 +134,6 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
-      - name: History, reaction-rate and spectrum queue contracts
-        env:
-          PYTHONPATH: src
-        run: |
-          pytest -q \
-            tests/test_irradiation_history_inputs.py \
-            tests/test_reaction_rate_view_inputs.py \
-            tests/test_spectrum_file_queue_conversion.py
-
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -179,12 +173,6 @@ jobs:
 
       - name: GUI scaffold regression tests
         run: pytest -q tests/test_modern_gui_shell.py tests/test_project_tracker_assets.py
-
-      - name: Supported GUI workflow regressions
-        run: pytest -q tests/test_production_gui_mode.py
-
-      - name: GUI consolidation regressions
-        run: pytest -q tests/test_gui_consolidation.py
 
       - name: Analysis workspace core helper tests
         run: |
@@ -235,19 +223,86 @@ jobs:
       - name: Module 3 workflow Qt tests
         run: pytest -q tests/test_module3_workflows_qt.py
 
-      - name: Qt report bundles and instrument provenance
-        run: pytest -q tests/test_gui_report_bundle.py tests/test_instrument_provenance.py
-
       - name: Predictive dashboard Qt tests
         run: pytest -q tests/test_predictive_dashboard_qt.py
 
-      - name: History, reaction-rate and spectrum queue Qt tests
+  native-desktop-gui-linux:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Linux desktop GUI deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk xvfb xauth imagemagick
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,gui-test]'
+
+      - name: Legacy desktop GUI acceptance (Linux/Xvfb)
+        env:
+          PYTHONPATH: src
         run: |
           pytest -q \
-            tests/test_irradiation_history_workspace_qt.py \
-            tests/test_reaction_rate_workspace_qt.py \
-            tests/test_spectrum_file_queue_workspace_qt.py \
-            tests/test_production_gui_mode.py
+            tests/test_gui_app.py \
+            tests/test_gui_desktop_native.py \
+            -W error::matplotlib.MatplotlibDeprecationWarning
+
+      - name: Build Linux legacy GUI evidence bundle
+        env:
+          PYTHONPATH: src
+          FLUXFORGE_OFFLINE: '1'
+        run: |
+          xvfb-run -a python tests/gui_desktop_driver.py artifacts/gui_review/linux
+
+      - name: Upload Linux legacy GUI evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluxforge-gui-legacy-review-linux
+          path: artifacts/gui_review/linux
+
+  native-desktop-gui-windows:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Windows desktop GUI deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,gui-test]"
+
+      - name: Legacy desktop GUI acceptance (Windows)
+        env:
+          PYTHONPATH: src
+          FLUXFORGE_OFFLINE: '1'
+        run: |
+          pytest -q tests/test_gui_desktop_native.py
+
+      - name: Build Windows legacy GUI evidence bundle
+        env:
+          PYTHONPATH: src
+          FLUXFORGE_OFFLINE: '1'
+        run: |
+          python tests/gui_desktop_driver.py artifacts/gui_review/windows
+
+      - name: Upload Windows legacy GUI evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluxforge-gui-legacy-review-windows
+          path: artifacts/gui_review/windows
 
   external-reference-parity:
     runs-on: ubuntu-latest
@@ -287,4 +342,4 @@ jobs:
       - name: Install ML test dependencies
         run: python -m pip install -e '.[dev,ml]'
       - name: Check ANN construction, inference, training and persistence
-        run: pytest -q tests/test_naa_ann.py tests/test_naa_ann_4e_dataset.py>>>>>>> origin/codex/adversarial-acceptance-20261002
+        run: pytest -q tests/test_naa_ann.py tests/test_naa_ann_4e_dataset.py

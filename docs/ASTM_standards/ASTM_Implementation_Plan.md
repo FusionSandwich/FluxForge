@@ -35,7 +35,10 @@ By following these steps, we ensure that every new mathematical standard is cons
    * Save the evaluated output dictionaries to `json` via standard standard output or designated file paths.
 
 ## Step 4: Graphical User Interface (GUI) Wiring
-**Target Location:** `src/fluxforge_gui/app.py`
+**Target Location:** `src/fluxforge/gui/dialogs/standards_review_dialog.py`
+
+The older Tk wiring is archived under `archive/legacy_gui/`. New standard
+workflows target the Qt interface and shared analysis/reporting APIs.
 
 1. **Add Form/Preview Callbacks:**
    * Implement UI builder functions formatted like `_load_astm_<standard>_preview` to build tables showcasing the standard's required variables before execution.

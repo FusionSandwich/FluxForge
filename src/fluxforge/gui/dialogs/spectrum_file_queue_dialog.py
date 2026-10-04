@@ -266,6 +266,15 @@ if QT_AVAILABLE:
             else:
                 super().closeEvent(event)
 
+        def done(self, result):
+            # Escape and accept/reject bypass closeEvent in QDialog.
+            if self.worker is not None:
+                self.status_label.setText(
+                    "Conversion is still running. Close after it finishes."
+                )
+                return
+            super().done(result)
+
 else:
 
     class SpectrumFileQueueDialog:

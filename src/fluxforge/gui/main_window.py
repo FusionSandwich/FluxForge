@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from datetime import datetime
+from html import escape
+import json
 from pathlib import Path
 
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
@@ -80,6 +82,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QSettings,
         QStatusBar,
         QToolBar,
+        QToolButton,
         QUndoStack,
         Qt,
     )
@@ -124,7 +127,7 @@ class MainWindowScaffold:
 
 
 def modern_gui_unavailable_message() -> str:
-    """Return the additive-launch guidance when Qt extras are absent."""
+    """Return the installation guidance when Qt extras are absent."""
 
     reason = (
         f"{type(QT_IMPORT_ERROR).__name__}: {QT_IMPORT_ERROR}"
@@ -285,7 +288,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _build_menu_bar(self) -> None:
             self._requires_spectrum_actions: list[QAction] = []
-            self._requires_example_actions: list[QAction] = []
             file_menu = self.menuBar().addMenu("&File")
             file_menu.setObjectName("FileMenu")
             file_menu.menuAction().setObjectName("OpenFileMenuAction")
@@ -451,12 +453,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._requires_spectrum_actions.append(self._run_astm_check_action)
             self._unfolding_action = self._action(
                 "Spectrum Unfolding Workspace",
-                enabled=self._workspace_contains_bundled_example(),
+                enabled=True,
                 handler=self._open_unfolding_workspace,
                 object_name="OpenSpectrumUnfoldingAction",
             )
             analysis_menu.addAction(self._unfolding_action)
-            self._requires_example_actions.append(self._unfolding_action)
             self._pu_isotopics_action = self._action(
                 "Pu Isotopics Wizard...",
                 enabled=self.analysis_workspace.spectrum() is not None,
@@ -604,12 +605,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._workspace_unfolding_action = self._action(
                 "Open Unfolding Workspace",
-                enabled=self._workspace_contains_bundled_example(),
+                enabled=True,
                 handler=self._open_unfolding_workspace,
                 object_name="WorkspaceOpenUnfoldingAction",
             )
             workspace_menu.addAction(self._workspace_unfolding_action)
-            self._requires_example_actions.append(self._workspace_unfolding_action)
             workspace_menu.addSeparator()
             workspace_menu.addAction(
                 self._action(
@@ -690,6 +690,69 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             toolbar.addAction(self._log_scale_action)
             toolbar.addAction(self._peak_labels_action)
             self.addToolBar(Qt.TopToolBarArea, toolbar)
+
+            # Share menu actions to preserve shortcuts and data-dependent locks.
+            self.addToolBarBreak(Qt.TopToolBarArea)
+            workflow = QToolBar("Analysis Workflow", self)
+            workflow.setObjectName("AnalysisWorkflowToolbar")
+            workflow.setMovable(False)
+            workflow.toggleViewAction().setObjectName(
+                "ToggleAnalysisWorkflowToolbarAction"
+            )
+            self.analysis_workflow_toolbar = workflow
+            self._review_peaks_action = self._action(
+                "Review Peaks",
+                "Ctrl+Shift+P",
+                enabled=False,
+                handler=self._focus_peak_review,
+                object_name="ReviewPeaksAction",
+            )
+            self._requires_spectrum_actions.append(self._review_peaks_action)
+            actions = {
+                action.objectName(): action for action in self.findChildren(QAction)
+            }
+            for name, label, hint in (
+                (
+                    "OpenSpectrumAction",
+                    "Open Spectrum",
+                    "Load a spectrum for analysis.",
+                ),
+                (
+                    "AutoFindPeaksAction",
+                    "Find Peaks",
+                    "Detect peaks using the selected search method.",
+                ),
+                (
+                    "ReviewPeaksAction",
+                    "Review Peaks",
+                    "Show the peak table for manual review and assignment.",
+                ),
+                (
+                    "OpenEnergyFwhmCalibrationAction",
+                    "Calibrate",
+                    "Review energy and FWHM calibration.",
+                ),
+                (
+                    "OpenIrradiationHistoryAction",
+                    "Irradiation",
+                    "Enter irradiation and shutdown segments.",
+                ),
+                (
+                    "OpenSpectrumUnfoldingAction",
+                    "Unfold",
+                    "Load reaction rates and a response matrix.",
+                ),
+                ("ExportReportAction", "Export", "Export the analysis report."),
+            ):
+                action = actions[name]
+                action.setToolTip(hint)
+                action.setStatusTip(hint)
+                button = QToolButton(workflow)
+                button.setDefaultAction(action)
+                button.setText(label)
+                button.setToolButtonStyle(Qt.ToolButtonTextOnly)
+                workflow.addWidget(button)
+            self.addToolBar(Qt.TopToolBarArea, workflow)
 
         def _build_central_workspace(self) -> None:
             self.central_tabs = CentralWorkspaceTabs(
@@ -1158,9 +1221,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._pu_isotopics_action.setEnabled(
                     has_spectrum and self.mode_manager.state.mode is not GUIMode.SIMPLE
                 )
-            has_example = self._workspace_contains_bundled_example()
-            for action in getattr(self, "_requires_example_actions", ()):
-                action.setEnabled(has_example)
             self._update_predictive_status()
 
         def _update_predictive_status(self) -> None:
@@ -1342,9 +1402,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._open_energy_fwhm_workspace(advanced_tab="quick_slider")
 
         def _run_auto_peak_search(self) -> None:
+            self._focus_peak_review()
             bottom_widget = self.bottom_dock.widget()
             if hasattr(bottom_widget, "run_auto_peak_search"):
                 bottom_widget.run_auto_peak_search()
+
+        def _focus_peak_review(self) -> None:
+            self.central_tabs.setCurrentIndex(0)
+            self._focus_analysis_surface_dock()
+            bottom = self.bottom_dock.widget()
+            bottom.setCurrentWidget(bottom.peak_table_panel)
+            bottom.peak_table_panel.setFocus()
 
         def _open_unfolding_workspace(self) -> None:
             if (
@@ -1355,16 +1423,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._unfolding_dialog.activateWindow()
                 return
 
-            if not self._workspace_contains_bundled_example():
-                self.statusBar().showMessage(
-                    "Open the bundled example to inspect the current unfolding "
-                    "workspace.",
-                    5000,
-                )
-                return
-
             self._unfolding_dialog = UnfoldingWorkspaceDialog(
                 mode_manager=self.mode_manager,
+                start_empty=not self._workspace_contains_bundled_example(),
                 parent=self,
             )
             self._unfolding_dialog.show()
@@ -1442,10 +1503,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _build_report_context(self, template_name: str) -> dict[str, object]:
+            from fluxforge.gui.report_snapshot import capture_report_snapshot
+
+            snapshot = capture_report_snapshot(self)
             state = self.analysis_workspace.state
             peak_rows = (
                 "".join(
-                    f"<tr><td>{peak.energy_keV:.3f}</td><td>{peak.nuclide or 'Unassigned'}</td><td>{peak.net_counts:.1f}</td></tr>"
+                    f"<tr><td>{peak.energy_keV:.3f}</td><td>{escape(peak.nuclide or 'Unassigned')}</td><td>{peak.net_counts:.1f}</td></tr>"
                     for peak in state.peaks
                 )
                 or "<tr><td colspan='3'>No peaks</td></tr>"
@@ -1457,7 +1521,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             activity_rows = (
                 "".join(
-                    f"<tr><td>{result.nuclide}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
+                    f"<tr><td>{escape(result.nuclide)}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
                     for result in state.activity_results
                 )
                 or "<tr><td colspan='4'>No activity results</td></tr>"
@@ -1480,9 +1544,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     module = self.registries.standards_modules.get(key)
                     evaluation = module.evaluate(context)
                     standards_rows.append(
-                        f"<tr><td>{module.display_name}</td>"
-                        f"<td>{evaluation.overall_status}</td>"
-                        f"<td>{evaluation.summary}</td></tr>"
+                        f"<tr><td>{escape(module.display_name)}</td>"
+                        f"<td>{escape(evaluation.overall_status)}</td>"
+                        f"<td>{escape(evaluation.summary)}</td></tr>"
                     )
             else:
                 standards_rows.append(
@@ -1496,7 +1560,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             qa_status_snapshot = (
                 "<br/>".join(
-                    f"{item.nuclide} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
+                    f"{escape(item.nuclide)} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
                     for item in self.qa_monitor.status_snapshot()
                 )
                 or "No QA snapshot available."
@@ -1515,7 +1579,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 panel = bottom_widget.batch_queue_panel
                 if getattr(panel, "results", ()):
                     batch_rows = "<br/>".join(
-                        f"{result.label}: {result.peak_count} peaks, {result.backend}"
+                        f"{escape(result.label)}: {result.peak_count} peaks, {escape(result.backend)}"
                         for result in panel.results
                     )
                     aggregate_csv = (
@@ -1538,9 +1602,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "activity_table": activity_table,
                 "astm_status_table": astm_status_table,
                 "qa_status_snapshot": qa_status_snapshot,
-                "provenance": provenance,
+                "provenance": escape(provenance),
                 "batch_rows": batch_rows,
-                "aggregate_csv": aggregate_csv or "No batch CSV available.",
+                "aggregate_csv": escape(aggregate_csv) or "No batch CSV available.",
+                "run_snapshot": snapshot,
+                "run_parameters_json": json.dumps(snapshot["parameters"], indent=2),
             }
             return payload
 

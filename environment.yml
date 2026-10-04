@@ -14,7 +14,6 @@ dependencies:
   - pandas
   - matplotlib-base
   - pillow
-  - tk
   - pyyaml
   - h5py
   - lxml

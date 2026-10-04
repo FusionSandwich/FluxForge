@@ -9,9 +9,11 @@ from pathlib import Path
 import tkinter as tk
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "src"))
+
+sys.path.insert(0, str(REPO_ROOT / "archive/legacy_gui/src"))
 
 from fluxforge_gui.app import FluxForgeGui
 

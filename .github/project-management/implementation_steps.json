@@ -374,7 +374,7 @@
       "evidence": [
         "tests/spectra/",
         ".github/workflows/quality-checks.yml",
-        "tests/test_gui_desktop_native.py",
+        "tests/test_production_gui_mode.py",
         "tests/test_n42.py",
         "tests/test_cnf_io.py",
         "tests/test_csv_readers.py"

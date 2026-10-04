@@ -121,9 +121,15 @@ def reaction_rate_payload(inputs, segments):
         "schema": "fluxforge.reaction_rate_editor.v1",
         "activity_reference": "end_of_irradiation",
         "rate_unit": "reactions_per_target_atom_per_s",
+        "rate_reference": "at_relative_power_one",
         "scientific_admission": False,
         "complete_uncertainty_budget": False,
         "inputs": [asdict(row) for row in inputs],
-        "irradiation": {"segments": [asdict(segment) for segment in segments]},
+        "irradiation": {
+            "power_basis": "relative_to_user_reference",
+            "reference_relative_power": 1.0,
+            "absolute_reference_power": None,
+            "segments": [asdict(segment) for segment in segments],
+        },
         "rows": [asdict(row) for row in results],
     }

@@ -28,6 +28,11 @@ results, and remaining scientific qualification requirements.
 | Validation and replay | Run parity, crosswalk, release-gate, and bundled RAFM replay workflows | `parity-check`, `phase5-crosswalk-report`, `phase5-release-gate`, `rafm-validate`, `phase6-ldrd-worked-example` |
 | Desktop GUI | Review spectra interactively, zoom/pan, set ROI boundaries, and inspect linked analysis panels | `fluxforge gui`, `fluxforge-gui` |
 
+The PySide6/Qt application is the sole supported GUI. The older Tkinter interface
+and its test drivers are preserved in `archive/legacy_gui/` for historical
+reference and are excluded from releases. GUI improvements focus on spectrum
+review, navigation, and sample setup through unfolding.
+
 ## Quick GUI Setup
 
 Use 64-bit Python **3.11 or 3.12**. Python 3.13 is not currently supported
@@ -109,6 +114,11 @@ What you get:
 Use a maintained replay workflow such as `fluxforge rafm-validate ...` or
 `fluxforge phase6-ldrd-worked-example ...` when you want a fully populated
 activity/inventory/planning output chain backed by committed reference assets.
+
+The analysis workflow toolbar provides shortcuts to loading spectra, finding and
+reviewing peaks, calibration, irradiation history, unfolding, and report export.
+Unfolding can start without a spectrum: load measured RAFM reaction rates, or
+load reaction-rates JSON and a matching FluxForge response bundle JSON.
 
 ## First GUI Workflow
 
