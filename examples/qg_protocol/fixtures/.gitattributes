@@ -2,3 +2,5 @@
 ANS/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 QG_report/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 *.ASC -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+# The independent review binds the manifest's raw SHA-256 too.
+manifest.json -text whitespace=cr-at-eol
