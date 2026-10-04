@@ -1,0 +1,2872 @@
+{
+  "status": "BOUNDED_COMPONENT_EVIDENCE; workflow integration pending #232/#220",
+  "engine_base_revision": "be4e7f578803265ed0df0063d634086f16c7d7da",
+  "engine_file_sha256": {
+    "src/fluxforge/analysis/flux_wire_analysis.py": "1f9faceb1704df026d056ef676d07357fbc488eb5f588fdcbb8dc062d002a305",
+    "src/fluxforge/analysis/peakfit.py": "53a0001131d8410bfbac113ff2adb5bbd79be653784931ab8711d747ea97c226",
+    "src/fluxforge/analysis/spectrum_math.py": "d5bac0936affbac6175216e0034047e8fbef25d2e29c480db4583ac1dbd0a488",
+    "src/fluxforge/data/rafm_profiles.json": "7fb3ab63f303bd8bacc3117257ff518834d5845669e8bcc9c2dc7adf6587acea",
+    "src/fluxforge/io/flux_wire.py": "9bdd44e1b4d1010f347893ec023f3c8c4bb66c617241cc3bdd55be38fc1d2cfd",
+    "src/fluxforge/io/spe.py": "e0924f1ae8a12d204ea551c05f749d823decb356432b281bc9e1fcbcfdaba618"
+  },
+  "engine_source_identity": {
+    "files_sha256": {
+      "src/fluxforge/analysis/flux_wire_analysis.py": "1f9faceb1704df026d056ef676d07357fbc488eb5f588fdcbb8dc062d002a305",
+      "src/fluxforge/analysis/peakfit.py": "53a0001131d8410bfbac113ff2adb5bbd79be653784931ab8711d747ea97c226",
+      "src/fluxforge/analysis/spectrum_math.py": "d5bac0936affbac6175216e0034047e8fbef25d2e29c480db4583ac1dbd0a488",
+      "src/fluxforge/data/rafm_profiles.json": "7fb3ab63f303bd8bacc3117257ff518834d5845669e8bcc9c2dc7adf6587acea",
+      "src/fluxforge/io/flux_wire.py": "9bdd44e1b4d1010f347893ec023f3c8c4bb66c617241cc3bdd55be38fc1d2cfd",
+      "src/fluxforge/io/spe.py": "e0924f1ae8a12d204ea551c05f749d823decb356432b281bc9e1fcbcfdaba618"
+    },
+    "hash_basis": "canonical_lf_sha256",
+    "revision": "be4e7f578803265ed0df0063d634086f16c7d7da",
+    "revision_status": "verified",
+    "required_ancestor": "be4e7f578803265ed0df0063d634086f16c7d7da",
+    "ancestor_verified": true,
+    "ancestor_status": "verified",
+    "profile": "qg_sensitivity_review_integrated",
+    "declared_source_revision": "be4e7f578803265ed0df0063d634086f16c7d7da",
+    "binding_sha256": "7af3075919c05f23d859a41918f53578d4ac9106b11f244f31157041c25227ba",
+    "declared_revision_files_verified": true
+  },
+  "historical_engine_binding": {
+    "revision": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "files_sha256": {
+      "src/fluxforge/analysis/flux_wire_analysis.py": "5b5fe5516ff0bdc630cdbbdc1b7672d7eb88e1b6c662c36f5d91cf3a8cfe6b32",
+      "src/fluxforge/analysis/spectrum_math.py": "d5bac0936affbac6175216e0034047e8fbef25d2e29c480db4583ac1dbd0a488",
+      "src/fluxforge/io/spe.py": "e0924f1ae8a12d204ea551c05f749d823decb356432b281bc9e1fcbcfdaba618",
+      "src/fluxforge/io/flux_wire.py": "1a6d2fad25f4ac7863da1eb5ac7677bd091c73a36a01edfcdafc3e82a814d377"
+    },
+    "qualification": "Historical provenance, not the engine used in this run"
+  },
+  "engine_hash_basis": "canonical_lf_source_bytes",
+  "component_sha256": "3372ba096942992dffe10badfbc699d568bdea6ea8e416a15a943a5d15e8f6a8",
+  "example_sha256": "6aee78b8a1fa3df30a774478e2ff5506f147fd88cf2e04788f1b1e3850880d21",
+  "dependencies": {
+    "python": "3.12.14",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1"
+  },
+  "protocol": {
+    "schema_version": 1,
+    "purpose": "historical_comparison",
+    "scenario_name": "declared_header_reproduction",
+    "fields": {
+      "ambient_enabled": {
+        "value": false,
+        "status": "saved_state",
+        "source": "ANS SHA256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7; SAVED_HEADER_ONLY; final report processing state not established"
+      },
+      "continuum_enabled": {
+        "value": true,
+        "status": "saved_state",
+        "source": "ANS SHA256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7; SAVED_HEADER_ONLY; final report processing state not established"
+      },
+      "roi_width_fwhm": {
+        "value": 4.0,
+        "status": "saved_state",
+        "source": "ANS SHA256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7; SAVED_HEADER_ONLY; final report processing state not established"
+      },
+      "background_width_channels": {
+        "value": 1,
+        "status": "saved_state",
+        "source": "ANS SHA256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7; SAVED_HEADER_ONLY; final report processing state not established"
+      },
+      "background_gap_fwhm": {
+        "value": 0.0,
+        "status": "saved_state",
+        "source": "ANS SHA256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7; SAVED_HEADER_ONLY; final report processing state not established"
+      },
+      "continuum_method": {
+        "value": "current_engine_local_sidebands",
+        "status": "assumed",
+        "source": "Explicit current-engine comparison; exact vendor continuum/aggregation not established"
+      },
+      "gamma_library_name": {
+        "value": "GammaLib.mdb",
+        "status": "report_confirmed",
+        "source": "Report SHA256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4"
+      },
+      "gamma_library_sha256": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "gamma_library_revision": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "gamma_intensities": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "gamma_corrections": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "efficiency_identity": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "efficiency_sha256": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "efficiency_units": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "vendor_software_version": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "use_library_efficiencies": {
+        "value": false,
+        "status": "report_confirmed",
+        "source": "Report SHA256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4"
+      },
+      "aggregation": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "activity_reference": {
+        "value": "measurement_date",
+        "status": "report_confirmed",
+        "source": "Report SHA256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4"
+      },
+      "activity_reference_timestamp": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "activity_reference_timezone": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "ambient_identity": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "ambient_sha256": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      },
+      "ambient_normalization": {
+        "value": null,
+        "status": "unknown",
+        "source": "Not established by supplied sources"
+      }
+    },
+    "evidence_by_status": {
+      "saved_state": [
+        "ambient_enabled",
+        "continuum_enabled",
+        "roi_width_fwhm",
+        "background_width_channels",
+        "background_gap_fwhm"
+      ],
+      "report_confirmed": [
+        "gamma_library_name",
+        "use_library_efficiencies",
+        "activity_reference"
+      ],
+      "assumed": [
+        "continuum_method"
+      ],
+      "unknown": [
+        "gamma_library_sha256",
+        "gamma_library_revision",
+        "gamma_intensities",
+        "gamma_corrections",
+        "efficiency_identity",
+        "efficiency_sha256",
+        "efficiency_units",
+        "vendor_software_version",
+        "aggregation",
+        "activity_reference_timestamp",
+        "activity_reference_timezone",
+        "ambient_identity",
+        "ambient_sha256",
+        "ambient_normalization"
+      ],
+      "unsupported": []
+    },
+    "saved_header": {
+      "source_sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+      "byte_length": 34416,
+      "values": {
+        "revision": 4,
+        "live_time_s": 129600.0,
+        "real_time_s": 129691.87000000002,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 2
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    "exact_vendor_parity": false,
+    "physical_defaults_changed": false
+  },
+  "saved_headers": [
+    {
+      "source": "ANS/Co-Cd-RAFM-1.ANS",
+      "source_sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+      "byte_length": 34416,
+      "values": {
+        "revision": 4,
+        "live_time_s": 129600.0,
+        "real_time_s": 129691.87000000002,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 2
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Co-RAFM-1.ANS",
+      "source_sha256": "1eadf548bd66b3da425d8bd891d8523e0ef1f59a9ea4471684f96dc0855675c9",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 43200.0,
+        "real_time_s": 43235.55,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Cu-Cd-RAFM-1.ANS",
+      "source_sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3665.86,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Cu-RAFM-1.ANS",
+      "source_sha256": "91f21b04eb5672deb7bee7666371be82594c0e45692843076a9be81f8b0b6b4f",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3798.2300000000005,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+      "report_confirmed": {
+        "gamma_library_name": "GAMMALIB.MDB",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Fe-Cd-RAFM-1.ANS",
+      "source_sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+      "byte_length": 34516,
+      "values": {
+        "revision": 4,
+        "live_time_s": 43200.0,
+        "real_time_s": 43236.05,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 4
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/In-Cd-RAFM-1.ANS",
+      "source_sha256": "a2f761ebdf0aef7e6a7d27972712fe5e41ef5a6767e2b24514ad67ee0271662e",
+      "byte_length": 34366,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3616.2200000000007,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 1
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Ni-RAFM-1.ANS",
+      "source_sha256": "ab4d6877ead21040232dc1c12e66365f8e38a92e102bca92f1c84040eaae4d76",
+      "byte_length": 34366,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3612.3800000000006,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 1
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-A-15d.ANS",
+      "source_sha256": "eb7bb3b3da1e114f55626fd81e2f60135bc412b588273d8ff7964b8fbee270ca",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 4111.8,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-A-24hr.ANS",
+      "source_sha256": "0f2d934cbe3c401fd0b79b8e279cd2da39cb070317f23764a9d6e2c7e622fe39",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.4,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-A-2hr.ANS",
+      "source_sha256": "4539685f80f9beb11e9094b9161d0568fe7dc95cef99366ea9d69a9d9c6aa18b",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 900.0,
+        "real_time_s": 900.7700000000001,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": null,
+      "report_confirmed": {},
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-A-300s.ANS",
+      "source_sha256": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 300.0,
+        "real_time_s": 331.1,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-A-4d.ANS",
+      "source_sha256": "ea91654c78c5e26506466c281eeddfe280b187ca2a16a8c6705f58193d6ee6f0",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3603.0300000000007,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-B-15d.ANS",
+      "source_sha256": "3e679cf61897e22064526264b3237983d2a1485ac132054067b6cbe9982cc327",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 4077.5800000000004,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-B-24hr.ANS",
+      "source_sha256": "5bf2a48f406248c88d94bbd62ef7ab9525f5075237fc5d1a1db6f61af344b9ad",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.4800000000005,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-B-2hr.ANS",
+      "source_sha256": "0f028ec324786918415cc1df1db35aeed6dae9ea967b00e15892696bf95870a8",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 900.0,
+        "real_time_s": 927.2200000000001,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-B-300s.ANS",
+      "source_sha256": "55af16afdcc51534f4427fd94aa2caf3107f77ab58865a1b530f807c268a1df5",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 300.0,
+        "real_time_s": 330.84000000000003,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-B-4d.ANS",
+      "source_sha256": "d51f817d584a92f5e9ee271752899f1b5f0434c07de7b358e6119b4adbd62bf2",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3603.0400000000004,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-C-15d.ANS",
+      "source_sha256": "b4df4a3195d880de8b096f2562c83873f12725f84730a52adb60cdb1bbf1664e",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 4061.5800000000004,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-C-24hr.ANS",
+      "source_sha256": "98fc1eef03f689eedec11b01bed53923c49062ad7a07b382684b3eaf370e3bca",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.120000000001,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-C-2hr.ANS",
+      "source_sha256": "0d41c896c079fb18d8d84fceddc03f6c927cce7ab17ba17ed2b5f1ea08cd46cd",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 900.0,
+        "real_time_s": 919.7700000000001,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-C-300s.ANS",
+      "source_sha256": "785b5817f618cadcb9b4e5acb1b6b6842d9b79d2c85c6450c60ae4231b38edbb",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 300.0,
+        "real_time_s": 329.87000000000006,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-C-4d.ANS",
+      "source_sha256": "416b152b59d5e0a988c71b51a6110f3111a8a69d607fb31de79bf4633515ebbc",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3602.9800000000005,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-N-15d.ANS",
+      "source_sha256": "19ad56848876157a40e669efb0b0c7bcd634b9caa1799e2bd62eb560f541b947",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3990.2400000000002,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-N-24hr.ANS",
+      "source_sha256": "b587cc72f47453d21dde373d656195d786b4fecaa75d6477d21a80e6ed28bbf7",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.5700000000006,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-N-2hr.ANS",
+      "source_sha256": "ae90f352be9497299eb108498044444a2db7d27ac54f097c019fdf65caa65621",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 900.0,
+        "real_time_s": 922.8100000000001,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-N-300s.ANS",
+      "source_sha256": "20c4e6932ed6093c9e2f69bd547c2ea91f647f54a7eb375b2ed45fc36cd83d2d",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 300.0,
+        "real_time_s": 320.22,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/RAFM-N-4d.ANS",
+      "source_sha256": "1dee8bcd90bf223748d250d466f02d949a4a765e911ed2ccf269c5ed5e5782d3",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3603.05,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Sc-Cd-RAFM-1.ANS",
+      "source_sha256": "32ae08601f00076d4c69f8f87b6207f3e0101eb48053ce64a64b263cdd833591",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 3650.3900000000003,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Sc-RAFM-1.ANS",
+      "source_sha256": "64277ab9834f317a0731111faa74171fb356b17fff36e13ea2b4a5bc2c34d229",
+      "byte_length": 34416,
+      "values": {
+        "revision": 4,
+        "live_time_s": 3600.0,
+        "real_time_s": 4124.81,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 2
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Ti-RAFM-1.ANS",
+      "source_sha256": "c86ef107b036999fde62e3249ca7213eb71ba583aca1264bb54a59acc41be99b",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 14400.0,
+        "real_time_s": 14411.89,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Ti-RAFM-1a.ANS",
+      "source_sha256": "59f89ee0d0536a259dadf5484f3bfe367d423b8e0f291281594b8838e8f02a61",
+      "byte_length": 34316,
+      "values": {
+        "revision": 4,
+        "live_time_s": 14400.0,
+        "real_time_s": 14411.95,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 0
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    },
+    {
+      "source": "ANS/Ti-RAFM-1b.ANS",
+      "source_sha256": "1fbc1d8c255ebb2b99695144ad822d947e749686b48e2acb455640f71da7424c",
+      "byte_length": 34666,
+      "values": {
+        "revision": 4,
+        "live_time_s": 172800.0,
+        "real_time_s": 172935.45,
+        "analysis_ctrl": 1,
+        "use_library_efficiencies": 0,
+        "roi_width_fwhm": 4.0,
+        "background_width_channels": 1,
+        "background_gap_fwhm": 0.0,
+        "first_channel": 0,
+        "last_channel": 8191,
+        "roi_count": 7
+      },
+      "library_name": "GammaLib.mdb",
+      "report_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+      "report_confirmed": {
+        "gamma_library_name": "GammaLib.mdb",
+        "use_library_efficiencies": false,
+        "activity_reference": "measurement_date"
+      },
+      "layout_id": "qg-study-rev4-observed-1548-v1",
+      "layout_scope": "32 study files; additional identities require separate validation",
+      "layout_offsets": {
+        "revision": {
+          "offset": 0,
+          "format": "<h"
+        },
+        "live_time_s": {
+          "offset": 104,
+          "format": "<d"
+        },
+        "real_time_s": {
+          "offset": 96,
+          "format": "<d"
+        },
+        "analysis_ctrl": {
+          "offset": 860,
+          "format": "<H"
+        },
+        "use_library_efficiencies": {
+          "offset": 1292,
+          "format": "<h"
+        },
+        "roi_width_fwhm": {
+          "offset": 852,
+          "format": "<f"
+        },
+        "background_width_channels": {
+          "offset": 846,
+          "format": "<h"
+        },
+        "background_gap_fwhm": {
+          "offset": 848,
+          "format": "<f"
+        },
+        "first_channel": {
+          "offset": 1020,
+          "format": "<h"
+        },
+        "last_channel": {
+          "offset": 1022,
+          "format": "<h"
+        },
+        "roi_count": {
+          "offset": 1026,
+          "format": "<h"
+        }
+      },
+      "saved_state": {
+        "ambient_enabled": false,
+        "continuum_enabled": true
+      },
+      "qualification": "SAVED_HEADER_ONLY; final report processing state not established"
+    }
+  ],
+  "physical_count_basis": {
+    "source": "examples/qg_protocol/fixtures/North-background.ASC",
+    "sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+    "qualification": "North measured-background scenario only; applicability to this experiment is not established",
+    "original_source": "src/fluxforge/data/backgrounds/background.ASC",
+    "sample_sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+    "energy_calibration_source_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+    "normalization": "live_time",
+    "scale_factor": 9.0,
+    "ambient_enabled": true,
+    "continuum_enabled": true,
+    "roi_parameters": {
+      "roi_width_fwhm": 4.0,
+      "background_width_channels": 1,
+      "background_gap_fwhm": 0.0
+    },
+    "roi_parameter_source": "Unchanged current engine defaults, independent of comparison protocol"
+  },
+  "comparison_count_basis": {
+    "sample_sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+    "energy_calibration_source_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+    "ambient_enabled": false,
+    "ambient_source_sha256": null,
+    "ambient_normalization": "none",
+    "scale_factor": null,
+    "qualification": "Comparison only; saved controls do not establish final report controls"
+  },
+  "line_evidence": [
+    {
+      "energy_keV": 1173.2,
+      "channel": 2351,
+      "fwhm_channels": 4.496858058572691,
+      "resolution_source_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+      "physical_counts": {
+        "net_counts": 8992.858982680844,
+        "net_counts_unc": 662.3890276820553,
+        "gross_counts": 16032.457089108768,
+        "local_continuum_counts": 7039.598106427924,
+        "roi_channels": [
+          2342,
+          2360
+        ],
+        "continuum_enabled": true,
+        "method": "current_engine_local_sidebands"
+      },
+      "comparison_counts": {
+        "net_counts": 11244.0,
+        "net_counts_unc": 365.42783145239497,
+        "gross_counts": 22891.0,
+        "local_continuum_counts": 11647.0,
+        "roi_channels": [
+          2342,
+          2360
+        ],
+        "continuum_enabled": true,
+        "method": "current_engine_local_sidebands"
+      }
+    },
+    {
+      "energy_keV": 1332.5,
+      "channel": 2670,
+      "fwhm_channels": 4.712491588848746,
+      "resolution_source_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+      "physical_counts": {
+        "net_counts": 5425.67438577292,
+        "net_counts_unc": 467.2883199248121,
+        "gross_counts": 10264.975418652532,
+        "local_continuum_counts": 4839.301032879612,
+        "roi_channels": [
+          2661,
+          2679
+        ],
+        "continuum_enabled": true,
+        "method": "current_engine_local_sidebands"
+      },
+      "comparison_counts": {
+        "net_counts": 10919.5,
+        "net_counts_unc": 272.508256755644,
+        "gross_counts": 16952.0,
+        "local_continuum_counts": 6032.5,
+        "roi_channels": [
+          2661,
+          2679
+        ],
+        "continuum_enabled": true,
+        "method": "current_engine_local_sidebands"
+      }
+    }
+  ],
+  "activity_computation": "Not performed; original GammaLib contents/corrections unknown",
+  "aggregation_computation": "Not performed; configured choice is metadata only",
+  "exact_vendor_parity": false,
+  "physical_defaults_changed": false
+}

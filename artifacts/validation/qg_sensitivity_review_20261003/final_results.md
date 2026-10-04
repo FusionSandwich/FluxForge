@@ -1,6 +1,6 @@
 # Final native replay and diagnostic results
 
-Fresh complete replay: **32 raw/report pairs, 33 reports, 300 reference ROI rows**. All raw channels were independently extracted before any reference overlay. Native input and package source hashes match the final tree.
+Fresh complete replay: **32 raw/report pairs, 33 reports, 300 reference ROI rows**. All raw channels were independently extracted before any reference overlay. All 80 native input hashes match the final tree. The method integration changes workflow reporting and adds seven opt-in modules; source-equivalence checks preserve the native extraction functions. Full replay and report generation retain their recorded earlier source epoch.
 
 | Status | Rows |
 |---|---:|
@@ -42,6 +42,10 @@ Full sweep: 20 cases × four configurations = 80 experiments. Cr51 and corrected
 
 ## Verification
 
-154 tests passed in the final focused suite; Luna independently passed 39 GUI/identity/sensitivity tests and 13 recovery tests. The independent acquisition agent verified all five immutable native clock/count sources. Luna reached its usage limit before reviewing the final 32-spectrum replay; the root agent checked the final counts, source hashes and spectrum figure. The separate workflow checks are recorded in the receipt.
+The post-integration broad run passed 512 tests and 12 subtests, with three example failures caused by historical engine pins. Those pins remain unchanged. A separate six-file integrated source binding now verifies current hashes against the actual immutable Git blobs, while a `historical` profile still rejects newer source. The final affected-method, source-identity, acquisition, matching and new GUI suite passed **138 tests**. Across the broad run and the final focused rerun, **525 distinct test cases have passing latest results**, plus the original 12 passing subtests. This is a combined receipt, not a claim that all repository tests ran in one invocation.
+
+Luna independently passed 39 tests and 13 recovery tests before method integration, then 31 acquisition/GUI/matching tests after integration. Its final source-binding/protocol/pilot check passed 59 tests; the initial finding and fixed disposition are published separately. The acquisition agent verified the five immutable native clock/count sources. Luna reviewed the final 32-spectrum audit and 80-experiment sweep and checked post-merge native helper equivalence. The native cache and five individual reports retain their recorded earlier source epoch; the two fresh bounded protocol/Poisson example receipts use the integrated source binding.
+
+Of the five newly generated individual count comparisons, Cu-Cd passes and Fe-Cd plus A-24h/A-300s/A-4d do not pass. Reference counts were not substituted into inference. The integrated Co-Cd Poisson pilot converges in eight fits but all eight flag strong lack of fit; its two free-normalization controls are unidentifiable. Convergence therefore does not qualify those fits or justify changing defaults.
 
 Plot: `reference_zero_regions.png`. Original acquisition bytes: `examples/RAFM_irradiation/recovered_qg_sources`. Scientific admission remains false; shared efficiency covariance, calibration/background applicability and near-contact geometry qualification remain separate.

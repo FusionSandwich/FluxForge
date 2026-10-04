@@ -27,6 +27,7 @@ from fluxforge.analysis.qg_protocol import (
 )
 from fluxforge.analysis.spectrum_math import subtract_measured_background
 from fluxforge.io.flux_wire import read_processed_txt, read_raw_asc
+from fluxforge.validation.example_identity import bound_example_engine, source_identity
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -93,13 +94,32 @@ def build_evidence(
     continuum: str | None = None,
     originals: Path = FIXTURES,
     aggregation: str | None = None,
+    engine_profile: str = "integrated",
 ) -> dict:
     if ambient not in {None, "on", "off"} or continuum not in {None, "on", "off"}:
         raise ValueError("Correction choices must be on/off or omitted")
     manifest = json.loads((FIXTURES / "manifest.json").read_text())
-    # Bind the reused implementation, not merely a claimed Git revision.
-    for path, digest in manifest["engine_files"].items():
-        verified_sha256((ROOT / path).read_bytes().replace(b"\r\n", b"\n"), digest)
+    # The historical manifest remains immutable; this run has its own epoch.
+    if engine_profile == "integrated":
+        engine_identity = bound_example_engine(
+            ROOT,
+            ROOT / "examples/engine_bindings/qg_sensitivity_review.json",
+            manifest["engine_files"],
+        )
+    elif engine_profile == "historical":
+        engine_identity = source_identity(
+            ROOT,
+            manifest["engine_files"],
+            expected_sha256=manifest["engine_files"],
+            canonical_lf=True,
+            required_ancestor=manifest["engine_base_revision"],
+        )
+        engine_identity.update(
+            profile="historical",
+            declared_source_revision=manifest["engine_base_revision"],
+        )
+    else:
+        raise ValueError("Unknown engine profile")
     audit = audit_originals(originals, manifest)
     row = next(r for r in manifest["rows"] if r["source"] == "ANS/Co-Cd-RAFM-1.ANS")
     state = parse_saved_state(
@@ -198,8 +218,14 @@ def build_evidence(
         )
     return {
         "status": "BOUNDED_COMPONENT_EVIDENCE; workflow integration pending #232/#220",
-        "engine_base_revision": manifest["engine_base_revision"],
-        "engine_file_sha256": manifest["engine_files"],
+        "engine_base_revision": engine_identity["declared_source_revision"],
+        "engine_file_sha256": engine_identity["files_sha256"],
+        "engine_source_identity": engine_identity,
+        "historical_engine_binding": {
+            "revision": manifest["engine_base_revision"],
+            "files_sha256": manifest["engine_files"],
+            "qualification": "Historical provenance, not the engine used in this run",
+        },
         "engine_hash_basis": "canonical_lf_source_bytes",
         "component_sha256": hashlib.sha256(
             (ROOT / "src/fluxforge/analysis/qg_protocol.py").read_bytes()
@@ -238,12 +264,16 @@ def main():
     parser.add_argument(
         "--originals", type=Path, default=FIXTURES, help="Root with ANS and QG_report"
     )
+    parser.add_argument(
+        "--engine-profile", choices=("integrated", "historical"), default="integrated"
+    )
     args = parser.parse_args()
     evidence = build_evidence(
         ambient=args.ambient,
         continuum=args.continuum,
         originals=args.originals,
         aggregation=args.aggregation,
+        engine_profile=args.engine_profile,
     )
     with args.output.open("x", encoding="utf-8", newline="\n") as handle:
         json.dump(evidence, handle, indent=2, allow_nan=False)

@@ -1,0 +1,131 @@
+{
+  "native_engine_baseline": "7c5cc8b",
+  "recovered_code_commit": "40d24b2",
+  "method_integration_commit": "be4e7f5",
+  "method_source_commit": "701288a",
+  "native_cache_sha256": "3d7860bf4c46bbb22534b244a43f5d62e4f5237867ad88759861680f09ba6f88",
+  "input_hashes_verified": 80,
+  "existing_runtime_files_changed": [
+    "src\\fluxforge\\examples\\rafm_workflow.py"
+  ],
+  "identical_native_extraction_functions": [
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "default_paths",
+      "identical_AST": true,
+      "AST_sha256": "61ac1d24c10d3da82d2d3389bcd8e189f8de5ee49780b11162758b99a705db1d"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "load_rafm_example_metadata",
+      "identical_AST": true,
+      "AST_sha256": "8b53ee2bae890acffd819525b5f27003440dd1f150df8232df374ef870be4b46"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "workflow_profile_energy_calibration",
+      "identical_AST": true,
+      "AST_sha256": "3179d5922f2272b5ddbc35ba845467a7bc22ac6c168b5c322563620743b150f2"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "build_generic_gamma_library",
+      "identical_AST": true,
+      "AST_sha256": "92c41a0a10f00b1810adc4f2208da5b3fc7f9e35665e30d0854aaa62b54a4fed"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "discover_input_files",
+      "identical_AST": true,
+      "AST_sha256": "037951c001d8b76938cc3f5a1db314744e7216f30b8ac876532863dc5d6ead2d"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "pair_input_files",
+      "identical_AST": true,
+      "AST_sha256": "9f41b68cd54ab41eaba7a927cf3520ea63741ae9f5d3bdee3b31ec84a6ec8fe5"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "select_generic_targeted_lines",
+      "identical_AST": true,
+      "AST_sha256": "fd9ec7ae9f6f0e2a08a1c57ce188ca8de7a2066726d7895fc7e956348952e971"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "merge_detected_and_targeted_peaks",
+      "identical_AST": true,
+      "AST_sha256": "85f03a4e88e2cc6ff52a74e09bdc7daf61bf06a2247ba61252b924f4fca4678f"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "qg_reference_peaks",
+      "identical_AST": true,
+      "AST_sha256": "5d25c94751fd40731e0b41cd5fa932a9bfb7c400b5e97e0f91684443eb3d653d"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "match_peak_set",
+      "identical_AST": true,
+      "AST_sha256": "7f72bf20481f5b7abf0e87bc0dbe71ba7b1b45d54d58dfe1e8a1ebda62423409"
+    },
+    {
+      "path": "src/fluxforge/examples/rafm_workflow.py",
+      "function": "normalize_pairing_key",
+      "identical_AST": true,
+      "AST_sha256": "da38a36e398d5315365cd55f7784a38406ab9ab23557c257a56f36116fd6ec06"
+    },
+    {
+      "path": "src/fluxforge/analysis/flux_wire_analysis.py",
+      "function": "analyze_raw_spectrum",
+      "identical_AST": true,
+      "AST_sha256": "0b7f40ed8b36545a985ed61c5970ee7b02f21dbfa102e5c034214e6e66fabb09"
+    },
+    {
+      "path": "src/fluxforge/analysis/flux_wire_analysis.py",
+      "function": "analyze_raw_spectrum_targeted",
+      "identical_AST": true,
+      "AST_sha256": "36bd2b43c06081ee30628c69780fdb53f27c92e64b5d725eea418e20352e0f0a"
+    },
+    {
+      "path": "src/fluxforge/analysis/flux_wire_analysis.py",
+      "function": "build_gamma_library",
+      "identical_AST": true,
+      "AST_sha256": "b6c329ccc9d01ddde4888c071c013c8bf7c4c270acce4ab51ef1711151af41b5"
+    },
+    {
+      "path": "src/fluxforge/analysis/flux_wire_analysis.py",
+      "function": "get_expected_isotopes",
+      "identical_AST": true,
+      "AST_sha256": "c09e2b633c7f876e1da60cb35b1c0edbaf37b4972985279ce18f8dfc48c7e71c"
+    },
+    {
+      "path": "src/fluxforge/io/flux_wire.py",
+      "function": "read_raw_asc",
+      "identical_AST": true,
+      "AST_sha256": "bb523f8d6c0167474690f40a38d35aada0e2852327578ac3154771a9044105fd"
+    },
+    {
+      "path": "src/fluxforge/io/flux_wire.py",
+      "function": "read_processed_txt",
+      "identical_AST": true,
+      "AST_sha256": "d56ccc595e37bccd8dd6420a6455c97d398b97f4b26ae7af4748ffca5c1ae8c0"
+    },
+    {
+      "path": "src/fluxforge/analysis/spectrum_math.py",
+      "function": "subtract_measured_background",
+      "identical_AST": true,
+      "AST_sha256": "0610c910189ceaeb9c4ace855b087be877d4d04b8301701649a91bcca1f4ca62"
+    }
+  ],
+  "scope": "Equivalent native peak extraction, not a rerun of derived activity/reaction outputs; reporting/time-reference/export changes are outside this equivalence claim.",
+  "new_modules": [
+    "src/fluxforge/analysis/activity_combination.py",
+    "src/fluxforge/analysis/joint_poisson.py",
+    "src/fluxforge/analysis/multiplet_validation.py",
+    "src/fluxforge/analysis/qg_protocol.py",
+    "src/fluxforge/analysis/repeated_count_validation.py",
+    "src/fluxforge/physics/efficiency_fidelity.py",
+    "src/fluxforge/validation/example_identity.py"
+  ]
+}

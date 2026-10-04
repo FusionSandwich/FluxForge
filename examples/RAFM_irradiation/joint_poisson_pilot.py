@@ -32,7 +32,7 @@ from fluxforge.analysis.peakfit import FWHM_SIG_RATIO, fit_single_peak
 from fluxforge.analysis.spectrum_math import subtract_measured_background
 from fluxforge.data.rafm_profile import load_rafm_profile
 from fluxforge.io.flux_wire import read_raw_asc
-from fluxforge.validation.example_identity import source_identity
+from fluxforge.validation.example_identity import bound_example_engine, source_identity
 
 
 def sha(path):
@@ -66,7 +66,7 @@ def json_value(value):
     raise TypeError(type(value).__name__)
 
 
-def run_pilot(evidence_root=None):
+def run_pilot(evidence_root=None, *, engine_profile="integrated"):
     base = ROOT / "examples/RAFM_irradiation"
     sample_path = base / "raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC"
     background_path = base / "background.ASC"
@@ -127,12 +127,23 @@ def run_pilot(evidence_root=None):
         "src/fluxforge/io/flux_wire.py": "1a6d2fad25f4ac7863da1eb5ac7677bd091c73a36a01edfcdafc3e82a814d377",
         "src/fluxforge/data/rafm_profiles.json": "7fb3ab63f303bd8bacc3117257ff518834d5845669e8bcc9c2dc7adf6587acea",
     }
-    identity = source_identity(
-        ROOT,
-        engine_files,
-        expected_sha256=engine_pins,
-        canonical_lf=True,
-    )
+    if engine_profile == "integrated":
+        identity = bound_example_engine(
+            ROOT,
+            ROOT / "examples/engine_bindings/qg_sensitivity_review.json",
+            engine_files,
+        )
+    elif engine_profile == "historical":
+        identity = source_identity(
+            ROOT,
+            engine_files,
+            expected_sha256=engine_pins,
+            canonical_lf=True,
+            required_ancestor=source_ref,
+        )
+        identity.update(profile="historical", declared_source_revision=source_ref)
+    else:
+        raise ValueError("Unknown engine profile")
     engine = identity["files_sha256"]
     rows = []
     # Co60 energies/yields are fixed inputs, not report net-count targets.
@@ -303,7 +314,12 @@ def run_pilot(evidence_root=None):
         raise RuntimeError("original input identity changed")
     return {
         "issue": 239,
-        "engine_base": source_ref,
+        "engine_base": identity["declared_source_revision"],
+        "historical_engine_binding": {
+            "revision": source_ref,
+            "files_sha256": engine_pins,
+            "qualification": "Historical provenance, not the engine used in this run",
+        },
         "engine_files_sha256_canonical_lf": engine,
         "engine_source_identity": identity,
         "implementation_sha256": sha(ROOT / "src/fluxforge/analysis/joint_poisson.py"),
@@ -315,7 +331,13 @@ def run_pilot(evidence_root=None):
             "numpy": np.__version__,
             "scipy": scipy.__version__,
             "numpy_repo_constraint": ">=1.26,<2.0",
-            "dependency_qualification": "local numpy 2.5.1 outside declared range; no environment changed",
+            "dependency_qualification": (
+                "numpy satisfies declared range; environment unchanged"
+                if (1, 26)
+                <= tuple(int(v) for v in np.__version__.split(".")[:2])
+                < (2, 0)
+                else "numpy outside declared range; environment unchanged"
+            ),
         },
         "sample_identity": {
             "id": sample.sample_id,
@@ -351,6 +373,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument(
+        "--engine-profile", choices=("integrated", "historical"), default="integrated"
+    )
+    parser.add_argument(
         "--evidence-root",
         type=Path,
         help="read-only local source-bound 46096eb checkout",
@@ -358,7 +383,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("output must be new")
-    payload = run_pilot(args.evidence_root)
+    payload = run_pilot(args.evidence_root, engine_profile=args.engine_profile)
     with args.output.open("x", encoding="utf-8") as stream:
         json.dump(payload, stream, indent=2, default=json_value, allow_nan=False)
     print(

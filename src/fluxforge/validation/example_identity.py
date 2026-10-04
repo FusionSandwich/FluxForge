@@ -3,10 +3,68 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
 from typing import Iterable, Mapping
+
+
+def bound_example_engine(
+    root: str | Path, binding_path: str | Path, files: Iterable[str]
+) -> dict:
+    """Verify a separately published source epoch without rewriting old receipts."""
+    binding = json.loads(Path(binding_path).read_text(encoding="utf-8"))
+    declared = binding["files_sha256"]
+    if not isinstance(declared, dict) or any(
+        not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)
+        for digest in declared.values()
+    ):
+        raise ValueError("Engine binding requires explicit SHA-256 pins")
+    if not isinstance(binding["source_revision"], str) or not re.fullmatch(
+        r"[0-9a-f]{40}", binding["source_revision"]
+    ):
+        raise ValueError("Engine binding requires a full source revision")
+    requested = list(files)
+    if not requested or not set(requested).issubset(declared):
+        raise ValueError("Engine binding does not cover all requested source files")
+    if binding["hash_basis"] != "canonical_lf_sha256":
+        raise ValueError("Unsupported engine binding hash basis")
+    # Verify every declared file, including those reused by the other example.
+    identity = source_identity(
+        root,
+        declared,
+        expected_sha256=declared,
+        canonical_lf=True,
+        required_ancestor=binding["source_revision"],
+    )
+    revision_files_verified = None
+    if identity["revision_status"] == "verified":
+        for name, expected in declared.items():
+            result = subprocess.run(
+                [
+                    "git",
+                    "show",
+                    f"{binding['source_revision']}:{Path(name).as_posix()}",
+                ],
+                cwd=Path(root).resolve(),
+                check=True,
+                capture_output=True,
+            )
+            digest = hashlib.sha256(result.stdout.replace(b"\r\n", b"\n")).hexdigest()
+            if digest != expected:
+                raise ValueError(
+                    f"Engine binding differs from declared Git revision: {name}"
+                )
+        revision_files_verified = True
+    return {
+        **identity,
+        "profile": binding["profile"],
+        "declared_source_revision": binding["source_revision"],
+        "binding_sha256": hashlib.sha256(Path(binding_path).read_bytes()).hexdigest(),
+        "declared_revision_files_verified": revision_files_verified,
+    }
 
 
 def _git_marker(root: Path) -> bool:
@@ -66,7 +124,9 @@ def source_identity(
         ancestor_status = "unknown_no_git_checkout"
     else:
         if not git_executable:
-            raise RuntimeError("Git checkout detected but git executable is unavailable")
+            raise RuntimeError(
+                "Git checkout detected but git executable is unavailable"
+            )
         revision = _git(base, "rev-parse", "HEAD")
         revision_status = "verified"
         if required_ancestor is None:

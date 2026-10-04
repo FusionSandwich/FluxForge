@@ -1,0 +1,14 @@
+{
+  "profile": "qg_sensitivity_review_integrated",
+  "source_revision": "be4e7f578803265ed0df0063d634086f16c7d7da",
+  "hash_basis": "canonical_lf_sha256",
+  "files_sha256": {
+    "src/fluxforge/analysis/flux_wire_analysis.py": "1f9faceb1704df026d056ef676d07357fbc488eb5f588fdcbb8dc062d002a305",
+    "src/fluxforge/analysis/peakfit.py": "53a0001131d8410bfbac113ff2adb5bbd79be653784931ab8711d747ea97c226",
+    "src/fluxforge/analysis/spectrum_math.py": "d5bac0936affbac6175216e0034047e8fbef25d2e29c480db4583ac1dbd0a488",
+    "src/fluxforge/data/rafm_profiles.json": "7fb3ab63f303bd8bacc3117257ff518834d5845669e8bcc9c2dc7adf6587acea",
+    "src/fluxforge/io/flux_wire.py": "9bdd44e1b4d1010f347893ec023f3c8c4bb66c617241cc3bdd55be38fc1d2cfd",
+    "src/fluxforge/io/spe.py": "e0924f1ae8a12d204ea551c05f749d823decb356432b281bc9e1fcbcfdaba618"
+  },
+  "scope": "Reused numerical engine only; historical fixture manifests remain unchanged. Newly generated evidence must record this separate source epoch."
+}

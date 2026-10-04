@@ -1,0 +1,138 @@
+........................................................................ [ 13%]
+........................................................................ [ 27%]
+........................................................................ [ 41%]
+........................................................................ [ 55%]
+................................................................F....... [ 69%]
+............................................................ [ 81%]
+.F.....F................................................................ [ 95%]
+.......................                                                  [100%]
+================================== FAILURES ===================================
+_ test_co_cd_pilot_preserves_originals_and_separates_adequacy_from_convergence _
+
+    def test_co_cd_pilot_preserves_originals_and_separates_adequacy_from_convergence():
+        import importlib.util
+        from pathlib import Path
+    
+        path = (
+            Path(__file__).resolve().parents[1]
+            / "examples/RAFM_irradiation/joint_poisson_pilot.py"
+        )
+        spec = importlib.util.spec_from_file_location("joint_poisson_pilot", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+>       payload = module.run_pilot()
+                  ^^^^^^^^^^^^^^^^^^
+
+tests\test_joint_poisson.py:369: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+examples\RAFM_irradiation\joint_poisson_pilot.py:130: in run_pilot
+    identity = source_identity(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Josh/.codex/worktrees/rafm-analysis-issues/FluxForge')
+files = ['src/fluxforge/analysis/peakfit.py', 'src/fluxforge/analysis/spectrum_math.py', 'src/fluxforge/analysis/flux_wire_analysis.py', 'src/fluxforge/io/flux_wire.py', 'src/fluxforge/data/rafm_profiles.json']
+required_ancestor = None
+expected_sha256 = {'src/fluxforge/analysis/peakfit.py': '53a0001131d8410bfbac113ff2adb5bbd79be653784931ab8711d747ea97c226', 'src/fluxfor...f3a8cfe6b32', 'src/fluxforge/io/flux_wire.py': '1a6d2fad25f4ac7863da1eb5ac7677bd091c73a36a01edfcdafc3e82a814d377', ...}
+canonical_lf = True
+
+    def source_identity(
+        root: str | Path,
+        files: Iterable[str],
+        *,
+        required_ancestor: str | None = None,
+        expected_sha256: Mapping[str, str] | None = None,
+        canonical_lf: bool = False,
+    ) -> dict:
+        """Hash declared files and report Git facts only when actually verified.
+    
+        ``canonical_lf`` hashes UTF-8/text source after CRLF-to-LF normalization.
+        Expected hashes are checked in the selected byte mode in every environment.
+        """
+        base = Path(root).resolve()
+        hashes: dict[str, str] = {}
+        for name in files:
+            relative = Path(name)
+            if relative.is_absolute() or ".." in relative.parts:
+                raise ValueError(f"Declared source path must be relative to root: {name}")
+            path = base / relative
+            if not path.is_file():
+                raise FileNotFoundError(f"Declared source file is missing: {name}")
+            content = path.read_bytes()
+            if canonical_lf:
+                content = content.replace(b"\r\n", b"\n")
+            digest = hashlib.sha256(content).hexdigest()
+            hashes[relative.as_posix()] = digest
+            expected = (expected_sha256 or {}).get(relative.as_posix())
+            if expected is not None and digest != expected:
+                mode = "canonical-LF " if canonical_lf else ""
+>               raise ValueError(f"{mode}SHA-256 mismatch: {name}")
+E               ValueError: canonical-LF SHA-256 mismatch: src/fluxforge/analysis/flux_wire_analysis.py
+
+src\fluxforge\validation\example_identity.py:58: ValueError
+______________ test_focused_example_separates_bases_and_controls ______________
+
+    def test_focused_example_separates_bases_and_controls():
+        example = load_example()
+>       saved = example.build_evidence()
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_qg_protocol.py:307: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+examples\qg_protocol\run_example.py:102: in build_evidence
+    verified_sha256((ROOT / path).read_bytes().replace(b"\r\n", b"\n"), digest)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = b'"""\nFlux Wire Analysis Workflow\n\nComplete workflow for analyzing flux wire gamma spectra, including:\n- Peak find...2, default=str)\n        if verbose:\n            print(f"\\nResults saved to: {output_file}")\n\n    return results\n'
+expected = '5b5fe5516ff0bdc630cdbbdc1b7672d7eb88e1b6c662c36f5d91cf3a8cfe6b32'
+
+    def verified_sha256(data: bytes, expected: str) -> str:
+        """Verify bytes against an explicitly supplied source identity."""
+        if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+            raise ValueError("Expected a lowercase SHA-256 source identity")
+        actual = hashlib.sha256(data).hexdigest()
+        if actual != expected:
+>           raise ValueError("Source SHA-256 mismatch")
+E           ValueError: Source SHA-256 mismatch
+
+src\fluxforge\analysis\qg_protocol.py:43: ValueError
+_______________________ test_portable_raw_count_oracle ________________________
+
+    def test_portable_raw_count_oracle():
+        """Direct raw bin sums challenge an incorrectly shared physical count basis."""
+        import numpy as np
+        from fluxforge.io.flux_wire import read_processed_txt, read_raw_asc
+    
+        example = load_example()
+>       evidence = example.build_evidence()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_qg_protocol.py:412: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+examples\qg_protocol\run_example.py:102: in build_evidence
+    verified_sha256((ROOT / path).read_bytes().replace(b"\r\n", b"\n"), digest)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = b'"""\nFlux Wire Analysis Workflow\n\nComplete workflow for analyzing flux wire gamma spectra, including:\n- Peak find...2, default=str)\n        if verbose:\n            print(f"\\nResults saved to: {output_file}")\n\n    return results\n'
+expected = '5b5fe5516ff0bdc630cdbbdc1b7672d7eb88e1b6c662c36f5d91cf3a8cfe6b32'
+
+    def verified_sha256(data: bytes, expected: str) -> str:
+        """Verify bytes against an explicitly supplied source identity."""
+        if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+            raise ValueError("Expected a lowercase SHA-256 source identity")
+        actual = hashlib.sha256(data).hexdigest()
+        if actual != expected:
+>           raise ValueError("Source SHA-256 mismatch")
+E           ValueError: Source SHA-256 mismatch
+
+src\fluxforge\analysis\qg_protocol.py:43: ValueError
+============================== warnings summary ===============================
+tests/test_gui_consolidation.py::test_empty_unfolding_imports_committed_rafm_rates
+  C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\src\fluxforge\solvers\rmle.py:886: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.6622391872802742e-31.
+    H_inv = linalg.inv(H)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_joint_poisson.py::test_co_cd_pilot_preserves_originals_and_separates_adequacy_from_convergence
+FAILED tests/test_qg_protocol.py::test_focused_example_separates_bases_and_controls
+FAILED tests/test_qg_protocol.py::test_portable_raw_count_oracle - ValueError...
+3 failed, 512 passed, 1 warning, 12 subtests passed in 434.47s (0:07:14)

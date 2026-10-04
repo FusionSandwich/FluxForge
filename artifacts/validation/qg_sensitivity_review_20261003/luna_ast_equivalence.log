@@ -1,0 +1,23 @@
+FILE src/fluxforge/examples/rafm_workflow.py old_present=True new_present=True
+  default_paths: IDENTICAL old=True new=True
+  load_rafm_example_metadata: IDENTICAL old=True new=True
+  workflow_profile_energy_calibration: IDENTICAL old=True new=True
+  build_generic_gamma_library: IDENTICAL old=True new=True
+  discover_input_files: IDENTICAL old=True new=True
+  pair_input_files: IDENTICAL old=True new=True
+  select_generic_targeted_lines: IDENTICAL old=True new=True
+  merge_detected_and_targeted_peaks: IDENTICAL old=True new=True
+  qg_reference_peaks: IDENTICAL old=True new=True
+  match_peak_set: IDENTICAL old=True new=True
+  resolve_measurement_timing: CHANGED/MISSING old=True new=True
+  normalize_pairing_key: IDENTICAL old=True new=True
+FILE src/fluxforge/analysis/flux_wire_analysis.py old_present=True new_present=True
+  analyze_raw_spectrum: IDENTICAL old=True new=True
+  analyze_raw_spectrum_targeted: IDENTICAL old=True new=True
+  build_gamma_library: IDENTICAL old=True new=True
+  get_expected_isotopes: IDENTICAL old=True new=True
+FILE src/fluxforge/io/flux_wire.py old_present=True new_present=True
+  read_raw_asc: IDENTICAL old=True new=True
+  read_processed_txt: IDENTICAL old=True new=True
+FILE src/fluxforge/analysis/spectrum_math.py old_present=True new_present=True
+  subtract_measured_background: IDENTICAL old=True new=True
