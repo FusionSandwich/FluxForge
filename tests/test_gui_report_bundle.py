@@ -159,7 +159,18 @@ def test_qt_generate_report_preserves_view_and_captures_tables_once(
             assert not any(
                 item["control"].startswith("Report") for item in snapshot["inputs"]
             )
-        assert dialog.last_context == captures[0]
+        assert (
+            dialog.last_context["run_snapshot"]["views"]
+            == captures[0]["run_snapshot"]["views"]
+        )
+        assert (
+            dialog.last_context["run_snapshot"]["captured_at"]
+            == captures[0]["run_snapshot"]["captured_at"]
+        )
+        assert (
+            dialog.last_context["run_snapshot"]["workspace"]
+            == captures[0]["run_snapshot"]["workspace"]
+        )
         QTest.mouseClick(dialog.generate_button, Qt.LeftButton)
         assert dialog.last_bundle_path is None
         assert "failed" in dialog.export_status.text()

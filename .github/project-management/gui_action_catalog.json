@@ -109,7 +109,7 @@
     {
       "surface": "report-export",
       "test_ids": ["tests/test_gui_report_bundle.py", "tests/test_module3_workflows_qt.py"],
-      "object_names": ["ReportTemplateCombo", "ReportExportPathInput", "RenderReportPreviewButton", "ExportReportHtmlButton", "ExportReportPdfButton", "ReportBundlePdfCheck", "GenerateReportBundleButton"]
+      "object_names": ["ReportTemplateCombo", "ReportExportPathInput", "RenderReportPreviewButton", "ExportReportHtmlButton", "ExportReportPdfButton", "ReportBundlePdfCheck", "GenerateReportBundleButton", "ReportAmplifierGainInput", "ReportShapingTimeInput", "ReportHighVoltageInput", "ReportCountGeometryInput", "ReportInstructionalCheck"]
     },
     {
       "surface": "spectrum-file-queue-dialog",

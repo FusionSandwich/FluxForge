@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Any
 from zipfile import ZIP_DEFLATED, ZipFile
 
+from fluxforge.reporting.instrument_provenance import validate_instructional_snapshot
+
 try:
     from jinja2 import Environment, FileSystemLoader, select_autoescape
 except ImportError as exc:  # pragma: no cover - optional dependency branch
@@ -164,6 +166,8 @@ class ReportingEngine:
         return True
 
     def render(self, template_name: str, context: dict[str, Any]) -> ReportRenderResult:
+        if "run_snapshot" in context:
+            validate_instructional_snapshot(context["run_snapshot"])
         if template_name not in self.templates:
             raise KeyError(f"Unknown template {template_name!r}")
         template = self.templates[template_name]

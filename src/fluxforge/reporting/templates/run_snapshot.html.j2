@@ -13,6 +13,9 @@
   {% for input in run_snapshot.inputs %}<tr><td>{{ input.control | e }}</td><td>{{ input.value | e }}</td></tr>{% endfor %}
   </table>
 </section>
+{% if instrument_provenance_json is defined %}
+<section><h2>Instrument Settings Provenance</h2><pre>{{ instrument_provenance_json | e }}</pre></section>
+{% endif %}
 {% for table in run_snapshot.tables %}
 <section><h2>{{ table.control | e }}</h2>
   <table style="border-collapse:collapse;width:100%"><tr>{% for header in table.headers %}<th style="border:1px solid #aaa;padding:4px">{{ header | e }}</th>{% endfor %}</tr>
