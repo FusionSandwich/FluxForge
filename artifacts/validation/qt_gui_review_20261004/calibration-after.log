@@ -1,0 +1,16 @@
+............................                                             [100%]
+============================== warnings summary ===============================
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation
+tests/test_calibration_workspace_qt.py::test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation
+tests/test_calibration_workspace_qt.py::test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation
+  C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge\src\fluxforge\core\calibration.py:257: RankWarning: Polyfit may be poorly conditioned
+    coefficients_desc = np.polyfit(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+28 passed, 9 warnings in 164.87s (0:02:44)

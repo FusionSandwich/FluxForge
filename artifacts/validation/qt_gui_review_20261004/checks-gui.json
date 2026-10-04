@@ -1,0 +1,16 @@
+[
+  {
+    "group": "gui",
+    "timeout_seconds": 360,
+    "tests": [
+      "tests/test_gui_consolidation.py",
+      "tests/test_modern_gui_shell.py",
+      "tests/test_gui_report_bundle.py",
+      "tests/test_instrument_provenance.py",
+      "tests/test_production_gui_mode.py",
+      "tests/test_reaction_rate_workspace_qt.py",
+      "tests/test_irradiation_history_workspace_qt.py",
+      "tests/test_spectrum_file_queue_workspace_qt.py"
+    ]
+  }
+]

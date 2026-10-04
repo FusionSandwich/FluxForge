@@ -1,12 +1,14 @@
 """Reference reproduction and unavailable evidence must not pass raw validation."""
 
 import pytest
+from pathlib import Path
 
 from fluxforge.examples.rafm_workflow import (
     build_summary_markdown,
     build_validation_flags,
     enforce_raw_comparison,
     summarize_validation_artifacts,
+    read_qg_activity_reference,
 )
 
 
@@ -67,6 +69,22 @@ def test_absent_reference_or_no_samples_is_not_a_pass():
     assert result["passed"] is None
     assert result["comparison_basis"] == "not_evaluated"
     assert summarize_validation_artifacts([])["overall_passed"] is None
+
+
+def test_paired_raw_text_export_cannot_be_used_as_activity_reference(tmp_path):
+    path = tmp_path / "sample.txt"
+    path.write_text("Acquisition Date:  28-Apr-2025 16:44\n0 12\n1 13\n")
+    assert read_qg_activity_reference(path, "rafm_25cm") is None
+    assert read_qg_activity_reference(None, "rafm_25cm") is None
+
+
+def test_real_qg_nuclide_report_is_retained_as_reference():
+    root = Path(__file__).resolve().parents[1] / "examples/RAFM_irradiation"
+    path = root / "QG_processed_gamma_data/flux_wires/Co-RAFM-1_25cm.txt"
+    report = read_qg_activity_reference(path, "rafm_25cm")
+    assert report is not None
+    assert report.has_nuclides
+    assert report.real_time > 0
 
 
 @pytest.mark.parametrize("metric", [None, float("nan"), float("inf"), "bad"])

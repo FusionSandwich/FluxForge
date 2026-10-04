@@ -1,2 +1,3 @@
 [console_scripts]
 fluxforge = fluxforge.cli.app:main
+fluxforge-gui = fluxforge.gui.app:main

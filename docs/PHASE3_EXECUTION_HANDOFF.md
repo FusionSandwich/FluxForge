@@ -682,7 +682,7 @@ D1. Current recommended probe refresh commands for continuation:
 - `PYTHONPATH=src /usr/bin/python tests/gui_phase6_optimization_probe.py artifacts/gui_review/phase6_optimization_probe`
 
 E. Legacy path policy:
-- Keep src/fluxforge_gui as legacy reference/fallback only.
+- Keep the Tk source under archive/legacy_gui as historical reference only.
 - Do not satisfy new phase requirements by only modifying legacy GUI.
 
 ## 12. Required Test Commands and Interpretation

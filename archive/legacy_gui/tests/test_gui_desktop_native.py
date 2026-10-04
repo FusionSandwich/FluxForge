@@ -11,7 +11,7 @@ import sys
 import pytest
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _desktop_dependencies_available() -> bool:
@@ -33,7 +33,7 @@ def _run_native_desktop_driver(output_dir: Path) -> dict[str, object]:
 
     command = [
         sys.executable,
-        str(REPO_ROOT / "tests" / "gui_desktop_driver.py"),
+        str(REPO_ROOT / "archive/legacy_gui/tests/gui_desktop_driver.py"),
         str(output_dir),
     ]
     if sys.platform != "win32" and not env.get("DISPLAY"):

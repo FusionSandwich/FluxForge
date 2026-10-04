@@ -13,6 +13,7 @@ from fluxforge.gui.dialogs.reaction_rate_dialog import ReactionRateDialog
 from fluxforge.gui.dialogs.spectrum_file_queue_dialog import SpectrumFileQueueDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.dialogs.unfolding_dialog import UnfoldingWorkspaceDialog
+from fluxforge.gui.dialogs.report_export_dialog import ReportExportDialog
 from fluxforge.gui.panels.modern_shell_shared import build_demo_spectrum
 from fluxforge.gui.production_contract import (
     ActionCatalogEntry,
@@ -140,7 +141,6 @@ def test_empty_production_workspace_does_not_open_demo_analysis_dialogs():
     for action_name in (
         "AutoFindPeaksAction",
         "OpenEnergyFwhmCalibrationAction",
-        "OpenSpectrumUnfoldingAction",
         "OpenPuIsotopicsAction",
         "RunAstmCheckAction",
         "WorkspaceOpenStandardsReviewAction",
@@ -153,7 +153,11 @@ def test_empty_production_workspace_does_not_open_demo_analysis_dialogs():
     window._open_standards_review()
     app.processEvents()
     assert window._calibration_dialog is None
-    assert window._unfolding_dialog is None
+    assert window._unfolding_dialog is not None
+    assert window._unfolding_dialog.workspace_input.measured_rates.size == 0
+    assert window._unfolding_dialog.current_result is None
+    assert not window._unfolding_dialog.run_button.isEnabled()
+    window._unfolding_dialog.close()
     assert window._standards_review_dialog is None
     window.close()
 
@@ -333,6 +337,7 @@ def test_machine_readable_action_catalog_matches_all_production_controls():
     window = _window()
     window.show()
     dialogs = (
+        ReportExportDialog(context_factory=window._build_report_context, parent=window),
         CovarianceDialog(parent=window),
         IrradiationHistoryDialog(parent=window),
         ReactionRateDialog(history_provider=lambda: (), parent=window),

@@ -1,0 +1,17 @@
+[
+  {
+    "group": "science",
+    "exit_code": 0,
+    "tests": [
+      "tests/test_reference_parity_runner.py",
+      "tests/test_rafm_workflow.py",
+      "tests/test_rafm_validation_independence.py",
+      "tests/test_flux_wire_sample_sources.py",
+      "tests/test_joint_peak_covariance.py",
+      "tests/test_astm_e261.py",
+      "tests/test_astm_e262.py",
+      "tests/test_reporting.py"
+    ],
+    "elapsed_seconds": 112.83
+  }
+]

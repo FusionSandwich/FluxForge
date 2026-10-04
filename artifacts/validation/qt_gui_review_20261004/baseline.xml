@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="32.568" timestamp="2026-10-04T02:33:38.001695-04:00" hostname="DESKTOP-RE6EJEJ"><testcase classname="artifacts.validation.qt_gui_review_20261004.test_consolidation_reproduction" name="test_shipped_gui_and_native_bundle_use_qt" time="0.002"><failure message="AssertionError: assert 'fluxforge-gui-legacy' not in {'fluxforge': 'fluxforge.cli.app:main', 'fluxforge-gui': 'fluxforge.gui.app:main', 'fluxforge-gui-legacy': 'fluxforge_gui.app:main'}">def test_shipped_gui_and_native_bundle_use_qt():
+        config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        scripts = config["project"]["scripts"]
+        assert scripts["fluxforge-gui"] == "fluxforge.gui.app:main"
+&gt;       assert "fluxforge-gui-legacy" not in scripts
+E       AssertionError: assert 'fluxforge-gui-legacy' not in {'fluxforge': 'fluxforge.cli.app:main', 'fluxforge-gui': 'fluxforge.gui.app:main', 'fluxforge-gui-legacy': 'fluxforge_gui.app:main'}
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:42: AssertionError</failure></testcase><testcase classname="artifacts.validation.qt_gui_review_20261004.test_consolidation_reproduction" name="test_workflow_shortcuts_reveal_peak_review_and_follow_loaded_data" time="5.526"><failure message="AttributeError: 'FluxForgeMainWindow' object has no attribute 'analysis_workflow_toolbar'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001C1F85FD910&gt;
+
+    @pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_workflow_shortcuts_reveal_peak_review_and_follow_loaded_data(monkeypatch):
+        from PySide6.QtWidgets import QToolButton
+        from PySide6.QtTest import QTest
+        from PySide6.QtCore import Qt
+        from PySide6.QtWidgets import QDialog
+        from fluxforge.gui.dialogs.auto_peak_review_dialog import AutoPeakReviewDialog
+    
+        monkeypatch.setattr(AutoPeakReviewDialog, "exec", lambda self: QDialog.Accepted)
+    
+        app = QApplication.instance() or QApplication([])
+        settings = MemorySettings()
+        window = FluxForgeMainWindow(
+            mode_manager=ModeManager(settings=settings),
+            selection_bus=SelectionBus(),
+            settings=settings,
+        )
+        window.resize(1280, 800)
+        window.show()
+        app.processEvents()
+        buttons = {
+            b.defaultAction().objectName(): b
+&gt;           for b in window.analysis_workflow_toolbar.findChildren(QToolButton)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            if b.defaultAction()
+        }
+E       AttributeError: 'FluxForgeMainWindow' object has no attribute 'analysis_workflow_toolbar'
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:73: AttributeError</failure></testcase><testcase classname="artifacts.validation.qt_gui_review_20261004.test_consolidation_reproduction" name="test_analysis_forms_scroll_without_forcing_a_tall_window" time="2.140"><failure message="assert 799 &lt; 300&#10; +  where 799 = &lt;built-in method height of PySide6.QtCore.QSize object at 0x000001C1FC3933C0&gt;()&#10; +    where &lt;built-in method height of PySide6.QtCore.QSize object at 0x000001C1FC3933C0&gt; = PySide6.QtCore.QSize(1638, 799).height&#10; +      where PySide6.QtCore.QSize(1638, 799) = &lt;built-in method minimumSizeHint of BottomWorkspaceTabs object at 0x000001C1FC3C78C0&gt;()&#10; +        where &lt;built-in method minimumSizeHint of BottomWorkspaceTabs object at 0x000001C1FC3C78C0&gt; = &lt;fluxforge.gui.panels.modern_shell.BottomWorkspaceTabs(0x1c19630cb00, name=&quot;BottomWorkspaceTabs&quot;) at 0x000001C1FC3C78C0&gt;.minimumSizeHint">@pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_analysis_forms_scroll_without_forcing_a_tall_window():
+        from PySide6.QtWidgets import QScrollArea
+    
+        app = QApplication.instance() or QApplication([])
+        settings = MemorySettings()
+        window = FluxForgeMainWindow(
+            mode_manager=ModeManager(settings=settings),
+            selection_bus=SelectionBus(),
+            settings=settings,
+        )
+        window.show()
+        app.processEvents()
+        bottom = window.bottom_dock.widget()
+&gt;       assert bottom.minimumSizeHint().height() &lt; 300
+E       assert 799 &lt; 300
+E        +  where 799 = &lt;built-in method height of PySide6.QtCore.QSize object at 0x000001C1FC3933C0&gt;()
+E        +    where &lt;built-in method height of PySide6.QtCore.QSize object at 0x000001C1FC3933C0&gt; = PySide6.QtCore.QSize(1638, 799).height
+E        +      where PySide6.QtCore.QSize(1638, 799) = &lt;built-in method minimumSizeHint of BottomWorkspaceTabs object at 0x000001C1FC3C78C0&gt;()
+E        +        where &lt;built-in method minimumSizeHint of BottomWorkspaceTabs object at 0x000001C1FC3C78C0&gt; = &lt;fluxforge.gui.panels.modern_shell.BottomWorkspaceTabs(0x1c19630cb00, name="BottomWorkspaceTabs") at 0x000001C1FC3C78C0&gt;.minimumSizeHint
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:115: AssertionError</failure></testcase><testcase classname="artifacts.validation.qt_gui_review_20261004.test_consolidation_reproduction" name="test_measured_data_unfolding_requires_matching_physical_response" time="0.089"><failure message="TypeError: UnfoldingWorkspaceDialog.__init__() got an unexpected keyword argument 'start_empty'">tmp_path = WindowsPath('C:/Users/Josh/AppData/Local/Temp/pytest-of-Josh/pytest-342/test_measured_data_unfolding_r0')
+
+    @pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_measured_data_unfolding_requires_matching_physical_response(tmp_path):
+        app = QApplication.instance() or QApplication([])
+&gt;       dialog = UnfoldingWorkspaceDialog(
+            start_empty=True, mode_manager=ModeManager(settings=MemorySettings())
+        )
+E       TypeError: UnfoldingWorkspaceDialog.__init__() got an unexpected keyword argument 'start_empty'
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:131: TypeError</failure></testcase><testcase classname="artifacts.validation.qt_gui_review_20261004.test_consolidation_reproduction" name="test_empty_unfolding_imports_committed_rafm_rates" time="0.001"><failure message="TypeError: UnfoldingWorkspaceDialog.__init__() got an unexpected keyword argument 'start_empty'">@pytest.mark.skipif(
+        not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE), reason="Qt renderer unavailable"
+    )
+    def test_empty_unfolding_imports_committed_rafm_rates():
+        app = QApplication.instance() or QApplication([])
+&gt;       dialog = UnfoldingWorkspaceDialog(
+            start_empty=True, mode_manager=ModeManager(settings=MemorySettings())
+        )
+E       TypeError: UnfoldingWorkspaceDialog.__init__() got an unexpected keyword argument 'start_empty'
+
+artifacts\validation\qt_gui_review_20261004\test_consolidation_reproduction.py:202: TypeError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,11 @@
+[
+  {
+    "group": "calibration",
+    "timeout_seconds": 360,
+    "tests": [
+      "tests/test_gui_calibration_target.py",
+      "tests/test_calibration_workspace_qt.py",
+      "tests/test_workspace_session_qt.py"
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="19.836" timestamp="2026-10-04T02:50:40.263951-04:00" hostname="DESKTOP-RE6EJEJ"><testcase classname="tests.test_gui_calibration_target" name="test_main_window_can_shrink_to_laptop_width" time="3.751"><failure message="assert 1822 &lt;= 1280&#10; +  where 1822 = &lt;built-in method width of FluxForgeMainWindow object at 0x000001E271363900&gt;()&#10; +    where &lt;built-in method width of FluxForgeMainWindow object at 0x000001E271363900&gt; = &lt;fluxforge.gui.main_window.FluxForgeMainWindow(0x1e269cfe1e0, name=&quot;FluxForgeMainWindow&quot;) at 0x000001E271363900&gt;.width">window = &lt;fluxforge.gui.main_window.FluxForgeMainWindow(0x1e269cfe1e0, name="FluxForgeMainWindow") at 0x000001E271363900&gt;
+
+    def test_main_window_can_shrink_to_laptop_width(window):
+        window.resize(1280, 850)
+        window.show()
+        QApplication.instance().processEvents()
+&gt;       assert window.width() &lt;= 1280
+E       assert 1822 &lt;= 1280
+E        +  where 1822 = &lt;built-in method width of FluxForgeMainWindow object at 0x000001E271363900&gt;()
+E        +    where &lt;built-in method width of FluxForgeMainWindow object at 0x000001E271363900&gt; = &lt;fluxforge.gui.main_window.FluxForgeMainWindow(0x1e269cfe1e0, name="FluxForgeMainWindow") at 0x000001E271363900&gt;.width
+
+tests\test_gui_calibration_target.py:135: AssertionError</failure></testcase></testsuite></testsuites>

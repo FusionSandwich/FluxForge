@@ -11,6 +11,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QButtonGroup,
         QComboBox,
         QHBoxLayout,
+        QVBoxLayout,
         QInputDialog,
         QLabel,
         QPushButton,
@@ -36,8 +37,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             super().__init__(parent)
             self.mode_manager = mode_manager
 
-            layout = QHBoxLayout(self)
-            layout.setContentsMargins(0, 0, 0, 0)
+            root = QVBoxLayout(self)
+            root.setContentsMargins(0, 0, 0, 0)
+            root.setSpacing(6)
+            layout = QHBoxLayout()
+            root.addLayout(layout)
             layout.setSpacing(10)
 
             self.mode_group = QButtonGroup(self)
@@ -68,6 +72,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.standard_combo.addItems(list(STANDARD_CHOICES))
             self.standard_combo.currentTextChanged.connect(self._standard_changed)
             layout.addWidget(self.standard_combo)
+
+            # Keep the mode controls usable beside workflow presets on laptops.
+            layout = QHBoxLayout()
+            layout.setSpacing(10)
+            root.addLayout(layout)
 
             self.theme_label = QLabel("Theme", self)
             self.theme_label.setObjectName("ModeMetaLabel")

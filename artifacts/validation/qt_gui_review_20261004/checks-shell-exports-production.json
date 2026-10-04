@@ -1,0 +1,31 @@
+[
+  {
+    "group": "shell",
+    "exit_code": 0,
+    "tests": [
+      "tests/test_gui_consolidation.py",
+      "tests/test_modern_gui_shell.py"
+    ],
+    "elapsed_seconds": 218.91
+  },
+  {
+    "group": "exports",
+    "exit_code": 0,
+    "tests": [
+      "tests/test_gui_report_bundle.py",
+      "tests/test_instrument_provenance.py",
+      "tests/test_reaction_rate_workspace_qt.py",
+      "tests/test_irradiation_history_workspace_qt.py",
+      "tests/test_spectrum_file_queue_workspace_qt.py"
+    ],
+    "elapsed_seconds": 32.99
+  },
+  {
+    "group": "production",
+    "exit_code": 0,
+    "tests": [
+      "tests/test_production_gui_mode.py"
+    ],
+    "elapsed_seconds": 77.05
+  }
+]

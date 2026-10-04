@@ -6,6 +6,22 @@ from scipy.sparse import csr_matrix
 from fluxforge.analysis.peakfit import fit_multiple_peaks
 
 
+def test_joint_evaluation_budget_exhaustion_returns_failed_components():
+    x = np.arange(51, dtype=float)
+    y = 200 * np.exp(-0.5 * ((x - 15.3) / 2.2) ** 2)
+    y += 150 * np.exp(-0.5 * ((x - 29.6) / 2.8) ** 2) + 20
+    fits = fit_multiple_peaks(x, y, [15, 29], fit_width=10, max_evaluations=1)
+    assert len(fits) == 2
+    assert all(not fit.success for fit in fits)
+    assert all("evaluations" in fit.message.lower() for fit in fits)
+
+
+@pytest.mark.parametrize("budget", [0, -1, 1.5, float("nan"), True])
+def test_joint_evaluation_budget_must_be_positive_integer(budget):
+    with pytest.raises(ValueError, match="positive integer"):
+        fit_multiple_peaks(np.arange(20), np.ones(20), [5, 12], max_evaluations=budget)
+
+
 @pytest.mark.parametrize("shared", [False, True])
 @pytest.mark.parametrize("background", ["linear", "constant"])
 def test_joint_signed_fit_matches_analytic_covariance_and_area_gradient(

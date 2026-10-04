@@ -47,7 +47,10 @@ from fluxforge.io.flux_wire import FluxWireData, read_processed_txt, read_raw_as
 from fluxforge.io.spe import GammaSpectrum
 from fluxforge.physics.activation import activation_study_metrics, count_decay_factor
 from fluxforge.physics.monitor_response import CoverLayer, MonitorResponseSpec
-from fluxforge.physics.operating_history import load_operating_history, history_rate_jacobian
+from fluxforge.physics.operating_history import (
+    load_operating_history,
+    history_rate_jacobian,
+)
 from fluxforge.uncertainty.reaction_rate_budget import (
     RateUncertaintyBudget,
     UncertaintyComponent,
@@ -456,11 +459,14 @@ def _parse_irradiation_history(
     """Parse schedule ``irradiation_history`` entries ({duration_s, relative_power})."""
     if not segments:
         return None
-    if any("duration_s" not in item or "relative_power" not in item for item in segments):
-        raise ValueError("History segments require explicit duration_s and relative_power")
+    if any(
+        "duration_s" not in item or "relative_power" not in item for item in segments
+    ):
+        raise ValueError(
+            "History segments require explicit duration_s and relative_power"
+        )
     return [
-        (float(item["duration_s"]), float(item["relative_power"]))
-        for item in segments
+        (float(item["duration_s"]), float(item["relative_power"])) for item in segments
     ]
 
 
@@ -501,7 +507,9 @@ def resolve_measurement_timing(
                 measurement_time=measurement_time,
                 decay_label=label,
                 schedule_source="sample_schedule.phase1",
-                irradiation_history=_parse_irradiation_history(phase.get("irradiation_history")),
+                irradiation_history=_parse_irradiation_history(
+                    phase.get("irradiation_history")
+                ),
                 irradiation_operating_log=phase.get("irradiation_operating_log"),
             )
 
@@ -529,7 +537,9 @@ def resolve_measurement_timing(
                 measurement_time=start_time,
                 decay_label=label,
                 schedule_source="sample_schedules.phase2",
-                irradiation_history=_parse_irradiation_history(phase2.get("irradiation_history")),
+                irradiation_history=_parse_irradiation_history(
+                    phase2.get("irradiation_history")
+                ),
                 irradiation_operating_log=phase2.get("irradiation_operating_log"),
             )
 
@@ -564,7 +574,9 @@ def resolve_measurement_timing(
                 irradiation_history=_parse_irradiation_history(
                     flux_wire_info.get("irradiation_history")
                 ),
-                irradiation_operating_log=flux_wire_info.get("irradiation_operating_log"),
+                irradiation_operating_log=flux_wire_info.get(
+                    "irradiation_operating_log"
+                ),
             )
         return TimingInfo(
             sample_group="RAFM1",
@@ -589,6 +601,23 @@ def resolve_measurement_timing(
         decay_label=parse_decay_label(stem),
         schedule_source=None,
     )
+
+
+def read_qg_activity_reference(
+    path: Optional[Path], profile_name: str
+) -> Optional[FluxWireData]:
+    """Ignore paired text with no nuclide observations (e.g. an ASC export).
+
+    A filename match alone cannot supply comparison truth or count clocks.
+    The original pairing path remains in the sample artifact for review.
+    """
+    if path is None:
+        return None
+    report = read_processed_txt(path, profile_name=profile_name)
+    if not report.has_nuclides:
+        return None
+    report.sample_id = report.sample_id or path.stem
+    return report
 
 
 def report_count_real_time_s(config: Dict[str, Any], report: FluxWireData) -> float:
@@ -767,7 +796,9 @@ def aggregate_isotope_results(
         )
         if timing.compare_eoi and timing.decay_time_s is not None:
             half_life_s = half_life_map.get(isotope, 0.0)
-            count_time = (count_real_time_by_isotope or {}).get(isotope, count_real_time_s)
+            count_time = (count_real_time_by_isotope or {}).get(
+                isotope, count_real_time_s
+            )
             factor = decay_correction_factor(
                 half_life_s, count_time, timing.decay_time_s
             )
@@ -901,7 +932,9 @@ def _peak_activity_for_qc(
         return None, None, stage
     if peak.isotope and timing.compare_eoi and timing.decay_time_s is not None:
         half_life_s = half_life_map.get(peak.isotope, 0.0)
-        factor = decay_correction_factor(half_life_s, count_real_time_s, timing.decay_time_s)
+        factor = decay_correction_factor(
+            half_life_s, count_real_time_s, timing.decay_time_s
+        )
         if math.isfinite(factor):
             activity *= factor
             activity_unc *= factor
@@ -967,7 +1000,9 @@ def build_fluxforge_line_consistency_rows(
         )
         mean_activity = float(np.mean(activities))
         median_activity = float(np.median(activities))
-        variance_activity = float(np.var(activities, ddof=1 if activities.size > 1 else 0))
+        variance_activity = float(
+            np.var(activities, ddof=1 if activities.size > 1 else 0)
+        )
         std_activity = float(np.sqrt(max(variance_activity, 0.0)))
         mad_activity = float(np.median(np.abs(activities - median_activity)))
         weighted_scatter = float(
@@ -980,10 +1015,14 @@ def build_fluxforge_line_consistency_rows(
         ):
             combined_unc = math.sqrt(activity_unc**2 + consensus_unc**2)
             line_consistency_en_score = (
-                (float(activity - consensus) / combined_unc) if combined_unc > 0.0 else None
+                (float(activity - consensus) / combined_unc)
+                if combined_unc > 0.0
+                else None
             )
             z_score_vs_all = (
-                float((activity - consensus) / combined_unc) if combined_unc > 0.0 else 0.0
+                float((activity - consensus) / combined_unc)
+                if combined_unc > 0.0
+                else 0.0
             )
 
             leave_one_out_consensus = None
@@ -1300,8 +1339,9 @@ def _qg_line_activity_bq(nuclide, peak):
     if not isinstance(unit, str):
         return None
     try:
-        return replace(nuclide, activity=float(peak.get("activity", 0.0)),
-                       activity_unit=unit).activity_bq
+        return replace(
+            nuclide, activity=float(peak.get("activity", 0.0)), activity_unit=unit
+        ).activity_bq
     except ValueError:
         return None
 
@@ -1331,11 +1371,19 @@ def qg_reference_peaks(reference_data: FluxWireData) -> List[Dict[str, Any]]:
                     "assignment": str(peak.get("assignment", "")),
                     "line_activity_bq": _qg_line_activity_bq(nuclide, peak),
                     "reported_line_activity": float(peak.get("activity", 0.0)),
-                    "reported_line_activity_unit": peak.get("activity_unit", nuclide.activity_unit),
-                    "line_activity_unit_basis": "ROI_column_header" if "activity_unit" in peak else "summary_unit_assumption",
+                    "reported_line_activity_unit": peak.get(
+                        "activity_unit", nuclide.activity_unit
+                    ),
+                    "line_activity_unit_basis": (
+                        "ROI_column_header"
+                        if "activity_unit" in peak
+                        else "summary_unit_assumption"
+                    ),
                     "reported_rad_int_text": peak.get("reported_rad_int_text"),
                     "reported_line_activity_text": peak.get("reported_activity_text"),
-                    "report_source_file": peak.get("source_file", reference_data.source_file),
+                    "report_source_file": peak.get(
+                        "source_file", reference_data.source_file
+                    ),
                     "report_source_sha256": peak.get("source_file_sha256"),
                     "report_source_line_number": peak.get("source_line_number"),
                     "report_source_line_text": peak.get("source_line_text"),
@@ -1730,7 +1778,11 @@ def build_line_diagnostic_records(
             "reference_gross_counts": float(ref_peak.get("gross_counts") or 0.0),
             "reference_gross_unc": float(ref_peak.get("gross_unc") or 0.0),
             "reference_line_activity_bq": ref_peak["line_activity_bq"],
-            "reference_line_activity_unc_bq": qg_line_activity_unc_bq if ref_peak["line_activity_bq"] is not None else None,
+            "reference_line_activity_unc_bq": (
+                qg_line_activity_unc_bq
+                if ref_peak["line_activity_bq"] is not None
+                else None
+            ),
             "reference_line_activity_uncertainty_basis": "counting-only proxy; full vendor uncertainty unqualified",
             "reference_header_activity_bq": float(
                 ref_peak.get("header_activity_bq") or 0.0
@@ -1748,26 +1800,53 @@ def build_line_diagnostic_records(
 
         # Keep both yield hypotheses and source QC independent of raw matching
         # and parity buckets. Neither QC outcome feeds runtime activities/rates.
-        row.update(qg_yield_diagnostic(ref_peak["isotope"], energy, ref_peak["rad_int_percent"]))
-        for name in ("reported_rad_int_text", "reported_line_activity", "reported_line_activity_text",
-                     "reported_line_activity_unit", "line_activity_unit_basis",
-                     "report_source_file", "report_source_sha256", "report_source_line_number",
-                     "report_source_line_text"):
+        row.update(
+            qg_yield_diagnostic(
+                ref_peak["isotope"], energy, ref_peak["rad_int_percent"]
+            )
+        )
+        for name in (
+            "reported_rad_int_text",
+            "reported_line_activity",
+            "reported_line_activity_text",
+            "reported_line_activity_unit",
+            "line_activity_unit_basis",
+            "report_source_file",
+            "report_source_sha256",
+            "report_source_line_number",
+            "report_source_line_text",
+        ):
             row[name] = ref_peak.get(name)
-        row["reference_implied_efficiency_basis"] = "legacy bundled-nearest yield convention; diagnostic only; vendor convention unverified"
+        row["reference_implied_efficiency_basis"] = (
+            "legacy bundled-nearest yield convention; diagnostic only; vendor convention unverified"
+        )
         for convention, probability in (
             ("percent", row["reference_rad_int_percent_assumption_fraction"]),
             ("fraction", row["reference_rad_int_fraction_assumption"]),
         ):
             row[f"reference_implied_efficiency_{convention}_assumption"] = (
-                float(ref_peak["net_counts"]) / (reference_data.live_time * qg_line_activity_bq * probability)
-                if qg_line_activity_bq > 0 and probability > 0 and reference_data.live_time > 0 else None)
+                float(ref_peak["net_counts"])
+                / (reference_data.live_time * qg_line_activity_bq * probability)
+                if qg_line_activity_bq > 0
+                and probability > 0
+                and reference_data.live_time > 0
+                else None
+            )
         header = float(ref_peak.get("header_activity_bq") or 0.0)
-        row["line_summary_relative_deviation"] = qg_line_activity_bq / header - 1 if header > 0 and qg_line_activity_bq > 0 else None
-        row["flag_line_summary_inconsistency"] = (row["line_summary_relative_deviation"] is not None and
-                                                   abs(row["line_summary_relative_deviation"]) > .25)
+        row["line_summary_relative_deviation"] = (
+            qg_line_activity_bq / header - 1
+            if header > 0 and qg_line_activity_bq > 0
+            else None
+        )
+        row["flag_line_summary_inconsistency"] = (
+            row["line_summary_relative_deviation"] is not None
+            and abs(row["line_summary_relative_deviation"]) > 0.25
+        )
         flags = []
-        if row["yield_qc_status"] in {"yield_convention_discrepancy", "yield_value_discrepancy"}:
+        if row["yield_qc_status"] in {
+            "yield_convention_discrepancy",
+            "yield_value_discrepancy",
+        }:
             flags.append(row["yield_qc_status"])
         elif row["yield_qc_status"] != "consistent_with_percent_assumption":
             flags.append("yield_reference_or_convention_unqualified")
@@ -1816,9 +1895,11 @@ def build_line_diagnostic_records(
         delta_activity = (
             raw_activity - qg_line_activity_bq if reference_activity_known else None
         )
-        combined_activity_unc = (math.sqrt(
-            max(raw_activity_unc**2 + qg_line_activity_unc_bq**2, 0.0)
-        ) if reference_activity_known else None)
+        combined_activity_unc = (
+            math.sqrt(max(raw_activity_unc**2 + qg_line_activity_unc_bq**2, 0.0))
+            if reference_activity_known
+            else None
+        )
 
         raw_branching = (
             float(match.gamma_line.intensity) if match.gamma_line is not None else None
@@ -1936,8 +2017,10 @@ def build_line_diagnostic_records(
     qg_consistency_rows: List[Dict[str, Any]] = []
     for nuclide in reference_data.nuclides:
         line_activities_bq = [
-            value for peak in nuclide.peaks
-            if (value := _qg_line_activity_bq(nuclide, peak)) is not None and value > 0.0
+            value
+            for peak in nuclide.peaks
+            if (value := _qg_line_activity_bq(nuclide, peak)) is not None
+            and value > 0.0
         ]
         if not line_activities_bq:
             continue
@@ -2879,8 +2962,9 @@ def write_sample_comparison_report(
         f"percent hypothesis={row['reference_rad_int_percent_assumption_fraction']} photons/decay | "
         f"fraction hypothesis={row['reference_rad_int_fraction_assumption']} photons/decay | "
         f"bundled intensity={row.get('bundled_emission_probability')} photons/decay | report-only"
-        for row in line_rows if row.get("source_qc_bucket") and
-        row["source_qc_bucket"] != "no_flag_under_report_assumptions"
+        for row in line_rows
+        if row.get("source_qc_bucket")
+        and row["source_qc_bucket"] != "no_flag_under_report_assumptions"
     ]
     sections.append(("QG source QC (no activity or rate correction)", source_rows))
 
@@ -2894,9 +2978,7 @@ def write_sample_comparison_report(
             continue
         drift = row.get("all_vs_leave_one_out_relative_delta")
         drift_text = (
-            f" | all-vs-LOO drift={float(drift):+.3f}"
-            if drift is not None
-            else ""
+            f" | all-vs-LOO drift={float(drift):+.3f}" if drift is not None else ""
         )
         section_rows.append(
             f"- {row['isotope']} @ {float(row['energy_keV']):.2f} keV | "
@@ -3163,11 +3245,12 @@ def analyze_generic_sample(
         "missing_peaks": [],
         "missing_nuclides": [],
     }
-    if qg_path is not None:
-        reference_data = read_processed_txt(
-            qg_path, profile_name=metadata.config["profile_name"]
-        )
-        reference_data.sample_id = reference_data.sample_id or qg_path.stem
+    reference_data = read_qg_activity_reference(
+        qg_path, metadata.config["profile_name"]
+    )
+    if qg_path is not None and reference_data is None:
+        validation["reference_state"] = "unavailable_no_nuclide_observations"
+    if reference_data is not None:
         if generic_method_key in {
             "qg",
             "qg_hybrid",
@@ -3368,7 +3451,9 @@ def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[f
         return None
     mass = row.get("mass_mg")
     if mass is None:
-        raise ValueError(f"flux_wire_metadata entry for {normalized_key!r} has no mass_mg")
+        raise ValueError(
+            f"flux_wire_metadata entry for {normalized_key!r} has no mass_mg"
+        )
     return float(mass)
 
 
@@ -3380,12 +3465,16 @@ def flux_wire_element_mass_fraction(row: Dict[str, Any]) -> Optional[float]:
     fraction = row.get("element_mass_fraction")
     if basis == "element_mass":
         if fraction is not None and float(fraction) != 1.0:
-            raise ValueError("element_mass must not receive another composition adjustment")
+            raise ValueError(
+                "element_mass must not receive another composition adjustment"
+            )
         return 1.0
     return fraction
 
 
-def flux_wire_specimen_mass_g(sample_key: str, metadata: RAFMMetadata) -> Optional[float]:
+def flux_wire_specimen_mass_g(
+    sample_key: str, metadata: RAFMMetadata
+) -> Optional[float]:
     """Do not present adjusted element mass as measured whole-specimen mass."""
     row = flux_wire_metadata_row(sample_key, metadata) or {}
     flux_wire_element_mass_fraction(row)
@@ -3401,26 +3490,45 @@ def build_flux_wire_reactions(
     isotope_payload: Dict[str, Dict[str, Any]],
     timing: TimingInfo,
     metadata: RAFMMetadata,
-    *, mode: Optional[str] = None,
+    *,
+    mode: Optional[str] = None,
 ) -> List[FluxWireReaction]:
-    mode = metadata.config.get("rate_construction_mode", "diagnostic") if mode is None else mode
+    mode = (
+        metadata.config.get("rate_construction_mode", "diagnostic")
+        if mode is None
+        else mode
+    )
     if mode not in {"diagnostic", "physical"}:
         raise ValueError("Rate construction mode must be diagnostic or physical")
     history = timing.irradiation_history
     log_binding = None
     if timing.irradiation_operating_log is not None:
         history, log_binding = load_operating_history(
-            timing.irradiation_operating_log, expected_end=timing.irradiation_end,
+            timing.irradiation_operating_log,
+            expected_end=timing.irradiation_end,
             expected_segments=history,
             expected_sample=sample_id,
             require_separability=mode == "physical",
         )
     if mode == "physical" and log_binding is None:
-        raise ValueError("Physical rate construction requires a complete irradiation operating log")
-    if mode == "physical" and (timing.irradiation_end is None or timing.irradiation_end.tzinfo is None):
-        raise ValueError("Physical rate construction requires a qualified timezone-bound EOI/log join")
-    if log_binding is not None and timing.irradiation_time_s is not None and not math.isclose(
-        float(timing.irradiation_time_s), sum(d for d, _ in history), rel_tol=0, abs_tol=1e-6
+        raise ValueError(
+            "Physical rate construction requires a complete irradiation operating log"
+        )
+    if mode == "physical" and (
+        timing.irradiation_end is None or timing.irradiation_end.tzinfo is None
+    ):
+        raise ValueError(
+            "Physical rate construction requires a qualified timezone-bound EOI/log join"
+        )
+    if (
+        log_binding is not None
+        and timing.irradiation_time_s is not None
+        and not math.isclose(
+            float(timing.irradiation_time_s),
+            sum(d for d, _ in history),
+            rel_tol=0,
+            abs_tol=1e-6,
+        )
     ):
         raise ValueError("Operating log duration disagrees with the schedule")
     reactions: List[FluxWireReaction] = []
@@ -3437,7 +3545,9 @@ def build_flux_wire_reactions(
         # time; measurement-time activity is never substituted for it.
         if payload.get("activity_eoi_bq") is None:
             if mode == "physical":
-                raise ValueError("Physical rate construction requires qualified EOI activity")
+                raise ValueError(
+                    "Physical rate construction requires qualified EOI activity"
+                )
             reactions.append(
                 FluxWireReaction(
                     sample_id=sample_id,
@@ -3462,7 +3572,9 @@ def build_flux_wire_reactions(
         if activity_unc_bq > 0.0:
             components.append(
                 UncertaintyComponent(
-                    "activity", base_relative_unc, None,
+                    "activity",
+                    base_relative_unc,
+                    None,
                     "reported activity uncertainty (composition not itemized)",
                     uncertainty_scope="reported_total_unknown",
                 )
@@ -3470,21 +3582,45 @@ def build_flux_wire_reactions(
         # Model terms are explicit, named components (never silent floors).
         model_terms: List[Tuple[str, float, float]] = []
         if reaction_id == "Ti-48(n,p)Sc-48":
-            model_terms.append((
-                "ti48_model",
-                float(metadata.config.get("ti48_model_relative_uncertainty_additional", 0.15)),
-                float(metadata.config.get("ti48_model_relative_uncertainty_floor", 0.20)),
-            ))
+            model_terms.append(
+                (
+                    "ti48_model",
+                    float(
+                        metadata.config.get(
+                            "ti48_model_relative_uncertainty_additional", 0.15
+                        )
+                    ),
+                    float(
+                        metadata.config.get(
+                            "ti48_model_relative_uncertainty_floor", 0.20
+                        )
+                    ),
+                )
+            )
         if "-cd-" in normalized_sample_id or "-cd-" in normalized_sample_key:
-            model_terms.append((
-                "cd_model",
-                float(metadata.config.get("cd_model_relative_uncertainty_additional", 0.20)),
-                float(metadata.config.get("cd_model_relative_uncertainty_floor", 0.25)),
-            ))
+            model_terms.append(
+                (
+                    "cd_model",
+                    float(
+                        metadata.config.get(
+                            "cd_model_relative_uncertainty_additional", 0.20
+                        )
+                    ),
+                    float(
+                        metadata.config.get("cd_model_relative_uncertainty_floor", 0.25)
+                    ),
+                )
+            )
         for name, additional, _ in model_terms:
             if additional > 0.0:
                 components.append(
-                    UncertaintyComponent(name, additional, None, f"config {name}_relative_uncertainty_additional", assumed=True)
+                    UncertaintyComponent(
+                        name,
+                        additional,
+                        None,
+                        f"config {name}_relative_uncertainty_additional",
+                        assumed=True,
+                    )
                 )
         floor = max((term[2] for term in model_terms), default=0.0)
         # Source components can be global, per-wire, or per observation. An
@@ -3492,33 +3628,67 @@ def build_flux_wire_reactions(
         # it is never added a second time. Coverage overlap is rejected below.
         declared = dict(metadata.config.get("rate_uncertainty_components", {}))
         declared.update(wire_metadata.get("rate_uncertainty_components", {}))
-        declared.update(metadata.config.get("rate_uncertainty_budgets", {}).get(
-            f"{sample_id}|{reaction_id}", {}))
+        declared.update(
+            metadata.config.get("rate_uncertainty_budgets", {}).get(
+                f"{sample_id}|{reaction_id}", {}
+            )
+        )
         for name, spec in declared.items():
-            kwargs = dict(source=spec.get("source", ""),
-                          correlation_group=spec.get("correlation_group"),
-                          uncertainty_scope=spec.get("uncertainty_scope", "unspecified"),
-                          covers=tuple(spec.get("covers", ())))
+            kwargs = dict(
+                source=spec.get("source", ""),
+                correlation_group=spec.get("correlation_group"),
+                uncertainty_scope=spec.get("uncertainty_scope", "unspecified"),
+                covers=tuple(spec.get("covers", ())),
+            )
             if "input_covariance" in spec:
                 sensitivity = spec.get("log_sensitivities")
                 names, units = spec.get("input_names"), spec.get("input_units")
                 if spec.get("kind") == "irradiation_history":
-                    if log_binding is not None and kwargs["correlation_group"] != log_binding["source_id"]:
-                        raise ValueError("History covariance source group disagrees with operating log")
+                    if (
+                        log_binding is not None
+                        and kwargs["correlation_group"] != log_binding["source_id"]
+                    ):
+                        raise ValueError(
+                            "History covariance source group disagrees with operating log"
+                        )
                     segments = history or [(float(timing.irradiation_time_s), 1.0)]
-                    sensitivity, calculated_names, calculated_units = history_rate_jacobian(half_life_s, segments)
+                    sensitivity, calculated_names, calculated_units = (
+                        history_rate_jacobian(half_life_s, segments)
+                    )
                     if names != calculated_names or units != calculated_units:
-                        raise ValueError("History covariance parameter names/units disagree with segments")
+                        raise ValueError(
+                            "History covariance parameter names/units disagree with segments"
+                        )
                 component = UncertaintyComponent.from_covariance(
-                    name, spec["input_covariance"], sensitivity, input_names=names,
-                    input_units=units, assumed=spec.get("assumed", False) or (spec.get("kind") == "irradiation_history" and log_binding is None),
+                    name,
+                    spec["input_covariance"],
+                    sensitivity,
+                    input_names=names,
+                    input_units=units,
+                    assumed=spec.get("assumed", False)
+                    or (
+                        spec.get("kind") == "irradiation_history"
+                        and log_binding is None
+                    ),
                     **kwargs,
                 )
             else:
-                component = (UncertaintyComponent(name, float(spec["relative"]), assumed=spec.get("assumed", False), **kwargs)
-                         if "relative" in spec else UncertaintyComponent.from_input(
-                             name, float(spec["standard_uncertainty"]),
-                             float(spec["log_sensitivity"]), assumed=spec.get("assumed", False), **kwargs))
+                component = (
+                    UncertaintyComponent(
+                        name,
+                        float(spec["relative"]),
+                        assumed=spec.get("assumed", False),
+                        **kwargs,
+                    )
+                    if "relative" in spec
+                    else UncertaintyComponent.from_input(
+                        name,
+                        float(spec["standard_uncertainty"]),
+                        float(spec["log_sensitivity"]),
+                        assumed=spec.get("assumed", False),
+                        **kwargs,
+                    )
+                )
             components = [c for c in components if c.name != name] + [component]
 
         current = math.sqrt(sum(c.relative**2 for c in components))
@@ -3530,7 +3700,9 @@ def build_flux_wire_reactions(
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
-            sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction,
+            sample_element,
+            mass_mg=mass_mg,
+            isotope_fraction=isotope_fraction,
             element_mass_fraction=element_mass_fraction,
         )
         irradiation_time_s = float(timing.irradiation_time_s or 0.0)
@@ -3548,17 +3720,36 @@ def build_flux_wire_reactions(
             else 0.0
         )
         budget = RateUncertaintyBudget(
-            row_id=f"{sample_id}|{reaction_id}", rate=rate, components=components,
-            diagnostic_assumptions=([] if log_binding else ["Irradiation chronology/history is not a complete operating log"]) +
-                ([] if log_binding and log_binding["local_spectrum_separability_qualified"] else ["Scalar history assumes a separable local spectrum and explicit reference-power normalization"]),
+            row_id=f"{sample_id}|{reaction_id}",
+            rate=rate,
+            components=components,
+            diagnostic_assumptions=(
+                []
+                if log_binding
+                else ["Irradiation chronology/history is not a complete operating log"]
+            )
+            + (
+                []
+                if log_binding and log_binding["local_spectrum_separability_qualified"]
+                else [
+                    "Scalar history assumes a separable local spectrum and explicit reference-power normalization"
+                ]
+            ),
             irradiation_log_binding=log_binding,
         )
         if mode == "physical":
             budget.require_complete()
             if any(c.assumed for c in components):
-                raise ValueError("Physical rate construction rejects assumed uncertainty components")
-            if any(c.uncertainty_scope in {"unspecified", "reported_total_unknown"} for c in components):
-                raise ValueError("Physical rate construction rejects unknown uncertainty coverage/conditioning")
+                raise ValueError(
+                    "Physical rate construction rejects assumed uncertainty components"
+                )
+            if any(
+                c.uncertainty_scope in {"unspecified", "reported_total_unknown"}
+                for c in components
+            ):
+                raise ValueError(
+                    "Physical rate construction rejects unknown uncertainty coverage/conditioning"
+                )
         reactions.append(
             FluxWireReaction(
                 sample_id=sample_id,
@@ -3619,13 +3810,9 @@ def analyze_flux_wire_sample(
         counts_csv,
     )
 
-    reference_data = (
-        read_processed_txt(qg_path, profile_name=metadata.config["profile_name"])
-        if qg_path
-        else None
+    reference_data = read_qg_activity_reference(
+        qg_path, metadata.config["profile_name"]
     )
-    if reference_data is not None:
-        reference_data.sample_id = reference_data.sample_id or qg_path.stem
 
     analysis = analyze_flux_wire_targeted(
         data=raw_data,
@@ -3803,6 +3990,8 @@ def analyze_flux_wire_sample(
         "missing_peaks": [],
         "missing_nuclides": [],
     }
+    if qg_path is not None and reference_data is None:
+        validation["reference_state"] = "unavailable_no_nuclide_observations"
     if reference_data is not None:
         peak_rows, missing_peaks = build_peak_comparison_records(
             sample_id, analysis.peaks, reference_data, metadata.config
@@ -4211,7 +4400,9 @@ def reaction_rows_to_dicts(
         row.pop("uncertainty_budget", None)
         budget = reaction.uncertainty_budget
         row["rate_uncertainty_components"] = (
-            ";".join(f"{c.name}={c.relative:.4g}" for c in budget.components) if budget else ""
+            ";".join(f"{c.name}={c.relative:.4g}" for c in budget.components)
+            if budget
+            else ""
         )
         row["rate_uncertainty_missing"] = ";".join(budget.missing) if budget else ""
         row["rate_uncertainty_budget"] = asdict(budget) if budget else None
@@ -4236,9 +4427,13 @@ _REACTION_ROW_EXTRA_KEYS = (
 
 def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
     """Rebuild a FluxWireReaction (with its uncertainty budget) from a row dict."""
-    data = {key: value for key, value in row.items() if key not in _REACTION_ROW_EXTRA_KEYS}
+    data = {
+        key: value for key, value in row.items() if key not in _REACTION_ROW_EXTRA_KEYS
+    }
     if row.get("rate_status") == "UNAVAILABLE":
-        for key in ("activity_bq", "activity_unc_bq", "reaction_rate", "reaction_rate_unc", "n_atoms"):
+        for key in (
+            "activity_bq", "activity_unc_bq", "reaction_rate", "reaction_rate_unc", "n_atoms"
+        ):
             data[key] = 0.0
     reaction = FluxWireReaction(**data)
     # Accept both the serialized form and a raw ``asdict(reaction)`` payload.
@@ -4250,7 +4445,10 @@ def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
             row_id=serialized["row_id"],
             rate=float(serialized["rate"]),
             components=[UncertaintyComponent(**c) for c in serialized["components"]],
-            required=serialized.get("required", RateUncertaintyBudget.__dataclass_fields__["required"].default),
+            required=serialized.get(
+                "required",
+                RateUncertaintyBudget.__dataclass_fields__["required"].default,
+            ),
             diagnostic_assumptions=serialized.get("diagnostic_assumptions", []),
             irradiation_log_binding=serialized.get("irradiation_log_binding"),
         )
@@ -4259,7 +4457,9 @@ def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
 
 def csv_reaction_rows(rows: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Reaction rows without the nested budget (it has its own tables)."""
-    return [{k: v for k, v in row.items() if k != "rate_uncertainty_budget"} for row in rows]
+    return [
+        {k: v for k, v in row.items() if k != "rate_uncertainty_budget"} for row in rows
+    ]
 
 
 def write_rate_uncertainty_tables(
@@ -4271,11 +4471,16 @@ def write_rate_uncertainty_tables(
         for r in reactions
         if r.uncertainty_budget is not None and r.reaction_rate > 0
     ]
-    write_rows_csv(budget_table(budgets), tables_root / "flux_wire_rate_uncertainty_budget.csv")
+    write_rows_csv(
+        budget_table(budgets), tables_root / "flux_wire_rate_uncertainty_budget.csv"
+    )
     covariance = rate_covariance(budgets)
     write_rows_csv(
         [
-            {"row_id": budget.row_id, **{b.row_id: float(v) for b, v in zip(budgets, row)}}
+            {
+                "row_id": budget.row_id,
+                **{b.row_id: float(v) for b, v in zip(budgets, row)},
+            }
             for budget, row in zip(budgets, covariance)
         ],
         tables_root / "flux_wire_rate_covariance.csv",
@@ -4348,7 +4553,9 @@ def cd_ratio_rows(
     configured_ranges = metadata.config.get("cd_ratio_expected_ranges", {})
     default_review_min = float(metadata.config.get("cd_ratio_default_review_min", 1.10))
 
-    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float, Optional[Dict[str, Any]]]]:
+    def rates(
+        artifact: Dict[str, Any]
+    ) -> Dict[str, Tuple[float, float, Optional[Dict[str, Any]]]]:
         return {
             str(row["reaction_id"]): (
                 float(row.get("reaction_rate") or 0.0),
@@ -4379,25 +4586,38 @@ def cd_ratio_rows(
             ratio = bare_rate / cd_rate if bare_rate > 0 and cd_rate > 0 else None
             shared_covariance = 0.0
             missing_uncertainty_components: List[str] = ["budget_unavailable"]
-            if ratio is not None and isinstance(bare_budget, dict) and isinstance(cd_budget, dict):
+            if (
+                ratio is not None
+                and isinstance(bare_budget, dict)
+                and isinstance(cd_budget, dict)
+            ):
                 budgets = [
                     RateUncertaintyBudget(
-                        row_id=str(budget["row_id"]), rate=rate,
-                        components=[UncertaintyComponent(**item) for item in budget["components"]],
+                        row_id=str(budget["row_id"]),
+                        rate=rate,
+                        components=[
+                            UncertaintyComponent(**item)
+                            for item in budget["components"]
+                        ],
                     )
                     for budget, rate in ((bare_budget, bare_rate), (cd_budget, cd_rate))
                 ]
                 shared_covariance = float(rate_covariance(budgets)[0, 1])
-                missing_uncertainty_components = sorted(set(budgets[0].missing + budgets[1].missing))
+                missing_uncertainty_components = sorted(
+                    set(budgets[0].missing + budgets[1].missing)
+                )
             if ratio is None:
                 ratio_unc = None
             else:
                 relative_variance = (
-                    (bare_unc / bare_rate) ** 2 + (cd_unc / cd_rate) ** 2
+                    (bare_unc / bare_rate) ** 2
+                    + (cd_unc / cd_rate) ** 2
                     - 2 * shared_covariance / (bare_rate * cd_rate)
                 )
                 if relative_variance < -1e-12:
-                    raise ValueError("Cd ratio component covariance exceeds marginal uncertainty")
+                    raise ValueError(
+                        "Cd ratio component covariance exceeds marginal uncertainty"
+                    )
                 ratio_unc = ratio * math.sqrt(max(relative_variance, 0.0))
             flag_review = ratio is None or (
                 (expected_min is not None and ratio < float(expected_min))
@@ -4420,7 +4640,9 @@ def cd_ratio_rows(
                     "cd_ratio": ratio,
                     "cd_ratio_unc": ratio_unc,
                     "shared_rate_covariance": shared_covariance,
-                    "missing_uncertainty_components": ";".join(missing_uncertainty_components),
+                    "missing_uncertainty_components": ";".join(
+                        missing_uncertainty_components
+                    ),
                     "basis": "per-target-atom EOI reaction rates",
                     "expected_cd_ratio_min": (
                         None if expected_min is None else float(expected_min)
@@ -4498,14 +4720,17 @@ def run_qg_benchmark(
                 "sample_group": timing.sample_group,
                 "n_isotopes": len(isotope_payload),
                 "n_reactions": len(reactions),
-                "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
+                "reaction_rate_mass_metadata": flux_wire_metadata_row(
+                    sample_key, metadata
+                ),
             }
         )
 
     write_rows_csv(sample_rows, tree["tables"] / "qg_samples.csv")
     write_rows_csv(isotope_rows, tree["tables"] / "qg_isotope_summary.csv")
     write_rows_csv(
-        csv_reaction_rows(reaction_rows), tree["tables"] / "flux_wire_reaction_rates.csv"
+        csv_reaction_rows(reaction_rows),
+        tree["tables"] / "flux_wire_reaction_rates.csv",
     )
     write_rate_uncertainty_tables(all_reactions, tree["tables"])
 
@@ -4714,7 +4939,11 @@ def adapt_unfold_result(
         converged=False,
         method=method,
         initial_guess_source=initial_guess_source,
-        metadata={"diagnostic_only": True, "physical_validation": False, **(metadata_dict or {})},
+        metadata={
+            "diagnostic_only": True,
+            "physical_validation": False,
+            **(metadata_dict or {}),
+        },
     )
 
 
@@ -4739,8 +4968,10 @@ def method_overlay_plot(results: Dict[str, UnfoldingResult], output_path: Path) 
             or result.metadata.get("diagnostic_only")
             or not result.metadata.get("physical_validation")
             or any(key not in result.metadata for key in required)
-            or result.metadata["observation_ids"] != reference.metadata.get("observation_ids")
-            or result.metadata["uncertainty_model"] != reference.metadata.get("uncertainty_model")
+            or result.metadata["observation_ids"]
+            != reference.metadata.get("observation_ids")
+            or result.metadata["uncertainty_model"]
+            != reference.metadata.get("uncertainty_model")
             or not np.array_equal(result.energy_edges, reference.energy_edges)
             or not np.array_equal(result.response_matrix, reference.response_matrix)
             or not np.array_equal(result.measured_rates, reference.measured_rates)
@@ -4791,7 +5022,9 @@ def save_unfolding_artifacts(
         "reactions_used": result.reactions_used,
         "measured_rates": result.measured_rates.tolist(),
         "predicted_rates": result.predicted_rates.tolist(),
-        "chi_squared": None if result.metadata.get("diagnostic_only") else result.chi_squared,
+        "chi_squared": (
+            None if result.metadata.get("diagnostic_only") else result.chi_squared
+        ),
         "iterations": result.iterations,
         "converged": result.converged,
         "initial_guess_source": result.initial_guess_source,
@@ -4886,7 +5119,8 @@ def run_flux_wire_unfolding(
     valid_reactions = [
         reaction
         for reaction in reactions
-        if reaction.reaction_rate > 0 and "Unknown(" not in reaction.reaction_id
+        if reaction.reaction_rate > 0
+        and "Unknown(" not in reaction.reaction_id
         and not (
             str(reaction.sample_id).lower().startswith("ni-rafm-1")
             and "ni-57" in reaction.reaction_id.lower()
@@ -4894,18 +5128,24 @@ def run_flux_wire_unfolding(
     ]
     if not valid_reactions:
         if excluded_reactions:
-            save_json({
-                "excluded_reactions": excluded_reactions,
-                "sensitivity_status": "not computed: no qualified physical inversion available",
-            }, output_root / "input_admission_review.json")
+            save_json(
+                {
+                    "excluded_reactions": excluded_reactions,
+                    "sensitivity_status": "not computed: no qualified physical inversion available",
+                },
+                output_root / "input_admission_review.json",
+            )
         return {}
-    save_json({
-        "included_observation_ids": [
-            f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
-        ],
-        "excluded_reactions": excluded_reactions,
-        "sensitivity_status": "not computed: no qualified physical inversion available",
-    }, output_root / "input_admission_review.json")
+    save_json(
+        {
+            "included_observation_ids": [
+                f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
+            ],
+            "excluded_reactions": excluded_reactions,
+            "sensitivity_status": "not computed: no qualified physical inversion available",
+        },
+        output_root / "input_admission_review.json",
+    )
 
     # Discrete binning is a per-reaction indicator, not an unfolded spectrum,
     # and is deliberately not produced or overlaid as a flux here.
@@ -4949,7 +5189,9 @@ def run_flux_wire_unfolding(
     )
     prior_gls = parse_prior_spectrum(prior_path, gls.energy_bounds_eV)
     save_unfolding_artifacts(
-        gls_result, prior_gls, output_root,
+        gls_result,
+        prior_gls,
+        output_root,
         reference_label="VITAMIN-J plot reference (not inversion prior)",
     )
 
@@ -4968,11 +5210,18 @@ def run_flux_wire_unfolding(
             budget = reaction.uncertainty_budget
             if budget is not None:
                 floor_component = floor_as_component(
-                    "iterative_rate_floor", budget.total_relative, min_relative_uncertainty,
-                    "explicit run_flux_wire_unfolding min_relative_uncertainty")
+                    "iterative_rate_floor",
+                    budget.total_relative,
+                    min_relative_uncertainty,
+                    "explicit run_flux_wire_unfolding min_relative_uncertainty",
+                )
                 budget = RateUncertaintyBudget(
-                    budget.row_id, budget.rate,
-                    list(budget.components) + ([floor_component] if floor_component else []), budget.required)
+                    budget.row_id,
+                    budget.rate,
+                    list(budget.components)
+                    + ([floor_component] if floor_component else []),
+                    budget.required,
+                )
             unfolder.add_reaction(
                 reaction=reaction.reaction_id,
                 activity_Bq=reaction.reaction_rate,
@@ -4994,7 +5243,9 @@ def run_flux_wire_unfolding(
                     if covered
                     else MonitorResponseSpec(
                         observation_id=f"{reaction.sample_id}|{reaction.reaction_id}",
-                        sample_id=reaction.sample_id, reaction=reaction.reaction_id)
+                        sample_id=reaction.sample_id,
+                        reaction=reaction.reaction_id,
+                    )
                 ),
             )
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)
@@ -5021,9 +5272,13 @@ def run_flux_wire_unfolding(
         {
             "admitted": False,
             "reason": "Methods use different response operators, energy grids, priors, or nonconverged diagnostic results (#191)",
-            "methods": {name: {"converged": bool(item.converged),
-                               "diagnostic_only": bool(item.metadata.get("diagnostic_only"))}
-                        for name, item in iterative_results.items()},
+            "methods": {
+                name: {
+                    "converged": bool(item.converged),
+                    "diagnostic_only": bool(item.metadata.get("diagnostic_only")),
+                }
+                for name, item in iterative_results.items()
+            },
         },
         output_root / "method_overlay_review.json",
     )
@@ -5244,7 +5499,8 @@ def run_rafm_validation(
         tree["tables"] / "flux_wire_count_disagreement_summary.md",
     )
     write_rows_csv(
-        csv_reaction_rows(reaction_rows), tree["tables"] / "flux_wire_reaction_rates.csv"
+        csv_reaction_rows(reaction_rows),
+        tree["tables"] / "flux_wire_reaction_rates.csv",
     )
     write_rate_uncertainty_tables(
         [reaction_from_row(row) for row in reaction_rows], tree["tables"]
@@ -5331,7 +5587,9 @@ def run_rafm_validation(
             save_path=tree["plots_comparisons"] / "validation_summary_table.png",
         )
 
-    validation_summary = summarize_validation_artifacts(artifacts, unmatched_qg=unmatched_qg)
+    validation_summary = summarize_validation_artifacts(
+        artifacts, unmatched_qg=unmatched_qg
+    )
     line_diagnostic_buckets: Dict[str, int] = {}
     for row in line_rows:
         bucket = row.get("diagnostic_bucket")

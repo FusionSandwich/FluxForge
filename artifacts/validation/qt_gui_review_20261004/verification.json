@@ -1,0 +1,31 @@
+{
+  "review_source": "c5eee227d621ddc84288758733f7441cc0070172",
+  "integrated_science_base": "701288a30f418ed7dc331e6deda0044eb220e72e",
+  "published_gui_reports_head": "a85f3bf716155e569a5cadef249e5387ed84d2a3",
+  "passing_groups": {
+    "science": 111,
+    "shell": 28,
+    "exports": 19,
+    "production": 9,
+    "calibration_dialog": 20,
+    "sessions": 5,
+    "targets": 5
+  },
+  "distinct_passing_cases": 197,
+  "wheel": {
+    "name": "fluxforge-0.1.0-py3-none-any.whl",
+    "sha256": "079af8b3275cf2da8a6896cc68f450366b1066f25277d5d0a5fc8166989a60f9",
+    "entry_points": "[console_scripts]\nfluxforge = fluxforge.cli.app:main\nfluxforge-gui = fluxforge.gui.app:main\n",
+    "legacy_gui_absent": true
+  },
+  "bundle": {
+    "sha256": "d65cc6dd394d542a5e3377082ec2488b4c18174ca895bd8112feef4b7826cf05",
+    "manifest_verified": true,
+    "scientific_admission": false
+  },
+  "limits": [
+    "Targeted checks across integration and repair revisions; not a full-suite receipt.",
+    "Two combined native runs timed out at 360 seconds; split groups passed.",
+    "Wheel inspected and compiled; Windows installer/frozen EXE not rebuilt."
+  ]
+}

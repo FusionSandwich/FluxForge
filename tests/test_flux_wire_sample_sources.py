@@ -80,3 +80,12 @@ def test_nominal_sample_metadata_cannot_claim_measured_admission():
         payload = json.load(handle)
     assert payload["_metadata"]["scientific_admission"] is False
     assert "not measured" in payload["_metadata"]["description"]
+
+
+def test_explicit_element_mass_does_not_inherit_example_purity():
+    reference = load_flux_wire_sample_reference()["Sc"]
+    expected = 0.002 * AVOGADRO / reference["atomic_mass"]
+    assert calculate_n_atoms("Sc", mass_mg=2) == pytest.approx(expected)
+    assert calculate_n_atoms(
+        "Sc", mass_mg=2, element_mass_fraction=0.25
+    ) == pytest.approx(expected * 0.25)

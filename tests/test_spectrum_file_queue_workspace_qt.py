@@ -10,6 +10,40 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 pytestmark = pytest.mark.skipif(not QT_AVAILABLE, reason="Native Qt is unavailable")
 
 
+def test_active_conversion_remains_visible_through_escape_and_dialog_completion():
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QApplication, QDialog
+    from fluxforge.gui.dialogs.spectrum_file_queue_dialog import SpectrumFileQueueDialog
+
+    app = QApplication.instance() or QApplication([])
+    dialog = SpectrumFileQueueDialog()
+    try:
+        dialog.show()
+        app.processEvents()
+        dialog.worker = object()  # Exercise Qt dismissal routes while a job is active.
+        QTest.keyClick(dialog, Qt.Key_Escape)
+        app.processEvents()
+        assert dialog.isVisible()
+        for finish in (
+            dialog.reject,
+            dialog.accept,
+            lambda: dialog.done(QDialog.Accepted),
+        ):
+            finish()
+            app.processEvents()
+            assert dialog.isVisible()
+        assert "still running" in dialog.status_label.text()
+        dialog.worker = None
+        dialog.reject()
+        assert not dialog.isVisible()
+    finally:
+        dialog.worker = None
+        dialog.close()
+        dialog.deleteLater()
+        app.processEvents()
+
+
 def test_queue_folder_worker_converts_and_preserves_outputs(tmp_path):
     from PySide6.QtWidgets import QApplication
     from PySide6.QtTest import QTest

@@ -1,0 +1,10 @@
+[
+  {
+    "group": "targets",
+    "exit_code": 0,
+    "tests": [
+      "tests/test_gui_calibration_target.py"
+    ],
+    "elapsed_seconds": 57.75
+  }
+]

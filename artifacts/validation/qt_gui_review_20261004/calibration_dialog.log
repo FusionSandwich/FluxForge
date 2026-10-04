@@ -1,0 +1,45 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Josh\.codex\environments\fluxforge-issue21-complete\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge
+configfile: pyproject.toml
+plugins: platformdirs-4.12.2
+collecting ... collected 20 items
+
+tests/test_calibration_workspace_qt.py::test_fit_energy_calibration_locks_astm_order_and_flags_outliers PASSED [  5%]
+tests/test_calibration_workspace_qt.py::test_fit_fwhm_calibration_returns_resolution_metrics PASSED [ 10%]
+tests/test_calibration_workspace_qt.py::test_quick_slider_calibration_builds_linear_preview PASSED [ 15%]
+tests/test_calibration_workspace_qt.py::test_energy_calibration_accepts_deviation_pairs PASSED [ 20%]
+tests/test_calibration_workspace_qt.py::test_peak_fitter_registry_contains_gaussian_skew_and_bayesian_entries PASSED [ 25%]
+tests/test_calibration_workspace_qt.py::test_method_selector_widget_tracks_modern_peak_fitter_registry PASSED [ 30%]
+tests/test_calibration_workspace_qt.py::test_efficiency_dialog_exposes_all_four_registered_models PASSED [ 35%]
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_locks_astm_order_and_applies_to_workspace_spectrum PASSED [ 40%]
+tests/test_calibration_workspace_qt.py::test_main_window_opens_calibration_workspace_dialog PASSED [ 45%]
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment PASSED [ 50%]
+tests/test_calibration_workspace_qt.py::test_main_window_exposes_manual_and_standards_workflows_and_library_selectors PASSED [ 55%]
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting PASSED [ 60%]
+tests/test_calibration_workspace_qt.py::test_calibration_controls_scroll_to_roi_fit_actions PASSED [ 65%]
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_supports_preserve_slots_fine_tune_and_nasa_seed PASSED [ 70%]
+tests/test_calibration_workspace_qt.py::test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation PASSED [ 75%]
+tests/test_calibration_workspace_qt.py::test_data_library_manager_tracks_gui_library_categories PASSED [ 80%]
+tests/test_calibration_workspace_qt.py::test_data_library_manager_recovers_removed_persisted_gamma_source PASSED [ 85%]
+tests/test_calibration_workspace_qt.py::test_data_library_manager_registers_and_removes_user_sources PASSED [ 90%]
+tests/test_calibration_workspace_qt.py::test_data_library_manager_resolves_astm_locked_sources PASSED [ 95%]
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_locks_gamma_library_to_astm_sources PASSED [100%]
+
+============================== warnings summary ===============================
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_supports_mouse_peak_selection_and_library_assignment
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_calibration_dialog_exposes_advanced_tools_and_roi_fitting
+tests/test_calibration_workspace_qt.py::test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation
+tests/test_calibration_workspace_qt.py::test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation
+tests/test_calibration_workspace_qt.py::test_apply_workspace_results_emits_new_calibrated_spectrum_without_mutation
+  C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge\src\fluxforge\core\calibration.py:257: RankWarning: Polyfit may be poorly conditioned
+    coefficients_desc = np.polyfit(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge\artifacts\validation\qt_gui_review_20261004\calibration_dialog.xml -
+======================= 20 passed, 9 warnings in 22.12s =======================

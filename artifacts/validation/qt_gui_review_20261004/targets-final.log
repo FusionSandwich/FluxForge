@@ -1,0 +1,19 @@
+....F                                                                    [100%]
+================================== FAILURES ===================================
+_________________ test_main_window_can_shrink_to_laptop_width _________________
+
+window = <fluxforge.gui.main_window.FluxForgeMainWindow(0x2104dfd6000, name="FluxForgeMainWindow") at 0x000002102F13C380>
+
+    def test_main_window_can_shrink_to_laptop_width(window):
+        window.resize(1280, 850)
+        window.show()
+        QApplication.instance().processEvents()
+>       assert window.width() <= 1280
+E       assert 1822 <= 1280
+E        +  where 1822 = <built-in method width of FluxForgeMainWindow object at 0x000002102F13C380>()
+E        +    where <built-in method width of FluxForgeMainWindow object at 0x000002102F13C380> = <fluxforge.gui.main_window.FluxForgeMainWindow(0x2104dfd6000, name="FluxForgeMainWindow") at 0x000002102F13C380>.width
+
+tests\test_gui_calibration_target.py:135: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_gui_calibration_target.py::test_main_window_can_shrink_to_laptop_width
+1 failed, 4 passed in 101.27s (0:01:41)

@@ -1,0 +1,16 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Josh\.codex\environments\fluxforge-issue21-complete\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge
+configfile: pyproject.toml
+plugins: platformdirs-4.12.2
+collecting ... collected 5 items
+
+tests/test_workspace_session_qt.py::test_session_actions_have_stable_ids_and_shortcuts PASSED [ 20%]
+tests/test_workspace_session_qt.py::test_save_and_open_session_replaces_complete_workspace PASSED [ 40%]
+tests/test_workspace_session_qt.py::test_opening_second_session_does_not_append_first_session PASSED [ 60%]
+tests/test_workspace_session_qt.py::test_gui_open_and_resave_preserves_session_envelope PASSED [ 80%]
+tests/test_workspace_session_qt.py::test_main_window_calibration_apply_and_undo_are_non_mutating PASSED [100%]
+
+- generated xml file: C:\Users\Josh\.codex\worktrees\qt-gui-review-20261004\FluxForge\artifacts\validation\qt_gui_review_20261004\sessions.xml -
+============================= 5 passed in 31.01s ==============================

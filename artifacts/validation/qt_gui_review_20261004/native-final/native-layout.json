@@ -1,0 +1,814 @@
+[
+  {
+    "name": "01-empty",
+    "width": 1280,
+    "height": 833,
+    "font": "Inter",
+    "controls": [
+      {
+        "name": "SaveThemeProfileButton",
+        "text": "Save Profile",
+        "x": 420,
+        "y": 104,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "LoadWorkflowPresetButton",
+        "text": "Load",
+        "x": 809,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SaveWorkflowPresetButton",
+        "text": "Save",
+        "x": 879,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "DeleteWorkflowPresetButton",
+        "text": "Delete",
+        "x": 955,
+        "y": 91,
+        "enabled": false,
+        "inside": true
+      },
+      {
+        "name": "SpectrumCrosshairButton",
+        "text": "Crosshair",
+        "x": 518,
+        "y": 283,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumSelectRoiButton",
+        "text": "Select ROI",
+        "x": 626,
+        "y": 283,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumClearRoiButton",
+        "text": "Clear ROI",
+        "x": 735,
+        "y": 283,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumZoomInButton",
+        "text": "Zoom +",
+        "x": 835,
+        "y": 283,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumZoomOutButton",
+        "text": "Zoom \u2212",
+        "x": 928,
+        "y": 283,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumResetViewButton",
+        "text": "Reset View",
+        "x": 1032,
+        "y": 283,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "RegisterCustomGammaButton",
+        "text": "Register Library",
+        "x": 95,
+        "y": 1189,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "RemoveRegisteredGammaButton",
+        "text": "Remove Selected",
+        "x": 244,
+        "y": 1189,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "SidebarPinSelectedNuclideButton",
+        "text": "Pin Selected Nuclide",
+        "x": 109,
+        "y": 2118,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "SaveNuclideToUserListButton",
+        "text": "Save To List",
+        "x": 255,
+        "y": 2118,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "AddNuclideToMixtureButton",
+        "text": "Add To Mixture",
+        "x": 384,
+        "y": 2118,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "QaHistoryShortcutButton",
+        "text": "View QA History",
+        "x": 147,
+        "y": 3102,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "RunAstmCheckButton",
+        "text": "Run ASTM Check",
+        "x": 427,
+        "y": 3102,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "AutoFindPeaksButton",
+        "text": "Auto Find Peaks",
+        "x": 84,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "BayesianMatchPeaksButton",
+        "text": "Bayesian Match",
+        "x": 412,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "MlPeakAnalysisButton",
+        "text": "ML Peak Analysis",
+        "x": 558,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakTablePinNuclideButton",
+        "text": "Pin Selected Nuclide",
+        "x": 719,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakTableTagPeakButton",
+        "text": "Tag Selected Peak",
+        "x": 883,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakTableClearPeaksButton",
+        "text": "Clear Peaks",
+        "x": 1020,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakIdUseSelectedPeakButton",
+        "text": "Use Selected Peak",
+        "x": 105,
+        "y": 1423,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "PeakIdAssignSelectedIsotopeButton",
+        "text": "Assign Selected Isotope",
+        "x": 284,
+        "y": 1423,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "PeakIdClearAssignmentButton",
+        "text": "Clear Peak ID",
+        "x": 447,
+        "y": 1423,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "SimpleModeButton",
+        "text": "Simple",
+        "x": 115,
+        "y": 69,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "ExpertModeButton",
+        "text": "Expert",
+        "x": 241,
+        "y": 69,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "StandardsModeButton",
+        "text": "Standards",
+        "x": 376,
+        "y": 69,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Log Scale",
+        "x": 1050,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Peak Labels",
+        "x": 1137,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Open Spectrum",
+        "x": 55,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Find Peaks",
+        "x": 148,
+        "y": 162,
+        "enabled": false,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Review Peaks",
+        "x": 235,
+        "y": 162,
+        "enabled": false,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Calibrate",
+        "x": 318,
+        "y": 162,
+        "enabled": false,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Irradiation",
+        "x": 391,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Unfold",
+        "x": 458,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Export",
+        "x": 513,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      }
+    ]
+  },
+  {
+    "name": "02-loaded",
+    "width": 1280,
+    "height": 833,
+    "font": "Inter",
+    "controls": [
+      {
+        "name": "SaveThemeProfileButton",
+        "text": "Save Profile",
+        "x": 420,
+        "y": 104,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "LoadWorkflowPresetButton",
+        "text": "Load",
+        "x": 809,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SaveWorkflowPresetButton",
+        "text": "Save",
+        "x": 879,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "DeleteWorkflowPresetButton",
+        "text": "Delete",
+        "x": 955,
+        "y": 91,
+        "enabled": false,
+        "inside": true
+      },
+      {
+        "name": "SpectrumCrosshairButton",
+        "text": "Crosshair",
+        "x": 518,
+        "y": 320,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumSelectRoiButton",
+        "text": "Select ROI",
+        "x": 626,
+        "y": 320,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumClearRoiButton",
+        "text": "Clear ROI",
+        "x": 735,
+        "y": 320,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumZoomInButton",
+        "text": "Zoom +",
+        "x": 835,
+        "y": 320,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumZoomOutButton",
+        "text": "Zoom \u2212",
+        "x": 928,
+        "y": 320,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "SpectrumResetViewButton",
+        "text": "Reset View",
+        "x": 1032,
+        "y": 320,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "RegisterCustomGammaButton",
+        "text": "Register Library",
+        "x": 95,
+        "y": 1189,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "RemoveRegisteredGammaButton",
+        "text": "Remove Selected",
+        "x": 244,
+        "y": 1189,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "SidebarPinSelectedNuclideButton",
+        "text": "Pin Selected Nuclide",
+        "x": 109,
+        "y": 2118,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "SaveNuclideToUserListButton",
+        "text": "Save To List",
+        "x": 255,
+        "y": 2118,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "AddNuclideToMixtureButton",
+        "text": "Add To Mixture",
+        "x": 384,
+        "y": 2118,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "QaHistoryShortcutButton",
+        "text": "View QA History",
+        "x": 147,
+        "y": 3102,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "RunAstmCheckButton",
+        "text": "Run ASTM Check",
+        "x": 427,
+        "y": 3102,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "AutoFindPeaksButton",
+        "text": "Auto Find Peaks",
+        "x": 84,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "BayesianMatchPeaksButton",
+        "text": "Bayesian Match",
+        "x": 412,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "MlPeakAnalysisButton",
+        "text": "ML Peak Analysis",
+        "x": 558,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakTablePinNuclideButton",
+        "text": "Pin Selected Nuclide",
+        "x": 719,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakTableTagPeakButton",
+        "text": "Tag Selected Peak",
+        "x": 883,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakTableClearPeaksButton",
+        "text": "Clear Peaks",
+        "x": 1020,
+        "y": 842,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PeakIdUseSelectedPeakButton",
+        "text": "Use Selected Peak",
+        "x": 105,
+        "y": 1423,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "PeakIdAssignSelectedIsotopeButton",
+        "text": "Assign Selected Isotope",
+        "x": 284,
+        "y": 1423,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "PeakIdClearAssignmentButton",
+        "text": "Clear Peak ID",
+        "x": 447,
+        "y": 1423,
+        "enabled": false,
+        "inside": false
+      },
+      {
+        "name": "SimpleModeButton",
+        "text": "Simple",
+        "x": 115,
+        "y": 69,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "ExpertModeButton",
+        "text": "Expert",
+        "x": 241,
+        "y": 69,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "StandardsModeButton",
+        "text": "Standards",
+        "x": 376,
+        "y": 69,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Log Scale",
+        "x": 1050,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Peak Labels",
+        "x": 1137,
+        "y": 91,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Open Spectrum",
+        "x": 55,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Auto Find Peaks",
+        "x": 163,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Review Peaks",
+        "x": 266,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Energy + FWHM Workspace",
+        "x": 404,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Irradiation",
+        "x": 532,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Unfold",
+        "x": 599,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "",
+        "text": "Export",
+        "x": 654,
+        "y": 162,
+        "enabled": true,
+        "inside": true
+      }
+    ]
+  },
+  {
+    "name": "03-calibration",
+    "width": 1280,
+    "height": 800,
+    "font": "Inter",
+    "controls": [
+      {
+        "name": "AddEnergyCalibrationPointButton",
+        "text": "Add point",
+        "x": 673,
+        "y": 340,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "RemoveEnergyCalibrationPointButton",
+        "text": "Remove selected",
+        "x": 800,
+        "y": 340,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "ResetEnergyCalibrationPointsButton",
+        "text": "Reset seeded points",
+        "x": 961,
+        "y": 340,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "AddFwhmCalibrationPointButton",
+        "text": "Add point",
+        "x": 673,
+        "y": 682,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "RemoveFwhmCalibrationPointButton",
+        "text": "Remove selected",
+        "x": 800,
+        "y": 682,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "ResetFwhmCalibrationPointsButton",
+        "text": "Reset seeded points",
+        "x": 961,
+        "y": 682,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "AssignCalibrationLibraryLineButton",
+        "text": "Assign line to selected row",
+        "x": 973,
+        "y": 1312,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "ResetCalibrationQuickAnchorsButton",
+        "text": "Reset to seeded anchors",
+        "x": 730,
+        "y": 1728,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "PromoteCalibrationQuickAnchorsButton",
+        "text": "Promote anchors to table",
+        "x": 931,
+        "y": 1728,
+        "enabled": true,
+        "inside": false
+      },
+      {
+        "name": "ApplyCalibrationButton",
+        "text": "Apply calibration to spectrum",
+        "x": 1070,
+        "y": 762,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "CloseCalibrationDialogButton",
+        "text": "Close",
+        "x": 1228,
+        "y": 762,
+        "enabled": true,
+        "inside": true
+      }
+    ]
+  },
+  {
+    "name": "04-report",
+    "width": 1100,
+    "height": 800,
+    "font": "Inter",
+    "controls": [
+      {
+        "name": "RenderReportPreviewButton",
+        "text": "Render Preview",
+        "x": 779,
+        "y": 71,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "ExportReportHtmlButton",
+        "text": "Export HTML",
+        "x": 913,
+        "y": 71,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "ExportReportPdfButton",
+        "text": "Export PDF",
+        "x": 1032,
+        "y": 71,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "GenerateReportBundleButton",
+        "text": "Generate Report",
+        "x": 1014,
+        "y": 119,
+        "enabled": true,
+        "inside": true
+      }
+    ]
+  },
+  {
+    "report_bundle": "C:\\Users\\Josh\\.codex\\worktrees\\qt-gui-review-20261004\\FluxForge\\artifacts\\validation\\qt_gui_review_20261004\\native-final\\review-report.zip",
+    "report_status": "Generated report bundle: C:\\Users\\Josh\\.codex\\worktrees\\qt-gui-review-20261004\\FluxForge\\artifacts\\validation\\qt_gui_review_20261004\\native-final\\review-report.zip"
+  },
+  {
+    "name": "05-unfolding",
+    "width": 1280,
+    "height": 800,
+    "font": "Inter",
+    "controls": [
+      {
+        "name": "LoadResponseMatrixButton",
+        "text": "Load Response",
+        "x": 633,
+        "y": 203,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "LoadMeasuredRatesButton",
+        "text": "Load Measured Rates",
+        "x": 633,
+        "y": 273,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "ResetUnfoldingPlotsButton",
+        "text": "Reset Plot Views",
+        "x": 478,
+        "y": 604,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "RunSelectedUnfoldingButton",
+        "text": "Run Selected",
+        "x": 789,
+        "y": 604,
+        "enabled": true,
+        "inside": true
+      },
+      {
+        "name": "RunComparisonUnfoldingButton",
+        "text": "Run Comparison",
+        "x": 1100,
+        "y": 604,
+        "enabled": false,
+        "inside": true
+      }
+    ]
+  }
+]

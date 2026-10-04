@@ -6157,9 +6157,8 @@ def cmd_gui(args: argparse.Namespace) -> None:
         return
     raise RuntimeError(
         "Unable to start the FluxForge desktop GUI. Install the 'native-gui' "
-        "extra and rerun this command. The archived compatibility interface, "
-        "when required for migration testing, must be launched explicitly with "
-        "'fluxforge-gui-legacy'."
+        "extra with python -m pip install 'fluxforge[native-gui]' "
+        "and rerun this command."
     )
 
 
