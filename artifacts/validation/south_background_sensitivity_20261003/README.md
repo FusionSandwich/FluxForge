@@ -1,0 +1,7 @@
+# South background sensitivity (2026-10-03)
+
+`monitor_comparison.json` records independent `iec_tiered` raw reductions of all seven eligible source-bound 25 cm monitor ASC spectra, each repeated with the historical North ASC and recovered South native ANS background. Both runs use the same South 25 cm recovered working efficiency. Original QG reports are read only for comparison; QG activities are not used to calculate raw activities. Source/background hashes are in the receipt. The computation used the `e5b8621` source plus the opt-in South background change in PR #230; subsequent changes in that PR correct labels and validate override timing without changing the numeric reduction.
+
+The October 3 South background is later than some sample counts and has Co-60 lines. The QG report background is unidentified. Reported QG count-start activities and raw count-average activities are not time harmonized, and the recovered efficiency percent unit remains a working assumption. Treat these results as sensitivity evidence. Do not infer that South is the physically correct default or that an apparently closer QG activity validates the background.
+
+The historical portable engine for this comparison performs linear interpolation of background channel counts on unequal energy grids; see issue #228 for its integration risk. The separate `4615e61` validation engine uses integrated overlap with covariance. Source applicability is issue #229. Near-contact, missing ASC, and Ti/Sc-48 ambiguity cases were excluded from this monitor comparison.

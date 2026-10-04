@@ -4622,7 +4622,13 @@ def run_rafm_validation(
     max_spectra: Optional[int] = None,
     flux_wire_counting_method: Optional[str] = None,
     generic_targeted_counting_method: Optional[str] = None,
+    background_spectrum_override: Optional[GammaSpectrum] = None,
 ) -> Dict[str, Any]:
+    if background_spectrum_override is not None:
+        live = float(background_spectrum_override.live_time)
+        real = float(background_spectrum_override.real_time)
+        if not math.isfinite(live) or live <= 0 or not math.isfinite(real) or real < live:
+            raise ValueError("Background override requires finite positive live time and real time >= live time")
     paths = default_paths(example_root, results_root=results_root)
     metadata = load_rafm_example_metadata(paths.example_root)
     if flux_wire_counting_method is not None:
@@ -4655,11 +4661,13 @@ def run_rafm_validation(
     )
 
     energy_override = workflow_profile_energy_calibration(metadata.config)
-    background_spectrum = read_raw_asc(
-        paths.background_path,
-        energy_calibration_override=energy_override,
-        profile_name=metadata.config["profile_name"],
-    ).spectrum
+    background_spectrum = background_spectrum_override
+    if background_spectrum is None:
+        background_spectrum = read_raw_asc(
+            paths.background_path,
+            energy_calibration_override=energy_override,
+            profile_name=metadata.config["profile_name"],
+        ).spectrum
     if background_spectrum is None:
         raise ValueError(
             f"Failed to load background spectrum from {paths.background_path}"

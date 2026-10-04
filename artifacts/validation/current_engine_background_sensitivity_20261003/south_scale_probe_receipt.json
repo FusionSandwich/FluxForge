@@ -1,0 +1,133 @@
+{
+  "status": "COMPLETED",
+  "scope": "one Co-Cd spectrum; synthetic South-amplitude stress test",
+  "engine_commit": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "South_source_sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+  "input_tree_sha256": "45803d05cfe2c49aa541c9bfc2079d441feb9c7978e81a6a68a732fedc0fdfe1",
+  "sample_sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+  "QG_report_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+  "method": "iec_tiered",
+  "qualification": "factor is a synthetic stress parameter, not inferred background correction",
+  "results": [
+    {
+      "factor": 0.0,
+      "activity_Bq": 246.1944545969775,
+      "peak_net_counts": [
+        11244.0,
+        10839.0
+      ],
+      "peak_gross_counts": [
+        22891.0,
+        16995.0
+      ],
+      "peak_background_adjusted_gross_counts": [
+        22891.0,
+        16995.0
+      ],
+      "peak_centers_keV": [
+        1173.1103079665097,
+        1332.375579728054
+      ]
+    },
+    {
+      "factor": 0.25,
+      "activity_Bq": 222.83673086925444,
+      "peak_net_counts": [
+        10284.767032806529,
+        9747.447198883034
+      ],
+      "peak_gross_counts": [
+        22891.0,
+        16995.0
+      ],
+      "peak_background_adjusted_gross_counts": [
+        19306.213844407484,
+        14562.88333770021
+      ],
+      "peak_centers_keV": [
+        1173.1041506481668,
+        1332.3620222747516
+      ]
+    },
+    {
+      "factor": 0.5,
+      "activity_Bq": 186.92217255230696,
+      "peak_net_counts": [
+        7946.046821805985,
+        8655.894397766071
+      ],
+      "peak_gross_counts": [
+        21589.0,
+        16995.0
+      ],
+      "peak_background_adjusted_gross_counts": [
+        14902.966544919285,
+        12130.766675400422
+      ],
+      "peak_centers_keV": [
+        1173.0987855642452,
+        1332.345823498819
+      ]
+    },
+    {
+      "factor": 0.75,
+      "activity_Bq": 160.61147068966918,
+      "peak_net_counts": [
+        6658.070232708977,
+        7564.341596649108
+      ],
+      "peak_gross_counts": [
+        21589.0,
+        16995.0
+      ],
+      "peak_background_adjusted_gross_counts": [
+        11559.949817378929,
+        9698.650013100636
+      ],
+      "peak_centers_keV": [
+        1173.0926354334035,
+        1332.324584937209
+      ]
+    },
+    {
+      "factor": 1.0,
+      "activity_Bq": 134.32510950719984,
+      "peak_net_counts": [
+        5370.093643611973,
+        6472.788795532143
+      ],
+      "peak_gross_counts": [
+        21589.0,
+        16995.0
+      ],
+      "peak_background_adjusted_gross_counts": [
+        8216.933089838574,
+        7266.533350800847
+      ],
+      "peak_centers_keV": [
+        1173.0854722383604,
+        1332.2962282826632
+      ]
+    },
+    {
+      "factor": 1.25,
+      "activity_Bq": 108.05318959054877,
+      "peak_net_counts": [
+        4082.1170545149644,
+        5381.235994415179
+      ],
+      "peak_gross_counts": [
+        21589.0,
+        16995.0
+      ],
+      "peak_background_adjusted_gross_counts": [
+        4873.916362298216,
+        4834.416688501059
+      ],
+      "peak_centers_keV": [
+        1173.0776299562149,
+        1332.2574955562868
+      ]
+    }
+  ]
+}
