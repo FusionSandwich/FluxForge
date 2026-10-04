@@ -131,6 +131,15 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
+      - name: History, reaction-rate and spectrum queue contracts
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_irradiation_history_inputs.py \
+            tests/test_reaction_rate_view_inputs.py \
+            tests/test_spectrum_file_queue_conversion.py
+
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -228,3 +237,51 @@ jobs:
 
       - name: Predictive dashboard Qt tests
         run: pytest -q tests/test_predictive_dashboard_qt.py
+
+      - name: History, reaction-rate and spectrum queue Qt tests
+        run: |
+          pytest -q \
+            tests/test_irradiation_history_workspace_qt.py \
+            tests/test_reaction_rate_workspace_qt.py \
+            tests/test_spectrum_file_queue_workspace_qt.py \
+            tests/test_production_gui_mode.py
+
+  external-reference-parity:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      MPLBACKEND: Agg
+      FLUXFORGE_REFERENCE_ROOT: ${{ github.workspace }}/.reference-inputs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Fetch pinned algorithm references
+        run: |
+          git clone https://github.com/tylerdolezal/Neutron-Unfolding.git .reference-inputs/Neutron-Unfolding
+          git -C .reference-inputs/Neutron-Unfolding checkout d5e377b7bc3f6ac01d59a9ebcdd1bdc32f4ab85b
+          git clone https://github.com/jrbourbeau/pyunfold.git .reference-inputs/pyunfold
+          git -C .reference-inputs/pyunfold checkout 0b50d43d17380d2663c3d1a8c3356fadde4917aa
+      - name: Check independent reference parity
+        run: pytest -q tests/test_unfolding_reference_parity.py
+
+  optional-ml-cpu:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      MPLBACKEND: Agg
+      OMP_NUM_THREADS: '1'
+      TF_NUM_INTRAOP_THREADS: '1'
+      TF_NUM_INTEROP_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install ML test dependencies
+        run: python -m pip install -e '.[dev,ml]'
+      - name: Check ANN construction, inference, training and persistence
+        run: pytest -q tests/test_naa_ann.py tests/test_naa_ann_4e_dataset.py>>>>>>> origin/codex/adversarial-acceptance-20261002

@@ -95,7 +95,8 @@ def calculate_n_atoms(
         Fraction of target isotope (e.g., 0.6917 for Cu-63 in natural Cu)
     element_mass_fraction : float, optional
         Mass fraction of ``element`` in the monitor (dilute alloy wires such as
-        Co-Al). Defaults to the bundled purity for pure-element wires, else 1.
+        Co-Al). An explicit mass is treated as element mass unless this fraction
+        is supplied. Bundled example purity applies only to nominal mass.
     allow_default_mass : bool
         Explicitly accept the bundled nominal mass when ``mass_mg`` is None.
 
@@ -107,6 +108,7 @@ def calculate_n_atoms(
     if not element:
         raise ValueError("Monitor element is required to count target atoms")
     params = FLUX_WIRE_SAMPLES.get(element, {})
+    using_nominal_mass = mass_mg is None
     if mass_mg is None:
         if not allow_default_mass or "mass_mg" not in params:
             raise ValueError(
@@ -132,7 +134,7 @@ def calculate_n_atoms(
     fraction = (
         float(element_mass_fraction)
         if element_mass_fraction is not None
-        else float(params.get("purity", 1.0))
+        else float(params.get("purity", 1.0)) if using_nominal_mass else 1.0
     )
     if not np.isfinite(fraction) or not 0 < fraction <= 1:
         raise ValueError("element_mass_fraction must be finite and in (0, 1]")

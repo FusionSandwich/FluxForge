@@ -100,8 +100,8 @@ if QT_AVAILABLE:
                     "Product",
                     "Reaction",
                     "Target atoms",
-                    "Saturation rate (s⁻¹)",
-                    "SigPhi (atom⁻¹ s⁻¹)",
+                    "Rate at relative power 1 (s⁻¹)",
+                    "SigPhi at relative power 1 (atom⁻¹ s⁻¹)",
                     "σ SigPhi (activity only)",
                     "Uncertainty scope",
                 ]
@@ -113,7 +113,9 @@ if QT_AVAILABLE:
             note = QLabel(
                 "Displayed sigma is conditional on fixed mass, composition, "
                 "half-life and timing. Blank sigma remains unavailable. These "
-                "rows do not qualify a complete reaction-rate uncertainty budget.",
+                "rates use relative power 1 in the applied history; its absolute "
+                "power remains unspecified. These rows do not qualify a complete "
+                "reaction-rate uncertainty budget.",
                 self,
             )
             note.setWordWrap(True)

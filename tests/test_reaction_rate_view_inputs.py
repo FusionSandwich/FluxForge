@@ -27,6 +27,10 @@ def test_rate_and_sigma_use_explicit_mass_composition_and_relative_power():
     payload = reaction_rate_payload([BASE], HISTORY)
     assert payload["complete_uncertainty_budget"] is False
     assert payload["activity_reference"] == "end_of_irradiation"
+    assert payload["rate_reference"] == "at_relative_power_one"
+    assert payload["irradiation"]["power_basis"] == "relative_to_user_reference"
+    assert payload["irradiation"]["reference_relative_power"] == 1
+    assert payload["irradiation"]["absolute_reference_power"] is None
 
 
 def test_zero_activity_retains_positive_supplied_sigma():
