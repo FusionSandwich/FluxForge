@@ -1312,6 +1312,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.setWindowModified(False)
 
         def _on_workspace_document_changed(self, document) -> None:
+            dialog = getattr(self, "_calibration_dialog", None)
+            if dialog is not None:
+                target = getattr(dialog, "workspace_target", None)
+                if target is not None and not self._calibration_target_is_current(target):
+                    dialog.close()
+                    self._calibration_dialog = None
             viewport = document.viewport_by_id("primary-spectrum")
             log_y = viewport.log_y if viewport is not None else False
             labels_visible = viewport.labels_visible if viewport is not None else True
@@ -1365,9 +1371,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._calibration_dialog.activateWindow()
                 return
 
-            current_spectrum = None
-            if hasattr(self.central_tabs, "current_spectrum"):
-                current_spectrum = self.central_tabs.current_spectrum()
+            document = self.analysis_workspace.document
+            record = document.spectrum_by_id(document.active_spectrum_id)
+            current_spectrum = record.spectrum if record is not None else None
             if current_spectrum is None:
                 self.statusBar().showMessage(
                     "Load a spectrum before opening calibration.",
@@ -1375,14 +1381,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 return
 
+            target = (document.document_id, record.spectrum_id, current_spectrum.counts)
             self._calibration_dialog = CalibrationWorkspaceDialog(
                 spectrum=current_spectrum,
                 mode_manager=self.mode_manager,
                 selection_bus=self.selection_bus,
                 library_manager=self.library_manager,
-                on_apply=self._apply_calibration_workspace_result,
+                on_apply=lambda spectrum, energy_fit, fwhm_fit: (
+                    self._apply_calibration_workspace_result(
+                        spectrum, energy_fit, fwhm_fit, target=target
+                    )
+                ),
+                publish_selection=False,
                 parent=self,
             )
+            self._calibration_dialog.workspace_target = target
             if advanced_tab is not None:
                 self._calibration_dialog.set_active_advanced_tab(advanced_tab)
             self._calibration_dialog.show()
@@ -2003,20 +2016,41 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._pu_isotopics_dialog.show()
 
+        def _calibration_target_is_current(self, target) -> bool:
+            document_id, spectrum_id, counts = target
+            document = self.analysis_workspace.document
+            record = document.spectrum_by_id(spectrum_id)
+            return (
+                document.document_id == document_id
+                and record is not None
+                and record.spectrum.counts is counts
+            )
+
         def _apply_calibration_workspace_result(
             self,
             spectrum,
             energy_fit,
             fwhm_fit,
-        ) -> None:
-            spectrum_id = self.analysis_workspace.document.active_spectrum_id
+            *,
+            target=None,
+        ) -> bool:
+            if target is not None and not self._calibration_target_is_current(target):
+                self.statusBar().showMessage(
+                    "Calibration source changed. Reopen calibration for the current spectrum.",
+                    6000,
+                )
+                return False
+            spectrum_id = (
+                target[1] if target is not None
+                else self.analysis_workspace.document.active_spectrum_id
+            )
             workspace_spectrum = (
                 self.analysis_workspace.document.spectrum_by_id(spectrum_id)
                 if spectrum_id is not None
                 else None
             )
             if spectrum_id is None or workspace_spectrum is None:
-                return
+                return False
             existing_profile = (
                 self.analysis_workspace.document.detector_profile_by_id(
                     workspace_spectrum.detector_profile_id
@@ -2105,9 +2139,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             else:
                 command.redo()
             self._refresh_analysis_workspace_derivatives()
-            self.file_label.setText(
-                f"File: {spectrum.spectrum_id or 'workspace spectrum'}"
-            )
             message = (
                 f"Applied calibration order {energy_fit.order} "
                 f"(RMS {energy_fit.rms_keV:.4f} keV)"
@@ -2117,6 +2148,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.statusBar().showMessage(message, 6000)
             self.progress.setValue(72)
             self.progress.setFormat("Calibration applied")
+            return True
 
         def _refresh_analysis_workspace_derivatives(self) -> None:
             from fluxforge.core.analysis_workspace import (
