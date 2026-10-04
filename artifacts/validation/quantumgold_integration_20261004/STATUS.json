@@ -1,0 +1,36 @@
+{
+  "status": "PUSHED_DRAFT_FULL_REPLAY_PENDING",
+  "integration_pr": "https://github.com/FusionSandwich/FluxForge/pull/248",
+  "implementation_commit": "6a4bc97b6c6e18b7913794f3a6b151e9e3337843",
+  "base_commit": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "code_commit_for_test_union": "99fa6c406dd9463ba78f122135d853de321bdec3",
+  "focused_union_tests": 343,
+  "focused_union_subtests": 12,
+  "post_label_patch_integration_tests": 15,
+  "full_replay_code_commit": "99fa6c406dd9463ba78f122135d853de321bdec3",
+  "source_copy_manifest_sha256": "3156bbd5aeeb88e06bea806c750386b17afdab47232ba7f703ff0588d6f6910e",
+  "source_copy_files": 1655,
+  "source_copy_bytes": 116478598,
+  "source_copy_all_bytes_verified": true,
+  "source_copy_git_metadata_present": false,
+  "full_replay_completed": false,
+  "final_artifact_acceptance": false,
+  "scientific_admission": false,
+  "exact_vendor_parity": false,
+  "component_prs": [
+    242,
+    243,
+    244,
+    245,
+    246,
+    247
+  ],
+  "next_agent_issue": "https://github.com/FusionSandwich/FluxForge/issues/249",
+  "evidence_sha256": {
+    "CONTINUATION.txt": "bb47aee4de344828ce1515c08c29baf2db47be37e4c2504b52ada28f58f8dfe5",
+    "INDEPENDENT_REVIEW.txt": "792ad26c28f1c926a27d3555281e0450a065b5daab07473c305aef258bf8befd",
+    "integrated_final_acceptance_tests.xml": "44ea90297f8b526be0835ceae44c3f2bf5c8ee17fbd3e875f274613e8ef5e592",
+    "integration_all_references.xml": "fb38f4663a7224d4b7a2aed79f480ac0e76a477ec67dc575d9b44193554bc68b",
+    "PROVENANCE_PATCH_WITNESS.json": "a6750ec245e82d03c5131d680f5fc4a4265b333ae5e9c8a7a330852e84b4addd"
+  }
+}
