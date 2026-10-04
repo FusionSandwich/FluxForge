@@ -1,0 +1,22 @@
+{
+  "analysis_replay_revision": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
+  "gui_revision": "5a1ffca4f631205b10ee8a4815134d55d27d1915",
+  "changed_gui_files": [
+    "src\\fluxforge\\gui\\backends\\pyqtgraph_backend.py",
+    "src\\fluxforge\\gui\\dialogs\\calibration_dialog.py",
+    "src\\fluxforge\\gui\\main_window.py",
+    "src\\fluxforge\\gui\\widgets\\mode_switcher.py"
+  ],
+  "numerical_analysis_sources_unchanged": true,
+  "whole_engine_identity_changed": true,
+  "tests": {
+    "latest_gui_calibration_target_final": {
+      "passed": 5,
+      "xml_sha256": "d61f502b487f5c861e29b46cc197ef9706c0c89b4a54fae0c5afb9b964bcd2b0"
+    },
+    "latest_gui_existing_regressions": {
+      "passed": 37,
+      "xml_sha256": "d1ab3e0bf25d1498da3c0b300bd08d3e78321af93123a7214698ec305bd3aefd"
+    }
+  }
+}

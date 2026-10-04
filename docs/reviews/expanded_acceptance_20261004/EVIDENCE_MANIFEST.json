@@ -1,5 +1,6 @@
 {
-  "git_head": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
+  "analysis_revision": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
+  "gui_revision": "5a1ffca4f631205b10ee8a4815134d55d27d1915",
   "files": {
     ".gitattributes": {
       "bytes": 8,
@@ -29,9 +30,33 @@
       "bytes": 810,
       "sha256": "5e98e05cf602cdc224ba4d12dbccdf51cfd707c2914109d7f82f7dc14ecb6573"
     },
+    "latest_gui_source_bridge.json": {
+      "bytes": 802,
+      "sha256": "4ff0531a678cc814fd83521cfd6e1703c09d6f4357d10c1ffab3e5600480ca68"
+    },
+    "latest_measured_unfolding_start.png": {
+      "bytes": 83825,
+      "sha256": "afdcdeff7bcd7c3c1cf4b9eb7e0082a77614d7bc625512ffc05026780ea0a8f6"
+    },
+    "latest_new_gui_source_campaign.png": {
+      "bytes": 157189,
+      "sha256": "ba6178c7b81e8a7d7253fe348e4e8b92918d960105f62e0dc793d6ec10a3bee2"
+    },
+    "latest_qt_native_gui.json": {
+      "bytes": 1025,
+      "sha256": "b74a91bb290959abfb3e475ff8450aa36782e45c8a7e126846b0e23f307ba68e"
+    },
+    "latest_source_campaign_report_preview.png": {
+      "bytes": 89269,
+      "sha256": "60023737a63488c8ade61263c4f5bbedfe9cfbe35d929f4edf03d865eebe67d4"
+    },
     "luna_integration_review.md": {
       "bytes": 2843,
       "sha256": "3e8f405a3ee559799d4dddc3b9b7fa97aca151afc25dd9959c32c5f9704a7e42"
+    },
+    "luna_latest_gui_review.md": {
+      "bytes": 2224,
+      "sha256": "33319e51acd3eea2265dd2252d8ef1c6dd8183bbc67609465d3eb850e57f04e5"
     },
     "luna_scientific_methods_review.md": {
       "bytes": 3140,
@@ -71,5 +96,5 @@
     }
   },
   "scientific_admission": false,
-  "note": "Public compact receipts; original local evidence and source inputs are retained"
+  "note": "Retains earlier evidence plus later GUI-specific checks; numerical replay is not relabeled"
 }

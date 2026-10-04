@@ -8,8 +8,9 @@ comparisons, and 1 unavailable comparison**. These results do not qualify an
 absolute activity, reaction rate, or neutron spectrum.
 
 This review uses analysis revision `d017a7162d51d97ef3e50fac98a0c748337b9ccb`.
-The subsequently added South pilot and evidence do not change package analysis
-sources. Public receipts and screenshots are in
+The subsequent South pilot does not change package analysis sources. Later Qt
+fixes at `5a1ffca4f631205b10ee8a4815134d55d27d1915` change four GUI files; numerical
+analysis sources used by the replay remain unchanged. Public receipts and screenshots are in
 [`expanded_acceptance_20261004`](expanded_acceptance_20261004/EVIDENCE_MANIFEST.json).
 Original inputs, full local outputs, failed attempts, and earlier reviews remain
 preserved. The receipt manifest binds the compact published evidence by bytes
@@ -49,6 +50,15 @@ included. Its original strict integration-ancestor prerequisite was replaced
 with current content identity plus an explicitly historical base field. No
 counts, response choices, or numerical results were tuned to vendor targets.
 
+A final remote check identified `codex/qt-gui-review-20261004`. Its four GUI fixes
+through `c5eee22` are integrated: calibration stays bound to its original
+document/acquisition when selection changes; stale document/acquisition replacement
+rejects apply; calibration plots scroll while action buttons remain accessible;
+and mode/theme/canvas controls fit narrower laptop windows. The new GUI regression
+group passes five tests, and 37 existing calibration/canvas/consolidation tests
+pass. Luna reviewed all four changes and found no concrete blocker. Existing
+conditioning warnings on synthetic calibration and unfolding tests remain visible.
+
 ## Verification scope
 
 | Check | Recorded result | Limit |
@@ -76,8 +86,10 @@ unfolding startup. Running measured unfolding stays disabled until inputs exist.
 The report ZIP contains one plot, nine tables, a snapshot, and a verified manifest.
 Workspace and viewport remain unchanged. All 120 unavailable instrument fields
 remain in the snapshot; the compact status display does not invent settings or
-allow an incomplete instructional export. A separate interactive new-GUI session
-remains open; its in-memory revision is `3ea8077`, which has the same GUI source.
+allow an incomplete instructional export. The later native probe repeats this
+30-spectrum/report check at `5a1ffca`; its receipt and screenshots use the
+`latest_` prefix. The updated GUI is open at that revision in a new interactive
+session. The earlier interactive session remains preserved with its original state.
 
 ## Source inventory and sample outcomes
 
@@ -128,8 +140,8 @@ shared systematics remain missing in activity combinations and likelihood
 intervals; they are not replaced by zero covariance. No rate or neutron-flux
 inversion is promoted using these conditional results.
 
-Luna independently inspected the six components, their integration, and the
-South pilot and found no concrete software blocker. The three review receipts
+Luna independently inspected the six components, their integration, the
+South pilot, and the later GUI fixes and found no concrete software blocker. The review receipts
 identify their scope and state that Luna did not rerun the tests. They preserve
 method assumptions and two non-blocking maintenance cautions concerning exact
 prose-based unavailable-rate classification and older historical metadata names.
