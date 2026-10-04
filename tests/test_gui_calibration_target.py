@@ -112,3 +112,17 @@ def test_replaced_acquisition_under_same_id_rejects_old_fit(window):
     dialog._apply_workspace_results()
     assert controller.document.to_dict() == before
     assert window.undo_stack.count() == 0
+
+
+def test_calibration_fits_laptop_height_with_visible_actions(window):
+    app = QApplication.instance()
+    window._open_energy_fwhm_workspace()
+    dialog = window._calibration_dialog
+    dialog.resize(1280, 800)
+    app.processEvents()
+    assert dialog.height() <= 800
+    for button in (dialog.apply_button, dialog.close_button):
+        center = button.mapTo(dialog, button.rect().center())
+        assert dialog.rect().contains(center)
+        assert dialog.childAt(center) is button
+    assert dialog.spectrum_plot.height() >= 180

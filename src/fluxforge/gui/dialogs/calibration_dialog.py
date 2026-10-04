@@ -226,7 +226,11 @@ if (
             splitter.setChildrenCollapsible(False)
             root.addWidget(splitter, 1)
 
-            plots_panel = QWidget(splitter)
+            plots_panel = QWidget()
+            plots_scroll = QScrollArea(splitter)
+            plots_scroll.setObjectName("CalibrationPlotsScrollArea")
+            plots_scroll.setWidgetResizable(True)
+            plots_scroll.setWidget(plots_panel)
             plots_layout = QVBoxLayout(plots_panel)
             plots_layout.setContentsMargins(0, 0, 0, 0)
             plots_layout.setSpacing(12)
@@ -637,9 +641,9 @@ if (
             self.close_button.setObjectName("CloseCalibrationDialogButton")
             self.close_button.clicked.connect(self.close)
             action_row.addWidget(self.close_button)
-            controls_layout.addLayout(action_row)
+            root.addLayout(action_row)
 
-            splitter.addWidget(plots_panel)
+            splitter.addWidget(plots_scroll)
             splitter.addWidget(controls_scroll)
             splitter.setStretchFactor(0, 3)
             splitter.setStretchFactor(1, 2)
@@ -1024,6 +1028,7 @@ if (
         ) -> pg.PlotWidget:
             widget = pg.PlotWidget(self)
             widget.setObjectName(object_name)
+            widget.setMinimumHeight(180)
             catalog_pyqtgraph_export_action(widget, object_name)
             widget.showGrid(x=True, y=True, alpha=0.12)
             widget.setMenuEnabled(False)
