@@ -1,0 +1,14 @@
+{
+  "QG_summary_Bq": 234.95,
+  "printed_line_activity_Bq": [
+    219.78,
+    246.42
+  ],
+  "approx_line_sigma_Bq_from_count_uncertainty_only": [
+    10.202249598286022,
+    8.530668764752162
+  ],
+  "manual_weight_activity_over_sigma_Bq": 235.0398255515649,
+  "inverse_variance_Bq": 235.45836940294447,
+  "qualification": "Approximate diagnostic using rounded QG printout; efficiency/yield uncertainty missing. Does not reproduce full vendor error model."
+}
