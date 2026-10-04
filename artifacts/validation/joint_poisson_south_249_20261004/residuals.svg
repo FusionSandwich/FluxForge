@@ -1,15 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
-<rect width="900" height="500" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="650" viewBox="0 0 900 650">
+<rect width="900" height="650" fill="white"/>
 <text x="450" y="30" text-anchor="middle" font-family="sans-serif" font-size="20">Issue #249: sample Poisson deviance residuals, South-background linear fits</text>
-<line x1="80" y1="250" x2="860" y2="250" stroke="black" stroke-width="1"/>
-<line x1="80" y1="130" x2="860" y2="130" stroke="gray" stroke-dasharray="6 6"/>
-<line x1="80" y1="370" x2="860" y2="370" stroke="gray" stroke-dasharray="6 6"/>
-<text x="52" y="136" font-family="sans-serif" font-size="12">+3</text><text x="52" y="376" font-family="sans-serif" font-size="12">-3</text>
-<polyline fill="none" stroke="black" stroke-width="2" points="90,241 132,313 174,226 216,252 258,244 300,196 342,162 384,164 426,111 468,195 510,282 552,459 594,477 636,344 678,367 720,204 762,156 804,231 846,168"/>
-<polyline fill="none" stroke="gray" stroke-width="2" stroke-dasharray="8 4" points="90,273 132,331 174,214 216,199 258,210 300,180 342,156 384,162 426,84 468,232 510,308 552,557 594,469 636,381 678,268 720,186 762,216 804,156 846,242"/>
-<text x="110" y="55" font-family="sans-serif" font-size="14">solid: 1173 keV; dashed: 1332 keV</text>
-<text x="450" y="480" text-anchor="middle" font-family="sans-serif" font-size="14">ROI channel offset (left to right; 19 bins)</text>
-<text x="20" y="250" transform="rotate(-90 20 250)" text-anchor="middle" font-family="sans-serif" font-size="14">deviance residual</text>
-<text x="640" y="85" font-family="sans-serif" font-size="12">1332 max |r| ≈ 7.7 (off-scale)</text>
-<text x="640" y="105" font-family="sans-serif" font-size="12">1173 max |r| ≈ 5.7</text>
+<line x1="80" y1="315" x2="860" y2="315" stroke="black" stroke-width="1"/>
+<line x1="80" y1="210" x2="860" y2="210" stroke="gray" stroke-dasharray="6 6"/>
+<line x1="80" y1="420" x2="860" y2="420" stroke="gray" stroke-dasharray="6 6"/>
+<text x="52" y="216" font-family="sans-serif" font-size="12">+3</text>
+<text x="52" y="426" font-family="sans-serif" font-size="12">-3</text>
+<polyline fill="none" stroke="black" stroke-width="2" points="90,307 132,370 174,294 216,317 258,309 300,267 342,238 384,239 426,194 468,267 510,343 552,498 594,514 636,397 678,418 720,275 762,233 804,299 846,243"/>
+<polyline fill="none" stroke="gray" stroke-width="2" stroke-dasharray="8 4" points="90,335 132,386 174,284 216,270 258,280 300,254 342,233 384,238 426,170 468,299 510,365 552,583 594,506 636,430 678,330 720,259 762,285 804,232 846,308"/>
+<text x="110" y="58" font-family="sans-serif" font-size="14">solid: 1173 keV; dashed: 1332 keV</text>
+<text x="450" y="625" text-anchor="middle" font-family="sans-serif" font-size="14">fixed 19-bin sample ROI, low → high energy</text>
+<text x="20" y="315" transform="rotate(-90 20 315)" text-anchor="middle" font-family="sans-serif" font-size="14">Poisson deviance residual</text>
+<text x="590" y="90" font-family="sans-serif" font-size="12">max |r| ≈ 5.7 (1173 keV), 7.7 (1332 keV)</text>
+<text x="590" y="110" font-family="sans-serif" font-size="12">±3 guides are diagnostic, not calibrated acceptance limits</text>
 </svg>
