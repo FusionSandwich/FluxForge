@@ -1,0 +1,176 @@
+{
+  "schema": "fluxforge.qt_integration.validation.v1",
+  "date": "2026-10-03",
+  "gui": "PySide6/Qt",
+  "source_commit": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+  "consolidation_base_commit": "b618f5e3bf41323d613b8193b43a8ec26f94ec90",
+  "python": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete\\python.exe",
+  "prefix": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete",
+  "qt_version": "6.11.2",
+  "groups": [
+    {
+      "group": "qt_consolidation",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 18.77,
+      "files": [
+        "tests/test_gui_consolidation.py"
+      ],
+      "cases": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_shell",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 87.26,
+      "files": [
+        "tests/test_modern_gui_shell.py"
+      ],
+      "cases": 23,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_new_workspaces",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 18.73,
+      "files": [
+        "tests/test_irradiation_history_workspace_qt.py",
+        "tests/test_reaction_rate_workspace_qt.py",
+        "tests/test_spectrum_file_queue_workspace_qt.py"
+      ],
+      "cases": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_calibration",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 31.7,
+      "files": [
+        "tests/test_calibration_workspace_qt.py"
+      ],
+      "cases": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_sessions",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 52.81,
+      "files": [
+        "tests/test_workspace_session_qt.py"
+      ],
+      "cases": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_parity",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 7.03,
+      "files": [
+        "tests/test_reference_parity_runner.py",
+        "tests/test_reference_parity_energy_tolerance.py",
+        "tests/test_parity_fixture_manifests.py"
+      ],
+      "cases": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "native_qt_production",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 118.36,
+      "files": [
+        "tests/test_production_gui_mode.py"
+      ],
+      "cases": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "selected_counts": {
+    "passed": 82,
+    "failed": 0,
+    "skipped": 0
+  },
+  "profiles": {
+    "offscreen": "offscreen",
+    "native": "windows"
+  },
+  "incomplete_attempts": [
+    {
+      "group": "qt_production",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": null,
+      "timed_out": true,
+      "elapsed_s": 90.17,
+      "files": [
+        "tests/test_production_gui_mode.py"
+      ]
+    }
+  ],
+  "native_gui_snapshot": {
+    "status": "ok",
+    "window_size": [
+      1539,
+      844
+    ],
+    "default_font": "Segoe UI",
+    "legacy_gui_imported": false,
+    "source_sha256": {
+      "src\\fluxforge\\gui\\main_window.py": "26cfaa6b60521f10ead9e7ad7bd32d694fde7fb8fec0f5152557c80b6e45888d",
+      "src\\fluxforge\\gui\\app.py": "a65b00bda413f3f5e60bbf2bbb15c9674a80e4d4e5713bd942327d8c79444600",
+      "pyproject.toml": "050d161e97be488e90de2190befd6498b2f43a8c97ccf35005983dea75f730b4"
+    }
+  },
+  "published_acceptance_precedence": {
+    "git_head": "c8985a3205c790e9804e082507d716c6e78ae8e1",
+    "correct_checks": 4,
+    "total_checks": 8,
+    "integration_requirement": "Retain #217 explicit-field precedence; latest acceptance comparator is insertion-order dependent."
+  },
+  "legacy_coordinate_workflow": {
+    "historical_result": "reproducible failure",
+    "current_gui_status": "Tk test archived outside active discovery; not a claimed passing replay"
+  },
+  "single_revision_full_suite_passed": false,
+  "artifact_sha256": {
+    "qt_checks_summary.json": "523c82c1b9d8872add68a4f96e55c00a72fea5eeea795398fd856dbb78579330",
+    "native_qt_checks_summary.json": "ddd6226779914ca1d4bb0888bb841a252897591a6feb1cf339a975f16eb3d34c",
+    "qt_snapshot.json": "23c18d6b58d4042c73d7a94c86a8b52080af100aa9505bf74c44336c3f500e19",
+    "qt_example_workspace.png": "edf8d8101cf18fcab7c9b734ca97048c06fcbc014d823ac8291e95f7ea937bb4",
+    "qt_empty_workspace.png": "adc3d51c4ba9ca05e6a0762f951ad071093481737460c0d66f5dbfa01b6a7944",
+    "qt_offscreen_missing_fonts.png": "58bbd4ed2499b0ae945255c285ac7ab3f08cb5638b5e0495d7f07949524c2c3b",
+    "published_parity_precedence.json": "292b8897e0bb28f5cfdf90f7d56dfe8bc22216ea6de5aab4e968a6fd59416504",
+    "qt_consolidation.xml": "c30013c2bf561fd39fb79ca8eead21269f247eaac957c6c1312813159ee25563",
+    "qt_consolidation.log": "4061dabe1d59eb8ac7d973bb254b296ca5bec2c03a93144cd916d81bdf88b47f",
+    "qt_shell.xml": "73a00aaa69041fb56a662f68b5b4482e97530ed903b1a738f5eaeabed4693d8f",
+    "qt_shell.log": "428da52a1e55c549d6b98c5643f58f92f1cf3f797d028660953ac67db4a4a529",
+    "qt_new_workspaces.xml": "f9440a338d72e7bb0fbd8c2d69352c7f8d605674168f267d2fde01fe07a4ecc8",
+    "qt_new_workspaces.log": "3f58fd0a3e038766394aed8660768ed9384a8f9adc39b30c0ba4e2e1da2806fa",
+    "qt_calibration.xml": "3dbbbfa4f005c109ae147ee8a4be71c5f06a19613b72d50928cc446b680d08aa",
+    "qt_calibration.log": "dc5e8267f5f986264cb0b4f0819e39f343a5c722bac562faeb2a64fde13e4da3",
+    "qt_sessions.xml": "9a1f3f1169b50d8c74b8a0e6995e0ca75bb699583608d03871e2d762635c0a8d",
+    "qt_sessions.log": "f72894b1e81ee0f5886f5d2ab651d01b46235b362bf56e712ceee593fb036839",
+    "qt_parity.xml": "6d5da04be5eac04ace1c0df00c1907f7762391f8d72ab800efe4ea25cee1a6b4",
+    "qt_parity.log": "a7e57eb84f8102d0bde5d4e4c3965c545930d32d57c97c8afd22d67413d71ad6",
+    "native_qt_production.xml": "1251978339d6b93e3ea9e2bcc0c4270d22c786171683fff2160319d34fa97774",
+    "native_qt_production.log": "7674c97c92b98d927dd5cc4a382e36c2405fd89a84e4d29a7c0597bd496f3509"
+  }
+}

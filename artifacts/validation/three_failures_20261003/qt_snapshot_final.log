@@ -1,0 +1,6 @@
+{"requested_size": [1560, 980], "actual_size": [2108, 980], "minimum_size_hint": [2108, 839]}
+Traceback (most recent call last):
+  File "C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge\artifacts\validation\three_failures_20261003\qt_snapshot.py", line 48, in <module>
+    assert window.analysis_workspace.state.peaks
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
