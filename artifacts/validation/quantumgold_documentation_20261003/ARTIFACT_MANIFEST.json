@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "study": "QuantumGold manufacturer documentation and saved-settings diagnosis",
+  "date": "2026-10-03",
+  "production_changed": false,
+  "source_manual_retained_locally": true,
+  "private_chat_receipt_published": false,
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 29,
+      "sha256": "730a35ae3d558080083c3103d9ac8100c3f6561678092abe341701dfa331eb1d"
+    },
+    {
+      "path": "combination_method_control.json",
+      "bytes": 12157,
+      "sha256": "54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6"
+    },
+    {
+      "path": "DOCUMENTATION_RECEIPT.json",
+      "bytes": 1192,
+      "sha256": "ab6cc410380a9ed621990edc75d6163761d211c6e1ccc946b32114d7a5ccc891"
+    },
+    {
+      "path": "FINDINGS.txt",
+      "bytes": 7688,
+      "sha256": "6fa1a3e928010b5b03f7ba453e3b6a2212d2254c65ed85e3ea0bc6abb63dbb42"
+    },
+    {
+      "path": "inspect_saved_qg_settings.py",
+      "bytes": 6389,
+      "sha256": "7f21966c60f08835ac5d4079ff96943ffb064c79581a1cbb03e5531e154823f7"
+    },
+    {
+      "path": "parser_counterexample_checks.json",
+      "bytes": 633,
+      "sha256": "2aac7a2fdf6c333647c202044c84c0c11f6b3cf410a233004420e6ea5b33ad51"
+    },
+    {
+      "path": "saved_settings_audit.json",
+      "bytes": 47225,
+      "sha256": "c63f9f6e095da6dcc0a86d4e4d8a36e150a45299122ac2304258d82a29942c4d"
+    },
+    {
+      "path": "weighting_control.json",
+      "bytes": 469,
+      "sha256": "9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824"
+    }
+  ]
+}

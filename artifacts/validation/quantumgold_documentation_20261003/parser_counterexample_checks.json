@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "wrong_revision",
+      "passed": true,
+      "rejection": "SYNTHETIC_MUTATION.ANS: unsupported revision"
+    },
+    {
+      "check": "wrong_channel_bound",
+      "passed": true,
+      "rejection": "SYNTHETIC_MUTATION.ANS: unsupported study channel layout"
+    },
+    {
+      "check": "wrong_roi_length",
+      "passed": true,
+      "rejection": "SYNTHETIC_MUTATION.ANS: study header/count/ROI length does not close"
+    },
+    {
+      "check": "flipped_ambient_flag_changes_inference",
+      "passed": true
+    }
+  ],
+  "originals_modified": false
+}

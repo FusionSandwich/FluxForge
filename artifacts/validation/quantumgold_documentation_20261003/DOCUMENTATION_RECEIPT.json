@@ -1,0 +1,18 @@
+{
+  "source_title": "PGT Quantum Software User Manual",
+  "title_version": "4.04.00",
+  "source_author": "Princeton Gamma-Tech",
+  "downloaded_mirror": "https://www-nh.scphys.kyoto-u.ac.jp/~adachi/public/zeze_high_school/QuantumMCA.pdf",
+  "manufacturer_distributor_copy": "https://ludlums.com/images/product_manuals/QTMmanual.pdf",
+  "bytes": 2973154,
+  "sha256": "0f8b20e997497ae7db38b5fe46483d9625c83ef9d01d96362e6977d04cc8ebc1",
+  "PDF_pages": 142,
+  "local_copy_only": true,
+  "installed_2025_version": "unknown",
+  "mirror_pagination_warning": "Kyoto PDF118 prints108; Ludlum PDF118 prints110. Cite section and mirror-specific page.",
+  "review_status": "ACCEPT_BOUNDED_SAVED_SETTING_INFERENCE",
+  "reviewer": "independent Sol south_baseline_acceptance",
+  "qualification": "Saved headers only; final report state not established. No production change.",
+  "mirror_version_warning": "Kyoto cover4.04.00, innerpage4.03.00; Ludlum innerpage4.04.00. Algorithm comparison is bounded; installed version unknown.",
+  "external_research_status": "Initial and targeted amendment completed/read; observed Extra High non-Pro ordinary Chat; independently checked findings only."
+}
