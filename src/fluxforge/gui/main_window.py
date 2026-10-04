@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from datetime import datetime
+from html import escape
+import json
 from pathlib import Path
 
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
@@ -1442,10 +1444,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _build_report_context(self, template_name: str) -> dict[str, object]:
+            from fluxforge.gui.report_snapshot import capture_report_snapshot
+
+            snapshot = capture_report_snapshot(self)
             state = self.analysis_workspace.state
             peak_rows = (
                 "".join(
-                    f"<tr><td>{peak.energy_keV:.3f}</td><td>{peak.nuclide or 'Unassigned'}</td><td>{peak.net_counts:.1f}</td></tr>"
+                    f"<tr><td>{peak.energy_keV:.3f}</td><td>{escape(peak.nuclide or 'Unassigned')}</td><td>{peak.net_counts:.1f}</td></tr>"
                     for peak in state.peaks
                 )
                 or "<tr><td colspan='3'>No peaks</td></tr>"
@@ -1457,7 +1462,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             activity_rows = (
                 "".join(
-                    f"<tr><td>{result.nuclide}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
+                    f"<tr><td>{escape(result.nuclide)}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
                     for result in state.activity_results
                 )
                 or "<tr><td colspan='4'>No activity results</td></tr>"
@@ -1480,9 +1485,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     module = self.registries.standards_modules.get(key)
                     evaluation = module.evaluate(context)
                     standards_rows.append(
-                        f"<tr><td>{module.display_name}</td>"
-                        f"<td>{evaluation.overall_status}</td>"
-                        f"<td>{evaluation.summary}</td></tr>"
+                        f"<tr><td>{escape(module.display_name)}</td>"
+                        f"<td>{escape(evaluation.overall_status)}</td>"
+                        f"<td>{escape(evaluation.summary)}</td></tr>"
                     )
             else:
                 standards_rows.append(
@@ -1496,7 +1501,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             qa_status_snapshot = (
                 "<br/>".join(
-                    f"{item.nuclide} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
+                    f"{escape(item.nuclide)} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
                     for item in self.qa_monitor.status_snapshot()
                 )
                 or "No QA snapshot available."
@@ -1515,7 +1520,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 panel = bottom_widget.batch_queue_panel
                 if getattr(panel, "results", ()):
                     batch_rows = "<br/>".join(
-                        f"{result.label}: {result.peak_count} peaks, {result.backend}"
+                        f"{escape(result.label)}: {result.peak_count} peaks, {escape(result.backend)}"
                         for result in panel.results
                     )
                     aggregate_csv = (
@@ -1538,9 +1543,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "activity_table": activity_table,
                 "astm_status_table": astm_status_table,
                 "qa_status_snapshot": qa_status_snapshot,
-                "provenance": provenance,
+                "provenance": escape(provenance),
                 "batch_rows": batch_rows,
-                "aggregate_csv": aggregate_csv or "No batch CSV available.",
+                "aggregate_csv": escape(aggregate_csv) or "No batch CSV available.",
+                "run_snapshot": snapshot,
+                "run_parameters_json": json.dumps(snapshot["parameters"], indent=2),
             }
             return payload
 

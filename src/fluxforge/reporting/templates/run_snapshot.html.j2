@@ -1,0 +1,24 @@
+{% if run_snapshot is defined %}
+<section>
+  <h2>Current Qt Workspace</h2>
+  <p>Captured {{ run_snapshot.captured_at | e }}. Presentation snapshot; scientific admission is not established by this export.</p>
+  {% for view in run_snapshot.views %}
+  <h3>{{ view.control | e }}</h3>
+  <img alt="{{ view.control | e }} current view" src="data:image/png;base64,{{ view.png_base64 | e }}" style="max-width:100%;height:auto" />
+  <pre>Range: {{ view.range | e }}; log X: {{ view.log_x | e }}; log Y: {{ view.log_y | e }}</pre>
+  {% else %}<p>No visible plot was available to capture.</p>{% endfor %}
+</section>
+<section><h2>Analysis Input Parameters</h2><pre>{{ run_parameters_json | e }}</pre>
+  <table><tr><th>Control</th><th>Current value</th></tr>
+  {% for input in run_snapshot.inputs %}<tr><td>{{ input.control | e }}</td><td>{{ input.value | e }}</td></tr>{% endfor %}
+  </table>
+</section>
+{% for table in run_snapshot.tables %}
+<section><h2>{{ table.control | e }}</h2>
+  <table style="border-collapse:collapse;width:100%"><tr>{% for header in table.headers %}<th style="border:1px solid #aaa;padding:4px">{{ header | e }}</th>{% endfor %}</tr>
+  {% for row in table.rows %}<tr>{% for cell in row %}<td style="border:1px solid #aaa;padding:4px">{{ cell | e }}</td>{% endfor %}</tr>
+  {% else %}<tr><td>No rows at capture time.</td></tr>{% endfor %}
+  </table>
+</section>
+{% endfor %}
+{% endif %}

@@ -13,6 +13,7 @@ from fluxforge.gui.dialogs.reaction_rate_dialog import ReactionRateDialog
 from fluxforge.gui.dialogs.spectrum_file_queue_dialog import SpectrumFileQueueDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.dialogs.unfolding_dialog import UnfoldingWorkspaceDialog
+from fluxforge.gui.dialogs.report_export_dialog import ReportExportDialog
 from fluxforge.gui.panels.modern_shell_shared import build_demo_spectrum
 from fluxforge.gui.production_contract import (
     ActionCatalogEntry,
@@ -333,6 +334,7 @@ def test_machine_readable_action_catalog_matches_all_production_controls():
     window = _window()
     window.show()
     dialogs = (
+        ReportExportDialog(context_factory=window._build_report_context, parent=window),
         CovarianceDialog(parent=window),
         IrradiationHistoryDialog(parent=window),
         ReactionRateDialog(history_provider=lambda: (), parent=window),

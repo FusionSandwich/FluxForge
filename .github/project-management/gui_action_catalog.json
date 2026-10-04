@@ -107,6 +107,11 @@
   ],
   "control_surfaces": [
     {
+      "surface": "report-export",
+      "test_ids": ["tests/test_gui_report_bundle.py", "tests/test_module3_workflows_qt.py"],
+      "object_names": ["ReportTemplateCombo", "ReportExportPathInput", "RenderReportPreviewButton", "ExportReportHtmlButton", "ExportReportPdfButton", "ReportBundlePdfCheck", "GenerateReportBundleButton"]
+    },
+    {
       "surface": "spectrum-file-queue-dialog",
       "test_ids": ["tests/test_spectrum_file_queue_workspace_qt.py"],
       "object_names": ["SpectrumQueueFilesButton", "SpectrumQueueFolderButton", "SpectrumQueueRemoveButton", "SpectrumQueueRecursiveCheck", "SpectrumQueueModeCombo", "SpectrumQueueIndependentCheck", "SpectrumQueueOutputInput", "SpectrumQueueOutputButton", "SpectrumQueueRunButton"]
