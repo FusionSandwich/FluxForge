@@ -104,11 +104,25 @@ Poisson coverage calibration.
 
 ## Evidence and unresolved qualification
 
-`results/` contains implementation/source/runtime hashes, all candidate JSON,
+`accepted/` contains implementation/source/runtime hashes, all candidate JSON,
 the comparison CSV, native sample and ambient residual plots and output hashes.
-`focused_tests.xml` records focused tests. `independent_sol_review.json` contains
+`accepted_tests.xml` records 91 passing focused tests, including native histogram
+and measured-background covariance controls. `independent_sol_review.json` contains
 the independent review and its evidence. Development baseline receipts may be
 retained locally; the published result set contains all required failed models.
+The existing runtime is Python 3.12.14 / NumPy 1.26.4 / SciPy 1.17.1 and satisfies
+the declared core dependency ranges. The implementation receipt identifies code
+commit `55f6103`; a subsequent evidence-only commit publishes these results.
+Sol's initial replay reproduced all earlier artifacts; its missing XCOM hash
+finding was corrected before this final committed replay. The new canonical
+pins include XCOM attenuation/interpolation and the complete engine content hash.
+Final verdict: `PASS_BOUNDED_SOFTWARE_REVIEW`, with no open software blockers.
+Sol independently repeated all 91 tests, reproduced final JSON/CSV/PNG bytes,
+decoded the raw spectra and checked Covell counts/covariance with separate
+oracles. `independent_sol_final_tests.xml` and `independent_sol_checks/` preserve
+those focused verification receipts and helper code. This gate accepts only
+the bounded software pilot and its evidence; it does not accept #248 integration
+or qualify any activity estimate.
 
 Unknown calibration/efficiency covariance is explicit and excluded from
 conditional asymptotic intervals, never treated as known zero. Geometry,

@@ -1,0 +1,17 @@
+{
+  "source_inputs_match_accepted_receipt": true,
+  "canonical_code_pins_match": true,
+  "accepted_output_hashes_match_staged_git_bytes": {
+    "ambient_residuals.png": "a17419ea0837c9c60dc6b20457526989710257e7080cf30f348f9ba890ca7a87",
+    "comparison.csv": "93ab526abb26e4adf19aad38e0092b9c89667eb296b1fad11d6476c5c71afbb7",
+    "pilot.json": "819d0a31a1658f9da70242417d10919f69a0239e24c6911e9b7ec17bfaef183d",
+    "sample_residuals.png": "127c6b1959e2da54b68cdb74f8a32c605f6fcebe3989ea917c5a402fc2c0ce95"
+  },
+  "both_91_test_receipts_pass_and_preserve_staged_bytes": true,
+  "primary_branch_preserved": "registry-uncertainty-qualification",
+  "primary_tracked_files_remain_clean": true,
+  "branch_and_staged_changes_within_authorized_pilot_scope": true,
+  "no_source_spectra_manifests_or_shared_drivers_modified": true,
+  "implementation_revision": "55f610320758b6f7c3076d3682c1d974c18ce1c8",
+  "independent_review_verdict": "PASS_BOUNDED_SOFTWARE_REVIEW"
+}

@@ -1,0 +1,492 @@
+{
+  "schema": "fluxforge-independent-sol-software-review-v1",
+  "issue": 249,
+  "reviewer": "independent Sol subagent; implementation read-only",
+  "reviewed_at_utc": "2026-10-04T06:46:40.898520+00:00",
+  "verdict": "PASS_BOUNDED_SOFTWARE_REVIEW",
+  "implementation_revision": "55f610320758b6f7c3076d3682c1d974c18ce1c8",
+  "required_integration_ancestor": "701288a30f418ed7dc331e6deda0044eb220e72e",
+  "script_canonical_lf_sha256": "5056b7b9c186a24615538d4ad2737cb2b88ef9ecd81e2492ae099383e07f5366",
+  "tests_canonical_lf_sha256": "6fa26be20fc770cacf24524773ecc30200c99044d7f69af66b789a2a3c68ac87",
+  "accepted_pilot_byte_sha256": "819d0a31a1658f9da70242417d10919f69a0239e24c6911e9b7ec17bfaef183d",
+  "accepted_output_hashes": {
+    "ambient_residuals.png": "a17419ea0837c9c60dc6b20457526989710257e7080cf30f348f9ba890ca7a87",
+    "comparison.csv": "93ab526abb26e4adf19aad38e0092b9c89667eb296b1fad11d6476c5c71afbb7",
+    "pilot.json": "819d0a31a1658f9da70242417d10919f69a0239e24c6911e9b7ec17bfaef183d",
+    "sample_residuals.png": "127c6b1959e2da54b68cdb74f8a32c605f6fcebe3989ea917c5a402fc2c0ce95"
+  },
+  "complete_engine_receipt": {
+    "status": "IDENTIFIED_BY_CONTENT",
+    "source_sha256": "c7b140f7b75c16c6bb98d500da9793e78633cb36cfb2ef86bedb70b246ea2dd9",
+    "revision": null,
+    "file_count": 308,
+    "scope": "pyproject.toml, replay drivers present in this source, complete src/fluxforge tree",
+    "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+  },
+  "complete_engine_hash_independently_recomputed": true,
+  "all_declared_engine_pins_match_current_canonical_source": true,
+  "runtime": {
+    "status": "COMPATIBLE",
+    "python": {
+      "version": "3.12.14",
+      "declared": ">=3.11,<3.13",
+      "status": "COMPATIBLE",
+      "executable": "C:\\Users\\Josh\\projects\\FluxForge\\.venv\\Scripts\\python.exe"
+    },
+    "packages": {
+      "numpy": {
+        "installed_version": "1.26.4",
+        "declared": ">=1.26,<2.0",
+        "status": "COMPATIBLE"
+      },
+      "scipy": {
+        "installed_version": "1.17.1",
+        "declared": ">=1.11",
+        "status": "COMPATIBLE"
+      },
+      "pandas": {
+        "installed_version": "3.0.6",
+        "declared": ">=2.1",
+        "status": "COMPATIBLE"
+      },
+      "matplotlib": {
+        "installed_version": "3.11.2",
+        "declared": ">=3.8",
+        "status": "COMPATIBLE"
+      },
+      "pillow": {
+        "installed_version": "12.3.0",
+        "declared": ">=10.0",
+        "status": "COMPATIBLE"
+      },
+      "pyyaml": {
+        "installed_version": "6.0.3",
+        "declared": ">=6.0",
+        "status": "COMPATIBLE"
+      },
+      "h5py": {
+        "installed_version": "3.16.0",
+        "declared": ">=3.10",
+        "status": "COMPATIBLE"
+      },
+      "lxml": {
+        "installed_version": "6.1.3",
+        "declared": ">=5.0",
+        "status": "COMPATIBLE"
+      }
+    },
+    "version_source": "importlib.metadata in executing interpreter",
+    "scope": "declared core dependencies only"
+  },
+  "open_software_blockers": [],
+  "findings": [
+    {
+      "id": "SOL-249-01",
+      "priority": "P2",
+      "status": "CORRECTED_AND_INDEPENDENTLY_VERIFIED",
+      "original_finding": "Early pilot canonical source list omitted src/fluxforge/data/xcom.py, although activity efficiency conversion invokes its attenuation data and interpolation.",
+      "resolution": "Implementation commit 55f610320758b6f7c3076d3682c1d974c18ce1c8 adds xcom.py, core/calibration.py, pyproject.toml and complete-engine receipt. Final accepted pins and length-prefixed engine hash match independently recomputed hashes; final artifacts replay byte-identically.",
+      "evidence": {
+        "xcom_canonical_sha256": "172df2c081e28bfb3660104b0738e5d0b338bdd427afa7ca5210e9d07d58ac45",
+        "accepted_replay_byte_identical": true
+      }
+    }
+  ],
+  "independently_verified": {
+    "status": "INDEPENDENT_ORACLES_PASSED",
+    "source_dir": "accepted",
+    "replay_dir": "independent_sol_final_replay",
+    "original_ASC_channels": 8192,
+    "ASC_ANS_full_count_array_equal": true,
+    "background_sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+    "raw_background_total": 543427,
+    "raw_background_polynomial": [
+      -1.6994324922561646,
+      0.49959567189216614,
+      9.02407251146542e-08
+    ],
+    "raw_background_live_s": 14400.0,
+    "raw_background_real_s": 14409.5,
+    "raw_background_start_unzoned": "2025-10-03T15:49:14",
+    "raw_sample_live_s": 129600.0,
+    "raw_sample_real_s": 129691.0,
+    "live_exposure_scale": 9.0,
+    "controls": [
+      {
+        "energy_keV": 1173.228,
+        "scenario": "south_native",
+        "roi": [
+          2342,
+          2360
+        ],
+        "roi_original_counts": 22891,
+        "independent_net": 7407.068131226114,
+        "independent_full_covariance_variance": 818335.8176843977,
+        "diagonal_only_variance": 806280.1937802131
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "ambient_off",
+        "roi": [
+          2342,
+          2360
+        ],
+        "roi_original_counts": 22891,
+        "independent_net": 11244.0,
+        "independent_full_covariance_variance": 133537.5,
+        "diagonal_only_variance": 133537.5
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "south_native",
+        "roi": [
+          2661,
+          2679
+        ],
+        "roi_original_counts": 16952,
+        "independent_net": 7513.089200140041,
+        "independent_full_covariance_variance": 452968.94343800907,
+        "diagonal_only_variance": 442681.76736322045
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "ambient_off",
+        "roi": [
+          2661,
+          2679
+        ],
+        "roi_original_counts": 16952,
+        "independent_net": 10919.5,
+        "independent_full_covariance_variance": 74260.75,
+        "diagonal_only_variance": 74260.75
+      }
+    ],
+    "baseline_nominal_matches": [
+      {
+        "energy_keV": 1173.228,
+        "scenario": "south_native",
+        "continuum": "linear",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "south_native",
+        "continuum": "step",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "ambient_off",
+        "continuum": "linear",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "ambient_off",
+        "continuum": "step",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "south_free_normalization",
+        "continuum": "linear",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "south_native",
+        "continuum": "linear",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "south_native",
+        "continuum": "step",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "ambient_off",
+        "continuum": "linear",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "ambient_off",
+        "continuum": "step",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "south_free_normalization",
+        "continuum": "linear",
+        "area_unchanged": true,
+        "deviance_unchanged": true
+      }
+    ],
+    "all_current_rows_checked": 26,
+    "current_input_hashes_match_receipts": true,
+    "declared_output_hashes_valid": true,
+    "replay_pilot_json_byte_identical": true,
+    "replay_output_hashes_identical": true,
+    "xcom_hash_current": "172df2c081e28bfb3660104b0738e5d0b338bdd427afa7ca5210e9d07d58ac45",
+    "xcom_in_declared_engine_receipt": true
+  },
+  "tests": {
+    "command": "& C:/Users/Josh/projects/FluxForge/.venv/Scripts/python.exe -m pytest tests/test_south_joint_poisson_pilot.py tests/test_joint_poisson.py tests/test_histogram_background.py tests/test_background_covariance.py -q --junitxml=artifacts/validation/south_joint_poisson_249_20261004/independent_sol_final_tests.xml",
+    "result": "91 passed in 11.18s",
+    "xml_summary": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "91",
+      "time": "11.041",
+      "timestamp": "2026-10-04T02:44:03.131910-04:00",
+      "hostname": "DESKTOP-RE6EJEJ"
+    },
+    "independent_xml_sha256": "a3426e409c907ab9d0f80b0e29542009c0185a808eca430de4bd4df5bb0867dd"
+  },
+  "commands": [
+    "$env:PYTHONPATH='src'; & C:/Users/Josh/projects/FluxForge/.venv/Scripts/python.exe examples/RAFM_irradiation/south_joint_poisson_pilot.py --output artifacts/validation/south_joint_poisson_249_20261004/independent_sol_replay",
+    "$env:PYTHONPATH='src'; & C:/Users/Josh/projects/FluxForge/.venv/Scripts/python.exe examples/RAFM_irradiation/south_joint_poisson_pilot.py --output artifacts/validation/south_joint_poisson_249_20261004/independent_sol_final_replay",
+    "& C:/Users/Josh/projects/FluxForge/.venv/Scripts/python.exe artifacts/validation/south_joint_poisson_249_20261004/independent_sol_checks/review_oracles.py accepted independent_sol_final_replay",
+    "& C:/Users/Josh/projects/FluxForge/.venv/Scripts/python.exe artifacts/validation/south_joint_poisson_249_20261004/independent_sol_checks/write_review.py"
+  ],
+  "checks": [
+    "Direct regex parsing of all 8192 ASC channel/count pairs matches direct uint32 ANS decoding; every candidate preserves the same integer sample ROI counts.",
+    "Direct South ANS float32 calibration and double live/real/timestamp decoding matches receipts. South original native counts total 543427; sample/background live ratio is exactly 9. Real durations remain separate and are not substituted into the Poisson exposure ratio.",
+    "Sample grid uses declared current integration nominal profile; original ASC and ANS calibration disagreement is preserved. Native South observation bins and native response integrations remain distinct and unrebinned. Independent midpoint/support selection matches recorded ROI edges and background counts.",
+    "Independent pairwise overlap and linear-functional variance oracle matches IEC net and full propagated covariance including ROI/sideband cross terms. South variance differs from diagonal-only approximation at both lines, demonstrating that correlations are actually retained.",
+    "IEC control explicitly identifies fixed Covell singlet scope and does not represent full tiered campaign selection. Ambient-off retains local continuum and has no background likelihood or fabricated measured zero counts.",
+    "Independent xlogy likelihood oracle and Pearson formula account for every sample and ambient deviance contribution, including failed free-normalization candidates. Zero-mean residual handling is covered by focused tests.",
+    "All 24 fixed-response candidates remain converged with strong lack of fit; both unidentifiable normalization candidates retain predictions/parameters while activity and profile are null. CSV preserves failed statuses and blank unavailable conversions.",
+    "The 10 baseline nominal/free candidates have exactly unchanged areas and deviances after additional declared sensitivities. No background or response winner is promoted. QG report information is only source/identity context, never a numeric inference target.",
+    "Rounded deterministic CDF Asimov challenges cover zero/weak/strong recovery, deliberate shifted/broad response inadequacy, free normalization unidentifiability and optimizer-budget failure. They do not establish calibrated coverage.",
+    "Final sample and ambient residual plots visually inspected: visible centroid/core-wing mismatch, separate native ambient bins, full candidate curves and diagnostic labels. Final legend sits outside sample data panels.",
+    "Input byte hashes are identical before and after both replays; all accepted output hashes validate. Final accepted JSON, CSV and both PNGs replay byte-for-byte on this runtime and checkout.",
+    "Nested artifact .gitattributes verified with git check-attr: accepted JSON/CSV/PNG and top-level JSON/XML have text unset."
+  ],
+  "scientific_diagnostics": {
+    "fixed_candidates": 24,
+    "strong_lack_of_fit_candidates": 24,
+    "unidentifiable_controls": 2,
+    "nominal_candidates": [
+      {
+        "energy_keV": 1173.228,
+        "scenario": "south_native",
+        "continuum": "linear",
+        "deviance": 136.93512628367253,
+        "diagnostics": {
+          "sample_poisson_deviance": 113.84966705226475,
+          "background_poisson_deviance": 23.085459231407782,
+          "counts_only_nominal_dof": 33,
+          "approximate_chi2_tail_probability": 1.285148212443752e-14,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 160.1504492194238
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "south_native",
+        "continuum": "step",
+        "deviance": 106.3295292901569,
+        "diagnostics": {
+          "sample_poisson_deviance": 77.26639522685855,
+          "background_poisson_deviance": 29.06313406329835,
+          "counts_only_nominal_dof": 33,
+          "approximate_chi2_tail_probability": 1.2249561776530614e-09,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 156.94323654962727
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "ambient_off",
+        "continuum": "linear",
+        "deviance": 113.84966705226543,
+        "diagnostics": {
+          "sample_poisson_deviance": 113.84966705226543,
+          "background_poisson_deviance": 0.0,
+          "counts_only_nominal_dof": 16,
+          "approximate_chi2_tail_probability": 8.286282687071119e-17,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 240.3711045546585
+      },
+      {
+        "energy_keV": 1173.228,
+        "scenario": "ambient_off",
+        "continuum": "step",
+        "deviance": 96.66133526970793,
+        "diagnostics": {
+          "sample_poisson_deviance": 96.66133526970793,
+          "background_poisson_deviance": 0.0,
+          "counts_only_nominal_dof": 16,
+          "approximate_chi2_tail_probability": 1.457649559697467e-13,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 240.11035122064817
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "south_native",
+        "continuum": "linear",
+        "deviance": 162.6682084000472,
+        "diagnostics": {
+          "sample_poisson_deviance": 149.1966547976881,
+          "background_poisson_deviance": 13.471553602359116,
+          "counts_only_nominal_dof": 33,
+          "approximate_chi2_tail_probability": 4.585987458829974e-19,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 156.81444704089768
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "south_native",
+        "continuum": "step",
+        "deviance": 147.75896510395793,
+        "diagnostics": {
+          "sample_poisson_deviance": 124.85534292080763,
+          "background_poisson_deviance": 22.903622183150304,
+          "counts_only_nominal_dof": 33,
+          "approximate_chi2_tail_probability": 1.8275667215699923e-16,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 152.88466618516807
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "ambient_off",
+        "continuum": "linear",
+        "deviance": 149.19665479768946,
+        "diagnostics": {
+          "sample_poisson_deviance": 149.19665479768946,
+          "background_poisson_deviance": 0.0,
+          "counts_only_nominal_dof": 16,
+          "approximate_chi2_tail_probability": 1.1250715432758505e-23,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 252.8960315923631
+      },
+      {
+        "energy_keV": 1332.492,
+        "scenario": "ambient_off",
+        "continuum": "step",
+        "deviance": 137.57176766611929,
+        "diagnostics": {
+          "sample_poisson_deviance": 137.57176766611929,
+          "background_poisson_deviance": 0.0,
+          "counts_only_nominal_dof": 16,
+          "approximate_chi2_tail_probability": 2.1506834161154494e-21,
+          "adequacy_flag": "strong_lack_of_fit",
+          "qualification": "asymptotic screening only; sparse bins, nuisance boundaries and auxiliary constraints invalidate calibrated tail probabilities",
+          "physical_interpretation": "requires model adequacy and applicability review"
+        },
+        "conditional_activity_bq": 252.47632521028908
+      }
+    ],
+    "synthetic_challenges": [
+      {
+        "name": "zero_signal",
+        "truth_area": 0,
+        "candidate_area": 0.0,
+        "status": "converged",
+        "adequacy": "not_qualified",
+        "generation": "rounded independent CDF Asimov; no random sampling"
+      },
+      {
+        "name": "weak_signal",
+        "truth_area": 50,
+        "candidate_area": 45.97991782070585,
+        "status": "converged",
+        "adequacy": "not_qualified",
+        "generation": "rounded independent CDF Asimov; no random sampling"
+      },
+      {
+        "name": "strong_signal",
+        "truth_area": 4000,
+        "candidate_area": 3997.8888661886763,
+        "status": "converged",
+        "adequacy": "not_qualified",
+        "generation": "rounded independent CDF Asimov; no random sampling"
+      },
+      {
+        "name": "shifted_response_misspecification",
+        "truth_area": 4000,
+        "candidate_area": 3631.577165562093,
+        "status": "converged",
+        "adequacy": "strong_lack_of_fit",
+        "generation": "rounded independent CDF Asimov; no random sampling"
+      },
+      {
+        "name": "broad_response_misspecification",
+        "truth_area": 4000,
+        "candidate_area": 3051.132921965025,
+        "status": "converged",
+        "adequacy": "strong_lack_of_fit",
+        "generation": "rounded independent CDF Asimov; no random sampling"
+      },
+      {
+        "name": "normalization_unidentifiable",
+        "truth_area": 4000,
+        "candidate_area": 3943.3957179978784,
+        "status": "unidentifiable",
+        "adequacy": "not_qualified",
+        "generation": "rounded independent CDF Asimov; no random sampling"
+      },
+      {
+        "name": "optimizer_budget_failure",
+        "truth_area": 4000,
+        "candidate_area": 1874.621558286595,
+        "status": "optimizer_failed",
+        "adequacy": "not_qualified",
+        "generation": "rounded independent CDF Asimov; no random sampling"
+      }
+    ]
+  },
+  "qualification": {
+    "scientific_admission": false,
+    "exact_vendor_parity": false,
+    "physical_inversion_qualified": false,
+    "software_scope": "Source-bound opt-in software pilot and diagnostics only; full campaign replay and integration acceptance remain owned by parent.",
+    "unknown_calibration_covariance": "UNKNOWN; not zero, not included in conditional intervals",
+    "ambient_temporal_applicability": "UNRESOLVED",
+    "unresolved": [
+      "All declared physical-data models retain strong lack of fit.",
+      "Later South background temporal applicability remains unresolved.",
+      "Original ASC versus ANS/profile calibration disagreement and unzoned acquisition/report clock conflict remain unresolved.",
+      "Efficiency/calibration covariance is UNKNOWN, not known zero; conditional intervals omit these uncertainties.",
+      "Nominal efficiency/yield conversions exclude summing, attenuation and decay; no QG-target tuning or qualified line combination.",
+      "Rounded deterministic challenges and asymptotic chi-square/profile screens do not calibrate sparse-count coverage or nuisance-boundary tests.",
+      "Ambient-off is a declared sensitivity; no claim of recovered final vendor setting.",
+      "Raw layout/timing decoding is source-bound and corroborated but is not vendor format certification.",
+      "Identical local replay is verified; no separate Git-free relocated pilot was run by this reviewer."
+    ]
+  },
+  "publication_attributes_evidence": "artifacts/validation/south_joint_poisson_249_20261004/accepted/pilot.json: text: unset\nartifacts/validation/south_joint_poisson_249_20261004/accepted/comparison.csv: text: unset\nartifacts/validation/south_joint_poisson_249_20261004/accepted/sample_residuals.png: text: unset\nartifacts/validation/south_joint_poisson_249_20261004/accepted_tests.xml: text: unset\nartifacts/validation/south_joint_poisson_249_20261004/independent_sol_review.json: text: unset\n"
+}
