@@ -11,7 +11,6 @@ import hashlib
 import json
 from pathlib import Path
 import platform
-import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 import numpy as np
 
 from fluxforge.analysis import activity_combination as implementation
+from fluxforge.validation.example_identity import source_identity
 from fluxforge.analysis.activity_combination import (
     ActivityLine,
     CovarianceComponent,
@@ -45,20 +45,11 @@ def build_example() -> dict:
         if r["sample"] == "Co-Cd-RAFM-1_25cm" and r["isotope"] == "Co60"
     )
     report = json.loads((directory / "weighting_control.json").read_text())
-    checkout_commit = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-    ).strip()
-    subprocess.run(
-        [
-            "git",
-            "merge-base",
-            "--is-ancestor",
-            manifest["required_engine_ancestor"],
-            "HEAD",
-        ],
-        cwd=ROOT,
-        check=True,
+    identity = source_identity(
+        ROOT,
+        ["src/fluxforge/analysis/activity_combination.py"],
     )
+    checkout_commit = identity["revision"] or "unknown"
     implementation_hash = hashlib.sha256(
         Path(implementation.__file__).read_bytes()
     ).hexdigest()
@@ -184,7 +175,8 @@ def build_example() -> dict:
         "scope": "gamma-line equation controls; no target fitting, no new isotope admission, no full vendor-error reproduction",
         "source_manifest": manifest,
         "execution": {
-            "checkout_commit": checkout_commit,
+            "checkout_commit": identity["revision"],
+            "source_identity": identity,
             "implementation_sha256": implementation_hash,
             "python": platform.python_version(),
             "executable": sys.executable,

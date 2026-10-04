@@ -33,6 +33,9 @@ def engine_identity(repo: Path) -> dict:
     """
     package = repo/'src/fluxforge'
     required = [repo/'pyproject.toml', repo/'examples/RAFM_irradiation/run_portable_qg_example.py']
+    integrated_driver = repo/'examples/RAFM_irradiation/run_integrated_qg_methods.py'
+    if integrated_driver.is_file():
+        required.append(integrated_driver)
     if not package.is_dir() or any(not path.is_file() for path in required):
         return dict(status='UNKNOWN', source_sha256=None, revision=None,
                     reason='Complete engine source tree or pyproject.toml is unavailable')
@@ -48,7 +51,7 @@ def engine_identity(repo: Path) -> dict:
         digest.update(payload)
     return dict(status='IDENTIFIED_BY_CONTENT', source_sha256=digest.hexdigest(),
                 revision=None, file_count=len(files),
-                scope='pyproject.toml, portable replay driver, complete src/fluxforge tree',
+                scope='pyproject.toml, replay drivers present in this source, complete src/fluxforge tree',
                 algorithm='SHA-256 over sorted relative path and file bytes, length-prefixed')
 
 
@@ -321,7 +324,62 @@ def label_replay_outputs(output: Path, manifest: dict) -> dict:
     return result
 
 
-def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
+
+
+
+def background_scenario(repo: Path, checked: dict, mode: str):
+    """Explicit current-engine controls; later South remains conditional."""
+    if mode == 'north_historical':
+        return None, dict(mode=mode, detector='North', applicability='cross-detector sensitivity only')
+    if mode not in ('south_native', 'ambient_off'):
+        raise ValueError('Unsupported background scenario')
+    import numpy as np
+    from fluxforge.io.spe import GammaSpectrum
+    supplement = json.loads((repo/'examples/RAFM_irradiation/quantumgold_reference/'
+                             'supplemental_inputs/manifest.json').read_text())
+    pins = [p for p in supplement['resources']
+            if p['role'] == 'recovered_South_native_background_not_ASC']
+    if len(pins) != 1:
+        raise ValueError('South source identity is ambiguous')
+    pin = pins[0]
+    blob = bound_path(repo, pin['path']).read_bytes()
+    if len(blob) != pin['bytes'] or hashlib.sha256(blob).hexdigest() != pin['sha256']:
+        raise ValueError('South source identity mismatch')
+    if len(blob) != 36616 or b'South 4 hr background terminal' not in blob[:1548]:
+        raise ValueError('Unsupported South background layout')
+    coefficients = struct.unpack_from('<3f', blob, 424)
+    live, real = struct.unpack_from('<d', blob, 104)[0], struct.unpack_from('<d', blob, 96)[0]
+    serial = struct.unpack_from('<d', blob, 80)[0]
+    counts = np.asarray(struct.unpack_from('<8192I', blob, 1548), dtype=float)
+    channels = np.arange(8192)
+    energies = coefficients[0] + coefficients[1]*channels + coefficients[2]*channels**2
+    if live != 14400 or not live <= real < 14500 or not 40000 < serial < 50000:
+        raise ValueError('Unsupported South background timing')
+    if int(counts.sum()) != 543427 or not np.all(np.diff(energies) > 0):
+        raise ValueError('Unsupported South count/calibration anchors')
+    start = datetime(1899, 12, 30) + timedelta(days=serial)
+    details = dict(mode=mode, detector='South', source_sha256=pin['sha256'],
+                   start_time_unzoned=start.isoformat(), live_time_s=live,
+                   temporal_applicability='UNRESOLVED',
+                   calibration='native polynomial; count-conserving bin overlap and covariance')
+    if mode == 'ambient_off':
+        counts = np.zeros_like(counts)
+        details = dict(mode=mode, source_sha256=None, synthetic=True,
+                       interpretation='no separate measured ambient; local continuum retained',
+                       evidence='saved header inference; final report setting unknown')
+        start, real = None, live
+    spectrum = GammaSpectrum(counts=counts, channels=channels, energies=energies,
+                             live_time=live, real_time=real, start_time=start,
+                             spectrum_id='South measured' if mode == 'south_native' else 'synthetic zero ambient control',
+                             detector_id='South' if mode == 'south_native' else 'synthetic',
+                             calibration={'energy': list(coefficients)}, metadata=details)
+    return spectrum, details
+
+
+
+def run(repo: Path, output: Path | None, verify_only: bool = False, *,
+        background_mode: str = 'north_historical', raw_independent: bool = False,
+        generate_plots: bool = True) -> dict:
     checked = verify_inputs(repo, repo/'examples/RAFM_irradiation/quantumgold_reference/manifest.json')
     manifest = checked['manifest']
     receipt = dict(status='INPUT_AUDIT_PASS', mode='reference_reproduction',
@@ -383,7 +441,18 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
     from fluxforge.examples.rafm_workflow import run_rafm_validation, run_qg_benchmark
     # Software execution and physical agreement are separate. Preserve all
     # failures and admission exclusions; do not turn --no-fail into validation.
-    raw = run_rafm_validation(staged, output/'raw_replay', enforce_thresholds=False)
+    kwargs = {}
+    if background_mode != 'north_historical':
+        background, background_details = background_scenario(repo, checked, background_mode)
+        kwargs['background_spectrum_override'] = background
+    else:
+        background_details = dict(mode=background_mode, applicability='cross-detector sensitivity only')
+    if raw_independent:
+        kwargs.update(flux_wire_counting_method='iec_tiered',
+                      generic_targeted_counting_method='iec_tiered')
+    if not generate_plots:
+        kwargs['generate_plots'] = False
+    raw = run_rafm_validation(staged, output/'raw_replay', enforce_thresholds=False, **kwargs)
     report = run_qg_benchmark(staged, output/'qg_report_replay')
     label_receipt = label_replay_outputs(output,manifest)
     report = json.loads((output/'qg_report_replay/qg_benchmark_summary.json').read_text(encoding='utf-8'))
@@ -399,6 +468,12 @@ def run(repo: Path, output: Path | None, verify_only: bool = False) -> dict:
                    scientific_status='QG-conditioned example/diagnostics; preserve threshold failures and admission exclusions',
                    software_python=sys.version, source_manifest_sha256=checked['manifest_sha256'])
     receipt['output_label_reconciliation'] = label_receipt
+    receipt['background_scenario'] = background_details
+    receipt['raw_reference_used_for_analysis'] = not raw_independent
+    if raw_independent:
+        receipt['mode'] = 'independent_raw_comparison_and_separate_report_reproduction'
+        receipt['comparison_basis'] = 'raw IEC counts and separate QG report replay; source-library/profile inputs remain conditional'
+        receipt['comparison_modes']['raw_vs_report'] = 'executed'
     dump(output/'REPLAY_RECEIPT.json', receipt)
     return receipt
 

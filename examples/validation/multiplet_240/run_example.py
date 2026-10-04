@@ -9,7 +9,6 @@ import hashlib
 import json
 from pathlib import Path
 import platform
-import subprocess
 import sys
 
 import numpy as np
@@ -20,6 +19,7 @@ from scipy.signal import find_peaks
 from fluxforge.analysis import multiplet_validation, peakfit
 from fluxforge.analysis.multiplet_validation import qualify_doublet
 from fluxforge.io.genie import read_genie_spectrum
+from fluxforge.validation.example_identity import source_identity
 
 
 SOURCE_HASH = "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3"
@@ -118,11 +118,20 @@ def run():
             count_basis="synthetic",
         ).to_dict()
         synthetic.append(dict(case=name, true_areas=truth, result=result))
+    identity = source_identity(
+        root,
+        [
+            "src/fluxforge/analysis/peakfit.py",
+            "src/fluxforge/analysis/multiplet_validation.py",
+            "examples/validation/multiplet_240/run_example.py",
+            "src/fluxforge/io/genie.py",
+            "tests/test_multiplet_validation.py",
+        ],
+    )
     return dict(
         engine_base=ENGINE_BASE,
-        checked_out_head=subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=root, text=True
-        ).strip(),
+        checked_out_head=identity["revision"],
+        source_identity=identity,
         engine_identity={
             name: sha(path)
             for name, path in {

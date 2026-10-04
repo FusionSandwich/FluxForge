@@ -125,6 +125,20 @@ jobs:
             tests/test_qg_saved_settings.py \
             tests/test_rafm_figure_ownership.py
 
+      - name: Integrated QuantumGold method contracts
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_qg_protocol.py \
+            tests/test_efficiency_fidelity.py \
+            tests/test_activity_combination.py \
+            tests/test_joint_poisson.py \
+            tests/test_multiplet_validation.py \
+            tests/test_repeated_count_validation.py \
+            tests/test_example_identity.py \
+            tests/test_integrated_qg_methods.py
+
       - name: CLI and standards regression tests
         env:
           PYTHONPATH: src
