@@ -1,0 +1,6 @@
+# Preserve the five source-bound recovery outputs and their receipts.
+**/Cu-Cd-RAFM-1_25cm* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+**/Fe-Cd-RAFM-1_0cm* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+**/RAFM3-A_24hrEOI* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+**/RAFM3-A_300sEOI* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+**/RAFM3-A_4dEOI* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol

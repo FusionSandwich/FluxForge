@@ -1,0 +1,125 @@
+Sample: RAFM3-A_24hrEOI
+Raw file: C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\examples\RAFM_irradiation\raw_gamma_spec\RAFM3\RAFM3-A_24hrEOI.ASC
+QG file: C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\examples\RAFM_irradiation\QG_processed_gamma_data\RAFM3\RAFM3-A_24hrEOI.txt
+Sample group: RAFM3
+Irradiation phase: phase1_rabbit_tube
+Schedule source: sample_schedule.phase1
+Decay label: 24h
+Decay time (s): 91972.0
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+Comparison basis: raw_estimate_vs_report
+Raw comparison passed: no
+
+Ambiguous observed components; isotope activities withheld
+----------------------------------------------------------
+- 124.68 keV | net=12013.12 +/- 1009.78 | candidates=Tb154m@123.07 | withheld_energy_mismatch
+
+Unidentifiable joint fit: channels [218, 252] | observed signed window counts=15017.75 +/- 130.70; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Ta182', 'energy_keV': 113.672, 'intensity': 0.019375988928}, {'isotope': 'Ta182', 'energy_keV': 116.419, 'intensity': 0.00429041038}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [2857, 2895] | observed signed window counts=196.25 +/- 16.98; no net peak area or isotope activity estimated | candidates=[{'isotope': 'V52', 'energy_keV': 1434.09, 'intensity': 1.0}, {'isotope': 'Sb124', 'energy_keV': 1436.56, 'intensity': 0.012}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Measurement-time activity audit
+-------------------------------
+Categories: activity_conversion_or_efficiency_limited, activity_evidence_incomplete, library_or_assignment_limited, peak_area_limited
+EOI parity: not_evaluated_no_independent_eoi_reference
+Accuracy qualified: no (calibration and systematic budgets remain incomplete)
+
+QG peaks not identified by FluxForge
+------------------------------------
+- Missing QG peak Mn56 @ 2112.88 keV (QG net=79.00 +/- 21.00)
+
+Matched energies with isotope mismatch
+--------------------------------------
+- none
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- W187 @ 134.16 keV | rel_err=+0.192 | En=+4.948
+- W187 @ 479.54 keV | rel_err=+0.061 | En=+3.674
+- W187 @ 618.30 keV | rel_err=+0.115 | En=+3.536
+- W187 @ 625.38 keV | rel_err=-0.264 | En=-2.008
+- W187 @ 772.82 keV | rel_err=+0.256 | En=+4.263
+- Cr51 @ 320.22 keV | rel_err=+1.325 | En=+3.766
+
+Peak gross-count parity failures
+--------------------------------
+- W187 @ 134.16 keV | gross_rel_err=-0.132 | gross_En=-12.825
+- W187 @ 551.50 keV | gross_rel_err=-0.118 | gross_En=-6.004
+- W187 @ 625.38 keV | gross_rel_err=+0.177 | gross_En=+4.038
+
+Isotope activity parity failures
+--------------------------------
+- W187 | rel_err=+0.640 | En=+19.255
+- Cr51 | rel_err=+0.432 | En=+0.845
+
+Line-level diagnostic flags
+---------------------------
+- W187 @ 134.16 keV | bucket=count_parity_failure | rel_count=+0.192 | rel_line_activity=+1.451 | eff_ratio=0.581
+- W187 @ 479.54 keV | bucket=count_parity_failure | rel_count=+0.061 | rel_line_activity=+0.811 | eff_ratio=0.719
+- W187 @ 551.50 keV | bucket=efficiency_or_activity_conversion_bias | rel_count=+0.112 | rel_line_activity=+0.832 | eff_ratio=0.738
+- W187 @ 618.30 keV | bucket=count_parity_failure | rel_count=+0.115 | rel_line_activity=+0.800 | eff_ratio=0.755
+- W187 @ 625.38 keV | bucket=count_parity_failure | rel_count=-0.264 | rel_line_activity=+0.186 | eff_ratio=0.755
+- W187 @ 685.72 keV | bucket=gamma_library_mismatch | rel_count=+0.034 | rel_line_activity=+0.644 | eff_ratio=0.773
+- W187 @ 772.82 keV | bucket=count_parity_failure | rel_count=+0.256 | rel_line_activity=+0.930 | eff_ratio=0.796
+- Cr51 @ 320.22 keV | bucket=count_parity_failure | rel_count=+1.325 | rel_line_activity=+2.485 | eff_ratio=0.670
+- Mn56 @ 846.66 keV | bucket=efficiency_or_activity_conversion_bias | rel_count=+0.205 | rel_line_activity=+0.474 | eff_ratio=0.818
+
+QG source QC (no activity or rate correction)
+---------------------------------------------
+- W187 @ 134.16 keV | source QC=yield_value_discrepancy | printed RAD INT=10.36 (unit unspecified) | percent hypothesis=0.1036 photons/decay | fraction hypothesis=10.36 photons/decay | bundled intensity=0.08667000000000001 photons/decay | report-only
+- W187 @ 479.54 keV | source QC=yield_value_discrepancy | printed RAD INT=26.6 (unit unspecified) | percent hypothesis=0.266 photons/decay | fraction hypothesis=26.6 photons/decay | bundled intensity=0.21681000000000003 photons/decay | report-only
+- W187 @ 551.50 keV | source QC=yield_value_discrepancy | printed RAD INT=6.14 (unit unspecified) | percent hypothesis=0.061399999999999996 photons/decay | fraction hypothesis=6.14 photons/decay | bundled intensity=0.05049 photons/decay | report-only
+- W187 @ 618.30 keV | source QC=yield_value_discrepancy | printed RAD INT=7.57 (unit unspecified) | percent hypothesis=0.0757 photons/decay | fraction hypothesis=7.57 photons/decay | bundled intensity=0.06210000000000001 photons/decay | report-only
+- W187 @ 625.38 keV | source QC=yield_value_discrepancy | printed RAD INT=1.31 (unit unspecified) | percent hypothesis=0.0131 photons/decay | fraction hypothesis=1.31 photons/decay | bundled intensity=0.0108 photons/decay | report-only
+- W187 @ 685.72 keV | source QC=yield_value_discrepancy | printed RAD INT=33.2 (unit unspecified) | percent hypothesis=0.332 photons/decay | fraction hypothesis=33.2 photons/decay | bundled intensity=0.27 photons/decay | report-only
+- W187 @ 772.82 keV | source QC=yield_value_discrepancy | printed RAD INT=5.02 (unit unspecified) | percent hypothesis=0.050199999999999995 photons/decay | fraction hypothesis=5.02 photons/decay | bundled intensity=0.04104 photons/decay | report-only
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- Mn56 @ 846.82 keV | stage=eoi | rel_dev=0.053 | consensus=9.942e+05 Bq | mod-z=+0.00 | all-vs-LOO drift=-0.168
+- Mn56 @ 1238.23 keV | stage=eoi | rel_dev=337.560 | consensus=9.942e+05 Bq | mod-z=+1019.36 | all-vs-LOO drift=-0.001
+- Sb124 @ 968.78 keV | stage=eoi | rel_dev=0.156 | consensus=1.807e+04 Bq | mod-z=-0.67 | all-vs-LOO drift=+1.236
+- Sb124 @ 1377.71 keV | stage=eoi | rel_dev=1.236 | consensus=1.807e+04 Bq | mod-z=+0.67 | all-vs-LOO drift=-0.156
+- Ta182 @ 84.56 keV | stage=eoi | rel_dev=8.145 | consensus=1589 Bq | mod-z=+0.00 | all-vs-LOO drift=-0.004
+- Ta182 @ 1114.04 keV | stage=eoi | rel_dev=54.045 | consensus=1589 Bq | mod-z=+3.80 | all-vs-LOO drift=-0.001
+- Ta182 @ 1120.25 keV | stage=eoi | rel_dev=0.004 | consensus=1589 Bq | mod-z=-0.67 | all-vs-LOO drift=+9.443
+- W187 @ 511.41 keV | stage=eoi | rel_dev=0.488 | consensus=7.262e+04 Bq | mod-z=+2.34 | all-vs-LOO drift=-0.000
+- W187 @ 745.36 keV | stage=eoi | rel_dev=1.382 | consensus=7.262e+04 Bq | mod-z=+7.26 | all-vs-LOO drift=-0.001
+- W187 @ 879.06 keV | stage=eoi | rel_dev=1.286 | consensus=7.262e+04 Bq | mod-z=+6.73 | all-vs-LOO drift=-0.000
+
+Measurement QC review flags
+---------------------------
+- none
+
+QG internal consistency flags
+-----------------------------
+- none
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- 238.63 keV | net=1191.60 +/- 101.51 | sig=11.74
+- 910.80 keV | net=494.27 +/- 32.17 | sig=15.36
+- 1460.71 keV | net=2621.00 +/- 57.42 | sig=45.64
+- 1660.72 keV | net=84.25 +/- 11.13 | sig=7.57
+- 1764.73 keV | net=335.25 +/- 21.53 | sig=15.57
+- 2204.85 keV | net=118.00 +/- 13.01 | sig=9.07
+- 2615.05 keV | net=251.50 +/- 19.90 | sig=12.64
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- Ta182 @ 84.56 keV | net=941.38 +/- 207.61
+- W187 @ 511.41 keV | net=696.75 +/- 158.12
+- W187 @ 745.36 keV | net=407.38 +/- 32.69
+- W187 @ 864.50 keV | net=150.56 +/- 56.56
+- W187 @ 879.06 keV | net=164.38 +/- 60.70
+- Sb124 @ 968.78 keV | net=401.24 +/- 29.70
+- Ta182 @ 1114.04 keV | net=481.12 +/- 103.33
+- Ta182 @ 1120.25 keV | net=711.25 +/- 30.98
+- Mn56 @ 1238.23 keV | net=465.58 +/- 26.33
+- Co60 @ 1332.58 keV | net=89.22 +/- 34.05
+- Sb124 @ 1377.71 keV | net=235.75 +/- 18.57
+

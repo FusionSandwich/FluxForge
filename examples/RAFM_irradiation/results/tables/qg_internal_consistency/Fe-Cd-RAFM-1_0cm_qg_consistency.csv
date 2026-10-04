@@ -1,0 +1,2 @@
+sample_id,sample_group,isotope,header_activity_bq,header_activity_unc_bq,n_line_activities,min_line_activity_bq,max_line_activity_bq,mean_line_activity_bq,max_relative_line_header_deviation,flag_internal_inconsistency
+Fe-Cd-RAFM-1_0cm,RAFM1,Fe59,61.42,5.6610000000000005,4,28.749000000000002,62.160000000000004,52.97475,0.5319277108433734,True

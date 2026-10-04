@@ -1,0 +1,2 @@
+sample_id,sample_group,check,dead_time_pct,threshold_pct,live_time_s,real_time_s,max_peak_significance,max_peak_gross_counts,flag_review,note
+Cu-Cd-RAFM-1_25cm,RAFM1,dead_time_review,1.7965770651361512,15.0,3600.0,3665.86,65.61056670082556,6741.0,False,Dead time within configured review threshold.

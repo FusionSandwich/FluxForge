@@ -1,0 +1,82 @@
+Sample: Fe-Cd-RAFM-1_0cm
+Raw file: C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\examples\RAFM_irradiation\raw_gamma_spec\flux_wires\Fe-Cd-RAFM-1_0cm.ASC
+QG file: C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\examples\RAFM_irradiation\QG_processed_gamma_data\flux_wires\Fe-Cd-RAFM-1_0cm.txt
+Sample group: RAFM1
+Irradiation phase: n/a
+Schedule source: n/a
+Decay label: n/a
+Decay time (s): n/a
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+Comparison basis: raw_estimate_vs_report
+Raw comparison passed: no
+
+Ambiguous observed components; isotope activities withheld
+----------------------------------------------------------
+- none
+
+Measurement-time activity audit
+-------------------------------
+Categories: activity_conversion_or_efficiency_limited, export_data_limited, peak_area_limited
+EOI parity: not_evaluated_no_independent_eoi_reference
+Accuracy qualified: no (calibration and systematic budgets remain incomplete)
+
+QG peaks not identified by FluxForge
+------------------------------------
+- none
+
+Matched energies with isotope mismatch
+--------------------------------------
+- none
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- Fe59 @ 142.67 keV | rel_err=+3.591 | En=+4.553
+
+Peak gross-count parity failures
+--------------------------------
+- Fe59 @ 142.67 keV | gross_rel_err=+2.225 | gross_En=+129.487
+- Fe59 @ 192.29 keV | gross_rel_err=+0.241 | gross_En=+24.016
+- Fe59 @ 1099.11 keV | gross_rel_err=+0.036 | gross_En=+4.056
+
+Isotope activity parity failures
+--------------------------------
+- Fe59 | rel_err=+40.144 | En=+83.712
+
+Line-level diagnostic flags
+---------------------------
+- Fe59 @ 142.67 keV | bucket=count_parity_failure | rel_count=+3.591 | rel_line_activity=+105.125 | eff_ratio=0.014
+- Fe59 @ 192.29 keV | bucket=efficiency_or_activity_conversion_bias | rel_count=-0.187 | rel_line_activity=+56.715 | eff_ratio=0.016
+- Fe59 @ 1099.11 keV | bucket=efficiency_or_activity_conversion_bias | rel_count=+0.013 | rel_line_activity=+41.191 | eff_ratio=0.024
+- Fe59 @ 1291.42 keV | bucket=efficiency_or_activity_conversion_bias | rel_count=-0.008 | rel_line_activity=+37.740 | eff_ratio=0.026
+
+QG source QC (no activity or rate correction)
+---------------------------------------------
+- Fe59 @ 142.67 keV | source QC=line_summary_inconsistency | printed RAD INT=1.02 (unit unspecified) | percent hypothesis=0.0102 photons/decay | fraction hypothesis=1.02 photons/decay | bundled intensity=0.00972 photons/decay | report-only
+- Fe59 @ 192.29 keV | source QC=yield_value_discrepancy | printed RAD INT=3.08 (unit unspecified) | percent hypothesis=0.0308 photons/decay | fraction hypothesis=3.08 photons/decay | bundled intensity=0.02918 photons/decay | report-only
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- Fe59 @ 192.30 keV | stage=count_start | rel_dev=0.342 | consensus=2530 Bq | mod-z=+1.17 | all-vs-LOO drift=-0.001
+
+Measurement QC review flags
+---------------------------
+- none
+
+QG internal consistency flags
+-----------------------------
+- Fe59 | header=61.42 Bq | line range=(28.75, 62.16) Bq | max rel deviation=0.532
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- none
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- Mn54 @ 834.73 keV | net=62409.50 +/- 417.89
+

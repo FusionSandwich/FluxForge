@@ -189,7 +189,9 @@ def recover(root):
         json.dumps(receipt, indent=2) + "\n", encoding="utf-8"
     )
     (source_out / "source_manifest.json").write_bytes(manifest_blob)
-    (source_out / ".gitattributes").write_text("* -text\n", encoding="utf-8")
+    (source_out / ".gitattributes").write_text(
+        "* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol\n", encoding="utf-8"
+    )
     return receipt
 
 

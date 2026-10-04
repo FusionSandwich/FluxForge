@@ -1,0 +1,2 @@
+sample_id,sample_group,isotope,header_activity_bq,header_activity_unc_bq,n_line_activities,min_line_activity_bq,max_line_activity_bq,mean_line_activity_bq,max_relative_line_header_deviation,flag_internal_inconsistency
+Cu-Cd-RAFM-1_25cm,RAFM1,Cu64,1090982.0,141932.0,1,1090982.0,1090982.0,1090982.0,0.0,False

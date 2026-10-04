@@ -1,0 +1,136 @@
+Sample: RAFM3-A_300sEOI
+Raw file: C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\examples\RAFM_irradiation\raw_gamma_spec\RAFM3\RAFM3-A_300sEOI.ASC
+QG file: C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\examples\RAFM_irradiation\QG_processed_gamma_data\RAFM3\RAFM3-A_300sEOI.txt
+Sample group: RAFM3
+Irradiation phase: phase1_rabbit_tube
+Schedule source: sample_schedule.phase1
+Decay label: 300s
+Decay time (s): 360.0
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+Comparison basis: raw_estimate_vs_report
+Raw comparison passed: no
+
+Ambiguous observed components; isotope activities withheld
+----------------------------------------------------------
+- 846.68 keV | net=90401.53 +/- 436.53 | candidates=Tb154m@845.16, Mn56@846.76 | withheld_ambiguous_assignment
+- 1333.33 keV | net=599.18 +/- 158.66 | candidates=Co60@1332.49, V52@1333.67 | withheld_ambiguous_assignment
+
+Unidentifiable joint fit: channels [1169, 1202] | observed signed window counts=18832.65 +/- 137.37; no net peak area or isotope activity estimated | candidates=[{'isotope': 'W187', 'energy_keV': 588.96, 'intensity': 0.001296}, {'isotope': 'Tb154m', 'energy_keV': 591.9, 'intensity': 0.0012}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [1473, 1542] | observed signed window counts=19446.54 +/- 139.65; no net peak area or isotope activity estimated | candidates=[{'isotope': 'W187', 'energy_keV': 745.4, 'intensity': 0.002997}, {'isotope': 'Tb154m', 'energy_keV': 749.4, 'intensity': 0.001}, {'isotope': 'Tb154m', 'energy_keV': 753.1, 'intensity': 0.0023}, {'isotope': 'Tb154m', 'energy_keV': 756.71, 'intensity': 0.027}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [1580, 1625] | observed signed window counts=12182.13 +/- 110.52; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 796.29, 'intensity': 0.0025}, {'isotope': 'Tb154m', 'energy_keV': 800.7, 'intensity': 0.001}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [1638, 1693] | observed signed window counts=24774.17 +/- 157.52; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 826.29, 'intensity': 0.0014}, {'isotope': 'Tb154m', 'energy_keV': 830.49, 'intensity': 0.0068}, {'isotope': 'Mn54', 'energy_keV': 834.838, 'intensity': 0.999746}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [1954, 1989] | observed signed window counts=9172.90 +/- 95.88; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 982.0, 'intensity': 0.0031}, {'isotope': 'Tb154m', 'energy_keV': 984.3, 'intensity': 0.0045}] | messages=['Optimal parameters not found: The maximum number of function evaluations is exceeded.', 'Optimal parameters not found: The maximum number of function evaluations is exceeded.']
+Unidentifiable joint fit: channels [2089, 2150] | observed signed window counts=17695.52 +/- 133.13; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 1053.9, 'intensity': 0.0022}, {'isotope': 'Tb154m', 'energy_keV': 1058.34, 'intensity': 0.0027}, {'isotope': 'Tb154m', 'energy_keV': 1061.39, 'intensity': 0.0014}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [2186, 2227] | observed signed window counts=13449.42 +/- 116.06; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Fe59', 'energy_keV': 1099.25, 'intensity': 0.5659}, {'isotope': 'Tb154m', 'energy_keV': 1102.43, 'intensity': 0.0027}] | messages=['Optimal parameters not found: The maximum number of function evaluations is exceeded.', 'Optimal parameters not found: The maximum number of function evaluations is exceeded.']
+Unidentifiable joint fit: channels [2290, 2324] | observed signed window counts=12760.15 +/- 113.03; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 1149.66, 'intensity': 0.0098}, {'isotope': 'Tb154m', 'energy_keV': 1152.42, 'intensity': 0.022}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [2434, 2526] | observed signed window counts=25484.17 +/- 159.75; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 1229.42, 'intensity': 0.0059}, {'isotope': 'Ta182', 'energy_keV': 1231.02, 'intensity': 0.11307273772}, {'isotope': 'Tb154m', 'energy_keV': 1234.0, 'intensity': 0.0012}, {'isotope': 'Tb154m', 'energy_keV': 1237.5, 'intensity': 0.0016}, {'isotope': 'Mn56', 'energy_keV': 1238.27, 'intensity': 0.0012}, {'isotope': 'Tb154m', 'energy_keV': 1241.23, 'intensity': 0.0027}, {'isotope': 'Tb154m', 'energy_keV': 1246.2, 'intensity': 0.0027}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [2964, 3014] | observed signed window counts=4283.42 +/- 65.49; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 1490.37, 'intensity': 0.0104}, {'isotope': 'Tb154m', 'energy_keV': 1494.1, 'intensity': 0.0027}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [3015, 3073] | observed signed window counts=5082.98 +/- 71.35; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 1515.8, 'intensity': 0.0031}, {'isotope': 'Tb154m', 'energy_keV': 1520.69, 'intensity': 0.0057}, {'isotope': 'Tb154m', 'energy_keV': 1523.0, 'intensity': 0.0033}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [3846, 3893] | observed signed window counts=1127.60 +/- 33.62; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Tb154m', 'energy_keV': 1931.0, 'intensity': 0.0012}, {'isotope': 'Tb154m', 'energy_keV': 1934.71, 'intensity': 0.0072}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Measurement-time activity audit
+-------------------------------
+Categories: activity_conversion_or_efficiency_limited, activity_evidence_incomplete, export_data_limited, library_or_assignment_limited, peak_area_limited
+EOI parity: not_evaluated_no_independent_eoi_reference
+Accuracy qualified: no (calibration and systematic budgets remain incomplete)
+
+QG peaks not identified by FluxForge
+------------------------------------
+- Missing QG peak W187 @ 552.01 keV (QG net=437.00 +/- 340.00)
+- Missing QG peak W187 @ 618.32 keV (QG net=309.00 +/- 278.00)
+- Missing QG peak W187 @ 773.35 keV (QG net=132.00 +/- 296.00)
+- Missing QG peak Mn56 @ 2529.10 keV (QG net=171.00 +/- 86.00)
+
+Matched energies with isotope mismatch
+--------------------------------------
+- QG Mn56 @ 846.59 keV matched to FluxForge unidentified @ 846.68 keV
+
+QG nuclides missing from FluxForge activity results
+---------------------------------------------------
+- none
+
+Peak count parity failures
+--------------------------
+- W187 @ 133.71 keV | rel_err=+11.009 | En=+28.905
+- W187 @ 479.67 keV | rel_err=+0.682 | En=+2.834
+- W187 @ 685.79 keV | rel_err=+0.703 | En=+3.350
+- Mn56 @ 846.59 keV | rel_err=+0.036 | En=+3.776
+- Mn56 @ 1810.20 keV | rel_err=+0.090 | En=+4.517
+- Mn56 @ 2112.49 keV | rel_err=+0.112 | En=+4.164
+
+Peak gross-count parity failures
+--------------------------------
+- W187 @ 133.71 keV | gross_rel_err=+0.054 | gross_En=+6.187
+- W187 @ 479.67 keV | gross_rel_err=-0.177 | gross_En=-16.175
+- W187 @ 685.79 keV | gross_rel_err=-0.104 | gross_En=-8.187
+- V52 @ 1433.60 keV | gross_rel_err=-0.043 | gross_En=-10.154
+- Al28 @ 1778.42 keV | gross_rel_err=-0.202 | gross_En=-5.979
+
+Isotope activity parity failures
+--------------------------------
+- W187 | rel_err=+0.835 | En=+3.979
+- V52 | rel_err=-0.990 | En=-7.373
+- Al28 | rel_err=-0.982 | En=-1.432
+
+Line-level diagnostic flags
+---------------------------
+- W187 @ 133.71 keV | bucket=count_parity_failure | rel_count=+11.009 | rel_line_activity=+23.694 | eff_ratio=0.581
+- W187 @ 479.67 keV | bucket=count_parity_failure | rel_count=+0.682 | rel_line_activity=+1.869 | eff_ratio=0.719
+- W187 @ 685.79 keV | bucket=count_parity_failure | rel_count=+0.703 | rel_line_activity=+1.706 | eff_ratio=0.774
+- Mn56 @ 846.59 keV | bucket=assignment_ambiguous | activity not estimated
+- Mn56 @ 1810.20 keV | bucket=count_parity_failure | rel_count=+0.090 | rel_line_activity=+0.003 | eff_ratio=1.059
+- Mn56 @ 2112.49 keV | bucket=count_parity_failure | rel_count=+0.112 | rel_line_activity=-0.053 | eff_ratio=1.126
+- V52 @ 1433.60 keV | bucket=efficiency_or_activity_conversion_bias | rel_count=+0.018 | rel_line_activity=-0.989 | eff_ratio=96.922
+- Al28 @ 1778.42 keV | bucket=efficiency_or_activity_conversion_bias | rel_count=+0.143 | rel_line_activity=-0.982 | eff_ratio=105.192
+
+QG source QC (no activity or rate correction)
+---------------------------------------------
+- W187 @ 133.71 keV | source QC=yield_value_discrepancy | printed RAD INT=10.36 (unit unspecified) | percent hypothesis=0.1036 photons/decay | fraction hypothesis=10.36 photons/decay | bundled intensity=0.08667000000000001 photons/decay | report-only
+- W187 @ 479.67 keV | source QC=yield_value_discrepancy | printed RAD INT=26.6 (unit unspecified) | percent hypothesis=0.266 photons/decay | fraction hypothesis=26.6 photons/decay | bundled intensity=0.21681000000000003 photons/decay | report-only
+- W187 @ 552.01 keV | source QC=yield_value_discrepancy | printed RAD INT=6.14 (unit unspecified) | percent hypothesis=0.061399999999999996 photons/decay | fraction hypothesis=6.14 photons/decay | bundled intensity=0.05049 photons/decay | report-only
+- W187 @ 618.32 keV | source QC=yield_value_discrepancy;line_summary_inconsistency | printed RAD INT=7.57 (unit unspecified) | percent hypothesis=0.0757 photons/decay | fraction hypothesis=7.57 photons/decay | bundled intensity=0.06210000000000001 photons/decay | report-only
+- W187 @ 685.79 keV | source QC=yield_value_discrepancy | printed RAD INT=33.2 (unit unspecified) | percent hypothesis=0.332 photons/decay | fraction hypothesis=33.2 photons/decay | bundled intensity=0.27 photons/decay | report-only
+- W187 @ 773.35 keV | source QC=yield_value_discrepancy;line_summary_inconsistency | printed RAD INT=5.02 (unit unspecified) | percent hypothesis=0.050199999999999995 photons/decay | fraction hypothesis=5.02 photons/decay | bundled intensity=0.04104 photons/decay | report-only
+- Mn56 @ 2529.10 keV | source QC=yield_reference_or_convention_unqualified;line_summary_inconsistency | printed RAD INT=1.02 (unit unspecified) | percent hypothesis=0.0102 photons/decay | fraction hypothesis=1.02 photons/decay | bundled intensity=None photons/decay | report-only
+- V52 @ 1433.60 keV | source QC=yield_convention_discrepancy | printed RAD INT=1.0 (unit unspecified) | percent hypothesis=0.01 photons/decay | fraction hypothesis=1.0 photons/decay | bundled intensity=1.0 photons/decay | report-only
+- Al28 @ 1778.42 keV | source QC=yield_convention_discrepancy | printed RAD INT=1.0 (unit unspecified) | percent hypothesis=0.01 photons/decay | fraction hypothesis=1.0 photons/decay | bundled intensity=1.0 photons/decay | report-only
+
+FluxForge line-activity consistency flags
+-----------------------------------------
+- Mn56 @ 2522.34 keV | stage=eoi | rel_dev=0.400 | consensus=5.724e+05 Bq | mod-z=-1.22 | all-vs-LOO drift=+0.003
+- Mn56 @ 2959.29 keV | stage=eoi | rel_dev=0.269 | consensus=5.724e+05 Bq | mod-z=-0.70 | all-vs-LOO drift=+0.004
+- Tb154m @ 490.70 keV | stage=eoi | rel_dev=4.096 | consensus=1.723e+05 Bq | mod-z=+0.08 | all-vs-LOO drift=-0.050
+- Tb154m @ 922.80 keV | stage=eoi | rel_dev=19.057 | consensus=1.723e+05 Bq | mod-z=+4.50 | all-vs-LOO drift=-0.356
+- Tb154m @ 1389.16 keV | stage=eoi | rel_dev=3.570 | consensus=1.723e+05 Bq | mod-z=-0.08 | all-vs-LOO drift=-0.047
+- Tb154m @ 2282.56 keV | stage=eoi | rel_dev=0.466 | consensus=1.723e+05 Bq | mod-z=-1.27 | all-vs-LOO drift=+10.269
+- W187 @ 133.70 keV | stage=eoi | rel_dev=4.243 | consensus=1.281e+05 Bq | mod-z=+0.67 | all-vs-LOO drift=-0.386
+- W187 @ 479.48 keV | stage=eoi | rel_dev=0.401 | consensus=1.281e+05 Bq | mod-z=-0.68 | all-vs-LOO drift=+0.289
+- W187 @ 510.97 keV | stage=eoi | rel_dev=22.578 | consensus=1.281e+05 Bq | mod-z=+6.00 | all-vs-LOO drift=-0.007
+- W187 @ 685.38 keV | stage=eoi | rel_dev=0.388 | consensus=1.281e+05 Bq | mod-z=-0.67 | all-vs-LOO drift=+0.384
+
+Measurement QC review flags
+---------------------------
+- none
+
+QG internal consistency flags
+-----------------------------
+- W187 | header=2.764e+04 Bq | line range=(1.539e+04, 3.071e+04) Bq | max rel deviation=0.443
+- Mn56 | header=5.886e+05 Bq | line range=(1.839e+05, 6.12e+05) Bq | max rel deviation=0.688
+
+FluxForge detected peaks still left unidentified
+------------------------------------------------
+- none
+
+FluxForge identified peaks with no QG counterpart
+-------------------------------------------------
+- Tb154m @ 490.70 keV | net=224.36 +/- 95.10
+- W187 @ 510.97 keV | net=3446.92 +/- 154.20
+- Tb154m @ 922.80 keV | net=1245.89 +/- 108.87
+- Fe59 @ 1293.24 keV | net=859.45 +/- 230.65
+- Tb154m @ 1389.16 keV | net=226.29 +/- 103.35
+- Tb154m @ 2282.56 keV | net=20.99 +/- 9.54
+- Mn56 @ 2522.34 keV | net=376.23 +/- 51.22
+- Mn56 @ 2657.08 keV | net=398.83 +/- 19.98
+- Mn56 @ 2959.29 keV | net=153.90 +/- 12.41
+
