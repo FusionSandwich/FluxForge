@@ -438,3 +438,223 @@ def run_pilot() -> dict:
 
         fits = {}
         for scenario in ("south_native", "ambient_off"):
+            for continuum in ("linear", "step"):
+                if scenario == "south_native":
+                    choice = BackgroundChoice(
+                        "later_conditional",
+                        "South detector background postdates the sample; source matched but temporal applicability remains unresolved",
+                        continuum="linear",
+                        peaks=(peak,),
+                    )
+                    bg_obs = background_observation
+                else:
+                    choice = BackgroundChoice(
+                        "no_separate_ambient_vendor",
+                        "ambient-off sensitivity only; saved settings do not establish final vendor report behavior",
+                        continuum="none",
+                    )
+                    bg_obs = None
+                fit = fit_joint_poisson(
+                    observation,
+                    bg_obs,
+                    peak,
+                    choice,
+                    sample_continuum=continuum,
+                )
+                item = _joint_payload(fit, observation, bg_obs)
+                item["count_average_activity_bq_conditional"] = (
+                    fit.area * conversion if fit.success else None
+                )
+                fits[f"{scenario}_{continuum}"] = item
+
+        free = fit_joint_poisson(
+            observation,
+            background_observation,
+            peak,
+            BackgroundChoice(
+                "later_conditional",
+                "South free-normalization sensitivity; no independent normalization auxiliary",
+                normalization="free",
+                continuum="linear",
+                peaks=(peak,),
+            ),
+            sample_continuum="linear",
+            confidence=None,
+        )
+        fits["south_native_free_normalization"] = _joint_payload(
+            free, observation, background_observation
+        )
+
+        rows.append(
+            {
+                "energy_keV": energy,
+                "yield": intensity,
+                "efficiency": efficiency,
+                "fixed_fwhm_keV": fwhm,
+                "fixed_roi_sample_channels_inclusive": [lo, hi],
+                "fixed_roi_sample_edges_keV": [sample_edges[lo], sample_edges[hi + 1]],
+                "south_native_channels_inclusive": [blo, bhi],
+                "sample_original_counts": observation.counts,
+                "south_original_counts": background_observation.counts,
+                "sample_native_edges_keV": observation.energy_edges_keV,
+                "south_native_edges_keV": background_observation.energy_edges_keV,
+                "fixed_roi_iec_covell_control": {
+                    "south_native": {
+                        "net_counts": iec_south[0],
+                        "std_counts_full_covariance": iec_south[1],
+                        "gross_counts": iec_south[2],
+                        "local_continuum_counts": iec_south[3],
+                        "roi": list(iec_south[4]),
+                        "count_average_activity_bq_conditional": iec_south[0]
+                        * conversion,
+                        "count_average_activity_std_bq_conditional": iec_south[1]
+                        * conversion,
+                    },
+                    "ambient_off": {
+                        "net_counts": iec_off[0],
+                        "std_counts": iec_off[1],
+                        "gross_counts": iec_off[2],
+                        "local_continuum_counts": iec_off[3],
+                        "roi": list(iec_off[4]),
+                        "count_average_activity_bq_conditional": iec_off[0]
+                        * conversion,
+                        "count_average_activity_std_bq_conditional": iec_off[1]
+                        * conversion,
+                    },
+                    "method": "current count-conserving South subtraction followed by fixed-ROI local-continuum IEC/Covell component",
+                },
+                "joint_fits": fits,
+            }
+        )
+
+    after_hashes = {
+        rel.as_posix(): sha(ROOT / rel)
+        for rel in (
+            SAMPLE_REL, SOUTH_REL, MANIFEST_REL, SUPPLEMENT_REL, CONFIG_REL, PROFILE_REL
+        )
+    }
+    if original_hashes != after_hashes:
+        raise RuntimeError("Source-bound inputs changed during pilot")
+
+    try:
+        git_head = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        git_head = None
+
+    return {
+        "issue": 249,
+        "integration_base_head": BASE_HEAD,
+        "observed_git_head": git_head,
+        "scope": "source-bound two-line South-background joint-Poisson model check",
+        "software_status": "pilot executable; model adequacy and physical qualification separate",
+        "vendor_agreement_status": "not an optimization objective; QuantumGold target activities are not loaded",
+        "physical_qualification_status": "NOT_QUALIFIED",
+        "vendor_targets_loaded": False,
+        "source_bound_inputs_unchanged": True,
+        "inputs_sha256": original_hashes,
+        "engine_files_sha256": {
+            rel: sha(ROOT / rel)
+            for rel in (
+                "src/fluxforge/analysis/joint_poisson.py",
+                "src/fluxforge/analysis/spectrum_math.py",
+                "src/fluxforge/analysis/flux_wire_analysis.py",
+                "src/fluxforge/io/flux_wire.py",
+                "src/fluxforge/io/spe.py",
+                "src/fluxforge/data/rafm_profile.py",
+            )
+        },
+        "pilot_script_sha256": sha(Path(__file__)),
+        "environment": {
+            "python": platform.python_version(),
+            "numpy": np.__version__,
+            "scipy": scipy.__version__,
+        },
+        "sample": {
+            "source_path": SAMPLE_REL.as_posix(),
+            "source_sha256": sha(sample_path),
+            "id": sample.sample_id,
+            "start_time": sample.start_time.isoformat() if sample.start_time else None,
+            "live_time_s": sample.live_time,
+            "roi_energy_calibration": list(profile.energy_calibration),
+            "roi_calibration_basis": "current nominal RAFM profile for direct current-engine comparability; original ASC counts unchanged",
+        },
+        "south_background": south_details,
+        "background_applicability": "later_conditional; same detector but temporal applicability unresolved",
+        "calibration_covariance": "UNAVAILABLE; never treated as zero",
+        "grid_policy": "joint likelihood keeps native integer observations; IEC control uses current integrated-count overlap rebin with propagated covariance",
+        "activity_reference": "count_average_live_normalized conditional conversion only; no decay/summing/attenuation or calibration covariance",
+        "current_integrated_iec_control": _current_iec_control(),
+        "synthetic_challenges": _synthetic_challenges(),
+        "limitations": [
+            "South background temporal applicability to the August 2025 sample is unresolved.",
+            "Calibration/efficiency shared covariance is unavailable and excluded from conditional line uncertainties.",
+            "Fixed Gaussian response and profile calibration are model assumptions; failed adequacy screens are preserved.",
+            "Profile intervals are asymptotic and do not calibrate sparse/nonregular coverage.",
+            "Ambient-off is a sensitivity control, not evidence of final QuantumGold settings.",
+            "North background results from issue #239 remain cross-detector sensitivity only and are not used here.",
+            "No QuantumGold activity or net-count target is loaded, fitted, or used to select a model.",
+        ],
+        "rows": rows,
+    }
+
+
+def _json_default(value):
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, np.generic):
+        return value.item()
+    raise TypeError(type(value).__name__)
+
+
+def write_outputs(payload: dict, output: Path) -> None:
+    if output.exists():
+        raise FileExistsError("output directory must be new")
+    output.mkdir(parents=True)
+    (output / "south_joint_poisson_pilot.json").write_text(
+        json.dumps(payload, indent=2, default=_json_default, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
+
+    summary_fields = [
+        "energy_keV",
+        "scenario",
+        "sample_continuum",
+        "status",
+        "success",
+        "area_counts",
+        "activity_bq_conditional",
+        "sample_deviance",
+        "background_deviance",
+        "approximate_tail_probability",
+        "adequacy_flag",
+        "identifiability_ratio",
+    ]
+    with (output / "summary.csv").open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=summary_fields)
+        writer.writeheader()
+        for row in payload["rows"]:
+            for name, fit in row["joint_fits"].items():
+                scenario, continuum = (
+                    ("south_native_free_normalization", "linear")
+                    if name == "south_native_free_normalization"
+                    else name.rsplit("_", 1)
+                )
+                diagnostic = fit["model_diagnostics"]
+                writer.writerow(
+                    {
+                        "energy_keV": row["energy_keV"],
+                        "scenario": scenario,
+                        "sample_continuum": continuum,
+                        "status": fit["status"],
+                        "success": fit["success"],
+                        "area_counts": fit["area_full_response_counts"],
+                        "activity_bq_conditional": fit.get(
+                            "count_average_activity_bq_conditional"
+                        ),
+                        "sample_deviance": diagnostic["sample_poisson_deviance"],
+                        "background_deviance": diagnostic[
+                            "background_poisson_deviance"
+                        ],
+                        "approximate_tail_probability": diagnostic[
