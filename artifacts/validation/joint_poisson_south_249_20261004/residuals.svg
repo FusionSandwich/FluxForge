@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+<rect width="900" height="500" fill="white"/>
+<text x="450" y="30" text-anchor="middle" font-family="sans-serif" font-size="20">Issue #249: sample Poisson deviance residuals, South-background linear fits</text>
+<line x1="80" y1="250" x2="860" y2="250" stroke="black" stroke-width="1"/>
+<line x1="80" y1="130" x2="860" y2="130" stroke="gray" stroke-dasharray="6 6"/>
+<line x1="80" y1="370" x2="860" y2="370" stroke="gray" stroke-dasharray="6 6"/>
+<text x="52" y="136" font-family="sans-serif" font-size="12">+3</text><text x="52" y="376" font-family="sans-serif" font-size="12">-3</text>
+<polyline fill="none" stroke="black" stroke-width="2" points="90,241 132,313 174,226 216,252 258,244 300,196 342,162 384,164 426,111 468,195 510,282 552,459 594,477 636,344 678,367 720,204 762,156 804,231 846,168"/>
+<polyline fill="none" stroke="gray" stroke-width="2" stroke-dasharray="8 4" points="90,273 132,331 174,214 216,199 258,210 300,180 342,156 384,162 426,84 468,232 510,308 552,557 594,469 636,381 678,268 720,186 762,216 804,156 846,242"/>
+<text x="110" y="55" font-family="sans-serif" font-size="14">solid: 1173 keV; dashed: 1332 keV</text>
+<text x="450" y="480" text-anchor="middle" font-family="sans-serif" font-size="14">ROI channel offset (left to right; 19 bins)</text>
+<text x="20" y="250" transform="rotate(-90 20 250)" text-anchor="middle" font-family="sans-serif" font-size="14">deviance residual</text>
+<text x="640" y="85" font-family="sans-serif" font-size="12">1332 max |r| ≈ 7.7 (off-scale)</text>
+<text x="640" y="105" font-family="sans-serif" font-size="12">1173 max |r| ≈ 5.7</text>
+</svg>
