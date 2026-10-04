@@ -145,6 +145,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.crosshair_readout.setVisible(False)
             header.addWidget(self.crosshair_readout)
 
+            shell.addLayout(header)
+            header = QHBoxLayout()
+            header.setContentsMargins(0, 0, 0, 0)
+
             self.crosshair_button = QPushButton("Crosshair", self)
             self.crosshair_button.setObjectName("SpectrumCrosshairButton")
             self.crosshair_button.setCheckable(True)
@@ -193,6 +197,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.reset_view_button.clicked.connect(self.reset_view)
             header.addWidget(self.reset_view_button)
+            header.addStretch(1)
 
             shell.addLayout(header)
 
