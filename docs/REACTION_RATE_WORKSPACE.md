@@ -25,6 +25,12 @@ per second. The calculation honors relative power and decay during gaps.
 Missing history, zero buildup, incompatible element/product pairs and
 incomplete or nonfinite measurements stop conversion with an error.
 
+Both rates are evaluated at relative power 1 in the applied history. That
+reference is the user's chosen common power scale; the workspace does not
+infer an absolute reactor power or claim a flux at a specified MW value.
+Exports retain the relative power basis and mark absolute reference power as
+unavailable so this scale remains visible when the results leave the editor.
+
 An optional activity sigma is propagated conditional on the fixed specimen,
 half-life and history inputs. The result is labeled `activity_only_conditional`;
 blank sigma remains `unavailable`. Zero activity retains a supplied positive

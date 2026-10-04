@@ -14,6 +14,16 @@
         "chat": "Check FluxForge features and samples",
         "branch": "codex/adversarial-acceptance-20261002",
         "scope": "acceptance/CI, peak recovery, calibration records, scientific source qualification"
+      },
+      {
+        "chat": "Archive old GUI and improve new one",
+        "branch": "codex/archive-legacy-gui",
+        "scope": "Tk archival and supported Qt workflows; published PR #218 integrated"
+      },
+      {
+        "chat": "Review old GUI issues",
+        "branch": "read-only issue audit",
+        "scope": "GUI backlog review and replacement issue drafts"
       }
     ]
   },
@@ -246,8 +256,8 @@
       "number": 49,
       "title": "Issue: GUI Export: Run Bundle PDF/HTML Report Generator",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/49",
-      "status": "queued",
-      "notes": ""
+      "status": "implemented_pending_integration",
+      "notes": "Implemented in draft PR #233 on the Qt-only GUI; 132 targeted checks passed, real PDF and clean isolated wheel verified. Based on PR #218 with acceptance fixes from PR #216. See docs/reviews/ISSUES_49_68_QT_REPORTS_2026-10-03.md. Pending integration; issue remains open."
     },
     {
       "number": 50,
@@ -379,8 +389,8 @@
       "number": 68,
       "title": "Issue: AA1.13 - Instrument-settings provenance capture",
       "url": "https://github.com/FusionSandwich/FluxForge/issues/68",
-      "status": "queued",
-      "notes": ""
+      "status": "implemented_pending_integration",
+      "notes": "Implemented in draft PR #233 on the Qt-only GUI; 132 targeted checks passed, real PDF and clean isolated wheel verified. Based on PR #218 with acceptance fixes from PR #216. See docs/reviews/ISSUES_49_68_QT_REPORTS_2026-10-03.md. Pending integration; issue remains open."
     },
     {
       "number": 69,
