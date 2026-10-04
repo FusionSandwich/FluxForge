@@ -1,0 +1,280 @@
+{
+  "engine_commit": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "engine_archive_sha256": "f4d317165c0bbf5dd90d33ceb381f1a608f8cfe4efeb4bf414d889a66c2a3c3b",
+  "dataset_commit": "68e2c7a8bc497a4165725a3f23dd557df2a31c66",
+  "measurements": [
+    {
+      "measurement_id": "Co-Cd-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Co-Cd-RAFM-1.ANS",
+          "sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+          "bytes": 34416,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Co-Cd-RAFM-1.ASC",
+          "sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Co-Cd-RAFM-1.txt",
+          "sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+          "bytes": 3366,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Co-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Co-RAFM-1.ANS",
+          "sha256": "1eadf548bd66b3da425d8bd891d8523e0ef1f59a9ea4471684f96dc0855675c9",
+          "bytes": 34316,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Co-RAFM-1.ASC",
+          "sha256": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Co-RAFM-1.txt",
+          "sha256": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+          "bytes": 3366,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Cu-Cd-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Cu-Cd-RAFM-1.ANS",
+          "sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+          "bytes": 34316,
+          "role": "original_ANS"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Cu-Cd-RAFM-1.txt",
+          "sha256": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+          "bytes": 3316,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Cu-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Cu-RAFM-1.ANS",
+          "sha256": "91f21b04eb5672deb7bee7666371be82594c0e45692843076a9be81f8b0b6b4f",
+          "bytes": 34316,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Cu-RAFM-1.ASC",
+          "sha256": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+          "bytes": 164326,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Cu-RAFM-1.txt",
+          "sha256": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+          "bytes": 3281,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Fe-Cd-RAFM-1.ANS",
+          "sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+          "bytes": 34516,
+          "role": "original_ANS"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Fe-Cd-RAFM-1.txt",
+          "sha256": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+          "bytes": 3544,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "In-Cd-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/In-Cd-RAFM-1.ANS",
+          "sha256": "a2f761ebdf0aef7e6a7d27972712fe5e41ef5a6767e2b24514ad67ee0271662e",
+          "bytes": 34366,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/In-Cd-RAFM-1.ASC",
+          "sha256": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+          "bytes": 164326,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/In-Cd-RAFM-1.txt",
+          "sha256": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+          "bytes": 3856,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Ni-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Ni-RAFM-1.ANS",
+          "sha256": "ab4d6877ead21040232dc1c12e66365f8e38a92e102bca92f1c84040eaae4d76",
+          "bytes": 34366,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ni-RAFM-1.ASC",
+          "sha256": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ni-RAFM-1.txt",
+          "sha256": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+          "bytes": 3270,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Sc-Cd-RAFM-1.ANS",
+          "sha256": "32ae08601f00076d4c69f8f87b6207f3e0101eb48053ce64a64b263cdd833591",
+          "bytes": 34316,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Sc-Cd-RAFM-1.ASC",
+          "sha256": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Sc-Cd-RAFM-1.txt",
+          "sha256": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+          "bytes": 3360,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Sc-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Sc-RAFM-1.ANS",
+          "sha256": "64277ab9834f317a0731111faa74171fb356b17fff36e13ea2b4a5bc2c34d229",
+          "bytes": 34416,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Sc-RAFM-1.ASC",
+          "sha256": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Sc-RAFM-1.txt",
+          "sha256": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+          "bytes": 3361,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Ti-RAFM-1",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Ti-RAFM-1.ANS",
+          "sha256": "c86ef107b036999fde62e3249ca7213eb71ba583aca1264bb54a59acc41be99b",
+          "bytes": 34316,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ti-RAFM-1.ASC",
+          "sha256": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1.txt",
+          "sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+          "bytes": 4406,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Ti-RAFM-1a",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Ti-RAFM-1a.ANS",
+          "sha256": "59f89ee0d0536a259dadf5484f3bfe367d423b8e0f291281594b8838e8f02a61",
+          "bytes": 34316,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ti-RAFM-1a.ASC",
+          "sha256": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1a.txt",
+          "sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+          "bytes": 4361,
+          "role": "original_QG_report"
+        }
+      }
+    },
+    {
+      "measurement_id": "Ti-RAFM-1b",
+      "files": {
+        "ANS": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Ti-RAFM-1b.ANS",
+          "sha256": "1fbc1d8c255ebb2b99695144ad822d947e749686b48e2acb455640f71da7424c",
+          "bytes": 34666,
+          "role": "original_ANS"
+        },
+        "ASC": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ti-RAFM-1b.ASC",
+          "sha256": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5",
+          "bytes": 164327,
+          "role": "original_ASC"
+        },
+        "QG_report": {
+          "path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1b.txt",
+          "sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+          "bytes": 4361,
+          "role": "original_QG_report"
+        }
+      }
+    }
+  ],
+  "code_hashes": {
+    "src/fluxforge/analysis/flux_wire_analysis.py": "de2a4b1e167aae6a56a49f6ea24cda7db499922352c224095d3ca3b404f1c50a",
+    "src/fluxforge/examples/rafm_workflow.py": "3035402a21c1da2c9578a3c5f2af44a6ac7b6aa2e33cac03dd4ec48cf58c13bd",
+    "src/fluxforge/analysis/peakfit.py": "4a606b2b17cb783f35d5237d69c1f06e9ce360fb69cfd1ccd862fd1555f258ec",
+    "src/fluxforge/analysis/spectrum_math.py": "a19a0b346a97d5ef571cedfa01429a7c24b850603e80891325e44c96f25429f1",
+    "src/fluxforge/io/flux_wire.py": "a477e35b9e819a69e16c8e48bb2d42c70c11a741c41f24de01a7cb7247dc54bd",
+    "src/fluxforge/data/rafm_decay_data.json": "159e6dccd10532323f986dbe45d95b7d804b53c965d254863fbe63cae565c355",
+    "src/fluxforge/data/rafm_profiles.json": "a272786f8ee8fd71beabd382b4dda900b99d4bf27d2e5a7e17281ad09b1da836"
+  }
+}

@@ -1,0 +1,352 @@
+[
+  {
+    "sample": "Co-Cd-RAFM-1_25cm",
+    "isotope": "Co60",
+    "energy_keV": 1173.2312153498783,
+    "legacy_efficiency": 0.0003554891539202694,
+    "recovered_curve_efficiency": 0.0003888531152243815,
+    "recovered_over_legacy": 1.0938536687721143,
+    "conditional_line_activity_with_recovered": 138.90166637303494,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Co-Cd-RAFM-1_25cm",
+    "isotope": "Co60",
+    "energy_keV": 1332.5455350389266,
+    "legacy_efficiency": 0.00033822794290617856,
+    "recovered_curve_efficiency": 0.0003543323492280322,
+    "recovered_over_legacy": 1.0476140622311647,
+    "conditional_line_activity_with_recovered": 151.9052722074638,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Co-RAFM-1_25cm",
+    "isotope": "Co60",
+    "energy_keV": 1173.1491363801185,
+    "legacy_efficiency": 0.00035550060862558604,
+    "recovered_curve_efficiency": 0.00038887437367754923,
+    "recovered_over_legacy": 1.0938782219838967,
+    "conditional_line_activity_with_recovered": 1977.0869331877666,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Co-RAFM-1_25cm",
+    "isotope": "Co60",
+    "energy_keV": 1332.4168353813495,
+    "legacy_efficiency": 0.00033823825964357057,
+    "recovered_curve_efficiency": 0.0003543553864667385,
+    "recovered_over_legacy": 1.0476502180449718,
+    "conditional_line_activity_with_recovered": 1946.0011928111915,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Cu-RAFM-1_25cm",
+    "isotope": "Cu64",
+    "energy_keV": 1345.4744204161175,
+    "legacy_efficiency": 0.0003372157887808468,
+    "recovered_curve_efficiency": 0.00035206292526801167,
+    "recovered_over_legacy": 1.0440285923172294,
+    "conditional_line_activity_with_recovered": 3065226.558013893,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "In-Cd-RAFM-1_25cm",
+    "isotope": "In114m",
+    "energy_keV": 190.17863903121298,
+    "legacy_efficiency": 0.0009308350382865735,
+    "recovered_curve_efficiency": 0.0014562030716441406,
+    "recovered_over_legacy": 1.5644050897832915,
+    "conditional_line_activity_with_recovered": 197846.99287870026,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "In-Cd-RAFM-1_25cm",
+    "isotope": "In114m",
+    "energy_keV": 558.2368507641241,
+    "legacy_efficiency": 0.0005656703824170965,
+    "recovered_curve_efficiency": 0.0007493477532781343,
+    "recovered_over_legacy": 1.324707420735356,
+    "conditional_line_activity_with_recovered": 269873.64945821837,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "In-Cd-RAFM-1_25cm",
+    "isotope": "In114m",
+    "energy_keV": 724.9588128104051,
+    "legacy_efficiency": 0.0004742329551583279,
+    "recovered_curve_efficiency": 0.000594606808017817,
+    "recovered_over_legacy": 1.253828527836706,
+    "conditional_line_activity_with_recovered": 279404.7233098046,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "In-Cd-RAFM-1_25cm",
+    "isotope": "In115m",
+    "energy_keV": 336.16513563402845,
+    "legacy_efficiency": 0.0007646435760897653,
+    "recovered_curve_efficiency": 0.0010985799124558597,
+    "recovered_over_legacy": 1.4367215612714335,
+    "conditional_line_activity_with_recovered": 12445.553224874504,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ni-RAFM-1_25cm",
+    "isotope": "Co58",
+    "energy_keV": 810.4649972716744,
+    "legacy_efficiency": 0.0004398522336371927,
+    "recovered_curve_efficiency": 0.0005369417466560936,
+    "recovered_over_legacy": 1.2207321131827742,
+    "conditional_line_activity_with_recovered": 46499.38298508152,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Sc-Cd-RAFM-1_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 889.1158082647779,
+    "legacy_efficiency": 0.00041464333432412217,
+    "recovered_curve_efficiency": 0.0004934077484428167,
+    "recovered_over_legacy": 1.1899570247453326,
+    "conditional_line_activity_with_recovered": 156428.13688702518,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Sc-Cd-RAFM-1_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 1120.3107119319038,
+    "legacy_efficiency": 0.00036343816641515845,
+    "recovered_curve_efficiency": 0.00040348165069202025,
+    "recovered_over_legacy": 1.1101796343291028,
+    "conditional_line_activity_with_recovered": 163307.34338466628,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Sc-RAFM-1_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 889.6163263241466,
+    "legacy_efficiency": 0.0004144972916468701,
+    "recovered_curve_efficiency": 0.0004931559878589543,
+    "recovered_over_legacy": 1.1897689027099776,
+    "conditional_line_activity_with_recovered": 1388693.7388346258,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Sc-RAFM-1_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 1120.835584577764,
+    "legacy_efficiency": 0.0003633536045175048,
+    "recovered_curve_efficiency": 0.00040332733813413737,
+    "recovered_over_legacy": 1.1100133124307752,
+    "conditional_line_activity_with_recovered": 1450592.152003878,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Sc47",
+    "energy_keV": 159.31730441454172,
+    "legacy_efficiency": 0.0009482362893432,
+    "recovered_curve_efficiency": 0.0014930607687063267,
+    "recovered_over_legacy": 1.574566155594511,
+    "conditional_line_activity_with_recovered": 2488.124007408,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 175.21998042298154,
+    "legacy_efficiency": 0.0009425117490550898,
+    "recovered_curve_efficiency": 0.001482510826624745,
+    "recovered_over_legacy": 1.5729361762450478,
+    "conditional_line_activity_with_recovered": 252.39453558045395,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 983.361143514081,
+    "legacy_efficiency": 0.0003899936005452768,
+    "recovered_curve_efficiency": 0.00045084045916382533,
+    "recovered_over_legacy": 1.1560201463138737,
+    "conditional_line_activity_with_recovered": 264.09009568667693,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 1037.3253726545609,
+    "legacy_efficiency": 0.0003783771240010264,
+    "recovered_curve_efficiency": 0.0004303651673349763,
+    "recovered_over_legacy": 1.1373974271600227,
+    "conditional_line_activity_with_recovered": 261.4059141836523,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 1311.815315110399,
+    "legacy_efficiency": 0.0003399521857800218,
+    "recovered_curve_efficiency": 0.00035812172075924497,
+    "recovered_over_legacy": 1.053447325062885,
+    "conditional_line_activity_with_recovered": 269.2481508987665,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 889.0886281992525,
+    "legacy_efficiency": 0.00041465126993372976,
+    "recovered_curve_efficiency": 0.000493421420015776,
+    "recovered_over_legacy": 1.1899672225642417,
+    "conditional_line_activity_with_recovered": 316.86008715833424,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1a_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 1120.29296341164,
+    "legacy_efficiency": 0.00036344102793755374,
+    "recovered_curve_efficiency": 0.00040348686875697786,
+    "recovered_over_legacy": 1.1101852508140737,
+    "conditional_line_activity_with_recovered": 559.3523271331494,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Sc47",
+    "energy_keV": 159.33101356149865,
+    "legacy_efficiency": 0.0009482353003598022,
+    "recovered_curve_efficiency": 0.0014930629621698398,
+    "recovered_over_legacy": 1.5745701110297265,
+    "conditional_line_activity_with_recovered": 1753.6050719651896,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 175.26067356069856,
+    "legacy_efficiency": 0.0009424870043093,
+    "recovered_curve_efficiency": 0.00148245548395745,
+    "recovered_over_legacy": 1.572918753446224,
+    "conditional_line_activity_with_recovered": 20.597066976524424,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 983.3489305570163,
+    "legacy_efficiency": 0.0003899964464113121,
+    "recovered_curve_efficiency": 0.00045084538098552244,
+    "recovered_over_legacy": 1.1560243308218139,
+    "conditional_line_activity_with_recovered": 141.96580985196996,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 1037.3797972534464,
+    "legacy_efficiency": 0.00037836624953557237,
+    "recovered_curve_efficiency": 0.00043034579217777303,
+    "recovered_over_legacy": 1.1373789092076876,
+    "conditional_line_activity_with_recovered": 131.32259530133237,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 1311.857242054092,
+    "legacy_efficiency": 0.0003399485701386486,
+    "recovered_curve_efficiency": 0.0003581138384938307,
+    "recovered_over_legacy": 1.0534353427277936,
+    "conditional_line_activity_with_recovered": 150.3585740712411,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 889.1670452475089,
+    "legacy_efficiency": 0.0004146283763336031,
+    "recovered_curve_efficiency": 0.000493381976240503,
+    "recovered_over_legacy": 1.1899377958722634,
+    "conditional_line_activity_with_recovered": 291.2408339351214,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1b_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 1120.328440093643,
+    "legacy_efficiency": 0.0003634353083102714,
+    "recovered_curve_efficiency": 0.000403476438612469,
+    "recovered_over_legacy": 1.1101740237853106,
+    "conditional_line_activity_with_recovered": 549.0742887128722,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Sc47",
+    "energy_keV": 159.29462871216532,
+    "legacy_efficiency": 0.000948237907871574,
+    "recovered_curve_efficiency": 0.0014930571405939463,
+    "recovered_over_legacy": 1.5745596418363825,
+    "conditional_line_activity_with_recovered": 2515.626604358715,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 175.25832771890194,
+    "legacy_efficiency": 0.0009424884319673071,
+    "recovered_curve_efficiency": 0.0014824586743022933,
+    "recovered_over_legacy": 1.5729197558508778,
+    "conditional_line_activity_with_recovered": 74.2725554922246,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 983.3016145149826,
+    "legacy_efficiency": 0.00039000747280601016,
+    "recovered_curve_efficiency": 0.00045086444935046204,
+    "recovered_over_legacy": 1.1560405397019717,
+    "conditional_line_activity_with_recovered": 267.2335583004814,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 1037.1919591162366,
+    "legacy_efficiency": 0.0003784037873801852,
+    "recovered_curve_efficiency": 0.00043041266255461975,
+    "recovered_over_legacy": 1.1374427976382298,
+    "conditional_line_activity_with_recovered": 267.00341885752204,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Sc48",
+    "energy_keV": 1311.7266963813317,
+    "legacy_efficiency": 0.0003399598296987479,
+    "recovered_curve_efficiency": 0.0003581383810803096,
+    "recovered_over_legacy": 1.0534726452759742,
+    "conditional_line_activity_with_recovered": 254.88673385652118,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 888.9953638630335,
+    "legacy_efficiency": 0.0004146785036540877,
+    "recovered_curve_efficiency": 0.0004934683366130311,
+    "recovered_over_legacy": 1.1900022119899119,
+    "conditional_line_activity_with_recovered": 320.9821090557789,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  },
+  {
+    "sample": "Ti-RAFM-1_25cm",
+    "isotope": "Sc46",
+    "energy_keV": 1120.1299233417546,
+    "legacy_efficiency": 0.0003634673205680362,
+    "recovered_curve_efficiency": 0.00040353480253752416,
+    "recovered_over_legacy": 1.1102368210348854,
+    "conditional_line_activity_with_recovered": 509.0284670641649,
+    "scope": "same physical counts; recovered curve percent assumption; not vendor efficiency truth"
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "client_date": "2026-10-03",
+  "repository": "FusionSandwich/FluxForge",
+  "research_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+  "engine_base": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "engine_descendant": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "integration_issues": [
+    232,
+    220
+  ],
+  "status": "Six local implementation/testing tasks started; component and workflow acceptance pending.",
+  "issues": [
+    {
+      "issue": 236,
+      "key": "qg-protocol",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/236"
+    },
+    {
+      "issue": 237,
+      "key": "efficiency-fidelity",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/237"
+    },
+    {
+      "issue": 238,
+      "key": "activity-combination",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/238"
+    },
+    {
+      "issue": 239,
+      "key": "joint-poisson",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/239"
+    },
+    {
+      "issue": 240,
+      "key": "multiplet-validation",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/240"
+    },
+    {
+      "issue": 241,
+      "key": "repeated-count-decay",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/241"
+    }
+  ],
+  "acceptance": "Independent Sol review and integration/replay required; task creation/component tests do not establish QuantumGold parity."
+}

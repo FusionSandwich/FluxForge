@@ -1,0 +1,336 @@
+[
+  {
+    "sample": "Cu-Cd-RAFM-1_25cm",
+    "source_type": "original_native_ANS_no_ASC_fabricated",
+    "native_sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+    "source_LT_RT_matches_QG": true,
+    "native_LT_s": 3600.0,
+    "native_RT_s": 3665.86,
+    "calibration_source": "QG report header parameters only; no report peak/activity used in raw analysis",
+    "efficiency": {
+      "C1": -20.26,
+      "C2": 10.29,
+      "C3": -1.655,
+      "C4": 0.08666,
+      "geometry_factor_A": 0.00348,
+      "al_window_T1_um": 1000.0,
+      "detector_thickness_DI_cm": 6.45,
+      "dead_layer_DL_um": 700.0,
+      "incident_angle_AI_deg": 0.0,
+      "detector_diameter_cm": 6.0,
+      "source_distance_cm": 25.0,
+      "detector_id": "South",
+      "relative_uncertainty": 0.0
+    },
+    "native_energy_coefficients": [
+      -1.69438636302948,
+      0.49962061643600464,
+      6.709741739996389e-08
+    ],
+    "scope": "Conditional native diagnostic; Fe near-contact efficiency model unqualified and excluded from25cm comparison population",
+    "isotopes": {
+      "Cu64": {
+        "activity_bq": 1118733.798376685,
+        "activity_unc_bq": 29065.58593467837,
+        "activity_uci": 30.23604860477527,
+        "activity_unc_uci": 0.7855563766129289,
+        "n_peaks": 1,
+        "peak_energies": [
+          1345.4049637647972
+        ],
+        "excluded_peak_energies": [],
+        "mean_line_activity_bq": 1118733.798376685,
+        "median_line_activity_bq": 1118733.798376685,
+        "variance_line_activity_bq2": 0.0,
+        "std_line_activity_bq": 0.0,
+        "relative_line_activity_variance": 0.0,
+        "max_abs_relative_line_delta": 0.0,
+        "single_peak_outlier_energies": [],
+        "single_peak_activity_diagnostics": [
+          {
+            "energy_keV": 1345.4049637647972,
+            "line_activity_bq": 1118733.798376685,
+            "line_activity_unc_bq": 29065.58593467837,
+            "relative_delta_vs_combined": 0.0,
+            "z_score_vs_combined": 0.0,
+            "modified_z_score": 0.0,
+            "leave_one_out_activity_bq": null,
+            "leave_one_out_activity_unc_bq": null,
+            "all_vs_leave_one_out_relative_delta": null,
+            "single_vs_leave_one_out_relative_delta": null,
+            "is_outlier": false
+          }
+        ],
+        "activity_reference": "count_average_live_normalized"
+      }
+    },
+    "QG_summary_Bq": {
+      "Cu64": 1090982.0
+    },
+    "peaks": [
+      {
+        "channel": 2695,
+        "energy_keV": 1345.4049637647972,
+        "net_counts": 6449.798821182034,
+        "net_counts_unc": 98.19542716951436,
+        "gross_counts": 6741.0,
+        "gross_counts_unc": 82.10359310042404,
+        "background_adjusted_gross_counts": 6695.998044017791,
+        "comparison_net_counts": 6618.0,
+        "comparison_net_counts_unc": 96.28083921528727,
+        "comparison_gross_counts": 6839.0,
+        "comparison_gross_counts_unc": 82.69824665614136,
+        "background": 12.957853833460884,
+        "fwhm": 2.2945805716144116,
+        "significance": 65.68329103602527,
+        "isotope": "Cu64",
+        "assignment_ambiguous": false,
+        "assignment_candidates": [
+          {
+            "isotope": "Cu64",
+            "energy_keV": 1345.77,
+            "intensity": 0.004749,
+            "intensity_uncertainty": 9.997900000000001e-05
+          }
+        ],
+        "activity_estimation_state": "estimated",
+        "assignment_nominal_fwhm_keV": 2.4387005999999998,
+        "gamma_energy": 1345.77,
+        "branching_ratio": 0.004749,
+        "branching_ratio_uncertainty": 9.997900000000001e-05,
+        "efficiency": 0.0003372210989363357,
+        "activity_bq": 1118733.798376685,
+        "activity_unc_bq": 29065.58593467837,
+        "activity_correction_factor": 1.0,
+        "activity_correction_uncertainty": 0.0
+      }
+    ]
+  },
+  {
+    "sample": "Fe-Cd-RAFM-1_0cm",
+    "source_type": "original_native_ANS_no_ASC_fabricated",
+    "native_sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+    "source_LT_RT_matches_QG": true,
+    "native_LT_s": 43200.0,
+    "native_RT_s": 43236.05,
+    "calibration_source": "QG report header parameters only; no report peak/activity used in raw analysis",
+    "efficiency": {
+      "C1": -131.6,
+      "C2": 72.9,
+      "C3": -12.17,
+      "C4": 0.65,
+      "geometry_factor_A": 0.0092,
+      "al_window_T1_um": 1000.0,
+      "detector_thickness_DI_cm": 6.45,
+      "dead_layer_DL_um": 700.0,
+      "incident_angle_AI_deg": 0.0,
+      "detector_diameter_cm": 6.0,
+      "source_distance_cm": 0.01,
+      "detector_id": "South",
+      "relative_uncertainty": 0.0
+    },
+    "native_energy_coefficients": [
+      -1.693598747253418,
+      0.4995284378528595,
+      9.916775667306865e-08
+    ],
+    "scope": "Conditional native diagnostic; Fe near-contact efficiency model unqualified and excluded from25cm comparison population",
+    "isotopes": {
+      "Mn54": {
+        "activity_bq": 95.53405406873993,
+        "activity_unc_bq": 0.6308327566458608,
+        "activity_uci": 0.0025820014613172956,
+        "activity_unc_uci": 1.7049533963401644e-05,
+        "n_peaks": 1,
+        "peak_energies": [
+          834.7049601926718
+        ],
+        "excluded_peak_energies": [],
+        "mean_line_activity_bq": 95.53405406873993,
+        "median_line_activity_bq": 95.53405406873993,
+        "variance_line_activity_bq2": 0.0,
+        "std_line_activity_bq": 0.0,
+        "relative_line_activity_variance": 0.0,
+        "max_abs_relative_line_delta": 0.0,
+        "single_peak_outlier_energies": [],
+        "single_peak_activity_diagnostics": [
+          {
+            "energy_keV": 834.7049601926718,
+            "line_activity_bq": 95.53405406873993,
+            "line_activity_unc_bq": 0.6308327566458608,
+            "relative_delta_vs_combined": 0.0,
+            "z_score_vs_combined": 0.0,
+            "modified_z_score": 0.0,
+            "leave_one_out_activity_bq": null,
+            "leave_one_out_activity_unc_bq": null,
+            "all_vs_leave_one_out_relative_delta": null,
+            "single_vs_leave_one_out_relative_delta": null,
+            "is_outlier": false
+          }
+        ],
+        "activity_reference": "count_average_live_normalized"
+      },
+      "Fe59": {
+        "activity_bq": 71.8873624424528,
+        "activity_unc_bq": 0.8152644618798583,
+        "activity_uci": 0.0019429016876338595,
+        "activity_unc_uci": 2.2034174645401578e-05,
+        "n_peaks": 2,
+        "peak_energies": [
+          1099.0893078895426,
+          1291.4317787213788
+        ],
+        "excluded_peak_energies": [],
+        "mean_line_activity_bq": 71.60815839000645,
+        "median_line_activity_bq": 71.60815839000645,
+        "variance_line_activity_bq2": 16.406677783653436,
+        "std_line_activity_bq": 4.050515742921318,
+        "relative_line_activity_variance": 0.0031747939919454155,
+        "max_abs_relative_line_delta": 0.04372606108737386,
+        "single_peak_outlier_energies": [],
+        "single_peak_activity_diagnostics": [
+          {
+            "energy_keV": 1099.0893078895426,
+            "line_activity_bq": 74.47230553912898,
+            "line_activity_unc_bq": 1.1005625213231485,
+            "relative_delta_vs_combined": 0.03595824090424072,
+            "z_score_vs_combined": 1.8873256373181748,
+            "modified_z_score": 0.6745,
+            "leave_one_out_activity_bq": 68.74401124088392,
+            "leave_one_out_activity_unc_bq": 1.2136282552084707,
+            "all_vs_leave_one_out_relative_delta": -0.04372606108737386,
+            "single_vs_leave_one_out_relative_delta": 0.08332790296703387,
+            "is_outlier": false
+          },
+          {
+            "energy_keV": 1291.4317787213788,
+            "line_activity_bq": 68.74401124088392,
+            "line_activity_unc_bq": 1.2136282552084707,
+            "relative_delta_vs_combined": -0.04372606108737386,
+            "z_score_vs_combined": -2.1499818699638835,
+            "modified_z_score": -0.6745,
+            "leave_one_out_activity_bq": 74.47230553912898,
+            "leave_one_out_activity_unc_bq": 1.1005625213231485,
+            "all_vs_leave_one_out_relative_delta": 0.03595824090424072,
+            "single_vs_leave_one_out_relative_delta": -0.07691844984220772,
+            "is_outlier": false
+          }
+        ],
+        "activity_reference": "count_average_live_normalized"
+      }
+    },
+    "QG_summary_Bq": {
+      "Fe59": 61.42
+    },
+    "peaks": [
+      {
+        "channel": 1674,
+        "energy_keV": 834.7049601926718,
+        "net_counts": 62406.20567271426,
+        "net_counts_unc": 412.08158167319414,
+        "gross_counts": 69904.0,
+        "gross_counts_unc": 264.39364591457183,
+        "background_adjusted_gross_counts": 68061.7113255594,
+        "comparison_net_counts": 62747.0,
+        "comparison_net_counts_unc": 361.57779245965867,
+        "comparison_gross_counts": 69904.0,
+        "comparison_gross_counts_unc": 264.39364591457183,
+        "background": 332.67680310853734,
+        "fwhm": 1.9272248058266652,
+        "significance": 151.44138551236244,
+        "isotope": "Mn54",
+        "assignment_ambiguous": false,
+        "assignment_candidates": [
+          {
+            "isotope": "Mn54",
+            "energy_keV": 834.838,
+            "intensity": 0.999746,
+            "intensity_uncertainty": 1.1000000000000001e-05
+          }
+        ],
+        "activity_estimation_state": "estimated",
+        "assignment_nominal_fwhm_keV": 1.945253838,
+        "gamma_energy": 834.838,
+        "branching_ratio": 0.999746,
+        "branching_ratio_uncertainty": 1.1000000000000001e-05,
+        "efficiency": 0.015125026640602625,
+        "activity_bq": 95.53405406873993,
+        "activity_unc_bq": 0.6308327566458608,
+        "activity_correction_factor": 1.0,
+        "activity_correction_uncertainty": 0.0
+      },
+      {
+        "channel": 2203,
+        "energy_keV": 1099.0893078895426,
+        "net_counts": 23526.549872748772,
+        "net_counts_unc": 336.5388590974992,
+        "gross_counts": 27366.0,
+        "gross_counts_unc": 165.42672093709655,
+        "background_adjusted_gross_counts": 26186.740823148364,
+        "comparison_net_counts": 23195.5,
+        "comparison_net_counts_unc": 258.8160543706669,
+        "comparison_gross_counts": 27366.0,
+        "comparison_gross_counts_unc": 165.42672093709655,
+        "background": 140.01005002103125,
+        "fwhm": 2.1751094055217837,
+        "significance": 69.90737989615891,
+        "isotope": "Fe59",
+        "assignment_ambiguous": false,
+        "assignment_candidates": [
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1099.25,
+            "intensity": 0.5659000000000001,
+            "intensity_uncertainty": 0.0021
+          }
+        ],
+        "activity_estimation_state": "estimated",
+        "assignment_nominal_fwhm_keV": 2.07772425,
+        "gamma_energy": 1099.25,
+        "branching_ratio": 0.5659000000000001,
+        "branching_ratio_uncertainty": 0.0021,
+        "efficiency": 0.01292230548139217,
+        "activity_bq": 74.47230553912898,
+        "activity_unc_bq": 1.1005625213231485,
+        "activity_correction_factor": 1.0,
+        "activity_correction_uncertainty": 0.0
+      },
+      {
+        "channel": 2587,
+        "energy_keV": 1291.4317787213788,
+        "net_counts": 15353.68716623753,
+        "net_counts_unc": 256.08939961457907,
+        "gross_counts": 17858.0,
+        "gross_counts_unc": 133.63382805263043,
+        "background_adjusted_gross_counts": 17166.794816342397,
+        "comparison_net_counts": 15226.5,
+        "comparison_net_counts_unc": 207.0199265771293,
+        "comparison_gross_counts": 17858.0,
+        "comparison_gross_counts_unc": 133.63382805263043,
+        "background": 95.42671842657194,
+        "fwhm": 2.3140263705821753,
+        "significance": 59.954403381573826,
+        "isotope": "Fe59",
+        "assignment_ambiguous": false,
+        "assignment_candidates": [
+          {
+            "isotope": "Fe59",
+            "energy_keV": 1291.59,
+            "intensity": 0.43210000000000004,
+            "intensity_uncertainty": 0.0025
+          }
+        ],
+        "activity_estimation_state": "estimated",
+        "assignment_nominal_fwhm_keV": 2.17408659,
+        "gamma_energy": 1291.59,
+        "branching_ratio": 0.43210000000000004,
+        "branching_ratio_uncertainty": 0.0025,
+        "efficiency": 0.011964920149982999,
+        "activity_bq": 68.74401124088392,
+        "activity_unc_bq": 1.2136282552084707,
+        "activity_correction_factor": 1.0,
+        "activity_correction_uncertainty": 0.0
+      }
+    ]
+  }
+]

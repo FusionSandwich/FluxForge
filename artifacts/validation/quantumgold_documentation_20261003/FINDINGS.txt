@@ -1,0 +1,58 @@
+QuantumGold documentation and saved-settings investigation - 2026-10-03
+
+QuantumGold has documented configuration and calculation choices that can differ from FluxForge. The strongest new evidence concerns saved background settings. This is a source-data investigation, not a production correction or a declaration that QuantumGold is physically correct.
+
+Primary source
+PGT Quantum Software User Manual, title-page version 4.04.00, copyright 1993-2001.
+Manufacturer/distributor-hosted text: https://ludlums.com/images/product_manuals/QTMmanual.pdf
+Downloaded university mirror: https://www-nh.scphys.kyoto-u.ac.jp/~adachi/public/zeze_high_school/QuantumMCA.pdf
+The Kyoto cover says4.04.00 but its inner version page says4.03.00; the Ludlum copy says4.04.00 internally. Their pagination differs. Section identifiers and mirror-specific pages are authoritative. Installed August2025 version is not established. No later-version errata were independently verified in this bounded pass.
+
+Documented mechanisms (paraphrased)
+- Sections 3.6/6.6.1/A.2: ambient and continuum corrections are separately selectable; ambient precedes continuum when both enabled.
+- Sections 4.4/6.6.1: optional library efficiencies and configurable ROI/background widths/gap.
+- Appendix A.5: isotope weights A_i/sigma_i; per-line SUMM CORR multiplier.
+- Appendix B: detector model plus empirical logarithmic residual, using McMaster attenuation.
+- Sections 7.9/A.5: overlap treatment/deconvolution.
+- Appendix C: stored analysis flags and library/settings fields.
+Relevant Kyoto pages: PDF70/printed60 (correction controls); PDF118/printed108 (activity/weighting); PDF126-127/printed116-117 (saved header fields). Equations and correction controls were visually checked, not accepted from corrupted PDF text extraction.
+
+New original-file observations
+The portable standard-library script inspect_saved_qg_settings.py examined all 32 original ANS files and matched 31 available report anchors. Every original has revision4 and consistent observed fields:
+  AnalysisCtrl at byte860 = 1
+  UseLibEff at byte1292 = 0
+  ROI width at byte852 = 4.0 FWHM
+  Background width at byte846 = 1 channel
+  Background gap at byte848 = 0 FWHM
+  Channel bounds at byte1020/1022 = 0/8191
+  Library at byte1294 = GammaLib.mdb
+The saved control value encodes ambient correction OFF and continuum correction ON. Report text independently states that library efficiencies were ignored.
+
+The published offsets fail against these files: using printed byte852 as AnalysisCtrl gives0; printed byte1280 as UseLibEff gives8224. Observed tool fields are shifted +8 and trailing descriptor/library fields +12. This is a checked layout for these study files, not a universal ANS decoder. All32 file lengths close as 1548+8192*4+50*NROI. Selected stored ROI counts also match report counts (CoCd2, FeCd4, Ti1b7). All source SHA-256 values and field offsets are recorded. Wrong revision, channel bound and ROI length are rejected; flipping the ambient flag changes the inference. Originals were unchanged.
+
+Qualification
+These are SAVED-header settings. Many other files have zero saved ROIs despite report peaks, demonstrating that saving and final report analysis need not share state. The flags do not prove the final report used ambient-off, identify a background file, or establish the exact installed version. Independent Sol acceptance approved this bounded inference with these caveats.
+
+Implication for Co-Cd
+The saved ambient-off setting strengthens the prior background-convention explanation. Holding legacy efficiency fixed: historical North background156.231Bq, no separate measured background246.194Bq, recovered South background134.325Bq, QG234.95Bq. No-background is now a source-supported vendor-convention scenario worth reproducing, but it is not an independently qualified physical background choice. Both available measured backgrounds postdate the experiment. Preserve the background applicability limitation and count-basis separation.
+
+Weighting controls
+Using rounded QG CoCd line activities/count errors, the documented weighting gives approximately235.040Bq versus235.458Bq for inverse variance; QG prints234.95Bq. Efficiency/yield uncertainties are missing from this approximation. Less than1Bq cannot explain the approximately79Bq original deficit.
+
+A separate same-input control over21 existing ASC isotope outputs changes CoCd by-0.167%, bareCo+0.264%, In114m+2.785%, and TiSc46+4.61 to+8.44%. Single-line Sc47, Co58 and In115m are unchanged. An unpaired Ni57 output changes+19.26%, but no new isotope identification is accepted. These are method controls, not revised reference activities or vendor reproduction.
+
+Prioritized work with existing data
+1. Reproduce the saved ambient-off/continuum-on scenario explicitly, retaining current background-adjusted outputs and provenance. Verify line-count closure before activity comparison; expose physical and comparison counts separately.
+2. Check detector-model evaluation against source-bound efficiency exports and original headers. Separate percent/fraction, window/dead-layer units, attenuation data and gamma-yield differences; do not fit to the same QG target and call it independent calibration.
+3. Retain vendor-style weighting as a declared reproduction option; select physical combination methods with shared efficiency covariance accounted for. Averaging cannot repair the large single-line discrepancies.
+4. For weak cobalt, pilot a joint Poisson fit to original un-subtracted sample and background counts, with peak+continuum models and explicit background normalization/applicability scenarios. Keep later background identity conditional. Assess residuals and stability against the existing ROI control.
+5. Use multi-peak fits where observed overlaps require them, and repeated-count decay checks for time-reference questions. An advanced fit cannot repair a wrong efficiency, yield or background input by itself.
+
+FluxForge already contains fit_peak_poisson and Gaussian/step response helpers (frozen engine4615e61, peakfit.py); review and extend those capabilities for the joint sample/background use case before implementing a separate fitting stack. No installation or production changes were made.
+
+ChatGPT documentation research
+A single ordinary Chat request was submitted using observed Extra High (4 of5), not Pro, with the Deep Research connector selected. The initial response completed and was read. Its primary-source recommendations agree with the bounded local diagnosis; the Kyoto inner-version inconsistency was independently confirmed. Its literal-offset recommendation was challenged by our original-byte checks, and a targeted amendment was submitted. The targeted amendment completed and was read; it accepts the bounded saved-setting inference and retracts blind use of the published offsets. No claim of a separate asynchronous Deep Research job is made. Exact payload, private conversation link and receipt are saved locally in D:/FluxForge_QuantumGold_documentation_20261003/chatgpt-chats.json. Chat links and browser captures are not published in the repository. The existing FluxForge repair task received the independently checked saved-setting evidence.
+
+Portable saved-settings reproduction (from repository root, existing Python3):
+  python artifacts/validation/quantumgold_documentation_20261003/inspect_saved_qg_settings.py --originals examples/RAFM_irradiation/quantumgold_reference/originals --output saved_settings_new.json
+The output file must be new. This reads originals without importing FluxForge or modifying the dependency environment. It reproduces the bounded header audit only, not a full spectrum analysis.

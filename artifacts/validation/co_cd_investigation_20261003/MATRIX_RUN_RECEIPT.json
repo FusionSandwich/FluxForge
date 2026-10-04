@@ -1,0 +1,308 @@
+{
+  "source_engine": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "input_dataset": "68e2c7a8bc497a4165725a3f23dd557df2a31c66",
+  "counting_method": "iec_tiered",
+  "background": "Maintained North4hr with legacy profile energy override; unchanged diagnostic baseline",
+  "background_sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+  "measurements": [
+    {
+      "measurement_id": "Co-Cd-RAFM-1",
+      "sample_id": "Co-Cd-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 0,
+        "activity_failures": 1,
+        "line_consistency_failures": 0,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Co-RAFM-1",
+      "sample_id": "Co-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": true,
+        "comparison_passed": true,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 0,
+        "activity_failures": 0,
+        "line_consistency_failures": 0,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Cu-Cd-RAFM-1",
+      "status": "NO_ORIGINAL_ASC",
+      "geometry": null
+    },
+    {
+      "measurement_id": "Cu-RAFM-1",
+      "sample_id": "Cu-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": true,
+        "comparison_passed": true,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 0,
+        "activity_failures": 0,
+        "line_consistency_failures": 0,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "status": "NO_ORIGINAL_ASC",
+      "geometry": null
+    },
+    {
+      "measurement_id": "In-Cd-RAFM-1",
+      "sample_id": "In-Cd-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 0,
+        "activity_failures": 2,
+        "line_consistency_failures": 1,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Ni-RAFM-1",
+      "sample_id": "Ni-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 0,
+        "activity_failures": 1,
+        "line_consistency_failures": 3,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "sample_id": "Sc-Cd-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": true,
+        "comparison_passed": true,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 0,
+        "activity_failures": 0,
+        "line_consistency_failures": 0,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Sc-RAFM-1",
+      "sample_id": "Sc-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 2,
+        "activity_failures": 0,
+        "line_consistency_failures": 0,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Ti-RAFM-1",
+      "sample_id": "Ti-RAFM-1_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 0,
+        "activity_failures": 2,
+        "line_consistency_failures": 3,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Ti-RAFM-1a",
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 1,
+        "activity_failures": 2,
+        "line_consistency_failures": 3,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    },
+    {
+      "measurement_id": "Ti-RAFM-1b",
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "status": "RAW_ANALYZED",
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "ambiguous_reference_assignments": 0,
+        "unidentifiable_fit_groups": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 1,
+        "activity_failures": 2,
+        "line_consistency_failures": 3,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      }
+    }
+  ]
+}

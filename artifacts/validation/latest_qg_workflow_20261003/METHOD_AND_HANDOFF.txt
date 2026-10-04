@@ -1,0 +1,17 @@
+Fresh full QuantumGold workflow validation, 2026-10-03
+
+Source identities: SOURCE_IDENTITIES.json. GitHub main52759a9; latest integrated development4615e61 (PR219 based217), source-bound portable data/driver68e2c7a (PR221). The source archives contain no .git; only data/baseline/driver/tests were overlaid, with no production src edits. Other GUI branches remain separate unmerged work.
+
+Command from unrelated C:/Users/joshu/Documents/thesis_slides:
+  python -I D:/FluxForge_validation_20261003/latest_integrated/examples/RAFM_irradiation/run_portable_qg_example.py --output D:/FluxForge_validation_20261003/latest_replay
+BLAS/OMP limited to one thread, MPLBACKEND=Agg. No software installed, environment changed, reactor code launched or remote work requested.
+
+Focused149tests pass in94s. Default main fails at import because the RAFM workflow module is not integrated. The full declared-environment check fails against available Python3.12.10/NumPy2.5.1 and absent optional Qt/ML/reporting dependencies. Keep existing issues21 and220 open with updated evidence.
+
+Default portable configuration uses QG reference reproduction. New code correctly labels its comparisons accordingly and does not claim independent validation. One representative raw-independent Co-Cd Co60 check (iec_tiered) fails activity parity:156.2311 vs234.95Bq, -33.50%, En=-3.308; net count errors -6.07%/-3.66% pass. It still uses legacy profile:rafm_25cm. Existing26/27 have evidence updates.
+
+New issue222: batch unfolding export leaves four pyplot figures open per uncertainty-bearing method; reproduction produces four validPNG files. Close owned figures only, exception safe, preserve GUI figures.
+New issue223: portable completion receipt lacks analysis engine identity and dependency compatibility; dataset identity is not engine identity.
+New issue224: saved working efficiency curve is rebuilt but not used by raw workflow; add explicit reproducible raw/reference and source-bound working curve selection with geometry/energy/Sc48/time limitations.
+
+Local repair task01a103df-5eda-7cd3-b276-2ad70d21decc in Fluxforge_1 owns222-224 and related integration limits. Preserve dirty primary checkout. No main merge/upstream writes. Full core workflow completed at2026-10-03T18:34:04 with exit0:30ASC analyses,29raw/reportpairs,32nativearrays,12monitorreports,19reactionrows,GLS/GRAVEL/MLEM. raw validation overall_passed=null:29reference_reproduction and1not_evaluated, correctly not independent qualification. Runtime warning confirms >20figures open. VALIDATION_RECEIPT.json binds terminal/source/test/probe evidence; independent terminal review is being recorded.

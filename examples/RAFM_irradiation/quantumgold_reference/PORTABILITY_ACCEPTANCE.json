@@ -1,0 +1,93 @@
+{
+  "schema": "fluxforge-portable-qg-acceptance-v1",
+  "date": "2026-10-03",
+  "status": "PORTABLE_WORKING_EXAMPLE_VERIFIED",
+  "latest_audited_source_commit": "68f25496b02c4fd3ad69b6478161bd6567f4a8dd",
+  "primary_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+  "input_audit": {
+    "status": "INPUT_AUDIT_PASS",
+    "counts": {
+      "physical_counts": 32,
+      "original_ANS": 32,
+      "original_ASC": 30,
+      "original_QG_reports": 31,
+      "extracted_ROI_rows": 288,
+      "extracted_nuclide_summaries": 88
+    },
+    "resources_hash_checked": 122,
+    "original_report_lines_verified": 376,
+    "supplemental_audit": {
+      "resources_hash_checked": 3,
+      "older_report_ROI_rows": 12,
+      "older_report_summaries": 6,
+      "South_native_background_preserved": true,
+      "primary_workflow_background_changed": false,
+      "manifest_sha256": "cbdc5672eb87d404af92a72f4d52d59221b80c01d3989cec0f4a03f6b5932dc3"
+    },
+    "required_external_data_paths": [],
+    "requires_quantumgold_installation": false,
+    "independent_absolute_qualification": false
+  },
+  "total_original_QG_reports_across_separately_labeled_scopes": 32,
+  "total_extracted_ROI_rows_across_scopes": 300,
+  "total_extracted_nuclide_summaries_across_scopes": 94,
+  "relocated_archive_replay": {
+    "source_commit": "7f47530",
+    "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+    "status": "SOFTWARE_REPLAY_COMPLETED",
+    "native_arrays_exported": 32,
+    "raw_ASC_analyzed": 30,
+    "raw_QG_pairs": 29,
+    "monitor_QG_reports": 12,
+    "monitor_reaction_rows": 19,
+    "unfolding_methods": [
+      "GLS",
+      "GRAVEL",
+      "MLEM"
+    ],
+    "receipt_sha256": "873f0e5de71e66080c177f7e955a4553507c789bea992fa8e6892afa605ed006",
+    "historical_local_evidence_path": "C:\\Users\\joshu\\Documents\\UWNR_work\\fluxforge_portability_validation_20261003\\relocated full replay\\REPLAY_RECEIPT.json",
+    "label_export_commit": "b25313ed39902f5fd2ca6eb19f31877d4b3868a4",
+    "label_corrections": 23,
+    "nonlabel_data_unchanged_JSON_CSV_files": 217,
+    "latest_changes_validation": "Label export separately tested; audit-only supplement verified. Unchanged numerical stages not repeated."
+  },
+  "tests": {
+    "focused_unittest_cases": 8,
+    "status": "PASS",
+    "relocation": "Git archive with spaces, no .git, isolated Python -I, unrelated working directory"
+  },
+  "runtime": {
+    "full_numeric_replay_Python": "3.12.10",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "pandas": "2.3.3",
+    "matplotlib": "3.11.1",
+    "h5py": "3.16.0",
+    "lxml": "6.1.1",
+    "PyYAML": "6.0.3",
+    "second_interpreter_input_audit_Python": "3.12.14",
+    "limitation": "Observed numerical NumPy 2.5.1 is outside current pyproject numpy>=1.26,<2 declaration. Declared dependency range and all operating systems were not exhaustively tested. Normal project dependencies are needed for numerical replay; input audit uses only standard library.",
+    "software_acquired_or_environment_modified": false
+  },
+  "known_missing_roles": {
+    "original_ASC": [
+      "Cu-Cd-RAFM-1",
+      "Fe-Cd-RAFM-1"
+    ],
+    "original_QG_report": [
+      "RAFM-A-2hr"
+    ],
+    "older_supplement_pairing": "Older RAFM1 report remains unpaired; no native identity or EOI inferred from filename."
+  },
+  "physical_scope": {
+    "independent_absolute_qualification": false,
+    "basis": "QG-conditioned working comparison; timing alternatives, near-contact exclusions and diagnostic unfolding assumptions preserved. South native background preserved separately; maintained replay uses labeled historical North background."
+  },
+  "independent_review": {
+    "status": "ACCEPT_SCOPED_SOFTWARE_PORTABILITY",
+    "reviewer": "Independent Sol south_baseline_acceptance",
+    "date": "2026-10-03",
+    "evidence": "Independent isolated final Git-archive input audit: 122 primary resources,376 source lines,3 supplemental resources. Reviewed coherent relocated numerical receipt and corrected monitor labels; prior source-binding and label blockers addressed. Acceptance is portable QG working example, not independent absolute calibration or dependency-range qualification."
+  }
+}
