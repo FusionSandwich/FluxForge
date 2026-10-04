@@ -3673,6 +3673,8 @@ def analyze_flux_wire_sample(
     )
     apply_activity_corrections(analysis.peaks, attenuation_config)
     analysis.nuclide_activities = combine_peak_activities(analysis.peaks)
+    for activity_row in analysis.nuclide_activities.values():
+        activity_row["activity_reference"] = "count_average_live_normalized"
     method_key = (
         str(metadata.config.get("flux_wire_counting_method", "qg")).strip().lower()
     )
@@ -3692,6 +3694,7 @@ def analyze_flux_wire_sample(
             else:
                 rel_unc = 0.0
             analysis.nuclide_activities[nuclide.isotope]["activity_bq"] = activity_bq
+            analysis.nuclide_activities[nuclide.isotope]["activity_reference"] = QG_REPORT_ACTIVITY_REFERENCE
             analysis.nuclide_activities[nuclide.isotope]["activity_unc_bq"] = (
                 abs(activity_bq) * rel_unc
             )
@@ -4635,31 +4638,41 @@ def compare_rafm_completion_results(
         "raw_results_root": str(raw_root),
         "qg_results_root": str(qg_root),
         "matched_reactions": len(matched_keys),
+        "valid_activity_comparisons": len(activity_errors),
+        "valid_rate_comparisons": len(rate_errors),
+        "activity_comparison_status": "AVAILABLE" if activity_errors else "UNAVAILABLE",
+        "rate_comparison_status": "AVAILABLE" if rate_errors else "UNAVAILABLE",
         "median_abs_activity_rel_error": (
-            float(np.median(activity_errors)) if activity_errors else 0.0
+            float(np.median(activity_errors)) if activity_errors else None
         ),
         "max_abs_activity_rel_error": (
-            float(np.max(activity_errors)) if activity_errors else 0.0
+            float(np.max(activity_errors)) if activity_errors else None
         ),
         "median_abs_rate_rel_error": (
-            float(np.median(rate_errors)) if rate_errors else 0.0
+            float(np.median(rate_errors)) if rate_errors else None
         ),
-        "max_abs_rate_rel_error": float(np.max(rate_errors)) if rate_errors else 0.0,
+        "max_abs_rate_rel_error": float(np.max(rate_errors)) if rate_errors else None,
         "shared_unfold_methods": shared_unfold_methods,
         "unfold_metrics": unfold_metrics,
         "comparison_root": str(compare_root),
     }
     save_json(summary, compare_root / "branch_comparison.json")
+    def display_metric(key: str) -> str:
+        value = summary[key]
+        return "UNAVAILABLE" if value is None else f"{value:.6g}"
+
     (compare_root / "branch_comparison.md").write_text(
         "\n".join(
             [
                 "# RAFM Branch Comparison",
                 "",
                 f"Matched reactions: {summary['matched_reactions']}",
-                f"Median |activity rel err|: {summary['median_abs_activity_rel_error']:.6g}",
-                f"Max |activity rel err|: {summary['max_abs_activity_rel_error']:.6g}",
-                f"Median |rate rel err|: {summary['median_abs_rate_rel_error']:.6g}",
-                f"Max |rate rel err|: {summary['max_abs_rate_rel_error']:.6g}",
+                f"Valid activity comparisons: {summary['valid_activity_comparisons']}",
+                f"Valid rate comparisons: {summary['valid_rate_comparisons']}",
+                f"Median |activity rel err|: {display_metric('median_abs_activity_rel_error')}",
+                f"Max |activity rel err|: {display_metric('max_abs_activity_rel_error')}",
+                f"Median |rate rel err|: {display_metric('median_abs_rate_rel_error')}",
+                f"Max |rate rel err|: {display_metric('max_abs_rate_rel_error')}",
             ]
         )
         + "\n",

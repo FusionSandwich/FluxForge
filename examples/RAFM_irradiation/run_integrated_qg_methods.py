@@ -118,11 +118,16 @@ def current_line_combinations(campaign, engine_sha):
             chosen = payload.get('single_peak_activity_diagnostics', [])
             if not chosen:
                 continue
+            reference = payload.get('activity_reference')
+            if reference != 'count_average_live_normalized':
+                rows.append(dict(sample_id=artifact['sample_id'], isotope=isotope,
+                                 status='EXCLUDED_UNKNOWN_OR_INCOMPATIBLE_ACTIVITY_REFERENCE', methods=[]))
+                continue
             lines = [ActivityLine(str(p['energy_keV']), isotope,
                          p['line_activity_bq'], p['line_activity_unc_bq'], True,
                          'inherited current-engine numerical line selection; physical qualification pending',
                          source, 'physical_background_adjusted_net_counts',
-                         'count_average_live_normalized') for p in chosen]
+                         reference) for p in chosen]
             diagonal = np.diag([line.sigma_bq**2 for line in lines])
             covariance = [CovarianceComponent('declared_line_variance', diagonal, source,
                           'independence assumed; reported line errors not decomposed'),
@@ -184,10 +189,13 @@ def run(output, skip_campaigns=False):
     rows = []
     for mode in campaigns:
         path = output/mode/'raw_replay/tables/isotope_comparison.csv'
-        if path.exists():
-            with path.open(newline='', encoding='utf-8') as stream:
-                for row in csv.DictReader(stream):
-                    rows.append({'scenario':mode, **row})
+        if not path.exists():
+            raise FileNotFoundError('Completed campaign lacks activity comparison table: ' + str(path))
+        with path.open(newline='', encoding='utf-8') as stream:
+            scenario_rows = [{'scenario':mode, **row} for row in csv.DictReader(stream)]
+        if not scenario_rows:
+            raise ValueError('Completed campaign has an empty activity comparison table: ' + str(path))
+        rows.extend(scenario_rows)
     if rows:
         with (output/'CAMPAIGN_ACTIVITY_COMPARISONS.csv').open('w', newline='', encoding='utf-8') as stream:
             writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
