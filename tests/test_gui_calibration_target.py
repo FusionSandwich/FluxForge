@@ -126,3 +126,10 @@ def test_calibration_fits_laptop_height_with_visible_actions(window):
         assert dialog.rect().contains(center)
         assert dialog.childAt(center) is button
     assert dialog.spectrum_plot.height() >= 180
+
+
+def test_main_window_can_shrink_to_laptop_width(window):
+    window.resize(1280, 850)
+    window.show()
+    QApplication.instance().processEvents()
+    assert window.width() <= 1280
