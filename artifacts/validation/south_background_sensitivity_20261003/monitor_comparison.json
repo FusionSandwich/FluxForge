@@ -1,5 +1,7 @@
 {
   "status": "COMPLETED",
+  "engine_lineage": "historical portable e5b8621 plus PR230 South scenario changes",
+  "does_not_evaluate_current_engine": "4615e61 validation engine",
   "eligible_measurements": 7,
   "comparisons": [
     {
