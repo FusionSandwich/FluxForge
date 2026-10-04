@@ -658,3 +658,136 @@ def write_outputs(payload: dict, output: Path) -> None:
                             "background_poisson_deviance"
                         ],
                         "approximate_tail_probability": diagnostic[
+                            "approximate_chi2_tail_probability"
+                        ],
+                        "adequacy_flag": diagnostic["adequacy_flag"],
+                        "identifiability_ratio": fit["identifiability_ratio"],
+                    }
+                )
+
+    residual_fields = [
+        "energy_keV",
+        "observation",
+        "bin_center_keV",
+        "observed",
+        "expected",
+        "deviance_residual",
+        "pearson_residual",
+    ]
+    with (output / "residuals.csv").open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=residual_fields)
+        writer.writeheader()
+        for row in payload["rows"]:
+            fit = row["joint_fits"]["south_native_linear"]
+            for obs_name, counts_key, edges_key, expected_key, diagnostics_key in (
+                (
+                    "sample",
+                    "sample_original_counts",
+                    "sample_native_edges_keV",
+                    "sample_expected",
+                    "sample_residual_diagnostics",
+                ),
+                (
+                    "south_background",
+                    "south_original_counts",
+                    "south_native_edges_keV",
+                    "background_expected",
+                    "background_residual_diagnostics",
+                ),
+            ):
+                counts = np.asarray(row[counts_key], dtype=float)
+                edges = np.asarray(row[edges_key], dtype=float)
+                expected = np.asarray(fit[expected_key], dtype=float)
+                diagnostics = fit[diagnostics_key]
+                dev = diagnostics["deviance_residuals"]
+                pearson = diagnostics["pearson_residuals"]
+                centers = (edges[:-1] + edges[1:]) / 2
+                for i in range(len(counts)):
+                    writer.writerow(
+                        {
+                            "energy_keV": row["energy_keV"],
+                            "observation": obs_name,
+                            "bin_center_keV": centers[i],
+                            "observed": counts[i],
+                            "expected": expected[i],
+                            "deviance_residual": dev[i],
+                            "pearson_residual": pearson[i],
+                        }
+                    )
+
+    fig, ax = plt.subplots()
+    for row in payload["rows"]:
+        fit = row["joint_fits"]["south_native_linear"]
+        edges = np.asarray(row["sample_native_edges_keV"], dtype=float)
+        x = (edges[:-1] + edges[1:]) / 2 - row["energy_keV"]
+        ax.plot(
+            x,
+            fit["sample_residual_diagnostics"]["deviance_residuals"],
+            marker="o",
+            label=f"sample {row['energy_keV']:.0f} keV",
+        )
+        bedges = np.asarray(row["south_native_edges_keV"], dtype=float)
+        bx = (bedges[:-1] + bedges[1:]) / 2 - row["energy_keV"]
+        ax.plot(
+            bx,
+            fit["background_residual_diagnostics"]["deviance_residuals"],
+            marker=".",
+            linestyle="--",
+            label=f"South bg {row['energy_keV']:.0f} keV",
+        )
+    ax.axhline(0, linewidth=0.8)
+    ax.set_xlabel("Energy offset from nominal Co-60 line (keV)")
+    ax.set_ylabel("Poisson deviance residual")
+    ax.set_title("Issue #249 South joint-Poisson residual screen")
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(output / "residuals.svg")
+    plt.close(fig)
+
+    provenance = {
+        key: payload[key]
+        for key in (
+            "issue",
+            "integration_base_head",
+            "observed_git_head",
+            "source_bound_inputs_unchanged",
+            "inputs_sha256",
+            "engine_files_sha256",
+            "pilot_script_sha256",
+            "environment",
+            "sample",
+            "south_background",
+            "grid_policy",
+            "calibration_covariance",
+            "vendor_targets_loaded",
+            "software_status",
+            "vendor_agreement_status",
+            "physical_qualification_status",
+            "limitations",
+        )
+    }
+    (output / "PROVENANCE.json").write_text(
+        json.dumps(provenance, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+    )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    result = run_pilot()
+    write_outputs(result, args.output)
+    print(
+        json.dumps(
+            {
+                "output": str(args.output),
+                "rows": len(result["rows"]),
+                "statuses": {
+                    str(row["energy_keV"]): {
+                        name: fit["status"] for name, fit in row["joint_fits"].items()
+                    }
+                    for row in result["rows"]
+                },
+            }
+        )
+    )
