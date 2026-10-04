@@ -218,3 +218,223 @@ def _joint_payload(fit, observation, background_observation) -> dict:
         "background_residual_diagnostics": (
             _residual_summary(
                 background_observation.counts,
+                fit.background_expected,
+                background_observation.energy_edges_keV,
+            )
+            if background_observation is not None
+            else None
+        ),
+        "provenance": fit.provenance,
+    }
+
+
+def _current_iec_control() -> dict:
+    path = ROOT / IEC_RECEIPT_REL
+    rows = json.loads(path.read_text(encoding="utf-8"))
+    matches = [
+        row
+        for row in rows
+        if row.get("sample_id") == "Co-Cd-RAFM-1_25cm"
+        and row.get("isotope") == "Co60"
+    ]
+    if len(matches) != 1:
+        raise ValueError("Current South IEC Co-Cd control is missing or ambiguous")
+    methods = matches[0]["methods"]
+    inverse = [row for row in methods if row["method"] == "inverse_variance"]
+    if len(inverse) != 1:
+        raise ValueError("Current South IEC inverse-variance control is ambiguous")
+    row = inverse[0]
+    return {
+        "source_path": IEC_RECEIPT_REL.as_posix(),
+        "source_sha256": sha(path),
+        "method": row["method"],
+        "analysis_role": row["analysis_role"],
+        "engine_identity": row["engine_identity"],
+        "activity_bq": row["activity_bq"],
+        "sigma_bq": row["sigma_bq"],
+        "input_lines": row["input_lines"],
+        "unavailable_components": row["unavailable_components"],
+        "status": row["status"],
+        "role_in_this_pilot": "external current-engine control; never an inference target",
+    }
+
+
+def _synthetic_challenges() -> list[dict]:
+    edges = np.linspace(-6, 6, 49)
+    peak = PeakResponse(0.0, 0.8)
+    p = peak.integrated(edges)
+    widths = np.diff(edges)
+    vendor = BackgroundChoice(
+        "no_separate_ambient_vendor",
+        "deterministic synthetic challenge with no separate ambient",
+        continuum="none",
+    )
+    rows = []
+    well_counts = np.rint(1500 * p + 40 * widths).astype(int)
+    well = fit_joint_poisson(
+        CountObservation(well_counts, edges, 1.0, "synthetic-well"),
+        None,
+        peak,
+        vendor,
+        sample_continuum="constant",
+        confidence=None,
+    )
+    rows.append(
+        {
+            "case": "well_specified_rounded_asimov",
+            "success": well.success,
+            "status": well.status,
+            "area": well.area,
+            "adequacy_flag": well.model_diagnostics["adequacy_flag"],
+            "deviance": well.deviance,
+            "purpose": "positive control; absence of a strong-lack flag is not physical qualification",
+        }
+    )
+
+    shoulder = PeakResponse(1.2, 0.8).integrated(edges)
+    bad_counts = np.rint(1200 * p + 300 * shoulder + 40 * widths).astype(int)
+    bad = fit_joint_poisson(
+        CountObservation(bad_counts, edges, 1.0, "synthetic-shoulder"),
+        None,
+        peak,
+        vendor,
+        sample_continuum="constant",
+        confidence=None,
+    )
+    rows.append(
+        {
+            "case": "unmodelled_shifted_shoulder",
+            "success": bad.success,
+            "status": bad.status,
+            "area": bad.area,
+            "adequacy_flag": bad.model_diagnostics["adequacy_flag"],
+            "deviance": bad.deviance,
+            "purpose": "negative control; a converged fit must retain model-inadequacy evidence",
+        }
+    )
+
+    b = 40 * widths + 800 * p
+    sample_counts = np.rint(1000 * p + b + 10 * widths).astype(int)
+    bg_counts = np.rint(4 * b).astype(int)
+    trade = fit_joint_poisson(
+        CountObservation(sample_counts, edges, 10, "synthetic-trade-sample"),
+        CountObservation(bg_counts, edges, 40, "synthetic-trade-background"),
+        peak,
+        BackgroundChoice(
+            "later_conditional",
+            "synthetic free-normalization tradeoff",
+            normalization="free",
+            continuum="constant",
+            peaks=(peak,),
+        ),
+        sample_continuum="constant",
+        confidence=None,
+    )
+    rows.append(
+        {
+            "case": "free_normalization_tradeoff",
+            "success": trade.success,
+            "status": trade.status,
+            "identifiability_ratio": trade.identifiability_ratio,
+            "purpose": "negative control; rank-deficient scale/peak/continuum tradeoff must not be accepted",
+        }
+    )
+    return rows
+
+
+def run_pilot() -> dict:
+    sample_path = ROOT / SAMPLE_REL
+    main_manifest_path = ROOT / MANIFEST_REL
+    supplement_path = ROOT / SUPPLEMENT_REL
+    config_path = ROOT / CONFIG_REL
+    if sha(sample_path) != SAMPLE_SHA256:
+        raise ValueError("Source-bound Co-Cd ASC identity changed")
+    main_manifest = json.loads(main_manifest_path.read_text(encoding="utf-8"))
+    source_rows = [
+        item
+        for item in main_manifest["resources"]
+        if item["path"] == SAMPLE_REL.as_posix()
+    ]
+    if len(source_rows) != 1 or source_rows[0]["sha256"] != SAMPLE_SHA256:
+        raise ValueError("Co-Cd ASC is not uniquely source-bound in the manifest")
+
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    profile = load_rafm_profile(config["profile_name"])
+    sample = read_raw_asc(
+        sample_path,
+        profile_name=profile.name,
+        energy_calibration_override=profile.energy_calibration,
+    )
+    south, south_details = south_native_background()
+    if sample.spectrum is None or sample.efficiency is None:
+        raise ValueError("Co-Cd original count spectrum/profile efficiency unavailable")
+
+    original_hashes = {
+        rel.as_posix(): sha(ROOT / rel)
+        for rel in (
+            SAMPLE_REL, SOUTH_REL, MANIFEST_REL, SUPPLEMENT_REL, CONFIG_REL, PROFILE_REL
+        )
+    }
+    sample_edges = midpoint_edges(sample.spectrum.energies)
+    south_edges = midpoint_edges(south.energies)
+    adjusted = subtract_measured_background(
+        sample.spectrum, south, mode="live", negative_policy="preserve"
+    )
+    if not adjusted.metadata["background_subtraction"]["energy_aligned"]:
+        raise ValueError("South background was not aligned by the current count-conserving engine")
+
+    rows = []
+    for energy, intensity in CO60_LINES:
+        center = int(sample.energy_to_channel(energy))
+        fwhm = sample.fwhm_at_energy(energy)
+        slope = (
+            profile.energy_calibration[1]
+            + 2 * profile.energy_calibration[2] * center
+        )
+        fwhm_channels = fwhm / slope
+        half = int(round(config["flux_wire_roi_width_fwhm"] / 2 * fwhm_channels))
+        lo, hi = center - half, center + half
+        selected = np.flatnonzero(
+            (south_edges[:-1] < sample_edges[hi + 1])
+            & (south_edges[1:] > sample_edges[lo])
+        )
+        blo, bhi = int(selected[0]), int(selected[-1])
+        observation = native_observation(sample, sample_path, sample_edges, lo, hi)
+        background_observation = CountObservation(
+            south.counts[blo : bhi + 1],
+            south_edges[blo : bhi + 2],
+            south.live_time,
+            SOUTH_SHA256,
+            south.start_time.isoformat() if south.start_time else None,
+        )
+        peak = PeakResponse(energy, fwhm / FWHM_SIG_RATIO)
+        efficiency = float(sample.efficiency.efficiency(energy))
+        conversion = 1 / (sample.live_time * efficiency * intensity)
+
+        iec_south = estimate_peak_area_local_background(
+            adjusted.counts,
+            center,
+            fwhm_channels,
+            roi_width_fwhm=float(config["flux_wire_roi_width_fwhm"]),
+            background_width_channels=int(
+                config["flux_wire_background_width_channels"]
+            ),
+            background_gap_fwhm=float(config["flux_wire_background_gap_fwhm"]),
+            spectrum_data=adjusted,
+        )
+        iec_off = estimate_peak_area_local_background(
+            sample.spectrum.counts,
+            center,
+            fwhm_channels,
+            roi_width_fwhm=float(config["flux_wire_roi_width_fwhm"]),
+            background_width_channels=int(
+                config["flux_wire_background_width_channels"]
+            ),
+            background_gap_fwhm=float(config["flux_wire_background_gap_fwhm"]),
+            spectrum_data=sample.spectrum,
+        )
+        if tuple(iec_south[4]) != (lo, hi) or tuple(iec_off[4]) != (lo, hi):
+            raise RuntimeError("Fixed IEC/Covell control did not preserve the joint ROI")
+
+        fits = {}
+        for scenario in ("south_native", "ambient_off"):
