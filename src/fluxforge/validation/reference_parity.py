@@ -868,19 +868,19 @@ def _resolve_tolerance(
 ) -> float | None:
     lowered_path = path.lower()
     field = lowered_path.rsplit(".", 1)[-1].split("[", 1)[0]
-    selected: float | None = None
+    # Explicit output-field limits precede the shared energy alias regardless
+    # of the key order in a fixture's tolerance mapping.
     for key, value in tolerances.items():
         if not key.lower().endswith(suffix):
             continue
         token = key[: -len(suffix)].lower()
-        energy_alias = token == "energy_kev" and field in {
-            "energies_kev",
-            "first_peak_kev",
-        }
-        if token and (token in lowered_path or energy_alias):
-            selected = float(value)
-            break
-    return selected
+        if token and token in lowered_path:
+            return float(value)
+    if field in {"energies_kev", "first_peak_kev"}:
+        for key, value in tolerances.items():
+            if key.lower() == "energy_kev" + suffix:
+                return float(value)
+    return None
 
 
 def _spectrum_from_payload(payload: dict[str, Any]) -> GammaSpectrum:

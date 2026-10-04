@@ -26,6 +26,24 @@ def test_declared_energy_tolerance_applies_to_energy_output_aliases(field):
     )
 
 
+@pytest.mark.parametrize("field", ["energies_keV[0]", "first_peak_keV"])
+@pytest.mark.parametrize("suffix", ["_abs", "_rel"])
+@pytest.mark.parametrize("alias_first", [True, False])
+def test_explicit_field_tolerance_precedes_energy_alias(field, suffix, alias_first):
+    from fluxforge.validation.reference_parity import _values_close
+
+    explicit = field.split("[", 1)[0] + suffix
+    items = [
+        ("energy_keV" + suffix, 8.0 if suffix == "_abs" else 0.08),
+        (explicit, 0.1 if suffix == "_abs" else 0.001),
+    ]
+    tolerances = dict(items if alias_first else reversed(items))
+    assert _values_close(100.0, 100.05, path=f"output.{field}", tolerances=tolerances)
+    assert not _values_close(
+        100.0, 101.0, path=f"output.{field}", tolerances=tolerances
+    )
+
+
 def test_reference_parity_suite_runs_all_fixture_families() -> None:
     payload = run_reference_parity_suite(
         reference_root=REFERENCE_ROOT,

@@ -104,6 +104,16 @@ def test_invalid_recorded_settings_are_rejected(field, value):
         instrument_provenance(_workspace(), {"measured": {field: value}})
 
 
+@pytest.mark.parametrize("voltage", [-2500.0, 0.0, 2500.0])
+def test_recorded_high_voltage_preserves_signed_bias_and_zero(voltage):
+    result = instrument_provenance(
+        _workspace(), {"measured": {"high_voltage_v": voltage}}
+    )
+    recorded = result["records"][0]["settings"]["high_voltage_v"]
+    assert recorded == {"value": voltage, "source": "user_entered"}
+    assert result["scientific_admission"] is False
+
+
 def test_qt_instructional_bundle_requires_all_spectra_and_preserves_settings_on_switch(
     tmp_path,
 ):

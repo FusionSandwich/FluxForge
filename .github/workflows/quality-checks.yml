@@ -122,6 +122,7 @@ jobs:
             tests/test_transport_contracts.py \
             tests/test_measurement_time_audit.py \
             tests/test_portable_qg_example.py \
+            tests/test_qg_saved_settings.py \
             tests/test_rafm_figure_ownership.py
 
       - name: CLI and standards regression tests
@@ -142,6 +143,11 @@ jobs:
             tests/test_irradiation_history_inputs.py \
             tests/test_reaction_rate_view_inputs.py \
             tests/test_spectrum_file_queue_conversion.py
+
+      - name: Report provenance and declared parity tolerances
+        env:
+          PYTHONPATH: src
+        run: pytest -q tests/test_reporting.py tests/test_instrument_provenance.py tests/test_reference_parity_runner.py
 
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
@@ -245,6 +251,11 @@ jobs:
             tests/test_reaction_rate_workspace_qt.py \
             tests/test_spectrum_file_queue_workspace_qt.py \
             tests/test_production_gui_mode.py
+
+      - name: Current Qt consolidation and report bundle tests
+        run: |
+          pytest -q tests/test_gui_consolidation.py
+          pytest -q tests/test_gui_report_bundle.py tests/test_instrument_provenance.py
 
   external-reference-parity:
     runs-on: ubuntu-latest

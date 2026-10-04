@@ -493,7 +493,7 @@ def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
         raise ValueError('Raw comparison requires iec_tiered, covell, or gilmore counting')
     if efficiency_mode not in ('south_recovered', 'legacy_profile'):
         raise ValueError('Unknown raw efficiency mode')
-    if background_mode not in ('north_historical', 'south_native'):
+    if background_mode not in ('north_historical', 'south_native', 'ambient_off'):
         raise ValueError('Unknown raw background mode')
     checked = verify_inputs(repo, repo/'examples/RAFM_irradiation/quantumgold_reference/manifest.json')
     manifest = checked['manifest']
@@ -530,7 +530,13 @@ def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
         raise ValueError('ASC spectrum could not be parsed')
     raw_data.sample_id = row['workflow_stem']
     raw_data.spectrum.spectrum_id = row['workflow_stem']
-    if background_mode == 'north_historical':
+    if background_mode == 'ambient_off':
+        background = None
+        background_details = dict(mode=background_mode, detector=None,
+                                  source_sha256=None, QG_background_match='UNKNOWN',
+                                  interpretation='explicit no measured ambient subtraction; local continuum retained',
+                                  qualification='saved ambient-off state is not proof of final report processing')
+    elif background_mode == 'north_historical':
         background_path = runtime/'background.ASC'
         background_blob = background_path.read_bytes()
         background = read_raw_asc(background_path,
@@ -602,7 +608,7 @@ def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
         data.efficiency = calibration
         return analyze_flux_wire_targeted(
             data=data, reference_data=None, background_spectrum=background,
-            background_scale_mode='live', background_subtract=True,
+            background_scale_mode='live', background_subtract=background is not None,
             profile_name=config['profile_name'], counting_method=counting_method,
             peak_threshold=0.0,
             min_energy_keV=energy_low,
@@ -675,14 +681,18 @@ def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
                                           if item['path'] == row['files']['ASC']),
                    channel_array_sha256=row['channel_array_sha256'],
                    background_source_sha256=background_details['source_sha256'],
-                   background_basis=('historical bundled North background' if background_mode == 'north_historical'
+                   background_basis=('explicit ambient-off comparison scenario; final QG state unresolved'
+                                     if background_mode == 'ambient_off' else
+                                     'historical bundled North background' if background_mode == 'north_historical'
                                      else 'recovered native South detector scenario; applicability unresolved'),
                    background_details=background_details,
                    background_processing=dict(
-                       scale_mode='live', scale_factor=float(raw_data.live_time/background.live_time),
+                       measured_background_subtracted=background is not None,
+                       scale_mode='live' if background is not None else None,
+                       scale_factor=float(raw_data.live_time/background.live_time) if background is not None else None,
                        negative_policy='hybrid',
                        energy_alignment='integrated_counts_bin_overlap_if_needed',
-                       covariance='C_sample + scale_factor**2 * W C_background W.T',
+                       covariance='C_sample + scale_factor**2 * W C_background W.T' if background is not None else 'C_sample',
                        local_continuum_model=str(config.get('flux_wire_comparison_background_model','constant'))),
                    energy_scope_keV=[curve.energy_min_keV, curve.energy_max_keV],
                    unsupported_energy_policy='outside positive adjacent brackets excluded from line analysis',
@@ -721,7 +731,7 @@ def main() -> int:
                         default='south_recovered')
     parser.add_argument('--counting-method', choices=['iec_tiered','covell','gilmore'],
                         default='iec_tiered')
-    parser.add_argument('--background-mode', choices=['north_historical','south_native'],
+    parser.add_argument('--background-mode', choices=['north_historical','south_native','ambient_off'],
                         default='north_historical')
     args = parser.parse_args()
     if args.raw_sample and args.verify_only:
@@ -729,7 +739,7 @@ def main() -> int:
     if args.raw_sample and not args.output:
         parser.error('--raw-sample requires --output')
     if not args.raw_sample and args.background_mode != 'north_historical':
-        parser.error('--background-mode south_native requires --raw-sample')
+        parser.error('--background-mode ' + args.background_mode + ' requires --raw-sample')
     result = (run_raw_comparison(REPO, args.output, args.raw_sample,
                                  args.efficiency_mode, args.counting_method,
                                  args.background_mode)

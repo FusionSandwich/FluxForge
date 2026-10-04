@@ -53,10 +53,8 @@ def instrument_provenance(workspace, overrides=None, *, require_complete=False):
                     value = float(value)
                 except (ValueError, TypeError) as exc:
                     raise ValueError(f"{name} must be a finite numeric value.") from exc
-                if (
-                    not math.isfinite(value)
-                    or value < 0
-                    or (name != "high_voltage_v" and value == 0)
+                if not math.isfinite(value) or (
+                    name != "high_voltage_v" and value <= 0
                 ):
                     raise ValueError(f"Invalid {name} for spectrum {spectrum_id}.")
             fields[name] = {"value": value, "source": source}

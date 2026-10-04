@@ -131,6 +131,27 @@ class PortableQGExampleTests(unittest.TestCase):
         self.assertEqual(south['background_processing']['negative_policy'], 'hybrid')
         self.assertNotIn('linear count interpolation', south['background_details']['calibration'])
 
+    def test_ambient_off_scenario_retains_continuum_and_never_uses_report_for_analysis(self):
+        import unittest.mock
+        from fluxforge.io.flux_wire import read_processed_txt
+        with unittest.mock.patch('fluxforge.io.flux_wire.read_processed_txt', wraps=read_processed_txt) as report_reader:
+            receipt = driver.run_raw_comparison(
+                REPO, Path(self.tmp.name)/'ambient_off', 'Co-Cd-RAFM-1',
+                efficiency_mode='legacy_profile', background_mode='ambient_off')
+            report_reader.assert_called_once()
+        self.assertFalse(receipt['reference_used_for_analysis'])
+        self.assertIsNone(receipt['background_source_sha256'])
+        self.assertIsNone(receipt['background_processing']['scale_factor'])
+        self.assertFalse(receipt['background_processing']['measured_background_subtracted'])
+        self.assertEqual(receipt['background_processing']['covariance'], 'C_sample')
+        self.assertEqual(receipt['background_processing']['local_continuum_model'], 'constant')
+        self.assertEqual(receipt['background_details']['QG_background_match'], 'UNKNOWN')
+        output = json.loads((Path(self.tmp.name)/'ambient_off/RAW_SELECTED_ANALYSIS.json').read_text())
+        for peak in output['peaks']:
+            if peak['isotope'] == 'Co60':
+                self.assertEqual(peak['net_counts'], peak['comparison_net_counts'])
+        self.assertFalse(receipt['independent_absolute_qualification'])
+
     def test_legacy_efficiency_receipt_does_not_claim_recovered_curve_was_selected(self):
         receipt = driver.run_raw_comparison(
             REPO, Path(self.tmp.name)/'legacy_efficiency', 'Co-Cd-RAFM-1',
