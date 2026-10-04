@@ -1,0 +1,391 @@
+{
+  "status": "READ_ONLY_DIAGNOSTIC",
+  "sources": {
+    "north": {
+      "path": "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\background.ASC",
+      "sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "start_time": "2026-03-02 17:59:00"
+    },
+    "south": {
+      "path": "D:\\FluxForge_south_background_scenario\\examples\\RAFM_irradiation\\quantumgold_reference\\supplemental_inputs\\South 4hr Background Terminal.ANS",
+      "sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "start_time": "2025-10-03 15:49:14 (saved ANS; local/unspecified timezone)"
+    },
+    "sample": {
+      "path": "D:\\FluxForge_validation_20261003\\latest_replay\\workflow_inputs\\raw_gamma_spec\\flux_wires\\Co-Cd-RAFM-1_25cm.ASC",
+      "sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+      "start_time": "2025-08-28 12:55:00"
+    }
+  },
+  "detector_identity": {
+    "ANS_original_files": 32,
+    "ANS_detector_ids": [
+      "South"
+    ],
+    "QG_report_files": 31,
+    "QG_report_detector_ids": [
+      "South"
+    ],
+    "South_background_native_detector_id": "South",
+    "North_ASC_header_id": "North 4hr background terminal"
+  },
+  "engine_commit": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "input_tree_sha256": "45803d05cfe2c49aa541c9bfc2079d441feb9c7978e81a6a68a732fedc0fdfe1",
+  "applied_profile_energy_calibration": [
+    -1.694,
+    0.4996,
+    6.71e-08
+  ],
+  "native_ASC_calibrations": {
+    "north": [
+      -1.502,
+      0.4991,
+      2.239e-07
+    ],
+    "CoCd_sample": [
+      0.541,
+      0.498,
+      2.605e-07
+    ]
+  },
+  "spectra": {
+    "north": {
+      "live_time_s": 14400.0,
+      "total_counts": 180607.0,
+      "total_cps": 12.542152777777778,
+      "energy_coefficients": [
+        -1.694,
+        0.4996,
+        6.71e-08
+      ]
+    },
+    "south": {
+      "live_time_s": 14400.0,
+      "total_counts": 543427.0,
+      "total_cps": 37.73798611111111,
+      "energy_coefficients": [
+        -1.6994324922561646,
+        0.49959567189216614,
+        9.02407251146542e-08
+      ]
+    },
+    "sample": {
+      "live_time_s": 129600.0,
+      "total_counts": 5385686.0,
+      "total_cps": 41.55621913580247,
+      "energy_coefficients": [
+        -1.694,
+        0.4996,
+        6.71e-08
+      ]
+    }
+  },
+  "bands": [
+    {
+      "energy_low_keV": 0,
+      "energy_high_keV": 100,
+      "spectra": {
+        "north": {
+          "observed_counts": 20174.0,
+          "counts_per_s": 1.4009722222222223,
+          "scaled_to_CoCd_live_counts": 181566.0
+        },
+        "south": {
+          "observed_counts": 60277.0,
+          "counts_per_s": 4.185902777777778,
+          "scaled_to_CoCd_live_counts": 542493.0
+        },
+        "sample": {
+          "observed_counts": 617276.0,
+          "counts_per_s": 4.762932098765432,
+          "scaled_to_CoCd_live_counts": 617276.0
+        }
+      }
+    },
+    {
+      "energy_low_keV": 100,
+      "energy_high_keV": 500,
+      "spectra": {
+        "north": {
+          "observed_counts": 95583.0,
+          "counts_per_s": 6.637708333333333,
+          "scaled_to_CoCd_live_counts": 860247.0
+        },
+        "south": {
+          "observed_counts": 281799.0,
+          "counts_per_s": 19.569375,
+          "scaled_to_CoCd_live_counts": 2536191.0
+        },
+        "sample": {
+          "observed_counts": 2816491.0,
+          "counts_per_s": 21.732183641975308,
+          "scaled_to_CoCd_live_counts": 2816491.0
+        }
+      }
+    },
+    {
+      "energy_low_keV": 500,
+      "energy_high_keV": 1000,
+      "spectra": {
+        "north": {
+          "observed_counts": 39885.0,
+          "counts_per_s": 2.769791666666667,
+          "scaled_to_CoCd_live_counts": 358965.0
+        },
+        "south": {
+          "observed_counts": 117929.0,
+          "counts_per_s": 8.18951388888889,
+          "scaled_to_CoCd_live_counts": 1061361.0
+        },
+        "sample": {
+          "observed_counts": 1134349.0,
+          "counts_per_s": 8.752692901234568,
+          "scaled_to_CoCd_live_counts": 1134349.0
+        }
+      }
+    },
+    {
+      "energy_low_keV": 1000,
+      "energy_high_keV": 1500,
+      "spectra": {
+        "north": {
+          "observed_counts": 18332.0,
+          "counts_per_s": 1.2730555555555556,
+          "scaled_to_CoCd_live_counts": 164988.0
+        },
+        "south": {
+          "observed_counts": 63608.0,
+          "counts_per_s": 4.417222222222223,
+          "scaled_to_CoCd_live_counts": 572472.0
+        },
+        "sample": {
+          "observed_counts": 627745.0,
+          "counts_per_s": 4.843711419753086,
+          "scaled_to_CoCd_live_counts": 627745.0
+        }
+      }
+    },
+    {
+      "energy_low_keV": 1500,
+      "energy_high_keV": 2500,
+      "spectra": {
+        "north": {
+          "observed_counts": 5577.0,
+          "counts_per_s": 0.38729166666666665,
+          "scaled_to_CoCd_live_counts": 50193.0
+        },
+        "south": {
+          "observed_counts": 17297.0,
+          "counts_per_s": 1.2011805555555555,
+          "scaled_to_CoCd_live_counts": 155673.0
+        },
+        "sample": {
+          "observed_counts": 165531.0,
+          "counts_per_s": 1.2772453703703703,
+          "scaled_to_CoCd_live_counts": 165531.0
+        }
+      }
+    },
+    {
+      "energy_low_keV": 2500,
+      "energy_high_keV": 4000,
+      "spectra": {
+        "north": {
+          "observed_counts": 1056.0,
+          "counts_per_s": 0.07333333333333333,
+          "scaled_to_CoCd_live_counts": 9504.0
+        },
+        "south": {
+          "observed_counts": 2517.0,
+          "counts_per_s": 0.17479166666666668,
+          "scaled_to_CoCd_live_counts": 22653.0
+        },
+        "sample": {
+          "observed_counts": 24294.0,
+          "counts_per_s": 0.1874537037037037,
+          "scaled_to_CoCd_live_counts": 24294.0
+        }
+      }
+    }
+  ],
+  "Co60_windows": {
+    "1173.228": {
+      "north": {
+        "gross_counts": 794.0,
+        "local_continuum_counts": 396.0,
+        "sideband_excess_counts": 398.0,
+        "sideband_excess_scaled_to_CoCd_live": 3582.0,
+        "max_energy_keV": 1170.7368993436,
+        "max_bin_counts": 120.0
+      },
+      "south": {
+        "gross_counts": 1655.0,
+        "local_continuum_counts": 1328.6666666666667,
+        "sideband_excess_counts": 326.33333333333326,
+        "sideband_excess_scaled_to_CoCd_live": 2936.9999999999995,
+        "max_energy_keV": 1173.348770752321,
+        "max_bin_counts": 142.0
+      },
+      "sample": {
+        "gross_counts": 23505.0,
+        "local_continuum_counts": 13064.666666666668,
+        "sideband_excess_counts": 10440.333333333332,
+        "sideband_excess_scaled_to_CoCd_live": 10440.333333333332,
+        "max_energy_keV": 1173.2364751871,
+        "max_bin_counts": 2981.0
+      }
+    },
+    "1332.492": {
+      "north": {
+        "gross_counts": 750.0,
+        "local_continuum_counts": 201.33333333333331,
+        "sideband_excess_counts": 548.6666666666667,
+        "sideband_excess_scaled_to_CoCd_live": 4938.000000000001,
+        "max_energy_keV": 1330.2165592975,
+        "max_bin_counts": 138.0
+      },
+      "south": {
+        "gross_counts": 1113.0,
+        "local_continuum_counts": 673.3333333333333,
+        "sideband_excess_counts": 439.66666666666674,
+        "sideband_excess_scaled_to_CoCd_live": 3957.0000000000005,
+        "max_energy_keV": 1332.3642510979737,
+        "max_bin_counts": 137.0
+      },
+      "sample": {
+        "gross_counts": 17294.0,
+        "local_continuum_counts": 6339.666666666667,
+        "sideband_excess_counts": 10954.333333333332,
+        "sideband_excess_scaled_to_CoCd_live": 10954.333333333332,
+        "max_energy_keV": 1332.2163909431,
+        "max_bin_counts": 2624.0
+      }
+    }
+  },
+  "qualification": "Fixed energy bands and sidebands compare source rates only; not a physically qualified peak fit or background choice.",
+  "campaign_artifact_provenance": {
+    "north": {
+      "receipt_sha256": "df72958bb79a0622f850357e70f0799831ba11169d0941388eb24b19fad40fe5",
+      "receipt_mode": "north",
+      "consumed_artifact_sha256": {
+        "counts/Co-Cd-RAFM-1_25cm_counts.csv": "2375775a8d07b8af20b2bb237f581c2af8f778efbe81090ffe374b1246fc94ab",
+        "analysis_json/Co-Cd-RAFM-1_25cm.json": "0a7991183525ef75de3f51a26949097a988f7a41b9558af6e7e5a5c65b49455f"
+      }
+    },
+    "south": {
+      "receipt_sha256": "793a4cde23cc6c3f83c8af975bed216a016bb860bd25a9b0b212445947d0341d",
+      "receipt_mode": "south",
+      "consumed_artifact_sha256": {
+        "counts/Co-Cd-RAFM-1_25cm_counts.csv": "88fd10dd4734a0a6f764e90a59fba87f38e0b99560e999441f39fde85f5c097c",
+        "analysis_json/Co-Cd-RAFM-1_25cm.json": "4fcb03d653f7e699d19abdde8cbd7b2e02cabe7aa5b8a3a9f56cf3cda31d8780",
+        "analysis_json/RAFM3-A_300sEOI.json": "3ef9551ec710c24d4138642cda332e077faf9ba847880e3b19c1e44c6a9d8502"
+      }
+    },
+    "zero_ambient": {
+      "receipt_sha256": "4d9d9dd15abe935685e964ba6dacd71ba3d73ee2a7579e7faa5c306551db1088",
+      "receipt_mode": "zero_ambient_control",
+      "consumed_artifact_sha256": {
+        "counts/Co-Cd-RAFM-1_25cm_counts.csv": "f7c54373c8c5663ccd44151ff9130cfa2fea5fd7b11dc82483e246baaaa40998",
+        "analysis_json/Co-Cd-RAFM-1_25cm.json": "9ca311655fb7567c6a7029c02ef95be07a790eaa3bc5aee9d8bb8ff1806de589"
+      }
+    }
+  },
+  "CoCd_fixed_window_controls": {
+    "1173.228": {
+      "north": {
+        "fixed_window_gross_counts": 16359.0,
+        "fixed_window_sideband_counts": 9500.666666666666,
+        "fixed_window_net_counts": 6858.333333333334,
+        "workflow_IEC_net_counts": 6989.5,
+        "workflow_IEC_gross_counts": 21589.0,
+        "workflow_IEC_energy_keV": 1173.2312153498783
+      },
+      "south": {
+        "fixed_window_gross_counts": 8585.972059331503,
+        "fixed_window_sideband_counts": 1108.6388187627251,
+        "fixed_window_net_counts": 7477.333240568778,
+        "workflow_IEC_net_counts": 5370.093643611973,
+        "workflow_IEC_gross_counts": 21589.0,
+        "workflow_IEC_energy_keV": 1173.0854722383604
+      },
+      "zero_ambient": {
+        "fixed_window_gross_counts": 23505.0,
+        "fixed_window_sideband_counts": 13064.666666666666,
+        "fixed_window_net_counts": 10440.333333333334,
+        "workflow_IEC_net_counts": 11244.0,
+        "workflow_IEC_gross_counts": 22891.0,
+        "workflow_IEC_energy_keV": 1173.1103079665097
+      }
+    },
+    "1332.492": {
+      "north": {
+        "fixed_window_gross_counts": 10544.0,
+        "fixed_window_sideband_counts": 4527.666666666667,
+        "fixed_window_net_counts": 6016.333333333333,
+        "workflow_IEC_net_counts": 6974.5,
+        "workflow_IEC_gross_counts": 15715.0,
+        "workflow_IEC_energy_keV": 1332.5455350389266
+      },
+      "south": {
+        "fixed_window_gross_counts": 7283.739853702233,
+        "fixed_window_sideband_counts": 287.25817062074015,
+        "fixed_window_net_counts": 6996.4816830814925,
+        "workflow_IEC_net_counts": 6472.788795532143,
+        "workflow_IEC_gross_counts": 16995.0,
+        "workflow_IEC_energy_keV": 1332.2962282826632
+      },
+      "zero_ambient": {
+        "fixed_window_gross_counts": 17294.0,
+        "fixed_window_sideband_counts": 6339.666666666667,
+        "fixed_window_net_counts": 10954.333333333332,
+        "workflow_IEC_net_counts": 10839.0,
+        "workflow_IEC_gross_counts": 16995.0,
+        "workflow_IEC_energy_keV": 1332.375579728054
+      }
+    }
+  },
+  "CoCd_QG_control": {
+    "QG_report_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+    "QG_net_counts": [
+      11202.0,
+      11439.0
+    ],
+    "FluxForge_zero_ambient_IEC_net_counts": [
+      11244.0,
+      10839.0
+    ],
+    "qualification": "Saved ANS ambient-off flag and line-count proximity support an ambient-off QG control; final report settings are unverified."
+  },
+  "V52_example": {
+    "QG_report_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+    "QG_report_line_number": 85,
+    "QG_report_rad_int_text": "1.00",
+    "QG_report_rad_int_unit": "unspecified",
+    "QG_report_net_counts": 98446.0,
+    "QG_report_activity_Bq": 95937300.0,
+    "FluxForge_South_detected_merged_line_net_counts": 100349.62443390636,
+    "FluxForge_South_detected_merged_line_activity_Bq": 1008979.7615474262,
+    "FluxForge_South_IEC_isotope_activity_Bq": 947129.2430911249,
+    "local_gamma_library_intensity_fraction": 1.0,
+    "QG_over_FluxForge_detected_line_activity_ratio": 95.08347308459918,
+    "QG_over_FluxForge_IEC_isotope_activity_ratio": 101.29272293070747,
+    "QG_over_FluxForge_detected_line_net_count_ratio": 0.9810300791393579,
+    "QG_over_FluxForge_per_count_conversion_ratio": 96.92207721909443,
+    "FluxForge_conversion_with_QG_counts_and_yield_0p01_Bq": 98983949.5320882,
+    "interpretation": "A 1%-versus-100% intensity convention is a leading, testable explanation; exact QG source library and remaining efficiency/timing differences are unverified. Detected-line and targeted IEC paths differ."
+  },
+  "Al28_example": {
+    "QG_report_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+    "QG_report_line_number": 90,
+    "QG_report_rad_int_text": "1.00",
+    "QG_report_rad_int_unit": "unspecified",
+    "QG_report_net_counts": 231.0,
+    "QG_report_activity_Bq": 248381.0,
+    "FluxForge_South_detected_line_net_counts": 438.10021536041677,
+    "FluxForge_South_detected_line_activity_Bq": 4478.132925780272,
+    "local_gamma_library_intensity_fraction": 1.0,
+    "QG_over_FluxForge_per_count_conversion_ratio": 105.1920399489223,
+    "FluxForge_conversion_with_QG_counts_and_yield_0p01_Bq": 236121.47850788466,
+    "interpretation": "Independent second line supports a 1%-versus-100% QG intensity hypothesis; exact source library is not verified."
+  }
+}

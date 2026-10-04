@@ -1,5 +1,7 @@
 # RAFM measured-background sensitivity on the current validation engine
 
+For the subsequent detector-identity, background-rate, Co-Cd count-estimator, and V-52 conversion investigation, see [FOLLOWUP_FORENSICS.md](FOLLOWUP_FORENSICS.md).
+
 This is a **conditional analysis receipt**, separate from the historical portable-engine numbers in this PR. It exercises the current `4615e61` validation lineage at the clean figure-lifecycle commit `a7bcc680d1f5e06b1d9dae405241fc380087ca2b`. The figure change is not numerical. All three runs used the same 69 staged input files (length-prefixed path-and-content tree SHA-256 `45803d05cfe2c49aa541c9bfc2079d441feb9c7978e81a6a68a732fedc0fdfe1`), `iec_tiered` flux-wire and generic counting, the current engine's integrated-bin-overlap rebinning and covariance, and the existing legacy 25 cm efficiency profile. QG report activities were not substituted for physical estimates. The source-bound runners and scenario receipts are beside this file. The local scripts contain the execution host's absolute paths; adapt those paths to replay them.
 
 ## Scope and main result
