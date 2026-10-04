@@ -1,0 +1,352 @@
+{
+  "scope": "10 original ASC reductions; same selected lines, counts, efficiencies, yields and uncertainties. Diagnostic weighting substitution only, not vendor reproduction or new accepted activity.",
+  "rows": [
+    {
+      "sample": "Co-Cd-RAFM-1_25cm",
+      "isotope": "Co60",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        151.9380973607045,
+        159.13809929159203
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        13.792011460618674,
+        11.349391220300818
+      ],
+      "inverse_variance_Bq": 156.2310754782869,
+      "manual_weighting_diagnostic_Bq": 155.97020945133184,
+      "relative_method_change_percent": -0.16697448068921927,
+      "input_json_sha256": "2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980"
+    },
+    {
+      "sample": "Co-RAFM-1_25cm",
+      "isotope": "Co60",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        2162.6923391830296,
+        2038.7285739644199
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        21.37307161461638,
+        18.952523698304926
+      ],
+      "inverse_variance_Bq": 2093.296232636004,
+      "manual_weighting_diagnostic_Bq": 2098.8154194788704,
+      "relative_method_change_percent": 0.2636600953471513,
+      "input_json_sha256": "239b16c9dc8542979be39dd65954e43311a1e774d756f75055f62cf5e3d9657a"
+    },
+    {
+      "sample": "Cu-RAFM-1_25cm",
+      "isotope": "Cu64",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        3200184.168496631
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        73262.47176435524
+      ],
+      "inverse_variance_Bq": 3200184.168496631,
+      "manual_weighting_diagnostic_Bq": 3200184.168496631,
+      "relative_method_change_percent": 0.0,
+      "input_json_sha256": "692438c7e41fc381e745356c5ad1312bb9dac3ae7983d9260920432b4e52ffc6"
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In114m",
+      "n_lines": 3,
+      "fixed_FluxForge_line_activities_Bq": [
+        309512.8426577573,
+        357503.6260982341,
+        350325.6128981546
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        24975.772451907604,
+        51144.52007758442,
+        50118.90437240085
+      ],
+      "inverse_variance_Bq": 324026.9594471649,
+      "manual_weighting_diagnostic_Bq": 333050.0888759529,
+      "relative_method_change_percent": 2.7846847818411957,
+      "input_json_sha256": "2e6d135f74c94eb64c93a4ffd2cf49c9e4fc841b36d1c62b30199246d4de7b56"
+    },
+    {
+      "sample": "In-Cd-RAFM-1_25cm",
+      "isotope": "In115m",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        17880.79466012842
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        881.4839933594997
+      ],
+      "inverse_variance_Bq": 17880.79466012842,
+      "manual_weighting_diagnostic_Bq": 17880.79466012842,
+      "relative_method_change_percent": 0.0,
+      "input_json_sha256": "2e6d135f74c94eb64c93a4ffd2cf49c9e4fc841b36d1c62b30199246d4de7b56"
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Ni57",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        123.33066764780646,
+        34.5596674863582
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        33.22181916086506,
+        43.027591653036566
+      ],
+      "inverse_variance_Bq": 90.17550204110809,
+      "manual_weighting_diagnostic_Bq": 107.54059217191971,
+      "relative_method_change_percent": 19.256993016679225,
+      "input_json_sha256": "a0818b9fd69e91eff42c706e116618f463b51ac81505af0ec631e31d1b13f4cb"
+    },
+    {
+      "sample": "Ni-RAFM-1_25cm",
+      "isotope": "Co58",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        56763.290053073695
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        200.29729297454935
+      ],
+      "inverse_variance_Bq": 56763.290053073695,
+      "manual_weighting_diagnostic_Bq": 56763.290053073695,
+      "relative_method_change_percent": 0.0,
+      "input_json_sha256": "a0818b9fd69e91eff42c706e116618f463b51ac81505af0ec631e31d1b13f4cb"
+    },
+    {
+      "sample": "Sc-Cd-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        186142.7603565401,
+        181300.48676204606
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        447.81980256307804,
+        396.42056733235285
+      ],
+      "inverse_variance_Bq": 183427.9038660119,
+      "manual_weighting_diagnostic_Bq": 183606.033056582,
+      "relative_method_change_percent": 0.09711128286142845,
+      "input_json_sha256": "f651e69e8b8be5900e75a87ba809d7244c92c798313b0a1a2ab753caed2a1b1b"
+    },
+    {
+      "sample": "Sc-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        1652224.625853489,
+        1610176.5996319111
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        1753.2788326722073,
+        1542.8395271324853
+      ],
+      "inverse_variance_Bq": 1628526.972109233,
+      "manual_weighting_diagnostic_Bq": 1630128.4327579625,
+      "relative_method_change_percent": 0.09833798740559452,
+      "input_json_sha256": "ddb91c5f5eb8a90ab8bd902965f457ef99e79e4389e13842cf0c2fb900096651"
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc47",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        3961.004125153134
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        122.53033905845929
+      ],
+      "inverse_variance_Bq": 3961.0041251531334,
+      "manual_weighting_diagnostic_Bq": 3961.004125153134,
+      "relative_method_change_percent": 2.220446049250313e-14,
+      "input_json_sha256": "160d17607cb3c5f59ac3ee609edabec20a8f78e3c05fffe8b0d47c86c52ed7ed"
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc48",
+      "n_lines": 3,
+      "fixed_FluxForge_line_activities_Bq": [
+        308.9328269641668,
+        303.7011157242719,
+        268.5162017615825
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        26.67575184211498,
+        25.237385670419243,
+        24.89391214868361
+      ],
+      "inverse_variance_Bq": 292.93087885246507,
+      "manual_weighting_diagnostic_Bq": 294.43020889974764,
+      "relative_method_change_percent": 0.5118374864254926,
+      "input_json_sha256": "160d17607cb3c5f59ac3ee609edabec20a8f78e3c05fffe8b0d47c86c52ed7ed"
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Ti51",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        5.603643808544208
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        35.50572163871855
+      ],
+      "inverse_variance_Bq": 5.603643808544208,
+      "manual_weighting_diagnostic_Bq": 5.603643808544208,
+      "relative_method_change_percent": 0.0,
+      "input_json_sha256": "160d17607cb3c5f59ac3ee609edabec20a8f78e3c05fffe8b0d47c86c52ed7ed"
+    },
+    {
+      "sample": "Ti-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        381.969419785564,
+        565.1421470895793
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        25.11973020840351,
+        27.222634150990896
+      ],
+      "inverse_variance_Bq": 466.20850534134684,
+      "manual_weighting_diagnostic_Bq": 487.69904237123376,
+      "relative_method_change_percent": 4.609640704463791,
+      "input_json_sha256": "160d17607cb3c5f59ac3ee609edabec20a8f78e3c05fffe8b0d47c86c52ed7ed"
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc47",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        3917.7158529868234
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        121.45964670020331
+      ],
+      "inverse_variance_Bq": 3917.715852986823,
+      "manual_weighting_diagnostic_Bq": 3917.7158529868234,
+      "relative_method_change_percent": 2.220446049250313e-14,
+      "input_json_sha256": "56a0229dda010e36e0ebb85a8afb889b041ddbb857f35dd0d2a2a1eb1a55b09e"
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc48",
+      "n_lines": 3,
+      "fixed_FluxForge_line_activities_Bq": [
+        305.2934710557572,
+        297.3224142368999,
+        283.6387443424336
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        26.385157838756076,
+        25.521748566102495,
+        23.743105598525144
+      ],
+      "inverse_variance_Bq": 294.62020604275045,
+      "manual_weighting_diagnostic_Bq": 295.2967155166866,
+      "relative_method_change_percent": 0.22962086783619995,
+      "input_json_sha256": "56a0229dda010e36e0ebb85a8afb889b041ddbb857f35dd0d2a2a1eb1a55b09e"
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Ti51",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        12.992222956558583
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        16.74009197638309
+      ],
+      "inverse_variance_Bq": 12.992222956558583,
+      "manual_weighting_diagnostic_Bq": 12.992222956558583,
+      "relative_method_change_percent": 0.0,
+      "input_json_sha256": "56a0229dda010e36e0ebb85a8afb889b041ddbb857f35dd0d2a2a1eb1a55b09e"
+    },
+    {
+      "sample": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc46",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        377.0531178572665,
+        620.9847035917512
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        22.39714090687783,
+        26.09726807231608
+      ],
+      "inverse_variance_Bq": 480.51463817557726,
+      "manual_weighting_diagnostic_Bq": 519.9123458043549,
+      "relative_method_change_percent": 8.199065022943586,
+      "input_json_sha256": "56a0229dda010e36e0ebb85a8afb889b041ddbb857f35dd0d2a2a1eb1a55b09e"
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc47",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        2761.17413286652
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        83.04548814399288
+      ],
+      "inverse_variance_Bq": 2761.17413286652,
+      "manual_weighting_diagnostic_Bq": 2761.17413286652,
+      "relative_method_change_percent": 0.0,
+      "input_json_sha256": "d530064bf676ae075e05e171309e45d930db66d2a5db7060acf73c0323fc2fbf"
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc48",
+      "n_lines": 3,
+      "fixed_FluxForge_line_activities_Bq": [
+        164.11593033370045,
+        149.363550198152,
+        158.3930360088002
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        14.383218505914225,
+        13.273225171540258,
+        14.25474267633079
+      ],
+      "inverse_variance_Bq": 156.86439983339952,
+      "manual_weighting_diagnostic_Bq": 157.31799929844308,
+      "relative_method_change_percent": 0.2891666085646616,
+      "input_json_sha256": "d530064bf676ae075e05e171309e45d930db66d2a5db7060acf73c0323fc2fbf"
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Ti51",
+      "n_lines": 1,
+      "fixed_FluxForge_line_activities_Bq": [
+        15.383874772991005
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        11.882787892890173
+      ],
+      "inverse_variance_Bq": 15.383874772991005,
+      "manual_weighting_diagnostic_Bq": 15.383874772991007,
+      "relative_method_change_percent": 2.220446049250313e-14,
+      "input_json_sha256": "d530064bf676ae075e05e171309e45d930db66d2a5db7060acf73c0323fc2fbf"
+    },
+    {
+      "sample": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc46",
+      "n_lines": 2,
+      "fixed_FluxForge_line_activities_Bq": [
+        346.5584760007582,
+        609.5680124574267
+      ],
+      "fixed_FluxForge_line_sigmas_Bq": [
+        12.738134958651086,
+        13.40655702017183
+      ],
+      "inverse_variance_Bq": 471.34346562007494,
+      "manual_weighting_diagnostic_Bq": 511.10764343223724,
+      "relative_method_change_percent": 8.436348589207787,
+      "input_json_sha256": "d530064bf676ae075e05e171309e45d930db66d2a5db7060acf73c0323fc2fbf"
+    }
+  ]
+}
