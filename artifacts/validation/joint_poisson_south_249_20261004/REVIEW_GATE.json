@@ -1,0 +1,15 @@
+{
+  "requested_gate": "independent Sol review",
+  "status": "PENDING_UNAVAILABLE_IN_CURRENT_CHAT_TOOLING",
+  "reason": "No independent model/sub-agent dispatch endpoint or repository Sol-review workflow is available in this session.",
+  "current_chat_self_review_is_independent": false,
+  "acceptance_effect": "Draft PR must remain draft/not accepted on behalf of issue #249 until independent Sol review is actually obtained.",
+  "scoped_self_review_findings": [
+    "No production/shared workflow driver changes.",
+    "Source hashes and South empirical-layout anchors are fail-closed.",
+    "Joint likelihood uses native integer observations; IEC sensitivity uses the existing count-conserving overlap/covariance path.",
+    "Ambient-off is explicitly a sensitivity control and is not selected by vendor agreement.",
+    "Strong lack-of-fit and free-normalization unidentifiability are preserved.",
+    "Unknown calibration covariance and unresolved South temporal applicability remain explicit."
+  ]
+}

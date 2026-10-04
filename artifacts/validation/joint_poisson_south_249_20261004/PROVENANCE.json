@@ -1,0 +1,36 @@
+{
+  "issue": 249,
+  "repository": "FusionSandwich/FluxForge",
+  "integration_branch": "quantumgold-methods-integration",
+  "integration_base_head": "701288a30f418ed7dc331e6deda0044eb220e72e",
+  "feature_branch": "joint-poisson-south-model-checks",
+  "primary_checkout_touched": false,
+  "shared_workflow_drivers_changed": false,
+  "agents_md": "not present anywhere in the integration-base recursive tree",
+  "continuation_file": "artifacts/validation/quantumgold_integration_20261004/CONTINUATION.txt",
+  "implementation": "examples/RAFM_irradiation/joint_poisson_south_pilot.py",
+  "focused_test": "tests/test_flux_wire_analysis.py::test_source_bound_south_joint_poisson_pilot_preserves_failures_and_controls",
+  "source_inputs": [
+    {
+      "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Co-Cd-RAFM-1.ASC",
+      "sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba"
+    },
+    {
+      "path": "examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/South 4hr Background Terminal.ANS",
+      "sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344"
+    }
+  ],
+  "reused_components": [
+    "src/fluxforge/analysis/joint_poisson.py",
+    "src/fluxforge/analysis/spectrum_math.py count-conserving overlap/covariance engine",
+    "src/fluxforge/analysis/flux_wire_analysis.py fixed-ROI local continuum control",
+    "quantumgold reference main and supplemental manifests",
+    "current rafm_25cm profile and runtime workflow_config.json"
+  ],
+  "forbidden_or_absent_inputs": [
+    "no QuantumGold activity target used for fitting or model selection",
+    "no new source acquisition",
+    "no North background in the South pilot",
+    "no physical inversion/default promotion"
+  ]
+}

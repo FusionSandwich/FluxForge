@@ -1,0 +1,11 @@
+energy_keV,scenario,sample_continuum,area_or_net_counts,activity_bq_count_average_conditional,sample_deviance,background_deviance,adequacy_or_status
+1173.228,south_native_joint,linear,7367.296268,160.150449,113.849667,23.085459,strong_lack_of_fit
+1173.228,south_native_joint,step,7219.756963,156.943237,77.266400,29.063100,strong_lack_of_fit
+1173.228,south_native_fixed_roi_iec_covell,fixed_roi,7407.068131,161.015011,,,conditional_control
+1173.228,ambient_off_joint,linear,11057.634556,240.371105,113.849667,,strong_lack_of_fit
+1173.228,south_native_free_normalization,linear,,,,,unidentifiable
+1332.492,south_native_joint,linear,6872.749145,156.814447,149.196655,13.471554,strong_lack_of_fit
+1332.492,south_native_joint,step,6700.517578,152.884666,124.855300,22.903600,strong_lack_of_fit
+1332.492,south_native_fixed_roi_iec_covell,fixed_roi,7513.089200,171.424986,,,conditional_control
+1332.492,ambient_off_joint,linear,11083.742715,252.896032,149.196655,,strong_lack_of_fit
+1332.492,south_native_free_normalization,linear,,,,,unidentifiable
