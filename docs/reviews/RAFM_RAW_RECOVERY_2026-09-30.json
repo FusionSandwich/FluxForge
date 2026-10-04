@@ -1,0 +1,809 @@
+{
+  "timestamp_utc": "2026-09-30T16:38:31.031580+00:00",
+  "git_head": "b4daf9012d977d46edc63676f36e6ee874a845bd",
+  "source_sha256": {
+    "src/fluxforge/examples/rafm_workflow.py": "3c38e0a6b9e531f90d559b5464600a29ef5449b2de3a81202eabc437b6283a61",
+    "src/fluxforge/analysis/flux_wire_analysis.py": "f30de002392bb8931fa5a724e88772a9a5f07cbf9296132cb8b4b37a8f8269c5",
+    "src/fluxforge/analysis/peakfit.py": "80cb495758ad29dae5cf07e23710fbcedd7fb129d65a4ea9003708b9c410a7d6",
+    "src/fluxforge/analysis/spectrum_math.py": "54b27bd2eb0dce8416f27b8c358163ffd626e3bebead5133e0e6f2455907c7ba"
+  },
+  "metadata_sha256": {
+    "flux_wire_metadata.json": "29e5dbc1cae2f7590479c19ffe34a915ad18d1be53dcb7d7e8be98583b6ddf72",
+    "pairing_aliases.json": "35e846e7e60ea5c6ec5d93438333a282ce70b6b8ebd573dde6015f8974746e4d",
+    "sample_gamma_library.json": "5b3acd81fe6eb373c7768cc43e950348bd93b1f7978bb6b07efbca8b5b791dbc",
+    "sample_schedule.json": "a8fc764e557b8ca0e7c6926f05113d7d7720d4c77d8b76e15ac0be122ede27a7",
+    "sample_schedules.json": "356fb3f5557402cb116aafeebc7dad8c8bb4bcd4b7e7db5438715de1102221be",
+    "workflow_config.json": "bd5aa84389098048897b5026b9168c3424a21603963652ddef6efd49601be2c1"
+  },
+  "background_sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+  "effective_configuration": {
+    "profile_name": "rafm_25cm",
+    "use_profile_energy_calibration": true,
+    "background_file": "background.ASC",
+    "min_peak_energy_keV": 80.0,
+    "max_peak_energy_keV": 3000.0,
+    "peak_significance_sigma": 3.0,
+    "targeted_peak_significance_sigma": 2.0,
+    "flux_wire_roi_width_fwhm": 4.0,
+    "flux_wire_background_width_channels": 1,
+    "flux_wire_background_gap_fwhm": 0.0,
+    "flux_wire_comparison_capture_range_channels": 32,
+    "flux_wire_broad_peak_ratio_threshold": 1.2,
+    "flux_wire_broad_peak_net_threshold": 5000.0,
+    "flux_wire_compact_window_edge_penalty": 80.0,
+    "flux_wire_compact_window_asymmetry_penalty": 10.0,
+    "flux_wire_compact_window_width_penalty": 120.0,
+    "flux_wire_broad_window_net_agreement_tolerance": 0.12,
+    "flux_wire_broad_window_max_raw_gross_ratio": 1.35,
+    "flux_wire_comparison_background_model": "constant",
+    "flux_wire_counting_method": "qg",
+    "generic_broad_window_max_raw_gross_ratio": 1.35,
+    "generic_comparison_background_model": "linear",
+    "generic_targeted_counting_method": "iec_tiered",
+    "generic_targeted_support_window_keV": 3.0,
+    "generic_targeted_support_min_intensity": 0.15,
+    "generic_targeted_fallback_top_lines_per_isotope": 6,
+    "generic_targeted_fallback_min_intensity": 0.03,
+    "generic_targeted_prune_neighbor_window_keV": 5.0,
+    "generic_targeted_prune_intensity_ratio": 20.0,
+    "line_activity_consistency_max_rel_deviation": 0.25,
+    "line_activity_consistency_min_lines": 2,
+    "line_activity_single_peak_drift_rel_threshold": 0.15,
+    "line_activity_outlier_modified_z_threshold": 3.5,
+    "ti48_model_relative_uncertainty_additional": 0.15,
+    "ti48_model_relative_uncertainty_floor": 0.2,
+    "cd_model_relative_uncertainty_additional": 0.2,
+    "cd_model_relative_uncertainty_floor": 0.25,
+    "qg_report_activity_includes_count_decay": false,
+    "qg_report_activity_includes_count_decay_note": "Reports state activities as of Measurement Date (count start). false applies the decay-during-count correction with the count real time, matching prior behaviour; verify against the Quantum Gold analysis settings.",
+    "cd_cover_thickness_cm": 0.0508,
+    "cd_cover_thickness_note": "INL nominal 0.0508 cm (20 mil) Cd; actual cover dimensions, closure and gaps not yet verified",
+    "cd_ratio_default_review_min": 1.1,
+    "cd_ratio_expected_ranges": {
+      "Cu": {
+        "min": 1.1
+      },
+      "Sc": {
+        "min": 1.1
+      }
+    },
+    "dead_time_review_threshold_pct": 15.0,
+    "attenuation_correction": {
+      "enabled": false,
+      "geometry": "point",
+      "material": "iron",
+      "thickness_cm": 0.0,
+      "container_material": null,
+      "container_thickness_cm": 0.0
+    },
+    "cross_isotope_line_collision_tolerance_keV": 0.15,
+    "peak_match_tolerances_keV": [
+      3.0,
+      3.0,
+      2.0
+    ],
+    "comparison_energy_tiers_keV": [
+      300.0,
+      1200.0
+    ],
+    "minimum_qg_net_counts": 1.0,
+    "validation_thresholds": {
+      "max_relative_count_error": 0.25,
+      "max_relative_activity_error": 0.2,
+      "max_en_score": 3.0,
+      "fail_on_line_consistency": false,
+      "fail_on_measurement_qc": false,
+      "fail_on_missing_nuclides": true,
+      "fail_on_missing_peaks": true
+    },
+    "generic_rafm_isotopes": [
+      "Al28",
+      "Co58",
+      "Co60",
+      "Cr51",
+      "Fe59",
+      "Mn54",
+      "Mn56",
+      "Sb124",
+      "Ta182",
+      "Tb154m",
+      "V52",
+      "W187"
+    ]
+  },
+  "status": "RUN_COMPLETE_REVIEW_REQUIRED",
+  "n_spectra": 16,
+  "all_committed_rafm3_rafm4_replayed": true,
+  "comparison_summary": {
+    "overall_passed": false,
+    "failing_samples": [
+      "RAFM3-B_24hrEOI",
+      "RAFM3-B_2hrEOI",
+      "RAFM3-B_300sEOI",
+      "RAFM3-B_4dEOI",
+      "RAFM3-C_24hrEOI",
+      "RAFM3-C_2hrEOI",
+      "RAFM3-C_300sEOI",
+      "RAFM3-C_4dEOI",
+      "RAFM3-N_24hrEOI",
+      "RAFM3-N_2hrEOI",
+      "RAFM3-N_300sEOI",
+      "RAFM3-N_4dEOI",
+      "RAFM4-A_15dEOI",
+      "RAFM4-B_15dEOI",
+      "RAFM4-C_15dEOI",
+      "RAFM4-N_15dEOI"
+    ],
+    "unvalidated_samples": [],
+    "unvalidated_reference_files": [],
+    "reference_reproduction_samples": []
+  },
+  "limits": [
+    "QG is a comparison report, not ground truth; stage, calibration and systematic uncertainty require review.",
+    "Configured profile energy calibration and counting methods remain unchanged apart from selecting raw iec_tiered.",
+    "Raw extraction complete does not mean isotope identification or absolute activities are qualified."
+  ],
+  "reviewed_source_commit": "156d924287361721e5816863b1fccc590a27cf60",
+  "source_commit_note": "At launch the source was uncommitted; the reviewed source content was subsequently committed as reviewed_source_commit. Physical file byte hashes are recorded above.",
+  "samples": [
+    {
+      "sample": "RAFM3-B_24hrEOI",
+      "raw_sha256": "236b954098010357f140a6858d0df43bdd415f7d4d94f0fe4fe2c9ff5b4de1d8",
+      "qg_sha256": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+      "prediction_sha256": "c90f47f48b319be83143109c7152b283a58a0d38e5aa6006d81b0c0c79103194",
+      "n_detected_peaks": 46,
+      "n_unidentified_peaks": 8,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 8,
+        "activity_failures": 2,
+        "line_consistency_failures": 28,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-B_24hrEOI:Mn56@2112.67"
+        ],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Al28",
+        "Co60",
+        "Cr51",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ],
+      "withheld_report_prediction_identical": true
+    },
+    {
+      "sample": "RAFM3-B_2hrEOI",
+      "raw_sha256": "55b92986f8ea0459ff79daf51ed6716498fbbc26bebee9860efda57ebaaf0b5d",
+      "qg_sha256": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+      "prediction_sha256": "90f4689f7ded5bf89319e6edb41340445ddfd913736d29b948e5503a9f5ed492",
+      "n_detected_peaks": 24,
+      "n_unidentified_peaks": 2,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 6,
+        "activity_failures": 2,
+        "line_consistency_failures": 12,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Al28",
+        "Co58",
+        "Co60",
+        "Mn54",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-B_300sEOI",
+      "raw_sha256": "5952e0a90f323d2b6dbf7270cf61f23440af3e8d56dfa483442cc675d22f05ca",
+      "qg_sha256": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+      "prediction_sha256": "570facaa8439d38c2688405fabeae081692bd2d2ae672da989375dc19130b732",
+      "n_detected_peaks": 21,
+      "n_unidentified_peaks": 0,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 6,
+        "activity_failures": 3,
+        "line_consistency_failures": 10,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-B_300sEOI:W187@618.33"
+        ],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co60",
+        "Fe59",
+        "Mn54",
+        "Mn56",
+        "Ta182",
+        "V52",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-B_4dEOI",
+      "raw_sha256": "1767c3fc9f277d2c05a7201dfc51632fe6e5ca8e3c4af5bb686cc09d404adb5f",
+      "qg_sha256": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+      "prediction_sha256": "4ac528e730cd67a6e3e5aef7dc2720907e58cd0cadfe4725b90f866c1bcdaad9",
+      "n_detected_peaks": 39,
+      "n_unidentified_peaks": 10,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 5,
+        "activity_failures": 2,
+        "line_consistency_failures": 25,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-B_4dEOI:Fe59@1098.93"
+        ],
+        "missing_nuclides": [
+          "RAFM3-B_4dEOI:Fe59"
+        ]
+      },
+      "isotopes": [
+        "Al28",
+        "Co60",
+        "Cr51",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-C_24hrEOI",
+      "raw_sha256": "7f375c0942c6b92fba7d1a3a185823c033dbc409b137b95d55cbe5daddd48e0a",
+      "qg_sha256": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+      "prediction_sha256": "e370ec9314bf7d334361d05151662c63cffdf3c756353bbe60752bafd98a763b",
+      "n_detected_peaks": 33,
+      "n_unidentified_peaks": 5,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 6,
+        "activity_failures": 2,
+        "line_consistency_failures": 16,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co58",
+        "Co60",
+        "Cr51",
+        "Fe59",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-C_2hrEOI",
+      "raw_sha256": "b1ea0c56e3b6a4621d98729b812c20013d9166a4234ad3cd19ca5e166e2d518a",
+      "qg_sha256": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+      "prediction_sha256": "fe1cc356f862e3ef834f0f825e3c59f4574a44b4de8c643c8bed1e883ddbcfae",
+      "n_detected_peaks": 26,
+      "n_unidentified_peaks": 3,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 4,
+        "activity_failures": 2,
+        "line_consistency_failures": 14,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Fe59",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "V52",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-C_300sEOI",
+      "raw_sha256": "c816ea0cb7bbd6a32e8f7a57aec384f90e75f95a4c810f1e24012de224e8e25d",
+      "qg_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+      "prediction_sha256": "84267b68b021eaf3d3d1e1fdb984181797f93ff3149671de536eb14182c033e6",
+      "n_detected_peaks": 23,
+      "n_unidentified_peaks": 0,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 7,
+        "activity_failures": 3,
+        "line_consistency_failures": 16,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-C_300sEOI:W187@618.27",
+          "RAFM3-C_300sEOI:W187@773.21"
+        ],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co60",
+        "Fe59",
+        "Mn54",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "V52",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-C_4dEOI",
+      "raw_sha256": "cfe869dfcbaa830a3d608c9ef75c960f9d45c6c23545d3d3098994343a1a0a96",
+      "qg_sha256": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+      "prediction_sha256": "b66e87662f365fb9589313f3a4232d05a457bc12bb286ddfe44144183e4738fc",
+      "n_detected_peaks": 26,
+      "n_unidentified_peaks": 7,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 4,
+        "activity_failures": 1,
+        "line_consistency_failures": 10,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-C_4dEOI:Fe59@1098.75"
+        ],
+        "missing_nuclides": [
+          "RAFM3-C_4dEOI:Fe59"
+        ]
+      },
+      "isotopes": [
+        "Co58",
+        "Co60",
+        "Cr51",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "V52",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-N_24hrEOI",
+      "raw_sha256": "954d43edbb255201adc0202aac328dac0ef1a182fe95e7516e08cf72faf902be",
+      "qg_sha256": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+      "prediction_sha256": "9c1f6f6392450f2328d2d07fecebba8e4c616d5f7f231e9e1576f4e3440bd7d3",
+      "n_detected_peaks": 33,
+      "n_unidentified_peaks": 6,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 6,
+        "activity_failures": 2,
+        "line_consistency_failures": 15,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-N_24hrEOI:Mn56@2112.80"
+        ],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co60",
+        "Cr51",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-N_2hrEOI",
+      "raw_sha256": "5032fb8d6603aee0adf9ecb4d79ad1da88d3ef6b226df85258a177e89ba22274",
+      "qg_sha256": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+      "prediction_sha256": "0edcc92b999ecfe87bb6b86800175435ca172c648cbcdd0f4bfad950aca5c72c",
+      "n_detected_peaks": 20,
+      "n_unidentified_peaks": 3,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 5,
+        "activity_failures": 2,
+        "line_consistency_failures": 11,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Mn54",
+        "Mn56",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-N_300sEOI",
+      "raw_sha256": "a0e357e249a5830e2b7c1a4022619a0f8079b3c0157423307a51e6092415e2dd",
+      "qg_sha256": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+      "prediction_sha256": "270a664192a5251a299368ad1cbe190c41d49238ea2c0e55b51ef508000c51d3",
+      "n_detected_peaks": 23,
+      "n_unidentified_peaks": 1,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 8,
+        "activity_failures": 4,
+        "line_consistency_failures": 14,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-N_300sEOI:W187@618.16"
+        ],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Al28",
+        "Cr51",
+        "Mn54",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "V52",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM3-N_4dEOI",
+      "raw_sha256": "e6a7d3ea0dd42e2e1da0645f3c5f0a84e21ef84e4b7cb1a4d08fca31c5897561",
+      "qg_sha256": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+      "prediction_sha256": "c4714409591396a22a115eb5ea7b34c8dd4f8d7ef12b3c0c183e49c96bea0606",
+      "n_detected_peaks": 39,
+      "n_unidentified_peaks": 11,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 6,
+        "activity_failures": 1,
+        "line_consistency_failures": 18,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [
+          "RAFM3-N_4dEOI:Fe59@1099.10"
+        ],
+        "missing_nuclides": [
+          "RAFM3-N_4dEOI:Fe59"
+        ]
+      },
+      "isotopes": [
+        "Al28",
+        "Co60",
+        "Cr51",
+        "Mn56",
+        "Sb124",
+        "Ta182",
+        "V52",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM4-A_15dEOI",
+      "raw_sha256": "4c20d9ccef0030c0f6069ab0de65e7dbd1f6127b8035c5b36996660cba4b11b2",
+      "qg_sha256": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+      "prediction_sha256": "856d8701c9e6bef1a9d7f136ce5e1e2f6c74aafa1172f786070dc2a3456ecc0f",
+      "n_detected_peaks": 39,
+      "n_unidentified_peaks": 2,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 16,
+        "activity_failures": 4,
+        "line_consistency_failures": 19,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co60",
+        "Cr51",
+        "Fe59",
+        "Mn54",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM4-B_15dEOI",
+      "raw_sha256": "f63df89e055a4c46af65c90e973bdb25289c774670205738f1940427bc9cf177",
+      "qg_sha256": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+      "prediction_sha256": "76d268268ba474f15e5d6ebfadcf3032419d295b6eeb86598a7757ecc45ac84e",
+      "n_detected_peaks": 40,
+      "n_unidentified_peaks": 1,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 19,
+        "activity_failures": 4,
+        "line_consistency_failures": 18,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co60",
+        "Cr51",
+        "Fe59",
+        "Mn54",
+        "Sb124",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM4-C_15dEOI",
+      "raw_sha256": "9a3f4693dc22418a30839ce1f98d7158d35f844741aa528934857f41f181f02d",
+      "qg_sha256": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+      "prediction_sha256": "1133253533687c0fff56d47735f5d2d24094f236477c905af7804d0b6beadf4e",
+      "n_detected_peaks": 42,
+      "n_unidentified_peaks": 3,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 18,
+        "activity_failures": 4,
+        "line_consistency_failures": 21,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Co60",
+        "Cr51",
+        "Fe59",
+        "Mn54",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    },
+    {
+      "sample": "RAFM4-N_15dEOI",
+      "raw_sha256": "568631002907e5c455ce9d627ffd07367135f93d6de90113751a3981cec4a6f9",
+      "qg_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+      "prediction_sha256": "465392e4104ad1ffcc8b54088c7688086fd11376727e9b86cdd15a655e1f99f6",
+      "n_detected_peaks": 49,
+      "n_unidentified_peaks": 3,
+      "validation": {
+        "passed": false,
+        "comparison_passed": false,
+        "comparison_basis": "raw_estimate_vs_report",
+        "reference_used_for_analysis": false,
+        "incomplete_comparison_rows": 0,
+        "required_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "available_comparison_domains": [
+          "counts",
+          "activities"
+        ],
+        "missing_comparison_domains": [],
+        "count_failures": 20,
+        "activity_failures": 5,
+        "line_consistency_failures": 27,
+        "measurement_qc_flags": 0,
+        "missing_peaks": [],
+        "missing_nuclides": []
+      },
+      "isotopes": [
+        "Al28",
+        "Co60",
+        "Cr51",
+        "Fe59",
+        "Mn54",
+        "Mn56",
+        "Ta182",
+        "Tb154m",
+        "W187"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 # FluxForge GUI Master Plan
 
 **Status:** active GUI source of truth  
-**Last Updated:** 2026-04-19  
+**Last Updated:** 2026-10-03
 **Purpose:** consolidated GUI architecture, interaction, and workspace plan for the
 modern Qt shell.
 
@@ -23,7 +23,7 @@ Use the GUI docs set in this order:
 
 - FluxForge remains a native Windows/Linux desktop application without a browser dependency.
 - The primary GUI surface is the Qt shell under `src/fluxforge/gui/`.
-- The Tk shell under `src/fluxforge_gui/` is legacy reference material, not the target for new parity work.
+- The Tk shell is archived under `archive/legacy_gui/`; Qt is the sole shipped GUI. All new interaction, navigation, sample setup, and unfolding work targets `src/fluxforge/gui/`.
 - Every adopted GUI workflow must map cleanly onto reusable core logic, a CLI or scriptable API path, and a saved artifact/report/provenance record.
 - The plot is a primary input surface, not a passive display.
 - Automation never blocks manual analyst correction.
@@ -31,6 +31,24 @@ Use the GUI docs set in this order:
 - Standards mode must visibly lock governed workflows without destroying expert-state context.
 - Library management must be provenance-aware: users choose which optional libraries are downloaded, external library locations can be registered from GUI and CLI, and bundled library IDs stay reserved against accidental shadowing.
 - Prefer registry-driven or configuration-driven selectors over hardcoded workflow and value lists unless the lock is deliberate for QuantumGold parity, PeakEasy parity, governed standards workflows, or RAFM irradiation-analysis paths.
+
+## Consolidation priorities (2026-10-03)
+
+The analysis workflow toolbar exposes Open Spectrum, Find Peaks, Review Peaks,
+Calibrate, Irradiation, Unfold, and Export through the same actions used by menus.
+Peak search reveals the peak table; Review Peaks restores a hidden analysis dock.
+Dense analysis forms scroll inside their docks instead of forcing an oversized
+window, preserving tab and control identities.
+Unfolding opens from an empty workspace and accepts measured RAFM rates or a
+reaction-rates JSON followed by a response bundle with matching reaction order
+and physical energy boundaries. Example measurements appear only when the
+bundled example has been explicitly opened.
+
+Continue improving all three areas together:
+
+- Spectrum review: peak selection, manual assignment, ROI editing, and graph/table synchronization.
+- Navigation: discoverable actions, readable layout at common desktop sizes, and keyboard access.
+- Sample setup and unfolding: irradiation histories, qualified measurements, response provenance, and actionable input errors.
 
 ## 3. Implemented GUI Baseline
 

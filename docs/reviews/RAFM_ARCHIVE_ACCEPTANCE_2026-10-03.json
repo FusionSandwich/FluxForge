@@ -1,0 +1,51 @@
+{
+  "status": "REVIEWED_EXAMPLE_EXPANSION",
+  "accuracy_qualified": false,
+  "tests": {
+    "passed": 115,
+    "failed": 0,
+    "duration_s": 76.3,
+    "command": "python -m pytest tests/test_rafm_archive_example.py tests/test_spectrum_csv_roundtrip.py tests/test_phase6_example_environment.py tests/test_raw_recovery_dispatch.py tests/test_csv_readers.py tests/test_rafm_workflow.py tests/test_rafm_validation_independence.py tests/test_rafm_background_integration.py tests/test_spectrum_io_parity.py -q"
+  },
+  "checks": {
+    "black_selected_files": "passed",
+    "git_diff_check": "passed",
+    "flake8": "unavailable_not_installed"
+  },
+  "runtime": {
+    "python": "3.12.10",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "matplotlib": "3.11.1"
+  },
+  "adversarial_review": {
+    "agent": "mass_basis_review",
+    "verdict": "No remaining blocker; activity accuracy and GUI coverage not inferred.",
+    "fixes": [
+      "runtime input hashes",
+      "complete converted inventory and mandatory29guard",
+      "strictCSVmeasurement rows"
+    ],
+    "manifest_snapshot_accepted": true
+  },
+  "data": {
+    "raw_acquisitions": 32,
+    "converted_files": 87,
+    "new_raw_replayed": 3,
+    "planning_outputs_verified": 50
+  },
+  "sha256": {
+    "docs/reviews/RAFM_ARCHIVE_FEATURE_REPLAY_2026-10-03.json": "7c07a62e706572cc02f3faf24133669a940f29fd746b254995678871361754a5",
+    "docs/reviews/RAFM2_RAW_REPLAY_2026-10-03.json": "23eeeb2ddc93d3c04083a48b7badd154af4633f8e278a80bc9616100e985bb76",
+    "docs/reviews/RAFM_PLANNING_REPLAY_2026-10-03.json": "54da4c781fe669be94c1678c2849fabeff845853d98af036f0a3deb3b0a8f0ac",
+    "docs/reviews/RAFM_ARCHIVE_MANIFEST_AT_RAW_REPLAY_2026-10-03.json": "57ddd1ba1900dfade1728e5beb39383c6bf5f1a6eee45ec791d2435b9116b4bf",
+    "examples/RAFM_irradiation/FEATURE_GUIDE.md": "795632c46f95d956702646f73b905483e3e61c7b297c4281f267649735dc2649",
+    "src/fluxforge/examples/rafm_feature_example.py": "f8ceae869cd55b80ba675fb03a99689eef4823010ed0e3749a707945e94b61e8",
+    "src/fluxforge/io/spectrum_csv.py": "78f8b9ba2b70dfcf18c822ea9273e0a9a964f138752a04f81cf2d3c04f42d4c6",
+    "src/fluxforge/workflows/phase6_ldrd_worked_example.py": "9b1ff1d0201ea3aa48323a9cbc76f749477bc229686327155c220a947dd7e77c",
+    "tools/audit_rafm_raw_recovery.py": "00784c3d7892acbeb454ee882140802fd818e7bb756da68a25d444832794a5a6",
+    "tests/test_rafm_archive_example.py": "a1db5b6521a1b81087209907b2cb6d12522f3a42abdfe20681fbd6fe81ad6a70",
+    "tests/test_spectrum_csv_roundtrip.py": "838ef243c4161c62bb2bc78eba7bbbe3c03ff6cc5a633a09ca2d35df2d90dfae",
+    "tests/test_phase6_example_environment.py": "3ab1eac8a918bb417b4081b013a303291d2c1773b68f60ea7c90dd02669443c5"
+  }
+}

@@ -102,10 +102,12 @@ def test_load_decay_dataset_source_exposes_decay_chain_and_uncertainty():
     assert dataset.half_life_s("Al-28") == pytest.approx(134.484, rel=1e-6)
 
 
-def test_load_sqlite_identification_source(tmp_path):
+@pytest.mark.parametrize("path_style", ["native", "posix", "encoded"])
+def test_load_sqlite_identification_source(tmp_path, path_style):
     import sqlite3
+    from urllib.parse import quote
 
-    db_path = tmp_path / "gamma.sqlite"
+    db_path = tmp_path / "gamma lines.sqlite"
     with sqlite3.connect(db_path) as connection:
         connection.execute(
             "CREATE TABLE gamma_lines (nuclide TEXT, energy_keV REAL, intensity REAL, half_life_s REAL)"
@@ -114,8 +116,11 @@ def test_load_sqlite_identification_source(tmp_path):
             "INSERT INTO gamma_lines VALUES (?, ?, ?, ?)",
             ("Cs137", 661.7, 0.851, 9.493632e8),
         )
+    locator_path = str(db_path) if path_style == "native" else db_path.as_posix()
+    if path_style == "encoded":
+        locator_path = quote(locator_path, safe="/:")
     database = load_gamma_identification_source(
-        "custom_gamma_file", custom_path=f"sqlite:///{db_path}?table=gamma_lines"
+        "custom_gamma_file", custom_path=f"sqlite:///{locator_path}?table=gamma_lines"
     )
 
     matches = database.find_matches(661.7, tolerance_keV=1.0)

@@ -102,6 +102,8 @@ def _build_flux_wire_nuclides() -> Dict[str, Dict[str, Any]]:
             "half_life_s": float(entry["half_life_seconds"]),
             "parent_element": meta.parent_element,
             "reaction": meta.reaction,
+            "reactions_by_element": dict(meta.reactions_by_element),
+            "reaction_ids_by_element": dict(meta.reaction_ids_by_element),
             "gamma_lines": _select_authoritative_lines(
                 isotope, list(meta.target_lines_keV)
             ),
@@ -276,6 +278,10 @@ class IdentifiedPeak:
     comparison_net_counts_unc: Optional[float] = None
     comparison_gross_counts: Optional[float] = None
     comparison_gross_counts_unc: Optional[float] = None
+    assignment_candidates: List[GammaLine] = field(default_factory=list)
+    assignment_ambiguous: bool = False
+    activity_estimation_state: str = "estimated"
+    assignment_nominal_fwhm_keV: Optional[float] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -295,14 +301,28 @@ class IdentifiedPeak:
             "fwhm": self.fwhm,
             "significance": self.significance,
             "isotope": self.isotope,
+            "assignment_ambiguous": self.assignment_ambiguous,
+            "assignment_candidates": [
+                {
+                    "isotope": line.isotope,
+                    "energy_keV": line.energy_keV,
+                    "intensity": line.intensity,
+                    "intensity_uncertainty": line.intensity_uncertainty,
+                }
+                for line in self.assignment_candidates
+            ],
+            "activity_estimation_state": self.activity_estimation_state,
+            "assignment_nominal_fwhm_keV": self.assignment_nominal_fwhm_keV,
             "gamma_energy": self.gamma_line.energy_keV if self.gamma_line else None,
             "branching_ratio": self.gamma_line.intensity if self.gamma_line else None,
             "branching_ratio_uncertainty": (
                 self.gamma_line.intensity_uncertainty if self.gamma_line else None
             ),
             "efficiency": self.efficiency,
-            "activity_bq": self.activity_bq,
-            "activity_unc_bq": self.activity_unc_bq,
+            "activity_bq": None if self.assignment_ambiguous else self.activity_bq,
+            "activity_unc_bq": (
+                None if self.assignment_ambiguous else self.activity_unc_bq
+            ),
             "activity_correction_factor": self.activity_correction_factor,
             "activity_correction_uncertainty": self.activity_correction_uncertainty,
         }
@@ -327,6 +347,7 @@ class FluxWireAnalysisResult:
     # Comparison with reference (if available)
     reference_activities: Dict[str, float] = field(default_factory=dict)
     activity_ratios: Dict[str, float] = field(default_factory=dict)
+    fit_diagnostics: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -337,6 +358,7 @@ class FluxWireAnalysisResult:
             "real_time": self.real_time,
             "dead_time_pct": self.dead_time_pct,
             "peaks": [p.to_dict() for p in self.peaks],
+            "fit_diagnostics": self.fit_diagnostics,
             "nuclide_activities": self.nuclide_activities,
             "reference_activities": self.reference_activities,
             "activity_ratios": self.activity_ratios,
@@ -431,6 +453,7 @@ def estimate_peak_area(
     background: np.ndarray,
     fwhm_channels: float = 8.0,
     spectrum_uncertainty: Optional[np.ndarray] = None,
+    spectrum_data: Optional[GammaSpectrum] = None,
 ) -> Tuple[float, float, float]:
     """
     Estimate peak area using simple summation method.
@@ -447,6 +470,9 @@ def estimate_peak_area(
         Full width at half maximum in channels
     spectrum_uncertainty : np.ndarray, optional
         Per-channel uncertainty for propagated counting statistics.
+    spectrum_data : GammaSpectrum, optional
+        The same spectrum, including channel covariance. Takes precedence over
+        diagonal spectrum_uncertainty when calculating counting variance.
 
     Returns
     -------
@@ -457,6 +483,8 @@ def estimate_peak_area(
     gross_counts : float
         Gross counts in ROI
     """
+    if spectrum_data is not None and not np.array_equal(spectrum, spectrum_data.counts):
+        raise ValueError("spectrum_data counts must match the integrated spectrum.")
     ch_min, ch_max = _roi_bounds(peak_channel, fwhm_channels, len(spectrum))
 
     # Sum counts in ROI
@@ -465,7 +493,13 @@ def estimate_peak_area(
 
     net = gross - bg
 
-    if spectrum_uncertainty is not None and len(spectrum_uncertainty) == len(spectrum):
+    if spectrum_data is not None:
+        weights = np.zeros(len(spectrum), dtype=float)
+        weights[ch_min : ch_max + 1] = 1.0
+        roi_var = spectrum_data.weighted_counts_variance(weights)
+    elif spectrum_uncertainty is not None and len(spectrum_uncertainty) == len(
+        spectrum
+    ):
         roi_var = float(
             np.sum(
                 np.asarray(spectrum_uncertainty[ch_min : ch_max + 1], dtype=float) ** 2
@@ -517,6 +551,7 @@ def estimate_peak_area_local_background(
     background_width_channels: int = 1,
     background_gap_fwhm: float = 0.0,
     spectrum_uncertainty: Optional[np.ndarray] = None,
+    spectrum_data: Optional[GammaSpectrum] = None,
 ) -> Tuple[float, float, float, float, Tuple[int, int]]:
     """
     Estimate peak area using a fixed ROI with local sideband background.
@@ -524,8 +559,12 @@ def estimate_peak_area_local_background(
     This mirrors the QG-style ROI accounting more closely than the fit-window
     gross counts used previously. Gross is the ROI sum, and net subtracts a
     locally estimated continuum background from the adjacent sidebands.
+    Supply spectrum_data with the same counts to include channel covariance
+    and ROI/sideband cross terms; it takes precedence over diagonal uncertainty.
     """
     counts = np.asarray(spectrum, dtype=float)
+    if spectrum_data is not None and not np.array_equal(counts, spectrum_data.counts):
+        raise ValueError("spectrum_data counts must match the integrated spectrum.")
     half_width = max(1, int(round(0.5 * roi_width_fwhm * max(fwhm_channels, 1.0))))
     gap_channels = max(0, int(round(background_gap_fwhm * max(fwhm_channels, 1.0))))
     sideband_width = max(1, int(background_width_channels))
@@ -593,7 +632,21 @@ def estimate_peak_area_local_background(
         )
     else:
         gross_var = max(gross, 0.0)
-    net_unc = float(np.sqrt(max(gross_var + background_var, 0.0)))
+    if spectrum_data is not None:
+        # The net ROI is a single linear sum. Correlated ROI/sideband counts
+        # contribute cross terms, including the negative continuum weights.
+        weights = np.zeros(len(counts), dtype=float)
+        weights[ch_min : ch_max + 1] = 1.0
+        if sideband_samples:
+            coefficient = -roi_channels / float(len(sideband_samples))
+            if left_max >= left_min:
+                weights[left_min : left_max + 1] = coefficient
+            if right_max >= right_min:
+                weights[right_min : right_max + 1] = coefficient
+        net_variance = spectrum_data.weighted_counts_variance(weights)
+    else:
+        net_variance = gross_var + background_var
+    net_unc = float(np.sqrt(max(net_variance, 0.0)))
     return net, net_unc, gross, background_sum, (ch_min, ch_max)
 
 
@@ -1447,6 +1500,38 @@ def _group_expected_lines_for_fit(
     return groups
 
 
+def _collapse_targeted_seeds(seeds, counts):
+    """One fit component per nearly coincident observed maximum.
+
+    Half the smaller calibrated FWHM is a conservative collapse trigger,
+    not a claim that more widely spaced components are identifiable. Bound
+    each cluster's full span so a chain cannot absorb well-separated peaks.
+    Keep every distinct transition as an alternative assignment.
+    """
+    clusters = []
+    for seed in sorted(seeds, key=lambda item: item[1]):
+        if clusters and seed[1] - clusters[-1][0][1] < 0.5 * min(
+            seed[4], *(item[4] for item in clusters[-1])
+        ):
+            clusters[-1].append(seed)
+        else:
+            clusters.append([seed])
+    physical_seeds, alternatives = [], []
+    for cluster in clusters:
+        representative = max(cluster, key=lambda item: counts[item[1]])
+        physical_seeds.append(representative)
+        unique = {
+            (s[0].isotope, s[0].energy_keV, s[0].intensity): s[0] for s in cluster
+        }
+        alternatives.append(
+            sorted(
+                unique.values(),
+                key=lambda line: (line.energy_keV, str(line.isotope or "")),
+            )
+        )
+    return physical_seeds, alternatives
+
+
 def analyze_raw_spectrum(
     spectrum: GammaSpectrum,
     efficiency: Optional[EfficiencyCalibration] = None,
@@ -1558,6 +1643,7 @@ def analyze_raw_spectrum(
             background,
             fwhm_ch,
             spectrum_uncertainty=working_spectrum.counts_uncertainty,
+            spectrum_data=working_spectrum,
         )
         raw_gross, raw_gross_unc = _roi_gross_counts(
             raw_counts, ch, fwhm_ch, spectrum.counts_uncertainty
@@ -1657,6 +1743,8 @@ def analyze_raw_spectrum_targeted(
     broad_window_max_raw_gross_ratio: float = 1.35,
     comparison_background_model: str = "constant",
     counting_method: str = "qg",
+    fit_diagnostics: Optional[List[Dict[str, Any]]] = None,
+    max_assignment_energy_delta_fwhm: Optional[float] = None,
     energy_tolerance_keV: float = 2.0,
     low_significance_candidates: Optional[List[IdentifiedPeak]] = None,
 ) -> List[IdentifiedPeak]:
@@ -1672,6 +1760,11 @@ def analyze_raw_spectrum_targeted(
     the detection threshold for tentative identity review. Those candidates
     never enter the returned detections or activity calculations.
     """
+    if max_assignment_energy_delta_fwhm is not None and (
+        not np.isfinite(max_assignment_energy_delta_fwhm)
+        or max_assignment_energy_delta_fwhm <= 0
+    ):
+        raise ValueError("Assignment energy tolerance must be finite and positive.")
     if data.spectrum is None:
         return []
 
@@ -1775,19 +1868,9 @@ def analyze_raw_spectrum_targeted(
         if not seeds:
             continue
 
-        # Multiple library lines can select the same observed maximum. Fitting
-        # duplicate components loses the supported peak in a singular multiplet.
-        # Keep the closest energy match for that unresolved maximum.
-        unique_seeds = {}
-        for seed in seeds:
-            line, channel, *_ = seed
-            previous = unique_seeds.get(channel)
-            delta = abs(analysis_data.channel_to_energy(channel) - line.energy_keV)
-            if previous is None or delta < abs(
-                analysis_data.channel_to_energy(channel) - previous[0].energy_keV
-            ):
-                unique_seeds[channel] = seed
-        seeds = sorted(unique_seeds.values(), key=lambda seed: seed[1])
+        seeds, assignment_candidates = _collapse_targeted_seeds(
+            seeds, counts_for_search
+        )
         fit_peak_channels = [seed[1] for seed in seeds]
 
         fit_results: List[Optional[PeakFitResult]] = [None] * len(seeds)
@@ -1797,12 +1880,13 @@ def analyze_raw_spectrum_targeted(
                 fit_width = int(max(8, round(0.5 * span + 3.0 * max_fwhm_ch)))
                 multiplet_results = fit_multiple_peaks(
                     channels=channels,
-                    counts=counts_for_search,
+                    counts=signed_counts,
                     peak_channels=fit_peak_channels,
                     fit_width=fit_width,
                     background_model="linear",
                     share_sigma=True,
                     counts_uncertainty=spectrum.counts_uncertainty,
+                    counts_covariance=spectrum.count_covariance_matrix(),
                 )
                 if len(multiplet_results) == len(seeds):
                     fit_results = multiplet_results
@@ -1810,11 +1894,13 @@ def analyze_raw_spectrum_targeted(
                 fit_width = int(max(6, round(2.5 * seeds[0][4])))
                 fit_results[0] = fit_single_peak(
                     channels=channels,
-                    counts=counts_for_search,
+                    counts=signed_counts,
                     peak_channel=fit_peak_channels[0],
                     fit_width=fit_width,
                     background_model="linear",
+                    initial_sigma=max(seeds[0][4] / 2.355, 0.8),
                     counts_uncertainty=spectrum.counts_uncertainty,
+                    counts_covariance=spectrum.count_covariance_matrix(),
                 )
                 # A tiny local maximum can be closer to the library energy
                 # than a supported, slightly shifted peak. Retry the other
@@ -1835,11 +1921,13 @@ def analyze_raw_spectrum_targeted(
                             continue
                         retry = fit_single_peak(
                             channels=channels,
-                            counts=counts_for_search,
+                            counts=signed_counts,
                             peak_channel=candidate,
                             fit_width=fit_width,
                             background_model="linear",
                             counts_uncertainty=spectrum.counts_uncertainty,
+                            counts_covariance=spectrum.count_covariance_matrix(),
+                            initial_sigma=max(seeds[0][4] / 2.355, 0.8),
                         )
                         if (
                             retry.success
@@ -1882,8 +1970,51 @@ def analyze_raw_spectrum_targeted(
                     counts_uncertainty=raw_counts_uncertainty,
                 )
 
+        joint_unidentifiable = (
+            len(seeds) > 1
+            and use_fit_fallback
+            and not all(result is not None and result.success for result in fit_results)
+        )
+        if joint_unidentifiable:
+            lo = max(0, min(fit_peak_channels) - fit_width)
+            hi = min(len(signed_counts), max(fit_peak_channels) + fit_width + 1)
+            if fit_diagnostics is not None:
+                covariance = spectrum.count_covariance_matrix()[lo:hi, lo:hi]
+                fit_diagnostics.append(
+                    {
+                        "state": "unidentifiable_joint_fit",
+                        "channel_window": [lo, hi - 1],
+                        "observed_signed_window_counts": float(
+                            np.sum(signed_counts[lo:hi])
+                        ),
+                        "observed_window_count_std": float(
+                            np.sqrt(float(covariance.sum()))
+                        ),
+                        "net_peak_area_estimated": False,
+                        "isotope_activity_estimated": False,
+                        "candidates": [
+                            {
+                                "isotope": c.isotope,
+                                "energy_keV": c.energy_keV,
+                                "intensity": c.intensity,
+                            }
+                            for choices in assignment_candidates
+                            for c in choices
+                        ],
+                        "fit_messages": [
+                            result.message if result else "no fit result"
+                            for result in fit_results
+                        ],
+                    }
+                )
+            continue
+
         for seed_idx, (seed, fit) in enumerate(zip(seeds, fit_results)):
             line, peak_channel, slope, fwhm_keV, fwhm_ch = seed
+            candidates = assignment_candidates[seed_idx]
+            assignment_ambiguous = (
+                len(candidates) > 1 or not line.isotope or not str(line.isotope).strip()
+            )
             roi_net = 0.0
             roi_unc = 0.0
             gross = 0.0
@@ -1945,7 +2076,12 @@ def analyze_raw_spectrum_targeted(
             if abs(peak_energy - line.energy_keV) > energy_tolerance_keV:
                 continue
 
-            if len(seeds) == 1:
+            if (
+                len(seeds) == 1
+                and not assignment_ambiguous
+                and peak_energy < 250.0
+                and _is_qg_counting_method(counting_method)
+            ):
                 try:
                     hypermet_width = int(max(8, round(3.5 * fwhm_ch)))
                     hypermet_peak, hypermet_result = fit_hypermet_peak(
@@ -1979,6 +2115,7 @@ def analyze_raw_spectrum_targeted(
                     background_width_channels=background_width_channels,
                     background_gap_fwhm=background_gap_fwhm,
                     spectrum_uncertainty=spectrum.counts_uncertainty,
+                    spectrum_data=spectrum,
                 )
             )
             roi_lo, roi_hi = roi_bounds
@@ -2209,10 +2346,10 @@ def analyze_raw_spectrum_targeted(
                 raise ValueError(f"Unknown counting_method: {counting_method}")
 
             comparison_net = selected_net
-            # Fits and raw comparison candidates cannot erase the measured
-            # subtraction/ROI variance. This is a conservative floor for
-            # unresolved components, not a component covariance estimate.
-            comparison_unc = max(selected_unc, float(roi_unc))
+            # Raw-reference diagnostics use the raw candidate's variance.
+            # The measured-subtraction ROI floor belongs to physical sample
+            # counts below; adding it here mixes two different observations.
+            comparison_unc = selected_unc
             comparison_gross = selected_gross
             comparison_gross_unc = float(
                 np.hypot.reduce(
@@ -2240,7 +2377,7 @@ def analyze_raw_spectrum_targeted(
                 )
             else:
                 net = float(comparison_net)
-                net_unc = float(comparison_unc)
+                net_unc = float(max(comparison_unc, roi_unc))
 
             stored_gross = float(
                 comparison_gross if _is_qg_counting_method(method_key) else raw_gross
@@ -2255,6 +2392,13 @@ def analyze_raw_spectrum_targeted(
                 continue
 
             significance = net / net_unc if net_unc > 0 else 0.0
+            energy_mismatch = (
+                max_assignment_energy_delta_fwhm is not None
+                and not assignment_ambiguous
+                and abs(peak_energy - float(line.energy_keV))
+                > max_assignment_energy_delta_fwhm * fwhm_keV
+            )
+            assignment_ambiguous = assignment_ambiguous or energy_mismatch
             peak = IdentifiedPeak(
                 channel=int(round(peak_channel)),
                 energy_keV=float(peak_energy),
@@ -2264,8 +2408,17 @@ def analyze_raw_spectrum_targeted(
                 background=float(background_at_peak),
                 fwhm=float(peak_fwhm_keV),
                 significance=float(significance),
-                isotope=line.isotope,
-                gamma_line=line,
+                isotope=None if assignment_ambiguous else line.isotope,
+                gamma_line=None if assignment_ambiguous else line,
+                assignment_candidates=candidates,
+                assignment_nominal_fwhm_keV=float(fwhm_keV),
+                assignment_ambiguous=assignment_ambiguous,
+                activity_estimation_state=(
+                    "withheld_energy_mismatch" if energy_mismatch else
+                    "withheld_ambiguous_assignment" if assignment_ambiguous else
+                    "withheld_low_significance" if significance < peak_threshold else
+                    "estimated"
+                ),
                 gross_counts_unc=float(stored_gross_unc),
                 background_adjusted_gross_counts=float(adjusted_gross),
                 comparison_net_counts=float(comparison_net),
@@ -2281,6 +2434,8 @@ def analyze_raw_spectrum_targeted(
 
     # Compute activities directly from the raw analysis result.
     for peak in results:
+        if peak.assignment_ambiguous:
+            continue
         efficiency = 0.0
         activity_bq = 0.0
         activity_unc_bq = 0.0
@@ -2387,6 +2542,7 @@ def analyze_flux_wire_targeted(
             broad_window_max_raw_gross_ratio=broad_window_max_raw_gross_ratio,
             comparison_background_model=comparison_background_model,
             counting_method=counting_method,
+            fit_diagnostics=result.fit_diagnostics,
         )
         method_key = str(counting_method).strip().lower()
         if _is_qg_counting_method(method_key):
@@ -2468,7 +2624,7 @@ def combine_peak_activities(peaks: List[IdentifiedPeak]) -> Dict[str, Dict[str, 
     # Group peaks by nuclide
     nuclide_peaks: Dict[str, List[IdentifiedPeak]] = {}
     for peak in peaks:
-        if peak.isotope is None:
+        if peak.isotope is None or peak.assignment_ambiguous:
             continue
         if peak.isotope not in nuclide_peaks:
             nuclide_peaks[peak.isotope] = []

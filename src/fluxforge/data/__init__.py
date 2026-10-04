@@ -113,6 +113,8 @@ from fluxforge.data.flux_wire_catalog import (
 from fluxforge.data.flux_wire_unfolding import (
     load_flux_wire_unfolding_defaults,
     load_flux_wire_sample_defaults,
+    load_flux_wire_sample_reference,
+    load_flux_wire_nominal_samples,
     load_flux_wire_reaction_defaults,
     load_flux_wire_product_reactions,
     get_flux_wire_reaction_id,
@@ -235,6 +237,8 @@ __all__ = [
     # Flux-wire unfolding defaults
     "load_flux_wire_unfolding_defaults",
     "load_flux_wire_sample_defaults",
+    "load_flux_wire_sample_reference",
+    "load_flux_wire_nominal_samples",
     "load_flux_wire_reaction_defaults",
     "load_flux_wire_product_reactions",
     "get_flux_wire_reaction_id",

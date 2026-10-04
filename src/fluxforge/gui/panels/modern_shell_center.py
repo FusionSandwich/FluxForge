@@ -697,8 +697,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         ),
                     )
                 )
+            first_nonempty_load = bool(traces) and not self.canvas._current_traces
             self.canvas.set_traces(traces)
-            self._apply_document_viewport()
+            self._apply_document_viewport(force=first_nonempty_load)
             self.canvas.set_peak_candidates(state.peaks)
             self._sync_analysis_overlays()
             self.canvas.set_cascade_sum_lines(state.cascade_sum_lines_keV)
@@ -768,7 +769,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.selection_bus.publish(reconciled)
 
-        def _apply_document_viewport(self) -> None:
+        def _apply_document_viewport(self, *, force: bool = False) -> None:
             """Reapply canonical viewport changes, including undo to no viewport."""
 
             if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
@@ -782,7 +783,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 or persisted_viewport.spectrum_id in {None, active_spectrum_id}
                 else None
             )
-            if (
+            if not force and (
                 viewport == self._last_canvas_viewport
                 and active_spectrum_id == self._last_canvas_spectrum_id
             ):

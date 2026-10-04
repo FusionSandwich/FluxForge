@@ -2,14 +2,21 @@ name: Quality Checks
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches:
       - main
       - add_gui
       - chore/folder-audit-native-gui-review-20260317
+      - registry-uncertainty-qualification
+      - 'JS/**'
+      - 'proposal/**'
+      - 'fix/**'
+      - 'codex/**'
     paths:
       - 'src/fluxforge/**/*.py'
-      - 'src/fluxforge_gui/**/*.py'
+      - 'src/fluxforge/data/**'
+      - 'tools/run_acceptance.py'
       - 'tests/**/*.py'
       - '.flake8'
       - 'pyproject.toml'
@@ -35,8 +42,6 @@ jobs:
 
       - name: Install tooling and runtime deps
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-tk
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
 
@@ -101,6 +106,21 @@ jobs:
             tests/test_genie_overrides.py \
             tests/test_pipeline_validation.py
 
+      - name: Adversarial scientific contracts
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q \
+            tests/test_histogram_background.py \
+            tests/test_background_covariance.py \
+            tests/test_signed_peak_fit_covariance.py \
+            tests/test_joint_peak_covariance.py \
+            tests/test_rafm_validation_independence.py \
+            tests/test_registry_uncertainty_qualification.py \
+            tests/test_nuclear_data_sources.py \
+            tests/test_run_readiness_manifest.py \
+            tests/test_transport_contracts.py
+
       - name: CLI and standards regression tests
         env:
           PYTHONPATH: src
@@ -151,6 +171,12 @@ jobs:
       - name: GUI scaffold regression tests
         run: pytest -q tests/test_modern_gui_shell.py tests/test_project_tracker_assets.py
 
+      - name: Supported GUI workflow regressions
+        run: pytest -q tests/test_production_gui_mode.py
+
+      - name: GUI consolidation regressions
+        run: pytest -q tests/test_gui_consolidation.py
+
       - name: Analysis workspace core helper tests
         run: |
           pytest -q \
@@ -181,8 +207,18 @@ jobs:
             tests/test_analysis_workspace_qt.py::test_main_window_activity_background_and_survey_map_workflows \
             tests/test_analysis_workspace_qt.py::test_main_window_background_selector_updates_subtracted_foreground_and_overlay
 
+      - name: Saved overlay label visibility test
+        run: pytest -q tests/test_analysis_workspace_qt.py::test_main_window_exposes_log_scale_and_peak_label_toggles
+
       - name: Calibration workspace Qt tests
         run: pytest -q tests/test_calibration_workspace_qt.py
+
+      - name: HPGe efficiency calibration and profile tests
+        run: |
+          pytest -q tests/test_hpge_efficiency_models.py
+          pytest -q tests/test_hpge_efficiency_dialog_qt.py
+          pytest -q tests/test_hpge_profile_persistence.py
+          pytest -q tests/test_hpge_profile_integration_qt.py
 
       - name: Unfolding workspace Qt tests
         run: pytest -q tests/test_unfolding_workspace_qt.py
@@ -192,81 +228,3 @@ jobs:
 
       - name: Predictive dashboard Qt tests
         run: pytest -q tests/test_predictive_dashboard_qt.py
-
-  native-desktop-gui-linux:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Linux desktop GUI deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-tk xvfb xauth imagemagick
-          python -m pip install --upgrade pip
-          python -m pip install -e '.[dev,gui-test]'
-
-      - name: Legacy desktop GUI acceptance (Linux/Xvfb)
-        env:
-          PYTHONPATH: src
-        run: |
-          pytest -q \
-            tests/test_gui_app.py \
-            tests/test_gui_desktop_native.py \
-            -W error::matplotlib.MatplotlibDeprecationWarning
-
-      - name: Build Linux legacy GUI evidence bundle
-        env:
-          PYTHONPATH: src
-          FLUXFORGE_OFFLINE: '1'
-        run: |
-          xvfb-run -a python tests/gui_desktop_driver.py artifacts/gui_review/linux
-
-      - name: Upload Linux legacy GUI evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: fluxforge-gui-legacy-review-linux
-          path: artifacts/gui_review/linux
-
-  native-desktop-gui-windows:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Windows desktop GUI deps
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[dev,gui-test]"
-
-      - name: Legacy desktop GUI acceptance (Windows)
-        env:
-          PYTHONPATH: src
-          FLUXFORGE_OFFLINE: '1'
-        run: |
-          pytest -q tests/test_gui_desktop_native.py
-
-      - name: Build Windows legacy GUI evidence bundle
-        env:
-          PYTHONPATH: src
-          FLUXFORGE_OFFLINE: '1'
-        run: |
-          python tests/gui_desktop_driver.py artifacts/gui_review/windows
-
-      - name: Upload Windows legacy GUI evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: fluxforge-gui-legacy-review-windows
-          path: artifacts/gui_review/windows

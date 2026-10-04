@@ -22,6 +22,7 @@ dev = [
     "pytest>=8.0",
     "black==24.10.*",
     "flake8==7.3.*",
+    "jsonschema>=4.0",
 ]
 native-gui = [
     "PySide6>=6.6",
@@ -46,7 +47,6 @@ reporting = [
 [project.scripts]
 fluxforge = "fluxforge.cli.app:main"
 fluxforge-gui = "fluxforge.gui.app:main"
-fluxforge-gui-legacy = "fluxforge_gui.app:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
@@ -57,6 +57,7 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["fluxforge", "fluxforge.*"]
 
 [tool.setuptools.package-data]
 fluxforge = [
@@ -65,6 +66,7 @@ fluxforge = [
     "data/*.dat",
     "data/*.npz",
     "data/*.uT12",
+    "data/backgrounds/*.ASC",
     "gui/themes/*.qss",
     "reporting/templates/*.j2",
     "resources/schemas/*.xsd",

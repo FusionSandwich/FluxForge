@@ -865,15 +865,19 @@ def _values_close(
 
 def _resolve_tolerance(path: str, tolerances: dict[str, float], *, suffix: str) -> float | None:
     lowered_path = path.lower()
-    selected: float | None = None
-    for key, value in tolerances.items():
-        if not key.lower().endswith(suffix):
-            continue
-        token = key[: -len(suffix)].lower()
-        if token and token in lowered_path:
-            selected = float(value)
-            break
-    return selected
+    # Peak-search JSON uses plural arrays while the shared manifest schema
+    # declares a per-energy tolerance. Match the actual field names explicitly;
+    # do not broaden tolerance matching to unrelated numeric output fields.
+    energy_alias = lowered_path.replace(".energies_kev[", ".energy_kev[")
+    energy_alias = energy_alias.replace(".first_peak_kev", ".energy_kev")
+    for candidate_path in (lowered_path, energy_alias):
+        for key, value in tolerances.items():
+            if not key.lower().endswith(suffix):
+                continue
+            token = key[: -len(suffix)].lower()
+            if token and token in candidate_path:
+                return float(value)
+    return None
 
 
 def _spectrum_from_payload(payload: dict[str, Any]) -> GammaSpectrum:

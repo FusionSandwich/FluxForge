@@ -12,6 +12,10 @@ FluxForge has two primary user entrypoints:
 If you are new to the project, start with the installation steps below, then
 run `fluxforge commands` to see the grouped CLI surface.
 
+The [October 2026 adversarial acceptance follow-up](docs/reviews/ADVERSARIAL_ACCEPTANCE_2026-10-02.md)
+documents the integrated fixes, reproducible test runner, full RAFM replay
+results, and remaining scientific qualification requirements.
+
 ## What FluxForge Covers
 
 | Capability family | Typical use | Main entry points |
@@ -23,6 +27,11 @@ run `fluxforge commands` to see the grouped CLI surface.
 | k0-NAA | Normalize peak observations, characterize detector and facility state, analyze, aggregate, QA/QC, and report | `k0-normalize`, `k0-detector`, `k0-facility`, `k0-analyze`, `k0-aggregate`, `k0-qaqc`, `k0-report`, `k0-import-kayzero` |
 | Validation and replay | Run parity, crosswalk, release-gate, and bundled RAFM replay workflows | `parity-check`, `phase5-crosswalk-report`, `phase5-release-gate`, `rafm-validate`, `phase6-ldrd-worked-example` |
 | Desktop GUI | Review spectra interactively, zoom/pan, set ROI boundaries, and inspect linked analysis panels | `fluxforge gui`, `fluxforge-gui` |
+
+The PySide6/Qt application is the sole supported GUI. The older Tkinter interface
+and its test drivers are preserved in `archive/legacy_gui/` for historical
+reference and are excluded from releases. GUI improvements focus on spectrum
+review, navigation, and sample setup through unfolding.
 
 ## Quick GUI Setup
 
@@ -106,6 +115,11 @@ Use a maintained replay workflow such as `fluxforge rafm-validate ...` or
 `fluxforge phase6-ldrd-worked-example ...` when you want a fully populated
 activity/inventory/planning output chain backed by committed reference assets.
 
+The analysis workflow toolbar provides shortcuts to loading spectra, finding and
+reviewing peaks, calibration, irradiation history, unfolding, and report export.
+Unfolding can start without a spectrum: load measured RAFM reaction rates, or
+load reaction-rates JSON and a matching FluxForge response bundle JSON.
+
 ## First GUI Workflow
 
 Install the full user profile first:
@@ -124,6 +138,10 @@ FluxForge starts with an empty analyst workspace. Choose **File > Open
 Example** for the bundled deterministic HPGe example, or open your own spectrum
 with **File > Open Spectrum**. The equivalent one-command example launch is
 `fluxforge gui --project-dir . --open-example`.
+
+For measured detector calibration points, model review, CSV import, and the
+limits of fitted uncertainty and geometry metadata, see
+[HPGe efficiency calibration](docs/HPGE_EFFICIENCY_CALIBRATION.md).
 
 Recommended first files:
 

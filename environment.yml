@@ -1,7 +1,6 @@
 name: fluxforge
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - python=3.11
   - pip
@@ -13,11 +12,16 @@ dependencies:
   - numpy=1.26.*
   - scipy
   - pandas
-  - matplotlib
+  - matplotlib-base
   - pillow
-  - tk
   - pyyaml
   - h5py
+  - lxml
+  - pycairo
+  - pango
+  - pyside6>=6.6
+  - pyqtgraph>=0.13
   - pip:
-      - -e .
+      - -e .[dev,native-gui,gui-test,ml,bundle,reporting]
       - tensorflow==2.15.1
+      - pyunfold==0.5.0

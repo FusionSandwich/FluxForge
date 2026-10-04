@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import json
 from pathlib import Path
 
 
@@ -37,6 +38,17 @@ def _find_offenders(root: Path, *, skip_comments: bool) -> list[str]:
             continue
 
         text = path.read_text(encoding="utf-8", errors="ignore")
+        if path.name == "manifest.json":
+            payload = json.loads(text)
+            if (
+                isinstance(payload, dict)
+                and payload.get("source_repo")
+                and payload.get("fixture_id")
+            ):
+                # Historical source locations are provenance, not runtime paths.
+                # Keep scanning every input/output locator in the same manifest.
+                payload.pop("source_paths", None)
+                text = json.dumps(payload, indent=2)
         for lineno, line in enumerate(text.splitlines(), start=1):
             stripped = line.strip()
             if skip_comments and stripped.startswith("#"):
@@ -45,7 +57,12 @@ def _find_offenders(root: Path, *, skip_comments: bool) -> list[str]:
                 continue
 
             if any(pattern.search(line) for pattern in BANNED_PATTERNS):
-                offenders.append(f"{path.relative_to(REPO_ROOT)}:{lineno}: {stripped}")
+                display_path = (
+                    path.relative_to(REPO_ROOT)
+                    if path.is_relative_to(REPO_ROOT)
+                    else path.relative_to(root)
+                )
+                offenders.append(f"{display_path}:{lineno}: {stripped}")
 
     return offenders
 
@@ -68,3 +85,23 @@ def test_no_external_repo_path_literals_in_src() -> None:
     ), "Found external testing-repo path literals in FluxForge src:\n" + "\n".join(
         offenders
     )
+
+
+def test_provenance_exception_does_not_hide_runtime_inputs(tmp_path) -> None:
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "fixture_id": "contract",
+                "source_repo": "upstream/repo",
+                "source_paths": ["testing/upstream/historical.dat"],
+                "input_files": ["local.dat"],
+            }
+        )
+    )
+    assert _find_offenders(tmp_path, skip_comments=True) == []
+    payload = json.loads(manifest.read_text())
+    payload["input_files"] = ["testing/upstream/runtime.dat"]
+    manifest.write_text(json.dumps(payload))
+    offenders = _find_offenders(tmp_path, skip_comments=True)
+    assert len(offenders) == 1 and "runtime.dat" in offenders[0]

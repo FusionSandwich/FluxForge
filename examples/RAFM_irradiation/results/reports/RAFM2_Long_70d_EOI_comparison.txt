@@ -1,0 +1,42 @@
+Sample: RAFM2_Long_70d_EOI
+Raw file: C:\Users\joshu\.codex\worktrees\issue-audit-9-up\Fluxforge_1\examples\RAFM_irradiation\raw_gamma_spec\RAFM2\RAFM2_Long_70d_EOI.ASC
+QG file: none
+Sample group: unknown
+Irradiation phase: n/a
+Schedule source: n/a
+Decay label: n/a
+Decay time (s): n/a
+QG comparison stage: raw FluxForge peak/activity results before any Cd-ratio post-processing
+Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path
+
+Comparison basis: not_evaluated
+Raw comparison passed: not established
+
+Ambiguous observed components; isotope activities withheld
+----------------------------------------------------------
+- 103.10 keV | net=10817.00 +/- 984.79 | candidates=Ta182@100.11 | withheld_energy_mismatch
+- 204.32 keV | net=38372.00 +/- 1168.17 | candidates=W187@206.25 | withheld_energy_mismatch
+- 218.25 keV | net=3133.50 +/- 952.40 | candidates=Ta182@222.11 | withheld_energy_mismatch
+- 543.65 keV | net=955.50 +/- 219.77 | candidates=Tb154m@540.18 | withheld_energy_mismatch
+- 861.83 keV | net=676.00 +/- 234.28 | candidates=W187@864.60 | withheld_energy_mismatch
+- 1218.24 keV | net=183.00 +/- 62.33 | candidates=Ta182@1221.41 | withheld_energy_mismatch
+- 1328.40 keV | net=1730.85 +/- 580.75 | candidates=Sb124@1325.51 | withheld_energy_mismatch
+- 1350.50 keV | net=153.00 +/- 39.60 | candidates=Sb124@1355.11 | withheld_energy_mismatch
+
+Unidentifiable joint fit: channels [481, 507] | observed signed window counts=275119.47 +/- 525.62; no net peak area or isotope activity estimated | candidates=[{'isotope': 'W187', 'energy_keV': 246.3, 'intensity': 0.001134}, {'isotope': 'Tb154m', 'energy_keV': 247.94, 'intensity': 0.22}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [1281, 1315] | observed signed window counts=50339.61 +/- 225.41; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Sb124', 'energy_keV': 645.855, 'intensity': 0.0742}, {'isotope': 'Tb154m', 'energy_keV': 649.44, 'intensity': 0.109}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Unidentifiable joint fit: channels [1412, 1445] | observed signed window counts=45660.21 +/- 214.62; no net peak area or isotope activity estimated | candidates=[{'isotope': 'Sb124', 'energy_keV': 709.31, 'intensity': 0.0137}, {'isotope': 'Sb124', 'energy_keV': 713.781, 'intensity': 0.0228}] | messages=['Joint fit covariance is non-finite or unidentifiable', 'Joint fit covariance is non-finite or unidentifiable']
+Measurement-time activity audit
+-------------------------------
+Categories: activity_evidence_incomplete, library_or_assignment_limited
+EOI parity: not_evaluated_no_independent_eoi_reference
+Accuracy qualified: no (calibration and systematic budgets remain incomplete)
+
+No paired QG processed file was found for this raw spectrum.
+
+Unidentified FluxForge peaks
+---------------------------
+- 1460.21 keV | net=2881.24 +/- 70.38 | sig=40.94
+- 1763.73 keV | net=454.96 +/- 27.23 | sig=16.71
+- 2202.35 keV | net=209.47 +/- 16.13 | sig=12.99
+- 2613.05 keV | net=315.93 +/- 21.47 | sig=14.71

@@ -76,6 +76,9 @@ def snip_background(
 
     # LLS transformation: v = log(log(sqrt(y + 1) + 1) + 1)
     if lls_transform:
+        # Smoothing can undershoot below zero. Use a nonnegative search copy
+        # for SNIP's Poisson transform without changing the signed measurement.
+        y = np.maximum(y, 0.0)
         y = np.log(np.log(np.sqrt(y + 1) + 1) + 1)
 
     background = np.copy(y)

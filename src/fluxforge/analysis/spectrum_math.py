@@ -56,26 +56,57 @@ def _resample_background_to_sample_energy(
     if sample_energies is None or background_energies is None:
         return background, False
 
-    n_min = min(len(sample_energies), len(background_energies))
-    if len(sample_energies) == len(background_energies) and np.allclose(
-        sample_energies[:n_min], background_energies[:n_min], atol=atol_keV, rtol=rtol
+    for energies, spectrum in (
+        (sample_energies, sample),
+        (background_energies, background),
     ):
-        return background, False
+        if (
+            energies.shape != spectrum.counts.shape
+            or energies.ndim != 1
+            or np.any(~np.isfinite(energies))
+            or np.any(np.diff(energies) <= 0)
+        ):
+            raise ValueError(
+                "Energy alignment requires finite, increasing channel centers."
+            )
 
-    background_counts = np.asarray(background.counts, dtype=float)
-    background_unc = np.asarray(background.counts_uncertainty, dtype=float)
-    resampled_counts = np.interp(
-        sample_energies, background_energies, background_counts, left=0.0, right=0.0
-    )
-    resampled_variance = np.interp(
-        sample_energies,
-        background_energies,
-        background_unc**2,
-        left=0.0,
-        right=0.0,
-    )
+    if np.array_equal(sample_energies, background_energies):
+        if np.array_equal(sample.channels, background.channels):
+            return background, False
+        return (
+            GammaSpectrum(
+                counts=np.asarray(background.counts, dtype=float).copy(),
+                counts_uncertainty=np.asarray(
+                    background.counts_uncertainty, dtype=float
+                ).copy(),
+                channels=np.asarray(sample.channels).copy(),
+                energies=np.asarray(sample_energies, dtype=float).copy(),
+                live_time=float(background.live_time),
+                real_time=float(background.real_time),
+                start_time=background.start_time,
+                spectrum_id=background.spectrum_id,
+                detector_id=background.detector_id,
+                calibration=dict(sample.calibration),
+                metadata=dict(background.metadata),
+                counts_covariance=background.counts_covariance,
+            ),
+            True,
+        )
+
+    rebin = _histogram_overlap_operator(sample_energies, background_energies)
+    resampled_counts = rebin @ np.asarray(background.counts, dtype=float)
+    # W C W.T retains the covariance created when output channels share a
+    # source count. Its diagonal alone is insufficient for peak/ROI sums.
+    resampled_covariance = (
+        rebin @ background.count_covariance_matrix() @ rebin.T
+    ).tocsr()
+    resampled_covariance.eliminate_zeros()
+    resampled_variance = resampled_covariance.diagonal()
     metadata = dict(background.metadata)
     metadata["energy_resampled_to_sample_grid"] = True
+    metadata["energy_rebin_method"] = "integrated_counts_bin_overlap"
+    metadata["energy_bin_edge_policy"] = "midpoint_centers_exterior_half_spacing"
+    metadata["energy_coverage_policy"] = "source_target_overlap_only"
     metadata["resampled_from_energy_calibration"] = list(
         background.calibration.get("energy", [])
     )
@@ -92,9 +123,47 @@ def _resample_background_to_sample_energy(
             detector_id=background.detector_id,
             calibration=dict(sample.calibration),
             metadata=metadata,
+            counts_covariance=resampled_covariance,
         ),
         True,
     )
+
+
+def _histogram_overlap_operator(target_centers: np.ndarray, source_centers: np.ndarray):
+    """Sparse fractional source-bin overlap; no extrapolation or count-height interpolation."""
+    from scipy.sparse import coo_matrix
+
+    def edges(centers):
+        if len(centers) < 2:
+            raise ValueError(
+                "Rebinning requires at least two centers to infer bin widths."
+            )
+        midpoints = (centers[1:] + centers[:-1]) * 0.5
+        return np.concatenate(
+            (
+                [centers[0] - (centers[1] - centers[0]) * 0.5],
+                midpoints,
+                [centers[-1] + (centers[-1] - centers[-2]) * 0.5],
+            )
+        )
+
+    shape = (len(target_centers), len(source_centers))
+    if not all(shape):
+        return coo_matrix(shape, dtype=float).tocsr()
+    target, source = edges(target_centers), edges(source_centers)
+    rows, columns, fractions = [], [], []
+    i = j = 0
+    while i < shape[0] and j < shape[1]:
+        overlap = min(target[i + 1], source[j + 1]) - max(target[i], source[j])
+        if overlap > 0:
+            rows.append(i)
+            columns.append(j)
+            fractions.append(overlap / (source[j + 1] - source[j]))
+        if target[i + 1] <= source[j + 1]:
+            i += 1
+        else:
+            j += 1
+    return coo_matrix((fractions, (rows, columns)), shape=shape).tocsr()
 
 
 def _align_spectra(
@@ -153,8 +222,26 @@ def _align_spectra(
     )
 
 
+def _resize_count_covariance(spectrum: GammaSpectrum, size: int):
+    """Pad/crop a covariance matrix on an already aligned channel grid."""
+    from scipy.sparse import csr_matrix
+
+    covariance = spectrum.count_covariance_matrix().tocoo()
+    keep = (covariance.row < size) & (covariance.col < size)
+    return csr_matrix(
+        (covariance.data[keep], (covariance.row[keep], covariance.col[keep])),
+        shape=(size, size),
+    )
+
+
+def _sum_count_covariance(left: GammaSpectrum, right: GammaSpectrum, size: int):
+    if left.counts_covariance is None and right.counts_covariance is None:
+        return None
+    return _resize_count_covariance(left, size) + _resize_count_covariance(right, size)
+
+
 def add_spectra(left: GammaSpectrum, right: GammaSpectrum) -> GammaSpectrum:
-    """Add two spectra with channel alignment."""
+    """Add independently acquired spectra with channel alignment."""
     aligned = _align_spectra(left, right)
     variance = aligned.left_uncertainty**2 + aligned.right_uncertainty**2
     return GammaSpectrum(
@@ -166,11 +253,12 @@ def add_spectra(left: GammaSpectrum, right: GammaSpectrum) -> GammaSpectrum:
         calibration=aligned.calibration,
         spectrum_id=f"{left.spectrum_id}_plus_{right.spectrum_id}",
         metadata={"operation": "add"},
+        counts_covariance=_sum_count_covariance(left, right, len(aligned.channels)),
     )
 
 
 def subtract_spectra(left: GammaSpectrum, right: GammaSpectrum) -> GammaSpectrum:
-    """Subtract two spectra with channel alignment (left - right)."""
+    """Subtract independently acquired spectra (left - right)."""
     aligned = _align_spectra(left, right)
     variance = aligned.left_uncertainty**2 + aligned.right_uncertainty**2
     return GammaSpectrum(
@@ -182,6 +270,7 @@ def subtract_spectra(left: GammaSpectrum, right: GammaSpectrum) -> GammaSpectrum
         calibration=aligned.calibration,
         spectrum_id=f"{left.spectrum_id}_minus_{right.spectrum_id}",
         metadata={"operation": "subtract"},
+        counts_covariance=_sum_count_covariance(left, right, len(aligned.channels)),
     )
 
 
@@ -204,16 +293,17 @@ def moving_average(
     window = np.ones(2 * width + 1, dtype=float)
     smoothed = np.convolve(counts, window, mode="valid") / window.size
     channels = spectrum.channels[width:-width]
-    uncertainty = (
-        np.sqrt(
-            np.convolve(
-                np.asarray(spectrum.counts_uncertainty, dtype=float) ** 2,
-                window,
-                mode="valid",
-            )
-        )
-        / window.size
-    )
+    from scipy.sparse import coo_matrix
+
+    output_size = len(smoothed)
+    rows = np.repeat(np.arange(output_size), window.size)
+    columns = (np.arange(output_size)[:, None] + np.arange(window.size)).ravel()
+    transform = coo_matrix(
+        (np.full(len(rows), 1.0 / window.size), (rows, columns)),
+        shape=(output_size, len(counts)),
+    ).tocsr()
+    covariance = transform @ spectrum.count_covariance_matrix() @ transform.T
+    uncertainty = np.sqrt(covariance.diagonal())
 
     return GammaSpectrum(
         counts=smoothed,
@@ -224,6 +314,7 @@ def moving_average(
         calibration=spectrum.calibration,
         spectrum_id=f"{spectrum.spectrum_id}_smoothed",
         metadata={"operation": "moving_average", "width": width},
+        counts_covariance=covariance,
     )
 
 
@@ -235,31 +326,40 @@ def _resolve_scale_factor(
 ) -> float:
     mode = mode.lower()
     if mode == "live":
+        numerator = float(sample.live_time)
         denom = float(background.live_time)
-        if denom <= 0.0:
-            warnings.warn(
-                "Background live time is non-positive; using scale factor 1.0.",
-                RuntimeWarning,
-                stacklevel=3,
+        if (
+            not np.isfinite(numerator)
+            or numerator <= 0.0
+            or not np.isfinite(denom)
+            or denom <= 0.0
+        ):
+            raise ValueError(
+                "Live-time background scaling requires positive finite sample and background live times."
             )
-            return 1.0
-        return float(sample.live_time) / denom
+        return numerator / denom
 
     if mode == "real":
+        numerator = float(sample.real_time)
         denom = float(background.real_time)
-        if denom <= 0.0:
-            warnings.warn(
-                "Background real time is non-positive; using scale factor 1.0.",
-                RuntimeWarning,
-                stacklevel=3,
+        if (
+            not np.isfinite(numerator)
+            or numerator <= 0.0
+            or not np.isfinite(denom)
+            or denom <= 0.0
+        ):
+            raise ValueError(
+                "Real-time background scaling requires positive finite sample and background real times."
             )
-            return 1.0
-        return float(sample.real_time) / denom
+        return numerator / denom
 
     if mode == "manual":
         if manual_scale is None:
             raise ValueError("manual_scale must be provided when mode='manual'.")
-        return float(manual_scale)
+        scale = float(manual_scale)
+        if not np.isfinite(scale) or scale < 0.0:
+            raise ValueError("manual_scale must be finite and nonnegative.")
+        return scale
 
     raise ValueError(f"Unknown background scale mode: {mode}")
 
@@ -315,21 +415,41 @@ def subtract_measured_background(
             detector_id=sample.detector_id,
             calibration=dict(sample.calibration),
             metadata=dict(sample.metadata),
+            counts_covariance=sample.counts_covariance,
         )
 
     aligned_background, energy_aligned = _resample_background_to_sample_energy(
         sample, background
     )
     aligned = _align_spectra(sample, aligned_background)
+    # Background subtraction describes the measured sample, so extra
+    # background channels must not extend its count or energy grid.
+    sample_channels = len(sample.counts)
     scale_factor = _resolve_scale_factor(
         sample, background, mode=mode, manual_scale=manual_scale
     )
 
-    net_counts = aligned.left_counts - scale_factor * aligned.right_counts
+    net_counts = (
+        aligned.left_counts[:sample_channels]
+        - scale_factor * aligned.right_counts[:sample_channels]
+    )
     variance = (
-        aligned.left_uncertainty**2 + (scale_factor**2) * aligned.right_uncertainty**2
+        aligned.left_uncertainty[:sample_channels] ** 2
+        + (scale_factor**2) * aligned.right_uncertainty[:sample_channels] ** 2
     )
     net_uncertainty = np.sqrt(np.maximum(variance, 0.0))
+    covariance = None
+    if (
+        sample.counts_covariance is not None
+        or aligned_background.counts_covariance is not None
+    ):
+        background_covariance = _resize_count_covariance(
+            aligned_background, sample_channels
+        )
+        covariance = (
+            sample.count_covariance_matrix() + scale_factor**2 * background_covariance
+        )
+        net_uncertainty = np.sqrt(covariance.diagonal())
 
     negative_policy_normalized = negative_policy.lower()
     if negative_policy_normalized not in {"hybrid", "clip", "preserve"}:
@@ -361,6 +481,7 @@ def subtract_measured_background(
                 "clipped": clipped,
                 "background_spectrum_id": background.spectrum_id,
                 "energy_aligned": energy_aligned,
+                "count_covariance_propagated": covariance is not None,
             },
         }
     )
@@ -368,8 +489,12 @@ def subtract_measured_background(
     return GammaSpectrum(
         counts=net_counts,
         counts_uncertainty=net_uncertainty,
-        channels=aligned.channels,
-        energies=None,
+        channels=np.asarray(sample.channels).copy(),
+        energies=(
+            np.asarray(sample.energies, dtype=float).copy()
+            if sample.energies is not None
+            else None
+        ),
         live_time=float(sample.live_time),
         real_time=float(sample.real_time),
         start_time=sample.start_time,
@@ -377,6 +502,7 @@ def subtract_measured_background(
         detector_id=sample.detector_id,
         calibration=dict(sample.calibration),
         metadata=metadata,
+        counts_covariance=covariance,
     )
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fluxforge.analysis.astm_e262 import analyze_astm_e262_plan
 from fluxforge.cli import app as cli_app
-from fluxforge_gui.app import build_gui_astm_e262_preview
+from fluxforge.reporting.standards_preview import build_gui_astm_e262_preview
 
 
 def test_analyze_astm_e262_plan_radiometric_with_cd_pair(tmp_path: Path) -> None:

@@ -60,6 +60,29 @@ def test_spectrum_file_roundtrip(tmp_path):
     assert payload["provenance"]["units"]["energies"] == "keV"
 
 
+def test_spectrum_file_preserves_explicit_channel_uncertainty(tmp_path):
+    np, GammaSpectrum = _require_numpy()
+    spectrum = GammaSpectrum(
+        counts=np.array([0.0, 4.0, 9.0]),
+        counts_uncertainty=np.array([0.3, 1.5, 4.0]),
+        channels=np.array([0, 1, 2]),
+    )
+    output = tmp_path / "explicit-uncertainty.json"
+    write_spectrum_file(output, spectrum)
+    payload = read_spectrum_file(output)
+    assert validate_artifact(payload) == []
+    restored = GammaSpectrum.from_dict(payload["spectrum"])
+    np.testing.assert_array_equal(restored.counts_uncertainty, [0.3, 1.5, 4.0])
+
+
+def test_spectrum_uncertainty_defaults_for_legacy_payload():
+    np, GammaSpectrum = _require_numpy()
+    restored = GammaSpectrum.from_dict(
+        {"counts": [0.0, 4.0, -1.0], "channels": [0, 1, 2]}
+    )
+    np.testing.assert_array_equal(restored.counts_uncertainty, [0.0, 2.0, 0.0])
+
+
 def test_peak_report_roundtrip(tmp_path):
     _require_numpy()
     peaks = [

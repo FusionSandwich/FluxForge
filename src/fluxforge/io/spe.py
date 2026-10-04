@@ -35,6 +35,9 @@ class GammaSpectrum:
         Channel counts array
     counts_uncertainty : Optional[np.ndarray]
         Per-channel 1-sigma uncertainty (sqrt(counts) if not supplied)
+    counts_covariance : optional sparse matrix
+        Counting covariance for correlated channels. Its diagonal must equal
+        counts_uncertainty squared. Absent means independent channels.
     channels : np.ndarray
         Channel numbers
     energies : Optional[np.ndarray]
@@ -77,10 +80,44 @@ class GammaSpectrum:
     device_label: str = ""
     gps: Dict[str, Any] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    counts_covariance: Any = None
 
     def __post_init__(self):
         """Initialize derived fields."""
         self.counts = np.asarray(self.counts, dtype=float)
+
+        if self.counts_covariance is not None:
+            from scipy.sparse import csr_matrix
+
+            self.counts_covariance = csr_matrix(
+                self.counts_covariance, dtype=float, copy=True
+            )
+            covariance = self.counts_covariance
+            if covariance.shape != (len(self.counts), len(self.counts)):
+                raise ValueError(
+                    "counts_covariance must match the spectrum channel count."
+                )
+            if np.any(~np.isfinite(covariance.data)) or np.any(
+                covariance.diagonal() < 0
+            ):
+                raise ValueError(
+                    "counts_covariance must be finite with nonnegative diagonal."
+                )
+            difference = (covariance - covariance.T).tocoo()
+            if difference.nnz:
+                values = np.asarray(covariance[difference.row, difference.col]).ravel()
+                transposed = np.asarray(
+                    covariance[difference.col, difference.row]
+                ).ravel()
+                tolerance = 1e-10 + 1e-10 * np.maximum(
+                    np.abs(values), np.abs(transposed)
+                )
+                if np.any(np.abs(difference.data) > tolerance):
+                    raise ValueError("counts_covariance must be symmetric.")
+                # Sparse products may differ by roundoff in symmetric entries.
+                self.counts_covariance = (covariance + covariance.T) * 0.5
+            if self.counts_uncertainty is None:
+                self.counts_uncertainty = np.sqrt(covariance.diagonal())
 
         if self.counts_uncertainty is None:
             self.counts_uncertainty = np.sqrt(np.maximum(self.counts, 0.0))
@@ -90,6 +127,19 @@ class GammaSpectrum:
                 raise ValueError(
                     "counts_uncertainty must have the same shape as counts."
                 )
+        if np.any(~np.isfinite(self.counts_uncertainty)) or np.any(
+            self.counts_uncertainty < 0
+        ):
+            raise ValueError("counts_uncertainty must be finite and nonnegative.")
+        if self.counts_covariance is not None and not np.allclose(
+            self.counts_uncertainty**2,
+            self.counts_covariance.diagonal(),
+            rtol=1e-10,
+            atol=1e-10,
+        ):
+            raise ValueError(
+                "counts_covariance diagonal must match counts_uncertainty squared."
+            )
 
         raw_channels = np.asarray(self.channels)
         if len(raw_channels) == 0 and len(self.counts) > 0:
@@ -224,7 +274,7 @@ class GammaSpectrum:
         counts : float
             Total counts in range
         uncertainty : float
-            Poisson uncertainty (sqrt(counts))
+            Propagated counting uncertainty, including channel covariance.
         """
         if use_energy:
             ch_min = self.energy_to_channel(e_min)
@@ -234,8 +284,33 @@ class GammaSpectrum:
 
         mask = (self.channels >= ch_min) & (self.channels <= ch_max)
         total = self.counts[mask].sum()
-        total_unc = np.sqrt(np.sum(self.counts_uncertainty[mask] ** 2))
+        total_unc = np.sqrt(self.weighted_counts_variance(mask.astype(float)))
         return float(total), float(total_unc)
+
+    def count_covariance_matrix(self):
+        """Return sparse counting covariance, using independent channels if absent."""
+        from scipy.sparse import diags
+
+        if self.counts_covariance is not None:
+            return self.counts_covariance
+        return diags(self.counts_uncertainty**2, format="csr")
+
+    def weighted_counts_variance(self, weights: np.ndarray) -> float:
+        """Variance of a linear count sum, including shared background counts."""
+        weights = np.asarray(weights, dtype=float)
+        if weights.shape != self.counts.shape or np.any(~np.isfinite(weights)):
+            raise ValueError("Count weights must be finite and match spectrum counts.")
+        if self.counts_covariance is None:
+            variance = float(np.sum((weights * self.counts_uncertainty) ** 2))
+        else:
+            variance = float(weights @ (self.counts_covariance @ weights))
+        if not np.isfinite(variance):
+            raise ValueError("Count sum variance must be finite.")
+        if variance < -1e-10:
+            raise ValueError(
+                "counts_covariance gives negative variance for this count sum."
+            )
+        return max(variance, 0.0)
 
     @property
     def dead_time_fraction(self) -> float:
@@ -260,6 +335,16 @@ class GammaSpectrum:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
+        covariance_payload = None
+        if self.counts_covariance is not None:
+            covariance = self.counts_covariance.tocoo()
+            covariance_payload = {
+                "format": "coo",
+                "shape": list(covariance.shape),
+                "row": covariance.row.tolist(),
+                "col": covariance.col.tolist(),
+                "data": covariance.data.tolist(),
+            }
         return {
             "counts": self.counts.tolist(),
             "counts_uncertainty": (
@@ -280,11 +365,23 @@ class GammaSpectrum:
             "device_label": self.device_label,
             "gps": self.gps,
             "metadata": self.metadata,
+            "counts_covariance": covariance_payload,
         }
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "GammaSpectrum":
         """Create GammaSpectrum from dictionary."""
+        covariance = None
+        payload = data.get("counts_covariance")
+        if payload is not None:
+            from scipy.sparse import coo_matrix
+
+            if payload.get("format") != "coo":
+                raise ValueError("Unknown counts_covariance serialization format.")
+            covariance = coo_matrix(
+                (payload["data"], (payload["row"], payload["col"])),
+                shape=tuple(payload["shape"]),
+            ).tocsr()
         return cls(
             counts=np.array(data["counts"]),
             counts_uncertainty=(
@@ -309,6 +406,7 @@ class GammaSpectrum:
             device_label=data.get("device_label", ""),
             gps=data.get("gps", {}),
             metadata=data.get("metadata", {}),
+            counts_covariance=covariance,
         )
 
 

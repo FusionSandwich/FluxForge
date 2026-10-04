@@ -106,6 +106,9 @@ def read_meshtal_hdf5(h5_path: str, tally_id: int) -> Dict[str, Any]:
         # Navigate to tally group
         # Structure varies by MCNP version, this is a common one
         tally_path = f"tallies/tally_{tally_id}"
+        mesh_path = f"results/mesh_tally/mesh_tally_{tally_id}"
+        if tally_path not in f and mesh_path in f:
+            tally_path = mesh_path
         if tally_path not in f:
             # Try searching
             found = False
@@ -134,10 +137,21 @@ def read_meshtal_hdf5(h5_path: str, tally_id: int) -> Dict[str, Any]:
             results["flux"] = grp["flux"][:]
             if "relative_error" in grp:
                 results["error"] = grp["relative_error"][:]
+        elif "mean" in grp:
+            results["flux"] = grp["mean"][:]
+            if "relative_standard_error" in grp:
+                results["error"] = grp["relative_standard_error"][:]
+        else:
+            raise ValueError(f"Tally {tally_id} has no supported flux dataset.")
 
         # Read energy boundaries
         if "energy_bins" in grp:
             results["energy_boundaries"] = grp["energy_bins"][:]
+        elif "grid_energy" in grp:
+            # Preserve a vendor grid without guessing whether it denotes bin
+            # centers or limits. A caller needs that convention before rebinning.
+            results["energy_grid"] = grp["grid_energy"][:]
+            results["energy_grid_kind"] = "unspecified"
 
         # Read mesh boundaries
         if "spatial_bins" in grp:
