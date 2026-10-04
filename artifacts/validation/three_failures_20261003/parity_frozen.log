@@ -1,0 +1,38 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____________ test_reference_parity_suite_runs_all_fixture_families ____________
+
+    def test_reference_parity_suite_runs_all_fixture_families() -> None:
+        payload = run_reference_parity_suite(
+            reference_root=REFERENCE_ROOT,
+            activation_root=ACTIVATION_ROOT,
+            scope="all",
+            include_activation=True,
+        )
+    
+        assert payload["schema"] == "fluxforge.reference_parity.run.v1"
+        assert payload["summary"]["total"] >= 13
+>       assert payload["summary"]["failed"] == 0
+E       assert 1 == 0
+
+tests\test_reference_parity_runner.py:25: AssertionError
+_______ test_reference_parity_suite_supports_scope_and_fixture_filters ________
+
+    def test_reference_parity_suite_supports_scope_and_fixture_filters() -> None:
+        payload = run_reference_parity_suite(
+            reference_root=REFERENCE_ROOT,
+            activation_root=ACTIVATION_ROOT,
+            scope="algorithm",
+            fixture_id="minimal_peak_search_algorithm_case",
+            include_activation=False,
+        )
+    
+        assert payload["summary"]["total"] == 1
+>       assert payload["summary"]["passed"] == 1
+E       assert 0 == 1
+
+tests\test_reference_parity_runner.py:38: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_reference_parity_runner.py::test_reference_parity_suite_runs_all_fixture_families
+FAILED tests/test_reference_parity_runner.py::test_reference_parity_suite_supports_scope_and_fixture_filters
+2 failed in 10.28s

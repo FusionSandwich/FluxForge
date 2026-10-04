@@ -1,0 +1,45 @@
+.F                                                                       [100%]
+================================== FAILURES ===================================
+_____________ test_coordinate_click_dispatches_to_visible_control _____________
+
+driver = <module 'desktop_diagnostics_driver' from 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\tests\\gui_desktop_driver.py'>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000022098B55250>
+
+    def test_coordinate_click_dispatches_to_visible_control(driver, monkeypatch):
+        monkeypatch.setattr(driver.sys, "platform", "win32")
+        monkeypatch.setenv("GITHUB_ACTIONS", "false")
+        root = tk.Tk()
+        try:
+            root.geometry("600x300+0+0")
+            button = ttk.Button(root, text="Visible")
+            button.pack()
+            root.update()
+            backend = Mock()
+>           driver._click_widget(root, backend, button)
+
+tests\test_gui_desktop_driver_diagnostics.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = <tkinter.Tk object .>, backend = <Mock id='2339024230160'>
+widget = <tkinter.ttk.Button object .!button>
+
+    def _click_widget(root: tk.Tk, backend, widget: tk.Misc) -> None:
+        _scroll_widget_into_view(root, widget)
+        root.update_idletasks()
+        local_x = max(int(widget.winfo_width() / 2), 1)
+        local_y = max(int(widget.winfo_height() / 2), 1)
+        if sys.platform == "win32" and not _prefer_ci_safe_tk_events():
+            x, y = _center_of(widget)
+            hit = root.winfo_containing(x, y)
+            if hit is not widget:
+>               raise LookupError(
+                    f"Coordinate click target is clipped or occluded: {widget} "
+                    f"at ({x}, {y}) hits {hit}; "
+                    f"screen={root.winfo_screenwidth()}x{root.winfo_screenheight()}."
+                )
+E               LookupError: Coordinate click target is clipped or occluded: .!button at (308, 43) hits None; screen=1536x864.
+
+tests\gui_desktop_driver.py:266: LookupError
+=========================== short test summary info ===========================
+FAILED tests/test_gui_desktop_driver_diagnostics.py::test_coordinate_click_dispatches_to_visible_control
+1 failed, 1 passed in 10.81s

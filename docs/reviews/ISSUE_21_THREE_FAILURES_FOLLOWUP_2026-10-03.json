@@ -1,0 +1,139 @@
+{
+  "schema": "fluxforge.recorded_validation_failures.followup.v1",
+  "date": "2026-10-03",
+  "base_commit": "3ed85ee0ca9df39f0dbfe50499c485bca45d9d55",
+  "repair_commit": "51654ce6814c0547a52705369018cf495501beeb",
+  "environment_prefix": "C:/Users/Josh/.codex/environments/fluxforge-issue21-complete",
+  "pythonpath": "worktree/src",
+  "original_suite": {
+    "git_head": "36ed262f5fba11c6f9c92d1d182de977b11b565e",
+    "collected": 2081,
+    "passed": 2052,
+    "skipped": 26,
+    "failed": 3,
+    "unreported": 0
+  },
+  "original_files_sha256": [
+    {
+      "path": "C:\\Users\\Josh\\.codex\\worktrees\\issue21-frozen-validation\\FluxForge\\artifacts\\validation\\issue21_full_20261003\\core.cases.jsonl",
+      "sha256": "756fee3ecf1c4aaa854de620797272877a5e0b873a2594d47c5f2abb72f86ecf"
+    },
+    {
+      "path": "C:\\Users\\Josh\\.codex\\worktrees\\issue21-frozen-validation\\FluxForge\\artifacts\\validation\\issue21_full_20261003\\environment.json",
+      "sha256": "4ac056598b89232363589932710c4f80f1f7d22ed59059844f61d7093e40a208"
+    },
+    {
+      "path": "C:\\Users\\Josh\\.codex\\worktrees\\issue21-frozen-validation\\FluxForge\\artifacts\\validation\\issue21_resumed_20261003\\gui_39.cases.jsonl",
+      "sha256": "71c57905055bd99af2ffb75e822b48e3ae33fa952de6427158440005f5080e6b"
+    },
+    {
+      "path": "C:\\Users\\Josh\\.codex\\worktrees\\issue21-frozen-validation\\FluxForge\\artifacts\\validation\\issue21_resumed_20261003\\gui_39.log",
+      "sha256": "aadc4d3bf93d8da0b546406d0ff88d9e9b2bc3165a988ed41727de1e451ebabf"
+    },
+    {
+      "path": "C:\\Users\\Josh\\.codex\\worktrees\\issue21-frozen-validation\\FluxForge\\artifacts\\validation\\issue21_resumed_20261003\\source_environment.json",
+      "sha256": "4ac056598b89232363589932710c4f80f1f7d22ed59059844f61d7093e40a208"
+    },
+    {
+      "path": "C:\\Users\\Josh\\.codex\\worktrees\\issue21-frozen-validation\\FluxForge\\artifacts\\validation\\issue21_resumed_20261003\\summary.json",
+      "sha256": "e3f75bf2ab4f0423d68f3c4054f9fce1849b8761ef525abe10848528e25e0f76"
+    }
+  ],
+  "runs": [
+    {
+      "name": "frozen parity reproduction",
+      "git_head": "36ed262f5fba11c6f9c92d1d182de977b11b565e",
+      "junit": "parity_frozen.xml",
+      "result": {
+        "cases": 2,
+        "failed": 2,
+        "skipped": 0,
+        "seconds": 1.16
+      },
+      "junit_sha256": "948dc6686eae4779e80ec271edc4e6a2694408b466e39d032c4b63f28dc29c92"
+    },
+    {
+      "name": "published parity verification",
+      "git_head": "3ed85ee0ca9df39f0dbfe50499c485bca45d9d55",
+      "junit": "parity_3ed85ee.xml",
+      "result": {
+        "cases": 15,
+        "failed": 0,
+        "skipped": 0,
+        "seconds": 1.087
+      },
+      "junit_sha256": "81ef46caa43f8c80b03a32e01e6a9281c1f510d0f80ee31f65fb0a3e008b15e2"
+    },
+    {
+      "name": "unmodified coordinate replay",
+      "git_head": "3ed85ee0ca9df39f0dbfe50499c485bca45d9d55",
+      "github_actions": "false",
+      "junit": "coordinate_original.xml",
+      "result": {
+        "cases": 1,
+        "failed": 1,
+        "skipped": 0,
+        "seconds": 38.936
+      },
+      "junit_sha256": "6c010cc57eee64f717853b05fec49f77d72082a2ad537c365774be3d44766c9e"
+    },
+    {
+      "name": "guarded coordinate replay",
+      "git_head_at_launch": "3ed85ee0ca9df39f0dbfe50499c485bca45d9d55",
+      "source_equivalent_commit": "51654ce6814c0547a52705369018cf495501beeb",
+      "driver_modified_at_launch": true,
+      "github_actions": "false",
+      "junit": "coordinate_guarded.xml",
+      "run_json": "coordinate_failure.json",
+      "result": {
+        "cases": 1,
+        "failed": 1,
+        "skipped": 0,
+        "seconds": 25.593
+      },
+      "junit_sha256": "ff890695f5bf7bb6f7d24e7ca76bdc3c55871493dc024085494496aec8d9560c"
+    },
+    {
+      "name": "event mode replay",
+      "git_head": "51654ce6814c0547a52705369018cf495501beeb",
+      "github_actions": "true",
+      "junit": "event_mode.xml",
+      "run_json": "event_mode_run.json",
+      "result": {
+        "cases": 1,
+        "failed": 0,
+        "skipped": 0,
+        "seconds": 38.802
+      },
+      "junit_sha256": "2dc5aea023acdb5245649c4ab109e00fd77ed58f4ea063774186a3a656a3b25a"
+    },
+    {
+      "name": "final parity and driver contracts",
+      "git_head": "51654ce6814c0547a52705369018cf495501beeb",
+      "junit": "focused_final.xml",
+      "result": {
+        "cases": 17,
+        "failed": 0,
+        "skipped": 0,
+        "seconds": 3.352
+      },
+      "junit_sha256": "1343f970f3c88e38e8d32e1ae236f1082e4b0f35e57afedea600b98b70839358"
+    }
+  ],
+  "independent_parity_probe": {
+    "git_head": "3ed85ee0ca9df39f0dbfe50499c485bca45d9d55",
+    "checks": 25,
+    "passed": true,
+    "file": "parity_probe.json",
+    "sha256": "f9b43346fd2a5e4b1d351c596e2aca5dcd59aa265c25c7fa3c8bfe3490e428e7"
+  },
+  "resolved_original_failures": 2,
+  "unresolved_original_failures": 1,
+  "coordinate_workflow_passed": false,
+  "single_revision_full_suite_passed": false,
+  "integration": {
+    "parity_fix": "PR #217 a88a2c4 already present; no duplicate comparator implementation",
+    "legacy_gui": "Archive old GUI and improve new one owns Tk archival. Relocate diagnostics with archived driver or retire active legacy test; a passing physical coordinate replay remains unestablished.",
+    "new_issue_implementation": "out of scope"
+  }
+}

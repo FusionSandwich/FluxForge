@@ -1,0 +1,380 @@
+[
+  {
+    "text": "Run Ingest",
+    "target": ".!notebook.!frame.!button4",
+    "center": [
+      281,
+      486
+    ],
+    "hit": ".!notebook.!frame.!button4",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      281,
+      486
+    ]
+  },
+  {
+    "text": "Load Preview",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe.!frame.!button",
+    "center": [
+      105,
+      631
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe.!frame.!button",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      105,
+      631
+    ]
+  },
+  {
+    "text": "Auto-detect peaks",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe7.!button",
+    "center": [
+      262,
+      534
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe7.!button",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      262,
+      534
+    ]
+  },
+  {
+    "text": "Count selected peak",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe7.!button2",
+    "center": [
+      268,
+      630
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe7.!button2",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      268,
+      630
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry",
+    "center": [
+      218,
+      534
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      218,
+      534
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry2",
+    "center": [
+      218,
+      568
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry2",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      218,
+      568
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry3",
+    "center": [
+      218,
+      602
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry3",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      218,
+      602
+    ]
+  },
+  {
+    "text": "Add / Update ROI",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!frame.!button",
+    "center": [
+      196,
+      642
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!frame.!button",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      196,
+      642
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry2",
+    "center": [
+      218,
+      568
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry2",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      218,
+      568
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry3",
+    "center": [
+      218,
+      602
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!entry3",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      218,
+      602
+    ]
+  },
+  {
+    "text": "Add / Update ROI",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!frame.!button",
+    "center": [
+      196,
+      642
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe4.!frame.!button",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      196,
+      642
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry5",
+    "center": [
+      310,
+      534
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry5",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      310,
+      534
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry6",
+    "center": [
+      310,
+      568
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry6",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      310,
+      568
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry7",
+    "center": [
+      310,
+      602
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry7",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      310,
+      602
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry8",
+    "center": [
+      310,
+      636
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry8",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      310,
+      636
+    ]
+  },
+  {
+    "text": "Add point",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!frame2.!button2",
+    "center": [
+      392,
+      708
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!frame2.!button2",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      392,
+      708
+    ]
+  },
+  {
+    "text": "Pick selected peak",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!frame2.!button",
+    "center": [
+      248,
+      708
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!frame2.!button",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      248,
+      708
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry7",
+    "center": [
+      310,
+      602
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry7",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      310,
+      602
+    ]
+  },
+  {
+    "text": "entry",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry8",
+    "center": [
+      310,
+      636
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!entry8",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      310,
+      636
+    ]
+  },
+  {
+    "text": "Add point",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!frame2.!button2",
+    "center": [
+      392,
+      708
+    ],
+    "hit": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!frame2.!button2",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      392,
+      708
+    ]
+  },
+  {
+    "text": "Fit calibration",
+    "target": ".!notebook.!frame2.!frame.!canvas.!frame.!labelframe5.!frame2.!button3",
+    "center": [
+      523,
+      708
+    ],
+    "hit": ".!notebook.!frame2.!labelframe.!canvas",
+    "screen": [
+      1920,
+      1080
+    ],
+    "canvas_yview": null,
+    "center_after": [
+      523,
+      708
+    ]
+  }
+]

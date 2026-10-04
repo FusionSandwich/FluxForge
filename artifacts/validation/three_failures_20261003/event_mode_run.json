@@ -1,0 +1,135 @@
+{
+  "platform": "win32",
+  "input_profile": {
+    "widget_clicks": "tk-invoke-or-generated-event",
+    "github_actions": "true",
+    "notebook_tab_fallback": "programmatic-select",
+    "entry_text_fallback": "delete-insert",
+    "command_dispatch": "synchronous"
+  },
+  "source": {
+    "python": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete\\python.exe",
+    "prefix": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete",
+    "files_sha256": {
+      "tests\\gui_desktop_driver.py": "226072248acad79dc5b8da4cdf014d67f9ba87eec2b0475249b5468e9fcd5add",
+      "src\\fluxforge_gui\\app.py": "9dd09a674782d650c03426e195eb617e7bb8179bd510cb1cfadb5716750d31a8",
+      "src\\fluxforge_gui\\ui_builder.py": "a78d0a4d63908fb105d5aaba9312000e579f93a62bc735835e051e37dfcfd047"
+    }
+  },
+  "offline_mode": true,
+  "screenshots": [
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\01-launch.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\02-spectrum-loaded.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\03-roi-calibration.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\04-peaks-artifact.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\05-activity-summary.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\06-rates-summary.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\07-standards-preset.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\08-unfold-compare.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\09-report-plots.png"
+  ],
+  "artifacts": [
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\ti_rafm_1a_25cm_ingested.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\gui_preview_native.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\cli_spectrum_plot.png",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\peaks.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\activities.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\rates.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_rois.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_peak_report.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\response.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\unfold.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\validation.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\k0_report.json",
+    "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\plot_suite"
+  ],
+  "cli_commands": {
+    "spectrum_plot": "fluxforge spectrum-plot --input 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\ti_rafm_1a_25cm_ingested.json' --output 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\cli_spectrum_plot.png' --background-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\examples\\RAFM_irradiation\\background.ASC' --manual-peaks-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_rois.json' --save-peak-report 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_peak_report.json' --title 'FluxForge RAFM Native Desktop Acceptance' --y-log",
+    "plot_suite": "fluxforge plots --example --unfold-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\unfold.json' --response-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\response.json' --rates-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\rates.json' --output-dir 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\plot_suite' --format png"
+  },
+  "steps": [
+    {
+      "step": "launch",
+      "title": "FluxForge GUI (Spectrum + Workflow MVP)"
+    },
+    {
+      "step": "ingest_raw",
+      "input": "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Ti-RAFM-1a_25cm.ASC",
+      "background": "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\examples\\RAFM_irradiation\\background.ASC",
+      "output": "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\ti_rafm_1a_25cm_ingested.json"
+    },
+    {
+      "step": "load_preview",
+      "preview_status": "Detected 4 peaks using segmented + line_match from decay_2012.",
+      "spectrum_label": "Ti-RAFM-1a @25cm"
+    },
+    {
+      "step": "peak_selection",
+      "peak_count": 4,
+      "selected_peak_energy_keV": 76.243018592,
+      "count_summary": "gaussian_fit: net 5837.288 \u00b1 127.286, gross 30271.343 \u00b1 173.987, ROI channels 130-174."
+    },
+    {
+      "step": "roi_edit",
+      "roi_count": 1,
+      "roi_bounds": [
+        360.0,
+        540.0
+      ]
+    },
+    {
+      "step": "calibration",
+      "point_count": 2,
+      "coefficients": [
+        "0",
+        "0.501598684211",
+        "0",
+        "0"
+      ]
+    },
+    {
+      "step": "save_png",
+      "output": "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\gui_preview_native.png"
+    },
+    {
+      "step": "run_spectrum_plot",
+      "command": "fluxforge spectrum-plot --input 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\ti_rafm_1a_25cm_ingested.json' --output 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\cli_spectrum_plot.png' --background-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\examples\\RAFM_irradiation\\background.ASC' --manual-peaks-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_rois.json' --save-peak-report 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_peak_report.json' --title 'FluxForge RAFM Native Desktop Acceptance' --y-log",
+      "last_cli": "fluxforge spectrum-plot --input 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\ti_rafm_1a_25cm_ingested.json' --output 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\cli_spectrum_plot.png' --background-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\examples\\RAFM_irradiation\\background.ASC' --manual-peaks-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_rois.json' --save-peak-report 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\manual_peak_report.json' --title 'FluxForge RAFM Native Desktop Acceptance' --y-log"
+    },
+    {
+      "step": "run_peaks",
+      "output": "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\peaks.json"
+    },
+    {
+      "step": "run_activity",
+      "output": "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\activities.json",
+      "summary": "Lines: 26 | Total activity: 2.905 Bq | Median relative \u03c3: 0.0382 | Strongest: unknown 161.1 keV"
+    },
+    {
+      "step": "run_rates",
+      "output": "C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\rates.json",
+      "summary": "Reactions: 26 | Sum rate: 5.81 reactions/s | Median relative \u03c3: 0.0382 | Largest: unknown"
+    },
+    {
+      "step": "standards_preset",
+      "preset": "k0-NAA",
+      "data_source": "k0_naa_monitors",
+      "status": "k0-NAA monitor constants (naa-reference) | Comparator and Cd-ratio monitor constants used in FluxForge k0 workflows. | monitor_count=7 | capabilities=k0-naa, monitor-selection"
+    },
+    {
+      "step": "unfold_preview",
+      "response_status": "Loaded response bundle with 2 reactions and 2 energy groups from response.json.",
+      "unfold_summary": "Method: GLS | \u03c7\u00b2: 0.35 | Peak group: 1e-05\u20130.001 eV | Integral flux: 4 | Iterations: 12 | Converged"
+    },
+    {
+      "step": "compare_summary",
+      "summary": "MAE: 0.02 | RMSE: 0.03 | CHI2: 0.8 | Flux norm ratio: 0.9667 | Max |residual|: 0.2"
+    },
+    {
+      "step": "run_plot_suite",
+      "command": "fluxforge plots --example --unfold-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\unfold.json' --response-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\response.json' --rates-file 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\rates.json' --output-dir 'C:\\Users\\Josh\\.codex\\worktrees\\validation-three-failures-20261003\\FluxForge\\artifacts\\validation\\three_failures_20261003\\event_mode_tmp\\test_native_desktop_gui_workfl0\\native_desktop_run\\plot_suite' --format png",
+      "plot_count": 6
+    }
+  ],
+  "status": "ok"
+}
