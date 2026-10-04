@@ -1,0 +1,18 @@
+{
+  "full_replay_code_commit": "99fa6c406dd9463ba78f122135d853de321bdec3",
+  "patched_code_commit": "6a4bc97b6c6e18b7913794f3a6b151e9e3337843",
+  "patch_scope": "Generic count-average and report-only activity-reference labels; numerical expressions unchanged",
+  "source_case": "RAFM-A-24hr",
+  "workflow_stem": "RAFM3-A_24hrEOI",
+  "old_artifact_sha256": "a7e5f8383e802ce77b82f91ae5e3050431e23ff8ed758c4ee03b4687665a0a16",
+  "patched_artifact_sha256": "a1b5f368bc438d08b60d8623d7000897c09696defe03d0cb81c76070b0afd8e4",
+  "isotope_payload_numerically_identical": true,
+  "tested_labels": {
+    "W187": "count_average_live_normalized",
+    "Cr51": "count_average_live_normalized",
+    "Mn56": "count_average_live_normalized"
+  },
+  "tested_runtime": "supported Python 3.11 environment",
+  "focused_test_receipt": "integration_all_references.xml: 15 passed",
+  "full_replay_repeated_after_label_patch": false
+}

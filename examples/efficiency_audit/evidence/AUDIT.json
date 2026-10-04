@@ -1,0 +1,936 @@
+{
+  "schema": "source-efficiency-fidelity-v1",
+  "engine_commit": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "required_engine_ancestor": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "implementation_sha256": "2639ed8fde844a5389fe4caef8a5ead1ca5a624c5191ef5946f96ddde5e09eb0",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "executable": "D:\\CodexEnvs\\FluxForge\\optimization-workflows-win\\Scripts\\python.exe",
+  "numpy": "1.26.4",
+  "scipy": "1.17.1",
+  "inputs": {
+    "fixtures/manifest.json": "71c93a7c4d8da26a19aa2b607104fbf2e696263467de52eeee87922b9405b6d1",
+    "fixtures/Co-Cd-RAFM-1.ANS": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+    "fixtures/Co-Cd-RAFM-1.txt": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+    "fixtures/Fe-Cd-RAFM-1.txt": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+    "fixtures/RAFM-A-300s.ANS": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+    "fixtures/RAFM-A-300s.txt": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+    "examples/RAFM_irradiation/calibration/South Small Vial 25cm.csv": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+    "examples/RAFM_irradiation/calibration/South Small Vial 25cm.provenance.json": "da7f73fa80bb5c09f1314d9ff697f9b71014b7b685299807c8a3b872b89aa473",
+    "src/fluxforge/physics/efficiency_fidelity.py": "2639ed8fde844a5389fe4caef8a5ead1ca5a624c5191ef5946f96ddde5e09eb0",
+    "src/fluxforge/analysis/qg_calibration.py": "189342c706cc15eefb5b3eb8caaf8b313c3cf0e5f1662e2ad8d71c522a2d35be",
+    "src/fluxforge/io/flux_wire.py": "a477e35b9e819a69e16c8e48bb2d42c70c11a741c41f24de01a7cb7247dc54bd",
+    "src/fluxforge/data/xcom.py": "4d49c413ab8b9bbb4f77e5ae686b1dd9413e02f1a54d7409a5967880d2ef8a3b"
+  },
+  "source_fixture_origin": "FusionSandwich/FluxForge commit 46096eb1d8f760645b4c498b2a7bb50c9b63f262; examples/RAFM_irradiation/quantumgold_reference/originals; narrowly copied original bytes",
+  "selected_method": "south_source_export_percent",
+  "source_header": {
+    "source_sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+    "offsets": {
+      "A": 504,
+      "export_DI_slot": 520,
+      "C1": 524,
+      "C2": 528,
+      "C3": 532,
+      "C4": 536,
+      "Error_slot": 540,
+      "detector_thickness_cm": 640,
+      "diameter_cm": 644,
+      "source_distance_cm": 656,
+      "angle_deg": 660,
+      "window_um": 664,
+      "dead_layer_observed_um": 824
+    },
+    "values": {
+      "A": 0.0034769647754728794,
+      "export_DI_slot": 1.3899999856948853,
+      "C1": -20.25685691833496,
+      "C2": 10.287172317504883,
+      "C3": -1.655045986175537,
+      "C4": 0.0866563469171524,
+      "Error_slot": 4.5893419155618176e-05,
+      "detector_thickness_cm": 6.449999809265137,
+      "diameter_cm": 6.0,
+      "source_distance_cm": 25.0,
+      "angle_deg": 0.0,
+      "window_um": 1000.0,
+      "dead_layer_observed_um": 700.0
+    },
+    "detector_id": "South",
+    "scope": "byte-pinned rev4 study layout; saved header only",
+    "unsupported_details": [
+      "export DI slot is not established as physical detector thickness",
+      "Error scaling/semantics are unspecified; not standard uncertainty",
+      "dead layer at observed 824 matches report um; manual offset/unit differs",
+      "saved settings do not establish final report settings"
+    ]
+  },
+  "header_export_audit": {
+    "coefficients": {
+      "C1": {
+        "header_to_export": {
+          "value": -20.25685691833496,
+          "source_token": "-20.2569",
+          "delta": 4.308166504e-05,
+          "half_last_printed_digit": 5e-05,
+          "within_printed_rounding": true
+        },
+        "header_to_report": {
+          "value": -20.25685691833496,
+          "source_token": "-2.026E+01",
+          "delta": 0.00314308166504,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": true
+        },
+        "export_to_report": {
+          "value": -20.2569,
+          "source_token": "-2.026E+01",
+          "delta": 0.0031,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": true
+        }
+      },
+      "C2": {
+        "header_to_export": {
+          "value": 10.287172317504883,
+          "source_token": "10.2872",
+          "delta": -2.7682495117e-05,
+          "half_last_printed_digit": 5e-05,
+          "within_printed_rounding": true
+        },
+        "header_to_report": {
+          "value": 10.287172317504883,
+          "source_token": "1.029E+01",
+          "delta": -0.002827682495117,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": true
+        },
+        "export_to_report": {
+          "value": 10.2872,
+          "source_token": "1.029E+01",
+          "delta": -0.0028,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": true
+        }
+      },
+      "C3": {
+        "header_to_export": {
+          "value": -1.655045986175537,
+          "source_token": "-1.65505",
+          "delta": 4.013824463e-06,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": true
+        },
+        "header_to_report": {
+          "value": -1.655045986175537,
+          "source_token": "-1.655E+00",
+          "delta": -4.5986175537e-05,
+          "half_last_printed_digit": 0.0005,
+          "within_printed_rounding": true
+        },
+        "export_to_report": {
+          "value": -1.65505,
+          "source_token": "-1.655E+00",
+          "delta": -5e-05,
+          "half_last_printed_digit": 0.0005,
+          "within_printed_rounding": true
+        }
+      },
+      "C4": {
+        "header_to_export": {
+          "value": 0.0866563469171524,
+          "source_token": "0.0866563",
+          "delta": 4.69171524e-08,
+          "half_last_printed_digit": 5e-08,
+          "within_printed_rounding": true
+        },
+        "header_to_report": {
+          "value": 0.0866563469171524,
+          "source_token": "8.666E-02",
+          "delta": -3.6530828476e-06,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": true
+        },
+        "export_to_report": {
+          "value": 0.0866563,
+          "source_token": "8.666E-02",
+          "delta": -3.7e-06,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": true
+        }
+      },
+      "A": {
+        "header_to_export": {
+          "value": 0.0034769647754728794,
+          "source_token": "0.00347696",
+          "delta": 4.7754728794e-09,
+          "half_last_printed_digit": 5e-09,
+          "within_printed_rounding": true
+        },
+        "header_to_report": {
+          "value": 0.0034769647754728794,
+          "source_token": "3.48E-03",
+          "delta": -3.0352245271206e-06,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": true
+        },
+        "export_to_report": {
+          "value": 0.00347696,
+          "source_token": "3.48E-03",
+          "delta": -3.04e-06,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": true
+        }
+      }
+    },
+    "coefficient_round_trips_pass": true,
+    "export_DI_raw": 1.39,
+    "saved_DI_slot": 1.3899999856948853,
+    "physical_detector_thickness_cm": 6.449999809265137,
+    "thickness_geometry_anchors": {
+      "window_um": {
+        "status": "checked_declared_units",
+        "saved_raw": 1000.0,
+        "saved_unit": "um",
+        "report_token": "1000.000",
+        "report_unit": "um",
+        "saved_cm": 0.1,
+        "report_cm": 0.1,
+        "matches": true
+      },
+      "dead_layer_observed_um": {
+        "status": "checked_declared_units",
+        "saved_raw": 700.0,
+        "saved_unit": "um",
+        "report_token": "700.000",
+        "report_unit": "um",
+        "saved_cm": 0.07,
+        "report_cm": 0.07,
+        "matches": true
+      },
+      "detector_thickness_cm": {
+        "status": "checked_declared_units",
+        "saved_raw": 6.449999809265137,
+        "saved_unit": "cm",
+        "report_token": "6.450",
+        "report_unit": "cm",
+        "saved_cm": 6.449999809265137,
+        "report_cm": 6.45,
+        "matches": true
+      },
+      "diameter_cm": {
+        "status": "checked_declared_units",
+        "saved_raw": 6.0,
+        "saved_unit": "cm",
+        "report_token": "6.000",
+        "report_unit": "cm",
+        "saved_cm": 6.0,
+        "report_cm": 6.0,
+        "matches": true
+      },
+      "source_distance_cm": {
+        "status": "checked_declared_units",
+        "saved_raw": 25.0,
+        "saved_unit": "cm",
+        "report_token": "25.000",
+        "report_unit": "cm",
+        "saved_cm": 25.0,
+        "report_cm": 25.0,
+        "matches": true
+      },
+      "angle_deg": {
+        "value": 0.0,
+        "source_token": "0.000",
+        "delta": 0.0,
+        "half_last_printed_digit": 0.0005,
+        "within_printed_rounding": true,
+        "matches": true
+      }
+    },
+    "report_anchor_status": "corroborated_at_printed_precision",
+    "header_window_matches_export": true,
+    "header_dead_layer_matches_export": true,
+    "DI_mapping_status": "unsupported: exported DI differs from physical thickness",
+    "Error_export_raw": 0.00458934,
+    "Error_saved_raw": 4.5893419155618176e-05,
+    "Error_interpretation": "unspecified; never treated as uncertainty"
+  },
+  "saved_vs_report_conflict_control": {
+    "coefficients": {
+      "C1": {
+        "header_to_export": {
+          "value": -14.142889976501465,
+          "source_token": "-20.2569",
+          "delta": 6.114010023498535,
+          "half_last_printed_digit": 5e-05,
+          "within_printed_rounding": false
+        },
+        "header_to_report": {
+          "value": -14.142889976501465,
+          "source_token": "-2.026E+01",
+          "delta": 6.117110023498535,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": false
+        },
+        "export_to_report": {
+          "value": -20.2569,
+          "source_token": "-2.026E+01",
+          "delta": 0.0031,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": true
+        }
+      },
+      "C2": {
+        "header_to_export": {
+          "value": 7.2121124267578125,
+          "source_token": "10.2872",
+          "delta": -3.0750875732421874,
+          "half_last_printed_digit": 5e-05,
+          "within_printed_rounding": false
+        },
+        "header_to_report": {
+          "value": 7.2121124267578125,
+          "source_token": "1.029E+01",
+          "delta": -3.0778875732421875,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": false
+        },
+        "export_to_report": {
+          "value": 10.2872,
+          "source_token": "1.029E+01",
+          "delta": -0.0028,
+          "half_last_printed_digit": 0.005,
+          "within_printed_rounding": true
+        }
+      },
+      "C3": {
+        "header_to_export": {
+          "value": -1.1497282981872559,
+          "source_token": "-1.65505",
+          "delta": 0.505321701812744,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": false
+        },
+        "header_to_report": {
+          "value": -1.1497282981872559,
+          "source_token": "-1.655E+00",
+          "delta": 0.5052717018127441,
+          "half_last_printed_digit": 0.0005,
+          "within_printed_rounding": false
+        },
+        "export_to_report": {
+          "value": -1.65505,
+          "source_token": "-1.655E+00",
+          "delta": -5e-05,
+          "half_last_printed_digit": 0.0005,
+          "within_printed_rounding": true
+        }
+      },
+      "C4": {
+        "header_to_export": {
+          "value": 0.059289637953042984,
+          "source_token": "0.0866563",
+          "delta": -0.027366662046957015,
+          "half_last_printed_digit": 5e-08,
+          "within_printed_rounding": false
+        },
+        "header_to_report": {
+          "value": 0.059289637953042984,
+          "source_token": "8.666E-02",
+          "delta": -0.027370362046957017,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": false
+        },
+        "export_to_report": {
+          "value": 0.0866563,
+          "source_token": "8.666E-02",
+          "delta": -3.7e-06,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": true
+        }
+      },
+      "A": {
+        "header_to_export": {
+          "value": 0.00539964996278286,
+          "source_token": "0.00347696",
+          "delta": 0.00192268996278286,
+          "half_last_printed_digit": 5e-09,
+          "within_printed_rounding": false
+        },
+        "header_to_report": {
+          "value": 0.00539964996278286,
+          "source_token": "3.48E-03",
+          "delta": 0.00191964996278286,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": false
+        },
+        "export_to_report": {
+          "value": 0.00347696,
+          "source_token": "3.48E-03",
+          "delta": -3.04e-06,
+          "half_last_printed_digit": 5e-06,
+          "within_printed_rounding": true
+        }
+      }
+    },
+    "coefficient_round_trips_pass": false,
+    "export_DI_raw": 1.39,
+    "saved_DI_slot": 1.3899999856948853,
+    "physical_detector_thickness_cm": 6.449999809265137,
+    "thickness_geometry_anchors": {
+      "window_um": {
+        "status": "checked_declared_units",
+        "saved_raw": 1000.0,
+        "saved_unit": "um",
+        "report_token": "1000.000",
+        "report_unit": "um",
+        "saved_cm": 0.1,
+        "report_cm": 0.1,
+        "matches": true
+      },
+      "dead_layer_observed_um": {
+        "status": "checked_declared_units",
+        "saved_raw": 700.0,
+        "saved_unit": "um",
+        "report_token": "700.000",
+        "report_unit": "um",
+        "saved_cm": 0.07,
+        "report_cm": 0.07,
+        "matches": true
+      },
+      "detector_thickness_cm": {
+        "status": "checked_declared_units",
+        "saved_raw": 6.449999809265137,
+        "saved_unit": "cm",
+        "report_token": "6.450",
+        "report_unit": "cm",
+        "saved_cm": 6.449999809265137,
+        "report_cm": 6.45,
+        "matches": true
+      },
+      "diameter_cm": {
+        "status": "checked_declared_units",
+        "saved_raw": 6.0,
+        "saved_unit": "cm",
+        "report_token": "6.000",
+        "report_unit": "cm",
+        "saved_cm": 6.0,
+        "report_cm": 6.0,
+        "matches": true
+      },
+      "source_distance_cm": {
+        "status": "checked_declared_units",
+        "saved_raw": 20.0,
+        "saved_unit": "cm",
+        "report_token": "25.000",
+        "report_unit": "cm",
+        "saved_cm": 20.0,
+        "report_cm": 25.0,
+        "matches": false
+      },
+      "angle_deg": {
+        "value": 0.0,
+        "source_token": "0.000",
+        "delta": 0.0,
+        "half_last_printed_digit": 0.0005,
+        "within_printed_rounding": true,
+        "matches": true
+      }
+    },
+    "report_anchor_status": "contradiction",
+    "header_window_matches_export": true,
+    "header_dead_layer_matches_export": true,
+    "DI_mapping_status": "unsupported: exported DI differs from physical thickness",
+    "Error_export_raw": 0.00458934,
+    "Error_saved_raw": 7.912042929092422e-05,
+    "Error_interpretation": "unspecified; never treated as uncertainty"
+  },
+  "comparison_metadata": {
+    "selected_method": "south_source_export_percent",
+    "curves": [
+      {
+        "method_id": "south_source_export_percent",
+        "kind": "source_calibration_export",
+        "source_refs": [
+          "South Small Vial 25cm.csv:sha256:03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000"
+        ],
+        "geometry": {
+          "detector_id": "South HPGe",
+          "distance_cm": 25.0,
+          "sample_geometry": "small_vial_0.5mL",
+          "near_contact": false
+        },
+        "energy_range_keV": [
+          40.0,
+          1999.0
+        ],
+        "validation_status": "conditional_source_reproduction",
+        "attenuation_data": "vendor McMaster-based routines; unavailable; raw export only",
+        "formula": "original exported values / 100; unit conditional",
+        "interpolation": "linear in keV and original efficiency; adjacent positive rows only",
+        "count_basis": "not_applicable",
+        "energy_unit": "keV",
+        "output_efficiency_unit": "fraction",
+        "extrapolation": "forbidden",
+        "scientific_admission": false,
+        "physical_qualified": false
+      },
+      {
+        "method_id": "south_source_export_fraction",
+        "kind": "source_calibration_export",
+        "source_refs": [
+          "South Small Vial 25cm.csv:sha256:03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000"
+        ],
+        "geometry": {
+          "detector_id": "South HPGe",
+          "distance_cm": 25.0,
+          "sample_geometry": "small_vial_0.5mL",
+          "near_contact": false
+        },
+        "energy_range_keV": [
+          40.0,
+          1999.0
+        ],
+        "validation_status": "conditional_source_reproduction",
+        "attenuation_data": "vendor McMaster-based routines; unavailable; raw export only",
+        "formula": "original exported values / 1; unit conditional",
+        "interpolation": "linear in keV and original efficiency; adjacent positive rows only",
+        "count_basis": "not_applicable",
+        "energy_unit": "keV",
+        "output_efficiency_unit": "fraction",
+        "extrapolation": "forbidden",
+        "scientific_admission": false,
+        "physical_qualified": false
+      },
+      {
+        "method_id": "current_engine_header_model",
+        "kind": "model",
+        "source_refs": [
+          "Co-Cd-RAFM-1.ANS:sha256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4"
+        ],
+        "geometry": {
+          "detector_id": "South HPGe",
+          "distance_cm": 25.0,
+          "sample_geometry": "small_vial_0.5mL",
+          "near_contact": false
+        },
+        "energy_range_keV": [
+          40.0,
+          1999.0
+        ],
+        "validation_status": "unvalidated_model",
+        "attenuation_data": "FluxForge embedded XCOM-labeled Al/Ge; sha256:4d49c413ab8b9bbb4f77e5ae686b1dd9413e02f1a54d7409a5967880d2ef8a3b; densities 2.699,5.323 g/cm3; not vendor McMaster",
+        "formula": "existing EfficiencyCalibration.efficiency: cm times mu/rho, no density; ln residual; existing clipping retained",
+        "interpolation": "existing XCOM log-log linear; audit forbids extrapolation",
+        "count_basis": "not_applicable",
+        "energy_unit": "keV",
+        "output_efficiency_unit": "fraction",
+        "extrapolation": "forbidden",
+        "scientific_admission": false,
+        "physical_qualified": false
+      },
+      {
+        "method_id": "pgt_shaped_xcom_density_aware_ln",
+        "kind": "model",
+        "source_refs": [
+          "Co-Cd-RAFM-1.ANS:sha256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+          "xcom.py:sha256:4d49c413ab8b9bbb4f77e5ae686b1dd9413e02f1a54d7409a5967880d2ef8a3b",
+          "inputs:C1-C4=(-20.25685691833496, 10.287172317504883, -1.655045986175537, 0.0866563469171524);A=0.0034769647754728794;window_Al=Thickness(value=1000.0, unit='um');dead_Ge=Thickness(value=700.0, unit='um');active_Ge=Thickness(value=6.449999809265137, unit='cm');AI_deg=0.0"
+        ],
+        "geometry": {
+          "detector_id": "South HPGe",
+          "distance_cm": 25.0,
+          "sample_geometry": "small_vial_0.5mL",
+          "near_contact": false
+        },
+        "energy_range_keV": [
+          40.0,
+          1999.0
+        ],
+        "validation_status": "unvalidated_model",
+        "attenuation_data": "FluxForge embedded XCOM-labeled Al/Ge; sha256:4d49c413ab8b9bbb4f77e5ae686b1dd9413e02f1a54d7409a5967880d2ef8a3b; densities 2.699,5.323 g/cm3; not vendor McMaster",
+        "formula": "A*exp(-(mu_Al*t_window+mu_Ge*t_dead)/cos(AI))*(-expm1(-mu_Ge*t_active/cos(AI)))*P(ln(E_keV)); mu=mu/rho*rho",
+        "interpolation": "existing XCOM log-log linear; audit forbids extrapolation",
+        "count_basis": "not_applicable",
+        "energy_unit": "keV",
+        "output_efficiency_unit": "fraction",
+        "extrapolation": "forbidden",
+        "scientific_admission": false,
+        "physical_qualified": false
+      },
+      {
+        "method_id": "vendor_mcmaster_model",
+        "kind": "model",
+        "source_refs": [
+          "Co-Cd-RAFM-1.ANS:sha256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4"
+        ],
+        "geometry": {
+          "detector_id": "South HPGe",
+          "distance_cm": 25.0,
+          "sample_geometry": "small_vial_0.5mL",
+          "near_contact": false
+        },
+        "energy_range_keV": [
+          40.0,
+          1999.0
+        ],
+        "validation_status": "unvalidated_model",
+        "attenuation_data": "PGT McMaster routines with vendor edge/line extensions: unavailable",
+        "formula": "reported detector model times logarithmic residual; log convention/deployed version not established",
+        "interpolation": "vendor behavior unknown",
+        "count_basis": "not_applicable",
+        "energy_unit": "keV",
+        "output_efficiency_unit": "fraction",
+        "extrapolation": "forbidden",
+        "scientific_admission": false,
+        "physical_qualified": false
+      },
+      {
+        "method_id": "historical_report_effective",
+        "kind": "report_effective",
+        "source_refs": [
+          "Co-Cd-RAFM-1.ANS:sha256:d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:67",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:68",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:67",
+          "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:68"
+        ],
+        "geometry": {
+          "detector_id": "South HPGe",
+          "distance_cm": 25.0,
+          "sample_geometry": "small_vial_0.5mL",
+          "near_contact": false
+        },
+        "energy_range_keV": [
+          1173.13,
+          1332.44
+        ],
+        "validation_status": "conditional_report_reconstruction",
+        "attenuation_data": "embedded in report effective response; unspecified",
+        "formula": "N_QG/(A_line_Bq*live_seconds*historical_yield_fraction)",
+        "interpolation": "linear descriptive knots; not an independent calibration",
+        "count_basis": "historical_report_net",
+        "energy_unit": "keV",
+        "output_efficiency_unit": "fraction",
+        "extrapolation": "forbidden",
+        "scientific_admission": false,
+        "physical_qualified": false
+      }
+    ],
+    "interpretation": "conditional pointwise efficiency comparison; no activity correction"
+  },
+  "comparison_rows": 11760,
+  "statuses": {
+    "excluded_nonpositive_efficiency": 34,
+    "excluded_invalid_model_value": 34,
+    "unsupported_model": 1960,
+    "excluded_outside_range": 1801,
+    "conditional_comparison": 7931
+  },
+  "source_range_keV": [
+    40.0,
+    1999.0
+  ],
+  "source_rows": 1960,
+  "nonpositive_source_rows": 17,
+  "maximum_positive_source_knot_delta_fraction": 0.0,
+  "references": [
+    {
+      "reference_id": "source_holdout_100",
+      "source_id": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+      "origin": "source_export_holdout",
+      "fitted_source_reused": false,
+      "curve_source_reused": true,
+      "certificate_ref": null,
+      "independence_status": "same_curve_source",
+      "independent_absolute_validation": false,
+      "independent_validation_pass": false,
+      "control": {
+        "status": "known_value_control",
+        "passed": true,
+        "ratio": 1.0,
+        "suspected_percent_fraction_error": false
+      },
+      "evaluation": {
+        "energy_keV": 100.0,
+        "method_id": "south_source_export_percent",
+        "kind": "source_calibration_export",
+        "validation_status": "conditional_source_reproduction",
+        "efficiency_fraction": 0.0010023,
+        "admissible_for_comparison": true,
+        "scientific_admission": false,
+        "physical_qualified": false,
+        "curve_sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+        "unit_assumption": "percent",
+        "source_lines": [
+          66
+        ],
+        "raw_bracket_values": [
+          0.10023
+        ],
+        "status": "conditional_comparison"
+      },
+      "qualification": "pointwise control only; does not qualify the entire curve"
+    },
+    {
+      "reference_id": "source_holdout_500",
+      "source_id": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+      "origin": "source_export_holdout",
+      "fitted_source_reused": false,
+      "curve_source_reused": true,
+      "certificate_ref": null,
+      "independence_status": "same_curve_source",
+      "independent_absolute_validation": false,
+      "independent_validation_pass": false,
+      "control": {
+        "status": "known_value_control",
+        "passed": true,
+        "ratio": 1.0,
+        "suspected_percent_fraction_error": false
+      },
+      "evaluation": {
+        "energy_keV": 500.0,
+        "method_id": "south_source_export_percent",
+        "kind": "source_calibration_export",
+        "validation_status": "conditional_source_reproduction",
+        "efficiency_fraction": 0.000821244,
+        "admissible_for_comparison": true,
+        "scientific_admission": false,
+        "physical_qualified": false,
+        "curve_sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+        "unit_assumption": "percent",
+        "source_lines": [
+          466
+        ],
+        "raw_bracket_values": [
+          0.0821244
+        ],
+        "status": "conditional_comparison"
+      },
+      "qualification": "pointwise control only; does not qualify the entire curve"
+    },
+    {
+      "reference_id": "source_holdout_1000",
+      "source_id": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+      "origin": "source_export_holdout",
+      "fitted_source_reused": false,
+      "curve_source_reused": true,
+      "certificate_ref": null,
+      "independence_status": "same_curve_source",
+      "independent_absolute_validation": false,
+      "independent_validation_pass": false,
+      "control": {
+        "status": "known_value_control",
+        "passed": true,
+        "ratio": 1.0,
+        "suspected_percent_fraction_error": false
+      },
+      "evaluation": {
+        "energy_keV": 1000.0,
+        "method_id": "south_source_export_percent",
+        "kind": "source_calibration_export",
+        "validation_status": "conditional_source_reproduction",
+        "efficiency_fraction": 0.000444251,
+        "admissible_for_comparison": true,
+        "scientific_admission": false,
+        "physical_qualified": false,
+        "curve_sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+        "unit_assumption": "percent",
+        "source_lines": [
+          966
+        ],
+        "raw_bracket_values": [
+          0.0444251
+        ],
+        "status": "conditional_comparison"
+      },
+      "qualification": "pointwise control only; does not qualify the entire curve"
+    },
+    {
+      "reference_id": "source_holdout_1999",
+      "source_id": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+      "origin": "source_export_holdout",
+      "fitted_source_reused": false,
+      "curve_source_reused": true,
+      "certificate_ref": null,
+      "independence_status": "same_curve_source",
+      "independent_absolute_validation": false,
+      "independent_validation_pass": false,
+      "control": {
+        "status": "known_value_control",
+        "passed": true,
+        "ratio": 1.0,
+        "suspected_percent_fraction_error": false
+      },
+      "evaluation": {
+        "energy_keV": 1999.0,
+        "method_id": "south_source_export_percent",
+        "kind": "source_calibration_export",
+        "validation_status": "conditional_source_reproduction",
+        "efficiency_fraction": 0.00029946,
+        "admissible_for_comparison": true,
+        "scientific_admission": false,
+        "physical_qualified": false,
+        "curve_sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+        "unit_assumption": "percent",
+        "source_lines": [
+          1965
+        ],
+        "raw_bracket_values": [
+          0.029946
+        ],
+        "status": "conditional_comparison"
+      },
+      "qualification": "pointwise control only; does not qualify the entire curve"
+    }
+  ],
+  "report_effective_points": [
+    [
+      1173.13,
+      {
+        "status": "conditional_report_reconstruction",
+        "kind": "report_effective",
+        "efficiency_fraction": 0.00039387129281229694,
+        "count_basis": "historical_report_net",
+        "report_ref": "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:67",
+        "net_counts": 11202.0,
+        "activity_bq": 219.78,
+        "live_time_s": 129600.0,
+        "historical_yield_fraction": 0.9984999999999999,
+        "historical_yield_source_ref": "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:67",
+        "scientific_admission": false,
+        "independent_absolute_validation": false,
+        "interpretation": "effective response includes unresolved vendor conventions; not intrinsic efficiency"
+      }
+    ],
+    [
+      1332.44,
+      {
+        "status": "conditional_report_reconstruction",
+        "kind": "report_effective",
+        "efficiency_fraction": 0.0003582564126204385,
+        "count_basis": "historical_report_net",
+        "report_ref": "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:68",
+        "net_counts": 11439.0,
+        "activity_bq": 246.42000000000002,
+        "live_time_s": 129600.0,
+        "historical_yield_fraction": 0.9998,
+        "historical_yield_source_ref": "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:68",
+        "scientific_admission": false,
+        "independent_absolute_validation": false,
+        "interpretation": "effective response includes unresolved vendor conventions; not intrinsic efficiency"
+      }
+    ]
+  ],
+  "gamma_yields": [
+    {
+      "isotope": "Co60",
+      "energy_keV": 1173.13,
+      "historical_vs_modern": {
+        "historical": {
+          "value": 99.85,
+          "unit": "percent",
+          "source_ref": "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:67",
+          "role": "historical_report",
+          "fraction": 0.9984999999999999
+        },
+        "modern": null,
+        "modern_status": "unavailable",
+        "delta_fraction": null,
+        "interpretation": "yield-only comparison; neither efficiency nor activity is changed"
+      },
+      "existing_bundled_reference_qc": {
+        "reference_rad_int_reported_value": 99.85,
+        "reference_rad_int_reported_unit": "unspecified",
+        "reference_rad_int_percent_assumption_fraction": 0.9984999999999999,
+        "reference_rad_int_fraction_assumption": 99.85,
+        "yield_qc_status": "consistent_with_percent_assumption",
+        "yield_qc_report_only": true,
+        "scientific_admission": false,
+        "source_qualification": "vendor gamma library, calibration and history unqualified",
+        "bundled_line_match_tolerance_keV": 1.0,
+        "bundled_line_energy_keV": 1173.23,
+        "bundled_line_energy_delta_keV": -0.09999999999990905,
+        "bundled_emission_probability": 0.9984999999999999,
+        "bundled_intensity_uncertainty": 0.0003,
+        "bundled_intensity_unit": "photons/parent_decay",
+        "bundled_decay_data_path": "C:\\Users\\joshu\\fluxforge-worktrees\\efficiency-source-fidelity-237\\src\\fluxforge\\data\\rafm_decay_data.json",
+        "bundled_decay_data_sha256": "159e6dccd10532323f986dbe45d95b7d804b53c965d254863fbe63cae565c355",
+        "bundled_decay_data_origin": "decay_2012 via actigamma",
+        "bundled_uncertainty_source": "actigamma decay_2012 intensities_unc * norms",
+        "yield_qc_tolerance_fraction": 0.049925,
+        "yield_qc_tolerance_definition": "max(5% of bundled intensity, 3 * bundled uncertainty); reporting heuristic",
+        "percent_assumption_matches_bundled": true,
+        "fraction_assumption_matches_bundled": false
+      }
+    },
+    {
+      "isotope": "Co60",
+      "energy_keV": 1332.44,
+      "historical_vs_modern": {
+        "historical": {
+          "value": 99.98,
+          "unit": "percent",
+          "source_ref": "Co-Cd-RAFM-1.txt:sha256:01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4:line:68",
+          "role": "historical_report",
+          "fraction": 0.9998
+        },
+        "modern": null,
+        "modern_status": "unavailable",
+        "delta_fraction": null,
+        "interpretation": "yield-only comparison; neither efficiency nor activity is changed"
+      },
+      "existing_bundled_reference_qc": {
+        "reference_rad_int_reported_value": 99.98,
+        "reference_rad_int_reported_unit": "unspecified",
+        "reference_rad_int_percent_assumption_fraction": 0.9998,
+        "reference_rad_int_fraction_assumption": 99.98,
+        "yield_qc_status": "consistent_with_percent_assumption",
+        "yield_qc_report_only": true,
+        "scientific_admission": false,
+        "source_qualification": "vendor gamma library, calibration and history unqualified",
+        "bundled_line_match_tolerance_keV": 1.0,
+        "bundled_line_energy_keV": 1332.49,
+        "bundled_line_energy_delta_keV": -0.049999999999954525,
+        "bundled_emission_probability": 0.9998260000000001,
+        "bundled_intensity_uncertainty": 5.999999999999999e-06,
+        "bundled_intensity_unit": "photons/parent_decay",
+        "bundled_decay_data_path": "C:\\Users\\joshu\\fluxforge-worktrees\\efficiency-source-fidelity-237\\src\\fluxforge\\data\\rafm_decay_data.json",
+        "bundled_decay_data_sha256": "159e6dccd10532323f986dbe45d95b7d804b53c965d254863fbe63cae565c355",
+        "bundled_decay_data_origin": "decay_2012 via actigamma",
+        "bundled_uncertainty_source": "actigamma decay_2012 intensities_unc * norms",
+        "yield_qc_tolerance_fraction": 0.04999130000000001,
+        "yield_qc_tolerance_definition": "max(5% of bundled intensity, 3 * bundled uncertainty); reporting heuristic",
+        "percent_assumption_matches_bundled": true,
+        "fraction_assumption_matches_bundled": false
+      }
+    }
+  ],
+  "near_contact_fe_cd": {
+    "energy_keV": 1099.2,
+    "method_id": "south_source_export_percent",
+    "kind": "source_calibration_export",
+    "validation_status": "conditional_source_reproduction",
+    "efficiency_fraction": null,
+    "admissible_for_comparison": false,
+    "scientific_admission": false,
+    "physical_qualified": false,
+    "status": "excluded_near_contact_25cm_transfer"
+  },
+  "scientific_admission": false,
+  "independent_absolute_calibration_validation": "unavailable; source holds/algebra controls are not physical validation",
+  "limits": [
+    "Saved-header fields do not establish final-report settings",
+    "Percent export units are conditional; acquisition date/certificate/covariance/active identity unavailable",
+    "PGT manual v4.04.00 Appendix B; deployed version and proprietary McMaster details unavailable",
+    "CSV MuWin/MuGe fields are not accepted as independently identified attenuation tables",
+    "Local XCOM-labeled tables require separate source qualification; this example tests implementation only",
+    "Natural log is an explicit alternative convention, not a verified vendor implementation",
+    "The 0.5mL/25cm geometry for Co-Cd is an explicit nominal comparison assumption",
+    "Bundled decay_2012 QC is separate from modern evaluated yields, which are unavailable here",
+    "No activity adjustment, sample-specific fit or physical workflow integration performed"
+  ]
+}

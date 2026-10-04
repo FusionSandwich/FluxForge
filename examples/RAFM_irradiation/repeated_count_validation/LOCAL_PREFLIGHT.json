@@ -1,0 +1,395 @@
+{
+  "observed_utc": "2026-10-04T02:56:59.2132493Z",
+  "ram_total_bytes": 34260418560,
+  "ram_free_bytes": 8885534720,
+  "disks": [
+    {
+      "DeviceID": "C:",
+      "Size": 998965768192,
+      "FreeSpace": 34330693632
+    },
+    {
+      "DeviceID": "D:",
+      "Size": 2000397791232,
+      "FreeSpace": 171293163520
+    }
+  ],
+  "processes": [
+    {
+      "Name": "Memory Compression",
+      "Id": 3460,
+      "WorkingSet64": 1312018432,
+      "CPU": null
+    },
+    {
+      "Name": "codex",
+      "Id": 53792,
+      "WorkingSet64": 852877312,
+      "CPU": 60.0
+    },
+    {
+      "Name": "ChatGPT",
+      "Id": 12408,
+      "WorkingSet64": 756142080,
+      "CPU": 61.328125
+    },
+    {
+      "Name": "chrome",
+      "Id": 72164,
+      "WorkingSet64": 730976256,
+      "CPU": 789.8125
+    },
+    {
+      "Name": "MsMpEng",
+      "Id": 48656,
+      "WorkingSet64": 679632896,
+      "CPU": null
+    },
+    {
+      "Name": "chrome",
+      "Id": 21056,
+      "WorkingSet64": 616673280,
+      "CPU": 9593.390625
+    },
+    {
+      "Name": "chrome",
+      "Id": 44524,
+      "WorkingSet64": 545378304,
+      "CPU": 691.203125
+    },
+    {
+      "Name": "ChatGPT",
+      "Id": 22568,
+      "WorkingSet64": 541917184,
+      "CPU": 36.890625
+    },
+    {
+      "Name": "chrome",
+      "Id": 36016,
+      "WorkingSet64": 487989248,
+      "CPU": 202.859375
+    },
+    {
+      "Name": "chrome",
+      "Id": 61392,
+      "WorkingSet64": 475750400,
+      "CPU": 497.015625
+    },
+    {
+      "Name": "claude",
+      "Id": 57284,
+      "WorkingSet64": 464998400,
+      "CPU": 1941.484375
+    },
+    {
+      "Name": "chrome",
+      "Id": 58988,
+      "WorkingSet64": 455061504,
+      "CPU": 717.21875
+    },
+    {
+      "Name": "chrome",
+      "Id": 16480,
+      "WorkingSet64": 454868992,
+      "CPU": 208.28125
+    },
+    {
+      "Name": "chrome",
+      "Id": 53192,
+      "WorkingSet64": 439062528,
+      "CPU": 285.84375
+    },
+    {
+      "Name": "ChatGPT",
+      "Id": 39064,
+      "WorkingSet64": 424353792,
+      "CPU": 23.734375
+    }
+  ],
+  "executables": [
+    {
+      "Name": "python.exe",
+      "Source": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
+    },
+    {
+      "Name": "py.exe",
+      "Source": "C:\\Windows\\py.exe"
+    },
+    {
+      "Name": "git.exe",
+      "Source": "C:\\Program Files\\Git\\cmd\\git.exe"
+    },
+    {
+      "Name": "gh.exe",
+      "Source": "C:\\Program Files\\GitHub CLI\\gh.exe"
+    },
+    {
+      "Name": "rg.exe",
+      "Source": "C:\\Users\\joshu\\AppData\\Local\\OpenAI\\Codex\\bin\\f1e5e36960c35938\\rg.exe"
+    }
+  ],
+  "versions": [
+    "Python 3.12.10",
+    "git version 2.55.0.windows.3",
+    "gh version 2.95.0 (2026-06-17)",
+    "https://github.com/cli/cli/releases/tag/v2.95.0",
+    "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "pytest 8.4.2 numpy 2.5.1 scipy 1.18.0"
+  ],
+  "environments": [
+    {
+      "path": "C:\\Users\\joshu\\miniconda3",
+      "exists": false,
+      "listing": null
+    },
+    {
+      "path": "C:\\Users\\joshu\\anaconda3",
+      "exists": false,
+      "listing": null
+    },
+    {
+      "path": "C:\\Users\\joshu\\miniforge3",
+      "exists": false,
+      "listing": null
+    },
+    {
+      "path": "C:\\Users\\joshu\\.conda\\environments.txt",
+      "exists": false,
+      "listing": null
+    },
+    {
+      "path": "D:\\FluxForge_validation_20261003\\latest_integrated",
+      "exists": true,
+      "listing": [
+        {
+          "Name": ".github",
+          "Length": null
+        },
+        {
+          "Name": ".pytest_cache",
+          "Length": null
+        },
+        {
+          "Name": "artifacts",
+          "Length": null
+        },
+        {
+          "Name": "docs",
+          "Length": null
+        },
+        {
+          "Name": "examples",
+          "Length": null
+        },
+        {
+          "Name": "flux_unfolding_results",
+          "Length": null
+        },
+        {
+          "Name": "src",
+          "Length": null
+        },
+        {
+          "Name": "testing_validation",
+          "Length": null
+        },
+        {
+          "Name": "tests",
+          "Length": null
+        },
+        {
+          "Name": "tools",
+          "Length": null
+        },
+        {
+          "Name": ".flake8",
+          "Length": 542
+        },
+        {
+          "Name": ".gitattributes",
+          "Length": 929
+        },
+        {
+          "Name": ".gitignore",
+          "Length": 475
+        },
+        {
+          "Name": "CONTRIBUTING.md",
+          "Length": 2597
+        },
+        {
+          "Name": "environment.yml",
+          "Length": 461
+        }
+      ]
+    }
+  ],
+  "caches": [
+    {
+      "path": "C:\\Users\\joshu\\AppData\\Local\\pip\\Cache",
+      "exists": true,
+      "bytes": 996985.0,
+      "files": 24
+    },
+    {
+      "path": "C:\\Users\\joshu\\.cache",
+      "exists": true,
+      "bytes": 2777594103.0,
+      "files": 32481
+    },
+    {
+      "path": "C:\\Users\\joshu\\Downloads",
+      "exists": true,
+      "bytes": 17651610805.0,
+      "files": 7199
+    },
+    {
+      "path": "C:\\Users\\joshu\\miniconda3\\pkgs",
+      "exists": false,
+      "bytes": null,
+      "files": 0
+    },
+    {
+      "path": "C:\\Users\\joshu\\miniforge3\\pkgs",
+      "exists": false,
+      "bytes": null,
+      "files": 0
+    },
+    {
+      "path": "C:\\Users\\joshu\\AppData\\Local\\uv\\cache",
+      "exists": false,
+      "bytes": null,
+      "files": 0
+    }
+  ],
+  "local_sources": [
+    "worktree C:/Users/joshu/OneDrive/Documents/Fluxforge_1",
+    "HEAD c297542da781291c3d1461af181b79349bda3087",
+    "branch refs/heads/hpge/03-calibration-efficiency",
+    "",
+    "worktree C:/Users/joshu/.codex/worktrees/9e15/Fluxforge_1",
+    "HEAD cd9c0550ec803a733773c2e08063e2c69766256b",
+    "branch refs/heads/JS/hpge-03-calibration-efficiency",
+    "",
+    "worktree C:/Users/joshu/.codex/worktrees/activity-live-time/Fluxforge_1",
+    "HEAD c297542da781291c3d1461af181b79349bda3087",
+    "detached",
+    "",
+    "worktree C:/Users/joshu/.codex/worktrees/issue-audit-9-up/Fluxforge_1",
+    "HEAD 4fd83feccc1d76bc5d66d0d250fe65d381a379fa",
+    "branch refs/heads/JS/issue-audit-9-up",
+    "",
+    "worktree C:/Users/joshu/.codex/worktrees/physical-gls/Fluxforge_1",
+    "HEAD c297542da781291c3d1461af181b79349bda3087",
+    "detached",
+    "",
+    "worktree C:/Users/joshu/.codex/worktrees/review-193-204/Fluxforge_1",
+    "HEAD 9d04eff6ebc867227ae439ecdcc37ddb40732b7f",
+    "branch refs/heads/JS/physical-provenance-validation",
+    "",
+    "worktree C:/Users/joshu/.codex/worktrees/unfolding-issues-185-192/Fluxforge_1",
+    "HEAD 3c28ed922e8a51587da98a2b86e9ae102a5af417",
+    "branch refs/heads/JS/unfolding-issues-185-192",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/activity-combination-238",
+    "HEAD a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "branch refs/heads/activity-combination-238",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/efficiency-source-fidelity-237",
+    "HEAD a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "branch refs/heads/efficiency-source-fidelity-237",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/historical-qg-protocol-236",
+    "HEAD a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "branch refs/heads/historical-qg-protocol-236",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/joint-poisson-239",
+    "HEAD a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "branch refs/heads/joint-poisson-239",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/overlap-qualification-240",
+    "HEAD a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "branch refs/heads/overlap-qualification-240",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/qg-report-yield-qc",
+    "HEAD 46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+    "branch refs/heads/south-efficiency-working-baseline",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/registry-uncertainty-qualification",
+    "HEAD 1148e18a53a156d74029e84ed528e5fcd9cfd263",
+    "branch refs/heads/registry-uncertainty-qualification",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/response-identity-validation",
+    "HEAD cff9dc72eede0af0b33ffcf22f217aea783e2c82",
+    "branch refs/heads/response-identity-validation",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/unfolding-physics-fixes",
+    "HEAD b25ac3f7a7201d120a516ddfbda46eee67453e7e",
+    "branch refs/heads/unfolding-physics-fixes",
+    "",
+    "worktree C:/Users/joshu/fluxforge-worktrees/unfolding-publication-integrity",
+    "HEAD da0f0680a4d652c3428a9f592057f82940a1f95d",
+    "branch refs/heads/JS/unfolding-publication-integrity",
+    "",
+    "worktree D:/FluxForge_figure_ownership_fix",
+    "HEAD a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "branch refs/heads/unfolding-figure-ownership-20261003",
+    "",
+    "worktree D:/FluxForge_raw_efficiency_fix",
+    "HEAD e5b8621e0d2de0bef8b5c5ffbdb43b8a6e1baa3f",
+    "branch refs/heads/portable-raw-working-efficiency-20261003",
+    "",
+    "worktree D:/FluxForge_replay_identity_fix",
+    "HEAD bd111f91fcc8b585ce7508a05b9bca02959a4fee",
+    "branch refs/heads/portable-replay-engine-identity-20261003",
+    "",
+    "worktree D:/FluxForge_south_background_scenario",
+    "HEAD 5ceb557518b86f539408df3ae2bd8deb7226e5e7",
+    "branch refs/heads/south-native-background-scenario-20261003",
+    ""
+  ],
+  "ancestor_exit": 0,
+  "plan": {
+    "branch": "repeated-count-validation-241",
+    "reason": "existing local Python/pytest/numpy/scipy and verified engine suffice; no software acquisition",
+    "checkout_tracked_bytes": 204058167.0,
+    "rollback": "remove only this new worktree after preserving evidence; never modify primary checkout",
+    "checkout_budget_bytes": 408116334.0,
+    "target": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241",
+    "acquisition_bytes": 0
+  },
+  "supplemental_environment_observations": {
+    "python_launcher": [
+      " -V:3.12 *        C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      " -V:3.11          D:\\openc-hts-dpa-data\\mlip-local\\Python311\\python.exe",
+      " -V:3.9           C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python39\\python.exe"
+    ],
+    "existing_fluxforge_environment": "D:\\CodexEnvs\\FluxForge\\optimization-workflows-win",
+    "environment_cfg": [
+      "home = D:\\openc-hts-dpa-data\\mlip-local\\Python311",
+      "include-system-site-packages = false",
+      "version = 3.11.9",
+      "executable = D:\\openc-hts-dpa-data\\mlip-local\\Python311\\python.exe",
+      "command = D:\\openc-hts-dpa-data\\mlip-local\\Python311\\python.exe -m venv D:\\CodexEnvs\\FluxForge\\optimization-workflows-win"
+    ],
+    "data_cache_roots": [
+      "D:\\conda-pkgs\\cache",
+      "D:\\miniforge3\\pkgs"
+    ],
+    "existing_local_capabilities_sufficient": true,
+    "no_acquisition_performed": true,
+    "data_drive_cache_inventory": [
+      {
+        "path": "D:\\conda-pkgs",
+        "bytes": 11710784.0,
+        "files": 15
+      },
+      {
+        "path": "D:\\miniforge3\\pkgs",
+        "bytes": 53242476.0,
+        "files": 165
+      }
+    ],
+    "survey_timing_note": "Initial RAM/disks/processes/executables/C-drive cache/Python/local-source receipt saved before worktree creation; supplemental D-drive environment/cache discovery completed after checkout, before implementation execution. No software acquired or environment modified."
+  }
+}

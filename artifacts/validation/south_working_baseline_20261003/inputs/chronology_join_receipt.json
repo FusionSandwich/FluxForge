@@ -1,0 +1,2586 @@
+{
+  "schema": "paper3-chronology-recovery-v1",
+  "created_local_date": "2026-10-01",
+  "scientific_admission": false,
+  "scope": {
+    "rows": 32,
+    "physical_counts": 32,
+    "principle": "candidate chronology is preserved separately from qualified event time; timestamps remain wall-clock strings without assigned timezone",
+    "no_event_power_inferred_from_cumulative_totals": true,
+    "no_source_data_modified": true,
+    "no_fluxforge_source_modified": true
+  },
+  "inputs": [
+    {
+      "id": "count_metadata_matrix_32_2026-09-27.json",
+      "sha256": "afe9f0411990c38340592930d7507737febe1a3bc20f2854f20159e2eb967b9b",
+      "bytes": 126354,
+      "visibility": "project_input"
+    },
+    {
+      "id": "count_disposition_32_2026-09-27.json",
+      "sha256": "f7b55d77d30d2ed22a2dfb1859728aa68cb5053d8d791eb1ed00c21833bdfb06",
+      "bytes": 414131,
+      "visibility": "project_input"
+    },
+    {
+      "id": "acquisition_corroboration_2026-09-16.json",
+      "sha256": "db76224d6454b37e22eed24c403c55a66bcfe02eb84d4289cf81118864c3ee69",
+      "bytes": 19504,
+      "visibility": "project_input"
+    },
+    {
+      "id": "native_ANS_recovery_receipt",
+      "sha256": "a2426309f4bfb934e8dd9e6de298dbfd402dca0f42444cedd7c4c22a74867333",
+      "bytes": 25449,
+      "visibility": "project_input"
+    },
+    {
+      "id": "FluxForge_sample_schedule",
+      "sha256": "a8fc764e557b8ca0e7c6926f05113d7d7720d4c77d8b76e15ac0be122ede27a7",
+      "bytes": 11369,
+      "visibility": "project_input"
+    },
+    {
+      "id": "FluxForge_sample_schedules",
+      "sha256": "356fb3f5557402cb116aafeebc7dad8c8bb4bcd4b7e7db5438715de1102221be",
+      "bytes": 5686,
+      "visibility": "project_input"
+    },
+    {
+      "id": "FluxForge_flux_wire_timing",
+      "sha256": "171769085210f252e02d1c920dc9a5a7074277c58d934bb37708725c4553c1b8",
+      "bytes": 1952,
+      "visibility": "project_input"
+    },
+    {
+      "id": "calibration_history_review",
+      "sha256": "b738036328ebdd247291ac7fb7079bd48b202d1de802cd4bde59e6fc465a3b75",
+      "bytes": 11720,
+      "visibility": "project_input"
+    },
+    {
+      "id": "mail_and_pro_review",
+      "sha256": "345443ddfc6bbf0ce26954328c4ae5676d1e9d34c97442d6522aedfb19399411",
+      "bytes": 6331,
+      "visibility": "project_input"
+    },
+    {
+      "id": "frozen_replay_receipt",
+      "sha256": "b2a15aab14b6878d960b6834b53fe0ce8120fc3fec1235b7984959eeb608efb5",
+      "bytes": 872,
+      "visibility": "project_input"
+    },
+    {
+      "id": "operator_log_source_eml",
+      "sha256": "518083a3bfcfa91ef138e9cf618bb94a1cd9c447f70af268e3494b2cbb20d6a3",
+      "bytes": 98895,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "operator_log_source_body",
+      "sha256": "9ccc0bdcb90d393c88f55132927947ae77c787c56b960465aed725f5e4d09033",
+      "bytes": 1088,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "operator_log_source_receipt",
+      "sha256": "69f27ab621f365b86826678618eb3bc6824ff7a44a1cfb4a5286972741da8d7b",
+      "bytes": 662,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "reactor_information_source_eml",
+      "sha256": "8310d6ffd2c7cc696971a2186e6c545a9fe515e6b86dc4653e9d54e4307e1d0a",
+      "bytes": 3172838,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "reactor_information_source_body",
+      "sha256": "0384140765788190b8a604e00cf9170227b0d3190b00c7211201d7a8116458b3",
+      "bytes": 3753,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "rod_explanation_source_eml",
+      "sha256": "ed06a0ac2d365513972bcfa01aa75bcd2798d17861ab82f0b9e5d71eb41f4745",
+      "bytes": 577280,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "rod_explanation_source_body",
+      "sha256": "5f46897921c195986b864b0a2340ef828dc1a3d25e21111b263661c3218e4621",
+      "bytes": 6063,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "rod_explanation_source_receipt",
+      "sha256": "000d662912ff02d8dd1336df46a54a82e3b575027a751cf04e21feac15685e23",
+      "bytes": 655,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "operator_workbook_attachment",
+      "sha256": "62119bd38ccf36f19e50a0eb1d3ce6c5776c0c08bfbffa6742551d8d7a38d486",
+      "bytes": 64867,
+      "visibility": "local_private_provenance"
+    },
+    {
+      "id": "measurement_reconciliation_readme",
+      "sha256": "5e75899badabc02994c0058abd38f63279635764c26c8b13a67225ad63c59c45",
+      "bytes": 4147,
+      "visibility": "project_input"
+    },
+    {
+      "id": "measurement_reconciliation_provenance",
+      "sha256": "3c8dbe97b3fe82924d3e96675c93414d4402145c6feee57ed8e4d47e72ac083e",
+      "bytes": 8975,
+      "visibility": "project_input"
+    }
+  ],
+  "source_findings": {
+    "operating_workbook": {
+      "sha256": "62119bd38ccf36f19e50a0eb1d3ce6c5776c0c08bfbffa6742551d8d7a38d486",
+      "bytes": 64867,
+      "sheet": "operating_log_data",
+      "data_rows": 680,
+      "date_range": [
+        "2009-09-17",
+        "2025-04-28"
+      ],
+      "august_2025_rows": 0,
+      "formula_cells": 0,
+      "interpretation": "cumulative/corrected history and bank/rod snapshots; no August 2025 interval and no within-irradiation power interpolation supported"
+    },
+    "correspondence_candidate": {
+      "campaign_label": "Hirst-RAFM4",
+      "start_local_unzoned": "2025-08-05T10:28:00",
+      "end_local_unzoned": "2025-08-05T12:28:00",
+      "location": "whale tube E8",
+      "source_sha256": "8310d6ffd2c7cc696971a2186e6c545a9fe515e6b86dc4653e9d54e4307e1d0a",
+      "qualification": "correspondence statement; campaign candidate only; does not prove power/rod history, timezone semantics, or every specimen/monitor identity"
+    },
+    "maintained_schedule_candidate": {
+      "sample_schedule_phase2_start": "2025-08-04T13:00:00",
+      "sample_schedule_phase2_end": "2025-08-04T15:00:00",
+      "flux_wire_schedule_start": "2025-08-04T13:00:00",
+      "flux_wire_schedule_end": "2025-08-04T15:00:00",
+      "phase1_rafm3": "four per-sample 3-second windows on 2025-07-31, as enumerated rowwise",
+      "qualification": "naive-time maintained metadata; disagrees with August 5 correspondence for RAFM4 phase2; no independent event log",
+      "same_naive_clock_difference_hours_between_phase2_schedule_and_correspondence": 21.4666666667
+    },
+    "native_count_chronology": {
+      "QG_reports": 31,
+      "ASC_spectra": 30,
+      "candidate_ASC_minus_QG_offsets_minutes": {
+        "approximately_60": 27,
+        "approximately_180": 3,
+        "unresolved_by_source": true
+      },
+      "timezone_semantics": "none verified; do not auto-correct these deltas",
+      "ANS_header_evidence": {
+        "timestamp_and_duration_fields_empirically_corroborated_to_all_31_available_QG_report_headers": true,
+        "empirical_timestamp_epoch_used": "1899-12-30",
+        "full_ASC_channel_array_equal_to_corresponding_ANS_for_30_available_ASC_files": true,
+        "limitation": "empirical correspondence for this set only; not a vendor-verified ANS format or a timezone declaration"
+      }
+    },
+    "missing_qg_report": {
+      "measurement_id": "RAFM-A-2hr",
+      "ans_and_asc_present": true,
+      "qg_report_absent": true,
+      "role": "retain raw count identity; exclude from QG report-derived result/activity rows until report or alternate validated reduction is available"
+    },
+    "fe_cd_geometry": {
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "QG_spectrum_id_label": "Fe-Cd-RAFM-1 @ 0cm",
+      "QG_structured_source_distance_cm_printed": 0.01,
+      "ASC_present": false,
+      "role": "separate nominal near-contact report geometry; report label and structured distance field differ; exclude from nominal South 25 cm efficiency-domain match; campaign join unknown"
+    },
+    "candidate_schedule_scope": "10 monitor rows exact-match maintained flux_wires base_name; Cu-Cd and Fe-Cd have no exact schedule row. Twenty specimen rows map by RAFM3 sample letter/timepoint or RAFM4 15d label to maintained schedule candidates. All schedule-to-physical-event joins remain unqualified."
+  },
+  "diagnostics": {
+    "decay_during_count": {
+      "Ti_4h_real_time": {
+        "real_time_s": 14411.89,
+        "half_life_h_reported": 43.7,
+        "start_activity_over_uniform_count_average": 1.0320851574099628,
+        "assumption": "single Sc-48 exponential decay; uniform live fraction over reported real duration; diagnostic only, no measured-rate/input change"
+      },
+      "Ti_b_48h_real_time": {
+        "real_time_s": 172935.45,
+        "half_life_h_reported": 43.7,
+        "start_activity_over_uniform_count_average": 1.4288928812039008,
+        "assumption": "single Sc-48 exponential decay; uniform live fraction over reported real duration; diagnostic only, no measured-rate/input change"
+      }
+    },
+    "use_limit": "These are conditional illustrations using printed Sc-48 half-life and real-time durations; do not apply as corrected reported activities. No event-level flux or date-alternative Gaussian uncertainty was created."
+  },
+  "implementation_review": {
+    "frozen_commit": "f672374e9a0dcf82e47d9d8a0bd11d4b3808d142",
+    "working_tree_clean": true,
+    "observed_existing_gates": [
+      "byte-bound operating-history file hash",
+      "complete coverage and power basis",
+      "timezone-aware ordered start/end and EOI equality",
+      "explicit unique monitor identity binding",
+      "full-duration power segments plus bound reactor-power and control-rod sources",
+      "local spectral-separability evidence when physical scalar history is requested"
+    ],
+    "demonstrated_new_code_gap": null,
+    "judgment": "present discrepancy is missing/conflicting source chronology, not a reproduced code defect; existing fail-closed gates cover the missing inputs"
+  },
+  "rows": [
+    {
+      "measurement_id": "Co-Cd-RAFM-1",
+      "sample_id": "Co-Cd-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+        "qg_report_sha256": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+        "asc_sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Co-Cd-RAFM-1 @25cm",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-28T09:55:22",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-29T21:56:53",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 129600.0,
+        "real_time_s": 129691.87,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "28-Aug-2025 12:55",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 179.63333333333333,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-28T09:55:22",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Co-RAFM-1",
+      "sample_id": "Co-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "1eadf548bd66b3da425d8bd891d8523e0ef1f59a9ea4471684f96dc0855675c9",
+        "qg_report_sha256": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+        "asc_sha256": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Co-RAFM-1 @ 25cm",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-27T14:41:57",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-28T02:42:32",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 43200.0,
+        "real_time_s": 43235.55,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "27-Aug-2025 15:41",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.05,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-27T14:41:57",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Cu-Cd-RAFM-1",
+      "sample_id": "Cu-Cd-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "report_only_ASC_absent",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+        "qg_report_sha256": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+        "asc_sha256": null,
+        "asc_full_array_match_to_ans": null,
+        "qg_report_present": true,
+        "asc_present": false,
+        "qg_printed_spectrum_id": "Cu-Cd-RAFM-1",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": null,
+        "candidate_end": null,
+        "candidate_source": null,
+        "candidate_join_basis": "No exact base_name match in the frozen flux_wires schedule; campaign membership not inferred from QG file label.",
+        "candidate_status": "unknown_no_direct_campaign_join"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-07T09:01:20",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-07T10:02:25",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3665.86,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": null,
+        "asc_timezone_declared": null,
+        "asc_minus_qg_candidate_minutes": null,
+        "clock_relation_status": "clock_pair_unavailable",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-07T09:01:20",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "ASC_not_recovered",
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved"
+      ]
+    },
+    {
+      "measurement_id": "Cu-RAFM-1",
+      "sample_id": "Cu-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "91f21b04eb5672deb7bee7666371be82594c0e45692843076a9be81f8b0b6b4f",
+        "qg_report_sha256": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+        "asc_sha256": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Cu-RAFM-1_25cm",
+        "qg_printed_file_label": "CU-RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-07T10:40:36",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-07T11:43:54",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3798.23,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "7-Aug-2025 11:40",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.4,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-07T10:40:36",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "sample_id": "Fe-Cd-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "retain as separate near-contact monitor count; exclude from nominal South 25 cm efficiency-domain match; its own campaign join remains unknown",
+      "coverage_status": "report_only_ASC_absent",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+        "qg_report_sha256": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+        "asc_sha256": null,
+        "asc_full_array_match_to_ans": null,
+        "qg_report_present": true,
+        "asc_present": false,
+        "qg_printed_spectrum_id": "Fe-Cd-RAFM-1 @ 0cm",
+        "qg_printed_file_label": "-RAFM-1_0cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": null,
+        "candidate_end": null,
+        "candidate_source": null,
+        "candidate_join_basis": "No exact base_name match in the frozen flux_wires schedule; campaign membership not inferred from QG file label.",
+        "candidate_status": "unknown_no_direct_campaign_join"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-18T13:54:31",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-19T01:55:07",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 43200.0,
+        "real_time_s": 43236.05,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": null,
+        "asc_timezone_declared": null,
+        "asc_minus_qg_candidate_minutes": null,
+        "clock_relation_status": "clock_pair_unavailable",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-18T13:54:31",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 0.01,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "outside_candidate_printed_detector_or_distance_domain",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": "QG spectrum_id label contains “@ 0cm”, while the structured source_distance_cm_printed field is 0.01 cm; preserve this internal report-label/field discrepancy. Either indication is outside the candidate 25 cm efficiency domain; ASC is absent."
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "ASC_not_recovered",
+        "candidate_25cm_efficiency_geometry_inapplicable",
+        "candidate_25cm_nominal_domain_mismatch",
+        "candidate_coefficients_not_within_QG_print_rounding",
+        "eff_csv_25cm_reference_geometry_mismatch",
+        "eff_csv_coefficient_difference:A",
+        "eff_csv_coefficient_difference:C1",
+        "eff_csv_coefficient_difference:C2",
+        "eff_csv_coefficient_difference:C3",
+        "eff_csv_coefficient_difference:C4",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved"
+      ]
+    },
+    {
+      "measurement_id": "In-Cd-RAFM-1",
+      "sample_id": "In-Cd-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "a2f761ebdf0aef7e6a7d27972712fe5e41ef5a6767e2b24514ad67ee0271662e",
+        "qg_report_sha256": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+        "asc_sha256": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "In-Cd-RAFM-1_25cm",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-07T07:40:17",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-07T08:40:33",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3616.22,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "7-Aug-2025 08:40",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.71666666666667,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-07T07:40:17",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Ni-RAFM-1",
+      "sample_id": "Ni-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "ab4d6877ead21040232dc1c12e66365f8e38a92e102bca92f1c84040eaae4d76",
+        "qg_report_sha256": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+        "asc_sha256": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Ni-RAFM-1 @ 25cm",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-27T08:58:42",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-27T09:58:54",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3612.38,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "27-Aug-2025 09:58",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.3,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-27T08:58:42",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-A-15d",
+      "sample_id": "A",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "eb7bb3b3da1e114f55626fd81e2f60135bc412b588273d8ff7964b8fbee270ca",
+        "qg_report_sha256": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+        "asc_sha256": "0239355ca97609f0b0d5a9696ef95722a67ab14eae6f873b2bca8bf60df04eeb",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM4",
+        "qg_printed_file_label": "RFM41"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04 13:00:00",
+        "candidate_end": "2025-08-04 15:00:00",
+        "candidate_source": "FluxForge sample_schedules.json:irradiation",
+        "candidate_join_basis": "RAFM4 / 15d sample label plus phase2 global schedule; E8 correspondence is attached as an alternative candidate below, not a qualified join",
+        "candidate_status": "candidate_schedule_conflicted_by_correspondence",
+        "correspondence_candidate": {
+          "start_local_unzoned": "2025-08-05T10:28:00",
+          "end_local_unzoned": "2025-08-05T12:28:00",
+          "location": "whale tube E8",
+          "source": "UWNR reactor information correspondence dated 2026-01-05",
+          "identity_scope": "source explicitly names Hirst-RAFM4; extension to each A/B/C/N count follows the maintained RAFM4 labels and remains a candidate identity join"
+        }
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-20T13:36:40",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-20T14:45:11",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 4111.8,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "20-Aug-2025 14:36",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.333333333333336,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-20T13:36:40",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "raw_sideband_linear_background_large_residuals",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "reported_dead_time_above_10_percent",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-A-24hr",
+      "sample_id": "A",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "0f2d934cbe3c401fd0b79b8e279cd2da39cb070317f23764a9d6e2c7e622fe39",
+        "qg_report_sha256": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+        "asc_sha256": "f4c4cc5ceae16d92c7a4aac13bf6bd2dc58e55f18a65aab05aa16d20216b751f",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 24hr EOI",
+        "qg_printed_file_label": "RAFM1"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:17:18",
+        "candidate_end": "2025-07-31T09:17:21",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.A.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-01T10:50:13",
+        "scheduled_cooldown_s": 91972.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-01T10:50:13",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-01T11:50:19",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.4,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "1-Aug-2025 11:50",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.78333333333333,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-01T10:50:13",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-A-2hr",
+      "sample_id": "A",
+      "sample_kind": "specimen",
+      "row_use_role": "retain original ANS and ASC spectrum identity; exclude from QG-report-derived activity/ROI use because the QG report is missing",
+      "coverage_status": "ASC_only_report_absent",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "4539685f80f9beb11e9094b9161d0568fe7dc95cef99366ea9d69a9d9c6aa18b",
+        "qg_report_sha256": null,
+        "asc_sha256": "4521855b644433701eeccaa8b64d018ff227affb4a16d7489c3828b51588ea48",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": false,
+        "asc_present": true,
+        "qg_printed_spectrum_id": null,
+        "qg_printed_file_label": null
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:17:18",
+        "candidate_end": "2025-07-31T09:17:21",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.A.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": null,
+        "scheduled_cooldown_s": null
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T11:15:40",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T11:30:40",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 900.0,
+        "real_time_s": 900.77,
+        "activity_reference_printed": null,
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "QG report absent; candidate timestamp comes from vendor-unverified ANS header",
+        "asc_clock_text": "31-Jul-2025 12:15",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.333333333333336,
+        "clock_relation_status": "unresolved_candidate_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T11:15:40",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": false,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": null,
+        "qg_source_distance_cm_printed": null,
+        "qg_DI_cm_printed": null,
+        "qg_T1_um_printed": null,
+        "qg_DL_um_printed": null,
+        "qg_AI_deg_printed": null,
+        "candidate_efficiency_geometry_match": "unknown_without_QG_geometry",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "ASC_ANS_candidate_clock_conflict_unresolved",
+        "QG_report_absent",
+        "candidate_domain_unclassifiable_without_report",
+        "dead_time_and_source_distance_unqualified_without_report",
+        "physical_count_geometry_uncertified",
+        "unresolved_candidate_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-A-300s",
+      "sample_id": "A",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+        "qg_report_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+        "asc_sha256": "38766e8abb82ab71a04968a2b7d3959da7ceb672b6815a1ff86d9066613ea4cc",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "File: 3-A_300sEOI.ANS   Date:  July 31, 2025 09:23:21",
+        "qg_printed_file_label": "3-A_300sEOI.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:17:18",
+        "candidate_end": "2025-07-31T09:17:21",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.A.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-07-31T09:23:21",
+        "scheduled_cooldown_s": 360.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T09:23:21",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T09:28:52",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 300.0,
+        "real_time_s": 331.1,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "31-Jul-2025 12:23",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 179.65,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T09:23:21",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-A-4d",
+      "sample_id": "A",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "ea91654c78c5e26506466c281eeddfe280b187ca2a16a8c6705f58193d6ee6f0",
+        "qg_report_sha256": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+        "asc_sha256": "554af6e9848d2642c9e6158ae40eeaad0122bdc9d591a1b8ae8c74682d52fbb1",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 4d EOI",
+        "qg_printed_file_label": "RAFM1"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:17:18",
+        "candidate_end": "2025-07-31T09:17:21",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.A.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-04T08:04:07",
+        "scheduled_cooldown_s": 341206.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-04T08:04:07",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-04T09:04:10",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3603.03,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "4-Aug-2025 09:04",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.88333333333333,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-04T08:04:07",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-B-15d",
+      "sample_id": "B",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "3e679cf61897e22064526264b3237983d2a1485ac132054067b6cbe9982cc327",
+        "qg_report_sha256": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+        "asc_sha256": "4c3913b1e9b0446cb1b5a5a6bb1911d00d4bbac7d736dda230856904fa84ecad",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM4",
+        "qg_printed_file_label": "RFM42"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04 13:00:00",
+        "candidate_end": "2025-08-04 15:00:00",
+        "candidate_source": "FluxForge sample_schedules.json:irradiation",
+        "candidate_join_basis": "RAFM4 / 15d sample label plus phase2 global schedule; E8 correspondence is attached as an alternative candidate below, not a qualified join",
+        "candidate_status": "candidate_schedule_conflicted_by_correspondence",
+        "correspondence_candidate": {
+          "start_local_unzoned": "2025-08-05T10:28:00",
+          "end_local_unzoned": "2025-08-05T12:28:00",
+          "location": "whale tube E8",
+          "source": "UWNR reactor information correspondence dated 2026-01-05",
+          "identity_scope": "source explicitly names Hirst-RAFM4; extension to each A/B/C/N count follows the maintained RAFM4 labels and remains a candidate identity join"
+        }
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-20T14:45:31",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-20T15:53:28",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 4077.58,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "20-Aug-2025 15:45",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.483333333333334,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-20T14:45:31",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "reported_dead_time_above_10_percent",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-B-24hr",
+      "sample_id": "B",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "5bf2a48f406248c88d94bbd62ef7ab9525f5075237fc5d1a1db6f61af344b9ad",
+        "qg_report_sha256": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+        "asc_sha256": "63630480fcf4ae53b1ea4536c8673b501df0a966c14adb7bef41239705fbe185",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 24hr EOI",
+        "qg_printed_file_label": "RAFM2"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:30:33",
+        "candidate_end": "2025-07-31T09:30:36",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.B.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-01T11:50:39",
+        "scheduled_cooldown_s": 94803.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-01T11:50:39",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-01T12:50:45",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.48,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "1-Aug-2025 12:50",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.35,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-01T11:50:39",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-B-2hr",
+      "sample_id": "B",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "0f028ec324786918415cc1df1db35aeed6dae9ea967b00e15892696bf95870a8",
+        "qg_report_sha256": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+        "asc_sha256": "62bed58620cec3c725719dcc9751d6b7cda8565bc564f303e2e22760e96204f9",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3",
+        "qg_printed_file_label": "RAFM2"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:30:33",
+        "candidate_end": "2025-07-31T09:30:36",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.B.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-07-31T11:30:58",
+        "scheduled_cooldown_s": 7222.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T11:30:58",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T11:46:25",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 900.0,
+        "real_time_s": 927.22,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "31-Jul-2025 14:30",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 179.03333333333333,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T11:30:58",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-B-300s",
+      "sample_id": "B",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "55af16afdcc51534f4427fd94aa2caf3107f77ab58865a1b530f807c268a1df5",
+        "qg_report_sha256": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+        "asc_sha256": "8e4f6b63970dc3201fd3248f05ee8876024d3f4ea89c2307db944ba0d92bbf31",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "File: 3-B_300sEOI.ANS   Date:  July 31, 2025 09:36:36",
+        "qg_printed_file_label": "3-B_300sEOI.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:30:33",
+        "candidate_end": "2025-07-31T09:30:36",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.B.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-07-31T09:36:36",
+        "scheduled_cooldown_s": 360.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T09:36:36",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T09:42:06",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 300.0,
+        "real_time_s": 330.84,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "31-Jul-2025 10:36",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.4,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T09:36:36",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-B-4d",
+      "sample_id": "B",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "d51f817d584a92f5e9ee271752899f1b5f0434c07de7b358e6119b4adbd62bf2",
+        "qg_report_sha256": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+        "asc_sha256": "2d98bb8a0eedf3bebc079ca4caa7498ed19bd90c4ef49887aec5009da97d6b40",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 4d EOI",
+        "qg_printed_file_label": "RAFM2"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:30:33",
+        "candidate_end": "2025-07-31T09:30:36",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.B.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-04T09:04:29",
+        "scheduled_cooldown_s": 344033.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-04T09:04:29",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-04T10:04:32",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3603.04,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "4-Aug-2025 10:04",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.516666666666666,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-04T09:04:29",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-C-15d",
+      "sample_id": "C",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "b4df4a3195d880de8b096f2562c83873f12725f84730a52adb60cdb1bbf1664e",
+        "qg_report_sha256": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+        "asc_sha256": "18b41618567a7fface768e453ef0e47d179c3c8f1042101f8f85d1c6e80338d4",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM4",
+        "qg_printed_file_label": "RFM43"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04 13:00:00",
+        "candidate_end": "2025-08-04 15:00:00",
+        "candidate_source": "FluxForge sample_schedules.json:irradiation",
+        "candidate_join_basis": "RAFM4 / 15d sample label plus phase2 global schedule; E8 correspondence is attached as an alternative candidate below, not a qualified join",
+        "candidate_status": "candidate_schedule_conflicted_by_correspondence",
+        "correspondence_candidate": {
+          "start_local_unzoned": "2025-08-05T10:28:00",
+          "end_local_unzoned": "2025-08-05T12:28:00",
+          "location": "whale tube E8",
+          "source": "UWNR reactor information correspondence dated 2026-01-05",
+          "identity_scope": "source explicitly names Hirst-RAFM4; extension to each A/B/C/N count follows the maintained RAFM4 labels and remains a candidate identity join"
+        }
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-20T15:53:48",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-20T17:01:29",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 4061.58,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "20-Aug-2025 16:53",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.2,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-20T15:53:48",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "reported_dead_time_above_10_percent",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-C-24hr",
+      "sample_id": "C",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "98fc1eef03f689eedec11b01bed53923c49062ad7a07b382684b3eaf370e3bca",
+        "qg_report_sha256": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+        "asc_sha256": "89d4e662cf0cf5ac584c621fcda61535d63b81f0b44ae7f5d5417d3bbdc7c82c",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 24hr EOI",
+        "qg_printed_file_label": "RAFM3"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:44:59",
+        "candidate_end": "2025-07-31T09:45:02",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.C.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-01T12:51:07",
+        "scheduled_cooldown_s": 97565.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-01T12:51:07",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-01T13:51:13",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.12,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "1-Aug-2025 13:51",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.88333333333333,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-01T12:51:07",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-C-2hr",
+      "sample_id": "C",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "0d41c896c079fb18d8d84fceddc03f6c927cce7ab17ba17ed2b5f1ea08cd46cd",
+        "qg_report_sha256": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+        "asc_sha256": "c8080b9b42d84ec0479b688a743003b30ea7f0b46ddc3400a2b501fdd713fe78",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3",
+        "qg_printed_file_label": "RAFM3"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:44:59",
+        "candidate_end": "2025-07-31T09:45:02",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.C.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-07-31T12:25:47",
+        "scheduled_cooldown_s": 9645.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T12:25:47",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T12:41:06",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 900.0,
+        "real_time_s": 919.77,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "31-Jul-2025 13:25",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.21666666666667,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T12:25:47",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-C-300s",
+      "sample_id": "C",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "785b5817f618cadcb9b4e5acb1b6b6842d9b79d2c85c6450c60ae4231b38edbb",
+        "qg_report_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+        "asc_sha256": "15ea5a1bbaa9974d1e50a1b4c4e9fa38cb39984e66cdf116cd3366d6ed565663",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "File: 3-C_300sEOI.ANS   Date:  July 31, 2025 09:51:02",
+        "qg_printed_file_label": "3-C_300sEOI.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:44:59",
+        "candidate_end": "2025-07-31T09:45:02",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.C.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-07-31T09:51:02",
+        "scheduled_cooldown_s": 360.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T09:51:02",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T09:56:31",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 300.0,
+        "real_time_s": 329.87,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "31-Jul-2025 10:51",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.96666666666667,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T09:51:02",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-C-4d",
+      "sample_id": "C",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "416b152b59d5e0a988c71b51a6110f3111a8a69d607fb31de79bf4633515ebbc",
+        "qg_report_sha256": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+        "asc_sha256": "73a16c19c40468ff7ef703357b09ef8c07374e47dfbf0a2ed0c14bf112625768",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 4d EOI",
+        "qg_printed_file_label": "RAFM3"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:44:59",
+        "candidate_end": "2025-07-31T09:45:02",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.C.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-04T10:04:50",
+        "scheduled_cooldown_s": 346788.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-04T10:04:50",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-04T11:04:52",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3602.98,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "4-Aug-2025 11:04",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.166666666666664,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-04T10:04:50",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-N-15d",
+      "sample_id": "N",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "19ad56848876157a40e669efb0b0c7bcd634b9caa1799e2bd62eb560f541b947",
+        "qg_report_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+        "asc_sha256": "6815d2373fa3a98cc23f9eebc0914ff87509af29dca69c59cac8a4a1702f4cb8",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM4",
+        "qg_printed_file_label": "RFM44"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04 13:00:00",
+        "candidate_end": "2025-08-04 15:00:00",
+        "candidate_source": "FluxForge sample_schedules.json:irradiation",
+        "candidate_join_basis": "RAFM4 / 15d sample label plus phase2 global schedule; E8 correspondence is attached as an alternative candidate below, not a qualified join",
+        "candidate_status": "candidate_schedule_conflicted_by_correspondence",
+        "correspondence_candidate": {
+          "start_local_unzoned": "2025-08-05T10:28:00",
+          "end_local_unzoned": "2025-08-05T12:28:00",
+          "location": "whale tube E8",
+          "source": "UWNR reactor information correspondence dated 2026-01-05",
+          "identity_scope": "source explicitly names Hirst-RAFM4; extension to each A/B/C/N count follows the maintained RAFM4 labels and remains a candidate identity join"
+        }
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-20T17:01:51",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-20T18:08:21",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3990.24,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "20-Aug-2025 18:01",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.15,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-20T17:01:51",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-N-24hr",
+      "sample_id": "N",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "b587cc72f47453d21dde373d656195d786b4fecaa75d6477d21a80e6ed28bbf7",
+        "qg_report_sha256": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+        "asc_sha256": "891b071615d0abff32858cc2d7b13bad57649633d8b9c230cf5a30097046f3ee",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 24hr EOI",
+        "qg_printed_file_label": "RAFM4"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:55:32",
+        "candidate_end": "2025-07-31T09:55:35",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.N.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-01T13:51:32",
+        "scheduled_cooldown_s": 100557.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-01T13:51:32",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-01T14:51:38",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3606.57,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "1-Aug-2025 14:51",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.46666666666667,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-01T13:51:32",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-N-2hr",
+      "sample_id": "N",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "ae90f352be9497299eb108498044444a2db7d27ac54f097c019fdf65caa65621",
+        "qg_report_sha256": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+        "asc_sha256": "c154246cd7c591c8d838bdb8cd3fe67bc427f0b50614b2e392c93bdf587c955d",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3",
+        "qg_printed_file_label": "RAFM4"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:55:32",
+        "candidate_end": "2025-07-31T09:55:35",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.N.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-07-31T12:42:11",
+        "scheduled_cooldown_s": 9996.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T12:42:11",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T12:57:33",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 900.0,
+        "real_time_s": 922.81,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "31-Jul-2025 13:42",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.81666666666667,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T12:42:11",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-N-300s",
+      "sample_id": "N",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "20c4e6932ed6093c9e2f69bd547c2ea91f647f54a7eb375b2ed45fc36cd83d2d",
+        "qg_report_sha256": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+        "asc_sha256": "4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "File: 3-N_300sEOI.ANS   Date:  July 31, 2025 10:01:35",
+        "qg_printed_file_label": "3-N_300sEOI.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:55:32",
+        "candidate_end": "2025-07-31T09:55:35",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.N.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-07-31T10:01:35",
+        "scheduled_cooldown_s": 360.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-07-31T10:01:35",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-07-31T10:06:55",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 300.0,
+        "real_time_s": 320.22,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "31-Jul-2025 11:01",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.416666666666664,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-07-31T10:01:35",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "RAFM-N-4d",
+      "sample_id": "N",
+      "sample_kind": "specimen",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "1dee8bcd90bf223748d250d466f02d949a4a765e911ed2ccf269c5ed5e5782d3",
+        "qg_report_sha256": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+        "asc_sha256": "70a6812f3275722e3daafb165bf5383181fe5857cd46c3aa349160b5ca3b7823",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "S25aRAFM3 4d EOI",
+        "qg_printed_file_label": "RAFM4"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-07-31T09:55:32",
+        "candidate_end": "2025-07-31T09:55:35",
+        "candidate_source": "FluxForge sample_schedule.json:rafm3_samples.N.phase1",
+        "candidate_join_basis": "RAFM3 sample letter and legacy timepoint label join the maintained sample schedule; metadata candidate, not independent log evidence",
+        "candidate_status": "candidate_schedule_only_unqualified",
+        "scheduled_measurement_time": "2025-08-04T11:05:13",
+        "scheduled_cooldown_s": 349778.0
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-04T11:05:13",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-04T12:05:16",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3603.05,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "4-Aug-2025 12:05",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.78333333333333,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-04T11:05:13",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "QG_printed_ID_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "sample_id": "Sc-Cd-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "32ae08601f00076d4c69f8f87b6207f3e0101eb48053ce64a64b263cdd833591",
+        "qg_report_sha256": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+        "asc_sha256": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Sc-Cd-RAFM-1 @ 25cm",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-27T10:21:21",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-27T11:22:11",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 3650.39,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "27-Aug-2025 11:21",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.65,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-27T10:21:21",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Sc-RAFM-1",
+      "sample_id": "Sc-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "64277ab9834f317a0731111faa74171fb356b17fff36e13ea2b4a5bc2c34d229",
+        "qg_report_sha256": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+        "asc_sha256": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Sc-RAFM-1 @ 25cm",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-27T12:18:37",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-27T13:27:21",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 3600.0,
+        "real_time_s": 4124.81,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "27-Aug-2025 13:18",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.38333333333333,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-27T12:18:37",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": null
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "raw_sideband_linear_background_large_residuals",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "reported_dead_time_above_10_percent",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Ti-RAFM-1",
+      "sample_id": "Ti-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "c86ef107b036999fde62e3249ca7213eb71ba583aca1264bb54a59acc41be99b",
+        "qg_report_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+        "asc_sha256": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Ti-RAFM-1 @25cm",
+        "qg_printed_file_label": "RAFM-1_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-12T10:04:31",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-12T14:04:42",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 14400.0,
+        "real_time_s": 14411.89,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "12-Aug-2025 11:04",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.483333333333334,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-12T10:04:31",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": "Source correspondence: Ti wire vertical in custom 2/5-dram vial; 4 h count."
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "QG_file_label_reused_across_distinct_counts",
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Ti-RAFM-1a",
+      "sample_id": "Ti-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "59f89ee0d0536a259dadf5484f3bfe367d423b8e0f291281594b8838e8f02a61",
+        "qg_report_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+        "asc_sha256": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Ti-RAFM-1a @25cm",
+        "qg_printed_file_label": "AFM-1a_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-12T14:07:29",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-12T18:07:40",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 14400.0,
+        "real_time_s": 14411.95,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "12-Aug-2025 15:07",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.516666666666666,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-12T14:07:29",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": "Source correspondence: Ti wire rolled into ring and placed at vial bottom; 4 h count."
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    },
+    {
+      "measurement_id": "Ti-RAFM-1b",
+      "sample_id": "Ti-RAFM-1",
+      "sample_kind": "monitor",
+      "row_use_role": "candidate_reported_measurement; retain original ANS/QG/ASC identities; physical activity remains unqualified",
+      "coverage_status": "matched_report_ASC",
+      "identity_join": {
+        "primary_key": "native ANS SHA256",
+        "ans_sha256": "1fbc1d8c255ebb2b99695144ad822d947e749686b48e2acb455640f71da7424c",
+        "qg_report_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+        "asc_sha256": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5",
+        "asc_full_array_match_to_ans": true,
+        "qg_report_present": true,
+        "asc_present": true,
+        "qg_printed_spectrum_id": "Ti-RAFM-1 48hr @25cm",
+        "qg_printed_file_label": "AFM-1b_25cm.ANS"
+      },
+      "campaign_irradiation_join": {
+        "candidate_start": "2025-08-04T13:00:00",
+        "candidate_end": "2025-08-04T15:00:00",
+        "candidate_source": "FluxForge sample_schedule.json:flux_wires",
+        "candidate_join_basis": "measurement identity joined to base_name after removing the schedule distance suffix; schedule values are naive example metadata",
+        "candidate_status": "candidate_schedule_only_unqualified"
+      },
+      "acquisition": {
+        "candidate_start_local_unzoned": "2025-08-13T09:49:41",
+        "candidate_end_local_unzoned_derived_from_real_time": "2025-08-15T09:51:56",
+        "end_derivation": "candidate start + reported real time; not a qualified absolute timestamp",
+        "live_time_s": 172800.0,
+        "real_time_s": 172935.45,
+        "activity_reference_printed": "Activities reported as of Measurement Date.",
+        "activity_reference_time_resolved": false,
+        "qg_clock_declaration": "local timestamp, timezone not declared",
+        "asc_clock_text": "13-Aug-2025 10:49",
+        "asc_timezone_declared": false,
+        "asc_minus_qg_candidate_minutes": 59.31666666666667,
+        "clock_relation_status": "unresolved_clock_conflict",
+        "automatic_timezone_correction": false,
+        "ans_clock_candidate": "2025-08-13T09:49:41",
+        "ANS_timestamp_duration_empirically_corroborated_to_report": true,
+        "ANS_field_layout_vendor_verified": false,
+        "ANS_timestamp_timezone_verified": false
+      },
+      "geometry": {
+        "qg_detector": "South",
+        "qg_source_distance_cm_printed": 25.0,
+        "qg_DI_cm_printed": 6.45,
+        "qg_T1_um_printed": 1000.0,
+        "qg_DL_um_printed": 700.0,
+        "qg_AI_deg_printed": 0.0,
+        "candidate_efficiency_geometry_match": "nominal_detector_distance_match_only",
+        "physical_count_geometry_certified": false,
+        "specific_sample_geometry_fact": "Source correspondence: same ring-at-bottom geometry as Ti_a; 48 h count."
+      },
+      "qualified_inputs": {
+        "irradiation_power_history": false,
+        "rod_history": false,
+        "local_spectrum_separability": false,
+        "EOI": false,
+        "absolute_clock_alignment": false
+      },
+      "source_exclusion_or_unknown_reasons": [
+        "legacy_eff_csv_DI_numeric_mismatch_unresolved",
+        "physical_count_geometry_uncertified",
+        "report_ASC_clock_conflict",
+        "report_ASC_real_time_precision_or_value_difference",
+        "report_DI_vs_csv_DI_numeric_difference_units_unresolved",
+        "unresolved_clock_conflict"
+      ]
+    }
+  ],
+  "matrix_upstream_input_hashes": {
+    "count_disposition_32_2026-09-27.json": "f7b55d77d30d2ed22a2dfb1859728aa68cb5053d8d791eb1ed00c21833bdfb06",
+    "eff.csv": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000",
+    "raw_peak_conditional_2026-09-27.py": "4db933be31865fe1a3d04c96e1442231b6287c0e983f7cf8c63dbe3fb842b526"
+  }
+}

@@ -1,0 +1,14 @@
+Independent Sol re-review, 2026-10-03
+Outcome: No blocking findings within the changed validator and bounded one-file receipt. The prior broad-single false admission now returns response_ambiguous, and raw-sample noise guards reject the prior false-uncertainty input. This is acceptance of the bounded method/receipt behavior, not physical qualification of an observed overlap or the full study.
+
+File identities (SHA-256):
+  Historical ASC fixture: 4f2aadb52bcab511b6e8da042ebe689a93f4f6007a481b3f6bcac5c0238188d3
+  multiplet_validation.py: ccecef901e437eaf84b41b2d95452a592533b7c4a9786acefe51f5aa00a99241
+  test_multiplet_validation.py: d2c7c2aba070fa4d3b8757ba1240f11d0867b997429ad277341cf29a9b73d648
+  run_example.py: b4a26d3fd2b7221604f5decca1454907fd8ec180f95f566a7f23edfff5388efe
+  final_receipt.json: 48f8ea8a6782ac9adebfa32637b8813cc589e3927f9fea79d04fbead140f1343
+  Checked-out HEAD: a7bcc680d1f5e06b1d9dae405241fc380087ca2b
+
+Checks: fixture is byte-identical to git show 46096eb:examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-N-300s.ASC. All receipt input/code hashes match current files. Running run_example.run() in memory exactly reproduced final_receipt.json. Independent focused pytest run: 17/17 passed. The source screen records one ASC file, 100-1800 keV, no 0.5-2 FWHM close pairs, and a fallback ROI at channels 1682-1712. Its doublet fit is rejected with no component admitted. Synthetic separated/partial examples qualify; unresolved/single controls do not.
+
+Limits: Resolution profile applicability to this ASC acquisition remains unknown because the saved QG settings and source calibration differ. No independent real doublet line identity was supplied. This review does not cover the other 31 study files, downstream #232/#220 integration, or a physical isotope/activity claim. The broad-single alternative spans a fixed diagnostic width range (up to 3 times the declared maximum); it is a conservative ambiguity gate within the stated Gaussian scope, not a physical response calibration. Tail responses remain unsupported.

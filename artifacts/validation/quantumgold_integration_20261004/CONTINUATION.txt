@@ -1,0 +1,64 @@
+FluxForge integration and separate next-agent work, 2026-10-04
+
+Repository: FusionSandwich/FluxForge
+Integration draft: https://github.com/FusionSandwich/FluxForge/pull/248
+Branch: quantumgold-methods-integration
+Base: unfolding-figure-ownership-20261003, a7bcc680d1f5e06b1d9dae405241fc380087ca2b
+Current implementation: 6a4bc97b6c6e18b7913794f3a6b151e9e3337843
+Six component drafts: #242, #243, #244, #245, #246, #247; integrated in #248.
+
+Root currently owns the full Git-free two-background replay, its final artifact
+review, integration receipts and #220/#232 acceptance. Do not duplicate that run,
+change its input files, edit the integration worktree concurrently or merge this
+stack on the strength of software tests alone.
+
+The separate next-agent task is #249:
+https://github.com/FusionSandwich/FluxForge/issues/249
+Develop a source-matched South-background Co-Cd joint Poisson pilot and diagnose
+model adequacy with the same fixed source counts/ROIs. The existing #239 pilot
+uses North background; its eight converged candidates have strong lack of fit.
+Preserve failures. Compare IEC and ambient-off controls without tuning to QG
+activity. Unknown efficiency covariance and South temporal applicability remain
+explicit. See the issue for full acceptance and an independent Sol review gate.
+
+Use an isolated descriptive branch based on #248, for example
+joint-poisson-south-model-checks. Reuse the source manifests, existing runtime,
+current count-conserving engine and fitter. Keep new changes in the opt-in pilot,
+its method code when evidence requires it, focused tests and source-bound results.
+Avoid shared rafm_workflow.py, run_integrated_qg_methods.py and source-manifest
+changes unless a specific blocker is reported to the integration owner first.
+Push the branch, create and attach a draft PR, and update #249 with evidence and
+remaining limitations. No upstream merge or physical admission is authorized by
+this handoff. No new software, environment or remote launch is needed.
+
+Verified tests and known status
+- 343 tests and 12 subtests passed on supported Python 3.11/NumPy 1.26.4 runtime
+  before the final metadata-only activity-reference patch.
+- 15 integration tests passed after that patch, including actual Co-Cd QG/IEC
+  paths, an actual RAFM-A-24hr raw analysis and QG payload/reference functions.
+- Independent Sol review rechecked CSV null/numeric handling, all-missing summary
+  metrics and lost time-reference selection. It independently verified matching
+  before/after hashes and identical isotope values excluding only reference labels
+  for the actual RAFM-A-24hr case.
+- Full relocated replay uses numerical implementation 99fa6c406dd9463ba78f122135d853de321bdec3.
+  Later commit 6a4bc97 adds generic/QG provenance labels and instructions/tests;
+  it does not change the numerical expressions. Full replay completion and final
+  review remain pending. This file is not a completion receipt.
+- All original 32 ANS, 30 ASC, 31 QG reports, 288 ROI rows and 88 isotope summaries
+  remain source-bound and preserved. Native Cu-Cd is a conditional raw diagnostic;
+  Fe-Cd near-contact is excluded from the 25 cm response, without fabricated ASC.
+- Missing EOI rates and empty comparison metrics remain null/UNAVAILABLE. Cu's
+  filename alias now binds to its source schedule. Count-average versus QG report
+  activity references remain distinct; the declared QG count-decay setting is a
+  conditional input, not recovered final vendor behavior.
+- The South IEC Co-Cd Co60 control is 134.325 Bq versus QG 234.95 Bq; bare Co is
+  2093.614 versus QG 2035 Bq. These nominal-profile controls are not the recovered
+  efficiency curve or older portable-engine numbers. Exact vendor parity and
+  physical flux-inversion qualification remain unestablished.
+
+Portable command (use a new output directory and existing project dependencies):
+  python examples/RAFM_irradiation/run_integrated_qg_methods.py --output NEW_FOLDER
+Use --skip-campaigns for the bounded six examples plus native-only controls.
+The driver works without .git; source hashes still identify the code/data while
+Git revision/ancestry remains unknown. No QuantumGold binary or external data
+drive paths are required.

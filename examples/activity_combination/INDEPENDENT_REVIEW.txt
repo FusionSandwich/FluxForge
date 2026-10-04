@@ -1,0 +1,14 @@
+Independent Sol review receipt — issue #238 — 2026-10-03
+
+Reviewed HEAD: a7bcc680d1f5e06b1d9dae405241fc380087ca2b (4615e61bbb262d974e0326a44107bc952e4cb903 is ancestor).
+Reviewed SHA256:
+  src/fluxforge/analysis/activity_combination.py 129BCD58F676CB047DCA041271FF9DF34D929DA786E819A119714AFC06162FD5
+  tests/test_activity_combination.py 4DF22EF909CC1EA063B86BA08C897F9DABD9AB0422CE9E880AD92FE152AB7687
+  examples/activity_combination/compare_same_lines.py 41D0EB36FA4A45610B2E55D3C10E2D235D68D4ED87A3B364F505FCD1CD168FBA
+  examples/activity_combination/SOURCE_MANIFEST.json E40F4D84208714A1BC599237B8ECF9745C36C31231932615D8FDF2C8C5FF9D71
+
+Bounded checks: python -m pytest -q tests/test_activity_combination.py: 50 passed. Independently reproduced and then verified correction of a high-baseline exact-constraint contradiction (A=[1e15,1e15+10] Bq, sigma=[1,1] Bq, C=ones), nonsingular residual-flag suppression at the same activities with C=I, np.float32 JSON failure, and infinite chi-square export from finite extreme inputs. Current tests lock these cases. Fixed-weight singular covariance propagation is mathematically valid without inversion; the documented policy now reserves singular refusal for GLS and leaves rank-sensitive diagnostics unavailable without an exact-constraint declaration.
+
+Example provenance: weighting_control.json SHA256 9202EB6DB23C8BD6FB083DD1899270B56BFB0481BE6D381FE0349E99E37D4824 and combination_method_control.json SHA256 54167ADE456E79E7F1EFA6BE29C6D42FED28C7033B36C261A648CF8BECFEF2B6 match the manifest and are byte-identical to commit 46096eb source paths. Example carries only selected Co60 lines, separates fixed ASC and rounded vendor-report controls, preserves missing efficiency/yield as unavailable, emits conditional partial controls and unavailable complete GLS, and isolates synthetic physical shared covariance. It explicitly says source reduction engine is unestablished and current descendant runs only the new aggregation.
+
+Review conclusion for these identities: no unresolved blocker found in changed combination logic or bounded example. This is not overall scientific acceptance, source-reduction parity, or workflow integration; #232/#220 remain separate. Any later file change requires revalidation of its identity.

@@ -1,0 +1,52 @@
+{
+  "REPLAY_RECEIPT.json": {
+    "original_output_sha256": "c70066957237f342b06520141eb55ae73c2b285a1c405064adbc6d47262dfef8",
+    "published_sha256": "ec0e764f95cf49e9d428d6fe7e216e045ba0dc382176f3e6c7e1eedfff3c58c7",
+    "transformation": "JSON runtime root path labels only"
+  },
+  "CURRENT_LINE_COMBINATIONS.json": {
+    "original_output_sha256": "4fbdbf256fddcdd4125c9f14cdce2de83157a8db52584c1be282edb56124996e",
+    "published_sha256": "f7c80cd969bd385da4ec9b8766ccc5f61f7743a3c00826e134a60f288854ccac",
+    "transformation": "JSON runtime root path labels only"
+  },
+  "raw_replay/tables/isotope_comparison.csv": {
+    "original_output_sha256": "069914df6fc92eb31f0dbcc61bb88169407ae81f0affac504faef9258a78b027",
+    "published_sha256": "069914df6fc92eb31f0dbcc61bb88169407ae81f0affac504faef9258a78b027",
+    "transformation": "none"
+  },
+  "raw_replay/tables/flux_wire_reaction_rates.csv": {
+    "original_output_sha256": "13af1b547d474965cc2faa9ae845737f060ab1ef4694d4e3fe0d37c4788e37b7",
+    "published_sha256": "13af1b547d474965cc2faa9ae845737f060ab1ef4694d4e3fe0d37c4788e37b7",
+    "transformation": "none"
+  },
+  "raw_replay/tables/flux_wire_cd_ratios.csv": {
+    "original_output_sha256": "683060bb64a8ab4e4174ee017873d32414f18d71aa7f5c24b8a325fe3efca27b",
+    "published_sha256": "683060bb64a8ab4e4174ee017873d32414f18d71aa7f5c24b8a325fe3efca27b",
+    "transformation": "none"
+  },
+  "raw_replay/tables/flux_wire_count_disagreement.csv": {
+    "original_output_sha256": "0a273af39b915067f3886e32c5b294319e6d962946347c6c80fc9e8edb56cad9",
+    "published_sha256": "0a273af39b915067f3886e32c5b294319e6d962946347c6c80fc9e8edb56cad9",
+    "transformation": "none"
+  },
+  "raw_replay/tables/measurement_qc.csv": {
+    "original_output_sha256": "042ed2f4c023458cde753bdf64e2376170450f3c285d29c64ef1a032a7fdda82",
+    "published_sha256": "042ed2f4c023458cde753bdf64e2376170450f3c285d29c64ef1a032a7fdda82",
+    "transformation": "none"
+  },
+  "raw_replay/tables/qg_internal_consistency.csv": {
+    "original_output_sha256": "cdf6e159445cc39e2f7e62c32a257ef5f2dbe8accc13995b587338c89f4eda85",
+    "published_sha256": "cdf6e159445cc39e2f7e62c32a257ef5f2dbe8accc13995b587338c89f4eda85",
+    "transformation": "none"
+  },
+  "raw_replay/tables/fluxforge_line_consistency.csv": {
+    "original_output_sha256": "c3f32e2d11543642fa55e87ff8589c984ac6cece51a0d2198793057a33c534e8",
+    "published_sha256": "c3f32e2d11543642fa55e87ff8589c984ac6cece51a0d2198793057a33c534e8",
+    "transformation": "none"
+  },
+  "raw_replay/tables/line_diagnostics.csv": {
+    "original_output_sha256": "6c2808e89fb97fffd1b66da11e60c8116527ddf4ae0e3bbd8e9d7bf3db675cf7",
+    "published_sha256": "6c2808e89fb97fffd1b66da11e60c8116527ddf4ae0e3bbd8e9d7bf3db675cf7",
+    "transformation": "none"
+  }
+}

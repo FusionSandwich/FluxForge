@@ -1,0 +1,30 @@
+{
+  "schema": "portable-QG-supplement-v1",
+  "resources": [
+    {
+      "path": "examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/RAFM1_Long_70d_EOI.QG.txt",
+      "sha256": "1a0b179b802e86e38498c866a8140eeda15f6ecf30e5ad0fd683030ed896427b",
+      "bytes": 5613,
+      "role": "older_RAFM1_unpaired_QG_report",
+      "original_filename": "RAFM1_Long_70d_EOI.txt"
+    },
+    {
+      "path": "examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/South 4hr Background Terminal.ANS",
+      "sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "bytes": 36616,
+      "role": "recovered_South_native_background_not_ASC",
+      "original_filename": "South 4hr Background Terminal.ANS"
+    },
+    {
+      "path": "examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/RAFM1_Long_70d_EOI.extracted.json",
+      "sha256": "bb048b92a69b40b57524658964dd8bfc80fa66c30c7293f6fb60eb009d9b5600",
+      "bytes": 28290,
+      "role": "source_bound_older_QG_extraction"
+    }
+  ],
+  "older_report_ROI_rows": 12,
+  "older_report_summaries": 6,
+  "usage": "Preserved and verified separately; no automatic older-RAFM1 cohort or background substitution in primary replay",
+  "South_background_provenance": "Recovered native attachment from UWNR reactor information ZIP; no corroborating ASC/calibration applicability assigned",
+  "maintained_background": "Primary replay freezes the historical North 4hr background; name/detector distinction explicit, not asserted South applicability"
+}
