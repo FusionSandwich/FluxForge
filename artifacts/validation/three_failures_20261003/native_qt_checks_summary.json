@@ -1,0 +1,23 @@
+{
+  "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+  "python": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete\\python.exe",
+  "prefix": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete",
+  "qt_qpa_platform": "windows",
+  "groups": [
+    {
+      "group": "native_qt_production",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 118.36,
+      "files": [
+        "tests/test_production_gui_mode.py"
+      ],
+      "cases": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "passed": true,
+  "single_revision_full_suite": false
+}

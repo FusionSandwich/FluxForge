@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import json
 import os
 import shlex
@@ -262,6 +263,13 @@ def _click_widget(root: tk.Tk, backend, widget: tk.Misc) -> None:
     local_y = max(int(widget.winfo_height() / 2), 1)
     if sys.platform == "win32" and not _prefer_ci_safe_tk_events():
         x, y = _center_of(widget)
+        hit = root.winfo_containing(x, y)
+        if hit is not widget:
+            raise LookupError(
+                f"Coordinate click target is clipped or occluded: {widget} "
+                f"at ({x}, {y}) hits {hit}; "
+                f"screen={root.winfo_screenwidth()}x{root.winfo_screenheight()}."
+            )
         backend.click(x, y)
     else:
         widget.focus_force()
@@ -348,6 +356,31 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
 
     evidence: dict[str, object] = {
         "platform": sys.platform,
+        "input_profile": {
+            "widget_clicks": (
+                "windows-coordinate"
+                if sys.platform == "win32" and not _prefer_ci_safe_tk_events()
+                else "tk-invoke-or-generated-event"
+            ),
+            "github_actions": os.environ.get("GITHUB_ACTIONS", ""),
+            "notebook_tab_fallback": "programmatic-select",
+            "entry_text_fallback": "delete-insert",
+            "command_dispatch": "synchronous",
+        },
+        "source": {
+            "python": sys.executable,
+            "prefix": sys.prefix,
+            "files_sha256": {
+                str(path.relative_to(REPO_ROOT)): hashlib.sha256(
+                    path.read_bytes()
+                ).hexdigest()
+                for path in (
+                    Path(__file__),
+                    REPO_ROOT / "archive/legacy_gui/src/fluxforge_gui/app.py",
+                    REPO_ROOT / "archive/legacy_gui/src/fluxforge_gui/ui_builder.py",
+                )
+            },
+        },
         "offline_mode": bool(app.offline_mode),
         "screenshots": [],
         "artifacts": [],
@@ -907,7 +940,17 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
 
         evidence["status"] = "ok"
         return evidence
+    except Exception as exc:
+        evidence["status"] = "failed"
+        evidence["error"] = {"type": type(exc).__name__, "message": str(exc)}
+        with contextlib.suppress(Exception):
+            failure_shot = _take_screenshot(root, backend, output_dir, "failure.png")
+            evidence["screenshots"].append(str(failure_shot))
+        raise
     finally:
+        (output_dir / "run.json").write_text(
+            json.dumps(evidence, indent=2), encoding="utf-8"
+        )
         with contextlib.suppress(Exception):
             root.destroy()
 

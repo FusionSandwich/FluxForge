@@ -1,0 +1,40 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Josh\.codex\environments\fluxforge-issue21-complete\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge
+configfile: pyproject.toml
+plugins: platformdirs-4.12.2
+collecting ... collected 5 items
+
+tests/test_gui_consolidation.py::test_shipped_gui_and_native_bundle_use_qt FAILED [ 20%]
+tests/test_gui_consolidation.py::test_workflow_shortcuts_reveal_peak_review_and_follow_loaded_data PASSED [ 40%]
+tests/test_gui_consolidation.py::test_analysis_forms_scroll_without_forcing_a_tall_window PASSED [ 60%]
+tests/test_gui_consolidation.py::test_measured_data_unfolding_requires_matching_physical_response PASSED [ 80%]
+tests/test_gui_consolidation.py::test_empty_unfolding_imports_committed_rafm_rates PASSED [100%]
+
+================================== FAILURES ===================================
+__________________ test_shipped_gui_and_native_bundle_use_qt __________________
+
+    def test_shipped_gui_and_native_bundle_use_qt():
+        config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        scripts = config["project"]["scripts"]
+        assert scripts["fluxforge-gui"] == "fluxforge.gui.app:main"
+        assert "fluxforge-gui-legacy" not in scripts
+>       assert not (ROOT / "src/fluxforge_gui").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = (WindowsPath('C:/Users/Josh/.codex/worktrees/validation-three-failures-20261003/FluxForge') / 'src/fluxforge_gui').exists
+
+tests\test_gui_consolidation.py:43: AssertionError
+============================== warnings summary ===============================
+tests/test_gui_consolidation.py::test_empty_unfolding_imports_committed_rafm_rates
+  C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge\src\fluxforge\solvers\rmle.py:886: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 2.8524297435231277e-31.
+    H_inv = linalg.inv(H)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge\artifacts\validation\three_failures_20261003\qt_consolidation.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_gui_consolidation.py::test_shipped_gui_and_native_bundle_use_qt - AssertionError: assert not True
+ +  where True = exists()
+ +    where exists = (WindowsPath('C:/Users/Josh/.codex/worktrees/validation-three-failures-20261003/FluxForge') / 'src/fluxforge_gui').exists
+=================== 1 failed, 4 passed, 1 warning in 12.23s ===================

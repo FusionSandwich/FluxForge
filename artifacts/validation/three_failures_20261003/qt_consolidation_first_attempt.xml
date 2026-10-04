@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="12.235" timestamp="2026-10-03T20:24:16.093928-04:00" hostname="DESKTOP-RE6EJEJ"><testcase classname="tests.test_gui_consolidation" name="test_shipped_gui_and_native_bundle_use_qt" time="0.003"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = (WindowsPath('C:/Users/Josh/.codex/worktrees/validation-three-failures-20261003/FluxForge') / 'src/fluxforge_gui').exists">def test_shipped_gui_and_native_bundle_use_qt():
+        config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        scripts = config["project"]["scripts"]
+        assert scripts["fluxforge-gui"] == "fluxforge.gui.app:main"
+        assert "fluxforge-gui-legacy" not in scripts
+&gt;       assert not (ROOT / "src/fluxforge_gui").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = (WindowsPath('C:/Users/Josh/.codex/worktrees/validation-three-failures-20261003/FluxForge') / 'src/fluxforge_gui').exists
+
+tests\test_gui_consolidation.py:43: AssertionError</failure></testcase><testcase classname="tests.test_gui_consolidation" name="test_workflow_shortcuts_reveal_peak_review_and_follow_loaded_data" time="1.606" /><testcase classname="tests.test_gui_consolidation" name="test_analysis_forms_scroll_without_forcing_a_tall_window" time="2.413" /><testcase classname="tests.test_gui_consolidation" name="test_measured_data_unfolding_requires_matching_physical_response" time="0.479" /><testcase classname="tests.test_gui_consolidation" name="test_empty_unfolding_imports_committed_rafm_rates" time="0.239" /></testsuite></testsuites>

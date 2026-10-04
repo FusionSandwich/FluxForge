@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\Josh\.codex\worktrees\validation-three-failures-20261003\FluxForge\artifacts\validation\three_failures_20261003\qt_snapshot.py", line 44, in <module>
+    assert window.width() == 1560 and window.height() == 980
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

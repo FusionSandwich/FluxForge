@@ -1,0 +1,102 @@
+{
+  "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+  "python": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete\\python.exe",
+  "prefix": "C:\\Users\\Josh\\.codex\\environments\\fluxforge-issue21-complete",
+  "qt_qpa_platform": "offscreen",
+  "groups": [
+    {
+      "group": "qt_consolidation",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 18.77,
+      "files": [
+        "tests/test_gui_consolidation.py"
+      ],
+      "cases": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_production",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": null,
+      "timed_out": true,
+      "elapsed_s": 90.17,
+      "files": [
+        "tests/test_production_gui_mode.py"
+      ]
+    },
+    {
+      "group": "qt_shell",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 87.26,
+      "files": [
+        "tests/test_modern_gui_shell.py"
+      ],
+      "cases": 23,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_new_workspaces",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 18.73,
+      "files": [
+        "tests/test_irradiation_history_workspace_qt.py",
+        "tests/test_reaction_rate_workspace_qt.py",
+        "tests/test_spectrum_file_queue_workspace_qt.py"
+      ],
+      "cases": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_calibration",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 31.7,
+      "files": [
+        "tests/test_calibration_workspace_qt.py"
+      ],
+      "cases": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_sessions",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 52.81,
+      "files": [
+        "tests/test_workspace_session_qt.py"
+      ],
+      "cases": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "group": "qt_parity",
+      "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_s": 7.03,
+      "files": [
+        "tests/test_reference_parity_runner.py",
+        "tests/test_reference_parity_energy_tolerance.py",
+        "tests/test_parity_fixture_manifests.py"
+      ],
+      "cases": 15,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "passed": false,
+  "single_revision_full_suite": false
+}

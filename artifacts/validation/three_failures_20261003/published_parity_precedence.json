@@ -1,0 +1,194 @@
+[
+  {
+    "ref": "HEAD",
+    "git_head": "bade0779be0169f1c69267db380cf67b68d7a5f3",
+    "source_sha256": "5465ca92a489fec7c1ab8e268190390cb7ae566619e77289edde8e106ef964f2",
+    "checks": [
+      {
+        "field": "energies_keV[0]",
+        "suffix": "abs",
+        "key_order": [
+          "energy_keV_abs",
+          "energies_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "energies_keV[0]",
+        "suffix": "abs",
+        "key_order": [
+          "energies_keV_abs",
+          "energy_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "energies_keV[0]",
+        "suffix": "rel",
+        "key_order": [
+          "energy_keV_rel",
+          "energies_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "energies_keV[0]",
+        "suffix": "rel",
+        "key_order": [
+          "energies_keV_rel",
+          "energy_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "abs",
+        "key_order": [
+          "energy_keV_abs",
+          "first_peak_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "abs",
+        "key_order": [
+          "first_peak_keV_abs",
+          "energy_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "rel",
+        "key_order": [
+          "energy_keV_rel",
+          "first_peak_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "rel",
+        "key_order": [
+          "first_peak_keV_rel",
+          "energy_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      }
+    ],
+    "correct": 8
+  },
+  {
+    "ref": "origin/codex/adversarial-acceptance-20261002",
+    "git_head": "c8985a3205c790e9804e082507d716c6e78ae8e1",
+    "source_sha256": "a8afa224d7fbca8b4894bcaecead5cc20783bf20d055b9c72f2dde80b1bf77a2",
+    "checks": [
+      {
+        "field": "energies_keV[0]",
+        "suffix": "abs",
+        "key_order": [
+          "energy_keV_abs",
+          "energies_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": true,
+        "correct": false
+      },
+      {
+        "field": "energies_keV[0]",
+        "suffix": "abs",
+        "key_order": [
+          "energies_keV_abs",
+          "energy_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "energies_keV[0]",
+        "suffix": "rel",
+        "key_order": [
+          "energy_keV_rel",
+          "energies_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": true,
+        "correct": false
+      },
+      {
+        "field": "energies_keV[0]",
+        "suffix": "rel",
+        "key_order": [
+          "energies_keV_rel",
+          "energy_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "abs",
+        "key_order": [
+          "energy_keV_abs",
+          "first_peak_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": true,
+        "correct": false
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "abs",
+        "key_order": [
+          "first_peak_keV_abs",
+          "energy_keV_abs"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "rel",
+        "key_order": [
+          "energy_keV_rel",
+          "first_peak_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": true,
+        "correct": false
+      },
+      {
+        "field": "first_peak_keV",
+        "suffix": "rel",
+        "key_order": [
+          "first_peak_keV_rel",
+          "energy_keV_rel"
+        ],
+        "expected_match": false,
+        "observed_match": false,
+        "correct": true
+      }
+    ],
+    "correct": 4
+  }
+]

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="10.280" timestamp="2026-10-03T15:34:06.506570-04:00" hostname="DESKTOP-RE6EJEJ"><testcase classname="tests.test_reference_parity_runner" name="test_reference_parity_suite_runs_all_fixture_families" time="1.105"><failure message="assert 1 == 0">def test_reference_parity_suite_runs_all_fixture_families() -&gt; None:
+        payload = run_reference_parity_suite(
+            reference_root=REFERENCE_ROOT,
+            activation_root=ACTIVATION_ROOT,
+            scope="all",
+            include_activation=True,
+        )
+    
+        assert payload["schema"] == "fluxforge.reference_parity.run.v1"
+        assert payload["summary"]["total"] &gt;= 13
+&gt;       assert payload["summary"]["failed"] == 0
+E       assert 1 == 0
+
+tests\test_reference_parity_runner.py:25: AssertionError</failure></testcase><testcase classname="tests.test_reference_parity_runner" name="test_reference_parity_suite_supports_scope_and_fixture_filters" time="0.055"><failure message="assert 0 == 1">def test_reference_parity_suite_supports_scope_and_fixture_filters() -&gt; None:
+        payload = run_reference_parity_suite(
+            reference_root=REFERENCE_ROOT,
+            activation_root=ACTIVATION_ROOT,
+            scope="algorithm",
+            fixture_id="minimal_peak_search_algorithm_case",
+            include_activation=False,
+        )
+    
+        assert payload["summary"]["total"] == 1
+&gt;       assert payload["summary"]["passed"] == 1
+E       assert 0 == 1
+
+tests\test_reference_parity_runner.py:38: AssertionError</failure></testcase></testsuite></testsuites>
