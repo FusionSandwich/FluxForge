@@ -8,6 +8,11 @@ from typing import Callable
 
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.reporting.engine import ReportingEngine
+from fluxforge.reporting.instrument_provenance import (
+    SETTING_FIELDS,
+    instrument_provenance,
+)
+import json
 
 if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
     from fluxforge.gui.qt_compat import (
@@ -15,6 +20,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
         QCheckBox,
         QDialog,
         QHBoxLayout,
+        QGridLayout,
+        QGroupBox,
         QLabel,
         QLineEdit,
         QPushButton,
@@ -45,6 +52,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             self.last_pdf_export_path = None
             self.last_bundle_path = None
             self.last_context = None
+            self._instrument_spectrum_id = None
+            self._instrument_overrides = {}
 
             root = QVBoxLayout(self)
             root.setContentsMargins(16, 16, 16, 16)
@@ -97,6 +106,44 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             bundle_controls.addWidget(self.generate_button)
             root.addLayout(bundle_controls)
 
+            provenance_group = QGroupBox(
+                "Acquisition settings for current spectrum", self
+            )
+            provenance_layout = QGridLayout(provenance_group)
+            self.instrument_inputs = {}
+            for index, (name, label, object_name) in enumerate(
+                (
+                    (
+                        "amplifier_gain",
+                        "Amplifier gain (×)",
+                        "ReportAmplifierGainInput",
+                    ),
+                    ("shaping_time_us", "Shaping time (µs)", "ReportShapingTimeInput"),
+                    ("high_voltage_v", "High voltage (V)", "ReportHighVoltageInput"),
+                    ("count_geometry", "Count geometry", "ReportCountGeometryInput"),
+                )
+            ):
+                editor = QLineEdit(provenance_group)
+                editor.setObjectName(object_name)
+                editor.setPlaceholderText(
+                    "Recorded value; blank uses imported metadata"
+                )
+                provenance_layout.addWidget(
+                    QLabel(label, provenance_group), index // 2, (index % 2) * 2
+                )
+                provenance_layout.addWidget(editor, index // 2, (index % 2) * 2 + 1)
+                self.instrument_inputs[name] = editor
+            self.instructional_check = QCheckBox(
+                "Require complete instrument settings (instructional report)",
+                provenance_group,
+            )
+            self.instructional_check.setObjectName("ReportInstructionalCheck")
+            provenance_layout.addWidget(self.instructional_check, 2, 0, 1, 4)
+            self.instrument_status = QLabel(provenance_group)
+            self.instrument_status.setWordWrap(True)
+            provenance_layout.addWidget(self.instrument_status, 3, 0, 1, 4)
+            root.addWidget(provenance_group)
+
             self.export_status = QLabel(self)
             self.export_status.setObjectName("ReportExportStatus")
             self.export_status.setWordWrap(True)
@@ -111,6 +158,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             self.preview.setObjectName("ReportPreviewBrowser")
             self.preview.setStyleSheet("background-color: white; color: #10253c;")
             root.addWidget(self.preview, 1)
+
+            self._workspace_controller = getattr(parent, "analysis_workspace", None)
+            if self._workspace_controller is not None:
+                self._workspace_controller.subscribe_document(self._on_document_changed)
+                self._on_document_changed(self._workspace_controller.document)
 
             self._sync_template_status()
             self._sync_pdf_status()
@@ -143,7 +195,61 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
                 self.export_status.setText(f"Report capture failed: {exc}")
 
         def _capture_context(self) -> dict[str, object]:
-            return deepcopy(self.context_factory(self.current_template_name()))
+            context = deepcopy(self.context_factory(self.current_template_name()))
+            snapshot = context.get("run_snapshot")
+            if snapshot is not None:
+                workspace = snapshot["workspace"]
+                active = workspace.get("active_spectrum_id")
+                self._bind_instrument_inputs(active)
+                if active is not None:
+                    self._instrument_overrides[active] = {
+                        name: editor.text()
+                        for name, editor in self.instrument_inputs.items()
+                    }
+                provenance = instrument_provenance(
+                    workspace,
+                    self._instrument_overrides,
+                    require_complete=self.instructional_check.isChecked(),
+                )
+                snapshot["instrument_provenance"] = provenance
+                snapshot["instructional_report"] = self.instructional_check.isChecked()
+                context["instrument_provenance_json"] = json.dumps(provenance, indent=2)
+                missing = provenance["missing_required"]
+                self.instrument_status.setText(
+                    f"Active spectrum: {active or 'none'}. "
+                    + (
+                        "All loaded spectra have the required recorded settings."
+                        if not missing
+                        else f"Missing: {', '.join(missing)}. "
+                        "Select each spectrum in the workspace to enter its settings."
+                    )
+                )
+            return context
+
+        def _bind_instrument_inputs(self, active) -> None:
+            if self._instrument_spectrum_id is not None:
+                self._instrument_overrides[self._instrument_spectrum_id] = {
+                    name: self.instrument_inputs[name].text() for name in SETTING_FIELDS
+                }
+            if active != self._instrument_spectrum_id:
+                restored = self._instrument_overrides.get(active, {})
+                for name, editor in self.instrument_inputs.items():
+                    editor.setText(restored.get(name, ""))
+                self._instrument_spectrum_id = active
+            self.instrument_status.setText(
+                f"Acquisition settings are bound to spectrum: {active or 'none'}."
+            )
+
+        def _on_document_changed(self, document) -> None:
+            self._bind_instrument_inputs(document.active_spectrum_id)
+
+        def closeEvent(self, event) -> None:
+            if self._workspace_controller is not None:
+                self._workspace_controller.unsubscribe_document(
+                    self._on_document_changed
+                )
+                self._workspace_controller = None
+            super().closeEvent(event)
 
         def _show_context(self, context: dict[str, object]) -> None:
             rendered = self.engine.render(self.current_template_name(), context)

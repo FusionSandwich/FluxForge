@@ -1,0 +1,160 @@
+"""Acquisition provenance remains explicit and bound to each recorded spectrum."""
+
+from copy import deepcopy
+import json
+from zipfile import ZipFile
+
+import pytest
+
+from fluxforge.reporting.instrument_provenance import (
+    instrument_provenance,
+    validate_instructional_snapshot,
+)
+
+SETTINGS = {
+    "amplifier_gain": 12.5,
+    "shaping_time_us": 6,
+    "high_voltage_v": 2500,
+    "count_geometry": "25 cm on source axis",
+}
+
+
+def _workspace():
+    return {
+        "spectra": [
+            {
+                "spectrum_id": "measured",
+                "label": "foil",
+                "source_hash": "recorded hash",
+                "spectrum": {
+                    "live_time": 60,
+                    "real_time": 65,
+                    "calibration": {"energy": [0.3, 0.5]},
+                    "metadata": {"instrument_settings": deepcopy(SETTINGS)},
+                },
+            }
+        ]
+    }
+
+
+def test_imported_and_user_entered_settings_preserve_recorded_timing_and_identity():
+    workspace = _workspace()
+    original = deepcopy(workspace)
+    result = instrument_provenance(
+        workspace, {"measured": {"amplifier_gain": "13"}}, require_complete=True
+    )
+    assert workspace == original
+    record = result["records"][0]
+    assert record["source_hash"] == "recorded hash"
+    assert record["settings"]["amplifier_gain"] == {
+        "value": 13,
+        "source": "user_entered",
+    }
+    assert record["settings"]["shaping_time_us"]["source"] == "recorded_metadata"
+    assert record["settings"]["live_time_s"]["value"] == 60
+    assert record["settings"]["mca_calibration"]["value"]["energy"] == [0.3, 0.5]
+    assert result["scientific_admission"] is False
+
+
+def test_missing_settings_and_inconsistent_time_never_become_defaults():
+    workspace = _workspace()
+    spectrum = workspace["spectra"][0]["spectrum"]
+    spectrum["metadata"] = {}
+    spectrum["calibration"] = {}
+    spectrum["real_time"] = 0
+    result = instrument_provenance(workspace)
+    record = result["records"][0]
+    assert record["settings"]["amplifier_gain"]["value"] is None
+    assert record["settings"]["real_time_s"]["value"] is None
+    assert "counting_time_order" in record["missing_required"]
+    assert "mca_calibration" in record["missing_required"]
+    assert result["complete_required_settings"] is False
+    with pytest.raises(ValueError, match="Instructional"):
+        instrument_provenance(workspace, require_complete=True)
+
+
+def test_instructional_export_rejects_a_stale_or_forged_settings_receipt():
+    workspace = _workspace()
+    snapshot = {
+        "workspace": workspace,
+        "instructional_report": True,
+        "instrument_provenance": instrument_provenance(workspace),
+    }
+    validate_instructional_snapshot(snapshot)
+    workspace["spectra"][0]["spectrum"]["live_time"] = 55
+    with pytest.raises(ValueError, match="does not match"):
+        validate_instructional_snapshot(snapshot)
+    snapshot["instrument_provenance"] = {"complete_required_settings": True}
+    with pytest.raises(ValueError):
+        validate_instructional_snapshot(snapshot)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("amplifier_gain", True),
+        ("amplifier_gain", 0),
+        ("shaping_time_us", -1),
+        ("high_voltage_v", "nan"),
+        ("count_geometry", 25),
+    ],
+)
+def test_invalid_recorded_settings_are_rejected(field, value):
+    with pytest.raises(ValueError):
+        instrument_provenance(_workspace(), {"measured": {field: value}})
+
+
+def test_qt_instructional_bundle_requires_all_spectra_and_preserves_settings_on_switch(
+    tmp_path,
+):
+    pytest.importorskip("PySide6")
+    pytest.importorskip("pyqtgraph")
+    from fluxforge.gui.qt_compat import QApplication
+    from fluxforge.gui.main_window import FluxForgeMainWindow
+    from fluxforge.gui.mode_manager import ModeManager
+    from fluxforge.gui.selection_bus import SelectionBus
+
+    app = QApplication.instance() or QApplication([])
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(), selection_bus=SelectionBus(), load_example=True
+    )
+    window.show()
+    app.processEvents()
+    window._open_report_export()
+    dialog = window._report_dialog
+    try:
+        dialog.path_input.setText(str(tmp_path / "instructional.html"))
+        dialog.instructional_check.setChecked(True)
+        dialog.generate_report()
+        assert dialog.last_bundle_path is None
+        assert not (tmp_path / "instructional.zip").exists()
+        assert "Instructional" in dialog.export_status.text()
+        records = list(window.analysis_workspace.document.spectra)
+        for index, record in enumerate(records):
+            window.analysis_workspace.select_spectrum(record.spectrum_id)
+            assert dialog._instrument_spectrum_id == record.spectrum_id
+            assert not dialog.instrument_inputs["amplifier_gain"].text()
+            for field, value in SETTINGS.items():
+                dialog.instrument_inputs[field].setText(
+                    str(value if field != "amplifier_gain" else index + 1)
+                )
+        window.analysis_workspace.select_spectrum(records[0].spectrum_id)
+        assert dialog.instrument_inputs["amplifier_gain"].text() == "1"
+        dialog.generate_report()
+        assert dialog.last_bundle_path is not None, dialog.export_status.text()
+        with ZipFile(dialog.last_bundle_path) as archive:
+            snapshot = json.loads(archive.read("snapshot.json"))
+            provenance = snapshot["instrument_provenance"]
+            assert snapshot["instructional_report"] is True
+            assert provenance["complete_required_settings"] is True
+            assert len(provenance["records"]) == len(records)
+            assert [
+                item["settings"]["amplifier_gain"]["value"]
+                for item in provenance["records"]
+            ] == list(range(1, len(records) + 1))
+            assert (
+                "Instrument Settings Provenance" in archive.read("report.html").decode()
+            )
+    finally:
+        dialog.close()
+        window.close()
