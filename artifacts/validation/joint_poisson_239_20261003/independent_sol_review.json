@@ -1,0 +1,31 @@
+{
+  "reviewer": "/root/sol_joint_review",
+  "model": "gpt-6-sol",
+  "scope": "changed scientific logic and decisive counterexamples; bounded two-line pilot",
+  "verdict": "accept_first_implementation_tranche_only",
+  "joint_tests_independently_rerun": "49 passed",
+  "counterexamples_found_and_repaired": [
+    "No-nuisance positive-count profiles falsely failed when all parameters were fixed; exact evaluation now handles infinite LR at zero.",
+    "16-node step quadrature failed for a very coarse bin; analytic step integral now matches independent quadrature."
+  ],
+  "independent_oracles": {
+    "100_count_signal_only_profile": [81.65937933, 120.90050080],
+    "coarse_bin_step_integral": 0.10833154705876864,
+    "required_engine_ancestry": "a7bcc680 descendant of 4615e61 verified"
+  },
+  "reviewed_sha256": {
+    "src/fluxforge/analysis/joint_poisson.py": "bf93a1fcf5c9746ba7b69a5928a10328bca9dfb09618f317f453682daf29dd8d",
+    "tests/test_joint_poisson.py": "67f0c1b162de808f5bc3361b0d8a4a12b4f774fb164d822b58860240fc4001c7",
+    "examples/RAFM_irradiation/joint_poisson_pilot.py": "39236cb93d40e3362087ba6783d145e793c585540df1f7ddd32195aa06de59fb",
+    "artifacts/validation/joint_poisson_239_20261003/co_cd_pilot.json": "1a9ad9c1e2e75f3f1d7810e5cc791a6de68121a8a2f2ae235fc1be68db9cc666"
+  },
+  "pilot_verification": "native original counts and same comparator ROI; eight numerical fits, eight strong lack-of-fit flags; two free-normalization controls unidentifiable",
+  "remaining_limits": [
+    "No physically accepted Co-Cd estimates or calibrated uncertainty coverage.",
+    "Later North cross-detector background conditional and unqualified.",
+    "Sparse-count and nuisance-boundary coverage uncalibrated; model/calibration/efficiency/systematic uncertainties excluded.",
+    "Local NumPy 2.5.1 outside repository <2.0 requirement.",
+    "Whole-workflow integration and parity pending #232/#220; no default changes."
+  ],
+  "remaining_blocking_findings_in_scoped_tranche": []
+}
