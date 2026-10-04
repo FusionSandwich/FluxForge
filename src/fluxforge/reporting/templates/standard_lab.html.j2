@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>{{ title }}</title>
+    <title>{{ title | e }}</title>
     <style>
       body { font-family: "IBM Plex Sans", sans-serif; margin: 24px; color: #10253c; }
       section { margin-bottom: 20px; padding: 16px; border: 1px solid #d8e3ec; border-radius: 14px; }
@@ -12,7 +12,8 @@
     </style>
   </head>
   <body>
-    <h1>{{ title }}</h1>
+    <h1>{{ title | e }}</h1>
+    {% include 'run_snapshot.html.j2' %}
     {% if spectrum_image %}<section><h2>Spectrum</h2><div>{{ spectrum_image }}</div></section>{% endif %}
     {% if calibration_curve or calibration_residuals or efficiency_curve or efficiency_residuals %}
     <section class="grid">

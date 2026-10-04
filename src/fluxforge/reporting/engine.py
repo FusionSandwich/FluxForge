@@ -3,9 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import base64
+from hashlib import sha256
 from importlib import import_module
+from io import BytesIO
+import json
 from pathlib import Path
 from typing import Any
+from zipfile import ZIP_DEFLATED, ZipFile
 
 try:
     from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -28,7 +33,8 @@ def _load_weasyprint_html():
         module = import_module("weasyprint")
     except Exception as exc:  # pragma: no cover - optional/native dependency branch
         raise RuntimeError(
-            "PDF export requires a working WeasyPrint installation and its native libraries."
+            "PDF export requires a working WeasyPrint installation and its "
+            "native libraries."
         ) from exc
     return module.HTML
 
@@ -75,7 +81,8 @@ class ReportingEngine:
             return self._environment
         if _JINJA2_IMPORT_ERROR is not None:
             raise RuntimeError(
-                "HTML report rendering requires the optional reporting extra (`Jinja2`)."
+                "HTML report rendering requires the optional reporting extra "
+                "(`Jinja2`)."
             ) from _JINJA2_IMPORT_ERROR
         self._environment = Environment(
             loader=FileSystemLoader(str(self.template_dir)),
@@ -90,7 +97,9 @@ class ReportingEngine:
         self.register(
             ReportTemplateSpec(
                 name="standard_lab",
-                description="Standard laboratory review template with residuals and provenance.",
+                description=(
+                    "Standard laboratory review template with residuals and provenance."
+                ),
                 required_context_keys=(
                     "title",
                     "spectrum_image",
@@ -111,7 +120,9 @@ class ReportingEngine:
         self.register(
             ReportTemplateSpec(
                 name="astm_compliance",
-                description="ASTM-oriented compliance report with QA and lock summaries.",
+                description=(
+                    "ASTM-oriented compliance report with QA and lock summaries."
+                ),
                 required_context_keys=(
                     "title",
                     "astm_status_table",
@@ -128,7 +139,12 @@ class ReportingEngine:
             ReportTemplateSpec(
                 name="batch_summary",
                 description="Aggregate batch-analysis summary with per-spectrum rows.",
-                required_context_keys=("title", "batch_rows", "aggregate_csv", "provenance"),
+                required_context_keys=(
+                    "title",
+                    "batch_rows",
+                    "aggregate_csv",
+                    "provenance",
+                ),
                 template_file="batch_summary.html.j2",
             )
         )
@@ -151,16 +167,16 @@ class ReportingEngine:
         if template_name not in self.templates:
             raise KeyError(f"Unknown template {template_name!r}")
         template = self.templates[template_name]
-        missing = [
-            key for key in template.required_context_keys if key not in context
-        ]
+        missing = [key for key in template.required_context_keys if key not in context]
         if missing:
             raise KeyError(
                 f"Template {template_name!r} missing context keys: {', '.join(missing)}"
             )
         template_file = template.template_file or f"{template_name}.html.j2"
         html = self._ensure_environment().get_template(template_file).render(**context)
-        return ReportRenderResult(template_name=template_name, html=html, context=dict(context))
+        return ReportRenderResult(
+            template_name=template_name, html=html, context=dict(context)
+        )
 
     def export_html(
         self,
@@ -189,4 +205,59 @@ class ReportingEngine:
         html_class(string=rendered.html, base_url=str(self.template_dir)).write_pdf(
             str(resolved)
         )
+        return resolved
+
+    def export_bundle(
+        self,
+        template_name: str,
+        context: dict[str, Any],
+        path: str | Path,
+        *,
+        include_pdf: bool = False,
+    ) -> Path:
+        """Export one captured run as a ZIP, without replacing an existing file.
+
+        HTML embeds its images for standalone use. The JSON companion preserves
+        typed inputs and tables, with separately hashed PNG assets. All rendering
+        finishes before the output is created, so PDF failures leave no bundle.
+        """
+        snapshot = json.loads(json.dumps(context["run_snapshot"], allow_nan=False))
+        if snapshot.get("schema") != "fluxforge.gui_report_snapshot.v1":
+            raise ValueError("A current Qt report snapshot is required.")
+        rendered = self.render(template_name, context)
+        entries = {"report.html": rendered.html.encode("utf-8")}
+        for index, view in enumerate(snapshot["views"]):
+            asset = f"views/{index:03d}.png"
+            pixels = base64.b64decode(view.pop("png_base64"), validate=True)
+            if sha256(pixels).hexdigest() != view["sha256"]:
+                raise ValueError("Captured plot hash does not match its pixels.")
+            view["asset"] = asset
+            entries[asset] = pixels
+        entries["snapshot.json"] = json.dumps(
+            snapshot, indent=2, allow_nan=False
+        ).encode("utf-8")
+        if include_pdf:
+            html_class = _load_weasyprint_html()
+            entries["report.pdf"] = html_class(
+                string=rendered.html, base_url=str(self.template_dir)
+            ).write_pdf()
+        manifest = {
+            "schema": "fluxforge.gui_report_bundle.v1",
+            "template": template_name,
+            "captured_at": snapshot["captured_at"],
+            "scientific_admission": False,
+            "files": {
+                name: {"sha256": sha256(data).hexdigest(), "bytes": len(data)}
+                for name, data in entries.items()
+            },
+        }
+        entries["manifest.json"] = json.dumps(manifest, indent=2).encode("utf-8")
+        memory = BytesIO()
+        with ZipFile(memory, "w", compression=ZIP_DEFLATED) as archive:
+            for name, data in entries.items():
+                archive.writestr(name, data)
+        resolved = Path(path)
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        with resolved.open("xb") as output:
+            output.write(memory.getvalue())
         return resolved
