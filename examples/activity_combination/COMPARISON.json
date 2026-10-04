@@ -1,0 +1,1189 @@
+{
+  "scope": "gamma-line equation controls; no target fitting, no new isotope admission, no full vendor-error reproduction",
+  "source_manifest": {
+    "source_commit": "46096eb",
+    "source_repository": "https://github.com/FusionSandwich/FluxForge",
+    "source_path": "artifacts/validation/quantumgold_documentation_20261003",
+    "source_reduction_engine": "not established by these receipts; not represented as current-engine reduction",
+    "aggregation_engine_base": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "required_engine_ancestor": "4615e61bbb262d974e0326a44107bc952e4cb903",
+    "files": {
+      "weighting_control.json": {
+        "sha256": "9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+        "bytes": 469
+      },
+      "combination_method_control.json": {
+        "sha256": "54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6",
+        "bytes": 12157
+      }
+    }
+  },
+  "execution": {
+    "checkout_commit": "b5c5678ea99fd1a64d984aa758da616a2818a14d",
+    "implementation_sha256": "129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+    "python": "3.12.10",
+    "executable": "C:\\Users\\joshu\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "numpy": "2.5.1"
+  },
+  "fixed_ASC_control": {
+    "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+    "complete_uncertainty_gls": {
+      "schema_version": 1,
+      "method": "gls",
+      "analysis_role": "method_control",
+      "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+      "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+      "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+      "qualified_line_ids": [
+        "Co60-line-0",
+        "Co60-line-1"
+      ],
+      "input_lines": [
+        {
+          "line_id": "Co60-line-0",
+          "isotope": "Co60",
+          "activity_bq": 151.9380973607045,
+          "sigma_bq": 13.792011460618674,
+          "qualified": true,
+          "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+          "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+          "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+          "activity_reference": "source measurement-time activity"
+        },
+        {
+          "line_id": "Co60-line-1",
+          "isotope": "Co60",
+          "activity_bq": 159.13809929159203,
+          "sigma_bq": 11.349391220300818,
+          "qualified": true,
+          "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+          "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+          "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+          "activity_reference": "source measurement-time activity"
+        }
+      ],
+      "exclusions": [],
+      "covariance_sources": [
+        {
+          "name": "declared_sigma_diagonal_control",
+          "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+          "definition": "Independent diagonal control; line-error correlations unavailable",
+          "availability": "available",
+          "matrix_bq2": [
+            [
+              190.21958012983686,
+              0.0
+            ],
+            [
+              0.0,
+              128.8086810714413
+            ]
+          ]
+        },
+        {
+          "name": "shared_efficiency_calibration",
+          "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+          "definition": "not available from source receipt/report",
+          "availability": "unavailable",
+          "matrix_bq2": null
+        },
+        {
+          "name": "shared_yield_calibration",
+          "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+          "definition": "not available from source receipt/report",
+          "availability": "unavailable",
+          "matrix_bq2": null
+        }
+      ],
+      "unavailable_components": [
+        "shared_efficiency_calibration",
+        "shared_yield_calibration"
+      ],
+      "status": "unavailable",
+      "activity_bq": null,
+      "sigma_bq": null,
+      "normalized_weights": null,
+      "diagnostics": null,
+      "reason": "Required uncertainty components unavailable"
+    },
+    "conditional_same_input_methods": [
+      {
+        "schema_version": 1,
+        "method": "historical_activity_over_sigma",
+        "analysis_role": "method_control",
+        "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+        "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+        "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+        "qualified_line_ids": [
+          "Co60-line-0",
+          "Co60-line-1"
+        ],
+        "input_lines": [
+          {
+            "line_id": "Co60-line-0",
+            "isotope": "Co60",
+            "activity_bq": 151.9380973607045,
+            "sigma_bq": 13.792011460618674,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+            "activity_reference": "source measurement-time activity"
+          },
+          {
+            "line_id": "Co60-line-1",
+            "isotope": "Co60",
+            "activity_bq": 159.13809929159203,
+            "sigma_bq": 11.349391220300818,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+            "activity_reference": "source measurement-time activity"
+          }
+        ],
+        "exclusions": [],
+        "covariance_sources": [
+          {
+            "name": "declared_sigma_diagonal_control",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "Independent diagonal control; line-error correlations unavailable",
+            "availability": "available",
+            "matrix_bq2": [
+              [
+                190.21958012983686,
+                0.0
+              ],
+              [
+                0.0,
+                128.8086810714413
+              ]
+            ]
+          },
+          {
+            "name": "shared_efficiency_calibration",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          },
+          {
+            "name": "shared_yield_calibration",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          }
+        ],
+        "unavailable_components": [
+          "shared_efficiency_calibration",
+          "shared_yield_calibration"
+        ],
+        "status": "conditional",
+        "activity_bq": 155.97020945133184,
+        "sigma_bq": 8.787522779146899,
+        "normalized_weights": [
+          0.43998458204158974,
+          0.5600154179584103
+        ],
+        "diagnostics": {
+          "covariance_rank": 2,
+          "scaled_eigenvalues": [
+            0.6771578455988666,
+            1.0
+          ],
+          "relative_rank_tolerance": 4.440892098500626e-15,
+          "condition_number": 1.476760561070687,
+          "weight_clipping": false,
+          "regularization": null,
+          "singular_policy": "reject",
+          "negative_weight_line_ids": [],
+          "residuals_bq": [
+            -4.032112090627345,
+            3.1678898402601927
+          ],
+          "residual_sigmas_bq": [
+            10.002638242221728,
+            7.8587240014952435
+          ],
+          "standardized_residuals": [
+            -0.40310486023652853,
+            0.4031048602365286
+          ],
+          "chi_square": 0.16337958981759654,
+          "chi_square_definition": "residual.T C+ residual on stochastic range",
+          "chi_square_dof": 1,
+          "rank_diagnostics_available": true,
+          "residual_definition": "centered line activities minus weighted centered mean",
+          "exact_cancellation": false,
+          "chi_square_interpretation": "GLS goodness of fit only; other weights are descriptive",
+          "null_constraint_residuals_bq": [],
+          "null_constraint_tolerance_bq": 3.197443168406772e-14,
+          "incompatible_exact_constraints": false,
+          "line_inconsistency_flags": [
+            false,
+            false
+          ]
+        },
+        "covariance_bq2": [
+          [
+            190.21958012983686,
+            0.0
+          ],
+          [
+            0.0,
+            128.8086810714413
+          ]
+        ]
+      },
+      {
+        "schema_version": 1,
+        "method": "inverse_variance",
+        "analysis_role": "method_control",
+        "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+        "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+        "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+        "qualified_line_ids": [
+          "Co60-line-0",
+          "Co60-line-1"
+        ],
+        "input_lines": [
+          {
+            "line_id": "Co60-line-0",
+            "isotope": "Co60",
+            "activity_bq": 151.9380973607045,
+            "sigma_bq": 13.792011460618674,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+            "activity_reference": "source measurement-time activity"
+          },
+          {
+            "line_id": "Co60-line-1",
+            "isotope": "Co60",
+            "activity_bq": 159.13809929159203,
+            "sigma_bq": 11.349391220300818,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+            "activity_reference": "source measurement-time activity"
+          }
+        ],
+        "exclusions": [],
+        "covariance_sources": [
+          {
+            "name": "declared_sigma_diagonal_control",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "Independent diagonal control; line-error correlations unavailable",
+            "availability": "available",
+            "matrix_bq2": [
+              [
+                190.21958012983686,
+                0.0
+              ],
+              [
+                0.0,
+                128.8086810714413
+              ]
+            ]
+          },
+          {
+            "name": "shared_efficiency_calibration",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          },
+          {
+            "name": "shared_yield_calibration",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          }
+        ],
+        "unavailable_components": [
+          "shared_efficiency_calibration",
+          "shared_yield_calibration"
+        ],
+        "status": "conditional",
+        "activity_bq": 156.23107547828687,
+        "sigma_bq": 8.763661564307403,
+        "normalized_weights": [
+          0.40375319912543606,
+          0.596246800874564
+        ],
+        "diagnostics": {
+          "covariance_rank": 2,
+          "scaled_eigenvalues": [
+            0.6771578455988666,
+            1.0
+          ],
+          "relative_rank_tolerance": 4.440892098500626e-15,
+          "condition_number": 1.476760561070687,
+          "weight_clipping": false,
+          "regularization": null,
+          "singular_policy": "reject",
+          "negative_weight_line_ids": [],
+          "residuals_bq": [
+            -4.292978117582378,
+            2.90702381330516
+          ],
+          "residual_sigmas_bq": [
+            10.649780097077969,
+            7.211582146639003
+          ],
+          "standardized_residuals": [
+            -0.4031048602365286,
+            0.40310486023652853
+          ],
+          "chi_square": 0.16249352834631123,
+          "chi_square_definition": "residual.T C+ residual on stochastic range",
+          "chi_square_dof": 1,
+          "rank_diagnostics_available": true,
+          "residual_definition": "centered line activities minus weighted centered mean",
+          "exact_cancellation": false,
+          "chi_square_interpretation": "GLS goodness of fit only; other weights are descriptive",
+          "null_constraint_residuals_bq": [],
+          "null_constraint_tolerance_bq": 3.197443168406772e-14,
+          "incompatible_exact_constraints": false,
+          "line_inconsistency_flags": [
+            false,
+            false
+          ]
+        },
+        "covariance_bq2": [
+          [
+            190.21958012983686,
+            0.0
+          ],
+          [
+            0.0,
+            128.8086810714413
+          ]
+        ]
+      },
+      {
+        "schema_version": 1,
+        "method": "gls",
+        "analysis_role": "method_control",
+        "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+        "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+        "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+        "qualified_line_ids": [
+          "Co60-line-0",
+          "Co60-line-1"
+        ],
+        "input_lines": [
+          {
+            "line_id": "Co60-line-0",
+            "isotope": "Co60",
+            "activity_bq": 151.9380973607045,
+            "sigma_bq": 13.792011460618674,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+            "activity_reference": "source measurement-time activity"
+          },
+          {
+            "line_id": "Co60-line-1",
+            "isotope": "Co60",
+            "activity_bq": 159.13809929159203,
+            "sigma_bq": 11.349391220300818,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "count_basis": "historical fixed ASC selected-line reduction; physical basis qualification unchanged",
+            "activity_reference": "source measurement-time activity"
+          }
+        ],
+        "exclusions": [],
+        "covariance_sources": [
+          {
+            "name": "declared_sigma_diagonal_control",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "Independent diagonal control; line-error correlations unavailable",
+            "availability": "available",
+            "matrix_bq2": [
+              [
+                190.21958012983686,
+                0.0
+              ],
+              [
+                0.0,
+                128.8086810714413
+              ]
+            ]
+          },
+          {
+            "name": "shared_efficiency_calibration",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          },
+          {
+            "name": "shared_yield_calibration",
+            "source_identity": "46096eb:combination_method_control.json:sha256:54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6;parent_input_sha256:2c07703c308e009a160582191f05891bcd056ffbe1d596a9f4b9435d1197e980",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          }
+        ],
+        "unavailable_components": [
+          "shared_efficiency_calibration",
+          "shared_yield_calibration"
+        ],
+        "status": "conditional",
+        "activity_bq": 156.23107547828687,
+        "sigma_bq": 8.763661564307402,
+        "normalized_weights": [
+          0.40375319912543606,
+          0.5962468008745638
+        ],
+        "diagnostics": {
+          "covariance_rank": 2,
+          "scaled_eigenvalues": [
+            0.6771578455988666,
+            1.0
+          ],
+          "relative_rank_tolerance": 4.440892098500626e-15,
+          "condition_number": 1.476760561070687,
+          "weight_clipping": false,
+          "regularization": null,
+          "singular_policy": "reject",
+          "negative_weight_line_ids": [],
+          "residuals_bq": [
+            -4.292978117582377,
+            2.9070238133051607
+          ],
+          "residual_sigmas_bq": [
+            10.649780097077967,
+            7.211582146639005
+          ],
+          "standardized_residuals": [
+            -0.4031048602365286,
+            0.4031048602365286
+          ],
+          "chi_square": 0.16249352834631126,
+          "chi_square_definition": "residual.T C+ residual on stochastic range",
+          "chi_square_dof": 1,
+          "rank_diagnostics_available": true,
+          "residual_definition": "centered line activities minus weighted centered mean",
+          "exact_cancellation": false,
+          "chi_square_interpretation": "GLS goodness of fit only; other weights are descriptive",
+          "null_constraint_residuals_bq": [],
+          "null_constraint_tolerance_bq": 3.197443168406772e-14,
+          "incompatible_exact_constraints": false,
+          "line_inconsistency_flags": [
+            false,
+            false
+          ]
+        },
+        "covariance_bq2": [
+          [
+            190.21958012983686,
+            0.0
+          ],
+          [
+            0.0,
+            128.8086810714413
+          ]
+        ]
+      }
+    ]
+  },
+  "historical_report_control": {
+    "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+    "complete_uncertainty_gls": {
+      "schema_version": 1,
+      "method": "gls",
+      "analysis_role": "historical_reproduction_control",
+      "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+      "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+      "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+      "qualified_line_ids": [
+        "Co60-line-0",
+        "Co60-line-1"
+      ],
+      "input_lines": [
+        {
+          "line_id": "Co60-line-0",
+          "isotope": "Co60",
+          "activity_bq": 219.78,
+          "sigma_bq": 10.202249598286022,
+          "qualified": true,
+          "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+          "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+          "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+          "activity_reference": "source measurement-time activity"
+        },
+        {
+          "line_id": "Co60-line-1",
+          "isotope": "Co60",
+          "activity_bq": 246.42,
+          "sigma_bq": 8.530668764752162,
+          "qualified": true,
+          "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+          "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+          "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+          "activity_reference": "source measurement-time activity"
+        }
+      ],
+      "exclusions": [],
+      "covariance_sources": [
+        {
+          "name": "declared_sigma_diagonal_control",
+          "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+          "definition": "Independent diagonal control; line-error correlations unavailable",
+          "availability": "available",
+          "matrix_bq2": [
+            [
+              104.08589686572729,
+              0.0
+            ],
+            [
+              0.0,
+              72.77230957391818
+            ]
+          ]
+        },
+        {
+          "name": "shared_efficiency_calibration",
+          "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+          "definition": "not available from source receipt/report",
+          "availability": "unavailable",
+          "matrix_bq2": null
+        },
+        {
+          "name": "shared_yield_calibration",
+          "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+          "definition": "not available from source receipt/report",
+          "availability": "unavailable",
+          "matrix_bq2": null
+        }
+      ],
+      "unavailable_components": [
+        "shared_efficiency_calibration",
+        "shared_yield_calibration"
+      ],
+      "status": "unavailable",
+      "activity_bq": null,
+      "sigma_bq": null,
+      "normalized_weights": null,
+      "diagnostics": null,
+      "reason": "Required uncertainty components unavailable"
+    },
+    "conditional_same_input_methods": [
+      {
+        "schema_version": 1,
+        "method": "historical_activity_over_sigma",
+        "analysis_role": "historical_reproduction_control",
+        "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+        "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+        "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+        "qualified_line_ids": [
+          "Co60-line-0",
+          "Co60-line-1"
+        ],
+        "input_lines": [
+          {
+            "line_id": "Co60-line-0",
+            "isotope": "Co60",
+            "activity_bq": 219.78,
+            "sigma_bq": 10.202249598286022,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+            "activity_reference": "source measurement-time activity"
+          },
+          {
+            "line_id": "Co60-line-1",
+            "isotope": "Co60",
+            "activity_bq": 246.42,
+            "sigma_bq": 8.530668764752162,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+            "activity_reference": "source measurement-time activity"
+          }
+        ],
+        "exclusions": [],
+        "covariance_sources": [
+          {
+            "name": "declared_sigma_diagonal_control",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "Independent diagonal control; line-error correlations unavailable",
+            "availability": "available",
+            "matrix_bq2": [
+              [
+                104.08589686572729,
+                0.0
+              ],
+              [
+                0.0,
+                72.77230957391818
+              ]
+            ]
+          },
+          {
+            "name": "shared_efficiency_calibration",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          },
+          {
+            "name": "shared_yield_calibration",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          }
+        ],
+        "unavailable_components": [
+          "shared_efficiency_calibration",
+          "shared_yield_calibration"
+        ],
+        "status": "conditional",
+        "activity_bq": 235.0398255515649,
+        "sigma_bq": 6.5476829614290715,
+        "normalized_weights": [
+          0.4271837255418579,
+          0.5728162744581421
+        ],
+        "diagnostics": {
+          "covariance_rank": 2,
+          "scaled_eigenvalues": [
+            0.6991562907681507,
+            1.0
+          ],
+          "relative_rank_tolerance": 4.440892098500626e-15,
+          "condition_number": 1.430295362001703,
+          "weight_clipping": false,
+          "regularization": null,
+          "singular_policy": "reject",
+          "negative_weight_line_ids": [],
+          "residuals_bq": [
+            -15.259825551564898,
+            11.380174448435088
+          ],
+          "residual_sigmas_bq": [
+            7.617771762804521,
+            5.6810329368534696
+          ],
+          "standardized_residuals": [
+            -2.0031875496814457,
+            2.0031875496814457
+          ],
+          "chi_square": 4.016850602122715,
+          "chi_square_definition": "residual.T C+ residual on stochastic range",
+          "chi_square_dof": 1,
+          "rank_diagnostics_available": true,
+          "residual_definition": "centered line activities minus weighted centered mean",
+          "exact_cancellation": false,
+          "chi_square_interpretation": "GLS goodness of fit only; other weights are descriptive",
+          "null_constraint_residuals_bq": [],
+          "null_constraint_tolerance_bq": 1.1830536550405662e-13,
+          "incompatible_exact_constraints": false,
+          "line_inconsistency_flags": [
+            false,
+            false
+          ]
+        },
+        "covariance_bq2": [
+          [
+            104.08589686572729,
+            0.0
+          ],
+          [
+            0.0,
+            72.77230957391818
+          ]
+        ]
+      },
+      {
+        "schema_version": 1,
+        "method": "inverse_variance",
+        "analysis_role": "historical_reproduction_control",
+        "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+        "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+        "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+        "qualified_line_ids": [
+          "Co60-line-0",
+          "Co60-line-1"
+        ],
+        "input_lines": [
+          {
+            "line_id": "Co60-line-0",
+            "isotope": "Co60",
+            "activity_bq": 219.78,
+            "sigma_bq": 10.202249598286022,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+            "activity_reference": "source measurement-time activity"
+          },
+          {
+            "line_id": "Co60-line-1",
+            "isotope": "Co60",
+            "activity_bq": 246.42,
+            "sigma_bq": 8.530668764752162,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+            "activity_reference": "source measurement-time activity"
+          }
+        ],
+        "exclusions": [],
+        "covariance_sources": [
+          {
+            "name": "declared_sigma_diagonal_control",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "Independent diagonal control; line-error correlations unavailable",
+            "availability": "available",
+            "matrix_bq2": [
+              [
+                104.08589686572729,
+                0.0
+              ],
+              [
+                0.0,
+                72.77230957391818
+              ]
+            ]
+          },
+          {
+            "name": "shared_efficiency_calibration",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          },
+          {
+            "name": "shared_yield_calibration",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          }
+        ],
+        "unavailable_components": [
+          "shared_efficiency_calibration",
+          "shared_yield_calibration"
+        ],
+        "status": "conditional",
+        "activity_bq": 235.45836940294447,
+        "sigma_bq": 6.544348454154085,
+        "normalized_weights": [
+          0.41147262000959184,
+          0.5885273799904082
+        ],
+        "diagnostics": {
+          "covariance_rank": 2,
+          "scaled_eigenvalues": [
+            0.6991562907681507,
+            1.0
+          ],
+          "relative_rank_tolerance": 4.440892098500626e-15,
+          "condition_number": 1.430295362001703,
+          "weight_clipping": false,
+          "regularization": null,
+          "singular_policy": "reject",
+          "negative_weight_line_ids": [],
+          "residuals_bq": [
+            -15.678369402944465,
+            10.961630597055521
+          ],
+          "residual_sigmas_bq": [
+            7.826710686893844,
+            5.472094012764146
+          ],
+          "standardized_residuals": [
+            -2.0031875496814457,
+            2.0031875496814457
+          ],
+          "chi_square": 4.012760359198754,
+          "chi_square_definition": "residual.T C+ residual on stochastic range",
+          "chi_square_dof": 1,
+          "rank_diagnostics_available": true,
+          "residual_definition": "centered line activities minus weighted centered mean",
+          "exact_cancellation": false,
+          "chi_square_interpretation": "GLS goodness of fit only; other weights are descriptive",
+          "null_constraint_residuals_bq": [],
+          "null_constraint_tolerance_bq": 1.1830536550405662e-13,
+          "incompatible_exact_constraints": false,
+          "line_inconsistency_flags": [
+            false,
+            false
+          ]
+        },
+        "covariance_bq2": [
+          [
+            104.08589686572729,
+            0.0
+          ],
+          [
+            0.0,
+            72.77230957391818
+          ]
+        ]
+      },
+      {
+        "schema_version": 1,
+        "method": "gls",
+        "analysis_role": "historical_reproduction_control",
+        "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+        "uncertainty_definition": "absolute 1-sigma Bq; conditional declared-error-only control",
+        "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+        "qualified_line_ids": [
+          "Co60-line-0",
+          "Co60-line-1"
+        ],
+        "input_lines": [
+          {
+            "line_id": "Co60-line-0",
+            "isotope": "Co60",
+            "activity_bq": 219.78,
+            "sigma_bq": 10.202249598286022,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+            "activity_reference": "source measurement-time activity"
+          },
+          {
+            "line_id": "Co60-line-1",
+            "isotope": "Co60",
+            "activity_bq": 246.42,
+            "sigma_bq": 8.530668764752162,
+            "qualified": true,
+            "qualification": "frozen selected Co60 equation-control set; absolute accuracy unqualified",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "count_basis": "rounded vendor report comparison counts; count-error-only approximation",
+            "activity_reference": "source measurement-time activity"
+          }
+        ],
+        "exclusions": [],
+        "covariance_sources": [
+          {
+            "name": "declared_sigma_diagonal_control",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "Independent diagonal control; line-error correlations unavailable",
+            "availability": "available",
+            "matrix_bq2": [
+              [
+                104.08589686572729,
+                0.0
+              ],
+              [
+                0.0,
+                72.77230957391818
+              ]
+            ]
+          },
+          {
+            "name": "shared_efficiency_calibration",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          },
+          {
+            "name": "shared_yield_calibration",
+            "source_identity": "46096eb:weighting_control.json:sha256:9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+            "definition": "not available from source receipt/report",
+            "availability": "unavailable",
+            "matrix_bq2": null
+          }
+        ],
+        "unavailable_components": [
+          "shared_efficiency_calibration",
+          "shared_yield_calibration"
+        ],
+        "status": "conditional",
+        "activity_bq": 235.45836940294447,
+        "sigma_bq": 6.544348454154085,
+        "normalized_weights": [
+          0.4114726200095918,
+          0.5885273799904083
+        ],
+        "diagnostics": {
+          "covariance_rank": 2,
+          "scaled_eigenvalues": [
+            0.6991562907681507,
+            1.0
+          ],
+          "relative_rank_tolerance": 4.440892098500626e-15,
+          "condition_number": 1.430295362001703,
+          "weight_clipping": false,
+          "regularization": null,
+          "singular_policy": "reject",
+          "negative_weight_line_ids": [],
+          "residuals_bq": [
+            -15.678369402944469,
+            10.961630597055517
+          ],
+          "residual_sigmas_bq": [
+            7.826710686893846,
+            5.4720940127641455
+          ],
+          "standardized_residuals": [
+            -2.0031875496814457,
+            2.0031875496814457
+          ],
+          "chi_square": 4.012760359198754,
+          "chi_square_definition": "residual.T C+ residual on stochastic range",
+          "chi_square_dof": 1,
+          "rank_diagnostics_available": true,
+          "residual_definition": "centered line activities minus weighted centered mean",
+          "exact_cancellation": false,
+          "chi_square_interpretation": "GLS goodness of fit only; other weights are descriptive",
+          "null_constraint_residuals_bq": [],
+          "null_constraint_tolerance_bq": 1.1830536550405662e-13,
+          "incompatible_exact_constraints": false,
+          "line_inconsistency_flags": [
+            false,
+            false
+          ]
+        },
+        "covariance_bq2": [
+          [
+            104.08589686572729,
+            0.0
+          ],
+          [
+            0.0,
+            72.77230957391818
+          ]
+        ]
+      }
+    ]
+  },
+  "same_input_relative_method_change_percent": -0.16697448068920817,
+  "physical_synthetic_shared_covariance_control": {
+    "schema_version": 1,
+    "method": "gls",
+    "analysis_role": "physical_analysis",
+    "engine_identity": "checkout:b5c5678ea99fd1a64d984aa758da616a2818a14d;activity_combination_sha256:129bcd58f676cb047dca041271ff9df34d929da786e819a119714afc06162fd5",
+    "uncertainty_definition": "1-sigma Bq; 2 Bq independent + 5 Bq shared",
+    "uncertainty_propagation": "fixed-weight sqrt(w.T C w); no scatter inflation",
+    "qualified_line_ids": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "input_lines": [
+      {
+        "line_id": "0",
+        "isotope": "synthetic",
+        "activity_bq": 100.0,
+        "sigma_bq": 5.385164807134504,
+        "qualified": true,
+        "qualification": "synthetic mathematical control",
+        "source_identity": "analytic fixture",
+        "count_basis": "synthetic",
+        "activity_reference": "common reference"
+      },
+      {
+        "line_id": "1",
+        "isotope": "synthetic",
+        "activity_bq": 100.0,
+        "sigma_bq": 5.385164807134504,
+        "qualified": true,
+        "qualification": "synthetic mathematical control",
+        "source_identity": "analytic fixture",
+        "count_basis": "synthetic",
+        "activity_reference": "common reference"
+      },
+      {
+        "line_id": "2",
+        "isotope": "synthetic",
+        "activity_bq": 100.0,
+        "sigma_bq": 5.385164807134504,
+        "qualified": true,
+        "qualification": "synthetic mathematical control",
+        "source_identity": "analytic fixture",
+        "count_basis": "synthetic",
+        "activity_reference": "common reference"
+      },
+      {
+        "line_id": "3",
+        "isotope": "synthetic",
+        "activity_bq": 100.0,
+        "sigma_bq": 5.385164807134504,
+        "qualified": true,
+        "qualification": "synthetic mathematical control",
+        "source_identity": "analytic fixture",
+        "count_basis": "synthetic",
+        "activity_reference": "common reference"
+      }
+    ],
+    "exclusions": [],
+    "covariance_sources": [
+      {
+        "name": "count",
+        "source_identity": "analytic fixture",
+        "definition": "independent 2 Bq standard uncertainty",
+        "availability": "available",
+        "matrix_bq2": [
+          [
+            4.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            4.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            4.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            4.0
+          ]
+        ]
+      },
+      {
+        "name": "shared_efficiency_yield",
+        "source_identity": "analytic fixture",
+        "definition": "fully shared 5 Bq standard uncertainty",
+        "availability": "available",
+        "matrix_bq2": [
+          [
+            25.0,
+            25.0,
+            25.0,
+            25.0
+          ],
+          [
+            25.0,
+            25.0,
+            25.0,
+            25.0
+          ],
+          [
+            25.0,
+            25.0,
+            25.0,
+            25.0
+          ],
+          [
+            25.0,
+            25.0,
+            25.0,
+            25.0
+          ]
+        ]
+      }
+    ],
+    "unavailable_components": [],
+    "status": "available",
+    "activity_bq": 100.0,
+    "sigma_bq": 5.0990195135927845,
+    "normalized_weights": [
+      0.2499999999999996,
+      0.25000000000000283,
+      0.24999999999999895,
+      0.2499999999999985
+    ],
+    "diagnostics": {
+      "covariance_rank": 4,
+      "scaled_eigenvalues": [
+        0.13793103448275829,
+        0.13793103448275862,
+        0.1379310344827589,
+        3.586206896551724
+      ],
+      "relative_rank_tolerance": 3.1851915740970006e-14,
+      "condition_number": 26.000000000000064,
+      "weight_clipping": false,
+      "regularization": null,
+      "singular_policy": "reject",
+      "negative_weight_line_ids": [],
+      "residuals_bq": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "residual_sigmas_bq": [
+        1.7320508075688785,
+        1.7320508075688705,
+        1.7320508075688799,
+        1.7320508075688805
+      ],
+      "standardized_residuals": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "chi_square": 0.0,
+      "chi_square_definition": "residual.T C+ residual on stochastic range",
+      "chi_square_dof": 3,
+      "rank_diagnostics_available": true,
+      "residual_definition": "centered line activities minus weighted centered mean",
+      "exact_cancellation": false,
+      "chi_square_interpretation": "GLS goodness of fit only; other weights are descriptive",
+      "null_constraint_residuals_bq": [],
+      "null_constraint_tolerance_bq": 0.0,
+      "incompatible_exact_constraints": false,
+      "line_inconsistency_flags": [
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    "covariance_bq2": [
+      [
+        29.0,
+        25.0,
+        25.0,
+        25.0
+      ],
+      [
+        25.0,
+        29.0,
+        25.0,
+        25.0
+      ],
+      [
+        25.0,
+        25.0,
+        29.0,
+        25.0
+      ],
+      [
+        25.0,
+        25.0,
+        25.0,
+        29.0
+      ]
+    ]
+  },
+  "limitations": [
+    "Source reductions were not rerun with the current engine. Current engine descendant executes only this new aggregation module.",
+    "Unavailable vendor/physical calibration errors stay unavailable; partial controls are conditional.",
+    "Source count bases and calibration qualification remain separate. No QuantumGold summary is used as a fit target.",
+    "Integration and complete physical uncertainty qualification remain under #232/#220."
+  ]
+}
