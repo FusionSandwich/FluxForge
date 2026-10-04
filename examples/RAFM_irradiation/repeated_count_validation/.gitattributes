@@ -1,0 +1,2 @@
+# Preserve the byte-bound example fixtures, source and receipts.
+* -text whitespace=cr-at-eol

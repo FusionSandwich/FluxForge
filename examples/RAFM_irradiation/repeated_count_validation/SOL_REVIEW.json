@@ -1,0 +1,50 @@
+{
+  "schema": "repeated-count-sol-adversarial-review-v1",
+  "review_status": "ACCEPTED_FOR_SCOPED_COMPONENT",
+  "scientific_admission": false,
+  "scope": [
+    "src/fluxforge/analysis/repeated_count_validation.py",
+    "tests/test_repeated_count_validation.py",
+    "examples/RAFM_irradiation/repeated_count_validation/run_example.py",
+    "examples/RAFM_irradiation/repeated_count_validation/fixtures.json",
+    "examples/RAFM_irradiation/repeated_count_validation/EXAMPLE_RECEIPT_final.json"
+  ],
+  "sha256": {
+    "src/fluxforge/analysis/repeated_count_validation.py": "3dd1fab991c10dacca8b99e5b491a628d359a985aad7a9f9bc2d28f4db397cbf",
+    "tests/test_repeated_count_validation.py": "ff2997a5db24cf433b69b63f26868fd770d252f7dfd827425a2f9930c9d7356d",
+    "examples/RAFM_irradiation/repeated_count_validation/run_example.py": "4ef481e8eb15c70b89c4fca4f44a9986a1ac42637b8550372ebbd44444ece5d0",
+    "examples/RAFM_irradiation/repeated_count_validation/fixtures.json": "ff971785eafdbb10174ce494efee3a1669c92363cba7cab9453e18d078d8661b",
+    "examples/RAFM_irradiation/repeated_count_validation/EXAMPLE_RECEIPT_final.json": "78959fb463ede14d191a80ca2bc6fdf3dba38826e097fddb46d69bb9fc86a9c9"
+  },
+  "verification": {
+    "focused_tests": "99 passed in 2.47s using the existing D:/CodexEnvs/FluxForge/optimization-workflows-win/Scripts/python.exe; test_repeated_count_validation.py, test_activation_count_clock.py, and test_count_decay_time.py",
+    "example_replay": "run_example() returned a dict exactly equal to EXAMPLE_RECEIPT_final.json; all three original report hashes matched before and after analysis",
+    "canonical_api": "Net-count normalization calls physics.activation.GammaLineMeasurement; count-average normalization calls physics.activation.count_decay_factor.",
+    "counterexamples": {
+      "analytic_two_count_truth": "CONSISTENT",
+      "duplicate_source_sha256": "INCOMPATIBLE",
+      "overlapping_count_windows": "INCOMPATIBLE",
+      "different_known_eoi": "INCOMPATIBLE",
+      "missing_calibration_id": "UNAVAILABLE",
+      "nonnumeric_identity_basis": "UNAVAILABLE",
+      "tiny_positive_half_life_net_counts": "UNAVAILABLE; no exception or infinite activity",
+      "tiny_positive_half_life_count_average": "UNAVAILABLE; no exception or infinite activity",
+      "boolean_count_value": "UNAVAILABLE",
+      "prior_count_decay_declaration_on_net_counts": "UNAVAILABLE",
+      "nonexistent_dst_local_timestamp": "UNAVAILABLE",
+      "count_end_before_start_with_short_duration": "UNAVAILABLE"
+    },
+    "receipt_scientific_admission": "False at report, line, pair, and activity levels"
+  },
+  "example_outcome": {
+    "strict_source": "Sc46 and Sc47 comparisons incompatible; Sc48 excluded",
+    "conditional_same_wire_same_clock": "Sc47 159.4 keV and Sc46 1120.5 keV consistent; Sc46 889.3 keV discrepant; Sc48 excluded",
+    "processed_reference": "Sc46 and Sc47 incompatible; Sc48 excluded"
+  },
+  "open_blocking_findings": [],
+  "limits": [
+    "Shared physical specimen identity, clock zone, background applicability, vendor point-reference convention, and irradiation history remain unqualified for the Ti reports.",
+    "The conditional same-line results test decay consistency under declared assumptions only; they do not establish absolute activity, reaction rate, flux, or full-workflow parity.",
+    "Caller-provided identity and source hashes require an upstream source adapter to bind actual input bytes; the focused example performs that binding for its three reports."
+  ]
+}
