@@ -13,7 +13,6 @@ import hashlib
 import json
 from pathlib import Path
 import platform
-import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,6 +32,7 @@ from fluxforge.analysis.peakfit import FWHM_SIG_RATIO, fit_single_peak
 from fluxforge.analysis.spectrum_math import subtract_measured_background
 from fluxforge.data.rafm_profile import load_rafm_profile
 from fluxforge.io.flux_wire import read_raw_asc
+from fluxforge.validation.example_identity import source_identity
 
 
 def sha(path):
@@ -118,18 +118,22 @@ def run_pilot(evidence_root=None):
         "src/fluxforge/io/flux_wire.py",
         "src/fluxforge/data/rafm_profiles.json",
     ]
-    engine = {}
-    for name in engine_files:
-        blob = subprocess.check_output(
-            ["git", "show", f"{source_ref}:{name}"], cwd=ROOT
-        )
-        # Windows worktrees may use CRLF; Git's canonical bytes establish identity.
-        actual = (ROOT / name).read_bytes().replace(b"\r\n", b"\n")
-        if actual != blob.replace(b"\r\n", b"\n"):
-            raise RuntimeError(
-                "current engine file differs from verified base: " + name
-            )
-        engine[name] = hashlib.sha256(blob).hexdigest()
+    # These SHA256 pins were computed from the local a7bcc68 Git objects after
+    # canonical-LF normalization. They preserve the exact source check offline.
+    engine_pins = {
+        "src/fluxforge/analysis/peakfit.py": "53a0001131d8410bfbac113ff2adb5bbd79be653784931ab8711d747ea97c226",
+        "src/fluxforge/analysis/spectrum_math.py": "d5bac0936affbac6175216e0034047e8fbef25d2e29c480db4583ac1dbd0a488",
+        "src/fluxforge/analysis/flux_wire_analysis.py": "5b5fe5516ff0bdc630cdbbdc1b7672d7eb88e1b6c662c36f5d91cf3a8cfe6b32",
+        "src/fluxforge/io/flux_wire.py": "1a6d2fad25f4ac7863da1eb5ac7677bd091c73a36a01edfcdafc3e82a814d377",
+        "src/fluxforge/data/rafm_profiles.json": "7fb3ab63f303bd8bacc3117257ff518834d5845669e8bcc9c2dc7adf6587acea",
+    }
+    identity = source_identity(
+        ROOT,
+        engine_files,
+        expected_sha256=engine_pins,
+        canonical_lf=True,
+    )
+    engine = identity["files_sha256"]
     rows = []
     # Co60 energies/yields are fixed inputs, not report net-count targets.
     for energy, intensity in [(1173.228, 0.9985), (1332.492, 0.999826)]:
@@ -300,7 +304,8 @@ def run_pilot(evidence_root=None):
     return {
         "issue": 239,
         "engine_base": source_ref,
-        "engine_files_sha256_git_bytes": engine,
+        "engine_files_sha256_canonical_lf": engine,
+        "engine_source_identity": identity,
         "implementation_sha256": sha(ROOT / "src/fluxforge/analysis/joint_poisson.py"),
         "pilot_script_sha256": sha(Path(__file__)),
         "inputs_sha256": before,

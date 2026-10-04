@@ -1,0 +1,918 @@
+{
+  "Al28": {
+    "half_life_seconds": 134.46,
+    "gamma_lines": [
+      {
+        "energy_keV": 1778.7,
+        "intensity": 1.0
+      }
+    ]
+  },
+  "Co58": {
+    "half_life_seconds": 6122300.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 810.775,
+        "intensity": 0.9945
+      },
+      {
+        "energy_keV": 863.959,
+        "intensity": 0.006832215
+      },
+      {
+        "energy_keV": 1674.73,
+        "intensity": 0.00519129
+      }
+    ]
+  },
+  "Co60": {
+    "half_life_seconds": 166337000.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 1173.23,
+        "intensity": 0.9985
+      },
+      {
+        "energy_keV": 1332.49,
+        "intensity": 0.999826
+      }
+    ]
+  },
+  "Cr51": {
+    "half_life_seconds": 2393540.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 320.084,
+        "intensity": 0.0987
+      }
+    ]
+  },
+  "Fe59": {
+    "half_life_seconds": 3844370.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 142.651,
+        "intensity": 0.00972
+      },
+      {
+        "energy_keV": 192.349,
+        "intensity": 0.02918
+      },
+      {
+        "energy_keV": 334.8,
+        "intensity": 0.00264
+      },
+      {
+        "energy_keV": 1099.25,
+        "intensity": 0.5659
+      },
+      {
+        "energy_keV": 1291.59,
+        "intensity": 0.4321
+      }
+    ]
+  },
+  "Mn54": {
+    "half_life_seconds": 26968000.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 834.838,
+        "intensity": 0.999746
+      }
+    ]
+  },
+  "Mn56": {
+    "half_life_seconds": 9296.64,
+    "gamma_lines": [
+      {
+        "energy_keV": 846.764,
+        "intensity": 0.9883
+      },
+      {
+        "energy_keV": 1238.27,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 1810.73,
+        "intensity": 0.276
+      },
+      {
+        "energy_keV": 2113.09,
+        "intensity": 0.148
+      },
+      {
+        "energy_keV": 2523.06,
+        "intensity": 0.0103
+      },
+      {
+        "energy_keV": 2657.56,
+        "intensity": 0.0066
+      },
+      {
+        "energy_keV": 2959.92,
+        "intensity": 0.0031
+      }
+    ]
+  },
+  "Sb124": {
+    "half_life_seconds": 5201280.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 400.03,
+        "intensity": 0.00127
+      },
+      {
+        "energy_keV": 444.1,
+        "intensity": 0.002
+      },
+      {
+        "energy_keV": 525.35,
+        "intensity": 0.00117
+      },
+      {
+        "energy_keV": 602.73,
+        "intensity": 0.9789
+      },
+      {
+        "energy_keV": 632.4,
+        "intensity": 0.00111
+      },
+      {
+        "energy_keV": 645.855,
+        "intensity": 0.0742
+      },
+      {
+        "energy_keV": 709.31,
+        "intensity": 0.0137
+      },
+      {
+        "energy_keV": 713.781,
+        "intensity": 0.0228
+      },
+      {
+        "energy_keV": 722.78,
+        "intensity": 0.108
+      },
+      {
+        "energy_keV": 735.66,
+        "intensity": 0.0013
+      },
+      {
+        "energy_keV": 790.73,
+        "intensity": 0.0074
+      },
+      {
+        "energy_keV": 968.201,
+        "intensity": 0.0188
+      },
+      {
+        "energy_keV": 1045.13,
+        "intensity": 0.0182
+      },
+      {
+        "energy_keV": 1325.51,
+        "intensity": 0.0155
+      },
+      {
+        "energy_keV": 1355.11,
+        "intensity": 0.0103
+      },
+      {
+        "energy_keV": 1368.16,
+        "intensity": 0.0261
+      },
+      {
+        "energy_keV": 1376.1,
+        "intensity": 0.0049
+      },
+      {
+        "energy_keV": 1436.56,
+        "intensity": 0.012
+      },
+      {
+        "energy_keV": 1445.3,
+        "intensity": 0.0035
+      },
+      {
+        "energy_keV": 1489.0,
+        "intensity": 0.0068
+      },
+      {
+        "energy_keV": 1526.35,
+        "intensity": 0.004
+      },
+      {
+        "energy_keV": 1579.7,
+        "intensity": 0.00152
+      },
+      {
+        "energy_keV": 1690.98,
+        "intensity": 0.476
+      },
+      {
+        "energy_keV": 2090.94,
+        "intensity": 0.0548
+      }
+    ]
+  },
+  "Ta182": {
+    "half_life_seconds": 9910080.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 84.6808,
+        "intensity": 0.026296008304
+      },
+      {
+        "energy_keV": 100.106,
+        "intensity": 0.14116811764
+      },
+      {
+        "energy_keV": 113.672,
+        "intensity": 0.019375988928
+      },
+      {
+        "energy_keV": 116.419,
+        "intensity": 0.00429041038
+      },
+      {
+        "energy_keV": 152.431,
+        "intensity": 0.07404402768
+      },
+      {
+        "energy_keV": 156.387,
+        "intensity": 0.026780391696
+      },
+      {
+        "energy_keV": 179.395,
+        "intensity": 0.031486022836
+      },
+      {
+        "energy_keV": 198.353,
+        "intensity": 0.01422059654
+      },
+      {
+        "energy_keV": 222.11,
+        "intensity": 0.07438984084
+      },
+      {
+        "energy_keV": 229.322,
+        "intensity": 0.03667599654
+      },
+      {
+        "energy_keV": 264.076,
+        "intensity": 0.035084398616
+      },
+      {
+        "energy_keV": 927.995,
+        "intensity": 0.006020415224
+      },
+      {
+        "energy_keV": 959.732,
+        "intensity": 0.003390798062
+      },
+      {
+        "energy_keV": 1001.7,
+        "intensity": 0.02034479654
+      },
+      {
+        "energy_keV": 1044.41,
+        "intensity": 0.002179798754
+      },
+      {
+        "energy_keV": 1113.39,
+        "intensity": 0.00422120692
+      },
+      {
+        "energy_keV": 1121.3,
+        "intensity": 0.34600015224
+      },
+      {
+        "energy_keV": 1157.32,
+        "intensity": 0.005882008304
+      },
+      {
+        "energy_keV": 1158.09,
+        "intensity": 0.00415200346
+      },
+      {
+        "energy_keV": 1189.05,
+        "intensity": 0.1613053038
+      },
+      {
+        "energy_keV": 1221.41,
+        "intensity": 0.26849595156
+      },
+      {
+        "energy_keV": 1223.81,
+        "intensity": 0.002145201107
+      },
+      {
+        "energy_keV": 1231.02,
+        "intensity": 0.11307273772
+      },
+      {
+        "energy_keV": 1257.42,
+        "intensity": 0.014704979932
+      },
+      {
+        "energy_keV": 1273.73,
+        "intensity": 0.0064702173
+      },
+      {
+        "energy_keV": 1289.16,
+        "intensity": 0.013459399308
+      },
+      {
+        "energy_keV": 1342.72,
+        "intensity": 0.002525799723
+      },
+      {
+        "energy_keV": 1373.84,
+        "intensity": 0.002179798754
+      }
+    ]
+  },
+  "Tb154m": {
+    "half_life_seconds": 32400.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 123.07,
+        "intensity": 0.3
+      },
+      {
+        "energy_keV": 124.4,
+        "intensity": 0.0023
+      },
+      {
+        "energy_keV": 232.1,
+        "intensity": 0.0047
+      },
+      {
+        "energy_keV": 247.94,
+        "intensity": 0.22
+      },
+      {
+        "energy_keV": 330.0,
+        "intensity": 0.002
+      },
+      {
+        "energy_keV": 337.9,
+        "intensity": 0.0031
+      },
+      {
+        "energy_keV": 346.7,
+        "intensity": 0.016
+      },
+      {
+        "energy_keV": 382.12,
+        "intensity": 0.0104
+      },
+      {
+        "energy_keV": 415.85,
+        "intensity": 0.021
+      },
+      {
+        "energy_keV": 444.54,
+        "intensity": 0.0106
+      },
+      {
+        "energy_keV": 461.61,
+        "intensity": 0.0025
+      },
+      {
+        "energy_keV": 484.74,
+        "intensity": 0.0016
+      },
+      {
+        "energy_keV": 492.1,
+        "intensity": 0.0014
+      },
+      {
+        "energy_keV": 506.43,
+        "intensity": 0.0061
+      },
+      {
+        "energy_keV": 518.04,
+        "intensity": 0.061
+      },
+      {
+        "energy_keV": 540.18,
+        "intensity": 0.2
+      },
+      {
+        "energy_keV": 545.5,
+        "intensity": 0.001
+      },
+      {
+        "energy_keV": 557.6,
+        "intensity": 0.0031
+      },
+      {
+        "energy_keV": 591.9,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 598.19,
+        "intensity": 0.014
+      },
+      {
+        "energy_keV": 625.19,
+        "intensity": 0.0023
+      },
+      {
+        "energy_keV": 642.18,
+        "intensity": 0.0068
+      },
+      {
+        "energy_keV": 649.44,
+        "intensity": 0.109
+      },
+      {
+        "energy_keV": 660.4,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 669.1,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 676.55,
+        "intensity": 0.032
+      },
+      {
+        "energy_keV": 692.41,
+        "intensity": 0.033
+      },
+      {
+        "energy_keV": 715.8,
+        "intensity": 0.0057
+      },
+      {
+        "energy_keV": 722.5,
+        "intensity": 0.0037
+      },
+      {
+        "energy_keV": 723.6,
+        "intensity": 0.0023
+      },
+      {
+        "energy_keV": 749.4,
+        "intensity": 0.001
+      },
+      {
+        "energy_keV": 753.1,
+        "intensity": 0.0023
+      },
+      {
+        "energy_keV": 756.71,
+        "intensity": 0.027
+      },
+      {
+        "energy_keV": 796.29,
+        "intensity": 0.0025
+      },
+      {
+        "energy_keV": 800.7,
+        "intensity": 0.001
+      },
+      {
+        "energy_keV": 826.29,
+        "intensity": 0.0014
+      },
+      {
+        "energy_keV": 830.49,
+        "intensity": 0.0068
+      },
+      {
+        "energy_keV": 845.16,
+        "intensity": 0.0025
+      },
+      {
+        "energy_keV": 850.54,
+        "intensity": 0.0016
+      },
+      {
+        "energy_keV": 857.2,
+        "intensity": 0.001
+      },
+      {
+        "energy_keV": 873.21,
+        "intensity": 0.092
+      },
+      {
+        "energy_keV": 880.6,
+        "intensity": 0.0031
+      },
+      {
+        "energy_keV": 892.76,
+        "intensity": 0.031
+      },
+      {
+        "energy_keV": 922.1,
+        "intensity": 0.003
+      },
+      {
+        "energy_keV": 922.1,
+        "intensity": 0.003
+      },
+      {
+        "energy_keV": 924.6,
+        "intensity": 0.014
+      },
+      {
+        "energy_keV": 927.5,
+        "intensity": 0.0035
+      },
+      {
+        "energy_keV": 953.18,
+        "intensity": 0.0057
+      },
+      {
+        "energy_keV": 964.9,
+        "intensity": 0.0033
+      },
+      {
+        "energy_keV": 982.0,
+        "intensity": 0.0031
+      },
+      {
+        "energy_keV": 984.3,
+        "intensity": 0.0045
+      },
+      {
+        "energy_keV": 996.24,
+        "intensity": 0.086
+      },
+      {
+        "energy_keV": 1004.73,
+        "intensity": 0.109
+      },
+      {
+        "energy_keV": 1012.9,
+        "intensity": 0.001
+      },
+      {
+        "energy_keV": 1020.4,
+        "intensity": 0.0029
+      },
+      {
+        "energy_keV": 1033.3,
+        "intensity": 0.0047
+      },
+      {
+        "energy_keV": 1041.9,
+        "intensity": 0.0022
+      },
+      {
+        "energy_keV": 1047.22,
+        "intensity": 0.0014
+      },
+      {
+        "energy_keV": 1053.9,
+        "intensity": 0.0022
+      },
+      {
+        "energy_keV": 1058.34,
+        "intensity": 0.0027
+      },
+      {
+        "energy_keV": 1061.39,
+        "intensity": 0.0014
+      },
+      {
+        "energy_keV": 1072.37,
+        "intensity": 0.0035
+      },
+      {
+        "energy_keV": 1084.21,
+        "intensity": 0.0021
+      },
+      {
+        "energy_keV": 1084.21,
+        "intensity": 0.0021
+      },
+      {
+        "energy_keV": 1102.43,
+        "intensity": 0.0027
+      },
+      {
+        "energy_keV": 1118.03,
+        "intensity": 0.0053
+      },
+      {
+        "energy_keV": 1128.77,
+        "intensity": 0.016
+      },
+      {
+        "energy_keV": 1140.75,
+        "intensity": 0.014
+      },
+      {
+        "energy_keV": 1149.66,
+        "intensity": 0.0098
+      },
+      {
+        "energy_keV": 1152.42,
+        "intensity": 0.022
+      },
+      {
+        "energy_keV": 1177.71,
+        "intensity": 0.0029
+      },
+      {
+        "energy_keV": 1189.1,
+        "intensity": 0.0061
+      },
+      {
+        "energy_keV": 1208.06,
+        "intensity": 0.0051
+      },
+      {
+        "energy_keV": 1214.3,
+        "intensity": 0.00106
+      },
+      {
+        "energy_keV": 1229.42,
+        "intensity": 0.0059
+      },
+      {
+        "energy_keV": 1234.0,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 1237.5,
+        "intensity": 0.0016
+      },
+      {
+        "energy_keV": 1241.23,
+        "intensity": 0.0027
+      },
+      {
+        "energy_keV": 1246.2,
+        "intensity": 0.0027
+      },
+      {
+        "energy_keV": 1258.17,
+        "intensity": 0.016
+      },
+      {
+        "energy_keV": 1274.46,
+        "intensity": 0.0078
+      },
+      {
+        "energy_keV": 1275.0,
+        "intensity": 0.0031
+      },
+      {
+        "energy_keV": 1280.8,
+        "intensity": 0.0018
+      },
+      {
+        "energy_keV": 1288.39,
+        "intensity": 0.008
+      },
+      {
+        "energy_keV": 1288.39,
+        "intensity": 0.008
+      },
+      {
+        "energy_keV": 1309.05,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 1339.53,
+        "intensity": 0.0029
+      },
+      {
+        "energy_keV": 1387.76,
+        "intensity": 0.0029
+      },
+      {
+        "energy_keV": 1419.4,
+        "intensity": 0.0072
+      },
+      {
+        "energy_keV": 1451.1,
+        "intensity": 0.0014
+      },
+      {
+        "energy_keV": 1490.37,
+        "intensity": 0.0104
+      },
+      {
+        "energy_keV": 1494.1,
+        "intensity": 0.0027
+      },
+      {
+        "energy_keV": 1515.8,
+        "intensity": 0.0031
+      },
+      {
+        "energy_keV": 1520.69,
+        "intensity": 0.0057
+      },
+      {
+        "energy_keV": 1523.0,
+        "intensity": 0.0033
+      },
+      {
+        "energy_keV": 1553.0,
+        "intensity": 0.0023
+      },
+      {
+        "energy_keV": 1618.9,
+        "intensity": 0.0039
+      },
+      {
+        "energy_keV": 1651.8,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 1673.15,
+        "intensity": 0.0045
+      },
+      {
+        "energy_keV": 1721.0,
+        "intensity": 0.0014
+      },
+      {
+        "energy_keV": 1814.9,
+        "intensity": 0.0014
+      },
+      {
+        "energy_keV": 1858.4,
+        "intensity": 0.0022
+      },
+      {
+        "energy_keV": 1894.7,
+        "intensity": 0.0017
+      },
+      {
+        "energy_keV": 1905.0,
+        "intensity": 0.0016
+      },
+      {
+        "energy_keV": 1931.0,
+        "intensity": 0.0012
+      },
+      {
+        "energy_keV": 1934.71,
+        "intensity": 0.0072
+      },
+      {
+        "energy_keV": 1965.03,
+        "intensity": 0.019
+      },
+      {
+        "energy_keV": 1998.0,
+        "intensity": 0.0037
+      },
+      {
+        "energy_keV": 2024.9,
+        "intensity": 0.002
+      },
+      {
+        "energy_keV": 2084.7,
+        "intensity": 0.00123
+      },
+      {
+        "energy_keV": 2107.0,
+        "intensity": 0.0016
+      },
+      {
+        "energy_keV": 2142.9,
+        "intensity": 0.0022
+      },
+      {
+        "energy_keV": 2153.81,
+        "intensity": 0.01
+      },
+      {
+        "energy_keV": 2182.6,
+        "intensity": 0.0018
+      },
+      {
+        "energy_keV": 2212.92,
+        "intensity": 0.0082
+      },
+      {
+        "energy_keV": 2245.7,
+        "intensity": 0.0045
+      },
+      {
+        "energy_keV": 2282.8,
+        "intensity": 0.0022
+      },
+      {
+        "energy_keV": 2295.9,
+        "intensity": 0.0031
+      },
+      {
+        "energy_keV": 2358.3,
+        "intensity": 0.002
+      },
+      {
+        "energy_keV": 2372.4,
+        "intensity": 0.0013
+      },
+      {
+        "energy_keV": 2389.5,
+        "intensity": 0.002
+      },
+      {
+        "energy_keV": 2411.1,
+        "intensity": 0.001
+      },
+      {
+        "energy_keV": 2496.3,
+        "intensity": 0.001
+      },
+      {
+        "energy_keV": 2559.6,
+        "intensity": 0.00143
+      },
+      {
+        "energy_keV": 2575.1,
+        "intensity": 0.00108
+      }
+    ]
+  },
+  "V52": {
+    "half_life_seconds": 224.7,
+    "gamma_lines": [
+      {
+        "energy_keV": 1333.67,
+        "intensity": 0.0059
+      },
+      {
+        "energy_keV": 1434.09,
+        "intensity": 1.0
+      },
+      {
+        "energy_keV": 1530.69,
+        "intensity": 0.00116
+      }
+    ]
+  },
+  "W187": {
+    "half_life_seconds": 85860.0,
+    "gamma_lines": [
+      {
+        "energy_keV": 134.25,
+        "intensity": 0.08667
+      },
+      {
+        "energy_keV": 206.25,
+        "intensity": 0.001296
+      },
+      {
+        "energy_keV": 246.3,
+        "intensity": 0.001134
+      },
+      {
+        "energy_keV": 479.49,
+        "intensity": 0.21681
+      },
+      {
+        "energy_keV": 511.65,
+        "intensity": 0.006372
+      },
+      {
+        "energy_keV": 551.49,
+        "intensity": 0.05049
+      },
+      {
+        "energy_keV": 588.96,
+        "intensity": 0.001296
+      },
+      {
+        "energy_keV": 618.28,
+        "intensity": 0.0621
+      },
+      {
+        "energy_keV": 625.5,
+        "intensity": 0.0108
+      },
+      {
+        "energy_keV": 685.74,
+        "intensity": 0.27
+      },
+      {
+        "energy_keV": 745.4,
+        "intensity": 0.002997
+      },
+      {
+        "energy_keV": 772.91,
+        "intensity": 0.04104
+      },
+      {
+        "energy_keV": 864.6,
+        "intensity": 0.003348
+      },
+      {
+        "energy_keV": 879.6,
+        "intensity": 0.001404
+      }
+    ]
+  }
+}

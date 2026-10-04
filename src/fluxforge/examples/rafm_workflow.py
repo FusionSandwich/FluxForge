@@ -534,7 +534,15 @@ def resolve_measurement_timing(
             )
 
     if "RAFM-1" in stem_upper or "RAFM1" in stem_upper:
-        flux_wire_info = schedule.get("flux_wires", {}).get(stem)
+        wire_schedule = schedule.get("flux_wires", {})
+        canonical = normalize_pairing_key(stem, metadata.pairing_aliases)
+        candidates = [
+            key for key in wire_schedule
+            if normalize_pairing_key(key, metadata.pairing_aliases) == canonical
+        ]
+        if len(candidates) > 1:
+            raise ValueError(f"Ambiguous flux-wire schedule aliases for {stem!r}: {candidates}")
+        flux_wire_info = wire_schedule[candidates[0]] if candidates else None
         if flux_wire_info is not None:
             return TimingInfo(
                 sample_group="flux_wires",
@@ -715,6 +723,7 @@ def aggregate_isotope_results(
     for isotope, payload in activity_payload.items():
         result = {
             "activity_bq": float(payload.get("activity_bq", 0.0)),
+            "activity_reference": payload.get("activity_reference"),
             "activity_unc_bq": float(payload.get("activity_unc_bq", 0.0)),
             "activity_uci": float(payload.get("activity_uci", 0.0)),
             "activity_unc_uci": float(payload.get("activity_unc_uci", 0.0)),
@@ -3916,7 +3925,7 @@ def analyze_flux_wire_sample(
             for peak in unidentified_peaks
         ],
         "isotopes": isotope_payload,
-        "reactions": [asdict(reaction) for reaction in reactions],
+        "reactions": reaction_rows_to_dicts(reactions),
         "peak_comparison": peak_rows,
         "isotope_comparison": isotope_rows,
         "line_diagnostics": line_rows,
@@ -4199,11 +4208,18 @@ def reaction_rows_to_dicts(
         )
         row["rate_uncertainty_missing"] = ";".join(budget.missing) if budget else ""
         row["rate_uncertainty_budget"] = asdict(budget) if budget else None
+        unavailable = reaction.rate_note == "no end-of-irradiation activity (decay timing missing or non-finite)"
+        row["rate_status"] = "UNAVAILABLE" if unavailable else "DIAGNOSTIC"
+        if unavailable:
+            # Internal legacy placeholders never become measured zeros in exports.
+            for key in ("activity_bq", "activity_unc_bq", "reaction_rate", "reaction_rate_unc", "n_atoms"):
+                row[key] = None
         rows.append(row)
     return rows
 
 
 _REACTION_ROW_EXTRA_KEYS = (
+    "rate_status",
     "rate_uncertainty_components",
     "rate_uncertainty_missing",
     "rate_uncertainty_budget",
@@ -4214,6 +4230,9 @@ _REACTION_ROW_EXTRA_KEYS = (
 def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
     """Rebuild a FluxWireReaction (with its uncertainty budget) from a row dict."""
     data = {key: value for key, value in row.items() if key not in _REACTION_ROW_EXTRA_KEYS}
+    if row.get("rate_status") == "UNAVAILABLE":
+        for key in ("activity_bq", "activity_unc_bq", "reaction_rate", "reaction_rate_unc", "n_atoms"):
+            data[key] = 0.0
     reaction = FluxWireReaction(**data)
     # Accept both the serialized form and a raw ``asdict(reaction)`` payload.
     serialized = row.get("rate_uncertainty_budget") or row.get("uncertainty_budget")
@@ -4516,6 +4535,16 @@ def run_qg_benchmark(
     return summary
 
 
+def optional_export_number(value: Any) -> Optional[float]:
+    """Read CSV nulls without manufacturing measured zeros."""
+    if value is None or value == "":
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("Non-finite numeric artifact value")
+    return number
+
+
 def compare_rafm_completion_results(
     raw_results_root: Path,
     qg_results_root: Path,
@@ -4547,14 +4576,15 @@ def compare_rafm_completion_results(
     for key in matched_keys:
         raw_row = raw_by_key[key]
         qg_row = qg_by_key[key]
-        raw_activity = float(raw_row.get("activity_bq") or 0.0)
-        qg_activity = float(qg_row.get("activity_bq") or 0.0)
-        raw_rate = float(raw_row.get("reaction_rate") or 0.0)
-        qg_rate = float(qg_row.get("reaction_rate") or 0.0)
+        raw_activity = optional_export_number(raw_row.get("activity_bq"))
+        qg_activity = optional_export_number(qg_row.get("activity_bq"))
+        raw_rate = optional_export_number(raw_row.get("reaction_rate"))
+        qg_rate = optional_export_number(qg_row.get("reaction_rate"))
         rel_activity = (
-            (raw_activity - qg_activity) / qg_activity if qg_activity else None
+            (raw_activity - qg_activity) / qg_activity
+            if raw_activity is not None and qg_activity else None
         )
-        rel_rate = (raw_rate - qg_rate) / qg_rate if qg_rate else None
+        rel_rate = (raw_rate - qg_rate) / qg_rate if raw_rate is not None and qg_rate else None
         if rel_activity is not None:
             activity_errors.append(abs(rel_activity))
         if rel_rate is not None:
@@ -5066,7 +5096,13 @@ def run_rafm_validation(
     max_spectra: Optional[int] = None,
     flux_wire_counting_method: Optional[str] = None,
     generic_targeted_counting_method: Optional[str] = None,
+    background_spectrum_override: Optional[GammaSpectrum] = None,
 ) -> Dict[str, Any]:
+    if background_spectrum_override is not None:
+        live = float(background_spectrum_override.live_time)
+        real = float(background_spectrum_override.real_time)
+        if not math.isfinite(live) or live <= 0 or not math.isfinite(real) or real < live:
+            raise ValueError("Background override requires finite positive live time and real time >= live time")
     paths = default_paths(example_root, results_root=results_root)
     metadata = load_rafm_example_metadata(paths.example_root)
     if flux_wire_counting_method is not None:
@@ -5099,11 +5135,13 @@ def run_rafm_validation(
     )
 
     energy_override = workflow_profile_energy_calibration(metadata.config)
-    background_spectrum = read_raw_asc(
-        paths.background_path,
-        energy_calibration_override=energy_override,
-        profile_name=metadata.config["profile_name"],
-    ).spectrum
+    background_spectrum = background_spectrum_override
+    if background_spectrum is None:
+        background_spectrum = read_raw_asc(
+            paths.background_path,
+            energy_calibration_override=energy_override,
+            profile_name=metadata.config["profile_name"],
+        ).spectrum
     if background_spectrum is None:
         raise ValueError(
             f"Failed to load background spectrum from {paths.background_path}"

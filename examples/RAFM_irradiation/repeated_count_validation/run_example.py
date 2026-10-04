@@ -6,7 +6,6 @@ import argparse
 import hashlib
 import json
 import platform
-import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -24,6 +23,7 @@ from fluxforge.analysis.repeated_count_validation import (
     compare_repeated_counts,
 )
 from fluxforge.io.flux_wire import read_processed_txt
+from fluxforge.validation.example_identity import source_identity
 
 HERE = Path(__file__).resolve().parent
 ENGINE_BASE = "a7bcc680d1f5e06b1d9dae405241fc380087ca2b"
@@ -42,10 +42,16 @@ def read_bound_report(path, fixture):
 
 
 def run_example():
-    subprocess.run(
-        ["git", "merge-base", "--is-ancestor", ENGINE_BASE, "HEAD"],
-        cwd=ROOT,
-        check=True,
+    identity = source_identity(
+        ROOT,
+        [
+            "src/fluxforge/analysis/repeated_count_validation.py",
+            "src/fluxforge/physics/activation.py",
+            "examples/RAFM_irradiation/repeated_count_validation/run_example.py",
+            "examples/RAFM_irradiation/repeated_count_validation/fixtures.json",
+            "src/fluxforge/io/flux_wire.py",
+        ],
+        required_ancestor=ENGINE_BASE,
     )
     manifest = json.loads((HERE / "fixtures.json").read_text(encoding="utf-8-sig"))
     groups, summaries, sources = {}, {}, []
@@ -146,17 +152,12 @@ def run_example():
         for f in manifest["reports"]
     ):
         raise ValueError("Original changed during diagnostic")
-    head = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
+    head = identity["revision"]
     return {
         "schema": "bounded-ti-repeated-count-example-v1",
         "engine_base": ENGINE_BASE,
         "worktree_head": head,
+        "source_identity": identity,
         "code_sha256": {
             p.relative_to(ROOT).as_posix(): digest(p)
             for p in [

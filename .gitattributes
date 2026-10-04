@@ -11,3 +11,4 @@ src/fluxforge/examples/rafm_feature_example.py -text
 src/fluxforge/io/spectrum_csv.py -text
 src/fluxforge/workflows/phase6_ldrd_worked_example.py -text
 tools/audit_rafm_raw_recovery.py -text
+artifacts/validation/south_working_baseline_20261003/** -text whitespace=-blank-at-eol,cr-at-eol

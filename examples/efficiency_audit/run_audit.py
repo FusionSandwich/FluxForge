@@ -8,7 +8,6 @@ import csv
 import hashlib
 import json
 from pathlib import Path
-import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,6 +17,7 @@ import numpy as np  # noqa: E402 (repository path bootstrap for direct execution
 import scipy  # noqa: E402
 
 from fluxforge.analysis.qg_calibration import QGEfficiencyTable  # noqa: E402
+from fluxforge.validation.example_identity import source_identity  # noqa: E402
 from fluxforge.analysis.qg_report_qc import qg_yield_diagnostic  # noqa: E402
 from fluxforge.io.flux_wire import (  # noqa: E402
     EfficiencyCalibration,
@@ -248,9 +248,11 @@ def run(output: Path, selected_method: str) -> dict:
     near_contact = source.at(1099.2, fe_geo)
     if near_contact["admissible_for_comparison"]:
         raise ValueError("Near-contact Fe-Cd erroneously admitted")
-    engine = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-    ).strip()
+    identity = source_identity(
+        ROOT,
+        ["src/fluxforge/physics/efficiency_fidelity.py"],
+    )
+    engine = identity["revision"]
     for name in [
         "physics/efficiency_fidelity.py",
         "analysis/qg_calibration.py",
@@ -264,6 +266,7 @@ def run(output: Path, selected_method: str) -> dict:
     receipt = {
         "schema": "source-efficiency-fidelity-v1",
         "engine_commit": engine,
+        "source_identity": identity,
         "required_engine_ancestor": "4615e61bbb262d974e0326a44107bc952e4cb903",
         "implementation_sha256": sha(
             ROOT / "src/fluxforge/physics/efficiency_fidelity.py"

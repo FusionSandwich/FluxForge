@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "scope": "working_comparison_failure_paths_and_source_identity",
+  "input_files_hash_checked": 13,
+  "physical_counts": 32,
+  "no_geometry_or_intensity_exclusion_bypass": true,
+  "no_silent_timing_shift": true,
+  "no_claim_of_independent_calibration": true
+}
