@@ -235,6 +235,9 @@ jobs:
       - name: Module 3 workflow Qt tests
         run: pytest -q tests/test_module3_workflows_qt.py
 
+      - name: Qt report bundles and instrument provenance
+        run: pytest -q tests/test_gui_report_bundle.py tests/test_instrument_provenance.py
+
       - name: Predictive dashboard Qt tests
         run: pytest -q tests/test_predictive_dashboard_qt.py
 
