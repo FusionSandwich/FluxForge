@@ -1,0 +1,3 @@
+# Preserve copied source receipts and exported identities byte for byte.
+*.json -text whitespace=cr-at-eol
+*.txt -text whitespace=cr-at-eol
