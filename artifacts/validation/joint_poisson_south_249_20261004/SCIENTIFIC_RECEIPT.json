@@ -1,0 +1,146 @@
+{
+  "issue": 249,
+  "integration_base_head": "701288a30f418ed7dc331e6deda0044eb220e72e",
+  "scope": "source-bound South-background Co-Cd two-line joint-Poisson model-check pilot",
+  "vendor_targets_loaded": false,
+  "vendor_agreement_role": "not an optimization target or model-selection criterion",
+  "software_status": "implemented; supported-runtime focused CI receipt pending at artifact creation",
+  "physical_qualification_status": "NOT_QUALIFIED",
+  "source_binding": {
+    "sample": {
+      "path": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Co-Cd-RAFM-1.ASC",
+      "sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+      "live_time_s": 129600,
+      "count_basis": "original integer ASC channel counts"
+    },
+    "south_background": {
+      "path": "examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/South 4hr Background Terminal.ANS",
+      "sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "live_time_s": 14400,
+      "real_time_s": 14409.5,
+      "channel_count": 8192,
+      "count_sum": 543427,
+      "native_energy_polynomial_keV": [
+        -1.6994324922561646,
+        0.49959567189216614,
+        9.02407251146542e-8
+      ],
+      "temporal_applicability": "UNRESOLVED"
+    }
+  },
+  "calibration_covariance": "UNAVAILABLE; never treated as zero",
+  "current_integrated_iec_control": {
+    "activity_bq": 134.32510950634438,
+    "sigma_bq_conditional": 11.123372474243185,
+    "line_activities_bq": [
+      {
+        "energy_keV": 1173.0854722048314,
+        "activity_bq": 116.72868245060657,
+        "sigma_bq": 16.933222685366214
+      },
+      {
+        "energy_keV": 1332.2962282832593,
+        "activity_bq": 147.68175971572145,
+        "sigma_bq": 14.752857559453478
+      }
+    ],
+    "unavailable_components": [
+      "shared_calibration"
+    ],
+    "role": "external current-engine control, not inference target"
+  },
+  "lines": [
+    {
+      "energy_keV": 1173.228,
+      "south_native_linear": {
+        "area_counts": 7367.296267771842,
+        "activity_bq_count_average_conditional": 160.1504492194236,
+        "sample_poisson_deviance": 113.8496670522652,
+        "background_poisson_deviance": 23.085459231407796,
+        "max_abs_sample_deviance_residual": 5.6841,
+        "adequacy_flag": "strong_lack_of_fit",
+        "profile_95_counts": [
+          6692.8443467,
+          8025.9528559
+        ]
+      },
+      "south_native_step": {
+        "area_counts": 7219.756963028671,
+        "activity_bq_count_average_conditional": 156.94323655,
+        "sample_poisson_deviance": 77.2664,
+        "background_poisson_deviance": 29.0631,
+        "adequacy_flag": "strong_lack_of_fit",
+        "boundary_note": "sample continuum nuisance reaches active boundary"
+      },
+      "same_fixed_roi_iec_covell": {
+        "net_counts": 7407.068131226115,
+        "sigma_counts_full_covariance": 904.6191561560024,
+        "activity_bq_count_average_conditional": 161.01501086687065,
+        "sigma_bq_conditional": 19.664631224976596
+      },
+      "ambient_off_linear": {
+        "area_counts": 11057.634556,
+        "activity_bq_count_average_conditional": 240.37110455,
+        "adequacy_flag": "strong_lack_of_fit",
+        "interpretation": "sensitivity control only"
+      },
+      "south_free_normalization": {
+        "status": "unidentifiable",
+        "identifiability_ratio": 6.539009261e-17
+      }
+    },
+    {
+      "energy_keV": 1332.492,
+      "south_native_linear": {
+        "area_counts": 6872.7491454501205,
+        "activity_bq_count_average_conditional": 156.81444704089748,
+        "sample_poisson_deviance": 149.19665479768855,
+        "background_poisson_deviance": 13.471553602359073,
+        "max_abs_sample_deviance_residual": 7.6654,
+        "adequacy_flag": "strong_lack_of_fit",
+        "profile_95_counts": [
+          6274.8775128,
+          7445.3789185
+        ]
+      },
+      "south_native_step": {
+        "area_counts": 6700.517577965922,
+        "activity_bq_count_average_conditional": 152.88466619,
+        "sample_poisson_deviance": 124.8553,
+        "background_poisson_deviance": 22.9036,
+        "adequacy_flag": "strong_lack_of_fit",
+        "boundary_note": "sample continuum nuisance reaches active boundary"
+      },
+      "same_fixed_roi_iec_covell": {
+        "net_counts": 7513.08920014004,
+        "sigma_counts_full_covariance": 673.0296750055002,
+        "activity_bq_count_average_conditional": 171.42498635627666,
+        "sigma_bq_conditional": 15.356413291757095
+      },
+      "ambient_off_linear": {
+        "area_counts": 11083.742715,
+        "activity_bq_count_average_conditional": 252.89603159,
+        "adequacy_flag": "strong_lack_of_fit",
+        "interpretation": "sensitivity control only"
+      },
+      "south_free_normalization": {
+        "status": "unidentifiable",
+        "identifiability_ratio": 1.0679622497e-16
+      }
+    }
+  ],
+  "synthetic_contracts": [
+    "well-specified rounded-Asimov positive control must not acquire a strong-lack flag",
+    "unmodelled shifted shoulder must converge yet retain strong_lack_of_fit",
+    "free normalization tradeoff must remain unidentifiable"
+  ],
+  "limitations": [
+    "South background temporal applicability remains unresolved.",
+    "Shared calibration/efficiency covariance is unavailable.",
+    "Fixed Gaussian response and profile calibration are model assumptions.",
+    "Asymptotic profile intervals do not calibrate sparse/nonregular coverage.",
+    "Ambient-off is a sensitivity control, not evidence of final QuantumGold settings.",
+    "No QuantumGold activity/net-count target is loaded or used for model choice.",
+    "North issue #239 results remain cross-detector sensitivity only."
+  ]
+}
