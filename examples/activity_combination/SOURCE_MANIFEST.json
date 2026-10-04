@@ -1,0 +1,18 @@
+{
+  "source_commit": "46096eb",
+  "source_repository": "https://github.com/FusionSandwich/FluxForge",
+  "source_path": "artifacts/validation/quantumgold_documentation_20261003",
+  "source_reduction_engine": "not established by these receipts; not represented as current-engine reduction",
+  "aggregation_engine_base": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "required_engine_ancestor": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "files": {
+    "weighting_control.json": {
+      "sha256": "9202eb6db23c8bd6fb083dd1899270b56bfb0481be6d381fe0349e99e37d4824",
+      "bytes": 469
+    },
+    "combination_method_control.json": {
+      "sha256": "54167ade456e79e7f1efa6be29c6d42fed28c7033b36c261a648cf8becfef2b6",
+      "bytes": 12157
+    }
+  }
+}

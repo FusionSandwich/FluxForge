@@ -1,0 +1,4 @@
+*.ANS -text
+Co-Cd-RAFM-1.txt -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+Fe-Cd-RAFM-1.txt -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+RAFM-A-300s.txt -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol

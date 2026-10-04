@@ -1,0 +1,43 @@
+{
+  "schema": "repeated-count-ti-fixtures-v1",
+  "reports": [
+    {
+      "measurement_id": "Ti-RAFM-1",
+      "original_catalog_specimen_id": "Ti-RAFM-1",
+      "source_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+      "source_path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1.txt",
+      "local_path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1_25cm.txt",
+      "sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+      "bytes": 4406,
+      "copy_action": "reuse byte-identical locally tracked report; no duplicate original"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1a",
+      "original_catalog_specimen_id": "Ti-RAFM-1a",
+      "source_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+      "source_path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1a.txt",
+      "local_path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1a_25cm.txt",
+      "sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+      "bytes": 4361,
+      "copy_action": "reuse byte-identical locally tracked report; no duplicate original"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1b",
+      "original_catalog_specimen_id": "Ti-RAFM-1b",
+      "source_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+      "source_path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1b.txt",
+      "local_path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1b_25cm.txt",
+      "sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+      "bytes": 4361,
+      "copy_action": "reuse byte-identical locally tracked report; no duplicate original"
+    }
+  ],
+  "identity_catalog_sha256": "ffba4786c8357ccade78ff70c9ba404b55ce45c94339cbaab5c9ae2b717a46a8",
+  "identity_catalog_source": "46096eb:examples/RAFM_irradiation/quantumgold_reference/identity_labels.json",
+  "documentation_sha256": "6fa1a3e928010b5b03f7ba453e3b6a2212d2254c65ed85e3ea0bc6abb63dbb42",
+  "documentation_source": "https://github.com/FusionSandwich/FluxForge/blob/46096eb/artifacts/validation/quantumgold_documentation_20261003/FINDINGS.txt",
+  "time_zone": null,
+  "eoi": null,
+  "physical_shared_specimen_identity": null,
+  "note": "The identity catalog keeps three count/specimen labels; source README describes correspondence-based shared-wire geometry. Shared identity is an explicit conditional scenario only."
+}

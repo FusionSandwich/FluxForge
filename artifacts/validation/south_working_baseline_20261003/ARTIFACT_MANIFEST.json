@@ -1,0 +1,165 @@
+{
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 83,
+      "sha256": "3876b064ca63d31951e66c09d1dcaf11df151fb6c17d8ded72b066c6c2169cca"
+    },
+    {
+      "path": "build_baseline.py",
+      "bytes": 12453,
+      "sha256": "471ffff7240509c52cd74fa8222fae027fab5db830dbbb4ce72c355ae68903fb"
+    },
+    {
+      "path": "BUILD_RECEIPT.json",
+      "bytes": 798,
+      "sha256": "a24542edb03cc383cef872b89d25ec2c474c8bb3aafcaf6c4e584ca89d22803d"
+    },
+    {
+      "path": "GIT_BYTE_VERIFICATION.json",
+      "bytes": 701,
+      "sha256": "b9dbf8a2ddfb9805bd2ed4e887456b772987a7f4101ac3420edc52d1375e0722"
+    },
+    {
+      "path": "INDEPENDENT_ACCEPTANCE.json",
+      "bytes": 1544,
+      "sha256": "705589af2ab8842e22f584f8f826fb1d71cc852a4464abc3cb7ddfa5f8f831a7"
+    },
+    {
+      "path": "inputs/chronology_join_receipt.json",
+      "bytes": 126557,
+      "sha256": "18f8d8669f53f0595f9bb12d7e3f1dcd17c23d8f6194da0c795b01fc6edb1ced"
+    },
+    {
+      "path": "inputs/count_metadata_matrix_32_2026-09-27.json",
+      "bytes": 126354,
+      "sha256": "afe9f0411990c38340592930d7507737febe1a3bc20f2854f20159e2eb967b9b"
+    },
+    {
+      "path": "inputs/detector_archive_inventory.json",
+      "bytes": 289024,
+      "sha256": "6537327102745f7ded7c81e71847464a967cd0f671e12a69a3e8722a984b95bd"
+    },
+    {
+      "path": "inputs/geomEffUWHPGe.xlsx.txt",
+      "bytes": 2492,
+      "sha256": "f82a793563d84a44a184ac5facfb1798cdf59b57ebcb9c014d09a005d7d23aa4"
+    },
+    {
+      "path": "inputs/QG_EFFECTIVE_EFFICIENCY.json",
+      "bytes": 422935,
+      "sha256": "a88082b1bcf68142824e94a91f00c682bfe1db550b5be362492df35eb24bc3df"
+    },
+    {
+      "path": "inputs/reconstruct_qg_efficiency_original.py",
+      "bytes": 7436,
+      "sha256": "8b72f92eb09724c8ba6a30ef13558c0f89d9f41c61f6e31fb41926c826749f68"
+    },
+    {
+      "path": "inputs/report_roi_rows.csv",
+      "bytes": 72934,
+      "sha256": "62d6ae249bed9d396339bfa4af9ac7e36e75c8fe7e4e74e1b622cc1e0df15f3a"
+    },
+    {
+      "path": "inputs/reported_summary_rows.json",
+      "bytes": 45003,
+      "sha256": "ec738337831083fe2e1691f14438dc26a317a375f6018ba47a2c191b484c331f"
+    },
+    {
+      "path": "inputs/SC48_QUANTITATIVE_DIAGNOSTIC.json",
+      "bytes": 54590,
+      "sha256": "12a2e2fa97acf109005c9058a22786ae0f422a0af66eeca37122a3fd006ba404"
+    },
+    {
+      "path": "inputs/South Small Vial 25cm.csv",
+      "bytes": 64635,
+      "sha256": "03d01e0acbb4da14c3775b00ed239b86187e6b9c16b8d7ed4c2a6be32d3a0000"
+    },
+    {
+      "path": "inputs/uwHPGeDimensions.xlsx",
+      "bytes": 6751,
+      "sha256": "ab42b9f1a3dbb7cc037cb410c010625bc92602382633081acb2ca98913d45591"
+    },
+    {
+      "path": "inputs/uwHPGeDimensions.xlsx.txt",
+      "bytes": 4723,
+      "sha256": "0afbceafe95876ea06b44dc7cb74524d1e9e52b27f081e8a8b67aeb0f3314464"
+    },
+    {
+      "path": "inputs/uwHPGeModeling.pptx.txt",
+      "bytes": 8604,
+      "sha256": "466eacda84ec8f26b2cfdd6022c6aa29d88c44768a231ec0397072e7bce79125"
+    },
+    {
+      "path": "irradiation_timing_scenarios.csv",
+      "bytes": 4289,
+      "sha256": "9c75e12306b714dd3c728ae8d3ad151b776f85c9b220f7592bcc86e7cddba85b"
+    },
+    {
+      "path": "line_response_lookup.csv",
+      "bytes": 78403,
+      "sha256": "184bc835cba2d1adbc0f7256279fac9cb3f7273c7015087e602cd791e99a6f24"
+    },
+    {
+      "path": "line_response_lookup.json",
+      "bytes": 266509,
+      "sha256": "9fd36c46d6692fffe23b502bbdc82e826a3a664d130acc12d467de25c37c0dc9"
+    },
+    {
+      "path": "measurement_identity_and_timing.csv",
+      "bytes": 13030,
+      "sha256": "be4e5e534640e0ba20ba59523ff1cb3906f8defbfce99e36ee8db7fbab5a0b32"
+    },
+    {
+      "path": "METHOD_AND_USE.txt",
+      "bytes": 9476,
+      "sha256": "d7e75325b96c770ebd955917552f111120745a6fd66c1720df911117e6158964"
+    },
+    {
+      "path": "plot_baseline.py",
+      "bytes": 2011,
+      "sha256": "bafbb385d0c4088b56f48259f196e39a7088732ffe6ba66a206a2589684a8c21"
+    },
+    {
+      "path": "provenance.json",
+      "bytes": 11639,
+      "sha256": "532adcd3ff4e2f84a92aa77ccda4f43d8adfdcababa1880f3b2547acfe20d0b3"
+    },
+    {
+      "path": "qg_conditioned_response_knots.csv",
+      "bytes": 5871,
+      "sha256": "f95eda007b046e97f8d52128c784f9bd4216439bf184619f12a191d95bf7c9d2"
+    },
+    {
+      "path": "sc48_corrected_yield_scenario.csv",
+      "bytes": 3831,
+      "sha256": "59c61bb7d69f9370ea21b58b97dcfae592c9e7e6bb59f8be98ce290e5fa19c52"
+    },
+    {
+      "path": "south_25cm_recovered_curve.csv",
+      "bytes": 124150,
+      "sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d"
+    },
+    {
+      "path": "south_efficiency_comparison.png",
+      "bytes": 120066,
+      "sha256": "997d24c88bc954ec7c697b6e352835b0264e9ce2dac976bec894ede9af194023"
+    },
+    {
+      "path": "south_efficiency_comparison.svg",
+      "bytes": 101644,
+      "sha256": "125d66aa7d2cace094aabd0d031bc052083c8296e1983260c51a860e0cb7d853"
+    },
+    {
+      "path": "VERIFICATION.json",
+      "bytes": 292,
+      "sha256": "0de4e28507b2d98f88c702bbc99f043465c2931163d5847a0421a74c9f34e1c7"
+    },
+    {
+      "path": "verify_baseline.py",
+      "bytes": 3970,
+      "sha256": "2247b0624e5bbf2f0fbd2a9dc986d1c08e7c537065bf11a87fd4a4f0a4cb3687"
+    }
+  ],
+  "bytes": 1992798
+}
