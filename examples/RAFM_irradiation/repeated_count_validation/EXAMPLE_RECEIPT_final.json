@@ -1,0 +1,2719 @@
+{
+  "schema": "bounded-ti-repeated-count-example-v1",
+  "engine_base": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "worktree_head": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "code_sha256": {
+    "src/fluxforge/analysis/repeated_count_validation.py": "3dd1fab991c10dacca8b99e5b491a628d359a985aad7a9f9bc2d28f4db397cbf",
+    "src/fluxforge/physics/activation.py": "d527f4b7ad32e44fc7de8a20b6a954492a45b43ca1840cb702e7eff7f8768859",
+    "examples/RAFM_irradiation/repeated_count_validation/run_example.py": "4ef481e8eb15c70b89c4fca4f44a9986a1ac42637b8550372ebbd44444ece5d0",
+    "examples/RAFM_irradiation/repeated_count_validation/fixtures.json": "ff971785eafdbb10174ce494efee3a1669c92363cba7cab9453e18d078d8661b",
+    "src/fluxforge/io/flux_wire.py": "a477e35b9e819a69e16c8e48bb2d42c70c11a741c41f24de01a7cb7247dc54bd"
+  },
+  "dependencies": {
+    "python": "3.11.9",
+    "executable": "D:\\CodexEnvs\\FluxForge\\optimization-workflows-win\\Scripts\\python.exe",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1"
+  },
+  "physical_counts": 3,
+  "comparison_scenario_counts": 3,
+  "historical_reproduction_performed": false,
+  "scientific_admission": false,
+  "sources": [
+    {
+      "measurement_id": "Ti-RAFM-1",
+      "original_catalog_specimen_id": "Ti-RAFM-1",
+      "source_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+      "source_path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1.txt",
+      "local_path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1_25cm.txt",
+      "sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+      "bytes": 4406,
+      "copy_action": "reuse byte-identical locally tracked report; no duplicate original",
+      "printed_id": "Ti-RAFM-1 @25cm",
+      "count_start_unzoned": "2025-08-12T10:04:31",
+      "live_time_s": 14400.0,
+      "real_time_s": 14411.89,
+      "printed_calibration_sha256": "0dd6f6abd27a6e272593f914486b998156baf50777947fa9503dd6a84e073dfd",
+      "reported_nuclides_and_lines": [
+        {
+          "isotope": "Sc47",
+          "half_life_value": 3.349,
+          "half_life_unit": "d",
+          "half_life_seconds": 289353.60000000003,
+          "activity": 0.0614,
+          "activity_unc": 0.00181,
+          "activity_unit": "uCi",
+          "activity_bq": 2271.8,
+          "peaks": [
+            {
+              "centroid": 159.3,
+              "rad_int": 68.3,
+              "center_keV": 159.29,
+              "gross_counts": 44532.0,
+              "gross_unc": 211,
+              "net_counts": 36293.0,
+              "net_unc": 300,
+              "assignment": "Sc47@159.4",
+              "activity": 0.0614,
+              "activity_unit": "uCi",
+              "reported_activity_text": "6.14E-02",
+              "reported_rad_int_text": "68.30",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+              "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+              "source_line_number": 67,
+              "source_line_text": "   159.3   68.30     159.29    44,532 \ufffd 211      36,293 \ufffd 300    Sc47@ 159.4    6.14E-02"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+            "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+            "source_line_number": 64,
+            "source_line_text": "Sc47        3.349 d   B                                Activity = 6.14E-02 \ufffd 1.81E-03 uCi",
+            "reported_activity_text": "6.14E-02",
+            "reported_uncertainty_text": "1.81E-03",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        },
+        {
+          "isotope": "Sc48",
+          "half_life_value": 43.7,
+          "half_life_unit": "h",
+          "half_life_seconds": 157320.0,
+          "activity": 0.424,
+          "activity_unc": 0.039,
+          "activity_unit": "uCi",
+          "activity_bq": 15688.0,
+          "peaks": [
+            {
+              "centroid": 175.6,
+              "rad_int": 7.48,
+              "center_keV": 175.23,
+              "gross_counts": 5346.0,
+              "gross_unc": 73,
+              "net_counts": 298.0,
+              "net_unc": 160,
+              "assignment": "Sc48@175.4",
+              "activity": 0.0047,
+              "activity_unit": "uCi",
+              "reported_activity_text": "4.70E-03",
+              "reported_rad_int_text": "7.48",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+              "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+              "source_line_number": 72,
+              "source_line_text": "   175.6    7.48     175.23     5,346 \ufffd 73          298 \ufffd 160    Sc48@ 175.4    4.70E-03"
+            },
+            {
+              "centroid": 983.3,
+              "rad_int": 1.0,
+              "center_keV": 983.36,
+              "gross_counts": 2703.0,
+              "gross_unc": 52,
+              "net_counts": 1575.0,
+              "net_unc": 97,
+              "assignment": "Sc48@983.5",
+              "activity": 0.646,
+              "activity_unit": "uCi",
+              "reported_activity_text": "0.646",
+              "reported_rad_int_text": "1.00",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+              "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+              "source_line_number": 73,
+              "source_line_text": "   983.3    1.00     983.36     2,703 \ufffd 52        1,575 \ufffd 97     Sc48@ 983.5       0.646"
+            },
+            {
+              "centroid": 1037.2,
+              "rad_int": 97.6,
+              "center_keV": 1037.25,
+              "gross_counts": 2497.0,
+              "gross_unc": 50,
+              "net_counts": 1705.0,
+              "net_unc": 85,
+              "assignment": "Sc48@1037.5",
+              "activity": 0.00752,
+              "activity_unit": "uCi",
+              "reported_activity_text": "7.52E-03",
+              "reported_rad_int_text": "97.60",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+              "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+              "source_line_number": 74,
+              "source_line_text": "  1037.2   97.60    1037.25     2,497 \ufffd 50        1,705 \ufffd 85     Sc48@1037.5    7.52E-03"
+            },
+            {
+              "centroid": 1311.7,
+              "rad_int": 1.0,
+              "center_keV": 1311.79,
+              "gross_counts": 1908.0,
+              "gross_unc": 44,
+              "net_counts": 1336.0,
+              "net_unc": 75,
+              "assignment": "Sc48@1312.1",
+              "activity": 0.691,
+              "activity_unit": "uCi",
+              "reported_activity_text": "0.691",
+              "reported_rad_int_text": "1.00",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+              "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+              "source_line_number": 75,
+              "source_line_text": "  1311.7    1.00    1311.79     1,908 \ufffd 44        1,336 \ufffd 75     Sc48@1312.1       0.691"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+            "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+            "source_line_number": 69,
+            "source_line_text": "Sc48       43.700 h   B                                Activity = 0.424 \ufffd 3.90E-02 uCi",
+            "reported_activity_text": "0.424",
+            "reported_uncertainty_text": "3.90E-02",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        },
+        {
+          "isotope": "Sc46",
+          "half_life_value": 83.81,
+          "half_life_unit": "d",
+          "half_life_seconds": 7241184.0,
+          "activity": 0.0128,
+          "activity_unc": 0.00118,
+          "activity_unit": "uCi",
+          "activity_bq": 473.6,
+          "peaks": [
+            {
+              "centroid": 889.0,
+              "rad_int": 99.98,
+              "center_keV": 889.04,
+              "gross_counts": 3430.0,
+              "gross_unc": 59,
+              "net_counts": 2121.0,
+              "net_unc": 112,
+              "assignment": "Sc46@889.3",
+              "activity": 0.00795,
+              "activity_unit": "uCi",
+              "reported_activity_text": "7.95E-03",
+              "reported_rad_int_text": "99.98",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+              "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+              "source_line_number": 80,
+              "source_line_text": "   889.0   99.98     889.04     3,430 \ufffd 59        2,121 \ufffd 112    Sc46@ 889.3    7.95E-03"
+            },
+            {
+              "centroid": 1120.1,
+              "rad_int": 99.99,
+              "center_keV": 1120.1,
+              "gross_counts": 4383.0,
+              "gross_unc": 66,
+              "net_counts": 3396.0,
+              "net_unc": 106,
+              "assignment": "Sc46@1120.5",
+              "activity": 0.0156,
+              "activity_unit": "uCi",
+              "reported_activity_text": "1.56E-02",
+              "reported_rad_int_text": "99.99",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+              "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+              "source_line_number": 81,
+              "source_line_text": "  1120.1   99.99    1120.10     4,383 \ufffd 66        3,396 \ufffd 106    Sc46@1120.5    1.56E-02"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt",
+            "source_file_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+            "source_line_number": 77,
+            "source_line_text": "Sc46       83.810 d   B                                Activity = 1.28E-02 \ufffd 1.18E-03 uCi",
+            "reported_activity_text": "1.28E-02",
+            "reported_uncertainty_text": "1.18E-03",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        }
+      ]
+    },
+    {
+      "measurement_id": "Ti-RAFM-1a",
+      "original_catalog_specimen_id": "Ti-RAFM-1a",
+      "source_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+      "source_path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1a.txt",
+      "local_path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1a_25cm.txt",
+      "sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+      "bytes": 4361,
+      "copy_action": "reuse byte-identical locally tracked report; no duplicate original",
+      "printed_id": "Ti-RAFM-1a @25cm",
+      "count_start_unzoned": "2025-08-12T14:07:29",
+      "live_time_s": 14400.0,
+      "real_time_s": 14411.95,
+      "printed_calibration_sha256": "0dd6f6abd27a6e272593f914486b998156baf50777947fa9503dd6a84e073dfd",
+      "reported_nuclides_and_lines": [
+        {
+          "isotope": "Sc47",
+          "half_life_value": 3.349,
+          "half_life_unit": "d",
+          "half_life_seconds": 289353.60000000003,
+          "activity": 0.0617,
+          "activity_unc": 0.00182,
+          "activity_unit": "uCi",
+          "activity_bq": 2282.9,
+          "peaks": [
+            {
+              "centroid": 159.3,
+              "rad_int": 68.3,
+              "center_keV": 159.3,
+              "gross_counts": 45284.0,
+              "gross_unc": 213,
+              "net_counts": 36476.0,
+              "net_unc": 313,
+              "assignment": "Sc47@159.4",
+              "activity": 0.0617,
+              "activity_unit": "uCi",
+              "reported_activity_text": "6.17E-02",
+              "reported_rad_int_text": "68.30",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+              "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+              "source_line_number": 67,
+              "source_line_text": "   159.3   68.30     159.30    45,284 \ufffd 213      36,476 \ufffd 313    Sc47@ 159.4    6.17E-02"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+            "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+            "source_line_number": 64,
+            "source_line_text": "Sc47        3.349 d   B                                Activity = 6.17E-02 \ufffd 1.82E-03 uCi",
+            "reported_activity_text": "6.17E-02",
+            "reported_uncertainty_text": "1.82E-03",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        },
+        {
+          "isotope": "Sc48",
+          "half_life_value": 43.7,
+          "half_life_unit": "h",
+          "half_life_seconds": 157320.0,
+          "activity": 0.408,
+          "activity_unc": 0.0368,
+          "activity_unit": "uCi",
+          "activity_bq": 15095.999999999998,
+          "peaks": [
+            {
+              "centroid": 175.1,
+              "rad_int": 7.48,
+              "center_keV": 175.28,
+              "gross_counts": 5456.0,
+              "gross_unc": 74,
+              "net_counts": 664.0,
+              "net_unc": 157,
+              "assignment": "Sc48@175.4",
+              "activity": 0.0105,
+              "activity_unit": "uCi",
+              "reported_activity_text": "1.05E-02",
+              "reported_rad_int_text": "7.48",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+              "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+              "source_line_number": 72,
+              "source_line_text": "   175.1    7.48     175.28     5,456 \ufffd 74          664 \ufffd 157    Sc48@ 175.4    1.05E-02"
+            },
+            {
+              "centroid": 983.4,
+              "rad_int": 1.0,
+              "center_keV": 983.4,
+              "gross_counts": 2637.0,
+              "gross_unc": 51,
+              "net_counts": 1617.0,
+              "net_unc": 94,
+              "assignment": "Sc48@983.5",
+              "activity": 0.663,
+              "activity_unit": "uCi",
+              "reported_activity_text": "0.663",
+              "reported_rad_int_text": "1.00",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+              "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+              "source_line_number": 73,
+              "source_line_text": "   983.4    1.00     983.40     2,637 \ufffd 51        1,617 \ufffd 94     Sc48@ 983.5       0.663"
+            },
+            {
+              "centroid": 1037.3,
+              "rad_int": 97.6,
+              "center_keV": 1037.36,
+              "gross_counts": 2558.0,
+              "gross_unc": 51,
+              "net_counts": 1603.0,
+              "net_unc": 94,
+              "assignment": "Sc48@1037.5",
+              "activity": 0.00707,
+              "activity_unit": "uCi",
+              "reported_activity_text": "7.07E-03",
+              "reported_rad_int_text": "97.60",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+              "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+              "source_line_number": 74,
+              "source_line_text": "  1037.3   97.60    1037.36     2,558 \ufffd 51        1,603 \ufffd 94     Sc48@1037.5    7.07E-03"
+            },
+            {
+              "centroid": 1311.9,
+              "rad_int": 1.0,
+              "center_keV": 1311.88,
+              "gross_counts": 1943.0,
+              "gross_unc": 44,
+              "net_counts": 1303.0,
+              "net_unc": 84,
+              "assignment": "Sc48@1312.1",
+              "activity": 0.674,
+              "activity_unit": "uCi",
+              "reported_activity_text": "0.674",
+              "reported_rad_int_text": "1.00",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+              "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+              "source_line_number": 75,
+              "source_line_text": "  1311.9    1.00    1311.88     1,943 \ufffd 44        1,303 \ufffd 84     Sc48@1312.1       0.674"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+            "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+            "source_line_number": 69,
+            "source_line_text": "Sc48       43.700 h   B                                Activity = 0.408 \ufffd 3.68E-02 uCi",
+            "reported_activity_text": "0.408",
+            "reported_uncertainty_text": "3.68E-02",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        },
+        {
+          "isotope": "Sc46",
+          "half_life_value": 83.81,
+          "half_life_unit": "d",
+          "half_life_seconds": 7241184.0,
+          "activity": 0.0131,
+          "activity_unc": 0.00131,
+          "activity_unit": "uCi",
+          "activity_bq": 484.70000000000005,
+          "peaks": [
+            {
+              "centroid": 889.1,
+              "rad_int": 99.98,
+              "center_keV": 889.11,
+              "gross_counts": 3796.0,
+              "gross_unc": 62,
+              "net_counts": 1875.0,
+              "net_unc": 142,
+              "assignment": "Sc46@889.3",
+              "activity": 0.00703,
+              "activity_unit": "uCi",
+              "reported_activity_text": "7.03E-03",
+              "reported_rad_int_text": "99.98",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+              "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+              "source_line_number": 80,
+              "source_line_text": "   889.1   99.98     889.11     3,796 \ufffd 62        1,875 \ufffd 142    Sc46@ 889.3    7.03E-03"
+            },
+            {
+              "centroid": 1120.3,
+              "rad_int": 99.99,
+              "center_keV": 1120.28,
+              "gross_counts": 4760.0,
+              "gross_unc": 69,
+              "net_counts": 3500.0,
+              "net_unc": 127,
+              "assignment": "Sc46@1120.5",
+              "activity": 0.0161,
+              "activity_unit": "uCi",
+              "reported_activity_text": "1.61E-02",
+              "reported_rad_int_text": "99.99",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+              "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+              "source_line_number": 81,
+              "source_line_text": "  1120.3   99.99    1120.28     4,760 \ufffd 69        3,500 \ufffd 127    Sc46@1120.5    1.61E-02"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt",
+            "source_file_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+            "source_line_number": 77,
+            "source_line_text": "Sc46       83.810 d   B                                Activity = 1.31E-02 \ufffd 1.31E-03 uCi",
+            "reported_activity_text": "1.31E-02",
+            "reported_uncertainty_text": "1.31E-03",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        }
+      ]
+    },
+    {
+      "measurement_id": "Ti-RAFM-1b",
+      "original_catalog_specimen_id": "Ti-RAFM-1b",
+      "source_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+      "source_path": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1b.txt",
+      "local_path": "examples/RAFM_irradiation/QG_processed_gamma_data/flux_wires/Ti-RAFM-1b_25cm.txt",
+      "sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+      "bytes": 4361,
+      "copy_action": "reuse byte-identical locally tracked report; no duplicate original",
+      "printed_id": "Ti-RAFM-1 48hr @25cm",
+      "count_start_unzoned": "2025-08-13T09:49:41",
+      "live_time_s": 172800.0,
+      "real_time_s": 172935.45,
+      "printed_calibration_sha256": "0dd6f6abd27a6e272593f914486b998156baf50777947fa9503dd6a84e073dfd",
+      "reported_nuclides_and_lines": [
+        {
+          "isotope": "Sc47",
+          "half_life_value": 3.349,
+          "half_life_unit": "d",
+          "half_life_seconds": 289353.60000000003,
+          "activity": 0.0434,
+          "activity_unc": 0.00124,
+          "activity_unit": "uCi",
+          "activity_bq": 1605.8,
+          "peaks": [
+            {
+              "centroid": 159.3,
+              "rad_int": 68.3,
+              "center_keV": 159.32,
+              "gross_counts": 404465.0,
+              "gross_unc": 636,
+              "net_counts": 308195.0,
+              "net_unc": 991,
+              "assignment": "Sc47@159.4",
+              "activity": 0.0434,
+              "activity_unit": "uCi",
+              "reported_activity_text": "4.34E-02",
+              "reported_rad_int_text": "68.30",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+              "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+              "source_line_number": 67,
+              "source_line_text": "   159.3   68.30     159.32   404,465 \ufffd 636     308,195 \ufffd 991    Sc47@ 159.4    4.34E-02"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+            "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+            "source_line_number": 64,
+            "source_line_text": "Sc47        3.349 d   B                                Activity = 4.34E-02 \ufffd 1.24E-03 uCi",
+            "reported_activity_text": "4.34E-02",
+            "reported_uncertainty_text": "1.24E-03",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        },
+        {
+          "isotope": "Sc48",
+          "half_life_value": 43.7,
+          "half_life_unit": "h",
+          "half_life_seconds": 157320.0,
+          "activity": 0.234,
+          "activity_unc": 0.0198,
+          "activity_unit": "uCi",
+          "activity_bq": 8658.0,
+          "peaks": [
+            {
+              "centroid": 175.6,
+              "rad_int": 7.48,
+              "center_keV": 175.26,
+              "gross_counts": 59634.0,
+              "gross_unc": 244,
+              "net_counts": 2626.0,
+              "net_unc": 536,
+              "assignment": "Sc48@175.4",
+              "activity": 0.00345,
+              "activity_unit": "uCi",
+              "reported_activity_text": "3.45E-03",
+              "reported_rad_int_text": "7.48",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+              "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+              "source_line_number": 72,
+              "source_line_text": "   175.6    7.48     175.26    59,634 \ufffd 244       2,626 \ufffd 536    Sc48@ 175.4    3.45E-03"
+            },
+            {
+              "centroid": 983.4,
+              "rad_int": 1.0,
+              "center_keV": 983.39,
+              "gross_counts": 21736.0,
+              "gross_unc": 147,
+              "net_counts": 10066.0,
+              "net_unc": 303,
+              "assignment": "Sc48@983.5",
+              "activity": 0.344,
+              "activity_unit": "uCi",
+              "reported_activity_text": "0.344",
+              "reported_rad_int_text": "1.00",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+              "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+              "source_line_number": 73,
+              "source_line_text": "   983.4    1.00     983.39    21,736 \ufffd 147      10,066 \ufffd 303    Sc48@ 983.5       0.344"
+            },
+            {
+              "centroid": 1037.4,
+              "rad_int": 97.6,
+              "center_keV": 1037.42,
+              "gross_counts": 21240.0,
+              "gross_unc": 146,
+              "net_counts": 10203.0,
+              "net_unc": 305,
+              "assignment": "Sc48@1037.5",
+              "activity": 0.00375,
+              "activity_unit": "uCi",
+              "reported_activity_text": "3.75E-03",
+              "reported_rad_int_text": "97.60",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+              "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+              "source_line_number": 74,
+              "source_line_text": "  1037.4   97.60    1037.42    21,240 \ufffd 146      10,203 \ufffd 305    Sc48@1037.5    3.75E-03"
+            },
+            {
+              "centroid": 1311.9,
+              "rad_int": 1.0,
+              "center_keV": 1311.93,
+              "gross_counts": 16545.0,
+              "gross_unc": 129,
+              "net_counts": 9097.0,
+              "net_unc": 276,
+              "assignment": "Sc48@1312.1",
+              "activity": 0.392,
+              "activity_unit": "uCi",
+              "reported_activity_text": "0.392",
+              "reported_rad_int_text": "1.00",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+              "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+              "source_line_number": 75,
+              "source_line_text": "  1311.9    1.00    1311.93    16,545 \ufffd 129       9,097 \ufffd 276    Sc48@1312.1       0.392"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+            "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+            "source_line_number": 69,
+            "source_line_text": "Sc48       43.700 h   B                                Activity = 0.234 \ufffd 1.98E-02 uCi",
+            "reported_activity_text": "0.234",
+            "reported_uncertainty_text": "1.98E-02",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        },
+        {
+          "isotope": "Sc46",
+          "half_life_value": 83.81,
+          "half_life_unit": "d",
+          "half_life_seconds": 7241184.0,
+          "activity": 0.0126,
+          "activity_unc": 0.00112,
+          "activity_unit": "uCi",
+          "activity_bq": 466.2,
+          "peaks": [
+            {
+              "centroid": 889.2,
+              "rad_int": 99.98,
+              "center_keV": 889.19,
+              "gross_counts": 44811.0,
+              "gross_unc": 212,
+              "net_counts": 25312.0,
+              "net_unc": 459,
+              "assignment": "Sc46@889.3",
+              "activity": 0.00791,
+              "activity_unit": "uCi",
+              "reported_activity_text": "7.91E-03",
+              "reported_rad_int_text": "99.98",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+              "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+              "source_line_number": 80,
+              "source_line_text": "   889.2   99.98     889.19    44,811 \ufffd 212      25,312 \ufffd 459    Sc46@ 889.3    7.91E-03"
+            },
+            {
+              "centroid": 1120.3,
+              "rad_int": 99.99,
+              "center_keV": 1120.33,
+              "gross_counts": 55968.0,
+              "gross_unc": 237,
+              "net_counts": 40434.0,
+              "net_unc": 442,
+              "assignment": "Sc46@1120.5",
+              "activity": 0.0155,
+              "activity_unit": "uCi",
+              "reported_activity_text": "1.55E-02",
+              "reported_rad_int_text": "99.99",
+              "reported_rad_int_unit": "unspecified",
+              "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+              "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+              "source_line_number": 81,
+              "source_line_text": "  1120.3   99.99    1120.33    55,968 \ufffd 237      40,434 \ufffd 442    Sc46@1120.5    1.55E-02"
+            }
+          ],
+          "report_provenance": {
+            "source_file": "C:\\Users\\joshu\\fluxforge-worktrees\\repeated-count-validation-241\\examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt",
+            "source_file_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+            "source_line_number": 77,
+            "source_line_text": "Sc46       83.810 d   B                                Activity = 1.26E-02 \ufffd 1.12E-03 uCi",
+            "reported_activity_text": "1.26E-02",
+            "reported_uncertainty_text": "1.12E-03",
+            "activity_unit": "uCi",
+            "decode_convention": "utf-8 with replacement; SHA256 binds original bytes"
+          }
+        }
+      ]
+    }
+  ],
+  "original_hashes_after": {
+    "Ti-RAFM-1": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+    "Ti-RAFM-1a": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+    "Ti-RAFM-1b": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+  },
+  "strict_source_validation": {
+    "Sc47@159.4": {
+      "status": "INCOMPATIBLE",
+      "reasons": [
+        "incompatible_specimen_id",
+        "unknown_background_id"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48@175.4": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48@983.5": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48@1037.5": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48@1312.1": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc46@889.3": {
+      "status": "INCOMPATIBLE",
+      "reasons": [
+        "incompatible_specimen_id",
+        "unknown_background_id"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc46@1120.5": {
+      "status": "INCOMPATIBLE",
+      "reasons": [
+        "incompatible_specimen_id",
+        "unknown_background_id"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    }
+  },
+  "conditional_same_wire_same_clock_line_diagnostics": {
+    "Sc47@159.4": {
+      "status": "CONSISTENT",
+      "reasons": [],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": "simple_decay_no_feeding_or_reirradiation",
+      "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+      "activities": [
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": 2.5641034212618936,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-12T10:04:31",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": 2.5770325703768746,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-12T14:07:29",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": 2.1784006111886547,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-13T09:49:41",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "CONSISTENT",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": 0.005029696313278209,
+          "log_expected_ratio": -0.03492163082886434,
+          "log_residual": 0.03995132714214255
+        },
+        {
+          "status": "CONSISTENT",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": -0.1630179312054646,
+          "log_expected_ratio": -0.20483939169818835,
+          "log_residual": 0.041821460492723755
+        },
+        {
+          "status": "CONSISTENT",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": -0.1680476275187428,
+          "log_expected_ratio": -0.16991776086932403,
+          "log_residual": 0.0018701333505812268
+        }
+      ]
+    },
+    "Sc48@175.4": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": "simple_decay_no_feeding_or_reirradiation",
+      "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48@983.5": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": "simple_decay_no_feeding_or_reirradiation",
+      "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48@1037.5": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": "simple_decay_no_feeding_or_reirradiation",
+      "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48@1312.1": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": "simple_decay_no_feeding_or_reirradiation",
+      "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc46@889.3": {
+      "status": "DISCREPANCY",
+      "reasons": [],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": "simple_decay_no_feeding_or_reirradiation",
+      "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+      "activities": [
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": 0.14739328798878157,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-12T10:04:31",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": 0.13029816868100397,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-12T14:07:29",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": 0.14769724522853991,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-13T09:49:41",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "DISCREPANCY",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": -0.12327901328914392,
+          "log_expected_ratio": -0.0013954485341351472,
+          "log_residual": -0.12188356475500878
+        },
+        {
+          "status": "CONSISTENT",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": 0.0020600955506349106,
+          "log_expected_ratio": -0.00818526575345702,
+          "log_residual": 0.01024536130409193
+        },
+        {
+          "status": "DISCREPANCY",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": 0.12533910883977883,
+          "log_expected_ratio": -0.006789817219321873,
+          "log_residual": 0.1321289260591007
+        }
+      ]
+    },
+    "Sc46@1120.5": {
+      "status": "CONSISTENT",
+      "reasons": [],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": "simple_decay_no_feeding_or_reirradiation",
+      "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+      "activities": [
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": 0.23599604243748337,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-12T10:04:31",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": 0.2432232482045407,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-12T14:07:29",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "AVAILABLE",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": 0.23593514592172815,
+          "activity_unit": "response_scaled_counts_per_s",
+          "activity_reference": "count_start",
+          "reference_timestamp": "2025-08-13T09:49:41",
+          "count_window_corrections": 1,
+          "common_naive_clock_assumption": "QG header shared naive local clock scenario; time zone remains unknown",
+          "input_kind": "count_average",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "CONSISTENT",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": 0.030164702917294006,
+          "log_expected_ratio": -0.0013954485341351472,
+          "log_residual": 0.03156015145142915
+        },
+        {
+          "status": "CONSISTENT",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": -0.000258073709029194,
+          "log_expected_ratio": -0.00818526575345702,
+          "log_residual": 0.007927192044427826
+        },
+        {
+          "status": "CONSISTENT",
+          "reasons": [],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": -0.0304227766263232,
+          "log_expected_ratio": -0.006789817219321873,
+          "log_residual": -0.023632959407001327
+        }
+      ]
+    }
+  },
+  "processed_reference_validation": {
+    "Sc47": {
+      "status": "INCOMPATIBLE",
+      "reasons": [
+        "incompatible_specimen_id",
+        "unknown_background_id"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc48": {
+      "status": "EXCLUDED",
+      "reasons": [
+        "Sc48 report yields/references inconsistent; excluded without substitution"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "EXCLUDED",
+          "reasons": [
+            "Sc48 report yields/references inconsistent; excluded without substitution",
+            "Sc48 report yields/references inconsistent; excluded without substitution"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    },
+    "Sc46": {
+      "status": "INCOMPATIBLE",
+      "reasons": [
+        "incompatible_specimen_id",
+        "unknown_background_id"
+      ],
+      "method": "repeated_count_log_ratio_v1",
+      "scientific_admission": false,
+      "qualification": "conditional decay consistency only",
+      "relative_tolerance": 0.05,
+      "tolerance_definition": "abs(log(observed_ratio/expected_ratio)) <= log1p(relative_tolerance)",
+      "decay_assumption": null,
+      "common_naive_clock_assumption": null,
+      "activities": [
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1a",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302"
+        },
+        {
+          "status": "UNAVAILABLE",
+          "reasons": [
+            "unknown_time_zone"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurement_id": "Ti-RAFM-1b",
+          "activity_value": null,
+          "activity_unit": "Bq",
+          "activity_reference": "count_start",
+          "reference_timestamp": null,
+          "count_window_corrections": 0,
+          "common_naive_clock_assumption": null,
+          "input_kind": "reference_activity",
+          "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa"
+        }
+      ],
+      "pairs": [
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1a"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        },
+        {
+          "status": "INCOMPATIBLE",
+          "reasons": [
+            "incompatible_specimen_id",
+            "unknown_background_id"
+          ],
+          "method": "repeated_count_log_ratio_v1",
+          "scientific_admission": false,
+          "qualification": "conditional decay consistency only",
+          "measurements": [
+            "Ti-RAFM-1a",
+            "Ti-RAFM-1b"
+          ],
+          "log_observed_ratio": null,
+          "log_expected_ratio": null,
+          "log_residual": null
+        }
+      ]
+    }
+  },
+  "limits": [
+    "Sc46 889.3/1120.5 and Sc47 159.4 same-line comparisons are conditionally admissible only under the recorded identity/clock/response/background/decay assumptions.",
+    "Sc48 all comparisons excluded: ambiguous 1.00 report yields and inconsistent line activities remain unchanged.",
+    "No qualified shared physical specimen identity, time zone, background applicability, exact vendor reference convention or irradiation history is established.",
+    "5% symmetric log-ratio reporting tolerance is fixed for all lines, not fitted to QG activities; no significance or uncertainty claim.",
+    "Activities with response_scaled_counts_per_s units are decay-normalized line rates, not Bq; no reaction rate or flux is emitted.",
+    "Component checks do not establish #232/#220 full-workflow parity or physical qualification."
+  ]
+}
