@@ -1,0 +1,12 @@
+{
+  "origin": "FusionSandwich/FluxForge commit 46096eb1d8f760645b4c498b2a7bb50c9b63f262; examples/RAFM_irradiation/quantumgold_reference/originals; narrowly copied original bytes",
+  "layout_scope": "Efficiency offsets corroborated only for the 32 study files. This example pins two ANS plus three original reports, including one actual saved-vs-report contradiction. Saved settings do not prove final report processing.",
+  "sha256": {
+    "Co-Cd-RAFM-1.ANS": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+    "Co-Cd-RAFM-1.txt": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+    "Fe-Cd-RAFM-1.txt": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+    "RAFM-A-300s.ANS": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+    "RAFM-A-300s.txt": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8"
+  },
+  "manual": "https://ludlums.com/images/product_manuals/QTMmanual.pdf; v4.04.00 Appendix B, C; manual not redistributed"
+}
