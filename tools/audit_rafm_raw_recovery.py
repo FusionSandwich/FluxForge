@@ -143,6 +143,12 @@ def main():
         action="store_true",
         help="Include all committed raw RAFM and flux-wire specimens",
     )
+    parser.add_argument(
+        "--example-root",
+        type=Path,
+        default=ROOT / "examples" / "RAFM_irradiation",
+        help="Example data root, including a source-bound staged campaign",
+    )
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument("--max-spectra", type=int)
     selection.add_argument(
@@ -150,7 +156,7 @@ def main():
     )
     args = parser.parse_args()
     output = args.output_root.resolve()
-    example = ROOT / "examples" / "RAFM_irradiation"
+    example = args.example_root.resolve()
     metadata = workflow.load_rafm_example_metadata(example)
     metadata.config["generic_targeted_counting_method"] = "iec_tiered"
     metadata.config["flux_wire_counting_method"] = "iec_tiered"
@@ -164,10 +170,14 @@ def main():
     selected = [
         (raw, qg) for raw, qg, _ in pairs if raw.parent.name in {"RAFM3", "RAFM4"}
     ]
-    assert len(selected) == 16, "Expected the committed 12 RAFM3 and 4 RAFM4 specimens"
+    discovered_rafm_count = len(selected)
+    if not args.all_raw and not selected:
+        raise ValueError("No RAFM3/4 spectra were discovered in the example root")
     if args.all_raw:
         selected = [(raw, qg) for raw, qg, _ in pairs]
-        assert len(selected) == len(files["raw"]), "Every discovered raw spectrum must be paired or explicitly unmatched"
+        assert len(selected) == len(
+            files["raw"]
+        ), "Every discovered raw spectrum must be paired or explicitly unmatched"
     if args.sample:
         requested = set(args.sample)
         available = {raw.stem for raw, _ in selected}
@@ -329,7 +339,8 @@ def main():
     receipt["status"] = "RUN_COMPLETE_REVIEW_REQUIRED"
     receipt["n_spectra"] = len(selected)
     receipt["all_committed_rafm3_rafm4_replayed"] = (
-        sum(raw.parent.name in {"RAFM3", "RAFM4"} for raw, _ in selected) == 16
+        sum(raw.parent.name in {"RAFM3", "RAFM4"} for raw, _ in selected)
+        == discovered_rafm_count
     )
     receipt["all_committed_raw_replayed"] = len(selected) == len(files["raw"])
     receipt["discovered_raw_count"] = len(files["raw"])

@@ -1933,7 +1933,12 @@ def build_line_diagnostic_records(
                 and abs(delta_activity / combined_activity_unc) > en_limit
             )
         ):
-            diagnostic_bucket = "efficiency_or_activity_conversion_bias"
+            diagnostic_bucket = (
+                "background_or_continuum_count_difference"
+                if raw_net_counts > 0
+                and abs(float(match.net_counts) / raw_net_counts - 1) > count_limit
+                else "efficiency_or_activity_conversion_bias"
+            )
 
         row.update(
             {
@@ -1941,6 +1946,14 @@ def build_line_diagnostic_records(
                 "raw_energy_keV": float(match.energy_keV),
                 "raw_net_counts": raw_net_counts,
                 "raw_net_unc": raw_net_unc,
+                # Retain legacy comparison aliases, but expose the distinct
+                # analysis counts that actually feed the activity calculation.
+                "comparison_net_counts": raw_net_counts,
+                "comparison_net_unc": raw_net_unc,
+                "activity_net_counts": float(match.net_counts),
+                "activity_net_unc": float(match.net_counts_unc),
+                "activity_count_basis": "analysis_net_counts",
+                "comparison_count_basis": "separate_report_comparison_counts",
                 "raw_gross_counts": raw_gross_counts,
                 "raw_gross_unc": raw_gross_unc,
                 "raw_background_adjusted_gross_counts": (
@@ -2109,17 +2122,35 @@ def build_measurement_time_audit(
             "gamma_library_mismatch",
         }:
             categories.add("library_or_assignment_limited")
-        if bucket == "efficiency_or_activity_conversion_bias":
+        if bucket == "background_or_continuum_count_difference":
+            categories.add("background_or_continuum_limited")
+        if (
+            bucket == "efficiency_or_activity_conversion_bias"
+            and "activity_net_counts" not in row
+        ):
             categories.add("activity_conversion_or_efficiency_limited")
+        comparison_n = row.get("comparison_net_counts", row.get("raw_net_counts"))
+        activity_n = row.get("activity_net_counts", row.get("raw_net_counts"))
+        if comparison_n is not None and activity_n is not None:
+            try:
+                if (
+                    float(comparison_n) > 0
+                    and abs(float(activity_n) / float(comparison_n) - 1) > 0.2
+                ):
+                    categories.add("background_or_continuum_limited")
+            except (ValueError, TypeError):
+                pass
         values = [
             row.get(key)
             for key in (
                 "raw_line_activity_bq",
                 "reference_line_activity_bq",
-                "raw_net_counts",
+                "activity_net_counts",
                 "reference_net_counts",
             )
         ]
+        if "activity_net_counts" not in row:
+            values[2] = row.get("raw_net_counts")
         try:
             valid_conversion = all(
                 value is not None and math.isfinite(float(value)) and float(value) > 0
@@ -2141,6 +2172,11 @@ def build_measurement_time_audit(
                     "isotope": row["reference_isotope"],
                     "energy_keV": row["reference_energy_keV"],
                     "activity_conversion_ratio_raw_over_report": ratio,
+                    "count_basis": (
+                        "activity_net_counts"
+                        if "activity_net_counts" in row
+                        else "legacy_unseparated_counts"
+                    ),
                 }
             )
             if abs(ratio - 1.0) > 0.2:
@@ -5324,8 +5360,15 @@ def run_rafm_validation(
     if background_spectrum_override is not None:
         live = float(background_spectrum_override.live_time)
         real = float(background_spectrum_override.real_time)
-        if not math.isfinite(live) or live <= 0 or not math.isfinite(real) or real < live:
-            raise ValueError("Background override requires finite positive live time and real time >= live time")
+        if (
+            not math.isfinite(live)
+            or live <= 0
+            or not math.isfinite(real)
+            or real < live
+        ):
+            raise ValueError(
+                "Background override requires finite positive live time and real time >= live time"
+            )
     paths = default_paths(example_root, results_root=results_root)
     metadata = load_rafm_example_metadata(paths.example_root)
     if flux_wire_counting_method is not None:

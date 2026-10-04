@@ -63,8 +63,9 @@ def test_rafm_rejects_invalid_background_override_before_writing(tmp_path, live,
     background = GammaSpectrum(counts=np.array([1.0]), live_time=live, real_time=real)
     output = tmp_path / "must_not_exist"
     with pytest.raises(ValueError, match="Background override requires"):
-        run_rafm_validation(tmp_path, results_root=output,
-                            background_spectrum_override=background)
+        run_rafm_validation(
+            tmp_path, results_root=output, background_spectrum_override=background
+        )
     assert not output.exists()
 
 

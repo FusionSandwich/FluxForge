@@ -122,7 +122,10 @@ jobs:
             tests/test_registry_uncertainty_qualification.py \
             tests/test_nuclear_data_sources.py \
             tests/test_run_readiness_manifest.py \
-            tests/test_transport_contracts.py
+            tests/test_transport_contracts.py \
+            tests/test_measurement_time_audit.py \
+            tests/test_portable_qg_example.py \
+            tests/test_rafm_figure_ownership.py
 
       - name: CLI and standards regression tests
         env:

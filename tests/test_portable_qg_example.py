@@ -126,6 +126,23 @@ class PortableQGExampleTests(unittest.TestCase):
         self.assertNotEqual(north['selected_raw_activities']['Co60']['activity_bq'],
                             south['selected_raw_activities']['Co60']['activity_bq'])
         self.assertEqual(north['QG_reference_activities_Bq'], south['QG_reference_activities_Bq'])
+        self.assertEqual(south['background_processing']['scale_mode'], 'live')
+        self.assertEqual(south['background_processing']['scale_factor'], 9.0)
+        self.assertEqual(south['background_processing']['negative_policy'], 'hybrid')
+        self.assertNotIn('linear count interpolation', south['background_details']['calibration'])
+
+    def test_legacy_efficiency_receipt_does_not_claim_recovered_curve_was_selected(self):
+        receipt = driver.run_raw_comparison(
+            REPO, Path(self.tmp.name)/'legacy_efficiency', 'Co-Cd-RAFM-1',
+            efficiency_mode='legacy_profile')
+        self.assertIsNone(receipt['selected_curve'])
+        self.assertEqual(receipt['selected_curve_line_witnesses'], [])
+        self.assertEqual(receipt['selected_efficiency_source']['model'], 'legacy_profile')
+        self.assertEqual(receipt['available_recovered_curve']['model'], 'recovered_South_small_vial_25cm')
+        self.assertTrue(receipt['selected_efficiency_line_witnesses'])
+        self.assertTrue(any(line['efficiency_used'] != line['curve_efficiency']
+                            for line in receipt['selected_efficiency_line_witnesses']))
+        self.assertFalse(receipt['independent_absolute_qualification'])
 
     def test_south_native_source_tamper_is_rejected(self):
         path = self.copy/'examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/South 4hr Background Terminal.ANS'

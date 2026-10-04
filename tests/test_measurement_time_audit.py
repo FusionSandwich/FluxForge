@@ -81,3 +81,27 @@ def test_malformed_conversion_is_unknown_not_a_crash_or_pass():
     audit = build_measurement_time_audit([line], [{"matched": True}], [])
     assert "activity_evidence_incomplete" in audit["categories"]
     assert audit["conversion_diagnostics"] == []
+
+
+def test_activity_conversion_uses_activity_counts_instead_of_comparison_counts():
+    line = row(1, 0.5, "efficiency_or_activity_conversion_bias")
+    line.update(activity_net_counts=500, comparison_net_counts=1000)
+    audit = build_measurement_time_audit([line], [{"matched": True}], [])
+    assert audit["categories"] == ["background_or_continuum_limited"]
+    diagnostic = audit["conversion_diagnostics"][0]
+    assert diagnostic["activity_conversion_ratio_raw_over_report"] == 1
+    assert diagnostic["count_basis"] == "activity_net_counts"
+
+
+def test_count_basis_and_conversion_differences_remain_separate():
+    line = row(1, 1, "matched")
+    line.update(activity_net_counts=500, comparison_net_counts=1000)
+    audit = build_measurement_time_audit([line], [{"matched": True}], [])
+    assert set(audit["categories"]) == {
+        "background_or_continuum_limited",
+        "activity_conversion_or_efficiency_limited",
+    }
+    assert (
+        audit["conversion_diagnostics"][0]["activity_conversion_ratio_raw_over_report"]
+        == 2
+    )
