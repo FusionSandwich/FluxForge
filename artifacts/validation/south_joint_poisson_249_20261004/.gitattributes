@@ -1,0 +1,5 @@
+# Hash-bound receipts must survive checkout byte for byte.
+accepted/** -text whitespace=cr-at-eol
+independent_sol_checks/** -text whitespace=cr-at-eol
+*.json -text whitespace=cr-at-eol
+*.xml -text whitespace=cr-at-eol

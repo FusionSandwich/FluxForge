@@ -1,0 +1,149 @@
+{
+  "status": "INDEPENDENT_ORACLES_PASSED",
+  "source_dir": "accepted",
+  "replay_dir": "independent_sol_final_replay",
+  "original_ASC_channels": 8192,
+  "ASC_ANS_full_count_array_equal": true,
+  "background_sha256": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+  "raw_background_total": 543427,
+  "raw_background_polynomial": [
+    -1.6994324922561646,
+    0.49959567189216614,
+    9.02407251146542e-08
+  ],
+  "raw_background_live_s": 14400.0,
+  "raw_background_real_s": 14409.5,
+  "raw_background_start_unzoned": "2025-10-03T15:49:14",
+  "raw_sample_live_s": 129600.0,
+  "raw_sample_real_s": 129691.0,
+  "live_exposure_scale": 9.0,
+  "controls": [
+    {
+      "energy_keV": 1173.228,
+      "scenario": "south_native",
+      "roi": [
+        2342,
+        2360
+      ],
+      "roi_original_counts": 22891,
+      "independent_net": 7407.068131226114,
+      "independent_full_covariance_variance": 818335.8176843977,
+      "diagonal_only_variance": 806280.1937802131
+    },
+    {
+      "energy_keV": 1173.228,
+      "scenario": "ambient_off",
+      "roi": [
+        2342,
+        2360
+      ],
+      "roi_original_counts": 22891,
+      "independent_net": 11244.0,
+      "independent_full_covariance_variance": 133537.5,
+      "diagonal_only_variance": 133537.5
+    },
+    {
+      "energy_keV": 1332.492,
+      "scenario": "south_native",
+      "roi": [
+        2661,
+        2679
+      ],
+      "roi_original_counts": 16952,
+      "independent_net": 7513.089200140041,
+      "independent_full_covariance_variance": 452968.94343800907,
+      "diagonal_only_variance": 442681.76736322045
+    },
+    {
+      "energy_keV": 1332.492,
+      "scenario": "ambient_off",
+      "roi": [
+        2661,
+        2679
+      ],
+      "roi_original_counts": 16952,
+      "independent_net": 10919.5,
+      "independent_full_covariance_variance": 74260.75,
+      "diagonal_only_variance": 74260.75
+    }
+  ],
+  "baseline_nominal_matches": [
+    {
+      "energy_keV": 1173.228,
+      "scenario": "south_native",
+      "continuum": "linear",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1173.228,
+      "scenario": "south_native",
+      "continuum": "step",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1173.228,
+      "scenario": "ambient_off",
+      "continuum": "linear",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1173.228,
+      "scenario": "ambient_off",
+      "continuum": "step",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1173.228,
+      "scenario": "south_free_normalization",
+      "continuum": "linear",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1332.492,
+      "scenario": "south_native",
+      "continuum": "linear",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1332.492,
+      "scenario": "south_native",
+      "continuum": "step",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1332.492,
+      "scenario": "ambient_off",
+      "continuum": "linear",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1332.492,
+      "scenario": "ambient_off",
+      "continuum": "step",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    },
+    {
+      "energy_keV": 1332.492,
+      "scenario": "south_free_normalization",
+      "continuum": "linear",
+      "area_unchanged": true,
+      "deviance_unchanged": true
+    }
+  ],
+  "all_current_rows_checked": 26,
+  "current_input_hashes_match_receipts": true,
+  "declared_output_hashes_valid": true,
+  "replay_pilot_json_byte_identical": true,
+  "replay_output_hashes_identical": true,
+  "xcom_hash_current": "172df2c081e28bfb3660104b0738e5d0b338bdd427afa7ca5210e9d07d58ac45",
+  "xcom_in_declared_engine_receipt": true
+}
