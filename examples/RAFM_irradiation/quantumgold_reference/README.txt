@@ -124,8 +124,9 @@ Use a fresh output directory. The receipt records the background source SHA256,
 native live/real time, polynomial, and detector. The South file starts on Oct 3,
 2025, later than some campaign counts; its applicability and the background used
 by QG remain unknown. It is an explicit sensitivity scenario, not the default.
-The current core aligns unequal energy grids by linear interpolation of channel
-counts, which is not generally count conserving (issue #228). Background source
+This portable branch aligns unequal energy grids by linear interpolation of channel
+counts, which is not generally count conserving (issue #228); the separate
+`4615e61` validation engine uses integrated overlap and covariance. Background source
 qualification is tracked in issue #229. This mode excludes near-contact, missing
 ASC and Ti/Sc48 ambiguity cases. QG reported activities remain separate reference
 values and do not drive raw activity estimation in this mode.

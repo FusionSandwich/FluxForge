@@ -4,4 +4,4 @@
 
 The October 3 South background is later than some sample counts and has Co-60 lines. The QG report background is unidentified. Reported QG count-start activities and raw count-average activities are not time harmonized, and the recovered efficiency percent unit remains a working assumption. Treat these results as sensitivity evidence. Do not infer that South is the physically correct default or that an apparently closer QG activity validates the background.
 
-The current core performs linear interpolation of background channel counts on unequal energy grids; see issue #228 for conservative rebinning. Source applicability is issue #229. Near-contact, missing ASC, and Ti/Sc-48 ambiguity cases were excluded from this monitor comparison.
+The historical portable engine for this comparison performs linear interpolation of background channel counts on unequal energy grids; see issue #228 for its integration risk. The separate `4615e61` validation engine uses integrated overlap with covariance. Source applicability is issue #229. Near-contact, missing ASC, and Ti/Sc-48 ambiguity cases were excluded from this monitor comparison.
