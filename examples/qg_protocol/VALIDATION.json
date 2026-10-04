@@ -1,0 +1,50 @@
+{
+  "issue": 236,
+  "engine_base_revision": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "required_engine_ancestor": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "ancestry_verified": true,
+  "scope": "qg_protocol module, focused tests, portable fixture example; shared integration pending",
+  "tests": {
+    "command": "PYTHONPATH=src python -m pytest -q tests/test_qg_protocol.py --tb=short",
+    "result": "44 passed",
+    "independent_sol_review": "REVIEW.json; NO_BLOCKING_FINDINGS"
+  },
+  "example": {
+    "command": "python examples/qg_protocol/run_example.py --originals SOURCE_ORIGINALS --output examples/qg_protocol/EVIDENCE.json",
+    "saved_headers": 32,
+    "paired_reports": 31,
+    "line_records": 2,
+    "comparison_ambient_enabled": false,
+    "comparison_continuum_enabled": true,
+    "original_ans_and_report_hashes_preserved_in_git_index": true,
+    "input_identities": "fixtures/manifest.json",
+    "physical_comparison_count_bases_separate": true
+  },
+  "format_check": {
+    "command": "python -m black --check src/fluxforge/analysis/qg_protocol.py tests/test_qg_protocol.py examples/qg_protocol/run_example.py",
+    "black_version": "25.12.0",
+    "result": "passed"
+  },
+  "environment": {
+    "python": "3.12.10",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "pytest": "8.4.2",
+    "source": "Existing local Windows Python; no installation or environment mutation",
+    "limitation": "Installed NumPy exceeds pyproject.toml's declared <2 constraint; these bounded observed results do not establish the supported dependency matrix"
+  },
+  "qualification": [
+    "Saved header state is not final report processing state",
+    "Observed layout only; literal manual offsets are not universal",
+    "Library efficiencies ignored is report-confirmed where a paired report exists",
+    "GammaLib contents, original intensities/corrections and installed vendor version remain unknown",
+    "Continuum estimator is an explicit current-engine approximation",
+    "North physical background applicability remains conditional",
+    "No activity/efficiency/aggregation computation or exact vendor parity claimed",
+    "Restored configuration requires verify_sources before reproduction"
+  ],
+  "physical_defaults_changed": false,
+  "shared_workflow_changed": false,
+  "full_campaign_run": false,
+  "integration_owner": "#232/#220; local integration chat 01a103df-5eda-7cd3-b276-2ad70d21decc"
+}

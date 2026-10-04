@@ -1,0 +1,4 @@
+# Preserve original study byte identities on Windows and Unix checkouts.
+ANS/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+QG_report/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+*.ASC -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
