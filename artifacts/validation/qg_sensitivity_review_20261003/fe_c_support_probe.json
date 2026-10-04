@@ -1,0 +1,42 @@
+{
+  "scope": "All independent-library neighbors within12keV; baseline only; support guard before ROI decision",
+  "neighbors": [
+    {
+      "isotope": "Fe59",
+      "energy": 1099.25
+    },
+    {
+      "isotope": "Tb154m",
+      "energy": 1102.43
+    }
+  ],
+  "energy_support_checks": [
+    {
+      "representative_isotope": "Fe59",
+      "representative_energy": 1099.25,
+      "fitted_energy": 1094.501447774975,
+      "energy_tolerance": 2.0,
+      "rejected": true,
+      "candidates": [
+        {
+          "isotope": "Fe59",
+          "energy": 1099.25
+        }
+      ]
+    },
+    {
+      "representative_isotope": "Tb154m",
+      "representative_energy": 1102.43,
+      "fitted_energy": 1098.520453200775,
+      "energy_tolerance": 2.0,
+      "rejected": true,
+      "candidates": [
+        {
+          "isotope": "Tb154m",
+          "energy": 1102.43
+        }
+      ]
+    }
+  ],
+  "returned_peaks": 0
+}

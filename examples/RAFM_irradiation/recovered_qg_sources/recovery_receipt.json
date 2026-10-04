@@ -1,0 +1,118 @@
+{
+  "source_commit": "46096eb1d8f760645b4c498b2a7bb50c9b63f262",
+  "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+  "layout_scope": "Empirically channel-verified RAFM rev4 archive only",
+  "scientific_admission": false,
+  "recovered": [
+    {
+      "measurement_id": "Cu-Cd-RAFM-1",
+      "raw_file": "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Cu-Cd-RAFM-1_25cm.ASC",
+      "original_git_path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Cu-Cd-RAFM-1.ANS",
+      "original_ans_sha256": "430abed8470297756cf5fd190f818831469cacea525153b31f59cf846dcb5a9a",
+      "original_report_sha256": "f8ded99ed4da52b12b8ff69b13f2b25ff2a77c76115d84c43632977bf5ed0da3",
+      "exported_asc_sha256": "93ec5ae15ef6ff22167b2472b935e04635cce1defee40c54845e5b47edf8ee4e",
+      "canonical_report_sha256": "c6617e9857ee28834e11f6f697d2b654e2dee555bd9b4479cf5d0a60567a55ed",
+      "report_equivalence": "only_plus_minus_replaced_by_utf8_replacement_character",
+      "channel_array_sha256": "97f7c3e9fd1091046795849d72b71b8b6729ce60bca130eb2f6458075ce815fd",
+      "native_start_local_unzoned": "2025-08-07T09:01:20",
+      "live_time_s": 3600.0,
+      "real_time_s": 3665.86,
+      "separate_original_asc_header": null,
+      "qualification": "Native clock corroborates report; source ASC clocks differ; no timezone inferred. Counts are observed native channels, not report ROI counts."
+    },
+    {
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "raw_file": "examples/RAFM_irradiation/raw_gamma_spec/flux_wires/Fe-Cd-RAFM-1_0cm.ASC",
+      "original_git_path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Fe-Cd-RAFM-1.ANS",
+      "original_ans_sha256": "ddb5f813b8a19983414337caf7ee44686da86a71e178b6897ebd19b02cc753cf",
+      "original_report_sha256": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+      "exported_asc_sha256": "e955da2eb900349a64ddb6790ccebf29c448aa54f1f5dc5ae3296e59bc2408ca",
+      "canonical_report_sha256": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+      "report_equivalence": "identical_bytes",
+      "channel_array_sha256": "80ec89d95bfeb8d3a5061ee46795f39043553021e4721e57e4ec9bb360cfc37a",
+      "native_start_local_unzoned": "2025-08-18T13:54:31",
+      "live_time_s": 43200.0,
+      "real_time_s": 43236.05,
+      "separate_original_asc_header": null,
+      "qualification": "Native clock corroborates report; source ASC clocks differ; no timezone inferred. Counts are observed native channels, not report ROI counts."
+    },
+    {
+      "measurement_id": "RAFM-A-24hr",
+      "raw_file": "examples/RAFM_irradiation/raw_gamma_spec/RAFM3/RAFM3-A_24hrEOI.ASC",
+      "original_git_path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/RAFM-A-24hr.ANS",
+      "original_ans_sha256": "0f2d934cbe3c401fd0b79b8e279cd2da39cb070317f23764a9d6e2c7e622fe39",
+      "original_report_sha256": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+      "exported_asc_sha256": "aabbf50e92db5f6a0331e8a9202d7d835f9276c769e25409ce322bfec3d059d1",
+      "canonical_report_sha256": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+      "report_equivalence": "identical_bytes",
+      "channel_array_sha256": "7fbba25ee570ca2964ab34559fd8c5d60a5a1f0309abe3dca514627710cf76b4",
+      "native_start_local_unzoned": "2025-08-01T10:50:13",
+      "live_time_s": 3600.0,
+      "real_time_s": 3606.4,
+      "separate_original_asc_header": {
+        "id": "S25aRAFM3 24hr EOI",
+        "clock_text": "1-Aug-2025 11:50",
+        "live_s": 3600.0,
+        "real_s": 3606.0,
+        "energy_polynomial_keV": [
+          0.541,
+          0.498,
+          2.605e-07
+        ]
+      },
+      "qualification": "Native clock corroborates report; source ASC clocks differ; no timezone inferred. Counts are observed native channels, not report ROI counts."
+    },
+    {
+      "measurement_id": "RAFM-A-300s",
+      "raw_file": "examples/RAFM_irradiation/raw_gamma_spec/RAFM3/RAFM3-A_300sEOI.ASC",
+      "original_git_path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/RAFM-A-300s.ANS",
+      "original_ans_sha256": "8a1456759b4308f835af682aa8abafe41a27bc52cbf663a88a82aac60c9c9a36",
+      "original_report_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+      "exported_asc_sha256": "dd17ecf16fd013112a1bc0e8c34854f7cddcef0407d9eefb1fbe5f0a4714fe16",
+      "canonical_report_sha256": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+      "report_equivalence": "identical_bytes",
+      "channel_array_sha256": "76233257d0bf453a90d878fe5473e7a103fd62b1300b9fadfbef2f60082dc44f",
+      "native_start_local_unzoned": "2025-07-31T09:23:21",
+      "live_time_s": 300.0,
+      "real_time_s": 331.1,
+      "separate_original_asc_header": {
+        "id": "Acquisition Date:  31-Jul-2025 12:23",
+        "clock_text": "31-Jul-2025 12:23",
+        "live_s": 300.0,
+        "real_s": 331.0,
+        "energy_polynomial_keV": [
+          -0.6664,
+          0.4978,
+          7.164e-07
+        ]
+      },
+      "qualification": "Native clock corroborates report; source ASC clocks differ; no timezone inferred. Counts are observed native channels, not report ROI counts."
+    },
+    {
+      "measurement_id": "RAFM-A-4d",
+      "raw_file": "examples/RAFM_irradiation/raw_gamma_spec/RAFM3/RAFM3-A_4dEOI.ASC",
+      "original_git_path": "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/RAFM-A-4d.ANS",
+      "original_ans_sha256": "ea91654c78c5e26506466c281eeddfe280b187ca2a16a8c6705f58193d6ee6f0",
+      "original_report_sha256": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+      "exported_asc_sha256": "46ae158324c7f4460d39cc910711b6bd125cce486932159d949f0ffae1e9eb35",
+      "canonical_report_sha256": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+      "report_equivalence": "identical_bytes",
+      "channel_array_sha256": "51f00f7c93f9878e40042f7b0810f17cf1725f8d46ea2ff2266aa58717372209",
+      "native_start_local_unzoned": "2025-08-04T08:04:07",
+      "live_time_s": 3600.0,
+      "real_time_s": 3603.0300000000007,
+      "separate_original_asc_header": {
+        "id": "S25aRAFM3 4d EOI",
+        "clock_text": "4-Aug-2025 09:04",
+        "live_s": 3600.0,
+        "real_s": 3603.0,
+        "energy_polynomial_keV": [
+          0.541,
+          0.498,
+          2.605e-07
+        ]
+      },
+      "qualification": "Native clock corroborates report; source ASC clocks differ; no timezone inferred. Counts are observed native channels, not report ROI counts."
+    }
+  ]
+}

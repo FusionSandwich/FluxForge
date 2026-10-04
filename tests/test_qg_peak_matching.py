@@ -154,3 +154,11 @@ def test_assignment_objective_matches_exhaustive_small_cases():
         )
         assert actual[:2] == expected[:2]
         assert actual[2] == pytest.approx(expected[2])
+
+
+def test_native_ambiguity_flag_cannot_pass_with_a_single_label():
+    observed = peak(200, 100, "Fe59")
+    observed.assignment_ambiguous = True
+    result = match_peak_set([ref(100)], [observed], {})
+    assert result[0][0] is observed
+    assert result[0][1] is False

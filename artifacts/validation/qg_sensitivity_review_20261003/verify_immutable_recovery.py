@@ -1,0 +1,19 @@
+import subprocess,json,re,hashlib,struct,datetime
+from pathlib import Path
+ROOT=Path.cwd();OUT=ROOT/'scratch/qg_missing_search';REF='46096eb1d8f760645b4c498b2a7bb50c9b63f262';BASE='examples/RAFM_irradiation/quantumgold_reference/'
+def blob(p):return subprocess.check_output(['git','show',f'{REF}:{p}'],cwd=ROOT)
+m=json.loads(blob(BASE+'manifest.json'));resource={r['path']:r for r in m['resources']}; mappings={'Cu-Cd-RAFM-1':'flux_wires/Cu-Cd-RAFM-1_25cm.txt','Fe-Cd-RAFM-1':'flux_wires/Fe-Cd-RAFM-1_0cm.txt','RAFM-A-24hr':'RAFM3/RAFM3-A_24hrEOI.txt','RAFM-A-300s':'RAFM3/RAFM3-A_300sEOI.txt','RAFM-A-4d':'RAFM3/RAFM3-A_4dEOI.txt'}
+results=[]
+for name,canonical in mappings.items():
+ ans_path=BASE+'originals/ANS/'+name+'.ANS';qg_path=BASE+'originals/QG_report/'+name+'.txt'; a=blob(ans_path); q=blob(qg_path); c=ROOT/'examples/RAFM_irradiation/QG_processed_gamma_data'/canonical; original=c.read_bytes();text=original.decode('utf8',errors='replace'); date=re.search(r'Date:\s*([^\n]+)',text).group(1).strip(); expected=datetime.datetime.strptime(date,'%B %d, %Y %H:%M:%S');lt,rt=re.search(r'LT:\s*([\d.,]+)\s*RT:\s*([\d.,]+)',text).groups();lt=float(lt.replace(',',''));rt=float(rt.replace(',',''))
+ days=struct.unpack_from('<d',a,80)[0];native_date=datetime.datetime(1899,12,30)+datetime.timedelta(days=days); nrt=struct.unpack_from('<d',a,96)[0];nlt=struct.unpack_from('<d',a,104)[0];payload=a[1548:1548+8192*4];native_counts=struct.unpack('<8192I',payload)
+ ans_sha=hashlib.sha256(a).hexdigest();qg_sha=hashlib.sha256(q).hexdigest();assert ans_sha==resource[ans_path]['sha256'];assert qg_sha==resource[qg_path]['sha256'];assert abs((native_date-expected).total_seconds())<0.00001;assert abs(nrt-rt)<1e-6 and abs(nlt-lt)<1e-6
+ row=dict(measurement_id=name,source_commit=REF,ANS_path=ans_path,ANS_sha256=ans_sha,canonical_report=str(c.relative_to(ROOT)),canonical_report_sha256=hashlib.sha256(original).hexdigest(),original_QG_path=qg_path,original_QG_sha256=qg_sha,report_bytes_identical=original==q,QG_clock=date,native_OLE_days_at_offset80=days,native_clock=native_date.isoformat(),native_vs_QG_clock_delta_s=(native_date-expected).total_seconds(),live_s=nlt,real_s=nrt,channel_count=len(native_counts),channel_payload_sha256=hashlib.sha256(payload).hexdigest(),payload_sha_matches_manifest=hashlib.sha256(payload).hexdigest()==next(x['channel_array_sha256'] for x in m['measurements'] if x['measurement_id']==name),count_sum=sum(native_counts),ANS_ASC_full_array_match=None)
+ if name=='Cu-Cd-RAFM-1':
+  transformed=q.replace(b'\xb1',b'\xef\xbf\xbd');assert transformed==original
+  row.update(canonical_report_encoding_difference='5 native cp1252 0xB1 plus/minus bytes became UTF-8 replacement characters',canonical_report_exact_lossy_transform_verified=True)
+ if name.startswith('RAFM-A'):
+  asc_path=BASE+'originals/ASC/'+name+'.ASC';b=blob(asc_path);asc_text=b.decode('utf8',errors='replace');ch=[tuple(map(int,line.split())) for line in asc_text.splitlines() if re.fullmatch(r'\s*\d+\s+\d+\s*',line)];assert len(ch)==8192;assert [x[0] for x in ch]==list(range(8192));assert [x[1] for x in ch]==list(native_counts)
+  row.update(ASC_path=asc_path,ASC_sha256=hashlib.sha256(b).hexdigest(),ANS_ASC_full_array_match=True,ASC_clock=re.search(r'Acquisition Date:\s*([^\n]+)',asc_text).group(1).strip(),ASC_real_s=float(re.search(r'Elapsed Real Time:\s*([\d.,]+)',asc_text).group(1)),ASC_clock_conflict_retained=True)
+ results.append(row);print(json.dumps(row,indent=2))
+(OUT/'immutable_git_recovery.json').write_text(json.dumps(dict(source_commit=REF,measurements=results,remaining_unrecovered='RAFM1_Long_70d_EOI.txt; 12 ROI rows',native_fields_basis='OLE date offset80, real double96/live double104; vendor schema confirmation supplied by parent; independently decoded and corroborated to canonical report clocks',clock_timezone='undeclared; no correction'),indent=2))

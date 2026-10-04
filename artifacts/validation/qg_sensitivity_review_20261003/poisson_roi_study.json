@@ -1,0 +1,134 @@
+{
+  "seed": 30261003,
+  "trials": 4000,
+  "scientific_admission": false,
+  "scope": "Fixed known energy and FWHM; flat independent Poisson continuum; excludes peak-search selection, tails, interferences, measured-background covariance and drift",
+  "results": {
+    "0.0": {
+      "baseline": {
+        "detection_fraction": 0.02375,
+        "average_net": -0.600375,
+        "expected_net": 0.0,
+        "average_uncertainty": 127.01708319999554,
+        "empirical_standard_deviation": 126.57804455236322,
+        "coverage_within_1_sigma": 0.6775,
+        "peak_capture_fraction": 0.9999996089397267
+      },
+      "wider_sidebands": {
+        "detection_fraction": 0.02325,
+        "average_net": 0.1083125,
+        "expected_net": 0.0,
+        "average_uncertainty": 59.19988979873242,
+        "empirical_standard_deviation": 59.562773479369916,
+        "coverage_within_1_sigma": 0.6845,
+        "peak_capture_fraction": 0.9999996089397267
+      },
+      "narrower_roi": {
+        "detection_fraction": 0.02675,
+        "average_net": -0.730625,
+        "expected_net": 0.0,
+        "average_uncertainty": 84.52110776643848,
+        "empirical_standard_deviation": 85.43831869357373,
+        "coverage_within_1_sigma": 0.683,
+        "peak_capture_fraction": 0.9989785905680413
+      },
+      "narrower_roi_wider_sidebands": {
+        "detection_fraction": 0.0275,
+        "average_net": 0.256625,
+        "expected_net": 0.0,
+        "average_uncertainty": 43.06865627581291,
+        "empirical_standard_deviation": 43.26577774555609,
+        "coverage_within_1_sigma": 0.68925,
+        "peak_capture_fraction": 0.9989785905680413
+      },
+      "choose_best_of_four": {
+        "detection_fraction": 0.0855,
+        "warning": "Exploratory per-spectrum selection increases false positives; not a calibrated decision rule"
+      }
+    },
+    "200.0": {
+      "baseline": {
+        "detection_fraction": 0.34225,
+        "average_net": 199.369875,
+        "expected_net": 199.99928142041426,
+        "average_uncertainty": 127.82347542162606,
+        "empirical_standard_deviation": 125.39788440136245,
+        "coverage_within_1_sigma": 0.69025,
+        "peak_capture_fraction": 0.9999996089397267
+      },
+      "wider_sidebands": {
+        "detection_fraction": 0.91075,
+        "average_net": 200.530125,
+        "expected_net": 199.99992170830365,
+        "average_uncertainty": 60.870200108446966,
+        "empirical_standard_deviation": 60.17352467138035,
+        "coverage_within_1_sigma": 0.6885,
+        "peak_capture_fraction": 0.9999996089397267
+      },
+      "narrower_roi": {
+        "detection_fraction": 0.6365,
+        "average_net": 199.59275,
+        "expected_net": 198.78655697422778,
+        "average_uncertainty": 85.70650656849574,
+        "empirical_standard_deviation": 84.34585617148494,
+        "coverage_within_1_sigma": 0.69475,
+        "peak_capture_fraction": 0.9989785905680413
+      },
+      "narrower_roi_wider_sidebands": {
+        "detection_fraction": 0.99175,
+        "average_net": 200.132265625,
+        "expected_net": 199.79467883389543,
+        "average_uncertainty": 45.341181101074596,
+        "empirical_standard_deviation": 45.05016439359826,
+        "coverage_within_1_sigma": 0.69325,
+        "peak_capture_fraction": 0.9989785905680413
+      },
+      "choose_best_of_four": {
+        "detection_fraction": 0.9965,
+        "warning": "Exploratory per-spectrum selection increases false positives; not a calibrated decision rule"
+      }
+    },
+    "10000.0": {
+      "baseline": {
+        "detection_fraction": 1.0,
+        "average_net": 10000.321875,
+        "expected_net": 9999.964071020713,
+        "average_uncertainty": 161.68410006535916,
+        "empirical_standard_deviation": 159.40115712003842,
+        "coverage_within_1_sigma": 0.6885,
+        "peak_capture_fraction": 0.9999996089397267
+      },
+      "wider_sidebands": {
+        "detection_fraction": 1.0,
+        "average_net": 10000.496921875,
+        "expected_net": 9999.996085415183,
+        "average_uncertainty": 116.2171312406471,
+        "empirical_standard_deviation": 113.49958696620699,
+        "coverage_within_1_sigma": 0.6945,
+        "peak_capture_fraction": 0.9999996089397267
+      },
+      "narrower_roi": {
+        "detection_fraction": 1.0,
+        "average_net": 9939.296125,
+        "expected_net": 9939.327848711395,
+        "average_uncertainty": 131.97898188024286,
+        "empirical_standard_deviation": 131.86989389058084,
+        "coverage_within_1_sigma": 0.6705,
+        "peak_capture_fraction": 0.9989785905680413
+      },
+      "narrower_roi_wider_sidebands": {
+        "detection_fraction": 1.0,
+        "average_net": 9990.12746875,
+        "expected_net": 9989.733941694769,
+        "average_uncertainty": 108.8418279471226,
+        "empirical_standard_deviation": 107.33465055102488,
+        "coverage_within_1_sigma": 0.6885,
+        "peak_capture_fraction": 0.9989785905680413
+      },
+      "choose_best_of_four": {
+        "detection_fraction": 1.0,
+        "warning": "Exploratory per-spectrum selection increases false positives; not a calibrated decision rule"
+      }
+    }
+  }
+}

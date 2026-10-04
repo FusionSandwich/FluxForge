@@ -52,6 +52,7 @@ def extract(inputs, group, sample, isotope, energy, threshold=2):
         counting_method="iec_tiered",
         profile_name=metadata.config["profile_name"],
         low_significance_candidates=candidates,
+        max_assignment_energy_delta_fwhm=1.0,
     )
     return detected, candidates, line
 
@@ -101,4 +102,14 @@ def test_tentative_collection_does_not_bypass_energy_support(
 ):
     detected, candidates, _ = extract(inputs, "RAFM4", sample, isotope, energy)
     assert detected == []
-    assert candidates == []
+    # New fit validation retains a fluctuation for review, but its centroid
+    # exceeds the production one-FWHM assignment guard.
+    assert all(
+        candidate.isotope is None and candidate.assignment_ambiguous
+        for candidate in candidates
+    )
+    assert all(candidate.activity_bq == 0 for candidate in candidates)
+    assert all(
+        candidate.activity_estimation_state == "withheld_energy_mismatch"
+        for candidate in candidates
+    )

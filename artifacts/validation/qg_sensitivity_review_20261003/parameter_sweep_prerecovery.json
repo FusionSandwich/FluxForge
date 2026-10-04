@@ -1,0 +1,4892 @@
+{
+  "scientific_admission": false,
+  "scope": "Reference-selected diagnostic; library-energy targets with neighbor fits, measured background and variance retained; no parameter tuning applied to production",
+  "cases": [
+    {
+      "report": "flux_wires/Ti-RAFM-1_25cm.txt",
+      "source_sha256": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+      "source_line_number": 72,
+      "reported_isotope": "Sc48",
+      "reported_energy_keV": 175.23,
+      "net_counts": 298.0,
+      "net_counts_unc": 160,
+      "activity_available": true,
+      "status": "tentative_native_same_id",
+      "expected_isotope": "Sc48",
+      "native_isotope": "Sc48",
+      "native_energy_keV": 175.25832772983227,
+      "native_channel": 354,
+      "native_significance": 0.497050927197023,
+      "confirmed_detection": false,
+      "tentative_isotope": null,
+      "tentative_energy_keV": null,
+      "tentative_channel": null,
+      "tentative_significance": null,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 175.35,
+      "reported_centroid_offset_keV": -0.12000000000000455,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 175.25832772983227,
+          "isotope": "Sc48",
+          "channel": 354,
+          "significance": 0.497050927197023,
+          "net": 120.5,
+          "sigma": 242.42988677141275,
+          "line_energy": 175.35,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1a_25cm.txt",
+      "source_sha256": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+      "source_line_number": 72,
+      "reported_isotope": "Sc48",
+      "reported_energy_keV": 175.28,
+      "net_counts": 664.0,
+      "net_counts_unc": 157,
+      "activity_available": true,
+      "status": "tentative_native_same_id",
+      "expected_isotope": "Sc48",
+      "native_isotope": "Sc48",
+      "native_energy_keV": 175.2199804030982,
+      "native_channel": 354,
+      "native_significance": 1.707907563642105,
+      "confirmed_detection": false,
+      "tentative_isotope": null,
+      "tentative_energy_keV": null,
+      "tentative_channel": null,
+      "tentative_significance": null,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 175.35,
+      "reported_centroid_offset_keV": -0.06999999999999318,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 175.2199804030982,
+          "isotope": "Sc48",
+          "channel": 354,
+          "significance": 1.707907563642105,
+          "net": 409.5,
+          "sigma": 239.76707447020326,
+          "line_energy": 175.35,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1b_25cm.txt",
+      "source_sha256": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+      "source_line_number": 72,
+      "reported_isotope": "Sc48",
+      "reported_energy_keV": 175.26,
+      "net_counts": 2626.0,
+      "net_counts_unc": 536,
+      "activity_available": true,
+      "status": "tentative_native_same_id",
+      "expected_isotope": "Sc48",
+      "native_isotope": "Sc48",
+      "native_energy_keV": 175.26067400511312,
+      "native_channel": 354,
+      "native_significance": 0.23244517715104368,
+      "confirmed_detection": false,
+      "tentative_isotope": null,
+      "tentative_energy_keV": null,
+      "tentative_channel": null,
+      "tentative_significance": null,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 175.35,
+      "reported_centroid_offset_keV": -0.09000000000000341,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 175.26067400511312,
+          "isotope": "Sc48",
+          "channel": 354,
+          "significance": 0.23244517715104368,
+          "net": 401.0,
+          "sigma": 1725.1379654972527,
+          "line_energy": 175.35,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "RAFM3/RAFM3-A_4dEOI.txt",
+      "source_sha256": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+      "source_line_number": 82,
+      "reported_isotope": "Fe59",
+      "reported_energy_keV": 1098.84,
+      "net_counts": 0,
+      "net_counts_unc": 82,
+      "activity_available": false,
+      "status": "reference_nondetection",
+      "paired_raw_available": false,
+      "library_energy_keV": 1099.25,
+      "reported_centroid_offset_keV": -0.41000000000008185
+    },
+    {
+      "report": "RAFM3/RAFM3-B_300sEOI.txt",
+      "source_sha256": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+      "source_line_number": 80,
+      "reported_isotope": "Mn56",
+      "reported_energy_keV": 2532.86,
+      "net_counts": 0,
+      "net_counts_unc": 162,
+      "activity_available": false,
+      "status": "reference_nondetection",
+      "paired_raw_available": true,
+      "library_energy_keV": 2523.06,
+      "reported_centroid_offset_keV": 9.800000000000182,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 2521.9966625984,
+          "isotope": "Mn56",
+          "channel": 5048,
+          "significance": 24.44547102962081,
+          "net": 603.6966936778131,
+          "sigma": 24.695645788387882,
+          "line_energy": 2523.06,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+      "source_line_number": 69,
+      "reported_isotope": "W187",
+      "reported_energy_keV": 551.64,
+      "net_counts": 0,
+      "net_counts_unc": 240,
+      "activity_available": false,
+      "status": "reference_nondetection",
+      "paired_raw_available": true,
+      "library_energy_keV": 551.49,
+      "reported_centroid_offset_keV": 0.14999999999997726,
+      "previous_native_fits_at_library_energy": [],
+      "previous_native_candidates_at_library_energy": [
+        {
+          "energy_keV": 551.4997610125739,
+          "isotope": "W187",
+          "channel": 1107,
+          "significance": 1.6506845238434382,
+          "net": 420.97735000613346,
+          "sigma": 255.03198456476335,
+          "line_energy": 551.49,
+          "assignment_ambiguous": false
+        }
+      ]
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+      "source_line_number": 72,
+      "reported_isotope": "W187",
+      "reported_energy_keV": 773.21,
+      "net_counts": 15.0,
+      "net_counts_unc": 201,
+      "activity_available": true,
+      "status": "tentative_same_id",
+      "expected_isotope": "W187",
+      "native_isotope": null,
+      "native_energy_keV": null,
+      "native_channel": null,
+      "native_significance": null,
+      "confirmed_detection": false,
+      "tentative_isotope": "W187",
+      "tentative_energy_keV": 772.9112190196823,
+      "tentative_channel": 1550,
+      "tentative_significance": 1.1040044740565815,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 772.91,
+      "reported_centroid_offset_keV": 0.3000000000000682,
+      "previous_native_fits_at_library_energy": [],
+      "previous_native_candidates_at_library_energy": [
+        {
+          "energy_keV": 772.9112190196823,
+          "isotope": "W187",
+          "channel": 1550,
+          "significance": 1.1040044740565815,
+          "net": 255.96986168484037,
+          "sigma": 231.85581915650968,
+          "line_energy": 772.91,
+          "assignment_ambiguous": false
+        }
+      ]
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_sha256": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+      "source_line_number": 80,
+      "reported_isotope": "Mn56",
+      "reported_energy_keV": 2530.61,
+      "net_counts": 0,
+      "net_counts_unc": 123,
+      "activity_available": false,
+      "status": "reference_nondetection",
+      "paired_raw_available": true,
+      "library_energy_keV": 2523.06,
+      "reported_centroid_offset_keV": 7.550000000000182,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 2522.99721775,
+          "isotope": "Mn56",
+          "channel": 5050,
+          "significance": 21.627819762063318,
+          "net": 468.44440280781924,
+          "sigma": 21.659344675578577,
+          "line_energy": 2523.06,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "RAFM3/RAFM3-C_4dEOI.txt",
+      "source_sha256": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+      "source_line_number": 82,
+      "reported_isotope": "Fe59",
+      "reported_energy_keV": 1098.75,
+      "net_counts": 62.0,
+      "net_counts_unc": 47,
+      "activity_available": true,
+      "status": "tentative_same_id",
+      "expected_isotope": "Fe59",
+      "native_isotope": null,
+      "native_energy_keV": null,
+      "native_channel": null,
+      "native_significance": null,
+      "confirmed_detection": false,
+      "tentative_isotope": "Fe59",
+      "tentative_energy_keV": 1098.6977089107827,
+      "tentative_channel": 2202,
+      "tentative_significance": 1.330396056211006,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 1099.25,
+      "reported_centroid_offset_keV": -0.5,
+      "previous_native_fits_at_library_energy": [],
+      "previous_native_candidates_at_library_energy": [
+        {
+          "energy_keV": 1098.6977089107827,
+          "isotope": "Fe59",
+          "channel": 2202,
+          "significance": 1.330396056211006,
+          "net": 67.97989450083578,
+          "sigma": 51.09748648417063,
+          "line_energy": 1099.25,
+          "assignment_ambiguous": false
+        }
+      ]
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_sha256": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+      "source_line_number": 85,
+      "reported_isotope": "Mn56",
+      "reported_energy_keV": 2112.8,
+      "net_counts": 60.0,
+      "net_counts_unc": 15,
+      "activity_available": true,
+      "status": "tentative_same_id",
+      "expected_isotope": "Mn56",
+      "native_isotope": null,
+      "native_energy_keV": null,
+      "native_channel": null,
+      "native_significance": null,
+      "confirmed_detection": false,
+      "tentative_isotope": "Mn56",
+      "tentative_energy_keV": 2113.005185341197,
+      "tentative_channel": 4230,
+      "tentative_significance": 1.986421849862582,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 2113.09,
+      "reported_centroid_offset_keV": -0.2899999999999636,
+      "previous_native_fits_at_library_energy": [],
+      "previous_native_candidates_at_library_energy": [
+        {
+          "energy_keV": 2113.005185341197,
+          "isotope": "Mn56",
+          "channel": 4230,
+          "significance": 1.986421849862582,
+          "net": 42.394373860097204,
+          "sigma": 21.342079912698296,
+          "line_energy": 2113.09,
+          "assignment_ambiguous": false
+        }
+      ]
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_sha256": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+      "source_line_number": 69,
+      "reported_isotope": "W187",
+      "reported_energy_keV": 551.58,
+      "net_counts": 0,
+      "net_counts_unc": 262,
+      "activity_available": false,
+      "status": "reference_nondetection",
+      "paired_raw_available": true,
+      "library_energy_keV": 551.49,
+      "reported_centroid_offset_keV": 0.09000000000003183,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 551.4454276279,
+          "isotope": "W187",
+          "channel": 1107,
+          "significance": 11.095682485676102,
+          "net": 1412.7869400888849,
+          "sigma": 127.32762873421377,
+          "line_energy": 551.49,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_sha256": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+      "source_line_number": 80,
+      "reported_isotope": "Mn56",
+      "reported_energy_keV": 2530.36,
+      "net_counts": 0,
+      "net_counts_unc": 134,
+      "activity_available": false,
+      "status": "reference_nondetection",
+      "paired_raw_available": true,
+      "library_energy_keV": 2523.06,
+      "reported_centroid_offset_keV": 7.300000000000182,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 2521.9966625984,
+          "isotope": "Mn56",
+          "channel": 5048,
+          "significance": 22.363279802889604,
+          "net": 500.56250000000006,
+          "sigma": 22.383232889449488,
+          "line_energy": 2523.06,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "RAFM3/RAFM3-N_4dEOI.txt",
+      "source_sha256": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+      "source_line_number": 82,
+      "reported_isotope": "Fe59",
+      "reported_energy_keV": 1099.1,
+      "net_counts": 93.0,
+      "net_counts_unc": 43,
+      "activity_available": true,
+      "status": "tentative_same_id",
+      "expected_isotope": "Fe59",
+      "native_isotope": null,
+      "native_energy_keV": null,
+      "native_channel": null,
+      "native_significance": null,
+      "confirmed_detection": false,
+      "tentative_isotope": "Fe59",
+      "tentative_energy_keV": 1099.0057659266095,
+      "tentative_channel": 2203,
+      "tentative_significance": 1.7798973850659008,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 1099.25,
+      "reported_centroid_offset_keV": -0.15000000000009095,
+      "previous_native_fits_at_library_energy": [],
+      "previous_native_candidates_at_library_energy": [
+        {
+          "energy_keV": 1099.0057659266095,
+          "isotope": "Fe59",
+          "channel": 2203,
+          "significance": 1.7798973850659008,
+          "net": 91.64068140535201,
+          "sigma": 51.48649701620805,
+          "line_energy": 1099.25,
+          "assignment_ambiguous": false
+        }
+      ]
+    },
+    {
+      "report": "RAFM4/RAFM4-A_15dEOI.txt",
+      "source_sha256": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+      "source_line_number": 93,
+      "reported_isotope": "Cr51",
+      "reported_energy_keV": 320.33,
+      "net_counts": 2855549.0,
+      "net_counts_unc": 2320,
+      "activity_available": true,
+      "status": "same_id",
+      "expected_isotope": "Cr51",
+      "native_isotope": "Cr51",
+      "native_energy_keV": 320.07622878559994,
+      "native_channel": 644,
+      "native_significance": 1674.7169684188088,
+      "confirmed_detection": true,
+      "tentative_isotope": null,
+      "tentative_energy_keV": null,
+      "tentative_channel": null,
+      "tentative_significance": null,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 320.084,
+      "reported_centroid_offset_keV": 0.2459999999999809,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 320.07622878559994,
+          "isotope": "Cr51",
+          "channel": 644,
+          "significance": 1674.7169684188088,
+          "net": 3100312.9631134816,
+          "sigma": 1851.2459248804623,
+          "line_energy": 320.084,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "RAFM4/RAFM4-N_15dEOI.txt",
+      "source_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+      "source_line_number": 92,
+      "reported_isotope": "Tb154m",
+      "reported_energy_keV": 264.28,
+      "net_counts": 65931.0,
+      "net_counts_unc": 1206,
+      "activity_available": true,
+      "status": "corrected_reference_id",
+      "expected_isotope": "Ta182",
+      "native_isotope": "Ta182",
+      "native_energy_keV": 264.1121909104,
+      "native_channel": 532,
+      "native_significance": 114.95699591509164,
+      "confirmed_detection": true,
+      "tentative_isotope": null,
+      "tentative_energy_keV": null,
+      "tentative_channel": null,
+      "tentative_significance": null,
+      "correction": {
+        "report": "RAFM4/RAFM4-N_15dEOI.txt",
+        "source_sha256": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+        "source_line_number": 92,
+        "reported_isotope": "Tb154m",
+        "reported_energy_keV": 264.28,
+        "corrected_isotope": "Ta182",
+        "library_energy_keV": 264.076,
+        "reason": "The user-designated erroneous Tb assignment; the reported 264.28-keV peak is consistent with the bundled Ta182 264.076-keV line. Preserve the original QG assignment and apply this exception only to this source row."
+      },
+      "paired_raw_available": true,
+      "library_energy_keV": 264.076,
+      "reported_centroid_offset_keV": 0.2039999999999509,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 264.1121909104,
+          "isotope": "Ta182",
+          "channel": 532,
+          "significance": 114.95699591509164,
+          "net": 79027.79915305486,
+          "sigma": 687.4553264372494,
+          "line_energy": 264.076,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_sha256": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+      "source_line_number": 83,
+      "reported_isotope": "Mn56",
+      "reported_energy_keV": 846.73,
+      "net_counts": 512.0,
+      "net_counts_unc": 83,
+      "activity_available": true,
+      "status": "same_id",
+      "expected_isotope": "Mn56",
+      "native_isotope": "Mn56",
+      "native_energy_keV": 846.8202629884,
+      "native_channel": 1698,
+      "native_significance": 25.819773877156173,
+      "confirmed_detection": true,
+      "tentative_isotope": null,
+      "tentative_energy_keV": null,
+      "tentative_channel": null,
+      "tentative_significance": null,
+      "correction": null,
+      "paired_raw_available": true,
+      "library_energy_keV": 846.764,
+      "reported_centroid_offset_keV": -0.033999999999991815,
+      "previous_native_fits_at_library_energy": [
+        {
+          "energy_keV": 846.8202629884,
+          "isotope": "Mn56",
+          "channel": 1698,
+          "significance": 25.819773877156173,
+          "net": 927.9074980602738,
+          "sigma": 35.937863068631756,
+          "line_energy": 846.764,
+          "assignment_ambiguous": false
+        }
+      ],
+      "previous_native_candidates_at_library_energy": []
+    }
+  ],
+  "experiments": [
+    {
+      "report": "flux_wires/Ti-RAFM-1_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 374.8208094524653,
+          "net_unc": 242.42988677141275,
+          "roi_net": 120.5,
+          "roi_unc": 242.42988677141275,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 332.0,
+          "selected_unc": 245.94613231356172,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 374.8208094524653,
+          "net_unc": 242.42988677141275,
+          "roi_net": 120.5,
+          "roi_unc": 242.42988677141275,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 332.0,
+          "selected_unc": 245.94613231356172,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.25832772983227,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.5460998412538303
+        }
+      ],
+      "net_counts": 374.8208094524653,
+      "net_counts_unc": 242.42988677141275,
+      "significance": 1.5460998412538303,
+      "fitted_energy_keV": 175.25832772983227
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 529.5625,
+          "net_unc": 122.89837964249162,
+          "roi_net": 529.5625,
+          "roi_unc": 122.89837964249162,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 332.0,
+          "selected_unc": 245.94613231356172,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 529.5625,
+          "net_unc": 122.89837964249162,
+          "roi_net": 529.5625,
+          "roi_unc": 122.89837964249162,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 332.0,
+          "selected_unc": 245.94613231356172,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.25832772983227,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 4.3089461516131
+        }
+      ],
+      "net_counts": 529.5625,
+      "net_counts_unc": 122.89837964249162,
+      "significance": 4.3089461516131,
+      "fitted_energy_keV": 175.25832772983227
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 361.5,
+          "net_unc": 160.58253329674432,
+          "roi_net": 361.5,
+          "roi_unc": 160.58253329674432,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 426.0,
+          "selected_unc": 226.74655454934702,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 361.5,
+          "net_unc": 160.58253329674432,
+          "roi_net": 361.5,
+          "roi_unc": 160.58253329674432,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 426.0,
+          "selected_unc": 226.74655454934702,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.25832772983227,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.2511788335782166
+        }
+      ],
+      "net_counts": 361.5,
+      "net_counts_unc": 160.58253329674432,
+      "significance": 2.2511788335782166,
+      "fitted_energy_keV": 175.25832772983227
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 357.125,
+          "net_unc": 91.6378316390125,
+          "roi_net": 357.125,
+          "roi_unc": 91.6378316390125,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 443.5,
+          "selected_unc": 81.03413632537833,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.25832772983227,
+          "channel": 354,
+          "net": 357.125,
+          "net_unc": 91.6378316390125,
+          "roi_net": 357.125,
+          "roi_unc": 91.6378316390125,
+          "fit_net": 374.8208094524653,
+          "fit_unc": 81.47720264904672,
+          "selected_net": 443.5,
+          "selected_unc": 81.03413632537833,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.25832772983227,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.8971349890383373
+        }
+      ],
+      "net_counts": 357.125,
+      "net_counts_unc": 91.6378316390125,
+      "significance": 3.8971349890383373,
+      "fitted_energy_keV": 175.25832772983227
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1a_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 477.214951613352,
+          "net_unc": 239.76707447020326,
+          "roi_net": 409.5,
+          "roi_unc": 239.76707447020326,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 474.0,
+          "selected_unc": 211.33149315707774,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 477.214951613352,
+          "net_unc": 239.76707447020326,
+          "roi_net": 409.5,
+          "roi_unc": 239.76707447020326,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 474.0,
+          "selected_unc": 211.33149315707774,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.2199804030982,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.9903272902162272
+        }
+      ],
+      "net_counts": 477.214951613352,
+      "net_counts_unc": 239.76707447020326,
+      "significance": 1.9903272902162272,
+      "fitted_energy_keV": 175.2199804030982
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1a_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 470.0,
+          "net_unc": 123.38668257757804,
+          "roi_net": 470.0,
+          "roi_unc": 123.38668257757804,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 576.4375,
+          "selected_unc": 108.9733876629978,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 470.0,
+          "net_unc": 123.38668257757804,
+          "roi_net": 470.0,
+          "roi_unc": 123.38668257757804,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 576.4375,
+          "selected_unc": 108.9733876629978,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.2199804030982,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.809163113729819
+        }
+      ],
+      "net_counts": 470.0,
+      "net_counts_unc": 123.38668257757804,
+      "significance": 3.809163113729819,
+      "fitted_energy_keV": 175.2199804030982
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1a_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 488.0,
+          "net_unc": 160.73114197317207,
+          "roi_net": 488.0,
+          "roi_unc": 160.73114197317207,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 664.0,
+          "selected_unc": 156.92036196746426,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 488.0,
+          "net_unc": 160.73114197317207,
+          "roi_net": 488.0,
+          "roi_unc": 160.73114197317207,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 664.0,
+          "selected_unc": 156.92036196746426,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.2199804030982,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.0361260052607166
+        }
+      ],
+      "net_counts": 488.0,
+      "net_counts_unc": 160.73114197317207,
+      "significance": 3.0361260052607166,
+      "fitted_energy_keV": 175.2199804030982
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1a_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 443.375,
+          "net_unc": 92.2845887052654,
+          "roi_net": 443.375,
+          "roi_unc": 92.2845887052654,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 664.0,
+          "selected_unc": 156.92036196746426,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.2199804030982,
+          "channel": 354,
+          "net": 443.375,
+          "net_unc": 92.2845887052654,
+          "roi_net": 443.375,
+          "roi_unc": 92.2845887052654,
+          "fit_net": 477.214951613352,
+          "fit_unc": 86.60022181561988,
+          "selected_net": 664.0,
+          "selected_unc": 156.92036196746426,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.2199804030982,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 4.80443166318953
+        }
+      ],
+      "net_counts": 443.375,
+      "net_counts_unc": 92.2845887052654,
+      "significance": 4.80443166318953,
+      "fitted_energy_keV": 175.2199804030982
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1b_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 2795.7035064837482,
+          "net_unc": 1725.1379654972527,
+          "roi_net": 401.0,
+          "roi_unc": 1725.1379654972527,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 4061.0,
+          "selected_unc": 828.1189528081096,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 2795.7035064837482,
+          "net_unc": 1725.1379654972527,
+          "roi_net": 401.0,
+          "roi_unc": 1725.1379654972527,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 4061.0,
+          "selected_unc": 828.1189528081096,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.26067400511312,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.6205680718863065
+        }
+      ],
+      "net_counts": 2795.7035064837482,
+      "net_counts_unc": 1725.1379654972527,
+      "significance": 1.6205680718863065,
+      "fitted_energy_keV": 175.26067400511312
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1b_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 2795.7035064837482,
+          "net_unc": 885.8194057093409,
+          "roi_net": 1511.6875,
+          "roi_unc": 885.8194057093409,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 2334.4375,
+          "selected_unc": 412.5685785796708,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 2795.7035064837482,
+          "net_unc": 885.8194057093409,
+          "roi_net": 1511.6875,
+          "roi_unc": 885.8194057093409,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 2334.4375,
+          "selected_unc": 412.5685785796708,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.26067400511312,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.1560648688261943
+        }
+      ],
+      "net_counts": 2795.7035064837482,
+      "net_counts_unc": 885.8194057093409,
+      "significance": 3.1560648688261943,
+      "fitted_energy_keV": 175.26067400511312
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1b_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 2795.7035064837482,
+          "net_unc": 1276.7213869909128,
+          "roi_net": 1916.0,
+          "roi_unc": 1276.7213869909128,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 3246.5,
+          "selected_unc": 711.134832503654,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 2795.7035064837482,
+          "net_unc": 1276.7213869909128,
+          "roi_net": 1916.0,
+          "roi_unc": 1276.7213869909128,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 3246.5,
+          "selected_unc": 711.134832503654,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.26067400511312,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.189752231747996
+        }
+      ],
+      "net_counts": 2795.7035064837482,
+      "net_counts_unc": 1276.7213869909128,
+      "significance": 2.189752231747996,
+      "fitted_energy_keV": 175.26067400511312
+    },
+    {
+      "report": "flux_wires/Ti-RAFM-1b_25cm.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_native_same_id",
+      "isotope": "Sc48",
+      "library_energy_keV": 175.35,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 1445.75,
+          "net_unc": 686.2362248162071,
+          "roi_net": 1445.75,
+          "roi_unc": 686.2362248162071,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 3246.5,
+          "selected_unc": 711.134832503654,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Sc48",
+          "library_energy_keV": 175.35,
+          "fitted_energy_keV": 175.26067400511312,
+          "channel": 354,
+          "net": 1445.75,
+          "net_unc": 686.2362248162071,
+          "roi_net": 1445.75,
+          "roi_unc": 686.2362248162071,
+          "fit_net": 2795.7035064837482,
+          "fit_unc": 667.13836386182,
+          "selected_net": 3246.5,
+          "selected_unc": 711.134832503654,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 175.26067400511312,
+          "isotope": "Sc48",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.106781816111808
+        }
+      ],
+      "net_counts": 1445.75,
+      "net_counts_unc": 686.2362248162071,
+      "significance": 2.106781816111808,
+      "fitted_energy_keV": 175.26067400511312
+    },
+    {
+      "report": "RAFM3/RAFM3-B_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 469.53125,
+          "net_unc": 40.54311057509237,
+          "roi_net": 469.53125,
+          "roi_unc": 40.54311057509237,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 415.0,
+          "selected_unc": 45.8530260724415,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 469.53125,
+          "net_unc": 40.54311057509237,
+          "roi_net": 469.53125,
+          "roi_unc": 40.54311057509237,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 415.0,
+          "selected_unc": 45.8530260724415,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.4956710955585,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 11.581036662945545
+        }
+      ],
+      "net_counts": 469.53125,
+      "net_counts_unc": 40.54311057509237,
+      "significance": 11.581036662945545,
+      "fitted_energy_keV": 2522.4956710955585
+    },
+    {
+      "report": "RAFM3/RAFM3-B_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 462.04296875,
+          "net_unc": 26.421361496001843,
+          "roi_net": 462.04296875,
+          "roi_unc": 26.421361496001843,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 415.0,
+          "selected_unc": 45.8530260724415,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 462.04296875,
+          "net_unc": 26.421361496001843,
+          "roi_net": 462.04296875,
+          "roi_unc": 26.421361496001843,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 415.0,
+          "selected_unc": 45.8530260724415,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.4956710955585,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 17.487477654015585
+        }
+      ],
+      "net_counts": 462.04296875,
+      "net_counts_unc": 26.421361496001843,
+      "significance": 17.487477654015585,
+      "fitted_energy_keV": 2522.4956710955585
+    },
+    {
+      "report": "RAFM3/RAFM3-B_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 453.40625,
+          "net_unc": 30.62020051677487,
+          "roi_net": 453.40625,
+          "roi_unc": 30.62020051677487,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 421.0,
+          "selected_unc": 37.5632799419859,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 453.40625,
+          "net_unc": 30.62020051677487,
+          "roi_net": 453.40625,
+          "roi_unc": 30.62020051677487,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 421.0,
+          "selected_unc": 37.5632799419859,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.4956710955585,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 14.807422627804394
+        }
+      ],
+      "net_counts": 453.40625,
+      "net_counts_unc": 30.62020051677487,
+      "significance": 14.807422627804394,
+      "fitted_energy_keV": 2522.4956710955585
+    },
+    {
+      "report": "RAFM3/RAFM3-B_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 425.4934895833333,
+          "net_unc": 24.23936996726705,
+          "roi_net": 425.4934895833333,
+          "roi_unc": 24.23936996726705,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 421.0,
+          "selected_unc": 37.5632799419859,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.4956710955585,
+          "channel": 5049,
+          "net": 425.4934895833333,
+          "net_unc": 24.23936996726705,
+          "roi_net": 425.4934895833333,
+          "roi_unc": 24.23936996726705,
+          "fit_net": 421.8238809370538,
+          "fit_unc": 23.65473533061434,
+          "selected_net": 421.0,
+          "selected_unc": 37.5632799419859,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.4956710955585,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 17.553818030663404
+        }
+      ],
+      "net_counts": 425.4934895833333,
+      "net_counts_unc": 24.23936996726705,
+      "significance": 17.553818030663404,
+      "fitted_energy_keV": 2522.4956710955585
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 420.97735000613346,
+          "net_unc": 255.03198456476335,
+          "roi_net": 16.00000000000091,
+          "roi_unc": 255.03198456476335,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 13.0,
+          "selected_unc": 255.025488922186,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 420.97735000613346,
+          "net_unc": 255.03198456476335,
+          "roi_net": 16.00000000000091,
+          "roi_unc": 255.03198456476335,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 13.0,
+          "selected_unc": 255.025488922186,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.2156898001092,
+          "channel": 1117,
+          "net": 80.68633267308849,
+          "net_unc": 155.07177647584683,
+          "roi_net": 61.625,
+          "roi_unc": 155.07177647584683,
+          "fit_net": 80.68633267308849,
+          "fit_unc": 57.763300652483146,
+          "selected_net": 63.5,
+          "selected_unc": 155.06853323611466,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.4997610125739,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.6506845238434382
+        },
+        {
+          "energy_keV": 556.2156898001092,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.5203160401380696
+        }
+      ],
+      "net_counts": 420.97735000613346,
+      "net_counts_unc": 255.03198456476335,
+      "significance": 1.6506845238434382,
+      "fitted_energy_keV": 551.4997610125739
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 451.91796875,
+          "net_unc": 120.10078480909041,
+          "roi_net": 451.91796875,
+          "roi_unc": 120.10078480909041,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 451.75,
+          "selected_unc": 120.09807190375706,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 451.91796875,
+          "net_unc": 120.10078480909041,
+          "roi_net": 451.91796875,
+          "roi_unc": 120.10078480909041,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 451.75,
+          "selected_unc": 120.09807190375706,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.2156898001092,
+          "channel": 1117,
+          "net": 80.68633267308849,
+          "net_unc": 83.77671866024319,
+          "roi_net": -188.95703125,
+          "roi_unc": 83.77671866024319,
+          "fit_net": 80.68633267308849,
+          "fit_unc": 57.763300652483146,
+          "selected_net": -187.9375,
+          "selected_unc": 83.77478644407277,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.4997610125739,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.762822778122216
+        },
+        {
+          "energy_keV": 556.2156898001092,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.9631116372594184
+        }
+      ],
+      "net_counts": 451.91796875,
+      "net_counts_unc": 120.10078480909041,
+      "significance": 3.762822778122216,
+      "fitted_energy_keV": 551.4997610125739
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 575.7604166666661,
+          "net_unc": 154.32709101115486,
+          "roi_net": 575.7604166666661,
+          "roi_unc": 154.32709101115486,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 575.5,
+          "selected_unc": 154.3235238063206,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 575.7604166666661,
+          "net_unc": 154.32709101115486,
+          "roi_net": 575.7604166666661,
+          "roi_unc": 154.32709101115486,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 575.5,
+          "selected_unc": 154.3235238063206,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.2156898001092,
+          "channel": 1117,
+          "net": 80.68633267308849,
+          "net_unc": 93.43811953993789,
+          "roi_net": 6.718750000000455,
+          "roi_unc": 93.43811953993789,
+          "fit_net": 80.68633267308849,
+          "fit_unc": 57.763300652483146,
+          "selected_net": 248.0,
+          "selected_unc": 121.91800523302537,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.4997610125739,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.7307799485772057
+        },
+        {
+          "energy_keV": 556.2156898001092,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.8635269317315515
+        }
+      ],
+      "net_counts": 575.7604166666661,
+      "net_counts_unc": 154.32709101115486,
+      "significance": 3.7307799485772057,
+      "fitted_energy_keV": 551.4997610125739
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 387.90885416666606,
+          "net_unc": 85.3472648414262,
+          "roi_net": 387.90885416666606,
+          "roi_unc": 85.3472648414262,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 588.0,
+          "selected_unc": 169.58183865025168,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.4997610125739,
+          "channel": 1107,
+          "net": 387.90885416666606,
+          "net_unc": 85.3472648414262,
+          "roi_net": 387.90885416666606,
+          "roi_unc": 85.3472648414262,
+          "fit_net": 420.97735000613346,
+          "fit_unc": 80.49423574406909,
+          "selected_net": 588.0,
+          "selected_unc": 169.58183865025168,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.2156898001092,
+          "channel": 1117,
+          "net": 80.68633267308849,
+          "net_unc": 57.763300652483146,
+          "roi_net": -53.28776041666606,
+          "roi_unc": 57.41529722753731,
+          "fit_net": 80.68633267308849,
+          "fit_unc": 57.763300652483146,
+          "selected_net": 248.0,
+          "selected_unc": 121.91800523302537,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.4997610125739,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 4.545064858111086
+        },
+        {
+          "energy_keV": 556.2156898001092,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.396844220494175
+        }
+      ],
+      "net_counts": 387.90885416666606,
+      "net_counts_unc": 85.3472648414262,
+      "significance": 4.545064858111086,
+      "fitted_energy_keV": 551.4997610125739
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_same_id",
+      "isotope": "W187",
+      "library_energy_keV": 772.91,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 255.96986168484037,
+          "net_unc": 231.85581915650968,
+          "roi_net": 187.85416666666697,
+          "roi_unc": 231.85581915650968,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 188.5,
+          "selected_unc": 231.84962799193792,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 255.96986168484037,
+          "net_unc": 231.85581915650968,
+          "roi_net": 187.85416666666697,
+          "roi_unc": 231.85581915650968,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 188.5,
+          "selected_unc": 231.84962799193792,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 772.9112190196823,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.1040044740565815
+        }
+      ],
+      "net_counts": 255.96986168484037,
+      "net_counts_unc": 231.85581915650968,
+      "significance": 1.1040044740565815,
+      "fitted_energy_keV": 772.9112190196823
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_same_id",
+      "isotope": "W187",
+      "library_energy_keV": 772.91,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 255.96986168484037,
+          "net_unc": 106.4639215544229,
+          "roi_net": 200.8671875,
+          "roi_unc": 106.4639215544229,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 200.375,
+          "selected_unc": 106.46093033362051,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 255.96986168484037,
+          "net_unc": 106.4639215544229,
+          "roi_net": 200.8671875,
+          "roi_unc": 106.4639215544229,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 200.375,
+          "selected_unc": 106.46093033362051,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 772.9112190196823,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.4042873674721075
+        }
+      ],
+      "net_counts": 255.96986168484037,
+      "net_counts_unc": 106.4639215544229,
+      "significance": 2.4042873674721075,
+      "fitted_energy_keV": 772.9112190196823
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_same_id",
+      "isotope": "W187",
+      "library_energy_keV": 772.91,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 461.3541666666665,
+          "net_unc": 157.1387467192166,
+          "roi_net": 461.3541666666665,
+          "roi_unc": 157.1387467192166,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 462.5,
+          "selected_unc": 157.1344965308382,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 461.3541666666665,
+          "net_unc": 157.1387467192166,
+          "roi_net": 461.3541666666665,
+          "roi_unc": 157.1387467192166,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 462.5,
+          "selected_unc": 157.1344965308382,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 772.9112190196823,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.9359669483112096
+        }
+      ],
+      "net_counts": 461.3541666666665,
+      "net_counts_unc": 157.1387467192166,
+      "significance": 2.9359669483112096,
+      "fitted_energy_keV": 772.9112190196823
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 72,
+      "original_status": "tentative_same_id",
+      "isotope": "W187",
+      "library_energy_keV": 772.91,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 208.36197916666652,
+          "net_unc": 80.776069519273,
+          "roi_net": 208.36197916666652,
+          "roi_unc": 80.776069519273,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 462.5,
+          "selected_unc": 157.1344965308382,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 772.91,
+          "fitted_energy_keV": 772.9112190196823,
+          "channel": 1550,
+          "net": 208.36197916666652,
+          "net_unc": 80.776069519273,
+          "roi_net": 208.36197916666652,
+          "roi_unc": 80.776069519273,
+          "fit_net": 255.96986168484037,
+          "fit_unc": 74.29254910096354,
+          "selected_net": 462.5,
+          "selected_unc": 157.1344965308382,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 772.9112190196823,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.5795013350699345
+        }
+      ],
+      "net_counts": 208.36197916666652,
+      "net_counts_unc": 80.776069519273,
+      "significance": 2.5795013350699345,
+      "fitted_energy_keV": 772.9112190196823
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 373.22916666666663,
+          "net_unc": 35.66777707091592,
+          "roi_net": 373.22916666666663,
+          "roi_unc": 35.66777707091592,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 329.5,
+          "selected_unc": 41.228024449396074,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 373.22916666666663,
+          "net_unc": 35.66777707091592,
+          "roi_net": 373.22916666666663,
+          "roi_unc": 35.66777707091592,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 329.5,
+          "selected_unc": 41.228024449396074,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.31909269795,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 10.464043383600817
+        }
+      ],
+      "net_counts": 373.22916666666663,
+      "net_counts_unc": 35.66777707091592,
+      "significance": 10.464043383600817,
+      "fitted_energy_keV": 2522.31909269795
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 320.21354166666663,
+          "net_unc": 25.127834111722947,
+          "roi_net": 320.21354166666663,
+          "roi_unc": 25.127834111722947,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 329.5,
+          "selected_unc": 41.228024449396074,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 320.21354166666663,
+          "net_unc": 25.127834111722947,
+          "roi_net": 320.21354166666663,
+          "roi_unc": 25.127834111722947,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 329.5,
+          "selected_unc": 41.228024449396074,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.31909269795,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 12.743380119549446
+        }
+      ],
+      "net_counts": 320.21354166666663,
+      "net_counts_unc": 25.127834111722947,
+      "significance": 12.743380119549446,
+      "fitted_energy_keV": 2522.31909269795
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 313.8125,
+          "net_unc": 33.34672257134125,
+          "roi_net": 313.8125,
+          "roi_unc": 33.34672257134125,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 314.0,
+          "selected_unc": 33.34666400106613,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 313.8125,
+          "net_unc": 33.34672257134125,
+          "roi_net": 313.8125,
+          "roi_unc": 33.34672257134125,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 314.0,
+          "selected_unc": 33.34666400106613,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.31909269795,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 9.410594979120852
+        }
+      ],
+      "net_counts": 313.8125,
+      "net_counts_unc": 33.34672257134125,
+      "significance": 9.410594979120852,
+      "fitted_energy_keV": 2522.31909269795
+    },
+    {
+      "report": "RAFM3/RAFM3-C_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 327.0234375,
+          "net_unc": 21.557965112271173,
+          "roi_net": 327.0234375,
+          "roi_unc": 21.557965112271173,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 327.0625,
+          "selected_unc": 21.557789340514486,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.31909269795,
+          "channel": 5049,
+          "net": 327.0234375,
+          "net_unc": 21.557965112271173,
+          "roi_net": 327.0234375,
+          "roi_unc": 21.557965112271173,
+          "fit_net": 330.088516236761,
+          "fit_unc": 21.375753221910827,
+          "selected_net": 327.0625,
+          "selected_unc": 21.557789340514486,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.31909269795,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 15.169494699379234
+        }
+      ],
+      "net_counts": 327.0234375,
+      "net_counts_unc": 21.557965112271173,
+      "significance": 15.169494699379234,
+      "fitted_energy_keV": 2522.31909269795
+    },
+    {
+      "report": "RAFM3/RAFM3-C_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": []
+    },
+    {
+      "report": "RAFM3/RAFM3-C_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": []
+    },
+    {
+      "report": "RAFM3/RAFM3-C_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": []
+    },
+    {
+      "report": "RAFM3/RAFM3-C_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": []
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 85,
+      "original_status": "tentative_same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 2113.09,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 24.12985702402731,
+          "roi_net": 43.0,
+          "roi_unc": 24.12985702402731,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 24.12985702402731,
+          "roi_net": 43.0,
+          "roi_unc": 24.12985702402731,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2112.9893948425465,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.8886854579076353
+        }
+      ],
+      "net_counts": 45.57371006267079,
+      "net_counts_unc": 24.12985702402731,
+      "significance": 1.8886854579076353,
+      "fitted_energy_keV": 2112.9893948425465
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 85,
+      "original_status": "tentative_same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 2113.09,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 13.42964886919982,
+          "roi_net": 3.8125,
+          "roi_unc": 13.42964886919982,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 13.42964886919982,
+          "roi_net": 3.8125,
+          "roi_unc": 13.42964886919982,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2112.9893948425465,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.393514641115573
+        }
+      ],
+      "net_counts": 45.57371006267079,
+      "net_counts_unc": 13.42964886919982,
+      "significance": 3.393514641115573,
+      "fitted_energy_keV": 2112.9893948425465
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 85,
+      "original_status": "tentative_same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 2113.09,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 12.96630247988994,
+          "roi_net": 56.25,
+          "roi_unc": 12.96630247988994,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 12.96630247988994,
+          "roi_net": 56.25,
+          "roi_unc": 12.96630247988994,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2112.9893948425465,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.5147807274551277
+        }
+      ],
+      "net_counts": 45.57371006267079,
+      "net_counts_unc": 12.96630247988994,
+      "significance": 3.5147807274551277,
+      "fitted_energy_keV": 2112.9893948425465
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 85,
+      "original_status": "tentative_same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 2113.09,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 10.659308120575885,
+          "roi_net": 22.734375,
+          "roi_unc": 10.659308120575885,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2113.09,
+          "fitted_energy_keV": 2112.9893948425465,
+          "channel": 4230,
+          "net": 45.57371006267079,
+          "net_unc": 10.659308120575885,
+          "roi_net": 22.734375,
+          "roi_unc": 10.659308120575885,
+          "fit_net": 45.57371006267079,
+          "fit_unc": 8.218778523467867,
+          "selected_net": 44.996522107882384,
+          "selected_unc": 8.326704428938596,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2112.9893948425465,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 4.2754848201356435
+        }
+      ],
+      "net_counts": 45.57371006267079,
+      "net_counts_unc": 10.659308120575885,
+      "significance": 4.2754848201356435,
+      "fitted_energy_keV": 2112.9893948425465
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 456.9999999999991,
+          "net_unc": 225.4325024282028,
+          "roi_net": 456.9999999999991,
+          "roi_unc": 225.4325024282028,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 454.0,
+          "selected_unc": 225.42515387595947,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 540.18,
+          "fitted_energy_keV": 539.133922226747,
+          "channel": 1082,
+          "net": 61.94534712088171,
+          "net_unc": 221.0727961703955,
+          "roi_net": 101.58333333333394,
+          "roi_unc": 221.0727961703955,
+          "fit_net": 61.94534712088171,
+          "fit_unc": 50.51373467815461,
+          "selected_net": 62.509191242625576,
+          "selected_unc": 50.50109737943248,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 456.9999999999991,
+          "net_unc": 225.4325024282028,
+          "roi_net": 456.9999999999991,
+          "roi_unc": 225.4325024282028,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 454.0,
+          "selected_unc": 225.42515387595947,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.8866093666654,
+          "channel": 1118,
+          "net": 62.47185919997125,
+          "net_unc": 84.08273003685947,
+          "roi_net": 86.67708333333348,
+          "roi_unc": 84.08273003685947,
+          "fit_net": 62.47185919997125,
+          "fit_unc": 41.17591136444723,
+          "selected_net": 198.0,
+          "selected_unc": 111.02026841978,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.5924745855267,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.0272143327936814
+        },
+        {
+          "energy_keV": 539.133922226747,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.28020339089182333
+        },
+        {
+          "energy_keV": 556.8866093666654,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.7429808614989709
+        }
+      ],
+      "net_counts": 456.9999999999991,
+      "net_counts_unc": 225.4325024282028,
+      "significance": 2.0272143327936814,
+      "fitted_energy_keV": 551.5924745855267
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 471.9804687499991,
+          "net_unc": 109.1679436373583,
+          "roi_net": 471.9804687499991,
+          "roi_unc": 109.1679436373583,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 471.8125,
+          "selected_unc": 109.16495903562645,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 540.18,
+          "fitted_energy_keV": 539.133922226747,
+          "channel": 1082,
+          "net": 61.94534712088171,
+          "net_unc": 106.0753320401924,
+          "roi_net": 66.19270833333394,
+          "roi_unc": 106.0753320401924,
+          "fit_net": 61.94534712088171,
+          "fit_unc": 50.51373467815461,
+          "selected_net": 62.509191242625576,
+          "selected_unc": 50.50109737943248,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 471.9804687499991,
+          "net_unc": 109.1679436373583,
+          "roi_net": 471.9804687499991,
+          "roi_unc": 109.1679436373583,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 471.8125,
+          "selected_unc": 109.16495903562645,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.8866093666654,
+          "channel": 1118,
+          "net": 62.47185919997125,
+          "net_unc": 52.37733242654985,
+          "roi_net": -34.533854166666515,
+          "roi_unc": 52.37733242654985,
+          "fit_net": 62.47185919997125,
+          "fit_unc": 41.17591136444723,
+          "selected_net": 198.0,
+          "selected_unc": 111.02026841978,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.5924745855267,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 4.323434636800128
+        },
+        {
+          "energy_keV": 539.133922226747,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.5839750480103174
+        },
+        {
+          "energy_keV": 556.8866093666654,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.1927270119679583
+        }
+      ],
+      "net_counts": 471.9804687499991,
+      "net_counts_unc": 109.1679436373583,
+      "significance": 4.323434636800128,
+      "fitted_energy_keV": 551.5924745855267
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 706.260416666667,
+          "net_unc": 138.814988455733,
+          "roi_net": 706.260416666667,
+          "roi_unc": 138.814988455733,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 706.0,
+          "selected_unc": 138.81102261708182,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 540.18,
+          "fitted_energy_keV": 539.133922226747,
+          "channel": 1082,
+          "net": 61.94534712088171,
+          "net_unc": 137.3185485980044,
+          "roi_net": 119.21875,
+          "roi_unc": 137.3185485980044,
+          "fit_net": 61.94534712088171,
+          "fit_unc": 50.51373467815461,
+          "selected_net": 62.509191242625576,
+          "selected_unc": 50.50109737943248,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 706.260416666667,
+          "net_unc": 138.814988455733,
+          "roi_net": 706.260416666667,
+          "roi_unc": 138.814988455733,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 706.0,
+          "selected_unc": 138.81102261708182,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.8866093666654,
+          "channel": 1118,
+          "net": 62.47185919997125,
+          "net_unc": 55.77578268413431,
+          "roi_net": 25.166666666666515,
+          "roi_unc": 55.77578268413431,
+          "fit_net": 62.47185919997125,
+          "fit_unc": 41.17591136444723,
+          "selected_net": 198.0,
+          "selected_unc": 111.02026841978,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.5924745855267,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 5.087782122979378
+        },
+        {
+          "energy_keV": 539.133922226747,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.4511069171159441
+        },
+        {
+          "energy_keV": 556.8866093666654,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.1200534747088662
+        }
+      ],
+      "net_counts": 706.260416666667,
+      "net_counts_unc": 138.814988455733,
+      "significance": 5.087782122979378,
+      "fitted_energy_keV": 551.5924745855267
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 69,
+      "original_status": "reference_nondetection",
+      "isotope": "W187",
+      "library_energy_keV": 551.49,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 486.34635416666697,
+          "net_unc": 78.1267209228862,
+          "roi_net": 486.34635416666697,
+          "roi_unc": 78.1267209228862,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 754.0,
+          "selected_unc": 151.6047492659778,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 540.18,
+          "fitted_energy_keV": 539.133922226747,
+          "channel": 1082,
+          "net": 61.94534712088171,
+          "net_unc": 73.91242717066453,
+          "roi_net": 82.48046875,
+          "roi_unc": 73.91242717066453,
+          "fit_net": 61.94534712088171,
+          "fit_unc": 50.51373467815461,
+          "selected_net": 62.509191242625576,
+          "selected_unc": 50.50109737943248,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "W187",
+          "library_energy_keV": 551.49,
+          "fitted_energy_keV": 551.5924745855267,
+          "channel": 1107,
+          "net": 486.34635416666697,
+          "net_unc": 78.1267209228862,
+          "roi_net": 486.34635416666697,
+          "roi_unc": 78.1267209228862,
+          "fit_net": 596.4782157053982,
+          "fit_unc": 79.33007943715546,
+          "selected_net": 754.0,
+          "selected_unc": 151.6047492659778,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 557.6,
+          "fitted_energy_keV": 556.8866093666654,
+          "channel": 1118,
+          "net": 62.47185919997125,
+          "net_unc": 41.17591136444723,
+          "roi_net": 13.944010416666515,
+          "roi_unc": 38.633103086867756,
+          "fit_net": 62.47185919997125,
+          "fit_unc": 41.17591136444723,
+          "selected_net": 198.0,
+          "selected_unc": 111.02026841978,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 551.5924745855267,
+          "isotope": "W187",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 6.2250962080785115
+        },
+        {
+          "energy_keV": 539.133922226747,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.8380910963436404
+        },
+        {
+          "energy_keV": 556.8866093666654,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.5171943286703231
+        }
+      ],
+      "net_counts": 486.34635416666697,
+      "net_counts_unc": 78.1267209228862,
+      "significance": 6.2250962080785115,
+      "fitted_energy_keV": 551.5924745855267
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 435.03125,
+          "net_unc": 31.968637992635326,
+          "roi_net": 435.03125,
+          "roi_unc": 31.968637992635326,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 464.0,
+          "selected_unc": 25.96150997149434,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 435.03125,
+          "net_unc": 31.968637992635326,
+          "roi_net": 435.03125,
+          "roi_unc": 31.968637992635326,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 464.0,
+          "selected_unc": 25.96150997149434,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.3093332445533,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 13.608063318187623
+        }
+      ],
+      "net_counts": 435.03125,
+      "net_counts_unc": 31.968637992635326,
+      "significance": 13.608063318187623,
+      "fitted_energy_keV": 2522.3093332445533
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 419.10546875,
+          "net_unc": 23.853361912996853,
+          "roi_net": 419.10546875,
+          "roi_unc": 23.853361912996853,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 464.0,
+          "selected_unc": 25.96150997149434,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 419.10546875,
+          "net_unc": 23.853361912996853,
+          "roi_net": 419.10546875,
+          "roi_unc": 23.853361912996853,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 464.0,
+          "selected_unc": 25.96150997149434,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.3093332445533,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 17.570079650770076
+        }
+      ],
+      "net_counts": 419.10546875,
+      "net_counts_unc": 23.853361912996853,
+      "significance": 17.570079650770076,
+      "fitted_energy_keV": 2522.3093332445533
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 369.90625,
+          "net_unc": 33.11112622197409,
+          "roi_net": 369.90625,
+          "roi_unc": 33.11112622197409,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 406.5,
+          "selected_unc": 35.358874416474286,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 369.90625,
+          "net_unc": 33.11112622197409,
+          "roi_net": 369.90625,
+          "roi_unc": 33.11112622197409,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 406.5,
+          "selected_unc": 35.358874416474286,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.3093332445533,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 11.171660170064314
+        }
+      ],
+      "net_counts": 369.90625,
+      "net_counts_unc": 33.11112622197409,
+      "significance": 11.171660170064314,
+      "fitted_energy_keV": 2522.3093332445533
+    },
+    {
+      "report": "RAFM3/RAFM3-N_300sEOI.txt",
+      "source_line_number": 80,
+      "original_status": "reference_nondetection",
+      "isotope": "Mn56",
+      "library_energy_keV": 2523.06,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 414.2434895833333,
+          "net_unc": 21.90605353344248,
+          "roi_net": 414.2434895833333,
+          "roi_unc": 21.90605353344248,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 406.5,
+          "selected_unc": 35.358874416474286,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn56",
+          "library_energy_keV": 2523.06,
+          "fitted_energy_keV": 2522.3093332445533,
+          "channel": 5049,
+          "net": 414.2434895833333,
+          "net_unc": 21.90605353344248,
+          "roi_net": 414.2434895833333,
+          "roi_unc": 21.90605353344248,
+          "fit_net": 407.12484916063033,
+          "fit_unc": 21.519009266018028,
+          "selected_net": 406.5,
+          "selected_unc": 35.358874416474286,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 2522.3093332445533,
+          "isotope": "Mn56",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 18.910000788181037
+        }
+      ],
+      "net_counts": 414.2434895833333,
+      "net_counts_unc": 21.90605353344248,
+      "significance": 18.910000788181037,
+      "fitted_energy_keV": 2522.3093332445533
+    },
+    {
+      "report": "RAFM3/RAFM3-N_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 52.578958481506646,
+          "roi_net": 129.875,
+          "roi_unc": 52.578958481506646,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 52.578958481506646,
+          "roi_net": 129.875,
+          "roi_unc": 52.578958481506646,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 1102.43,
+          "fitted_energy_keV": 1102.9756952859577,
+          "channel": 2210,
+          "net": 21.72097931215085,
+          "net_unc": 66.05123484841143,
+          "roi_net": -70.875,
+          "roi_unc": 66.05123484841143,
+          "fit_net": 21.72097931215085,
+          "fit_unc": 12.516625837880166,
+          "selected_net": 20.083087928548757,
+          "selected_unc": 11.841524415330989,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 1099.0016665631117,
+          "isotope": "Fe59",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.0027454487992693
+        },
+        {
+          "energy_keV": 1102.9756952859577,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.32885046527897355
+        }
+      ],
+      "net_counts": 105.30226980144317,
+      "net_counts_unc": 52.578958481506646,
+      "significance": 2.0027454487992693,
+      "fitted_energy_keV": 1099.0016665631117
+    },
+    {
+      "report": "RAFM3/RAFM3-N_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 26.938293020519602,
+          "roi_net": 122.171875,
+          "roi_unc": 26.938293020519602,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 26.938293020519602,
+          "roi_net": 122.171875,
+          "roi_unc": 26.938293020519602,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 1102.43,
+          "fitted_energy_keV": 1102.9756952859577,
+          "channel": 2210,
+          "net": 21.72097931215085,
+          "net_unc": 26.527311250624326,
+          "roi_net": 82.125,
+          "roi_unc": 26.527311250624326,
+          "fit_net": 21.72097931215085,
+          "fit_unc": 12.516625837880166,
+          "selected_net": 20.083087928548757,
+          "selected_unc": 11.841524415330989,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 1099.0016665631117,
+          "isotope": "Fe59",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.9090179070081272
+        },
+        {
+          "energy_keV": 1102.9756952859577,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.8188157143758639
+        }
+      ],
+      "net_counts": 105.30226980144317,
+      "net_counts_unc": 26.938293020519602,
+      "significance": 3.9090179070081272,
+      "fitted_energy_keV": 1099.0016665631117
+    },
+    {
+      "report": "RAFM3/RAFM3-N_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 38.0478728051911,
+          "roi_net": 69.625,
+          "roi_unc": 38.0478728051911,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 38.0478728051911,
+          "roi_net": 69.625,
+          "roi_unc": 38.0478728051911,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 1102.43,
+          "fitted_energy_keV": 1102.9756952859577,
+          "channel": 2210,
+          "net": 21.72097931215085,
+          "net_unc": 38.60517290467691,
+          "roi_net": -6.875,
+          "roi_unc": 38.60517290467691,
+          "fit_net": 21.72097931215085,
+          "fit_unc": 12.516625837880166,
+          "selected_net": 20.083087928548757,
+          "selected_unc": 11.841524415330989,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 1099.0016665631117,
+          "isotope": "Fe59",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.7676256788546705
+        },
+        {
+          "energy_keV": 1102.9756952859577,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 0.5626442696108067
+        }
+      ],
+      "net_counts": 105.30226980144317,
+      "net_counts_unc": 38.0478728051911,
+      "significance": 2.7676256788546705,
+      "fitted_energy_keV": 1099.0016665631117
+    },
+    {
+      "report": "RAFM3/RAFM3-N_4dEOI.txt",
+      "source_line_number": 82,
+      "original_status": "tentative_same_id",
+      "isotope": "Fe59",
+      "library_energy_keV": 1099.25,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 20.280834693359516,
+          "roi_net": 89.390625,
+          "roi_unc": 20.280834693359516,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Fe59",
+          "library_energy_keV": 1099.25,
+          "fitted_energy_keV": 1099.0016665631117,
+          "channel": 2203,
+          "net": 105.30226980144317,
+          "net_unc": 20.280834693359516,
+          "roi_net": 89.390625,
+          "roi_unc": 20.280834693359516,
+          "fit_net": 105.30226980144317,
+          "fit_unc": 17.15572894624284,
+          "selected_net": 97.10921936376529,
+          "selected_unc": 16.4455224774728,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 1102.43,
+          "fitted_energy_keV": 1102.9756952859577,
+          "channel": 2210,
+          "net": 21.72097931215085,
+          "net_unc": 19.65059164384434,
+          "roi_net": -24.578125,
+          "roi_unc": 19.65059164384434,
+          "fit_net": 21.72097931215085,
+          "fit_unc": 12.516625837880166,
+          "selected_net": 20.083087928548757,
+          "selected_unc": 11.841524415330989,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 1099.0016665631117,
+          "isotope": "Fe59",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 5.192205912310007
+        },
+        {
+          "energy_keV": 1102.9756952859577,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.1053600678204043
+        }
+      ],
+      "net_counts": 105.30226980144317,
+      "net_counts_unc": 20.280834693359516,
+      "significance": 5.192205912310007,
+      "fitted_energy_keV": 1099.0016665631117
+    },
+    {
+      "report": "RAFM4/RAFM4-A_15dEOI.txt",
+      "source_line_number": 93,
+      "original_status": "same_id",
+      "isotope": "Cr51",
+      "library_energy_keV": 320.084,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2860966.0,
+          "net_unc": 2366.875986928762,
+          "roi_net": 2860966.0,
+          "roi_unc": 2366.875986928762,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 3185551.5,
+          "selected_unc": 4305.084813334111,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2860966.0,
+          "net_unc": 2366.875986928762,
+          "roi_net": 2860966.0,
+          "roi_unc": 2366.875986928762,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 3185551.5,
+          "selected_unc": 4305.084813334111,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 320.31152517852234,
+          "isotope": "Cr51",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 1208.7519649529104
+        }
+      ],
+      "net_counts": 2860966.0,
+      "net_counts_unc": 2366.875986928762,
+      "significance": 1208.7519649529104,
+      "fitted_energy_keV": 320.31152517852234
+    },
+    {
+      "report": "RAFM4/RAFM4-A_15dEOI.txt",
+      "source_line_number": 93,
+      "original_status": "same_id",
+      "isotope": "Cr51",
+      "library_energy_keV": 320.084,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2967821.78125,
+          "net_unc": 1839.9986921222849,
+          "roi_net": 2967821.78125,
+          "roi_unc": 1839.9986921222849,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 3185551.5,
+          "selected_unc": 4305.084813334111,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2967821.78125,
+          "net_unc": 1839.9986921222849,
+          "roi_net": 2967821.78125,
+          "roi_unc": 1839.9986921222849,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 3185551.5,
+          "selected_unc": 4305.084813334111,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 320.31152517852234,
+          "isotope": "Cr51",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 1612.9477667328476
+        }
+      ],
+      "net_counts": 2967821.78125,
+      "net_counts_unc": 1839.9986921222849,
+      "significance": 1612.9477667328476,
+      "fitted_energy_keV": 320.31152517852234
+    },
+    {
+      "report": "RAFM4/RAFM4-A_15dEOI.txt",
+      "source_line_number": 93,
+      "original_status": "same_id",
+      "isotope": "Cr51",
+      "library_energy_keV": 320.084,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2709711.125,
+          "net_unc": 2243.1961398582603,
+          "roi_net": 2709711.125,
+          "roi_unc": 2243.1961398582603,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 3185551.5,
+          "selected_unc": 4305.084813334111,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2709711.125,
+          "net_unc": 2243.1961398582603,
+          "roi_net": 2709711.125,
+          "roi_unc": 2243.1961398582603,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 3185551.5,
+          "selected_unc": 4305.084813334111,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 320.31152517852234,
+          "isotope": "Cr51",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 1207.9688783572965
+        }
+      ],
+      "net_counts": 2709711.125,
+      "net_counts_unc": 2243.1961398582603,
+      "significance": 1207.9688783572965,
+      "fitted_energy_keV": 320.31152517852234
+    },
+    {
+      "report": "RAFM4/RAFM4-A_15dEOI.txt",
+      "source_line_number": 93,
+      "original_status": "same_id",
+      "isotope": "Cr51",
+      "library_energy_keV": 320.084,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2889407.125,
+          "net_unc": 1785.7836315497289,
+          "roi_net": 2889407.125,
+          "roi_unc": 1785.7836315497289,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 2889410.0625,
+          "selected_unc": 1785.7526479138285,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Cr51",
+          "library_energy_keV": 320.084,
+          "fitted_energy_keV": 320.31152517852234,
+          "channel": 644,
+          "net": 2889407.125,
+          "net_unc": 1785.7836315497289,
+          "roi_net": 2889407.125,
+          "roi_unc": 1785.7836315497289,
+          "fit_net": 2723903.720091882,
+          "fit_unc": 1805.0154199122642,
+          "selected_net": 2889410.0625,
+          "selected_unc": 1785.7526479138285,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 320.31152517852234,
+          "isotope": "Cr51",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 1618.0051569251593
+        }
+      ],
+      "net_counts": 2889407.125,
+      "net_counts_unc": 1785.7836315497289,
+      "significance": 1618.0051569251593,
+      "fitted_energy_keV": 320.31152517852234
+    },
+    {
+      "report": "RAFM4/RAFM4-N_15dEOI.txt",
+      "source_line_number": 92,
+      "original_status": "corrected_reference_id",
+      "isotope": "Ta182",
+      "library_energy_keV": 264.076,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 65156.75,
+          "net_unc": 1283.521413436488,
+          "roi_net": 65156.75,
+          "roi_unc": 1283.521413436488,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 65159.5,
+          "selected_unc": 1283.15168627875,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 65156.75,
+          "net_unc": 1283.521413436488,
+          "roi_net": 65156.75,
+          "roi_unc": 1283.521413436488,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 65159.5,
+          "selected_unc": 1283.15168627875,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 264.2629935593481,
+          "isotope": "Ta182",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 50.764053733665364
+        }
+      ],
+      "net_counts": 65156.75,
+      "net_counts_unc": 1283.521413436488,
+      "significance": 50.764053733665364,
+      "fitted_energy_keV": 264.2629935593481
+    },
+    {
+      "report": "RAFM4/RAFM4-N_15dEOI.txt",
+      "source_line_number": 92,
+      "original_status": "corrected_reference_id",
+      "isotope": "Ta182",
+      "library_energy_keV": 264.076,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 67880.421875,
+          "net_unc": 650.6230699494067,
+          "roi_net": 67880.421875,
+          "roi_unc": 650.6230699494067,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 67849.1875,
+          "selected_unc": 650.4502857396175,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 67880.421875,
+          "net_unc": 650.6230699494067,
+          "roi_net": 67880.421875,
+          "roi_unc": 650.6230699494067,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 67849.1875,
+          "selected_unc": 650.4502857396175,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 264.2629935593481,
+          "isotope": "Ta182",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 104.3314093984993
+        }
+      ],
+      "net_counts": 67880.421875,
+      "net_counts_unc": 650.6230699494067,
+      "significance": 104.3314093984993,
+      "fitted_energy_keV": 264.2629935593481
+    },
+    {
+      "report": "RAFM4/RAFM4-N_15dEOI.txt",
+      "source_line_number": 92,
+      "original_status": "corrected_reference_id",
+      "isotope": "Ta182",
+      "library_energy_keV": 264.076,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 62196.25,
+          "net_unc": 829.2925260425299,
+          "roi_net": 62196.25,
+          "roi_unc": 829.2925260425299,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 62187.5,
+          "selected_unc": 829.0643823009163,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 62196.25,
+          "net_unc": 829.2925260425299,
+          "roi_net": 62196.25,
+          "roi_unc": 829.2925260425299,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 62187.5,
+          "selected_unc": 829.0643823009163,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 264.2629935593481,
+          "isotope": "Ta182",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 74.99916862486025
+        }
+      ],
+      "net_counts": 62196.25,
+      "net_counts_unc": 829.2925260425299,
+      "significance": 74.99916862486025,
+      "fitted_energy_keV": 264.2629935593481
+    },
+    {
+      "report": "RAFM4/RAFM4-N_15dEOI.txt",
+      "source_line_number": 92,
+      "original_status": "corrected_reference_id",
+      "isotope": "Ta182",
+      "library_energy_keV": 264.076,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": true,
+      "diagnostic": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 65257.9375,
+          "net_unc": 488.03474577732425,
+          "roi_net": 65257.9375,
+          "roi_unc": 488.03474577732425,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 65243.0,
+          "selected_unc": 487.92532727867285,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Ta182",
+          "library_energy_keV": 264.076,
+          "fitted_energy_keV": 264.2629935593481,
+          "channel": 532,
+          "net": 65257.9375,
+          "net_unc": 488.03474577732425,
+          "roi_net": 65257.9375,
+          "roi_unc": 488.03474577732425,
+          "fit_net": 62230.13965030641,
+          "fit_unc": 489.92763455697065,
+          "selected_net": 65243.0,
+          "selected_unc": 487.92532727867285,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 264.2629935593481,
+          "isotope": "Ta182",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 133.71576115151288
+        }
+      ],
+      "net_counts": 65257.9375,
+      "net_counts_unc": 488.03474577732425,
+      "significance": 133.71576115151288,
+      "fitted_energy_keV": 264.2629935593481
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 83,
+      "original_status": "same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 846.764,
+      "variant": "baseline",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn54",
+          "library_energy_keV": 834.838,
+          "fitted_energy_keV": 835.0248178219246,
+          "channel": 1674,
+          "net": 38.77959651566463,
+          "net_unc": 35.40700848702132,
+          "roi_net": 30.5,
+          "roi_unc": 35.40700848702132,
+          "fit_net": 38.77959651566463,
+          "fit_unc": 14.09505416285098,
+          "selected_net": 21.5,
+          "selected_unc": 33.69347117766289,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 845.16,
+          "fitted_energy_keV": 846.8848390795993,
+          "channel": 1698,
+          "net": 505.05249037410147,
+          "net_unc": 103.97671622248157,
+          "roi_net": 664.875,
+          "roi_unc": 53.980175759254436,
+          "fit_net": 505.05249037410147,
+          "fit_unc": 103.97671622248157,
+          "selected_net": 509.11326131808346,
+          "selected_unc": 122.01004497857491,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 857.2,
+          "fitted_energy_keV": 856.0774016896726,
+          "channel": 1717,
+          "net": 41.375,
+          "net_unc": 19.462704719539882,
+          "roi_net": 41.375,
+          "roi_unc": 19.462704719539882,
+          "fit_net": 20.277828195273514,
+          "fit_unc": 8.708340146504565,
+          "selected_net": 40.5,
+          "selected_unc": 18.621224449536072,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 846.8848390795993,
+          "isotope": null,
+          "assignment_ambiguous": true,
+          "activity_estimation_state": "withheld_ambiguous_assignment",
+          "significance": 4.857361424007929
+        },
+        {
+          "energy_keV": 856.0774016896726,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.1258607473225926
+        },
+        {
+          "energy_keV": 835.0248178219246,
+          "isotope": "Mn54",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.0952519902911186
+        }
+      ]
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 83,
+      "original_status": "same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 846.764,
+      "variant": "wider_sidebands",
+      "roi_width_fwhm": 4.0,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn54",
+          "library_energy_keV": 834.838,
+          "fitted_energy_keV": 835.0248178219246,
+          "channel": 1674,
+          "net": 38.77959651566463,
+          "net_unc": 19.64011534740504,
+          "roi_net": -11.828125,
+          "roi_unc": 19.64011534740504,
+          "fit_net": 38.77959651566463,
+          "fit_unc": 14.09505416285098,
+          "selected_net": -9.4375,
+          "selected_unc": 18.84963113034311,
+          "standards_policy": "covell_local",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 845.16,
+          "fitted_energy_keV": 846.8848390795993,
+          "channel": 1698,
+          "net": 505.05249037410147,
+          "net_unc": 103.97671622248157,
+          "roi_net": 600.6875,
+          "roi_unc": 35.06380902191032,
+          "fit_net": 505.05249037410147,
+          "fit_unc": 103.97671622248157,
+          "selected_net": 509.11326131808346,
+          "selected_unc": 122.01004497857491,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 857.2,
+          "fitted_energy_keV": 856.0774016896726,
+          "channel": 1717,
+          "net": 20.277828195273514,
+          "net_unc": 13.358022592364673,
+          "roi_net": 9.890625,
+          "roi_unc": 13.358022592364673,
+          "fit_net": 20.277828195273514,
+          "fit_unc": 8.708340146504565,
+          "selected_net": 37.0,
+          "selected_unc": 21.37755832643195,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 846.8848390795993,
+          "isotope": null,
+          "assignment_ambiguous": true,
+          "activity_estimation_state": "withheld_ambiguous_assignment",
+          "significance": 4.857361424007929
+        },
+        {
+          "energy_keV": 835.0248178219246,
+          "isotope": "Mn54",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.9745096110542142
+        },
+        {
+          "energy_keV": 856.0774016896726,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.518026194001509
+        }
+      ]
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 83,
+      "original_status": "same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 846.764,
+      "variant": "narrower_roi",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 1,
+      "gap_fwhm": 0.0,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn54",
+          "library_energy_keV": 834.838,
+          "fitted_energy_keV": 835.0248178219246,
+          "channel": 1674,
+          "net": 98.0,
+          "net_unc": 25.771229113102077,
+          "roi_net": 98.0,
+          "roi_unc": 25.771229113102077,
+          "fit_net": 38.77959651566463,
+          "fit_unc": 14.09505416285098,
+          "selected_net": 80.0,
+          "selected_unc": 24.166091947189145,
+          "standards_policy": "covell_local",
+          "used_fit_area": false
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 845.16,
+          "fitted_energy_keV": 846.8848390795993,
+          "channel": 1698,
+          "net": 505.05249037410147,
+          "net_unc": 103.97671622248157,
+          "roi_net": 645.625,
+          "roi_unc": 42.80752708344644,
+          "fit_net": 505.05249037410147,
+          "fit_unc": 103.97671622248157,
+          "selected_net": 509.11326131808346,
+          "selected_unc": 122.01004497857491,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 857.2,
+          "fitted_energy_keV": 856.0774016896726,
+          "channel": 1717,
+          "net": 20.277828195273514,
+          "net_unc": 14.010598666723704,
+          "roi_net": 16.375,
+          "roi_unc": 14.010598666723704,
+          "fit_net": 20.277828195273514,
+          "fit_unc": 8.708340146504565,
+          "selected_net": 37.0,
+          "selected_unc": 21.37755832643195,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 835.0248178219246,
+          "isotope": "Mn54",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 3.8026901848533434
+        },
+        {
+          "energy_keV": 846.8848390795993,
+          "isotope": null,
+          "assignment_ambiguous": true,
+          "activity_estimation_state": "withheld_ambiguous_assignment",
+          "significance": 4.857361424007929
+        },
+        {
+          "energy_keV": 856.0774016896726,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.4473206090354285
+        }
+      ]
+    },
+    {
+      "report": "RAFM3/RAFM3-N_24hrEOI.txt",
+      "source_line_number": 83,
+      "original_status": "same_id",
+      "isotope": "Mn56",
+      "library_energy_keV": 846.764,
+      "variant": "narrower_roi_wider_sidebands",
+      "roi_width_fwhm": 2.5,
+      "sideband_channels_each": 8,
+      "gap_fwhm": 0.5,
+      "detected": false,
+      "diagnostic": [],
+      "neighbor_diagnostics": [
+        {
+          "isotope": "Mn54",
+          "library_energy_keV": 834.838,
+          "fitted_energy_keV": 835.0248178219246,
+          "channel": 1674,
+          "net": 38.77959651566463,
+          "net_unc": 17.033041763547402,
+          "roi_net": 17.28125,
+          "roi_unc": 17.033041763547402,
+          "fit_net": 38.77959651566463,
+          "fit_unc": 14.09505416285098,
+          "selected_net": 80.0,
+          "selected_unc": 24.166091947189145,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 845.16,
+          "fitted_energy_keV": 846.8848390795993,
+          "channel": 1698,
+          "net": 505.05249037410147,
+          "net_unc": 103.97671622248157,
+          "roi_net": 615.25,
+          "roi_unc": 31.473901018343753,
+          "fit_net": 505.05249037410147,
+          "fit_unc": 103.97671622248157,
+          "selected_net": 509.11326131808346,
+          "selected_unc": 122.01004497857491,
+          "standards_policy": "multiplet_fit",
+          "used_fit_area": true
+        },
+        {
+          "isotope": "Tb154m",
+          "library_energy_keV": 857.2,
+          "fitted_energy_keV": 856.0774016896726,
+          "channel": 1717,
+          "net": 20.277828195273514,
+          "net_unc": 10.19947532351542,
+          "roi_net": 14.125,
+          "roi_unc": 10.19947532351542,
+          "fit_net": 20.277828195273514,
+          "fit_unc": 8.708340146504565,
+          "selected_net": 37.0,
+          "selected_unc": 21.37755832643195,
+          "standards_policy": "gilmore_minimum",
+          "used_fit_area": true
+        }
+      ],
+      "failed_joint_fits": [],
+      "returned_neighbor_fits": [
+        {
+          "energy_keV": 835.0248178219246,
+          "isotope": "Mn54",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "estimated",
+          "significance": 2.2767276129538567
+        },
+        {
+          "energy_keV": 846.8848390795993,
+          "isotope": null,
+          "assignment_ambiguous": true,
+          "activity_estimation_state": "withheld_ambiguous_assignment",
+          "significance": 4.857361424007929
+        },
+        {
+          "energy_keV": 856.0774016896726,
+          "isotope": "Tb154m",
+          "assignment_ambiguous": false,
+          "activity_estimation_state": "withheld_low_significance",
+          "significance": 1.9881246389725487
+        }
+      ]
+    }
+  ],
+  "audit_sha256": "5df3537c8db774026fb196daa84a48a7714a0d36045dfdde49b9b2480ceffb8d",
+  "native_sha256": "b2171d0933040b97c198e3bed263de315759525c4c5a432acf5c49c68d79921d",
+  "input_sha256": {
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Co-Cd-RAFM-1_25cm.ASC": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Co-RAFM-1_25cm.ASC": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\CU-RAFM-1.ASC": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\In-Cd-RAFM-1_25cm.ASC": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Ni-RAFM-1_25cm.ASC": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Sc-Cd-RAFM-1_25cm.ASC": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Sc-RAFM-1_25cm.ASC": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Ti-RAFM-1_25cm.ASC": "02ad37c88379bfa725461977344b83f84483fe467ebe3a3b849babe1f8f2f8a7",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Ti-RAFM-1a_25cm.ASC": "2be1072b18fb53a6738f68b28362f1beb3cdbf35426b4925cd122454673f1919",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\flux_wires\\Ti-RAFM-1b_25cm.ASC": "6a02ab760f830e99c4c6a3b874a2c3530beaaec66779cecec45fdf94ec4617c5",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM1\\RAFM1.ASC": "61591a1481467e7a7ea795e5ce3fd0a30e0df7365ca23d7e3a1e7dc763f1385f",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM1\\RAFM1_Long_144h_EOI.ASC": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM1\\RAFM1_Long_72h_EOI.ASC": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM2\\RAFM2_Long_144h_EOI.ASC": "8f71162f0fa41d0d6e5f8a3ca7d02250e569e1e975dc538aaebeb6f6faf53184",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM2\\RAFM2_Long_70d_EOI.ASC": "3292b08d6107ed13157d70801b1d691569ff08bc6480e66debdaf3692c36014e",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM2\\RAFM2_Long_72h_EOI.ASC": "e52a9dd77908cac451e9f24f8684904bf2edef610193d853bbf7cb6db2d62ebd",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-B_24hrEOI.ASC": "236b954098010357f140a6858d0df43bdd415f7d4d94f0fe4fe2c9ff5b4de1d8",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-B_2hrEOI.ASC": "55b92986f8ea0459ff79daf51ed6716498fbbc26bebee9860efda57ebaaf0b5d",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-B_300sEOI.ASC": "5952e0a90f323d2b6dbf7270cf61f23440af3e8d56dfa483442cc675d22f05ca",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-B_4dEOI.ASC": "1767c3fc9f277d2c05a7201dfc51632fe6e5ca8e3c4af5bb686cc09d404adb5f",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-C_24hrEOI.ASC": "7f375c0942c6b92fba7d1a3a185823c033dbc409b137b95d55cbe5daddd48e0a",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-C_2hrEOI.ASC": "b1ea0c56e3b6a4621d98729b812c20013d9166a4234ad3cd19ca5e166e2d518a",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-C_300sEOI.ASC": "c816ea0cb7bbd6a32e8f7a57aec384f90e75f95a4c810f1e24012de224e8e25d",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-C_4dEOI.ASC": "cfe869dfcbaa830a3d608c9ef75c960f9d45c6c23545d3d3098994343a1a0a96",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-N_24hrEOI.ASC": "954d43edbb255201adc0202aac328dac0ef1a182fe95e7516e08cf72faf902be",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-N_2hrEOI.ASC": "5032fb8d6603aee0adf9ecb4d79ad1da88d3ef6b226df85258a177e89ba22274",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-N_300sEOI.ASC": "a0e357e249a5830e2b7c1a4022619a0f8079b3c0157423307a51e6092415e2dd",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM3\\RAFM3-N_4dEOI.ASC": "e6a7d3ea0dd42e2e1da0645f3c5f0a84e21ef84e4b7cb1a4d08fca31c5897561",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM4\\RAFM4-A_15dEOI.ASC": "4c20d9ccef0030c0f6069ab0de65e7dbd1f6127b8035c5b36996660cba4b11b2",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM4\\RAFM4-B_15dEOI.ASC": "f63df89e055a4c46af65c90e973bdb25289c774670205738f1940427bc9cf177",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM4\\RAFM4-C_15dEOI.ASC": "9a3f4693dc22418a30839ce1f98d7158d35f844741aa528934857f41f181f02d",
+    "examples\\RAFM_irradiation\\raw_gamma_spec\\RAFM4\\RAFM4-N_15dEOI.ASC": "568631002907e5c455ce9d627ffd07367135f93d6de90113751a3981cec4a6f9",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Co-Cd-RAFM-1_25cm.txt": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Co-RAFM-1_25cm.txt": "06ac1cc3b2c8788450d3e9471fc02906c28ecb1a6c3d188e855580d93b9f9e1f",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Cu-Cd-RAFM-1_25cm.txt": "c6617e9857ee28834e11f6f697d2b654e2dee555bd9b4479cf5d0a60567a55ed",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Cu-RAFM-1_25cm.txt": "433eefebc7cf37ce98dddf5986eb538d70dbab67050accf3b4d0a66bf6c17040",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Fe-Cd-RAFM-1_0cm.txt": "aba101ba2f08b8f5bfb69097a46fcf3c6ce4967a6dbf8e574382856a199718af",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\In-Cd-RAFM-1_25cm.txt": "a779e7066526a87135967576063840ccae4ddf0f6d52d764dcaa1e7c0c608bbd",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ni-RAFM-1_25cm.txt": "271fdc8d84c95bc9452c6a92d1f1311343776b226badaefcfa54addeb1503e50",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Sc-Cd-RAFM-1_25cm.txt": "d38bc75661c45e764a4bfda54c2851c98cdc05207703369169e5e51b16698d8f",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Sc-RAFM-1_25cm.txt": "8507222b4aabe085d5f1594cbaae608226c2132c30a9973f64c44e44061ed194",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1_25cm.txt": "05200c4fba9cfda5d7905d6e14eb5e55cd614614317f05e84178a746b02a3da1",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1a_25cm.txt": "22e4b5448dafe8738c02ffa490627436c31dbe6025a7e17624da726f360d4302",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\flux_wires\\Ti-RAFM-1b_25cm.txt": "f296f4605849ca0467a0df8cf13014becc400d7bc68f378edd122047b446abfa",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM1\\RAFM1_Long_144h_EOI.txt": "ce585a6f79a2f4e3fceafedf8c341c17e0963dfb17c8d7cd5a8a907ee633ceb6",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM1\\RAFM1_Long_70d_EOI.txt": "1a0b179b802e86e38498c866a8140eeda15f6ecf30e5ad0fd683030ed896427b",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-A_24hrEOI.txt": "6a2b9e35b410189e80a9c43694e527e488450026268b607620120cc6eb83b7e2",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-A_300sEOI.txt": "7275ad7c6cbd5e10ceaaf5d46163bf39a7c2607bb431a2ecfc1fc67d1e223ba8",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-A_4dEOI.txt": "c59d4620784bec9de8f1d014a3b60db89073037dde0a74f52ddc36f3b486409b",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-B_24hrEOI.txt": "eae3bd9957111ee14c7b5129e94c88fe02beea8593df94fff0fd883a2db84723",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-B_2hrEOI.txt": "a7c2edcd756a0a5e2cf8cd14f5d05c11fee86db7538b7fa0a600b1178036c69c",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-B_300sEOI.txt": "24966847360e344a27a19e841b60e50e60081b14b2160cf859e4d901930819e9",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-B_4dEOI.txt": "86bc02a7e374796f3baca6cc66d7424a0cf1d390ae722de1225b3b80c7c349ac",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-C_24hrEOI.txt": "4e2cc494a2d73e0db394e7896362bce7913330d5f812c578989b6268488644e8",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-C_2hrEOI.txt": "04ad6e693965e980d30b7c986fbefb7e4da752f3f38002d8602333631d8e0875",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-C_300sEOI.txt": "b20641b609fe8044f2168c1b36fbce5f69a3ea53f5ddd4d2d2b8a5cee9b807bb",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-C_4dEOI.txt": "e01ae436a5d22c3de906363535ca2a91cf98ba8cf8260f6bc85a8596395292cb",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-N_24hrEOI.txt": "bc1a9f73b45e99d82d2258fac6cd1e0c20ecf9526f68a0fd9661df0245dfde29",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-N_2hrEOI.txt": "4e936721734b8541d6c1756d327d3a11f703ab1c0ce455395f2e50e5ecc49110",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-N_300sEOI.txt": "47b1f0eedf24acfe5d0b4ac144854081db7725fa9a7c579788fd77d3fb7828eb",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM3\\RAFM3-N_4dEOI.txt": "5fbb40cf781b1200748c494e07b4eb4cf499cebd47c264ef58c53352c9f9df6d",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM4\\RAFM4-A_15dEOI.txt": "3e819eca0320d10a93bb3039a70a491b032a9158e788331eac4921433b5d2989",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM4\\RAFM4-B_15dEOI.txt": "6e03dab5286823ae95b4afc35d66427d3537faa394fe166b0e9868c32c288e16",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM4\\RAFM4-C_15dEOI.txt": "8ae86914b753c6b6632609ac727b9b78ceac7d72f8f8815fb938527b0450eb72",
+    "examples\\RAFM_irradiation\\QG_processed_gamma_data\\RAFM4\\RAFM4-N_15dEOI.txt": "74b9931cc764d1d61774c80c5d0f0846c384ae91cf10ac4301a131969e26e9bc",
+    "examples\\RAFM_irradiation\\background.ASC": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+    "examples\\RAFM_irradiation\\metadata\\archive_manifest.json": "9748eff28030a86a70fbc37f8401b2a7bd6fb46ebfed43b1dc8d9136b37d4dbf",
+    "examples\\RAFM_irradiation\\metadata\\flux_wire_metadata.json": "29e5dbc1cae2f7590479c19ffe34a915ad18d1be53dcb7d7e8be98583b6ddf72",
+    "examples\\RAFM_irradiation\\metadata\\material_compositions.json": "bc466933786184422669437ad5c59943d8bd962869de51de7afb9903a29c557f",
+    "examples\\RAFM_irradiation\\metadata\\pairing_aliases.json": "35e846e7e60ea5c6ec5d93438333a282ce70b6b8ebd573dde6015f8974746e4d",
+    "examples\\RAFM_irradiation\\metadata\\qg_peak_id_corrections.json": "7969953ea1e90442a9d3bb2322057ab470dde4500f24e7de80c42b36339975b6",
+    "examples\\RAFM_irradiation\\metadata\\sample_gamma_library.json": "5b3acd81fe6eb373c7768cc43e950348bd93b1f7978bb6b07efbca8b5b791dbc",
+    "examples\\RAFM_irradiation\\metadata\\sample_schedule.json": "a8fc764e557b8ca0e7c6926f05113d7d7720d4c77d8b76e15ac0be122ede27a7",
+    "examples\\RAFM_irradiation\\metadata\\sample_schedules.json": "356fb3f5557402cb116aafeebc7dad8c8bb4bcd4b7e7db5438715de1102221be",
+    "examples\\RAFM_irradiation\\metadata\\workflow_config.json": "bd5aa84389098048897b5026b9168c3424a21603963652ddef6efd49601be2c1"
+  },
+  "tool_sha256": "9834453cdd42bd9cfe8c2786ced028b5739a90930272465bf663d0a9faa42801",
+  "runtime_source_sha256": {
+    "src/fluxforge/k0_physics.py": "7f7a7b6c47d1979161e858c540e353fe87b9aa2ca7d12c0c3d5682524e5d90f8",
+    "src/fluxforge/_tensorflow_env.py": "1ebd68a2fccaeb81506c0f0a644f15832a65c0b33d9e9ac757f4af4b3a267b06",
+    "src/fluxforge/__init__.py": "4b7e29b92b3412575b75175b07e597ae459209f369de789ceea3d3fc99bb097c",
+    "src/fluxforge/analysis/astm_e2005.py": "b0536b608a10c9e8266a9091a916d5c03c88d3e0c79ff535d99795037781be0d",
+    "src/fluxforge/analysis/astm_e261.py": "7299cade47c94beee92a342006674b6dde25c653535d02dbf1e1b72a3dc5ca9a",
+    "src/fluxforge/analysis/astm_e262.py": "717fedc21290bd1e75f933aa9ae323a6c3832eaeaae620a61775b63a377e1751",
+    "src/fluxforge/analysis/astm_e3376.py": "f15f0e53ce54765c0c2bb1a38340af775574048e5549abab7aea6111acc4dfa9",
+    "src/fluxforge/analysis/attenuation_tools.py": "b4672cdb4451caa2ad935aae63644f3d11505eaba1aeb5e55f9db876c15c9051",
+    "src/fluxforge/analysis/auto_calibration.py": "87b9cd78b0c84e02823eb696f006a2ffb88cb655075afd024de69a5c617ebb63",
+    "src/fluxforge/analysis/detector_calibration.py": "579ec50e94d90d32d9c0bdb8f396ab0098d34534f440e00ec55617e7a132f973",
+    "src/fluxforge/analysis/efficiency_models.py": "0abf9e3bed2b8b4ecac7e5840712884ce43c2a854f0ca71957c1b3aa6b16ebd8",
+    "src/fluxforge/analysis/ensdf_matching.py": "8c2bf0ceea78a3f6ff03212502230b457f8ea67e546956072ce2df52036f7291",
+    "src/fluxforge/analysis/flux_unfold.py": "b722b57c9ea3e86d0e9c381eb5d714bb86cccfe4e93c2865082810b359981a20",
+    "src/fluxforge/analysis/flux_wire_analysis.py": "e770a3598b5fe3fba5d518c3f4d0b362da32394095a88c8ce7427ddcca88423b",
+    "src/fluxforge/analysis/flux_wire_selection.py": "a7862b262897b3387338a6cf74f1ccd7f91eb468fd0edd5e3d1d74d8f37d9349",
+    "src/fluxforge/analysis/holdout_validation.py": "a5be0838b05ee4519f72eb7e15947380451acc144f2ee0319bc7e83d8a90441a",
+    "src/fluxforge/analysis/hpge_processor.py": "b38a6161f5b3be0257ffef1aa3ec83b117694a65e241aabd173cafda5e1aeca3",
+    "src/fluxforge/analysis/isotope_priority.py": "79c44dcfbb79b917724b14504129f454a034eb3c09596d78faa2d2e33f4ba2db",
+    "src/fluxforge/analysis/k0_naa.py": "b31b030cdddfb2f83fffd60bb912641c68463b8ca1f32e20bc110e5949601590",
+    "src/fluxforge/analysis/k0_physics.py": "d56ffe2c8dcbdae3ab855486c6585288f9f540dbe5a728c842ac7544db7932c3",
+    "src/fluxforge/analysis/k0_workflow.py": "8943688b14f61af8b4db6c39bcabf07b073cb927aee0c8c841bcd88322bc8bb0",
+    "src/fluxforge/analysis/line_search.py": "7d7a2b63cebffef00b98fa3f9a844ac1afb00d3af581bac2e1ee3dd466e2fe11",
+    "src/fluxforge/analysis/masking_review.py": "c05ff85c276edd3d467efc2b5abc39d9370ca65536d0426e96de4b10b6cd9c5d",
+    "src/fluxforge/analysis/method_comparison.py": "42b94557b16fd2535cf67ba7f20a71d08bd89cf60cf9ef854d77ebd21eb2ac18",
+    "src/fluxforge/analysis/naa_ann.py": "1b8809d596fc383f62356449ef8307dfdef6c65cfc9a41ce32fb3b68a85feb9d",
+    "src/fluxforge/analysis/optimization_bassd.py": "ff8b02f289f1fda6851c35484ea6ee6352c46e70cd0671d11d2ed8bacd729be2",
+    "src/fluxforge/analysis/optimization_difom.py": "a561e33be99f2415ff3ad9f7827f6db58c7dd02762f1833a754551139b00aee3",
+    "src/fluxforge/analysis/optimization_fim.py": "36e9881d5f56770bb0e1dd919a9cb15522a0cad7e1d83aebff761b89fd9e116a",
+    "src/fluxforge/analysis/optimization_mwdcs.py": "d46afb016c32b8a3bbf77f6a32e71b37f61ad2b1c4f06a8e7dd31630e13839ad",
+    "src/fluxforge/analysis/optimization_schedule_builder.py": "dd58ee4b42410f00e37b61242cbc79c72df385b724fc3f026f4cc8b4fe4280b3",
+    "src/fluxforge/analysis/optimization_stbdmr.py": "37ccf511481afaa65e3d255cba1ecdbc2be1c5973c34efcea2d6724e236be12b",
+    "src/fluxforge/analysis/peakfit.py": "4a606b2b17cb783f35d5237d69c1f06e9ce360fb69cfd1ccd862fd1555f258ec",
+    "src/fluxforge/analysis/peak_finders.py": "c467142d699e102558af7ef1a5293fe43d6c60f96fa4efa21bb2651c9097a5e3",
+    "src/fluxforge/analysis/physical_gls.py": "bf4e7db794aa920f3a1cc3e08051c532a1413c4a344a8930852006763a1f56e5",
+    "src/fluxforge/analysis/qg_calibration.py": "189342c706cc15eefb5b3eb8caaf8b313c3cf0e5f1662e2ad8d71c522a2d35be",
+    "src/fluxforge/analysis/qg_peak_ids.py": "14cfded7dbec4f591f94a89890963ce1225cd2a79b3ed42d0f449296e7f0c47a",
+    "src/fluxforge/analysis/qg_report_qc.py": "7ed90522de4ef57f36fe5ae899816a5d04d495b270c7cbbf17c4f12451be4122",
+    "src/fluxforge/analysis/robustness.py": "4a1fac1cfaf4f016e0c7c2aa1bb569aee2813f04a4a6071f024fddbc3b531297",
+    "src/fluxforge/analysis/segmented_detection.py": "e2d722629d17078a6fd31bcd6c717fc08e8b63ba8eacdc6e4b28c0bbed1f82df",
+    "src/fluxforge/analysis/spectroscopy_tools.py": "fa790bd39cd6afc45e54e64e601cb5d3bbc0ece16f2e776d81cdc18123f19628",
+    "src/fluxforge/analysis/spectrum_math.py": "a19a0b346a97d5ef571cedfa01429a7c24b850603e80891325e44c96f25429f1",
+    "src/fluxforge/analysis/stopping_tools.py": "a32a1ed50d74d86881f3d829a1699cfdbd4428a6fd7c7a21e00bbf41c64e6fcf",
+    "src/fluxforge/analysis/__init__.py": "35ccecdb611f6c8fcbe81ab7feb81a52a4ef028df69b04136abaacdba37a46ff",
+    "src/fluxforge/cli/app.py": "ad643b202ec12bddaebd02429bb7c82690fe4ba49ecb0ee1fa65d05ca185277d",
+    "src/fluxforge/cli/command_catalog.py": "3f2f703dba5b0c737beb582bfab02677d3832aebe9d49092f7e638737f667b12",
+    "src/fluxforge/cli/__init__.py": "4935a5bb52c9fca31b3d0e2ae30e8eec08748af5bef1f3743532cd05699f4980",
+    "src/fluxforge/core/activity_review.py": "782e490c26b116e907ef85c3e894892c2db296f6ff87866a3cc92e1859b746c3",
+    "src/fluxforge/core/analysis_workspace.py": "d51f51437cf674f85e110b22002fbe87adae822c261cc71448647f10b3e13697",
+    "src/fluxforge/core/batch_analysis.py": "6e549c403dc79e13fe4d3b851aa8f9f340d747c59e2a26ed77d3e6977b491eb3",
+    "src/fluxforge/core/calibration.py": "cb5f76d4bcbf87c04da27a637221c695b859974d45a63997bdb7300944b48446",
+    "src/fluxforge/core/inventory_timeline.py": "efdc9805b5d7d1a17101b295171605219326a1fd6dae3187280cb46fb940d26a",
+    "src/fluxforge/core/linalg.py": "a793152b5d0c43247ddeaadff8ee2eedc57760a6bc3e93958a82882e4259fe0b",
+    "src/fluxforge/core/peak_fitting.py": "0e36e7ea03aff1179e42899cf71f497314fa23319a6847fe281a786c33494805",
+    "src/fluxforge/core/planning_models.py": "9864427794eebfee27fc0127b5b1f8c2e570976ec27a4c2b2d4d9de7c47c5792",
+    "src/fluxforge/core/predictive.py": "adefc7a24b91b56ef881fec3b5691afde110c3e403706c228dfd49133e14825e",
+    "src/fluxforge/core/prior_covariance.py": "b1feba01c33343e02c963167bf0fb0add85205695ce02185953a3a2cc9722c12",
+    "src/fluxforge/core/provenance.py": "3b74d6b61c5b32d1a195fcc3f93ba136891233dc34dafd7efcdb80a45dcbcc84",
+    "src/fluxforge/core/response.py": "5ed7a096197c07ae7707bbb695f243f389a112dffc26fc8e0697dc15c8dc075d",
+    "src/fluxforge/core/runtime.py": "2b28e4c5790ef0993f76aa5f6270ca51e406422a772f527b3c4fdb069f084d03",
+    "src/fluxforge/core/sample.py": "61f8ff66fd1dc633fc4b91242585bdda525cf813371b26d33065fc7e5a941ec8",
+    "src/fluxforge/core/schemas.py": "fe703a47c4de7155ac52709e00a1d9626ee7b10699bab7e3696bef4244294425",
+    "src/fluxforge/core/spectrum_file_queue.py": "84675c7ce9e51f8c08b172dfc69155f89be4816dc66ec6299caa98fd4874b62a",
+    "src/fluxforge/core/spectrum_ops.py": "13a6b6b70a59ec78a3f54b5bda53a7f9bfbc57ce954508dabd162e5db53fa4f5",
+    "src/fluxforge/core/unfolding_diagnostics.py": "669ffebdf8e398502660e096bcca842eb8b925e46350d64aff00902b5b28c29c",
+    "src/fluxforge/core/unfolding_inputs.py": "e8483cbebf2e12703819f4f1b94781fe6aa0a848986c1b4d378f10332599fd7f",
+    "src/fluxforge/core/validation.py": "16467520774d6a1a10f3e071ec5275aec6acefdd54204410bdec3050c7daedf1",
+    "src/fluxforge/core/workspace_document.py": "3e399597474b7072f8eb6843ab832bd04a9bfcce133c339f536d14e5a97f9359",
+    "src/fluxforge/core/__init__.py": "87967c5772da9cff20745a097d4624f926b30b115fd4fa4414d0736f815c6e8b",
+    "src/fluxforge/corrections/coincidence.py": "9c574611c8d14a012762ed7dcbb4d55cc04ac77bdd9d5fa4c887ae105575a53d",
+    "src/fluxforge/corrections/covers.py": "621880c1c34479c0bb6c12b5bf99db958d32b0ca7892d5e48b22c4664acbf84c",
+    "src/fluxforge/corrections/gamma_attenuation.py": "4f374e64d4062f0e4781a2a0f5a49fd758a9bf6f9189ecd95d18fdafbeaf63f3",
+    "src/fluxforge/corrections/self_shielding.py": "440ef9d135d9457b21d63d3b08d923595eb6d6030178f8a68669692986c8e5a7",
+    "src/fluxforge/corrections/__init__.py": "b4628d89e880a80487835c3a050f5f7b455617915c0d271ec24d632b9dfa553f",
+    "src/fluxforge/data/attenuation_components.py": "07e3f2a94efaf4331aa8180b0d41b78121a362e4810fef47968f98eb39247117",
+    "src/fluxforge/data/crosssections.py": "4035ea5d961ef8acfb87e03ebcd599d0a9d698bcb864b057a3af623db24d3ef4",
+    "src/fluxforge/data/efficiency.py": "7b740fdf4910876f53871d72b9a0a0447f9b636667e23a9f6731325246d63249",
+    "src/fluxforge/data/efficiency_models.py": "874e1a1e2517f17dbb92d70be47c94b65a92ebf5359282323e144f432128d46f",
+    "src/fluxforge/data/elements.py": "048fc284d53f2b78aa22c20594387353bc93a14a8cd70fc27e8abef302e514fd",
+    "src/fluxforge/data/endf_covariance.py": "56e4fe3318cf0151aad5f06705d2e4e6bb8917747d37744d1c1dac6242e8cc15",
+    "src/fluxforge/data/flux_wire_catalog.py": "1858b6148f5555a997c273f1e01462d2536300fbe37f505bfda6c64d57e4d276",
+    "src/fluxforge/data/flux_wire_unfolding.py": "2476c727ae6df7a72c6b6b2c8f3721a211a32c62115701fe04bba1d263f4b054",
+    "src/fluxforge/data/gamma_database.py": "a8bc45c35108a92fb86b97008dc792bef618d5d574b16505394affc90c2cc798",
+    "src/fluxforge/data/group_structures.py": "724053b1cef68769e5a2bcfcf93391f34ec340c969b31b59a2bba693f3e429a3",
+    "src/fluxforge/data/irdff.py": "fc955cbe2ee53ceb6259975b965cd5aacecb8c8e065b87637912fa6d8abb1e4f",
+    "src/fluxforge/data/irdff_access.py": "5cdf2abd13942b73e390ed53401539cc41b0dacba19b5893aeef39ded933ba06",
+    "src/fluxforge/data/isotope_names.py": "a888197d36fa92048990ae0905a7cfaf3fa37aa21036d6edb78ca15d9279c74d",
+    "src/fluxforge/data/k0_library.py": "3d4931c9246219b2ef434f67dc5177970854023f78b4d91a10386140f74fe909",
+    "src/fluxforge/data/kayzero_k0.py": "00e14cb6d8c675a9bb1dd1bfcbb120718cd7d1cd444ac1846f806fdfa6e4105f",
+    "src/fluxforge/data/materials.py": "131e5c34333c8c65f40dbcb84726a8d9373091253866e3470faa8879b0846617",
+    "src/fluxforge/data/njoy.py": "7a5eef2c84d38419c8195c5954e980810563f6223913983409e2ff3e6d230b60",
+    "src/fluxforge/data/nndc.py": "137c43d2dfd4177e35c8ee0ee00ae1ab79c313f21a3939f1febfdf77007437ad",
+    "src/fluxforge/data/nuclear_data.py": "277483d840d8f4add61dd258fa7fc43b6d2cf886d245554f0dc31a03473b483c",
+    "src/fluxforge/data/nuclear_data_sources.py": "c57bd97d080b82d27a7ba6e4d8959983bb80e6102345d848e7a6e5405ab79b6c",
+    "src/fluxforge/data/nuclide_library.py": "a3c83a396f469abbf4c6c196ab3c179c625f44909a2b5fefa95af5c7f4489f76",
+    "src/fluxforge/data/rafm_decay.py": "5c5a4573a1df8f0617f038d5a2ba866b23dad737ef80036f766d79c1dbb73e1c",
+    "src/fluxforge/data/rafm_profile.py": "c5ff7b3861aae9f4cd5d176e0367cf16082f5df5b0fd5ba3c4403583b99ff73d",
+    "src/fluxforge/data/thermal_scattering.py": "34147825034a0474ea8fbe397fc3005f0027018b354890c1214525448b940502",
+    "src/fluxforge/data/xcom.py": "4d49c413ab8b9bbb4f77e5ae686b1dd9413e02f1a54d7409a5967880d2ef8a3b",
+    "src/fluxforge/data/__init__.py": "199f321295e537971c3290c545832e4ba70bb06055b90e659a3c75223708159c",
+    "src/fluxforge/evaluation/gma_workflow.py": "aec8ca6b7f10d44ec88fb39b3c70b32078a12a76d312d6270135a402250415fc",
+    "src/fluxforge/examples/rafm_feature_example.py": "f8ceae869cd55b80ba675fb03a99689eef4823010ed0e3749a707945e94b61e8",
+    "src/fluxforge/examples/rafm_workflow.py": "8b48ff58d3f5536299757bf7e3820fc0985b2d2b5692e53952f254e4c00728a9",
+    "src/fluxforge/examples/__init__.py": "d25fd4c487cbaae6f1e00549b4740865262c947973ba6e0471e9469c9d511a47",
+    "src/fluxforge/gui/analysis_workspace.py": "5e17ebee0e0a23e1346ff0b0675065c7e810b3b6cf8b7111fb0ebc8cfe3717f4",
+    "src/fluxforge/gui/app.py": "a65b00bda413f3f5e60bbf2bbb15c9674a80e4d4e5713bd942327d8c79444600",
+    "src/fluxforge/gui/canvas_controller.py": "77e85d4048755ab83ea41f31cac91434242de2bb8666bfca2ab6dfcc8daeb780",
+    "src/fluxforge/gui/canvas_intents.py": "432928df82f5bc52cc0232f4b6e79bbc0c0c65161e39a5d83250a6c21ecc42fd",
+    "src/fluxforge/gui/covariance_view.py": "f03074a6a7dd914ecd0ba53513e189f250e27e37f00f6f128f34147f6388ad24",
+    "src/fluxforge/gui/detector_profile_adapter.py": "0624887f5ed65257e6326b63716217c7bd019e1c1a8d71b1f5e6e84a07e1472f",
+    "src/fluxforge/gui/file_workflow.py": "9a914be1bcf298b5fa5d013f9eab9163f05aa0cd814170ae453b99e1b910d51a",
+    "src/fluxforge/gui/irradiation_history.py": "affe2c70db9cff7b7f7a2ab5a59b1103eea4fe9e61403d60f412667c58f70144",
+    "src/fluxforge/gui/library_manager.py": "48a2480aff68a9d650b9c5aa7644f8e926b431f52e4793cd917882d9b97c42ef",
+    "src/fluxforge/gui/main_window.py": "26cfaa6b60521f10ead9e7ad7bd32d694fde7fb8fec0f5152557c80b6e45888d",
+    "src/fluxforge/gui/mode_manager.py": "31fe970f7a1c3c92c58552536700731f394a1dcc2bf8a4465e5ad265cf120b34",
+    "src/fluxforge/gui/nuclide_search.py": "a63d763a028f9e74c078dc25fbb70927209e91a9d27ec6adfdecc90517b921cc",
+    "src/fluxforge/gui/production_contract.py": "9d210a81abbd555e6d993f5aad71ff99e787c257b594638608f9b5bbea3ab146",
+    "src/fluxforge/gui/qt_compat.py": "75cda4c32cf53ee7f501bd72a2be7537c9b003150563bab49910c7e715362ceb",
+    "src/fluxforge/gui/reaction_rate_view.py": "7a7555d6e2fc547a25e9b0b478260e0671214f4c007942159ee394efdf3d5b5c",
+    "src/fluxforge/gui/selection_bus.py": "d90039d20de3a404024eec268e8e23181b305d6d6d5e8654a11b6bf6f4b4af8b",
+    "src/fluxforge/gui/spectrum_canvas.py": "6badcf2d38307885f7db11db33a82953a3a158b6326d38984e95f20a52d606f2",
+    "src/fluxforge/gui/theme_manager.py": "0015b4b861c6fb65762bbc75a96d0259aeef80fa4778d3d5dd38aab34252e82b",
+    "src/fluxforge/gui/workflow_presets.py": "005a2365d9af71a6a0bf75ee7649889cdc6472aebe842703555783288fd00e85",
+    "src/fluxforge/gui/workspace_undo.py": "d02ab3839d4d0a5dda348da5f7ee69f97e4a0c7571b98633ba73676ca38eacf7",
+    "src/fluxforge/gui/__init__.py": "aca4321c0ce4946ca72297b06d6748b9fb4812f0f42842f7c57706d29c5ef1fd",
+    "src/fluxforge/hal/base.py": "473ad4122a7458f22930a0cee2dc3e02fdfad678af9225c6a1e53fce9733a80c",
+    "src/fluxforge/hal/__init__.py": "07423699e0a9e45859512bba30a08b1b361bdc84e273efc351b68c3ac581aa65",
+    "src/fluxforge/io/alara.py": "a9d8eef520130793c6cbdf6b16e37e4498fd78f7a6ac35a9839ee425207638c4",
+    "src/fluxforge/io/artifacts.py": "1c2c154ed3356c4735dc0b492581291522a474839012054046ff04099dbeec91",
+    "src/fluxforge/io/atomic.py": "94f98d5e7311170ed09392faafafad1355c5add8765e22f7c438fb75c6a27e70",
+    "src/fluxforge/io/calibration_text.py": "380d608e9400bd1062d4f75993a9ce7a5ad501f6ed2b370da62d7f3d2e41efff",
+    "src/fluxforge/io/cnf.py": "65c2f1c9f6181bf3b2954fcaa17c6f9a5f5d87d93f574ec4f49d46f55484c8e4",
+    "src/fluxforge/io/csv_readers.py": "98ec9ebb0120469fd7563e5d5355fc53f8c4a45cde156c7f464897772c2cbe0d",
+    "src/fluxforge/io/flux_wire.py": "333336072566c6a16f4801dc18fd87ce5e69d6217ec817ecaece2a1c6be7a752",
+    "src/fluxforge/io/genie.py": "5affc994a8a3518fe8206e4aa5b413f5d145e8b03afcae72427a35a9d9867ea6",
+    "src/fluxforge/io/hpge.py": "3aa0cbae15e6e2c7568eef116febcdba2160abff163824da248a9f2b75aa5180",
+    "src/fluxforge/io/iec.py": "2198c2f92f13d2a61e7c81e94e122d54c81b80e5cee865119d28276210a0d9e9",
+    "src/fluxforge/io/interop.py": "3c6bec1b24f96601b1918645d36715f46d13da1c3915932eec94211fd6cf4ae5",
+    "src/fluxforge/io/mcnp.py": "5473c6618d233f59abc1636ab30ceddd569fbac57a78b8c0c2c1f590e624c107",
+    "src/fluxforge/io/metadata.py": "50298f5b6c155446af8dc8004babd3310dd5736aed69408a5f9eb34b092fa38e",
+    "src/fluxforge/io/n42.py": "062e2217d54646f61ea848a553ea9599a9bf9a56774cd7b841c98ebd59e8cdee",
+    "src/fluxforge/io/openmc.py": "0dcc9d5c3afd123aba04eb89258ddb5d8aa59df20e8dd67429199d679b341f4a",
+    "src/fluxforge/io/pra.py": "be9cdf90c5c26089674ef9c93cd70e1ddc5f81a86ab8e512195e23e0a2d8e73c",
+    "src/fluxforge/io/reader_factory.py": "028d5409b71d7f36f3c80516dd36e7dd9372e2a4389b3b58b429f784ce70ea61",
+    "src/fluxforge/io/session.py": "1a30b1ccb1629687046648a3d79340a6af437fe369edf2e9c930a5b059af4a8f",
+    "src/fluxforge/io/spc.py": "96a0c331338e97fe6e1050a2c2f135b6a1b255977a1c6da9fc259dfdb95e2fd6",
+    "src/fluxforge/io/spe.py": "a1bd8fc71d8f137690aaef0cb36d189c5095606b478c8c32e594f9149f75253c",
+    "src/fluxforge/io/spectrum_csv.py": "78f8b9ba2b70dfcf18c822ea9273e0a9a964f138752a04f81cf2d3c04f42d4c6",
+    "src/fluxforge/io/spectrum_export.py": "a2cd30c303ea51029b926c03b21c7f7dead7b3db87ad52bfb9e031dd84e4245f",
+    "src/fluxforge/io/__init__.py": "a9866137a173a693ca8b34ccebaec82509141fb182d6e32b159e627faa41a6b3",
+    "src/fluxforge/ml/peak_analysis.py": "a1d8a3744b9b1950be927ce89c17b0c6b27014017a59916c2f1627c438c89a48",
+    "src/fluxforge/ml/__init__.py": "af68d3df956fc46a4d30e24d43d3faf8a9b889f4eae2aa3d7480f2cdec37045d",
+    "src/fluxforge/physics/activation.py": "d527f4b7ad32e44fc7de8a20b6a954492a45b43ca1840cb702e7eff7f8768859",
+    "src/fluxforge/physics/attenuation.py": "35ca0faa434953f0fa01248cfefea2e2a245628944b3cf22e80c451e9a528ac9",
+    "src/fluxforge/physics/decay_chain.py": "b25c239e0cf38b752c4cc0990363bc2a861f55651e1cf7b2b490bef3b8d1d451",
+    "src/fluxforge/physics/decay_inventory.py": "c20b99d20870d94d927191e2fb2c5af4ee9befcca8ac4ba23a9c11702783a937",
+    "src/fluxforge/physics/decay_library.py": "d6c3d6cb4fbb6c6732a0b0c2d2c4f0f117e3173d0164abc0494b0f45ce5405c5",
+    "src/fluxforge/physics/dose.py": "5afc6dcf3bbcffafb7b71ed57626fded062e745ef7e0955072acb8b1dc0f7714",
+    "src/fluxforge/physics/gamma_spectrum.py": "203c08247f33e574fad3155447b9bd9a167e4588d687089234af5919d52794ce",
+    "src/fluxforge/physics/monitor_response.py": "33d3c41e1b56a648ba75f6bcc0493912ed67953b2b58876b2fff43f6530a6748",
+    "src/fluxforge/physics/neutron_corrections.py": "d6be4227d0fd6942c58465eefa0babca9955cdf458fe0b5a87dd59216358df23",
+    "src/fluxforge/physics/nuclides.py": "7e471a910f30ddecec3a5109aa2b84d5df5c714dbaea852adf86b92b76fcb386",
+    "src/fluxforge/physics/operating_history.py": "98f3f03f04c9a299e4785118b605291c71cfbf4fc6b7bfd9d1a85f744bc2a583",
+    "src/fluxforge/physics/sigphi.py": "f8116d9809108e2ad7bf0795ba53d67eb9988887d1e6f7d956b46e25c1fa757e",
+    "src/fluxforge/physics/stacked_target.py": "42748365ba13991fbe97245ba9373f702ba8acfac1459380b53ec1f9bf0df4a0",
+    "src/fluxforge/physics/stopping_power.py": "36266636b9a85b8a572d1ae93ed541dc540cb9bd0e56dbd32f0d4ba80190e2d5",
+    "src/fluxforge/physics/__init__.py": "69071de6691dc82ceca8a5971af9027fcac11d74cbbe88b29bb2cd51aa3a3645",
+    "src/fluxforge/plots/activation.py": "62160adbc8599899ae950447767dd3d50baccb3dca38c43c8ceffcb8a70d3597",
+    "src/fluxforge/plots/master_suite.py": "542021c0eca8c2d0b1993cc9eb7f8dbbaa967eb1a6368659e010d1d7f8e91bfd",
+    "src/fluxforge/plots/spectrum_inspection.py": "39bfa8cddb41a1457f2b5554b60f32686604ed9189f2959734825378a863bede",
+    "src/fluxforge/plots/unfolding.py": "b8885624df1669cbb9ce050c91474ae717c9fbaa2848079a39b41e942f2f2216",
+    "src/fluxforge/plots/__init__.py": "a0a0dfc9f2aeb328d52e1db150c43cfbc295d3c57379a8413c8a84e8fd7dcefb",
+    "src/fluxforge/plugins/registry.py": "03ce9726d5e78e9e0eeeb95e2c9ae072f8ed3085bb6ded9b16af51aa12d8f93e",
+    "src/fluxforge/plugins/__init__.py": "c2e6a7a594796789e2eb6c891c8905a7b23fca008c0cff8bd79bf08815acce5e",
+    "src/fluxforge/reporting/engine.py": "72a542805dd7ac399ab0678ed47daa9911fbff0448118020efde49d0f517d910",
+    "src/fluxforge/reporting/standards_preview.py": "785aa5a129d258bc9a87036a9ab94e86eaa166962371ba4cb14593d0f56e4aac",
+    "src/fluxforge/reporting/__init__.py": "8f3128de097505f484c575dcb02694adb3cff553ef6c4fe42505b24fdf74bab8",
+    "src/fluxforge/solvers/advanced.py": "2f0593baa6b411bfff9c8970b08bbcf8133cf0293189ac12db15957559e15061",
+    "src/fluxforge/solvers/advanced_unfolding.py": "1c658b116ae4e647e511dcd5bb2ccb45fdeaa25636b0c77782b4e84c3f4ce78c",
+    "src/fluxforge/solvers/gls.py": "219a26d181c4b610d6b657e858f68bf3a7701f5f20971a58facbbbd53dd7f207",
+    "src/fluxforge/solvers/iterative.py": "a4c2a5476ade99b44f0a102a812432b770a9b701d6e8eb08bb92f8dc38ceb47b",
+    "src/fluxforge/solvers/mcmc.py": "1541935ad0f97bb2a9f4340fbc4de0483e8631a801e02b72e2b27c6a6acba8ac",
+    "src/fluxforge/solvers/regularized.py": "11d5fa848c9190c5e1124a424435d29859e18925467fbbb3b790793d4fb404be",
+    "src/fluxforge/solvers/rmle.py": "2895566f090f1fd051f55fa76822a60a366fc360e76e8344e75f63e7fbbc2d51",
+    "src/fluxforge/solvers/test_statistics.py": "d18f9f8e4662c34a03dcbc72f5afe4306579a9d0532ea823326ed4bc760866f3",
+    "src/fluxforge/solvers/__init__.py": "2b58e17609ee05374b5977a9edee285d442b81841943ba2350f6a40c947f23ff",
+    "src/fluxforge/standards/base.py": "e1f480c9c8a2e320de51c724d641d00b88ec21f3cece25f61137e5a58e20bca3",
+    "src/fluxforge/standards/c1030.py": "f70852a26dc43fdcd16acb65f5561d832a64d7deb9b43d3869c915159e790aca",
+    "src/fluxforge/standards/c1232.py": "301f88800f10d2354719bbb873b79a5d6829cf111ec327dfc0ce760d923c00f2",
+    "src/fluxforge/standards/e1218.py": "714500fdb0e0ce15320175a1c221614cc9c659df0da77120cea8de747cfdae0e",
+    "src/fluxforge/standards/e1297.py": "f7b1bfea7e59bc8df2da06b0fb5af5760231b15dc157d09d9091dd20f777292c",
+    "src/fluxforge/standards/e181.py": "857af87247154d8e0586097c89e368424a21c2768fd43b470493e38be62bfd05",
+    "src/fluxforge/standards/e261.py": "4e7cf302d99d545c53bb99cc71ea6deb09318f5693329eb59f96bdffc8447c74",
+    "src/fluxforge/standards/qa_monitor.py": "8d69225293bd94dc94b6fe9f974b114bb50f1a1e7d544dd634196c3dff4c7038",
+    "src/fluxforge/standards/__init__.py": "05d7cf540094698444560fe33bed5083eeb09334ba0c0d230d50f24e760603e5",
+    "src/fluxforge/triga/cd_ratio.py": "14956d76e09febf66f59e7c035c4cc78337eed4d1ec16f42441e18fdee163cb9",
+    "src/fluxforge/triga/k0.py": "3f22ab5c65af4af8fa0cb3827079aa8b829c6746bbbb627d3e9dac04c78a9214",
+    "src/fluxforge/triga/reconcile.py": "30703c44a5fb90c5a7e686ea42eed88fa4dd4d591e1a1c224d5e0310dd252691",
+    "src/fluxforge/triga/__init__.py": "99929ea3b548fd69a6db0324486dcb60d86ed3dfab20be11db534b41c8bac91c",
+    "src/fluxforge/uncertainty/budget.py": "1a5c31cf1a9d28a3f8ceb61179fa674ff0e8aee07a2b3227aee2e7a9af9ea0d9",
+    "src/fluxforge/uncertainty/covariance.py": "e2109b61ceff9eae3735ad006fc7bccf15a16265832df6c7c7c085f4cf74f9ed",
+    "src/fluxforge/uncertainty/mc.py": "d028877ed24b8ec56c225712d3d11d957e08355cdb186d884442ab31352f1172",
+    "src/fluxforge/uncertainty/reaction_rate_budget.py": "303370d3a42f0ab419fed0ba72921797e5d30c1b6ad730c0002c1c7ed78c74f8",
+    "src/fluxforge/uncertainty/__init__.py": "4935a5bb52c9fca31b3d0e2ae30e8eec08748af5bef1f3743532cd05699f4980",
+    "src/fluxforge/unfold/gamma_rmle.py": "c27808e5e21b08a769ff86b4a0f4f5474efa2fea2db13aae5ca04bd85f9514be",
+    "src/fluxforge/unfold/neutron_ibu.py": "c8991b59ed1c2c1e170aa9aa54f26909319246a2e41a7f6d03b6b595109dd3b0",
+    "src/fluxforge/unfold/_types.py": "bffd7dae70645d0a5d8fb548ff36ab721d7ece499901d0d308e4f901c5557672",
+    "src/fluxforge/unfold/__init__.py": "7fe8dea461d1b1f243c3ce9e9e4de097d653177074dfa339045001700ad6e6e2",
+    "src/fluxforge/unfolding/base.py": "038993e1ffdf6adb62ec0f8665b48a4e65ee38515941ac308216b2c0f7f954f7",
+    "src/fluxforge/unfolding/gpu_backend.py": "7475d16724ce994eb58f04a0108e3e9d0c837dd8b29b84e4719722d80354ef6c",
+    "src/fluxforge/unfolding/gravel.py": "e63bf83d9f9a012c590bf9d4358006bfc44cb425c16da494815b1e854e41d6a2",
+    "src/fluxforge/unfolding/maxed.py": "e0bcb25cf6e156259d0071bad1a01b0928509ffaeb9371135796dde099a16969",
+    "src/fluxforge/unfolding/ml_seed.py": "59943bfad5ff6e2ce64b228b0392a7fe1bd5424efa9e4f3c31436a4d21217603",
+    "src/fluxforge/unfolding/response_matrix.py": "3501ec5bc86276e7ca7254fb3e5984759b50a05a46d3ee0f8d930023860d798e",
+    "src/fluxforge/unfolding/rmle.py": "377afd7faa73666d51c10c12af9a04021241f714e3afb17b776de5db4383479b",
+    "src/fluxforge/unfolding/__init__.py": "44b97b70ea2693a97d151f6e78666ff7bbdfbcd7e44de73ba3c2a59c2bd9fc42",
+    "src/fluxforge/validation/metrics.py": "ee2209d4d3deaecf15f56f41bf947be4818434ddd25e129cc4b7c2e2f6cd97b2",
+    "src/fluxforge/validation/phase5_crosswalk.py": "bf410dcd7a76cd029d813b09c97a9db59df1a08b91ffbf9adda3746bfe0e6fc3",
+    "src/fluxforge/validation/reference_parity.py": "6bdc8e7213ecd996601c3ada029de4a6e693b99cc83deba2431fffd03ef1facd",
+    "src/fluxforge/validation/run_readiness.py": "4039ee96afa4c83a815e742f05798aa86709526d44b702311c84508dcf88fb09",
+    "src/fluxforge/validation/transport_comparison.py": "35860765d2fbaf8194fc87952b67c545296a8f498c1252038467d55393ae0039",
+    "src/fluxforge/validation/__init__.py": "ee9b7cfa0d75e9c610aaa300415171c36a501d6f0c6a2eda29607a1848aab778",
+    "src/fluxforge/workflows/activation_pipeline.py": "fd30ed4bcea8bab2443711c8527b3c11b6ba5cfb593eac120806dc56cc766f15",
+    "src/fluxforge/workflows/astm_inl_dosimetry.py": "a6181d1849b883d6fa8899ab9f5df2fdaf2cf44eaf7d7190ebafeb4470e15153",
+    "src/fluxforge/workflows/batch_processing.py": "d363e625396c55f5b741baa8c3709788d3f62844d14e3ecc31a5cf0eb731e7cf",
+    "src/fluxforge/workflows/irradiation_optimization.py": "91df8a51d1c125d516bf3d2be61a71696c41777f2112c00dba0e080905aa534f",
+    "src/fluxforge/workflows/phase6_ldrd_worked_example.py": "9b1ff1d0201ea3aa48323a9cbc76f749477bc229686327155c220a947dd7e77c",
+    "src/fluxforge/workflows/spectrum_unfolding.py": "d2a887bf26b0c09736739ce41f323973f2130f1c841f0203c7efddeec7ebca44",
+    "src/fluxforge/workflows/__init__.py": "803208a45bc80f1cdb873bc36ad07c65fea1796c0e82a3e885a8130305105d8c",
+    "src/fluxforge/examples/flux_wire/batch_compare_spectra.py": "2fcb6884757e593a545f6ca42b178a86dbd52bef111183ecba8d4a43bba5fa8f",
+    "src/fluxforge/examples/flux_wire/flux_wire_spectrum_analysis.py": "18dd8ec3d598e55852f260b077c7683964060de9e5aa236b9a3aa9d0ecda6f11",
+    "src/fluxforge/gui/backends/pyqtgraph_backend.py": "554a15b9aad415b0884e81b649474d4bc4afd92c5b7323c0e12081b115d20929",
+    "src/fluxforge/gui/backends/vispy_backend.py": "cc5d4a4831ea05c7264f4b455b25bd4bbf19df5c36cd7bd7c4169487ccfee271",
+    "src/fluxforge/gui/backends/__init__.py": "ad75592a876a0a06be1df66a33c3e918e92691401ac6a4aeb2a5f29c9bfef49d",
+    "src/fluxforge/gui/dialogs/auto_peak_review_dialog.py": "2d53dca2ebb1715ae93ca85395ec349af38e6a4a2a5a4da02671cdc2223e4807",
+    "src/fluxforge/gui/dialogs/calibration_dialog.py": "b3eaefd2d3929451d304fb115d936e877458566b787b4c5104bc9c858e9f30a5",
+    "src/fluxforge/gui/dialogs/covariance_dialog.py": "56df356b1897eed344a8fd37eaa0ec764b1c82d1f61d5feda7904c28fe2bbee4",
+    "src/fluxforge/gui/dialogs/efficiency_dialog.py": "5ca494d230d0ad234f1153640bf4ac7474deb902d7686e77f0fe1c426365b164",
+    "src/fluxforge/gui/dialogs/irradiation_history_dialog.py": "9cb1a4eff3fc098f03ec1ffbe29af30db1fce7172a4f4b5198263ba31f361bff",
+    "src/fluxforge/gui/dialogs/pu_isotopics_dialog.py": "cfe4a356745e4e8887ab779ba3e7ad955aacd00bdfcf7bdc197af33424920ea8",
+    "src/fluxforge/gui/dialogs/qa_history_dialog.py": "d2df1677ba3681858615cf1aa8c4cec3f967934c70691ed1fc5b1cf4cf9e988d",
+    "src/fluxforge/gui/dialogs/reaction_rate_dialog.py": "afdd9abd899dd5900e7cdd59aa95ddbe8632c09f926d487193acaec471f9dcf5",
+    "src/fluxforge/gui/dialogs/report_export_dialog.py": "70e2866c46b9e73a41bab8d470225b15316844c2186fd3972e325d2230b59538",
+    "src/fluxforge/gui/dialogs/spectrum_file_queue_dialog.py": "d8bc0c6d28785a43d3445aaf5f09ba84fda5712986d20390e317d5696c36c136",
+    "src/fluxforge/gui/dialogs/standards_review_dialog.py": "16ee995304e9d4d9c55e7602c25798c4eb4ac1c4e53e8402b91e904dbbcebf95",
+    "src/fluxforge/gui/dialogs/unfolding_dialog.py": "d3e45d85b5bb95fbc22b0b7bc7a09ca06b6790492c580090152fdfa192be4d6e",
+    "src/fluxforge/gui/dialogs/__init__.py": "32efec8424330b9a96192f2fc1cd2d4b8e31a04461b51775508911620d994f74",
+    "src/fluxforge/gui/panels/modern_shell.py": "0739a394620e5ec672e58a2f4c91a78fe3458777188f38b8e5fbf01bc9e44a90",
+    "src/fluxforge/gui/panels/modern_shell_center.py": "ec98db5ee678c92f4add2b08ba224d0cc8ae1f6409db4b18e6ff84099097a352",
+    "src/fluxforge/gui/panels/modern_shell_context.py": "6f74da7f715837740cf310501e226ad4dc73c9dbbda6ca7251e1f837ca1664c6",
+    "src/fluxforge/gui/panels/modern_shell_shared.py": "464168be6e4b95f037ae7e1e201dc45b5d547b3de5d5d9526565f73177f482d1",
+    "src/fluxforge/gui/panels/modern_shell_sidebar.py": "90152d6f349bb148021c85ef329f2c01ce05d87b78507433d98333fdb1496dfa",
+    "src/fluxforge/gui/panels/phase5.py": "0b93d079afab742fb9ce59e27b1c88097415a41cfc9f204ef714d85956b693c7",
+    "src/fluxforge/gui/panels/phase6.py": "8d8121bc476969331874d7f30be564e614bf31584780a8c6d6f466081bdc75e3",
+    "src/fluxforge/gui/panels/__init__.py": "362a119db00b2875f1df555de045ad8d4cb2c4f46571e8df002daad841f2b659",
+    "src/fluxforge/gui/themes/color_tokens.py": "624f5912e278a6990aae4930b01cc719b9d72e0ad3a5f47662b490c0f4de639d",
+    "src/fluxforge/gui/themes/__init__.py": "3610b460a84321912f7c8d4654a34acff8ea1de4d1b2fa1f434a4f8cdbe24c0f",
+    "src/fluxforge/gui/widgets/hardware_led.py": "bb7b8275d0e5d3a5edb9f42128709f517bc0d2e4044cb3c83d81d9c74cf521b2",
+    "src/fluxforge/gui/widgets/method_selector.py": "c2e45f9ff7e1b166a8598f8b1ad46a4f18e038b854c03f4562c9183d656aad37",
+    "src/fluxforge/gui/widgets/mode_switcher.py": "7dba7e8bd0529fdf4ce8f70aa88f0f2d91dcce1c9da83eaf9b79c98c182cff45",
+    "src/fluxforge/gui/widgets/__init__.py": "a9d51fa4c03a031e90444e52e60e7bb0f3f998fd2363d2531a2b39f4cf4340b2"
+  }
+}

@@ -1,0 +1,8 @@
+.......................................                                  [100%]
+============================== warnings summary ===============================
+tests/test_gui_consolidation.py::test_empty_unfolding_imports_committed_rafm_rates
+  C:\Users\Josh\.codex\worktrees\rafm-analysis-issues\FluxForge\src\fluxforge\solvers\rmle.py:886: LinAlgWarning: An ill-conditioned matrix detected: slice 0 has rcond = 1.6622391872802742e-31.
+    H_inv = linalg.inv(H)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+39 passed, 1 warning in 73.30s (0:01:13)

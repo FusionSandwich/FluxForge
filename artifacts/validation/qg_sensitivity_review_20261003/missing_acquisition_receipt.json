@@ -1,0 +1,25 @@
+{
+  "readable_files_checked": 734,
+  "relevant_zips_checked": 20,
+  "additional_binary_filenames_checked": 120,
+  "unread_cloud_objects": 223,
+  "local_manifest_sha256": {
+    "header_manifest.json": "2939f2f7f49b97430bde69b14003b6918b0ebe53bec5eb3b7c145192378215f2",
+    "archive_manifest.json": "f4be118e8bba230c88b15c4dbb3ac6f2121820f317b1b9d29428ba0b934e0df7",
+    "read_errors.json": "7d9cd0cc16f749de831b0e14abc82e82d2bbc16b2a1974e6add25302889c0f15",
+    "report_acquisition_matches.json": "81a3612571613633510fd620ee0538841c99de5f3412269144b6b043932dd00f"
+  },
+  "initial_filesystem_search_superseded_by_git_recovery": true,
+  "recovered_positive_rows": 35,
+  "recovered_zero_rows": 1,
+  "remaining_positive_rows": 12,
+  "remaining_acquisitions": [
+    {
+      "report": "RAFM1_Long_70d_EOI",
+      "date_local_unzoned": "2025-07-01T14:57:31",
+      "live_time_s": 3600,
+      "real_time_s": 3848.07
+    }
+  ],
+  "scope": "Full personal path inventories remain local; two unhydrated UW archives and cloud placeholders were not asserted to be read."
+}

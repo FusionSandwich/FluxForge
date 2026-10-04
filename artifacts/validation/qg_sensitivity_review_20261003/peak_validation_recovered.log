@@ -1,0 +1,2 @@
+{"reports": 33, "roi_rows": 300, "status_counts": {"same_id": 268, "tentative_native_same_id": 3, "missing_raw_spectrum": 12, "tentative_same_id": 8, "different_or_ambiguous_id": 1, "missing_peak": 1, "reference_nondetection": 6, "corrected_reference_id": 1}, "paired_identity_labels_agree": false, "tentative_candidates_are_confirmed_detections": false, "matched_native_fits": 272, "confirmed_detections": 269, "detection_significance_threshold": 2.0}
+All-reports identity acceptance: False

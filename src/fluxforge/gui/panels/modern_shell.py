@@ -555,7 +555,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.peak_search_selector.current_key()
                 or self.workspace_controller.state.peak_search_method
             )
-            peaks = detect_peak_candidates(spectrum, method=method)
+            # Keep every candidate meeting the method's threshold for review.
+            # A top-12 display cap otherwise discards real weak sample peaks.
+            peaks = detect_peak_candidates(spectrum, method=method, max_peaks=None)
             dialog = AutoPeakReviewDialog(peaks, parent=self)
             if dialog.exec() != QDialog.Accepted:
                 return

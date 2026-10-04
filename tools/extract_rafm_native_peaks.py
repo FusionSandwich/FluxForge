@@ -95,10 +95,13 @@ def main():
             )
             targets = select_generic_targeted_lines(detected, lib, c)
         candidates = []
+        fit_diagnostics = []
         targeted = analyze_raw_spectrum_targeted(
             d,
             targets,
             low_significance_candidates=candidates,
+            fit_diagnostics=fit_diagnostics,
+            max_assignment_energy_delta_fwhm=1.0,
             peak_threshold=0.0 if wire else c["targeted_peak_significance_sigma"],
             min_energy_keV=c["min_peak_energy_keV"],
             max_energy_keV=c["max_peak_energy_keV"],
@@ -138,6 +141,7 @@ def main():
                     "net": p.net_counts,
                     "sigma": p.net_counts_unc,
                     "line_energy": p.gamma_line.energy_keV if p.gamma_line else None,
+                    "assignment_ambiguous": p.assignment_ambiguous,
                 }
                 for p in peaks
             ],
@@ -151,6 +155,7 @@ def main():
                 "net": p.net_counts,
                 "sigma": p.net_counts_unc,
                 "line_energy": p.gamma_line.energy_keV if p.gamma_line else None,
+                "assignment_ambiguous": p.assignment_ambiguous,
             }
             for p in candidates
         ]

@@ -702,7 +702,7 @@ def detect_peak_candidates(
     method: str = "mariscotti",
     threshold: float = 4.0,
     min_distance: int = 18,
-    max_peaks: int = 12,
+    max_peaks: int | None = 12,
     registries: PluginRegistries | None = None,
 ) -> tuple[PeakCandidate, ...]:
     """Detect candidate peaks and attach lightweight fit diagnostics."""
@@ -725,7 +725,9 @@ def detect_peak_candidates(
         min_distance=min_distance,
         registries=registries,
     )
-    ordered = sorted(peaks, key=lambda item: item[1], reverse=True)[:max_peaks]
+    ordered = sorted(peaks, key=lambda item: item[1], reverse=True)
+    if max_peaks is not None:
+        ordered = ordered[:max_peaks]
 
     candidates: list[PeakCandidate] = []
     for index, (channel, significance) in enumerate(
