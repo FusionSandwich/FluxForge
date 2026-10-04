@@ -1,6 +1,6 @@
 # ADR-001: GUI Stack and Migration Path
 
-**Status:** Accepted
+**Status:** Superseded by ADR-008 (2026-10-03)
 
 ## Context
 

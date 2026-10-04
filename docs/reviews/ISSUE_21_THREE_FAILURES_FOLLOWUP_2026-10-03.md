@@ -1,5 +1,12 @@
 # Recorded validation failures: independent follow-up
 
+**Adoption update:** PR #218's published Qt consolidation at `b618f5e` has now
+been integrated into this worktree. Qt is the sole shipped GUI; the diagnostic
+driver and its geometry tests now live under `archive/legacy_gui/tests/` and
+are excluded from normal discovery. The records below describe the earlier
+failure investigation, before that integration. Current GUI validation is in
+`ISSUE_21_QT_INTEGRATION_2026-10-03.md`; use its current Qt commands.
+
 Two original parity failures are resolved by the existing PR #217 fix. The
 legacy Tk desktop coordinate workflow remains reproducible. Its calibration
 timeout is a clipped-control input failure, not evidence of a failed calibration
@@ -91,7 +98,9 @@ active would require an accessible Tk layout and a new passing coordinate run;
 that product change belongs to the archival decision. No Tk layout repair is
 claimed by this draft.
 
-Use the complete environment and set `PYTHONPATH` to this checkout's `src`:
+Historical reproduction at `51654ce` uses the complete environment and sets
+`PYTHONPATH` to that checkout's `src` (the Tk test paths below are archived in
+the current integration):
 
 ```powershell
 $env:PYTHONPATH = (Resolve-Path src).Path

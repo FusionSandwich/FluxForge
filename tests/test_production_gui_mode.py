@@ -140,7 +140,6 @@ def test_empty_production_workspace_does_not_open_demo_analysis_dialogs():
     for action_name in (
         "AutoFindPeaksAction",
         "OpenEnergyFwhmCalibrationAction",
-        "OpenSpectrumUnfoldingAction",
         "OpenPuIsotopicsAction",
         "RunAstmCheckAction",
         "WorkspaceOpenStandardsReviewAction",
@@ -153,7 +152,11 @@ def test_empty_production_workspace_does_not_open_demo_analysis_dialogs():
     window._open_standards_review()
     app.processEvents()
     assert window._calibration_dialog is None
-    assert window._unfolding_dialog is None
+    assert window._unfolding_dialog is not None
+    assert window._unfolding_dialog.workspace_input.measured_rates.size == 0
+    assert window._unfolding_dialog.current_result is None
+    assert not window._unfolding_dialog.run_button.isEnabled()
+    window._unfolding_dialog.close()
     assert window._standards_review_dialog is None
     window.close()
 

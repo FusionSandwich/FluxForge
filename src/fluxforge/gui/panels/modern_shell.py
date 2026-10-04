@@ -130,6 +130,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QDoubleSpinBox,
         QFileDialog,
         QFrame,
+        QScrollArea,
         QGridLayout,
         QGroupBox,
         QHBoxLayout,
@@ -3364,6 +3365,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.addTab(self.survey_map_panel, "Survey Map")
             if self.developer_tools:
                 self.addTab(self._log_panel(), "Developer Log")
+            for index in range(self.count()):
+                self._make_panel_scrollable(self.widget(index))
             self.setProperty(
                 "fluxforgeTabIds",
                 {
@@ -3381,6 +3384,25 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     "Developer Log": "developer.log.open",
                 },
             )
+
+        @staticmethod
+        def _make_panel_scrollable(panel: QWidget) -> None:
+            """Keep dense analysis forms reachable in a small dock.
+
+            Preserve the page widget and its public controls while moving its
+            content into a scroll area; the page no longer forces the window to
+            grow to the full form height.
+            """
+            content = QWidget(panel)
+            content.setLayout(panel.layout())
+            scroll = QScrollArea(panel)
+            scroll.setObjectName("AnalysisPanelScrollArea")
+            scroll.setWidgetResizable(True)
+            scroll.setFrameShape(QFrame.NoFrame)
+            scroll.setWidget(content)
+            layout = QVBoxLayout(panel)
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.addWidget(scroll)
 
         def _text_panel(self, heading: str, body: str) -> QWidget:
             widget = QWidget(self)

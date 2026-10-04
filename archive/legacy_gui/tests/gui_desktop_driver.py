@@ -14,9 +14,11 @@ from pathlib import Path
 import tkinter as tk
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "src"))
+
+sys.path.insert(0, str(REPO_ROOT / "archive/legacy_gui/src"))
 
 from fluxforge_gui.app import FluxForgeGui
 from fluxforge.io.artifacts import (
@@ -374,8 +376,8 @@ def run_acceptance(output_dir: Path) -> dict[str, object]:
                 ).hexdigest()
                 for path in (
                     Path(__file__),
-                    REPO_ROOT / "src/fluxforge_gui/app.py",
-                    REPO_ROOT / "src/fluxforge_gui/ui_builder.py",
+                    REPO_ROOT / "archive/legacy_gui/src/fluxforge_gui/app.py",
+                    REPO_ROOT / "archive/legacy_gui/src/fluxforge_gui/ui_builder.py",
                 )
             },
         },

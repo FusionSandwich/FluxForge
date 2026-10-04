@@ -14,6 +14,7 @@ from fluxforge.gui.backends.pyqtgraph_backend import catalog_pyqtgraph_export_ac
 from fluxforge.gui.mode_manager import ModeManager
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 from fluxforge.io import read_reaction_rates
+from fluxforge.io.artifacts import read_response_bundle
 from fluxforge.plugins import bootstrap_builtin_registries
 from fluxforge.unfolding import register_builtin_unfolders
 from fluxforge.unfolding.base import UnfoldingResult
@@ -98,6 +99,19 @@ def build_demo_unfolding_workspace_input() -> UnfoldingWorkspaceInput:
     )
 
 
+def build_empty_unfolding_workspace_input() -> UnfoldingWorkspaceInput:
+    """Start a measured-data workflow without synthetic measurements."""
+    return UnfoldingWorkspaceInput(
+        label="Load measured rates and a response bundle",
+        measured_rates=np.array([], dtype=float),
+        measurement_uncertainty=np.array([], dtype=float),
+        response_matrix=np.empty((0, 0), dtype=float),
+        energy_edges=np.array([], dtype=float),
+        initial_flux=np.array([], dtype=float),
+        energy_unit="eV",
+    )
+
+
 if (
     QT_AVAILABLE and PYQTGRAPH_AVAILABLE
 ):  # pragma: no cover - optional dependency branch
@@ -110,6 +124,7 @@ if (
             *,
             mode_manager: ModeManager | None = None,
             workspace_input: UnfoldingWorkspaceInput | None = None,
+            start_empty: bool = False,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -117,8 +132,10 @@ if (
             self.resize(1420, 940)
 
             self.mode_manager = mode_manager or ModeManager()
-            self.workspace_input = (
-                workspace_input or build_demo_unfolding_workspace_input()
+            self.workspace_input = workspace_input or (
+                build_empty_unfolding_workspace_input()
+                if start_empty
+                else build_demo_unfolding_workspace_input()
             )
             self.registries = bootstrap_builtin_registries()
             register_builtin_unfolders(self.registries)
@@ -236,6 +253,9 @@ if (
             )
             self.response_source_combo.setMinimumContentsLength(14)
             self.response_source_combo.addItem("Demo Response", "demo")
+            self.response_source_combo.addItem(
+                "FluxForge Response Bundle", "response_bundle"
+            )
             self.response_source_combo.addItem("User CSV", "user_csv")
             self.response_source_combo.addItem("MCNP / GEANT4 Table", "mcnp_geant4")
             self.response_source_combo.addItem("Analytical HPGe", "analytical_hpge")
@@ -243,12 +263,16 @@ if (
                 "UWNR RAFM Simplified Response",
                 "uwnr_flux_wires",
             )
+            if self.workspace_input.measured_rates.size == 0:
+                self.response_source_combo.setCurrentIndex(
+                    self.response_source_combo.findData("response_bundle")
+                )
             response_layout.addWidget(self.response_source_combo, 0, 1)
             response_layout.addWidget(QLabel("Path / note", response_group), 1, 0)
             self.response_path_input = QLineEdit(response_group)
             self.response_path_input.setObjectName("ResponsePathInput")
             self.response_path_input.setPlaceholderText(
-                "CSV/TSV path for file-backed response matrices"
+                "Response bundle JSON or CSV/TSV matrix path"
             )
             response_layout.addWidget(self.response_path_input, 1, 1)
             self.response_load_button = QPushButton("Load Response", response_group)
@@ -498,7 +522,19 @@ if (
                 for key in self._selected_method_keys()
             )
             self.show_uncertainty_bands_checkbox.setEnabled(supports_uncertainty)
-            self.compare_button.setEnabled(compare_enabled)
+            ready = self._inputs_ready()
+            self.run_button.setEnabled(ready)
+            self.compare_button.setEnabled(compare_enabled and ready)
+
+        def _inputs_ready(self) -> bool:
+            data = self.workspace_input
+            return (
+                data.measured_rates.size > 0
+                and data.response_matrix.shape
+                == (data.measured_rates.size, data.initial_flux.size)
+                and data.initial_flux.size > 0
+                and data.energy_edges.size == data.initial_flux.size + 1
+            )
 
         @staticmethod
         def _slider_to_lambda(value: int) -> float:
@@ -562,7 +598,10 @@ if (
 
         def _update_response_matrix_view(self) -> None:
             image = np.asarray(self.workspace_input.response_matrix, dtype=float).T
-            self.response_image.setImage(image)
+            if image.size:
+                self.response_image.setImage(image)
+            else:
+                self.response_image.clear()
             rows, columns = self.workspace_input.response_matrix.shape
             self.response_plot.setTitle(
                 f"{self.workspace_input.label} ({rows}×{columns})"
@@ -606,6 +645,10 @@ if (
                     raise ValueError("reaction-rates artifact contains no rates")
                 if np.any(rates < 0.0) or np.any(uncertainties < 0.0):
                     raise ValueError("rates and uncertainties must be non-negative")
+                if not np.all(np.isfinite(rates)) or not np.all(
+                    np.isfinite(uncertainties)
+                ):
+                    raise ValueError("rates and uncertainties must be finite")
                 labels = tuple(
                     str(
                         row.get("reaction_id") or row.get("reaction") or f"M{index + 1}"
@@ -622,7 +665,19 @@ if (
                         labels,
                     )
                 else:
-                    if rates.size != self.workspace_input.response_matrix.shape[0]:
+                    if (
+                        self.workspace_input.response_matrix.size
+                        and self.response_source_combo.currentData()
+                        == "response_bundle"
+                        and labels != self.workspace_input.measurement_labels
+                    ):
+                        raise ValueError(
+                            "Loaded rates must match response reactions in row order."
+                        )
+                    if (
+                        self.workspace_input.response_matrix.size
+                        and rates.size != self.workspace_input.response_matrix.shape[0]
+                    ):
                         raise ValueError(
                             f"rate count {rates.size} does not match response rows "
                             f"{self.workspace_input.response_matrix.shape[0]}"
@@ -649,7 +704,58 @@ if (
                 source_key = str(self.response_source_combo.currentData() or "demo")
                 if source_key == "demo":
                     self.workspace_input = build_demo_unfolding_workspace_input()
+                elif source_key == "response_bundle":
+                    path = self.response_path_input.text().strip()
+                    if not path:
+                        raise ValueError(
+                            "Choose a FluxForge response bundle JSON first."
+                        )
+                    payload = read_response_bundle(Path(path))
+                    matrix = np.asarray(payload["matrix"], dtype=float)
+                    edges = np.asarray(payload["boundaries_eV"], dtype=float)
+                    reactions = tuple(str(value) for value in payload["reactions"])
+                    if reactions != self.workspace_input.measurement_labels:
+                        raise ValueError(
+                            "Response reactions must match loaded rates in row order."
+                        )
+                    if (
+                        matrix.ndim != 2
+                        or not matrix.size
+                        or matrix.shape[0] != len(reactions)
+                    ):
+                        raise ValueError("Response rows must match reaction labels.")
+                    if edges.ndim != 1 or edges.size != matrix.shape[1] + 1:
+                        raise ValueError(
+                            "Energy boundaries must match the response columns."
+                        )
+                    if not np.all(np.isfinite(matrix)) or np.any(matrix < 0.0):
+                        raise ValueError(
+                            "Response values must be finite and non-negative."
+                        )
+                    if (
+                        not np.all(np.isfinite(edges))
+                        or np.any(edges <= 0.0)
+                        or np.any(np.diff(edges) <= 0.0)
+                    ):
+                        raise ValueError(
+                            "Energy boundaries must be finite, positive, and increasing."
+                        )
+                    data = self.workspace_input
+                    self.workspace_input = UnfoldingWorkspaceInput(
+                        label=Path(path).name,
+                        measured_rates=data.measured_rates,
+                        measurement_uncertainty=data.measurement_uncertainty,
+                        response_matrix=matrix,
+                        energy_edges=edges,
+                        initial_flux=np.ones(matrix.shape[1], dtype=float),
+                        measurement_labels=reactions,
+                        energy_unit="eV",
+                    )
                 elif source_key == "analytical_hpge":
+                    if not self._inputs_ready():
+                        raise ValueError(
+                            "Load measured rates and energy boundaries before an analytical response."
+                        )
                     loaded = build_analytical_hpge_response(
                         n_channels=int(self.workspace_input.measured_rates.size),
                         energy_edges=self.workspace_input.energy_edges,
@@ -671,6 +777,10 @@ if (
                         self.workspace_input.measurement_labels,
                     )
                 else:
+                    if self.workspace_input.energy_edges.size == 0:
+                        raise ValueError(
+                            "Load a response bundle JSON with physical energy boundaries first."
+                        )
                     path = self.response_path_input.text().strip()
                     if not path:
                         self.summary_label.setText(
@@ -689,7 +799,7 @@ if (
                     self.workspace_input = self._workspace_input_from_loaded_response(
                         loaded
                     )
-            except (OSError, TypeError, ValueError) as exc:
+            except (OSError, KeyError, TypeError, ValueError) as exc:
                 self.summary_label.setText(f"Response matrix was not loaded: {exc}")
                 return
             self._populate_measurement_table()
@@ -765,6 +875,13 @@ if (
             )
 
         def _run_selected_method(self) -> None:
+            self._sync_method_controls()
+            if not self._inputs_ready():
+                self.summary_label.setText(
+                    "Load measured reaction rates, then a matching response bundle JSON "
+                    "with energy boundaries. RAFM CSV uses the labelled simplified UWNR response."
+                )
+                return
             method_keys = self._selected_method_keys()
             self.comparison_results = {
                 method_key: self._run_method(method_key) for method_key in method_keys
@@ -773,6 +890,8 @@ if (
             self._refresh_view()
 
         def _run_comparison(self) -> None:
+            if not self._inputs_ready():
+                return
             method_keys = self._selected_method_keys()
             self.comparison_results = {
                 method_key: self._run_method(method_key) for method_key in method_keys
