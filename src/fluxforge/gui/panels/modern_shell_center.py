@@ -345,7 +345,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _build_spectrum_tab(self) -> QWidget:
             widget = QWidget(self)
             layout = QVBoxLayout(widget)
-            layout.setContentsMargins(14, 14, 14, 14)
+            layout.setContentsMargins(14, 6, 14, 6)
             layout.setSpacing(10)
 
             self.standards_banner = QLabel(widget)
