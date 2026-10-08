@@ -184,7 +184,7 @@ jobs:
         run: pytest -q tests/test_production_gui_mode.py
 
       - name: GUI consolidation regressions
-        run: pytest -q tests/test_gui_consolidation.py
+        run: pytest -q tests/test_gui_consolidation.py tests/test_gui_compact_context.py
 
       - name: Analysis workspace core helper tests
         run: |
@@ -236,7 +236,7 @@ jobs:
         run: pytest -q tests/test_module3_workflows_qt.py
 
       - name: Qt report bundles and instrument provenance
-        run: pytest -q tests/test_gui_report_bundle.py tests/test_instrument_provenance.py
+        run: pytest -q tests/test_gui_report_bundle.py tests/test_instrument_provenance.py tests/test_gui_report_worker.py tests/test_gui_session_guard.py
 
       - name: Predictive dashboard Qt tests
         run: pytest -q tests/test_predictive_dashboard_qt.py

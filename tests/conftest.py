@@ -23,6 +23,36 @@ collect_ignore_glob = [
 ]
 
 
+@pytest.fixture(autouse=True)
+def discard_unsaved_test_workspaces(monkeypatch):
+    """Existing GUI tests discard their disposable workspaces on close.
+
+    Tests of the confirmation flow explicitly override this default response.
+    Import Qt only when a collected GUI test has already loaded it.
+    """
+    compat = sys.modules.get("fluxforge.gui.qt_compat")
+    if compat is not None and compat.QT_AVAILABLE:
+        from PySide6.QtWidgets import QMessageBox
+
+        monkeypatch.setattr(
+            QMessageBox, "question", lambda *args, **kwargs: QMessageBox.Discard
+        )
+
+
+@pytest.fixture
+def wait_for_report_export():
+    from time import monotonic
+    from PySide6.QtTest import QTest
+
+    def wait(dialog, timeout_seconds=30):
+        deadline = monotonic() + timeout_seconds
+        while dialog.worker is not None and monotonic() < deadline:
+            QTest.qWait(10)
+        assert dialog.worker is None, dialog.export_status.text()
+
+    return wait
+
+
 @pytest.fixture
 def independent_background_sum_variance():
     """Direct source-bin overlap oracle, independent of the production sparse W."""
