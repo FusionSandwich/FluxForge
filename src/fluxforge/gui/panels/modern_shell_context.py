@@ -28,7 +28,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             super().__init__(parent)
             self.setObjectName("ToolContextScrollArea")
             self.setWidgetResizable(True)
-            self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.setMinimumWidth(220)
+            # Keep diagnostic text readable when docks are squeezed. Unusually
+            # long source names still need an accessible horizontal scrollbar.
+            self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
