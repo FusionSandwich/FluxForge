@@ -126,7 +126,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             shell = QVBoxLayout(self)
             shell.setContentsMargins(0, 0, 0, 0)
-            shell.setSpacing(12)
+            shell.setSpacing(10)
 
             header = QHBoxLayout()
             header.setContentsMargins(0, 0, 0, 0)
