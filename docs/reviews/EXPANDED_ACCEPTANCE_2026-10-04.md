@@ -163,8 +163,8 @@ The imported session test now creates a valid ROI with both background sidebands
 Luna identified text encoding damage during edits; it was corrected before the
 final source commit, and the original Unicode strings are preserved.
 
-All six native Windows compact/calibration tests pass at the final GUI code
-revision, including 1280 by 720 operation, reachable canvas and forecast controls,
+All six native Windows compact/calibration tests pass at `91ea0d2`, whose
+calibration/layout sources remain unchanged at `2f915f3`, including 1280 by 720 operation, reachable canvas and forecast controls,
 selection-safe calibration, stale-acquisition rejection and undo. The final native
 30-spectrum GUI/report probe again verifies one plot, nine tables, three hashed
 bundle files, unchanged workspace and viewport, and all 120 missing instrument

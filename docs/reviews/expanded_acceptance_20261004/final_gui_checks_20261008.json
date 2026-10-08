@@ -8,7 +8,8 @@
     "final_native_compact_20261008": {
       "passed": 6,
       "xml_sha256": "ca73bc6d132bc6a5a3454d5197f4b0344b86cbf0aaf4edbdc54ec43e9d2f57e0",
-      "scope": "final code revision, native Windows"
+      "scope": "Native Windows at91ea0d2; calibration/layout sources unchanged at2f915f3. Later report-provenance change checked separately.",
+      "source_revision": "91ea0d2d1efad4327c89bcbf8fc3ba62ef57f861"
     }
   },
   "groups_overlap": true,

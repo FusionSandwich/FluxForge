@@ -27,8 +27,8 @@
       "sha256": "5e2cf0cf799d1eeb2500ff95cdfb071a7403af6fdb6f24fa480932fda3a38552"
     },
     "final_gui_checks_20261008.json": {
-      "bytes": 1121,
-      "sha256": "f84ddeb6f4517de08bcd6568108f28da4bd89922d444bd616de706abd51b4d40"
+      "bytes": 1279,
+      "sha256": "5253e1d5ad8212f556a52570b8a353e78d5b48bc8bfe26c8247b9ed4f51deb3e"
     },
     "final_gui_isolated_20261008.json": {
       "bytes": 2775,
@@ -55,8 +55,8 @@
       "sha256": "5e98e05cf602cdc224ba4d12dbccdf51cfd707c2914109d7f82f7dc14ecb6573"
     },
     "latest_gui_source_bridge.json": {
-      "bytes": 1996,
-      "sha256": "2793af7360c8394ef3232cfd14d2db526161d36d53e0d8622dbdc0264bf844b0"
+      "bytes": 2154,
+      "sha256": "2ede37c2a5fe92ce3fa61973259d4fb6239d63ddd9ad5ac363ec6caac71ad6d8"
     },
     "latest_measured_unfolding_start.png": {
       "bytes": 83825,
