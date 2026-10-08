@@ -259,7 +259,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                             else "stable"
                         )
                         + (
-                            f" ({recalibration_forecast.days_until_recalibration:.1f} d)"
+                            f" ({recalibration_forecast.days_until_recalibration:.1f} d after latest QA)"
                             if recalibration_forecast.days_until_recalibration
                             is not None
                             else ""

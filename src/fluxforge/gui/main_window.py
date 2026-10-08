@@ -1272,12 +1272,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 if forecast.eta_seconds and forecast.eta_seconds > 60.0
                 else f"{int(round(forecast.eta_seconds or 0.0))}s"
             )
-            qa_text = (
-                f"QA {int(round(recalibration.days_until_recalibration))}d"
-                if recalibration is not None
-                and recalibration.days_until_recalibration is not None
-                else "QA stable"
-            )
+            if recalibration is None:
+                qa_text = "QA no history"
+            elif recalibration.predicted_recalibration_at is None:
+                qa_text = "QA no projected trigger"
+            else:
+                qa_text = (
+                    f"QA target {recalibration.predicted_recalibration_at:%Y-%m-%d}"
+                )
             self.predictive_label.setText(f"Predictive: ETA {eta_text} | {qa_text}")
 
         def open_path(self, path: str | Path) -> None:
