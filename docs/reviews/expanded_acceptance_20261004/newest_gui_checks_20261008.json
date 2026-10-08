@@ -1,0 +1,28 @@
+{
+  "tests": {
+    "latest_followups_gui_20261008": {
+      "passed": 7,
+      "xml_sha256": "183b19a1f832b4f820c137d0a7711eeb19e5783509f44aac7092d361d6d54017",
+      "scope": "Seven GUI checks on the precommit working tree; committed code follows unchanged"
+    },
+    "latest_followups_native_compact_20261008": {
+      "passed": 1,
+      "xml_sha256": "8a969f0ecc54eff9c27961fe2aff177bf5f6a810025167196188892dab88565e",
+      "scope": "Native Windows at0bd285b"
+    }
+  },
+  "gui_source_branch_revision": "eeb2854",
+  "gui_revision": "0bd285bef8122650571b07e26db7032575fe7f4c",
+  "runtime": "Local PySide6 6.11.2",
+  "temporary_dependency_bound": "PySide6>=6.6,<6.12",
+  "superseded_ci": {
+    "run_id": 37792041619,
+    "commit": "b59664e20af199a82c9c145d86e838817ba72ce9",
+    "job_id": 113361688742,
+    "status": "FAILED_PROCESS_SHUTDOWN",
+    "gui_scaffold_assertions_passed": 29,
+    "installed_binding": "PySide6 6.12.0",
+    "error": "bool_dealloc during Python finalizing; expand the temporary compatibility cap after isolated validation"
+  },
+  "scientific_acceptance_complete": false
+}

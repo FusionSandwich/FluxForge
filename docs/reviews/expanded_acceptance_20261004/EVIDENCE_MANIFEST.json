@@ -1,6 +1,6 @@
 {
   "analysis_revision": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
-  "gui_revision": "2f915f3f1e462273d17350d49113fbd2a985ce80",
+  "gui_revision": "0bd285bef8122650571b07e26db7032575fe7f4c",
   "files": {
     ".gitattributes": {
       "bytes": 8,
@@ -59,8 +59,8 @@
       "sha256": "5e98e05cf602cdc224ba4d12dbccdf51cfd707c2914109d7f82f7dc14ecb6573"
     },
     "latest_gui_source_bridge.json": {
-      "bytes": 2154,
-      "sha256": "2ede37c2a5fe92ce3fa61973259d4fb6239d63ddd9ad5ac363ec6caac71ad6d8"
+      "bytes": 2838,
+      "sha256": "5658c9634b909d78ec4e96c26b2c87a7d858cf1b1a089cdc535935a747bae4ed"
     },
     "latest_measured_unfolding_start.png": {
       "bytes": 83825,
@@ -98,6 +98,10 @@
       "bytes": 2841,
       "sha256": "3d08342fb104b2df45ccec66dc3da1a1bb544797589d1520e5a22a7d88a6a059"
     },
+    "luna_latest_followups_integration_review.md": {
+      "bytes": 2031,
+      "sha256": "e70dc035eeac5337f5c96b7c017bb6cf7f4e1d28759439f3a10d429748f95fd8"
+    },
     "luna_latest_gui_final_integration_review.md": {
       "bytes": 3240,
       "sha256": "524dd0e9e36f7a9533dd1b0cfc6d237a6962e1397a6c042f6b9f4ddb833f457c"
@@ -121,6 +125,26 @@
     "new_gui_source_campaign.png": {
       "bytes": 169524,
       "sha256": "716eab230bd0e676c269dac60607b165199fc709fb4afddcede8f142abd05d2a"
+    },
+    "newest_gui_checks_20261008.json": {
+      "bytes": 1100,
+      "sha256": "73efe2f067718f165d9a5b128429e9e6591b261d550c608f3a1cc7d8dedb0928"
+    },
+    "newest_measured_unfolding_start.png": {
+      "bytes": 83825,
+      "sha256": "afdcdeff7bcd7c3c1cf4b9eb7e0082a77614d7bc625512ffc05026780ea0a8f6"
+    },
+    "newest_new_gui_source_campaign.png": {
+      "bytes": 158522,
+      "sha256": "cfd39ad5e1174d7c258f4ce513aa3e43a4790afdce2282bcc296034513d6fbad"
+    },
+    "newest_qt_native_gui_20261008.json": {
+      "bytes": 1025,
+      "sha256": "41e361f886ee9782e6e0766f561b7387de51795bd2221ad0513ba4322ea66374"
+    },
+    "newest_source_campaign_report_preview.png": {
+      "bytes": 109759,
+      "sha256": "79ae3667f064494fb01892a90270c901c47fd91c53cd5f3f640ba465c1cdf89e"
     },
     "phase6_qualification.json": {
       "bytes": 6665,

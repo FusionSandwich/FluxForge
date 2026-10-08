@@ -1,6 +1,6 @@
 {
   "analysis_replay_revision": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
-  "gui_revision": "2f915f3f1e462273d17350d49113fbd2a985ce80",
+  "gui_revision": "0bd285bef8122650571b07e26db7032575fe7f4c",
   "changed_gui_files": [
     "src\\fluxforge\\gui\\backends\\pyqtgraph_backend.py",
     "src\\fluxforge\\gui\\dialogs\\calibration_dialog.py",
@@ -14,10 +14,11 @@
     "src\\fluxforge\\gui\\backends\\pyqtgraph_backend.py": "4feab68ebf806f68ccc146b18c788d41696d7bfb215eba712a8ddcaf248caf7e",
     "src\\fluxforge\\gui\\dialogs\\calibration_dialog.py": "f947589966056db9f9fd7ad480efd75fdeb3e7786c9a65d0df8773f777933a77",
     "src\\fluxforge\\gui\\dialogs\\report_export_dialog.py": "62f7cfe4f0899d1e2c40d977785aab6d48fe427b999b7f35b4d0617ca9467602",
-    "src\\fluxforge\\gui\\main_window.py": "8fe28b68bf621f0eb57e4a1818a47fd4c099a7ec76ad22face145c186fbdb312",
-    "src\\fluxforge\\gui\\panels\\modern_shell_center.py": "5645a951cd5a6b2388089cde11f36215cfc0c9cd971b1ca4bd8d172019a9749f",
-    "src\\fluxforge\\gui\\panels\\modern_shell_context.py": "fdb69a70631a5e78cb53aef75e0bc320770de2238909cd162586f1acc1955b87",
-    "src\\fluxforge\\gui\\widgets\\mode_switcher.py": "dff92681f99a1e261d66c1d24fbbbc67a65609d5aceca61e8e0ba8f4a321ab5e"
+    "src\\fluxforge\\gui\\main_window.py": "a5e852acff7d5de22711e1693ad8627e1221eeaab7220f97227cd4065ad6d6ba",
+    "src\\fluxforge\\gui\\panels\\modern_shell_center.py": "2d9cbbe619bb5ec96190e9ff40265adc5114872dc390b8d4c8c8082f56ba16a1",
+    "src\\fluxforge\\gui\\panels\\modern_shell_context.py": "f5cd854c79d213f0a2836639a8a63843bace40fdd762e3f9e3b581e3eb63f92e",
+    "src\\fluxforge\\gui\\widgets\\mode_switcher.py": "dff92681f99a1e261d66c1d24fbbbc67a65609d5aceca61e8e0ba8f4a321ab5e",
+    "src\\fluxforge\\gui\\widgets\\eliding_label.py": "36ab413a76351655ddcdedaf95ebd89ed0bef5399f9d3625341c7a02e08d895e"
   },
   "numerical_analysis_sources_unchanged": true,
   "whole_engine_identity_changed": true,
@@ -32,6 +33,21 @@
       "xml_sha256": "ca73bc6d132bc6a5a3454d5197f4b0344b86cbf0aaf4edbdc54ec43e9d2f57e0",
       "scope": "Native Windows at91ea0d2; calibration/layout sources unchanged at2f915f3. Later report-provenance change checked separately.",
       "source_revision": "91ea0d2d1efad4327c89bcbf8fc3ba62ef57f861"
+    }
+  },
+  "added_gui_files": [
+    "src\\fluxforge\\gui\\widgets\\eliding_label.py"
+  ],
+  "newest_tests": {
+    "latest_followups_gui_20261008": {
+      "passed": 7,
+      "xml_sha256": "183b19a1f832b4f820c137d0a7711eeb19e5783509f44aac7092d361d6d54017",
+      "scope": "Seven GUI checks on the precommit working tree; committed code follows unchanged"
+    },
+    "latest_followups_native_compact_20261008": {
+      "passed": 1,
+      "xml_sha256": "8a969f0ecc54eff9c27961fe2aff177bf5f6a810025167196188892dab88565e",
+      "scope": "Native Windows at0bd285b"
     }
   }
 }

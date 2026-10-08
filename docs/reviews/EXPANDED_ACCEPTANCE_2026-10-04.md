@@ -9,7 +9,7 @@ absolute activity, reaction rate, or neutron spectrum.
 
 This review uses analysis revision `d017a7162d51d97ef3e50fac98a0c748337b9ccb`.
 The subsequent South pilot does not change package analysis sources. Later Qt
-fixes through `2f915f3f1e462273d17350d49113fbd2a985ce80` change seven GUI files; numerical
+fixes through `0bd285bef8122650571b07e26db7032575fe7f4c` change seven existing GUI files and add one GUI widget; numerical
 analysis sources used by the replay remain unchanged. Public receipts and screenshots are in
 [`expanded_acceptance_20261004`](expanded_acceptance_20261004/EVIDENCE_MANIFEST.json).
 Original inputs, full local outputs, failed attempts, and earlier reviews remain
@@ -193,3 +193,28 @@ All 10 Module 3 GUI tests pass locally. A subprocess with Qt deliberately
 unavailable passes 48 reporting/provenance/parity checks and skips exactly three
 GUI tests. Luna reviewed these fixes without finding a blocker; package GUI and
 numerical sources remain unchanged. The failed CI run remains explicitly recorded.
+
+## Latest GUI follow-ups and compatibility check
+
+The final October 8 refresh includes `codex/gui-followups-20261007` through
+`eeb2854`. `0bd285b` integrates the readable eliding status labels, accessible
+full status text, the scrollable forecast dashboard with its headings and usable
+chart heights, and readable inspector overflow. Existing calibration binding,
+manual provenance clearing, asynchronous exports, single-line canvas metadata,
+two-row canvas controls and the 120-pixel spectrum floor are retained.
+Seven focused layout/calibration/forecast checks pass; a native Windows 1280 by
+720 check verifies top controls and actual navigation to forecast end content.
+The newest native GUI/report probe again loads 30 spectra, verifies all bundle
+hashes and the unchanged workspace/viewport, and preserves missing settings and
+scientific admission=false. Captures and receipts use the `newest_` prefix.
+
+The subsequent CI dependency installation selected PySide6 6.12.0. All 29
+scaffold assertions passed, then the process aborted during Python finalization
+with `bool_dealloc`. The package now temporarily bounds PySide6 below 6.12,
+retaining the locally validated 6.11.2 runtime. This compatibility cap should be
+expanded after isolated validation of the new binding/runtime combination.
+Luna reviewed the GUI integration and this bounded compatibility decision.
+
+All numerical sources still match the original 30-acquisition replay. The only
+new package file is the GUI eliding-label widget; the source bridge records it
+separately from the seven changed GUI files. Scientific outcomes remain 3/26/1.
