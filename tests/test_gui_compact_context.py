@@ -54,7 +54,14 @@ def test_context_scrolls_on_720_pixel_desktop():
         dashboard = window.central_tabs.predictive_dashboard
         assert isinstance(dashboard, QScrollArea)
         assert dashboard.verticalScrollBar().maximum() > 0
-        dashboard.ensureWidgetVisible(dashboard.summary_browser)
+        # Follow the user action: scroll the dashboard to its bottom. Qt's
+        # ensureWidgetVisible can use geometry from before the tab was laid out.
+        dashboard.verticalScrollBar().setValue(
+            dashboard.verticalScrollBar().maximum()
+        )
+        dashboard.summary_browser.verticalScrollBar().setValue(
+            dashboard.summary_browser.verticalScrollBar().maximum()
+        )
         app.processEvents()
         point = dashboard.summary_browser.mapTo(
             dashboard.viewport(), dashboard.summary_browser.rect().bottomLeft()
