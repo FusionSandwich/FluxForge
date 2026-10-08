@@ -24,13 +24,16 @@ collect_ignore_glob = [
 
 
 @pytest.fixture(autouse=True)
-def discard_unsaved_test_workspaces(monkeypatch):
+def discard_unsaved_test_workspaces(monkeypatch, request):
     """Existing GUI tests discard their disposable workspaces on close.
 
     Tests of the confirmation flow explicitly override this default response.
     Import Qt only when a collected GUI test has already loaded it.
     """
     compat = sys.modules.get("fluxforge.gui.qt_compat")
+    if compat is None and request.node.name.startswith("test_qt_"):
+        from fluxforge.gui import qt_compat as compat
+
     if compat is not None and compat.QT_AVAILABLE:
         from PySide6.QtWidgets import QMessageBox
 

@@ -80,7 +80,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QProgressBar,
         QPushButton,
         QSettings,
-        QSizePolicy,
         QStatusBar,
         QToolBar,
         QToolButton,
@@ -90,6 +89,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from PySide6.QtWidgets import QMessageBox
     from fluxforge.gui.theme_manager import load_stylesheet, resolve_theme
     from fluxforge.gui.widgets import HardwareLedWidget, ModeSwitcherWidget
+    from fluxforge.gui.widgets.eliding_label import ElidingLabel
 
 
 @dataclass(frozen=True)
@@ -143,18 +143,6 @@ def modern_gui_unavailable_message() -> str:
 
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
-
-    class _StatusLabel(QLabel):
-        """Keep full status text accessible without forcing a wide window."""
-
-        def __init__(self, text, parent):
-            super().__init__(text, parent)
-            self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-            self.setToolTip(text)
-
-        def setText(self, text):
-            super().setText(text)
-            self.setToolTip(text)
 
     class FluxForgeMainWindow(QMainWindow):
         """Dockable analyst workspace for HPGe and neutron-spectrum workflows."""
@@ -847,12 +835,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.setObjectName("FluxForgeStatusBar")
             self.setStatusBar(status)
 
-            self.cursor_label = _StatusLabel("Cursor: --", self)
-            self.file_label = _StatusLabel("File: none", self)
-            self.mode_label = _StatusLabel("Mode: Expert", self)
-            self.library_label = _StatusLabel("Library: bundled gamma", self)
-            self.renderer_label = _StatusLabel("Renderer: PyQtGraph", self)
-            self.predictive_label = _StatusLabel("Predictive: --", self)
+            self.cursor_label = ElidingLabel("Cursor: --", self)
+            self.file_label = ElidingLabel("File: none", self)
+            self.mode_label = ElidingLabel("Mode: Expert", self)
+            self.library_label = ElidingLabel("Library: bundled gamma", self)
+            self.renderer_label = ElidingLabel("Renderer: PyQtGraph", self)
+            self.predictive_label = ElidingLabel("Predictive: --", self)
             self.progress = QProgressBar(self)
             self.progress.setObjectName("StatusProgress")
             self.progress.setMaximumWidth(180)

@@ -56,14 +56,26 @@ def test_context_scrolls_on_720_pixel_desktop():
         assert canvas.plot.height() > 100
         window.central_tabs.setCurrentIndex(1)
         app.processEvents()
-        forecasts = window.central_tabs.currentWidget()
-        assert isinstance(forecasts, QScrollArea)
+        dashboard = window.central_tabs.predictive_dashboard
+        assert isinstance(dashboard, QScrollArea)
         assert window.height() <= 720
-        forecasts.ensureWidgetVisible(window.central_tabs.predictive_dashboard.target_counts_spin)
-        point = window.central_tabs.predictive_dashboard.target_counts_spin.mapTo(
-            forecasts.viewport(), window.central_tabs.predictive_dashboard.target_counts_spin.rect().center()
+        assert dashboard.verticalScrollBar().maximum() > 0
+        dashboard.ensureWidgetVisible(dashboard.target_counts_spin)
+        app.processEvents()
+        point = dashboard.target_counts_spin.mapTo(
+            dashboard.viewport(), dashboard.target_counts_spin.rect().center()
         )
-        assert forecasts.viewport().rect().contains(point)
+        assert dashboard.viewport().rect().contains(point)
+        dashboard.verticalScrollBar().setValue(dashboard.verticalScrollBar().maximum())
+        dashboard.summary_browser.verticalScrollBar().setValue(
+            dashboard.summary_browser.verticalScrollBar().maximum()
+        )
+        app.processEvents()
+        point = dashboard.summary_browser.mapTo(
+            dashboard.viewport(), dashboard.summary_browser.rect().bottomLeft()
+        )
+        assert dashboard.viewport().rect().contains(point)
+        assert dashboard.count_rate_plot.height() >= 160
     finally:
         window.close()
         app.processEvents()

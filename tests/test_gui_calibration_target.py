@@ -149,3 +149,4 @@ def test_main_window_can_shrink_to_laptop_width(window):
     QApplication.instance().processEvents()
     assert window.width() <= 1280
     assert window.library_label.text() == window.library_label.toolTip() == full_text
+    assert window.library_label.accessibleName() == full_text
