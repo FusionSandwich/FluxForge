@@ -1,0 +1,85 @@
+{
+  "git_head": "2f915f3f1e462273d17350d49113fbd2a985ce80",
+  "status": "ALL_SCOPED_TEST_FILES_PASSED",
+  "execution": "Separate subprocess per test file; assertions unchanged",
+  "files": [
+    {
+      "file": "test_gui_compact_context",
+      "returncode": 0,
+      "elapsed_s": 9.141,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "d5231d6c2afeb3678b8fe700640938aad1355ae65834605e3e279875b7342a1b",
+      "test_source_sha256": "d62d326412946ef408ba786e85f215c497aefb7c4b126053ea02059351ca03e3"
+    },
+    {
+      "file": "test_gui_calibration_target",
+      "returncode": 0,
+      "elapsed_s": 57.062,
+      "passed": 5,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "a4a6cd19e438531eafc9d9fed05dd2d698beab8e55592b728091d926c44d585b",
+      "test_source_sha256": "f556853f03180db2357c54bf4681528c7a6b501b8a8b503b2edca3424c6ca781"
+    },
+    {
+      "file": "test_gui_session_guard",
+      "returncode": 0,
+      "elapsed_s": 67.453,
+      "passed": 8,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "29dfef0a4474eafec6a7704662e4d0bd92c454c34b9c9b05cce94f5655da1395",
+      "test_source_sha256": "a9dd74167c390c3f9e6ee94b8d79aaf19e05f1a54fb64ee6ec69159a38a07720"
+    },
+    {
+      "file": "test_gui_report_worker",
+      "returncode": 0,
+      "elapsed_s": 10.266,
+      "passed": 4,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "7ab9f3040d69c0831b927c5651eec5f9e4b362a1a814c54e9a9e7e42354c4b80",
+      "test_source_sha256": "f40ab1cc7120769918fc6f6f9b68b4c85e460148ef15bdd94188b6374003df5e"
+    },
+    {
+      "file": "test_gui_report_bundle",
+      "returncode": 0,
+      "elapsed_s": 10.812,
+      "passed": 4,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "9657c60e563f7f314920540ad918418d75610e74efa47c25346aaddf10fafcec",
+      "test_source_sha256": "e57807cd61f765546175858b835fc40567ea9f1249718068b898a83b444f4e7f"
+    },
+    {
+      "file": "test_instrument_provenance",
+      "returncode": 0,
+      "elapsed_s": 18.297,
+      "passed": 14,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "58efb4276d2ede6af97bc810a1f5683d62dc85d50f4e9fddf91c33c12655be3a",
+      "test_source_sha256": "6363e3c2d939580afc28e9acbc6ec011c53a4309bc8d61f8eed65290899bef5f"
+    },
+    {
+      "file": "test_predictive_dashboard_qt",
+      "returncode": 0,
+      "elapsed_s": 9.609,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "7d8a959de7b0d4eb36068c6cb76f84ccbdf5669cf849d2fceb51ec3bb5586ba1",
+      "test_source_sha256": "11234e716da9e71beacf59f7c28fcbda10f404ccd954cafc3a1898160c48778a"
+    }
+  ],
+  "total_passed": 37
+}

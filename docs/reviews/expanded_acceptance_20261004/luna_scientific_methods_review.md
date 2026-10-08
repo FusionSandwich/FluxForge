@@ -13,4 +13,3 @@ The qualification limits are material and should travel with any integration. QG
 ## Usage and validation status
 
 The APIs and bounded examples are present, but these new methods remain opt-in analysis/example functionality; the production workflow/UI does not thereby gain qualified QG parity or scientific admission. No current engine result from these primitives should be described as physically admitted. I did not rerun the focused tests per the read-only bounded-review request; this receipt records source inspection only. The prior example documentation and receipts explicitly preserve unavailable vendor methods/uncertainties rather than filling them with assumptions.
-

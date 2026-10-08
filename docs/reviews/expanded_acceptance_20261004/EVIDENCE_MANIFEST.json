@@ -1,6 +1,6 @@
 {
   "analysis_revision": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
-  "gui_revision": "5a1ffca4f631205b10ee8a4815134d55d27d1915",
+  "gui_revision": "2f915f3f1e462273d17350d49113fbd2a985ce80",
   "files": {
     ".gitattributes": {
       "bytes": 8,
@@ -26,13 +26,37 @@
       "bytes": 1182,
       "sha256": "5e2cf0cf799d1eeb2500ff95cdfb071a7403af6fdb6f24fa480932fda3a38552"
     },
+    "final_gui_checks_20261008.json": {
+      "bytes": 1121,
+      "sha256": "f84ddeb6f4517de08bcd6568108f28da4bd89922d444bd616de706abd51b4d40"
+    },
+    "final_gui_isolated_20261008.json": {
+      "bytes": 2775,
+      "sha256": "a46fe1776ea54daa8e10895e0354c4bc177082237acf77ae37cdc8c1d427d2f1"
+    },
+    "final_measured_unfolding_start.png": {
+      "bytes": 83825,
+      "sha256": "afdcdeff7bcd7c3c1cf4b9eb7e0082a77614d7bc625512ffc05026780ea0a8f6"
+    },
+    "final_new_gui_source_campaign.png": {
+      "bytes": 158522,
+      "sha256": "cfd39ad5e1174d7c258f4ce513aa3e43a4790afdce2282bcc296034513d6fbad"
+    },
+    "final_qt_native_gui_20261008.json": {
+      "bytes": 1025,
+      "sha256": "0e126885311ab5aea5af8a0a01db469c3a89bbad3f08c66e71c815afcfab181b"
+    },
+    "final_source_campaign_report_preview.png": {
+      "bytes": 109396,
+      "sha256": "0582c6c13afd9ace7cb4ae770da27b3c58e2265280170e5081c2bcc77a91be78"
+    },
     "inl_and_planning_receipt.json": {
       "bytes": 810,
       "sha256": "5e98e05cf602cdc224ba4d12dbccdf51cfd707c2914109d7f82f7dc14ecb6573"
     },
     "latest_gui_source_bridge.json": {
-      "bytes": 802,
-      "sha256": "4ff0531a678cc814fd83521cfd6e1703c09d6f4357d10c1ffab3e5600480ca68"
+      "bytes": 1996,
+      "sha256": "2793af7360c8394ef3232cfd14d2db526161d36d53e0d8622dbdc0264bf844b0"
     },
     "latest_measured_unfolding_start.png": {
       "bytes": 83825,
@@ -50,21 +74,37 @@
       "bytes": 89269,
       "sha256": "60023737a63488c8ade61263c4f5bbedfe9cfbe35d929f4edf03d865eebe67d4"
     },
+    "luna_compact_final_review.md": {
+      "bytes": 1223,
+      "sha256": "7f4d6bbfb12e6081bc627a0a4ebf8a1beff2d651772249c8cc1eb1d410600ac9"
+    },
+    "luna_final_provenance_fix_review.md": {
+      "bytes": 1293,
+      "sha256": "1feba927eab98a0a6e9749a07af29029765c7c106363d11901fa6ca1c2eaa062"
+    },
+    "luna_gui_width_followup_review.md": {
+      "bytes": 1576,
+      "sha256": "ef74903cbcb5ea155e72b63449181723134ed0056139b849a7f8b0f201646a39"
+    },
     "luna_integration_review.md": {
-      "bytes": 2843,
-      "sha256": "3e8f405a3ee559799d4dddc3b9b7fa97aca151afc25dd9959c32c5f9704a7e42"
+      "bytes": 2841,
+      "sha256": "3d08342fb104b2df45ccec66dc3da1a1bb544797589d1520e5a22a7d88a6a059"
+    },
+    "luna_latest_gui_final_integration_review.md": {
+      "bytes": 3240,
+      "sha256": "524dd0e9e36f7a9533dd1b0cfc6d237a6962e1397a6c042f6b9f4ddb833f457c"
     },
     "luna_latest_gui_review.md": {
-      "bytes": 2224,
-      "sha256": "33319e51acd3eea2265dd2252d8ef1c6dd8183bbc67609465d3eb850e57f04e5"
+      "bytes": 2223,
+      "sha256": "3c83e216d305e9c6b6a511998bc8a074b865266a2f6036638faf993e34e1d13b"
     },
     "luna_scientific_methods_review.md": {
-      "bytes": 3140,
-      "sha256": "d53c953e734db88e3a4653f9633d94521d378b2dfa6a42024f31c635c054cde7"
+      "bytes": 3138,
+      "sha256": "97aebec372c67e0d4ce11a97f048553877efe8c2dd306510cdde167c598bcca2"
     },
     "luna_south_poisson_review.md": {
-      "bytes": 2574,
-      "sha256": "290e1d372e60fe57f18cee036d02a513d55fa1b420d919dedf1b26494eb4170e"
+      "bytes": 2573,
+      "sha256": "8a9ce54ac380a2f7a4aa903e05d1deaf33a40c9657e93aa600c2b472a273db6b"
     },
     "measured_unfolding_start.png": {
       "bytes": 83825,
@@ -96,5 +136,5 @@
     }
   },
   "scientific_admission": false,
-  "note": "Retains earlier evidence plus later GUI-specific checks; numerical replay is not relabeled"
+  "note": "Preserves earlier evidence and source epochs; final GUI checks do not relabel numerical replay"
 }

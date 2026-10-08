@@ -9,7 +9,7 @@ absolute activity, reaction rate, or neutron spectrum.
 
 This review uses analysis revision `d017a7162d51d97ef3e50fac98a0c748337b9ccb`.
 The subsequent South pilot does not change package analysis sources. Later Qt
-fixes at `5a1ffca4f631205b10ee8a4815134d55d27d1915` change four GUI files; numerical
+fixes through `2f915f3f1e462273d17350d49113fbd2a985ce80` change seven GUI files; numerical
 analysis sources used by the replay remain unchanged. Public receipts and screenshots are in
 [`expanded_acceptance_20261004`](expanded_acceptance_20261004/EVIDENCE_MANIFEST.json).
 Original inputs, full local outputs, failed attempts, and earlier reviews remain
@@ -88,8 +88,7 @@ Workspace and viewport remain unchanged. All 120 unavailable instrument fields
 remain in the snapshot; the compact status display does not invent settings or
 allow an incomplete instructional export. The later native probe repeats this
 30-spectrum/report check at `5a1ffca`; its receipt and screenshots use the
-`latest_` prefix. The updated GUI is open at that revision in a new interactive
-session. The earlier interactive session remains preserved with its original state.
+`latest_` prefix. That GUI was opened during the October 4 review. The October 8 verification below uses the newer code; earlier session artifacts are preserved.
 
 ## Source inventory and sample outcomes
 
@@ -145,3 +144,42 @@ South pilot, and the later GUI fixes and found no concrete software blocker. The
 identify their scope and state that Luna did not rerun the tests. They preserve
 method assumptions and two non-blocking maintenance cautions concerning exact
 prose-based unavailable-rate classification and older historical metadata names.
+
+## Final GUI integration, October 8
+
+The latest local GUI update `1070ff3` was incorporated as `e3801d1`, adding
+Save/Discard/Cancel protection for dirty sessions at close, session replacement,
+example loading and reset. Report rendering/export uses a worker with a detached
+snapshot captured on the GUI thread, and the dialog and main window wait for
+active export workers before closing. Reused acquisition IDs cannot carry manual
+instrument overrides into a different acquisition. The inspector context scrolls.
+
+The earlier Linux CI width failure at `966dcba` remains recorded rather than
+relabeled as a pass. The width fix `89efc2f` separates six canvas buttons into two
+rows and keeps full status text in tooltips. Final fix `91ea0d2` also scrolls the
+Forecasts tab, keeps metadata on one shrinking line, and preserves a 120-pixel
+plot floor. This resolves the hidden forecast panel forcing an 863-pixel window.
+The imported session test now creates a valid ROI with both background sidebands.
+Luna identified text encoding damage during edits; it was corrected before the
+final source commit, and the original Unicode strings are preserved.
+
+All six native Windows compact/calibration tests pass at the final GUI code
+revision, including 1280 by 720 operation, reachable canvas and forecast controls,
+selection-safe calibration, stale-acquisition rejection and undo. The final native
+30-spectrum GUI/report probe again verifies one plot, nine tables, three hashed
+bundle files, unchanged workspace and viewport, and all 120 missing instrument
+fields with scientific admission disabled. The final captures and receipts use
+the `final_` prefix. All 37 checks across the seven affected GUI test files pass in separate processes
+at `2f915f3`, avoiding accumulated Qt stylesheet work across closed windows.
+The prior 37-test width scope overlaps and must not be summed as a unique suite.
+A combined development probe found an empty manual-override record after replacement;
+`2f915f3` removes completely blank overrides and tests calibration preservation,
+same-ID acquisition replacement and reload. A generic test-window cleanup experiment
+caused a Qt abort and was fully reverted; failed and stopped probes remain preserved.
+
+Luna source-reviewed the width fix, worker/session integration and compact fix.
+The encoding finding is resolved; no remaining software blocker was found in
+those scopes. Luna did not independently rerun the tests. Numerical package
+sources remain byte-identical to the 30-acquisition replay at `d017a71`; seven
+subsequent package changes are confined to GUI files. The source bridge binds
+those GUI bytes and retains the original replay revision and 3/26/1 outcomes.

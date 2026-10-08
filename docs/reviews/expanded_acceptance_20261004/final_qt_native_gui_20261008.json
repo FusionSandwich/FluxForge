@@ -1,0 +1,25 @@
+{
+  "status": "CURRENT_QT_GUI_AND_REPORT_BUNDLE_VERIFIED",
+  "git_head": "2f915f3f1e462273d17350d49113fbd2a985ce80",
+  "window_class": "FluxForgeMainWindow",
+  "qt_platform": "windows",
+  "legacy_imported": false,
+  "loaded_source_spectra": 30,
+  "source_session_sha256": "ff890f8be8a6a006d0f8fbb4cfb3206576815ce27ceb09de6efcb7fe58b06bb3",
+  "guided_analysis_toolbar": true,
+  "measured_unfolding_starts_empty": true,
+  "run_disabled_until_measured_inputs": true,
+  "bundle_sha256": "59b713c0b09bb078fb1d4a5207c8da3ccb59042abc0e2426f1ef223f0537aa9d",
+  "bundle_files_verified": 3,
+  "workspace_unchanged": true,
+  "viewport_unchanged": true,
+  "views": 1,
+  "tables": 9,
+  "missing_instrument_fields": 120,
+  "scientific_admission": false,
+  "limits": [
+    "Import, rendering and report export exercised; full analysis accuracy is assessed separately",
+    "Instrument settings remain unavailable rather than invented for source acquisitions",
+    "Native-only acquisitions are not replaced with invented ASC spectra"
+  ]
+}

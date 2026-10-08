@@ -1,0 +1,33 @@
+{
+  "tests": {
+    "gui_cross_platform_width_fix": {
+      "passed": 37,
+      "xml_sha256": "386e3fe74fcd76c64e0529bae5f1c05644618023495990b81c9d459f19c1b51a",
+      "scope": "prior width fix, before session/export integration"
+    },
+    "final_native_compact_20261008": {
+      "passed": 6,
+      "xml_sha256": "ca73bc6d132bc6a5a3454d5197f4b0344b86cbf0aaf4edbdc54ec43e9d2f57e0",
+      "scope": "final code revision, native Windows"
+    }
+  },
+  "groups_overlap": true,
+  "prior_ci_failure": {
+    "commit": "966dcba2aa7ffdd2be17ff7484685d232b349b76",
+    "run_id": 37184880382,
+    "job_id": 111384625369,
+    "test": "test_main_window_can_shrink_to_laptop_width",
+    "observed_width": 1297,
+    "maximum_allowed": 1280
+  },
+  "superseded_attempts": [
+    "compact_context_initial_20261008.xml",
+    "compact_width_height_fixed_20261008.xml",
+    "final_gui_integration_fixed_20261008.xml",
+    "session_guard_initial_20261008.xml",
+    "initial_combined_gui_probe_stopped.json",
+    "final_gui_integration_fixed2_20261008.xml",
+    "reverted_test_cleanup_probe.json"
+  ],
+  "scientific_acceptance_complete": false
+}
