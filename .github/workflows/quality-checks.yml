@@ -287,4 +287,4 @@ jobs:
       - name: Install ML test dependencies
         run: python -m pip install -e '.[dev,ml]'
       - name: Check ANN construction, inference, training and persistence
-        run: pytest -q tests/test_naa_ann.py tests/test_naa_ann_4e_dataset.py>>>>>>> origin/codex/adversarial-acceptance-20261002
+        run: pytest -q tests/test_naa_ann.py tests/test_naa_ann_4e_dataset.py
