@@ -11,7 +11,7 @@ from zipfile import ZipFile
 import PySide6
 
 BASELINE = "57eac3d801e2ac00fcaa6e16e8cedef36e9929aa"
-root = Path(__file__).resolve().parents[1]
+root = Path(__file__).resolve().parents[3]
 subprocess.run(["git", "fetch", "--depth=1", "origin", BASELINE], cwd=root, check=True)
 with tempfile.TemporaryDirectory(prefix="fluxforge-qt-baseline-") as directory:
     temporary = Path(directory).resolve()

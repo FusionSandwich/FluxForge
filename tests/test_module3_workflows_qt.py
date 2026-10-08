@@ -51,7 +51,9 @@ def test_main_window_opens_qa_history_and_exports_csv(tmp_path):
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt module-3 workspace dependencies are unavailable.",
 )
-def test_main_window_opens_report_export_and_writes_html(tmp_path, wait_for_report_export):
+def test_main_window_opens_report_export_and_writes_html(
+    tmp_path, wait_for_report_export
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
