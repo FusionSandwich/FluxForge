@@ -7,7 +7,12 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 pytest.importorskip("PySide6")
 pytest.importorskip("pyqtgraph")
 from PySide6.QtWidgets import QApplication, QScrollArea  # noqa: E402
-from fluxforge.gui import FluxForgeMainWindow, ModeManager, SelectionBus  # noqa: E402
+from fluxforge.gui import (  # noqa: E402
+    FluxForgeMainWindow,
+    GUIMode,
+    ModeManager,
+    SelectionBus,
+)
 
 
 class MemorySettings:
@@ -24,12 +29,20 @@ class MemorySettings:
         pass
 
 
-def test_context_scrolls_on_720_pixel_desktop():
+@pytest.mark.parametrize("mode", [GUIMode.SIMPLE, GUIMode.EXPERT, GUIMode.STANDARDS])
+@pytest.mark.parametrize("theme", ["dark", "light"])
+def test_context_scrolls_on_720_pixel_desktop(mode, theme):
     app = QApplication.instance() or QApplication([])
     settings = MemorySettings()
+    manager = ModeManager(settings=settings)
+    manager.set_theme(theme)
+    if mode is GUIMode.STANDARDS:
+        manager.set_standard("ASTM E181")
+    else:
+        manager.set_mode(mode)
     window = FluxForgeMainWindow(
         settings=settings,
-        mode_manager=ModeManager(settings=settings),
+        mode_manager=manager,
         selection_bus=SelectionBus(),
         load_example=True,
     )
