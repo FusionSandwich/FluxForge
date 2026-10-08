@@ -39,6 +39,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             QLabel,
             QMenu,
             QPushButton,
+            QSizePolicy,
             QVBoxLayout,
             QWidget,
         )
@@ -134,16 +135,22 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.header_label.setObjectName("CanvasHeader")
             header.addWidget(self.header_label)
 
-            header.addStretch(1)
-
             self.status_label = QLabel("No spectrum loaded", self)
             self.status_label.setObjectName("CanvasMeta")
-            header.addWidget(self.status_label)
+            self.status_label.setWordWrap(False)
+            self.status_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+            header.addWidget(self.status_label, 1)
 
             self.crosshair_readout = QLabel("x -- | y --", self)
             self.crosshair_readout.setObjectName("SpectrumCrosshairReadout")
+            self.crosshair_readout.setWordWrap(False)
+            self.crosshair_readout.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
             self.crosshair_readout.setVisible(False)
-            header.addWidget(self.crosshair_readout)
+            header.addWidget(self.crosshair_readout, 1)
+
+            shell.addLayout(header)
+            header = QHBoxLayout()
+            header.setContentsMargins(0, 0, 0, 0)
 
             self.crosshair_button = QPushButton("Crosshair", self)
             self.crosshair_button.setObjectName("SpectrumCrosshairButton")
@@ -168,6 +175,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.clear_roi_button.setObjectName("SpectrumClearRoiButton")
             self.clear_roi_button.clicked.connect(self._clear_roi)
             header.addWidget(self.clear_roi_button)
+            header.addStretch(1)
+            shell.addLayout(header)
+            header = QHBoxLayout()
+            header.setContentsMargins(0, 0, 0, 0)
 
             self.zoom_in_button = QPushButton("Zoom +", self)
             self.zoom_in_button.setObjectName("SpectrumZoomInButton")
@@ -193,11 +204,13 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.reset_view_button.clicked.connect(self.reset_view)
             header.addWidget(self.reset_view_button)
+            header.addStretch(1)
 
             shell.addLayout(header)
 
             self.plot = pg.PlotWidget(self)
             self.plot.setObjectName("SpectrumPlot")
+            self.plot.setMinimumHeight(120)
             self.plot.setBackground("#0f172a")
             self.plot.showGrid(x=True, y=True, alpha=0.14)
             self.plot.setMenuEnabled(False)
@@ -327,8 +340,11 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
         def set_traces(self, traces: Sequence[SpectrumTrace]) -> None:
             if not traces:
                 self.clear()
+                if self.selection_bus is not None:
+                    self._on_selection_changed(self.selection_bus.state)
                 return
 
+            first_nonempty_load = not self._current_traces
             self._current_traces = tuple(traces)
             self._x_axis_is_energy = traces[0].x_axis_label.lower().startswith("energy")
             self.plot.setLabel("bottom", traces[0].x_axis_label)
@@ -371,8 +387,13 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 f"{len(values):,} channels · {len(self.buffer.levels)} LOD levels · "
                 f"{visible_labels}"
             )
+            self.status_label.setToolTip(self.status_label.text())
             if self._annotation_specs:
                 self.set_annotation_lines(self._annotation_specs)
+
+            if first_nonempty_load:
+                self.plot_item.enableAutoRange(x=True, y=True)
+                self.plot_item.autoRange()
 
         def set_reference_lines(self, energies_keV: Sequence[float]) -> None:
             self.set_annotation_lines(
@@ -1375,8 +1396,11 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.crosshair_readout.setText(
                 f"x {float(data_position.x()):.3f} | y {float(data_position.y()):.3f}"
             )
+            self.crosshair_readout.setToolTip(self.crosshair_readout.text())
 
         def clear(self) -> None:
+            self._viewport_commit_timer.stop()
+            self._interaction_spectrum_id = None
             self._replace_roi_items(())
             self._peak_overlays_by_id = {}
             self._selected_roi_id = None
@@ -1390,6 +1414,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.set_peak_candidates(())
             self.set_peak_residuals((), visible=False)
             self.status_label.setText("No spectrum loaded")
+            self.status_label.setToolTip(self.status_label.text())
             self._roi_region.setVisible(False)
             self.roi_button.setChecked(False)
 

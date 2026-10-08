@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -135,7 +136,12 @@ def test_raw_flux_wire_parity():
     assert RAW_DIR.exists(), f"Raw directory missing: {RAW_DIR}"
     assert BACKGROUND_ASC.exists(), f"Background fixture missing: {BACKGROUND_ASC}"
 
-    comparisons, missing = compare_raw_to_processed(tolerance=0.01)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        comparisons, missing = compare_raw_to_processed(tolerance=0.01)
+    assert not any(
+        "no background spectrum was provided" in str(item.message) for item in caught
+    )
     assert comparisons, "No raw/processed comparisons generated"
     assert not missing, f"Missing isotopes in raw analysis: {missing}"
 

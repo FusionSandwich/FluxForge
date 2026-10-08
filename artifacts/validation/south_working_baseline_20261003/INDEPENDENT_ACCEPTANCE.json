@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-03",
+  "reviewer": "independent GPT-6 Sol agent south_baseline_acceptance",
+  "disposition": "ACCEPT_for_conditional_working_comparison",
+  "root_confirmed_input_pins": 13,
+  "scope": [
+    "Same-physical-count QG line refits",
+    "Explicitly assumed South 25 cm recovered-curve scenarios",
+    "Exploratory QG-conditioned response knots",
+    "Source-preserving Sc48 central-yield alternatives",
+    "Existing identity/timing joins and explicitly separate EOI scenarios"
+  ],
+  "decisive_checks": [
+    "Formula and unit conversion consistency",
+    "288 ROI rows, 268 accepted same-count anchors, 14 ambiguous-intensity exclusions",
+    "Fe-Cd near-contact count excluded from pooled 25 cm curve",
+    "32 physical count identities and 31 source-report hashes preserved",
+    "12 Sc48 rows preserve QG activities and separate count-average/start conventions",
+    "No fabricated uncertainty floors or promotion of algebraic agreement to independent calibration"
+  ],
+  "limits": [
+    "Low-energy response/export ratio reaches about 1.28 at 100.1 keV",
+    "Empirical response can include historical attenuation and processing",
+    "No independently quantified shared-response or gamma-yield covariance",
+    "This acceptance does not qualify absolute neutron flux or transport C/E"
+  ],
+  "root_review": "Accepted within the user's QG-conditioned working-reference instruction; focused failure-path verification PASS. Reviewer's reported input count 14 was reconciled to the 13 entries actually in provenance.json."
+}

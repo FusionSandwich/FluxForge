@@ -212,11 +212,11 @@ In PowerShell, use a Windows output directory:
 | `fluxforge` | Main CLI and command discovery |
 | `fluxforge gui` | Recommended modern Qt GUI launch path |
 | `fluxforge-gui` | Direct modern Qt GUI launcher |
-| `fluxforge-gui-legacy` | Archived Tk interface for explicit migration testing |
 
-The Qt GUI is the supported default. FluxForge never falls back to the archived
-Tk interface automatically; its launcher remains available only for explicit
-migration and regression workflows.
+The Qt GUI is the sole supported desktop interface. The former Tk interface
+is preserved as source in `archive/legacy_gui/` and is excluded from installed
+packages, native bundles, and normal CI. See the archive README for historical
+regression instructions.
 
 ## Troubleshooting
 

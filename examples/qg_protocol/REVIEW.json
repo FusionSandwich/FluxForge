@@ -1,0 +1,51 @@
+{
+  "review_type": "independent_sol_adversarial_component_review",
+  "issue": 236,
+  "reviewed_at_utc": "2026-10-04T03:13:21+00:00",
+  "verdict": "NO_BLOCKING_FINDINGS",
+  "scope": "Historical protocol parser/configuration, focused example, source provenance and physical/comparison count separation; root retains component acceptance judgment.",
+  "engine_head": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+  "required_engine_ancestor": "4615e61bbb262d974e0326a44107bc952e4cb903",
+  "tests": {
+    "command": "python -m pytest -q tests/test_qg_protocol.py",
+    "result": "44 passed in 4.09s"
+  },
+  "sha256": {
+    "src/fluxforge/analysis/qg_protocol.py": "11bfd4d8c164f646334b52f6fe665693ea83edd9fc98150e283e718126095f89",
+    "examples/qg_protocol/run_example.py": "2519b473ab1a3e0be0ec46ef72f2de35d786cb0cbd16ea7ab954e1a3cd75aaaa",
+    "tests/test_qg_protocol.py": "357f6649aabbe9227dc5b42f1042e253a1b6bb2651d13db70d8418bd9ac42e89",
+    "examples/qg_protocol/fixtures/manifest.json": "b6cddad727d3f2ce4ec75aa19b20fb05334f30c6ebf674f470de9dd00818af5d",
+    "examples/qg_protocol/EVIDENCE.json": "3f67ab0c5bc9bfc23536b7b49dfe651784698a46c4b15a54e5f4a8283ef0c5ed",
+    "independent_saved_settings_audit.json": "c63f9f6e095da6dcc0a86d4e4d8a36e150a45299122ac2304258d82a29942c4d"
+  },
+  "source_audit": {
+    "ans_files": 32,
+    "paired_reports": 31,
+    "ans_hashes_lengths_values_match_independent_audit": true,
+    "report_hashes_match_independent_audit": true,
+    "fixture_bytes_match_manifest": true,
+    "north_background_copy_matches_original_bytes": true,
+    "reused_engine_files_match_worktree_and_HEAD_canonical_lf_hashes": 4
+  },
+  "adversarial_checks": [
+    "Wrong revision, channel bounds, ROI record closure and source hashes reject.",
+    "Serialized false saved/report status rejects; a self-consistent altered header or spoofed digest rejects on verify_sources rebinding.",
+    "Unknown gamma intensities/corrections and other unsupported identities remain explicit null or unsupported status.",
+    "Raw-bin gross, local-continuum and variance oracle passes; physical counts remain independent of ambient and continuum comparison toggles.",
+    "Example output refuses overwrite and incomplete 32-file source set."
+  ],
+  "evidence": {
+    "saved_headers": 32,
+    "line_records": 2,
+    "physical_background_sha256": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+    "comparison_ambient_enabled": false,
+    "exact_vendor_parity": false,
+    "physical_defaults_changed": false
+  },
+  "bounds": [
+    "Saved headers do not establish final report correction controls or installed vendor version.",
+    "Physical North background applicability remains unestablished.",
+    "No activity, GammaLib yield/correction, efficiency fidelity or aggregation computation is claimed.",
+    "Restored serialized configuration requires verify_sources(original_bytes, report=...) before calculation."
+  ]
+}

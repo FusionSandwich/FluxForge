@@ -1,0 +1,92 @@
+{
+  "audit": "Independent read-only Luna verification",
+  "created_at_utc": "2026-10-03",
+  "workspace": "C:\\Users\\Josh\\.codex\\worktrees\\rafm-analysis-issues\\FluxForge",
+  "head": "92c3859484007bcd07b008539ef8f3be638af811",
+  "baseline": "1148e18a53a156d74029e84ed528e5fcd9cfd263",
+  "result": "accepted",
+  "source_edits_made": false,
+  "push_performed": false,
+  "hash_verification": {
+    "receipt_artifacts_checked": 32,
+    "artifact_mismatches": [],
+    "receipt_tools_checked": 2,
+    "tool_mismatches": [],
+    "final_runtime_sources_checked": 247,
+    "runtime_source_mismatches": [],
+    "antagonist_reviews": {
+      "activation": {
+        "accepted": true,
+        "source_hash_count": 7,
+        "source_hash_mismatches": []
+      },
+      "peaks": {
+        "accepted": true,
+        "source_hash_count": 4,
+        "source_hash_mismatches": []
+      },
+      "unfolding": {
+        "accepted": true,
+        "source_hash_count": 4,
+        "source_hash_mismatches": []
+      }
+    },
+    "raw_inputs_checked": 64,
+    "raw_inputs_equal_before_after": true
+  },
+  "test_reproduction": {
+    "affected_relevant_path_set": "161 passed",
+    "preserved_antagonist_suite": "74 passed",
+    "saved_xml_runs": {
+      "final_suite.xml": {
+        "tests": 415,
+        "failures": 1
+      },
+      "affected_final_suite.xml": {
+        "tests": 125,
+        "failures": 0
+      },
+      "antagonist_reproduction.xml": {
+        "tests": 74,
+        "failures": 0
+      },
+      "gui_activity_helper_tests.xml": {
+        "tests": 2,
+        "failures": 0
+      }
+    },
+    "reconciled_repository_test_identities": 444,
+    "reconciled_repository_passes": 444,
+    "gui_helpers": 2,
+    "repository_checks_including_gui": 446,
+    "distinct_total_with_antagonists": 520,
+    "saved_receipt_claim": 520
+  },
+  "source_review": {
+    "areas": [
+      "count-average activity uses real clock duration and applies live acceptance once",
+      "single-segment irradiation honors relative power",
+      "E262 divides each physical monitor measurement by its own target inventory",
+      "peak seeds are tolerance-bound and retry supported in-tolerance maxima after unusable fits",
+      "Gaussian/ML seed weighting whitens measurement and response rows together",
+      "NNLS fallback remains bounded and reports solver stopping state"
+    ],
+    "qg_comparison": "Reference-conditioned compatibility only; physical sample counts use measured signed background residual. Material differences remain documented.",
+    "scientific_admission": false,
+    "blockers": []
+  },
+  "scratch_or_uncommitted_outputs_observed": [
+    "artifacts/validation/analysis_issues_20261002/final_peak_inventory_tests.xml",
+    "artifacts/validation/analysis_issues_20261002/final_tests.log",
+    "artifacts/validation/analysis_issues_20261002/focused_tests.xml",
+    "artifacts/validation/analysis_issues_20261002/peak_parity_retry.xml",
+    "artifacts/validation/analysis_issues_20261002/rafm_after.json",
+    "artifacts/validation/analysis_issues_20261002/rafm_after.log",
+    "artifacts/validation/analysis_issues_20261002/rafm_before_seed_retry.json",
+    "scratch/antagonist_activation",
+    "scratch/antagonist_peaks",
+    "scratch/antagonist_unfolding",
+    "scratch/baseline"
+  ],
+  "recommendation": "Publish commits 320161a, 7485a65, and 92c3859 with committed artifacts/validation/analysis_issues_20261002. Exclude transient untracked replay/retry XML, logs, JSON and scratch directories listed above. This audit receipt is newly created evidence for parent review."
+}

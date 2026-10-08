@@ -7,8 +7,13 @@ import pytest
 from fluxforge.gui import QT_AVAILABLE, FluxForgeMainWindow, ModeManager, SelectionBus
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE
 from fluxforge.gui.dialogs.calibration_dialog import CalibrationWorkspaceDialog
+from fluxforge.gui.dialogs.covariance_dialog import CovarianceDialog
+from fluxforge.gui.dialogs.irradiation_history_dialog import IrradiationHistoryDialog
+from fluxforge.gui.dialogs.reaction_rate_dialog import ReactionRateDialog
+from fluxforge.gui.dialogs.spectrum_file_queue_dialog import SpectrumFileQueueDialog
 from fluxforge.gui.dialogs.efficiency_dialog import EfficiencyCalibrationDialog
 from fluxforge.gui.dialogs.unfolding_dialog import UnfoldingWorkspaceDialog
+from fluxforge.gui.dialogs.report_export_dialog import ReportExportDialog
 from fluxforge.gui.panels.modern_shell_shared import build_demo_spectrum
 from fluxforge.gui.production_contract import (
     ActionCatalogEntry,
@@ -136,7 +141,6 @@ def test_empty_production_workspace_does_not_open_demo_analysis_dialogs():
     for action_name in (
         "AutoFindPeaksAction",
         "OpenEnergyFwhmCalibrationAction",
-        "OpenSpectrumUnfoldingAction",
         "OpenPuIsotopicsAction",
         "RunAstmCheckAction",
         "WorkspaceOpenStandardsReviewAction",
@@ -149,7 +153,11 @@ def test_empty_production_workspace_does_not_open_demo_analysis_dialogs():
     window._open_standards_review()
     app.processEvents()
     assert window._calibration_dialog is None
-    assert window._unfolding_dialog is None
+    assert window._unfolding_dialog is not None
+    assert window._unfolding_dialog.workspace_input.measured_rates.size == 0
+    assert window._unfolding_dialog.current_result is None
+    assert not window._unfolding_dialog.run_button.isEnabled()
+    window._unfolding_dialog.close()
     assert window._standards_review_dialog is None
     window.close()
 
@@ -329,6 +337,11 @@ def test_machine_readable_action_catalog_matches_all_production_controls():
     window = _window()
     window.show()
     dialogs = (
+        ReportExportDialog(context_factory=window._build_report_context, parent=window),
+        CovarianceDialog(parent=window),
+        IrradiationHistoryDialog(parent=window),
+        ReactionRateDialog(history_provider=lambda: (), parent=window),
+        SpectrumFileQueueDialog(parent=window),
         CalibrationWorkspaceDialog(
             spectrum=build_demo_spectrum(),
             mode_manager=window.mode_manager,
@@ -403,12 +416,18 @@ def test_machine_readable_action_catalog_matches_all_production_controls():
         QSlider,
         QPlainTextEdit,
         QTextEdit,
+        QTableWidget,
     )
     actual_controls = []
     for control in window.findChildren(QWidget):
         if not isinstance(control, interactive_types):
             continue
         if is_developer_descendant(control):
+            continue
+        if (
+            isinstance(control, QTableWidget)
+            and control.editTriggers() == QTableWidget.NoEditTriggers
+        ):
             continue
         if isinstance(control, (QPlainTextEdit, QTextEdit)) and control.isReadOnly():
             continue

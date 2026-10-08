@@ -1,0 +1,1335 @@
+{
+  "schema": "fluxforge.issue_work_queue.v1",
+  "snapshot_date": "2026-10-03",
+  "base_ref": "origin/codex/adversarial-acceptance-20261002",
+  "coordination": {
+    "working_chat": "Address FluxForge GitHub issues",
+    "excluded": [
+      {
+        "chat": "Complete analysis issues",
+        "branch": "codex/activation-uncertainty-budget; owner actively auditing peak identification and QG zero-count rows",
+        "scope": "activation uncertainty, unfolding, peak detection and material counting"
+      },
+      {
+        "chat": "Check FluxForge features and samples",
+        "branch": "codex/adversarial-acceptance-20261002",
+        "scope": "acceptance/CI, peak recovery, calibration records, scientific source qualification"
+      },
+      {
+        "chat": "Archive old GUI and improve new one",
+        "branch": "codex/archive-legacy-gui",
+        "scope": "Tk archival and supported Qt workflows; published PR #218 integrated"
+      },
+      {
+        "chat": "Review old GUI issues",
+        "branch": "read-only issue audit",
+        "scope": "GUI backlog review and replacement issue drafts"
+      }
+    ]
+  },
+  "issues": [
+    {
+      "number": 9,
+      "title": "[Core] Add measured background subtraction API",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/9",
+      "status": "pending_integration",
+      "notes": ""
+    },
+    {
+      "number": 11,
+      "title": "[Core] Implement hybrid negative-bin policy with warnings",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/11",
+      "status": "pending_integration",
+      "notes": ""
+    },
+    {
+      "number": 13,
+      "title": "[IO] Unify calibration/efficiency override precedence in loaders",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/13",
+      "status": "pending_integration",
+      "notes": ""
+    },
+    {
+      "number": 14,
+      "title": "[Analysis] Integrate measured background into HPGe processor",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/14",
+      "status": "pending_integration",
+      "notes": ""
+    },
+    {
+      "number": 15,
+      "title": "[Analysis] Integrate measured background into flux-wire analysis",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/15",
+      "status": "pending_integration",
+      "notes": ""
+    },
+    {
+      "number": 16,
+      "title": "[Tests] Add RAFM background integration and regression coverage",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/16",
+      "status": "pending_integration",
+      "notes": ""
+    },
+    {
+      "number": 17,
+      "title": "[Docs] Publish RAFM runbook and user-facing warning guidance",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/17",
+      "status": "pending_integration",
+      "notes": ""
+    },
+    {
+      "number": 21,
+      "title": "[Environment] Provide one full Conda environment for FluxForge tests",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/21",
+      "status": "implemented_pending_integration",
+      "notes": "Complete Conda environment and runtime smoke supplied; frozen coverage 2052 passed, 26 skipped, 3 failed, no missing. Targeted follow-ups passed; full acceptance caveats retained."
+    },
+    {
+      "number": 24,
+      "title": "Improve Generic RAFM Peak Recovery and Identification",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/24",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 25,
+      "title": "Audit RAFM Peak and Activity Uncertainty Propagation",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/25",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 26,
+      "title": "Audit Measurement-Time Activity Parity Against QG",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/26",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 27,
+      "title": "Refine Low-Energy HPGe Profile Efficiency for RAFM 25 cm Data",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/27",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 28,
+      "title": "Audit QG Sc48 Export Inconsistency in Ti Flux-Wire Files",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/28",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 29,
+      "title": "Move Flux-Wire Product/Reaction Metadata Out of `flux_wire_analysis.py`",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/29",
+      "status": "implemented_pending_integration",
+      "notes": "Context-aware shared product catalog; 70 regression checks passed."
+    },
+    {
+      "number": 30,
+      "title": "Use Data-Backed Branching-Ratio Uncertainty in Flux-Wire Activity Calculations",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/30",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 31,
+      "title": "Externalize Flux-Wire Sample and Reaction Defaults from `flux_unfold.py`",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/31",
+      "status": "implemented_pending_integration",
+      "notes": "Nominal sample resources separated from reference data; 50 checks passed."
+    },
+    {
+      "number": 32,
+      "title": "Issue 24: Line-Level Efficiency and Activity Diagnostics",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/32",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 33,
+      "title": "Issue 25: QG Internal Consistency Audit",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/33",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 34,
+      "title": "Issue 26: Peak-Area Audit Against QG Counts",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/34",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 35,
+      "title": "Issue 27: RAFM 25 cm Detector Profile Bias",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/35",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 36,
+      "title": "Issue 28: Crowded-Region Isotope Mismatch Near 1189 keV",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/36",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 37,
+      "title": "Issue 29: QG Peak Gross/Net/Energy Side-by-Side Comparison",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/37",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 38,
+      "title": "Flux-Wire Raw Count Parity Split",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/38",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 39,
+      "title": "Flux-Wire Gross Count Protocol Gap",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/39",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 40,
+      "title": "Background Energy Alignment Before Subtraction",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/40",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 41,
+      "title": "Broad Peak Comparison ROI",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/41",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 42,
+      "title": "Manual ROI Spectrum Inspection",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/42",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 44,
+      "title": "Issue: GUI Validation: Covariance Correlation Heatmap",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/44",
+      "status": "implemented_pending_integration",
+      "notes": "Covariance/correlation GUI and PNG export; 26 focused checks plus 11 GUI/catalog regressions passed."
+    },
+    {
+      "number": 45,
+      "title": "Issue: GUI Pipeline: Irradiation History Inputs",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/45",
+      "status": "implemented_pending_integration",
+      "notes": "Validated GUI history editor; draft PR 217."
+    },
+    {
+      "number": 46,
+      "title": "Issue: GUI Pipeline: Activity to Reaction Rate Translator UI",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/46",
+      "status": "implemented_pending_integration",
+      "notes": "Activity/SigPhi workspace reuses integrated owner engine; 50 focused checks and 21 integration checks pass. Draft PR 217."
+    },
+    {
+      "number": 47,
+      "title": "Issue: GUI Pipeline: Unfolding Solver Launch Config",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/47",
+      "status": "queued",
+      "notes": "Existing solver workspace audited; real-time solver progress requires owner unfolding APIs. Preserve active ownership."
+    },
+    {
+      "number": 48,
+      "title": "Issue: GUI Batch: Spectrum Summing and Conversion",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/48",
+      "status": "implemented_pending_integration",
+      "notes": "Background folder queue with append/sum and covariance-preserving .ffs conversion; draft PR 217."
+    },
+    {
+      "number": 49,
+      "title": "Issue: GUI Export: Run Bundle PDF/HTML Report Generator",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/49",
+      "status": "implemented_pending_integration",
+      "notes": "Qt report bundles and acquisition provenance on codex/next-issue-batch-20261003, based on published Qt-only migration b618f5e with acceptance a4d1b24 integrated. See docs/GUI_REPORT_BUNDLES.md. Pending final checks and draft review."
+    },
+    {
+      "number": 50,
+      "title": "Issue: GUI Packaging: Spec and Build Scripts",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/50",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 51,
+      "title": "Issue: Implementation: ASTM E844 Dosimetry Schema and Traceability",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/51",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 52,
+      "title": "Issue: Implementation: ASTM E261 Radioactivation Rate Math & Uncertainty Prop",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/52",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 53,
+      "title": "Issue: Testing: E261 Fraction Uncertainty & E844 Schema Rules",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/53",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 54,
+      "title": "Issue: Example: End-to-End E844 Sensor Set to E261 Reaction Rate Matrix",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/54",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 55,
+      "title": "Issue: Implementation: IEC 61452 / ASTM E3376 Energy & FWHM Calibration Base",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/55",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 56,
+      "title": "Issue: Implementation: ASTM E3376 Polynomial Efficiency Curve Models",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/56",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 57,
+      "title": "Issue: Implementation: IEC 61452 Coincidence & Pile-Up Math",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/57",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 58,
+      "title": "Issue: Implementation: TECDOC-2026 k0-NAA Monitor Factors (f, alpha)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/58",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 59,
+      "title": "Issue: Implementation: k0-NAA Intermittent Irradiation & non-1/v",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/59",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 60,
+      "title": "Issue: Implementation: k0-NAA Mass Fraction Determination",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/60",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 61,
+      "title": "Issue: Implementation: TRS-487 Traceability & Library Stamping",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/61",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 62,
+      "title": "Issue: Implementation: TRS-487 Spectrum Interferences & Blank Handling",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/62",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 63,
+      "title": "Keep Main RAFM Workflow Automatic",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/63",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 64,
+      "title": "Generic flux-wire comparison-window scoring",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/64",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 65,
+      "title": "Issue: AA1.11 - Minimum detectable concentration calculator",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/65",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 66,
+      "title": "Generic RAFM count-parity background model",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/66",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 67,
+      "title": "Issue: AA1.12 - Analysis report bundle + checklist export",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/67",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 68,
+      "title": "Issue: AA1.13 - Instrument-settings provenance capture",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/68",
+      "status": "implemented_pending_integration",
+      "notes": "Qt report bundles and acquisition provenance on codex/next-issue-batch-20261003, based on published Qt-only migration b618f5e with acceptance a4d1b24 integrated. See docs/GUI_REPORT_BUNDLES.md. Pending final checks and draft review."
+    },
+    {
+      "number": 69,
+      "title": "Issue: AA1.14 - Quantitative discussion helpers",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/69",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 70,
+      "title": "Issue: AA1.1 - Teaching-spectrum import",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/70",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 71,
+      "title": "Issue: AA1.2 - Calibration source feature templates",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/71",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 72,
+      "title": "Issue: AA1.4 - Reference-assisted isotope identification",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/72",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 73,
+      "title": "Issue: AA1.5 - Batch calibrated spectrum plotting",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/73",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 74,
+      "title": "Issue: AA1.6 - Comparator-standard mass estimation",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/74",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 75,
+      "title": "Issue: AA1.7 - Single-element sample identity solver",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/75",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 76,
+      "title": "Issue: AA1.8 - Standard-type classification",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/76",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 77,
+      "title": "Issue: AA1.9 - Irradiation / decay / counting time planner",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/77",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 78,
+      "title": "Issue: B1.10 - Multicomponent deconvolution",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/78",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 79,
+      "title": "Issue: B1.11 - Library-directed multiplet seeding",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/79",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 80,
+      "title": "Issue: B1.12 - Linear continuum background",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/80",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 81,
+      "title": "Issue: B1.13 - AI/ML peak detection",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/81",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 82,
+      "title": "Issue: B1.7 - Derivative & Top-hat peak search",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/82",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 83,
+      "title": "Issue: B1.8 - Quadratic smoothing",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/83",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 84,
+      "title": "Issue: B1.9 - Dynamic ROI sizing",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/84",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 85,
+      "title": "Issue: C1.10 - Zero-count MDA reporting",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/85",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 86,
+      "title": "Issue: C1.9 - ROI-directed operation mode",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/86",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 87,
+      "title": "Issue: C10 - MCA acquisition plugin (future)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/87",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 88,
+      "title": "Issue: C11 - Dose rate + isotope ID workflows",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/88",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 89,
+      "title": "Issue: C12 - Gamma line synthesis from activities",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/89",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 90,
+      "title": "Issue: C13 - Cross section evaluation with covariances",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/90",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 91,
+      "title": "Issue: C14 - Expanded peak-finding algorithms",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/91",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 92,
+      "title": "Issue: C15 - Scintillation detector workflows",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/92",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 93,
+      "title": "Issue: C16 - ANN-based NAA workflow",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/93",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 94,
+      "title": "Issue: C17 - Additional unfolding libraries",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/94",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 95,
+      "title": "Issue: C18 - Guided instructional NAA workflow",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/95",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 96,
+      "title": "Issue: C19 - Calibration wizard for standard sources",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/96",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 97,
+      "title": "Issue: C1 - Desktop GUI spectrum viewer (pan/zoom, overlays, ROI edit)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/97",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 98,
+      "title": "Issue: C20 - Reference-assisted isotope ID workspace",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/98",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 99,
+      "title": "Issue: C21 - Comparator-standard mass worksheet",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/99",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 100,
+      "title": "Issue: C22 - Irradiation / decay / count-time planner",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/100",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 101,
+      "title": "Issue: C23 - MDA detection-limit worksheet",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/101",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 102,
+      "title": "Issue: C24 - Analysis checklist + figure-pack export",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/102",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 103,
+      "title": "Issue: C2 - ROI/peak workflows with multiplet deconvolution",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/103",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 104,
+      "title": "Issue: C3 - Energy/efficiency calibration UI",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/104",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 105,
+      "title": "Issue: C4 - Batch operations (sum/append/convert, ROI integration)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/105",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 106,
+      "title": "Issue: C5 - GUI-to-CLI macro recorder + project file",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/106",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 107,
+      "title": "Issue: C6 - Interactive CLI shell (HDTV-style)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/107",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 108,
+      "title": "Issue: C7 - Config-driven CLI tools (Neutron-Spectrometry-style)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/108",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 109,
+      "title": "Issue: C8 - STAYSL parity UI panels (SigPhi/SHIELD/BCF)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/109",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 110,
+      "title": "Issue: C9 - Online GUI/PWA (Gamma-MCA-style)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/110",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 111,
+      "title": "Issue: GUI Core: DearPyGui App Loop and Main Setup",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/111",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 112,
+      "title": "Issue: GUI Core: Asynchronous Thread Worker",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/112",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 113,
+      "title": "Issue: GUI Core: CLI Macro Transcript Logger",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/113",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 114,
+      "title": "Issue: GUI Ingest: Project Workspace Wizard",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/114",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 115,
+      "title": "Issue: GUI Ingest: Spectrum File Picker & Metadata Viewer",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/115",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 116,
+      "title": "Issue: GUI Viewer: Base Canvas and Pan/Zoom Controls",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/116",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 117,
+      "title": "Issue: GUI Viewer: Multi-Spectrum Overlays",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/117",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 118,
+      "title": "Title",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/118",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 119,
+      "title": "Issue: GUI Viewer: Interactive Cursor Readout",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/119",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 120,
+      "title": "Issue: GUI Viewer: Clickable Point Annotations",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/120",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 121,
+      "title": "Issue: GUI Viewer: Click-and-Drag ROI Bounding Boxes",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/121",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 122,
+      "title": "Issue: GUI Peaks: Peak Search Configuration Panel",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/122",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 123,
+      "title": "Issue: GUI Peaks: Linear Continuum Visualization",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/123",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 124,
+      "title": "Issue: GUI Peaks: Multiplet Deconvolution Display",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/124",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 125,
+      "title": "Issue: GUI Peaks: Peak Results Data Grid Table",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/125",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 126,
+      "title": "Issue: GUI Calibration: Interactive Energy Calibration Sliders",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/126",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 127,
+      "title": "Issue: GUI Calibration: Efficiency Library Picker",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/127",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 128,
+      "title": "Issue: GUI Calibration: Resolution FWHM Curve Plotter",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/128",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 129,
+      "title": "Issue: GUI Validation: Calculated vs. Expected Parity Plot",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/129",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 130,
+      "title": "GUI shell and docking framework",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/130",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 131,
+      "title": "Spectrum canvas and renderer abstraction",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/131",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 132,
+      "title": "File I/O, session model, and N42.42 export",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/132",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 133,
+      "title": "Nuclide library database",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/133",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 134,
+      "title": "Core spectroscopy workflows (calibration, fitting, ID, activity)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/134",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 135,
+      "title": "Standards and QA framework",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/135",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 136,
+      "title": "Unfolding workspace (GRAVEL + MAXED + RMLE + ML)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/136",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 137,
+      "title": "HAL, live acquisition, and dashboard foundation",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/137",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 138,
+      "title": "Reporting engine and packaging",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/138",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 139,
+      "title": "Plugin/registry architecture",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/139",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 140,
+      "title": "ADR: adopt PySide6 and additive capability policy",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/140",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 141,
+      "title": "ADR: renderer abstraction \u00e2\u20ac\u201d PyQtGraph first, Vispy optional",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/141",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 142,
+      "title": "ADR: Standards-mode design and user-choice policy",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/142",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 143,
+      "title": "ADR: plugin/registry architecture \u00e2\u20ac\u201d fitters, unfolding, calibration, ID",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/143",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 144,
+      "title": "Scaffold `MainWindow` with dockable zones A\u00e2\u20ac\u201cF",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/144",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 145,
+      "title": "Implement `ModeManager` (Simple / Expert / Standards)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/145",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 146,
+      "title": "Implement `SelectionBus` for coordinated multiple views",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/146",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 147,
+      "title": "Implement plugin registry base classes (all six registries)",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/147",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 148,
+      "title": "Implement `SpectrumCanvas` abstraction interface",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/148",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 149,
+      "title": "Implement PyQtGraph backend for `SpectrumCanvas`",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/149",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 150,
+      "title": "Add Vispy backend stub and renderer capability flags",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/150",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 151,
+      "title": "Define `Spectrum` session model and `.ffs` session file",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/151",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 152,
+      "title": "Define `MCADevice` abstract base class and mock device",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/152",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 153,
+      "title": "Implement reader factory and N42 / CHN / SPC / CNF / SPE / CSV readers",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/153",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 154,
+      "title": "Implement N42.42 (2012) export writer with XSD validation",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/154",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 155,
+      "title": "Build nuclide library SQLite schema with decay-chain support",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/155",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 156,
+      "title": "Implement nuclide search panel with FTS5 and instant overlay",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/156",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 157,
+      "title": "Implement peak table and canvas SelectionBus synchronization",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/157",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 158,
+      "title": "Implement calibration workspace shell with shared main canvas",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/158",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 159,
+      "title": "Implement Jinja2 report engine skeleton",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/159",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 160,
+      "title": "Scaffold ASTM standards module interface",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/160",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 161,
+      "title": "Scaffold QA monitor storage and history plot",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/161",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 162,
+      "title": "Scaffold unfolding workspace with algorithm registry",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/162",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 163,
+      "title": "Add test harness: sample spectra, regression snapshots, CI baseline",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/163",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 164,
+      "title": "Add dark/light theme QSS files and ModeManager theme hook",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/164",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 165,
+      "title": "Offline spectroscopy parity module",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/165",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 166,
+      "title": "Build repo-to-feature crosswalk and parity tracker matrix",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/166",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 167,
+      "title": "Implement peak-search, background, and ROI parity",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/167",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 168,
+      "title": "Implement calibration and efficiency parity workflows",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/168",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 169,
+      "title": "Implement identification, activity, and reference-data parity",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/169",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 170,
+      "title": "Implement operational calculator parity",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/170",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 171,
+      "title": "Implement archive, batch, and k0 parity workflows",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/171",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 172,
+      "title": "Curate repo-backed parity fixtures and manifests",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/172",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 173,
+      "title": "Add algorithm-level parity tests",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/173",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 174,
+      "title": "Add workflow-level parity tests",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/174",
+      "status": "reserved_or_existing_review",
+      "notes": "Overlaps active analysis/acceptance owner scope; audit published evidence before implementation."
+    },
+    {
+      "number": 175,
+      "title": "Implement direct-manipulation canvas parity",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/175",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 176,
+      "title": "Implement new parity workspaces in the modern Qt shell",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/176",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 177,
+      "title": "Implement GUI polish parity and saved themes",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/177",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 178,
+      "title": "Add GUI verification and artifact review for parity surfaces",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/178",
+      "status": "queued",
+      "notes": ""
+    },
+    {
+      "number": 185,
+      "title": "Physical GLS uses Gaussian reaction-label response instead of sample/Cd operator",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/185",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 186,
+      "title": "GLS covariance floor overwhelms measured-rate uncertainty",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/186",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 187,
+      "title": "Unfolding exports prior innovation as chi-squared and unconditional convergence",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/187",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 188,
+      "title": "RAFM GLS labels VITAMIN-J as prior but solves with generated prior",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/188",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 189,
+      "title": "Physical unfolding artifacts omit input provenance and holdout identities",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/189",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 190,
+      "title": "PyUnfold wrapper treats activation cross sections as probabilities",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/190",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 191,
+      "title": "RAFM method overlay compares incompatible and nonconverged unfoldings",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/191",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 192,
+      "title": "RAFM unfolding includes Ni-57 activity absent from QG report without admission review",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/192",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 193,
+      "title": "IRDFF response uses coarse built-in approximations; real IRDFF-II data is never read and missing reactions are silently dropped",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/193",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 194,
+      "title": "GRAVEL and MLEM row weighting depends on the units of each reaction row",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/194",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 195,
+      "title": "Iterative unfolding: chi2/dof, \"converged\" and flux uncertainty are not meaningful for underdetermined problems",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/195",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 196,
+      "title": "No Cd-cover transmission or self-shielding in any unfolding response; correction modules are orphaned",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/196",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 197,
+      "title": "Activity-to-rate conversion treats missing irradiation time as saturation and silently falls back to measurement-time activity",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/197",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 198,
+      "title": "Decay-during-count correction uses live time and can double-correct processed-report activities",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/198",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 199,
+      "title": "Reaction-rate uncertainty omits most components, applies silent ad hoc floors, and produces no covariance",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/199",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 200,
+      "title": "flux_unfold mixes flux and reaction-rate quantities; DISCRETE returns reaction rates labeled as flux",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/200",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 201,
+      "title": "RAFM Cd ratio divides raw summed activities without per-atom or decay normalization",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/201",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 202,
+      "title": "Add exact standard energy group structures (all OpenMC defaults, incl. VITAMIN-J-175 = ALARA 175); replace synthetic grids",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/202",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 203,
+      "title": "Physical GLS candidate: holdout validation impossible when observations share calibration covariance",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/203",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 204,
+      "title": "Silent physical defaults and unit fallbacks in the flux-wire reaction path",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/204",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 208,
+      "title": "Duplicate aggregation merges different physical monitor responses because identity keys omit inputs",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/208",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 209,
+      "title": "Invalid cover and shielding inputs silently remove attenuation in physical response construction",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/209",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 211,
+      "title": "Cached unfolding response ignores changed monitor physics and bypasses covered-input validation",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/211",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    },
+    {
+      "number": 214,
+      "title": "RMLE registry publishes arbitrary fixed 10% as Poisson unfolding uncertainty",
+      "url": "https://github.com/FusionSandwich/FluxForge/issues/214",
+      "status": "reserved_or_existing_review",
+      "notes": ""
+    }
+  ],
+  "validation_baseline": "869bff9 (latest acceptance-owner fixes integrated locally)"
+}

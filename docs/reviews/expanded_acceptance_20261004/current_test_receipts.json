@@ -1,0 +1,34 @@
+{
+  "scientific_integration_final": {
+    "receipt_sha256": "12f98748df97fbd42c5464764a446fc7a03877bba61d4a76677ed0e03bb9fc83",
+    "cases": 299,
+    "outcomes": {
+      "passed": 299
+    },
+    "scope": "Selected integration and workflow regressions; not the entire repository suite"
+  },
+  "integration_workflow_regression": {
+    "receipt_sha256": "668dfa3f505c400348ae18d9a317987916afe92d3557097eee638bb93637cd32",
+    "cases": 121,
+    "outcomes": {
+      "passed": 121
+    },
+    "scope": "Selected integration and workflow regressions; not the entire repository suite"
+  },
+  "subprocess_checkout_fix": {
+    "receipt_sha256": "416d2665db9861305acb4aaee380fb67df8a9757bae2517cfc5afea9f70c6a70",
+    "cases": 16,
+    "outcomes": {
+      "passed": 16
+    },
+    "scope": "Selected integration and workflow regressions; not the entire repository suite"
+  },
+  "south_poisson_current_final": {
+    "receipt_sha256": "7727fc650fe74352039b5ec7cc3036702f3280071ec4f6f70aa0f6da6a046bdc",
+    "cases": 91,
+    "outcomes": {
+      "passed": 91
+    },
+    "scope": "Selected integration and workflow regressions; not the entire repository suite"
+  }
+}

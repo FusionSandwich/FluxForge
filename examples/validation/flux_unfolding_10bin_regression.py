@@ -64,7 +64,7 @@ def load_background(raw_dir: Path):
 def load_model_spectrum(path: Path) -> Optional[Dict[str, np.ndarray]]:
     if not path.exists():
         return None
-    data = np.genfromtxt(path, delimiter=",", names=True)
+    data = np.genfromtxt(path, delimiter=",", names=True, encoding="utf-8-sig")
     if data.size == 0:
         return None
 

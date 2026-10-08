@@ -1,0 +1,20 @@
+{
+  "schema": "fluxforge.gui_report_bundle.v1",
+  "template": "standard_lab",
+  "captured_at": "2026-10-04T06:46:24.065140+00:00",
+  "scientific_admission": false,
+  "files": {
+    "report.html": {
+      "sha256": "01469c12a9c5f911ae34b98168d279daf15eabfade7272a61d5dae66507c5ae1",
+      "bytes": 97058
+    },
+    "views/000.png": {
+      "sha256": "e53337975155e992677d40ffa3112fdb2e3bf0153f52c9e8525a4b438f4bc4aa",
+      "bytes": 20271
+    },
+    "snapshot.json": {
+      "sha256": "dc026ce728b9f94486dbc95fe532ff1586caf55d966a1d95a56f89dbe8c53dc5",
+      "bytes": 22160605
+    }
+  }
+}

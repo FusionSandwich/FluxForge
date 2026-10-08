@@ -20,13 +20,15 @@ from fluxforge.gui import (
     register_builtin_render_backends,
 )
 from fluxforge.gui.backends import PYQTGRAPH_AVAILABLE, PyQtGraphSpectrumCanvas
-from fluxforge.gui.qt_compat import QApplication
 from fluxforge.gui.spectrum_canvas import ReferenceLine, SpectrumTrace
 from fluxforge.plugins import PluginRegistries
 
 ROOT = Path(__file__).resolve().parents[1]
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+if QT_AVAILABLE:
+    from fluxforge.gui.qt_compat import QApplication
 
 if QT_AVAILABLE and PYQTGRAPH_AVAILABLE:
     from PySide6.QtCore import QPoint, Qt
@@ -53,11 +55,11 @@ def _qapp():
     return QApplication.instance() or QApplication([])
 
 
-def test_describe_gui_scaffold_exposes_primary_and_legacy_entrypoints():
+def test_describe_gui_scaffold_exposes_primary_entrypoint_and_archive():
     scaffold = describe_gui_scaffold()
 
     assert scaffold["modern_entrypoint"] == "fluxforge-gui"
-    assert scaffold["legacy_entrypoint"] == "fluxforge-gui-legacy"
+    assert scaffold["archived_gui_source"] == "archive/legacy_gui"
     assert scaffold["renderer_backends"][0]["key"] == "pyqtgraph"
 
 
@@ -642,6 +644,7 @@ def test_spectrum_context_export_action_is_registered_with_stable_id():
     window.close()
 
 
+@pytest.mark.skipif(not QT_AVAILABLE, reason="Qt GUI dependencies are unavailable.")
 def test_modern_shell_reuses_shared_demo_and_selection_helpers():
     modern_shell_path = (
         ROOT / "src" / "fluxforge" / "gui" / "panels" / "modern_shell.py"

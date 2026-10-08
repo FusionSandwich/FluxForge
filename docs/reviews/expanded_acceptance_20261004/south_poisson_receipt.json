@@ -1,0 +1,61 @@
+{
+  "status": "BOUNDED_SOFTWARE_PILOT_COMPLETED",
+  "engine": {
+    "files_sha256": {
+      "pyproject.toml": "15d0653c6bdf6b8a0a92f3ceef29c52a4460f1504db0b9f1bbe77e0f3e232892",
+      "examples/RAFM_irradiation/south_joint_poisson_pilot.py": "3b6a22c4e2c5064d0eba988653a11500208f27e53dde7694a9a8e8e4021c88ff",
+      "examples/RAFM_irradiation/run_portable_qg_example.py": "5ce96dceca8aaae2d272641b9337ec685553538d84f9820717b4dc8fec5e4e60",
+      "src/fluxforge/analysis/joint_poisson.py": "bf93a1fcf5c9746ba7b69a5928a10328bca9dfb09618f317f453682daf29dd8d",
+      "src/fluxforge/analysis/flux_wire_analysis.py": "5b5fe5516ff0bdc630cdbbdc1b7672d7eb88e1b6c662c36f5d91cf3a8cfe6b32",
+      "src/fluxforge/analysis/peakfit.py": "497ee977a316b88a6d09a7dbfec21e6d372767eb3b63c21985c15cb564158070",
+      "src/fluxforge/analysis/spectrum_math.py": "d5bac0936affbac6175216e0034047e8fbef25d2e29c480db4583ac1dbd0a488",
+      "src/fluxforge/io/flux_wire.py": "1a6d2fad25f4ac7863da1eb5ac7677bd091c73a36a01edfcdafc3e82a814d377",
+      "src/fluxforge/io/spe.py": "e0924f1ae8a12d204ea551c05f749d823decb356432b281bc9e1fcbcfdaba618",
+      "src/fluxforge/data/rafm_profile.py": "164a05d1f33ec732f056e127f3a45eea02ca00623361c3f45799b74525063603",
+      "src/fluxforge/data/rafm_profiles.json": "7fb3ab63f303bd8bacc3117257ff518834d5845669e8bcc9c2dc7adf6587acea",
+      "src/fluxforge/data/xcom.py": "172df2c081e28bfb3660104b0738e5d0b338bdd427afa7ca5210e9d07d58ac45",
+      "src/fluxforge/core/calibration.py": "73ae21b6e04e5ae8a33877a076dd921476111508d6c42adc22a88e7038fda8c3",
+      "src/fluxforge/validation/example_identity.py": "938929de55a7f606001f468d56dff87351d122206b711ae388a44a7be30dbb7a"
+    },
+    "hash_basis": "canonical_lf_sha256",
+    "revision": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
+    "revision_status": "verified",
+    "required_ancestor": null,
+    "ancestor_verified": null,
+    "ancestor_status": "not_requested"
+  },
+  "complete_engine": {
+    "status": "IDENTIFIED_BY_CONTENT",
+    "source_sha256": "b7f74817d250eb42c16f1437bf88d565a2bf56a3e5ce9cb2a7b712e0c2361019",
+    "revision": null,
+    "file_count": 312,
+    "scope": "pyproject.toml, replay drivers present in this source, complete src/fluxforge tree",
+    "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+  },
+  "historical_integration_base": "701288a30f418ed7dc331e6deda0044eb220e72e",
+  "dataset_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+  "inputs_sha256": {
+    "examples/RAFM_irradiation/metadata/workflow_config.json": "bd5aa84389098048897b5026b9168c3424a21603963652ddef6efd49601be2c1",
+    "examples/RAFM_irradiation/quantumgold_reference/manifest.json": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+    "examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/manifest.json": "cbdc5672eb87d404af92a72f4d52d59221b80c01d3989cec0f4a03f6b5932dc3",
+    "src/fluxforge/data/rafm_profiles.json": "a272786f8ee8fd71beabd382b4dda900b99d4bf27d2e5a7e17281ad09b1da836",
+    "examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/South 4hr Background Terminal.ANS": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+    "examples/RAFM_irradiation/quantumgold_reference/originals/ANS/Co-Cd-RAFM-1.ANS": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+    "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Co-Cd-RAFM-1.ASC": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+    "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Co-Cd-RAFM-1.txt": "01670269434ea365fc9672196471f7a07ad9c8bf62f72669eb2f075236ce34b4"
+  },
+  "adequacy_counts": {
+    "strong_lack_of_fit": 24,
+    "unidentifiable": 2
+  },
+  "originals_byte_identical_after_run": true,
+  "scientific_admission": false,
+  "exact_vendor_parity": false,
+  "physical_inversion_qualified": false,
+  "outputs": {
+    "ambient_residuals.png": "a17419ea0837c9c60dc6b20457526989710257e7080cf30f348f9ba890ca7a87",
+    "comparison.csv": "93ab526abb26e4adf19aad38e0092b9c89667eb296b1fad11d6476c5c71afbb7",
+    "pilot.json": "0085426dc76b697c1564e1bc22107909907d4f1b71e42ba84dd48d7eb0e5781b",
+    "sample_residuals.png": "127c6b1959e2da54b68cdb74f8a32c605f6fcebe3989ea917c5a402fc2c0ce95"
+  }
+}

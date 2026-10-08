@@ -1,0 +1,111 @@
+ID:  S25aRAFM4                                                               
+
+File: RFM41             Date:  August 20, 2025 13:36:40
+LT:       3,600.00      RT:       4,111.80      DT:   12.4 %
+
+Calibrations:
+  Energy = -1.694E+00 +4.996E-01 * Ch  +6.710E-08 * Ch^2  (keV)
+  Efficiency = (Det. Model) * (C1 + C2*Log(E) + C3*Log(E)^2 + C4*Log(E)^3)
+    where Detector Model = A*Exp((-T1*U1-T2*U2-T3*U3-T4*U4-DL*U5) / Cos(AI))*
+                             (1-Exp(-DI*U5/Cos(AI)))
+    and E is Energy in keV
+      C1:             -2.026E+01
+      C2:             1.029E+01
+      C3:             -1.655E+00
+      C4:             8.666E-02
+
+    where the Ui are the appropriate linear mass absorption coefficients and
+      Geometry Factor (A):      3.48E-03    Al Window (T1):               1000.000 um
+      Detector Thickness (DI)   6.450 cm
+      Detector Dead Layer (DL): 700.000 um
+      Det. Incident Angle (AI): 0.000 deg
+
+Additional Detector Parameters
+      Detector ID:              South       
+      Detector Material:        HpGe(P)     Detector Shape:               Coaxial
+      Detector Diameter:        6.000 cm    Source Dist.:                 25.000 cm
+      Well Depth:               5.060 cm    Well Diameter:                0.920 cm
+  Resolution = 1.389E+00 +7.800E-04 * E  +-4.072E-08 * E^2 
+      FWHM at 661.66 keV = 1.89 keV
+Hardware Parameters
+  Hardware Device:           SYS8016:01 at Bus Address 0 Unit 0
+  Connected as Port:         0 using device handle  0 
+  Device type is             100
+  High Voltage:              1800, On       Bias Set Point:               1800
+  Bias Control Flags:        0xFF1
+  Amp Coarse Gain:           4              Amp Fine Gain:                1.000
+  Amp Shaping Type:          Unipolar Gaussian
+                                            Amp Shaping Time:             4.00 usec
+  Amp Pole Zero:             0.0 %          Amp Fast Thresh:              0.0 %
+  Amp Input Polarity:        Pos            Amp Pile Up Rejection:        Neg
+  Amplifier Control Flags:   0x8BD
+  ADC Group Size:            8,192          ADC Conversion Gain:          8,192
+  ADC Lower Level Disc:      0.95 %         ADC Upper Level Disc:         97.51 %
+  ADC Digital Offset:        0              ADC Zero:                     0.05 %
+  Dead Time Correction Mode: Lowes          ADC Gate Mode:                Off
+  ADC Operation Mode:        PHA
+  ADC Conversion Mode:       Linear         ADC Pile Up Rejector:         Pos
+  ADC Sync Mode:             Internal       External ADC Control Word:    0x0
+  Stabilizers
+    Type    Status    Range   Offset   Start Ch    End Ch    Assoc. ROI
+    Gain   Off        ±12.5%    0.00         0         0         0
+    Gain   Off        ±12.5%    0.00         0         0         0
+
+Library: GammaLib.mdb
+
+
+
+Library efficiencies were ignored
+
+Activities reported as of Measurement Date.
+
+NUCLIDES ANALYZED
+
+Ta182     114.430 d   B                                Activity = 19.918 ± 0.889 uCi
+  ROI        RAD      CENTER       GROSS              NET               ROI      Activity
+CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)
+    99.5   14.20      99.58   733,717 ± 857     289,117 ± 1,844  Ta182@ 100.1     11.891
+   113.2    1.87     113.18   457,383 ± 676      30,061 ± 1,676  Ta182@ 113.7      8.128
+   152.1    7.01     152.10   889,199 ± 943     177,439 ± 2,423  Ta182@ 152.4     11.641
+   156.3    2.67     156.27   332,981 ± 577      62,822 ± 1,069  Ta182@ 156.4     10.842
+   179.5    3.12     179.53   564,193 ± 751     100,464 ± 1,952  Ta182@ 179.4     15.310
+   198.7    1.47     198.59   466,044 ± 683      43,742 ± 1,906  Ta182@ 198.4     14.725
+   222.2    7.57     222.33   615,834 ± 785     246,766 ± 1,789  Ta182@ 222.1     16.926
+   229.6    3.64     229.55   423,848 ± 651     111,046 ± 1,617  Ta182@ 229.3     16.079
+   264.3    3.61     264.31   330,321 ± 575     111,403 ± 1,365  Ta182@ 264.1     17.579
+  1001.6    2.09    1001.71    95,769 ± 309      28,526 ± 817    Ta182@1001.7     22.826
+  1121.2   35.24    1121.29   482,230 ± 694     435,142 ± 952    Ta182@1121.3     22.697
+  1189.0   16.49    1189.01   219,650 ± 469     193,839 ± 682    Ta182@1189.0     22.650
+  1221.3   27.23    1221.36   356,202 ± 597     320,722 ± 843    Ta182@1221.4     23.169
+  1231.0   11.62    1231.00   157,989 ± 397     127,088 ± 695    Ta182@1231.0     21.642
+  1257.3    1.51    1257.34    30,097 ± 173      17,287 ± 406    Ta182@1257.4     23.029
+
+Fe59       44.495 d   B                                Activity = 9.053 ± 0.747 uCi
+  ROI        RAD      CENTER       GROSS              NET               ROI      Activity
+CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)
+   192.3    3.08     192.49   440,532 ± 664      34,658 ± 1,812  Fe59@ 192.3       5.481
+  1099.2   56.50    1099.25   316,407 ± 563     272,114 ± 832    Fe59@1099.2       8.708
+  1291.3   43.20    1291.43   221,344 ± 470     202,824 ± 638    Fe59@1291.6       9.623
+
+Cr51       27.703 d   B                                Activity = 185.0 ± 7.264 uCi
+  ROI        RAD      CENTER       GROSS              NET               ROI      Activity
+CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)
+   320.3    9.91     320.33 3,171,627 ± 1,781 2,855,549 ± 2,320  Cr51@ 320.1       185.0
+
+W187       23.900 h   B                                Activity = 0.182 ± 2.22E-02 uCi
+  ROI        RAD      CENTER       GROSS              NET               ROI      Activity
+CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)
+   480.1   26.60     479.79    76,369 ± 276       3,521 ± 812    W187@ 479.5       0.114
+   685.7   33.20     685.92    67,158 ± 259       6,118 ± 745    W187@ 685.8       0.217
+
+Mn54      312.120 d   B                                Activity = 0.544 ± 4.90E-02 uCi
+  ROI        RAD      CENTER       GROSS              NET               ROI      Activity
+CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)
+   834.8   99.98     834.92   127,074 ± 356      38,433 ± 962    Mn54@ 834.8       0.544
+
+Co60        5.271 a   B                                Activity = 0.103 ± 1.03E-02 uCi
+  ROI        RAD      CENTER       GROSS              NET               ROI      Activity
+CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)
+  1173.1   99.85    1173.17    24,256 ± 156       5,644 ± 438    Co60@1173.2       0.108
+  1332.3   99.98    1332.43    12,402 ± 111       4,732 ± 298    Co60@1332.5    9.91E-02
+

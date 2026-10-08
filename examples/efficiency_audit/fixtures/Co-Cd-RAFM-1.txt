@@ -1,0 +1,69 @@
+ID:  Co-Cd-RAFM-1 @25cm                                                      
+
+File: RAFM-1_25cm.ANS   Date:  August 28, 2025 09:55:22
+LT:     129,600.00      RT:     129,691.87      DT:   0.1 %
+
+Calibrations:
+  Energy = -1.694E+00 +4.996E-01 * Ch  +6.710E-08 * Ch^2  (keV)
+  Efficiency = (Det. Model) * (C1 + C2*Log(E) + C3*Log(E)^2 + C4*Log(E)^3)
+    where Detector Model = A*Exp((-T1*U1-T2*U2-T3*U3-T4*U4-DL*U5) / Cos(AI))*
+                             (1-Exp(-DI*U5/Cos(AI)))
+    and E is Energy in keV
+      C1:             -2.026E+01
+      C2:             1.029E+01
+      C3:             -1.655E+00
+      C4:             8.666E-02
+
+    where the Ui are the appropriate linear mass absorption coefficients and
+      Geometry Factor (A):      3.48E-03    Al Window (T1):               1000.000 um
+      Detector Thickness (DI)   6.450 cm
+      Detector Dead Layer (DL): 700.000 um
+      Det. Incident Angle (AI): 0.000 deg
+
+Additional Detector Parameters
+      Detector ID:              South       
+      Detector Material:        HpGe(P)     Detector Shape:               Coaxial
+      Detector Diameter:        6.000 cm    Source Dist.:                 25.000 cm
+      Well Depth:               5.060 cm    Well Diameter:                0.920 cm
+  Resolution = 1.389E+00 +7.800E-04 * E  +-4.072E-08 * E^2 
+      FWHM at 661.66 keV = 1.89 keV
+Hardware Parameters
+  Hardware Device:           SYS8016:01 at Bus Address 0 Unit 0
+  Connected as Port:         0 using device handle  0 
+  Device type is             100
+  High Voltage:              1800, On       Bias Set Point:               1800
+  Bias Control Flags:        0xFF1
+  Amp Coarse Gain:           4              Amp Fine Gain:                1.000
+  Amp Shaping Type:          Unipolar Gaussian
+                                            Amp Shaping Time:             4.00 usec
+  Amp Pole Zero:             0.0 %
+  Amp Input Polarity:        Pos            Amp Pile Up Rejection:        Neg
+  Amplifier Control Flags:   0x8BD
+  ADC Group Size:            8,192          ADC Conversion Gain:          8,192
+  ADC Lower Level Disc:      0.95 %         ADC Upper Level Disc:         97.51 %
+                                            ADC Zero:                     0.05 %
+  Dead Time Correction Mode: Lowes          ADC Gate Mode:                Off
+  ADC Operation Mode:        PHA
+  ADC Conversion Mode:       Linear         ADC Pile Up Rejector:         Pos
+  ADC Sync Mode:             Internal       External ADC Control Word:    0x0
+  Stabilizers
+    Type    Status    Range   Offset   Start Ch    End Ch    Assoc. ROI
+    Gain   Off        ±12.5%    0.00         0         0         0
+    Gain   Off        ±12.5%    0.00         0         0         0
+
+Library: GammaLib.mdb
+
+
+
+Library efficiencies were ignored
+
+Activities reported as of Measurement Date.
+
+NUCLIDES ANALYZED
+
+Co60        5.271 a   B                                Activity = 6.35E-03 ± 5.98E-04 uCi
+  ROI        RAD      CENTER       GROSS              NET               ROI      Activity
+CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)
+  1173.0   99.85    1173.13    28,478 ± 169      11,202 ± 520    Co60@1173.2    5.94E-03
+  1332.4   99.98    1332.44    20,514 ± 143      11,439 ± 396    Co60@1332.5    6.66E-03
+

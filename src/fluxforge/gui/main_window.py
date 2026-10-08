@@ -5,6 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from datetime import datetime
+from html import escape
+import json
 from pathlib import Path
 
 from fluxforge.gui.file_workflow import RecentFilesManager, normalize_dropped_paths
@@ -43,6 +45,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.backends import available_renderer_status
     from fluxforge.gui.dialogs import (
         CalibrationWorkspaceDialog,
+        CovarianceDialog,
+        IrradiationHistoryDialog,
+        ReactionRateDialog,
+        SpectrumFileQueueDialog,
         PuIsotopicsDialog,
         QAHistoryDialog,
         ReportExportDialog,
@@ -76,12 +82,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QSettings,
         QStatusBar,
         QToolBar,
+        QToolButton,
         QUndoStack,
         Qt,
     )
     from PySide6.QtWidgets import QMessageBox
     from fluxforge.gui.theme_manager import load_stylesheet, resolve_theme
     from fluxforge.gui.widgets import HardwareLedWidget, ModeSwitcherWidget
+    from fluxforge.gui.widgets.eliding_label import ElidingLabel
 
 
 @dataclass(frozen=True)
@@ -120,7 +128,7 @@ class MainWindowScaffold:
 
 
 def modern_gui_unavailable_message() -> str:
-    """Return the additive-launch guidance when Qt extras are absent."""
+    """Return the installation guidance when Qt extras are absent."""
 
     reason = (
         f"{type(QT_IMPORT_ERROR).__name__}: {QT_IMPORT_ERROR}"
@@ -154,7 +162,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         ) -> None:
             super().__init__(parent)
             self.setObjectName("FluxForgeMainWindow")
-            self.setWindowTitle("FluxForge — HPGe Analysis")
+            self.setWindowTitle("FluxForge — HPGe Analysis[*]")
             self.resize(1560, 980)
 
             self.settings = settings or QSettings(self.ORGANIZATION, self.APPLICATION)
@@ -183,6 +191,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._calibration_dialog = None
             self._unfolding_dialog = None
             self._qa_history_dialog = None
+            self._covariance_dialog = None
+            self._irradiation_history_dialog = None
+            self._reaction_rate_dialog = None
+            self._spectrum_file_queue_dialog = None
+            self._irradiation_segments = ()
             self._report_dialog = None
             self._pu_isotopics_dialog = None
             self._standards_review_dialog = None
@@ -276,7 +289,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def _build_menu_bar(self) -> None:
             self._requires_spectrum_actions: list[QAction] = []
-            self._requires_example_actions: list[QAction] = []
             file_menu = self.menuBar().addMenu("&File")
             file_menu.setObjectName("FileMenu")
             file_menu.menuAction().setObjectName("OpenFileMenuAction")
@@ -442,12 +454,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._requires_spectrum_actions.append(self._run_astm_check_action)
             self._unfolding_action = self._action(
                 "Spectrum Unfolding Workspace",
-                enabled=self._workspace_contains_bundled_example(),
+                enabled=True,
                 handler=self._open_unfolding_workspace,
                 object_name="OpenSpectrumUnfoldingAction",
             )
             analysis_menu.addAction(self._unfolding_action)
-            self._requires_example_actions.append(self._unfolding_action)
             self._pu_isotopics_action = self._action(
                 "Pu Isotopics Wizard...",
                 enabled=self.analysis_workspace.spectrum() is not None,
@@ -499,6 +510,38 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 object_name="OpenQaHistoryAction",
             )
             tools_menu.addAction(self._qa_history_action)
+            tools_menu.addAction(
+                self._action(
+                    "Covariance and Correlation",
+                    enabled=True,
+                    handler=self._open_covariance_view,
+                    object_name="OpenCovarianceAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Irradiation History",
+                    enabled=True,
+                    handler=self._open_irradiation_history,
+                    object_name="OpenIrradiationHistoryAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Activity to Reaction Rate",
+                    enabled=True,
+                    handler=self._open_reaction_rate,
+                    object_name="OpenReactionRateAction",
+                )
+            )
+            tools_menu.addAction(
+                self._action(
+                    "Spectrum Summing and Conversion",
+                    enabled=True,
+                    handler=self._open_spectrum_file_queue,
+                    object_name="OpenSpectrumFileQueueAction",
+                )
+            )
             if self.developer_tools:
                 tools_menu.addAction(
                     self._unavailable_action(
@@ -563,12 +606,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._workspace_unfolding_action = self._action(
                 "Open Unfolding Workspace",
-                enabled=self._workspace_contains_bundled_example(),
+                enabled=True,
                 handler=self._open_unfolding_workspace,
                 object_name="WorkspaceOpenUnfoldingAction",
             )
             workspace_menu.addAction(self._workspace_unfolding_action)
-            self._requires_example_actions.append(self._workspace_unfolding_action)
             workspace_menu.addSeparator()
             workspace_menu.addAction(
                 self._action(
@@ -650,6 +692,69 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             toolbar.addAction(self._peak_labels_action)
             self.addToolBar(Qt.TopToolBarArea, toolbar)
 
+            # Share menu actions to preserve shortcuts and data-dependent locks.
+            self.addToolBarBreak(Qt.TopToolBarArea)
+            workflow = QToolBar("Analysis Workflow", self)
+            workflow.setObjectName("AnalysisWorkflowToolbar")
+            workflow.setMovable(False)
+            workflow.toggleViewAction().setObjectName(
+                "ToggleAnalysisWorkflowToolbarAction"
+            )
+            self.analysis_workflow_toolbar = workflow
+            self._review_peaks_action = self._action(
+                "Review Peaks",
+                "Ctrl+Shift+P",
+                enabled=False,
+                handler=self._focus_peak_review,
+                object_name="ReviewPeaksAction",
+            )
+            self._requires_spectrum_actions.append(self._review_peaks_action)
+            actions = {
+                action.objectName(): action for action in self.findChildren(QAction)
+            }
+            for name, label, hint in (
+                (
+                    "OpenSpectrumAction",
+                    "Open Spectrum",
+                    "Load a spectrum for analysis.",
+                ),
+                (
+                    "AutoFindPeaksAction",
+                    "Find Peaks",
+                    "Detect peaks using the selected search method.",
+                ),
+                (
+                    "ReviewPeaksAction",
+                    "Review Peaks",
+                    "Show the peak table for manual review and assignment.",
+                ),
+                (
+                    "OpenEnergyFwhmCalibrationAction",
+                    "Calibrate",
+                    "Review energy and FWHM calibration.",
+                ),
+                (
+                    "OpenIrradiationHistoryAction",
+                    "Irradiation",
+                    "Enter irradiation and shutdown segments.",
+                ),
+                (
+                    "OpenSpectrumUnfoldingAction",
+                    "Unfold",
+                    "Load reaction rates and a response matrix.",
+                ),
+                ("ExportReportAction", "Export", "Export the analysis report."),
+            ):
+                action = actions[name]
+                action.setToolTip(hint)
+                action.setStatusTip(hint)
+                button = QToolButton(workflow)
+                button.setDefaultAction(action)
+                button.setText(label)
+                button.setToolButtonStyle(Qt.ToolButtonTextOnly)
+                workflow.addWidget(button)
+            self.addToolBar(Qt.TopToolBarArea, workflow)
+
         def _build_central_workspace(self) -> None:
             self.central_tabs = CentralWorkspaceTabs(
                 mode_manager=self.mode_manager,
@@ -730,12 +835,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.setObjectName("FluxForgeStatusBar")
             self.setStatusBar(status)
 
-            self.cursor_label = QLabel("Cursor: --", self)
-            self.file_label = QLabel("File: none", self)
-            self.mode_label = QLabel("Mode: Expert", self)
-            self.library_label = QLabel("Library: bundled gamma", self)
-            self.renderer_label = QLabel("Renderer: PyQtGraph", self)
-            self.predictive_label = QLabel("Predictive: --", self)
+            self.cursor_label = ElidingLabel("Cursor: --", self)
+            self.file_label = ElidingLabel("File: none", self)
+            self.mode_label = ElidingLabel("Mode: Expert", self)
+            self.library_label = ElidingLabel("Library: bundled gamma", self)
+            self.renderer_label = ElidingLabel("Renderer: PyQtGraph", self)
+            self.predictive_label = ElidingLabel("Predictive: --", self)
             self.progress = QProgressBar(self)
             self.progress.setObjectName("StatusProgress")
             self.progress.setMaximumWidth(180)
@@ -750,11 +855,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             status.addWidget(self.cursor_label, 1)
             status.addWidget(self.file_label, 1)
-            status.addPermanentWidget(self.mode_label)
-            status.addPermanentWidget(self.library_label)
+            status.addPermanentWidget(self.mode_label, 1)
+            status.addPermanentWidget(self.library_label, 2)
             if self.developer_tools:
-                status.addPermanentWidget(self.renderer_label)
-            status.addPermanentWidget(self.predictive_label)
+                status.addPermanentWidget(self.renderer_label, 1)
+            status.addPermanentWidget(self.predictive_label, 1)
             status.addPermanentWidget(self.progress)
             if self.developer_tools:
                 status.addPermanentWidget(self.hardware_led)
@@ -907,6 +1012,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _load_example_workspace(self) -> None:
             """Load the bundled deterministic HPGe example on explicit request."""
 
+            if not self._confirm_workspace_replacement():
+                return
             self.qa_monitor.seed_demo_history()
             self.analysis_workspace.set_document(
                 AnalysisWorkspaceController(
@@ -922,6 +1029,27 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._refresh_analysis_workspace_derivatives()
             self.file_label.setText("File: bundled HPGe example")
             self.statusBar().showMessage("Bundled HPGe example loaded", 4000)
+
+        def _confirm_workspace_replacement(self) -> bool:
+            document = self.analysis_workspace.document
+            if not self._document_dirty or not (
+                document.spectra
+                or document.rois
+                or document.peaks
+                or document.detector_profiles
+                or document.pinned_nuclides
+            ):
+                return True
+            choice = QMessageBox.question(
+                self,
+                "Unsaved session",
+                "Save changes to the current session before continuing?",
+                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
+                QMessageBox.Save,
+            )
+            if choice == QMessageBox.Save:
+                return self.save_session()
+            return choice == QMessageBox.Discard
 
         def _open_dialog_path(self, filename: str) -> None:
             try:
@@ -1117,9 +1245,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._pu_isotopics_action.setEnabled(
                     has_spectrum and self.mode_manager.state.mode is not GUIMode.SIMPLE
                 )
-            has_example = self._workspace_contains_bundled_example()
-            for action in getattr(self, "_requires_example_actions", ()):
-                action.setEnabled(has_example)
             self._update_predictive_status()
 
         def _update_predictive_status(self) -> None:
@@ -1161,6 +1286,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             source = Path(path)
             if source.suffix.lower() == ".ffs":
                 session = read_ffs_session(source)
+                if not self._confirm_workspace_replacement():
+                    return
                 self.analysis_workspace.set_document(session.document)
                 self._session_path = source.resolve()
                 self._session_device_snapshot = deepcopy(session.device_snapshot)
@@ -1211,6 +1338,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self.setWindowModified(False)
 
         def _on_workspace_document_changed(self, document) -> None:
+            dialog = getattr(self, "_calibration_dialog", None)
+            if dialog is not None:
+                target = getattr(dialog, "workspace_target", None)
+                if target is not None and not self._calibration_target_is_current(
+                    target
+                ):
+                    dialog.close()
+                    self._calibration_dialog = None
             viewport = document.viewport_by_id("primary-spectrum")
             log_y = viewport.log_y if viewport is not None else False
             labels_visible = viewport.labels_visible if viewport is not None else True
@@ -1264,9 +1399,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._calibration_dialog.activateWindow()
                 return
 
-            current_spectrum = None
-            if hasattr(self.central_tabs, "current_spectrum"):
-                current_spectrum = self.central_tabs.current_spectrum()
+            document = self.analysis_workspace.document
+            record = document.spectrum_by_id(document.active_spectrum_id)
+            current_spectrum = record.spectrum if record is not None else None
             if current_spectrum is None:
                 self.statusBar().showMessage(
                     "Load a spectrum before opening calibration.",
@@ -1274,14 +1409,21 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 return
 
+            target = (document.document_id, record.spectrum_id, current_spectrum.counts)
             self._calibration_dialog = CalibrationWorkspaceDialog(
                 spectrum=current_spectrum,
                 mode_manager=self.mode_manager,
                 selection_bus=self.selection_bus,
                 library_manager=self.library_manager,
-                on_apply=self._apply_calibration_workspace_result,
+                on_apply=lambda spectrum, energy_fit, fwhm_fit: (
+                    self._apply_calibration_workspace_result(
+                        spectrum, energy_fit, fwhm_fit, target=target
+                    )
+                ),
+                publish_selection=False,
                 parent=self,
             )
+            self._calibration_dialog.workspace_target = target
             if advanced_tab is not None:
                 self._calibration_dialog.set_active_advanced_tab(advanced_tab)
             self._calibration_dialog.show()
@@ -1301,9 +1443,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._open_energy_fwhm_workspace(advanced_tab="quick_slider")
 
         def _run_auto_peak_search(self) -> None:
+            self._focus_peak_review()
             bottom_widget = self.bottom_dock.widget()
             if hasattr(bottom_widget, "run_auto_peak_search"):
                 bottom_widget.run_auto_peak_search()
+
+        def _focus_peak_review(self) -> None:
+            self.central_tabs.setCurrentIndex(0)
+            self._focus_analysis_surface_dock()
+            bottom = self.bottom_dock.widget()
+            bottom.setCurrentWidget(bottom.peak_table_panel)
+            bottom.peak_table_panel.setFocus()
 
         def _open_unfolding_workspace(self) -> None:
             if (
@@ -1314,16 +1464,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 self._unfolding_dialog.activateWindow()
                 return
 
-            if not self._workspace_contains_bundled_example():
-                self.statusBar().showMessage(
-                    "Open the bundled example to inspect the current unfolding "
-                    "workspace.",
-                    5000,
-                )
-                return
-
             self._unfolding_dialog = UnfoldingWorkspaceDialog(
                 mode_manager=self.mode_manager,
+                start_empty=not self._workspace_contains_bundled_example(),
                 parent=self,
             )
             self._unfolding_dialog.show()
@@ -1401,10 +1544,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _build_report_context(self, template_name: str) -> dict[str, object]:
+            from fluxforge.gui.report_snapshot import capture_report_snapshot
+
+            snapshot = capture_report_snapshot(self)
             state = self.analysis_workspace.state
             peak_rows = (
                 "".join(
-                    f"<tr><td>{peak.energy_keV:.3f}</td><td>{peak.nuclide or 'Unassigned'}</td><td>{peak.net_counts:.1f}</td></tr>"
+                    f"<tr><td>{peak.energy_keV:.3f}</td><td>{escape(peak.nuclide or 'Unassigned')}</td><td>{peak.net_counts:.1f}</td></tr>"
                     for peak in state.peaks
                 )
                 or "<tr><td colspan='3'>No peaks</td></tr>"
@@ -1416,7 +1562,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             activity_rows = (
                 "".join(
-                    f"<tr><td>{result.nuclide}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
+                    f"<tr><td>{escape(result.nuclide)}</td><td>{result.line_energy_keV:.3f}</td><td>{result.activity_bq:.3f}</td><td>{result.uncertainty_bq:.3f}</td></tr>"
                     for result in state.activity_results
                 )
                 or "<tr><td colspan='4'>No activity results</td></tr>"
@@ -1439,9 +1585,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                     module = self.registries.standards_modules.get(key)
                     evaluation = module.evaluate(context)
                     standards_rows.append(
-                        f"<tr><td>{module.display_name}</td>"
-                        f"<td>{evaluation.overall_status}</td>"
-                        f"<td>{evaluation.summary}</td></tr>"
+                        f"<tr><td>{escape(module.display_name)}</td>"
+                        f"<td>{escape(evaluation.overall_status)}</td>"
+                        f"<td>{escape(evaluation.summary)}</td></tr>"
                     )
             else:
                 standards_rows.append(
@@ -1455,7 +1601,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             qa_status_snapshot = (
                 "<br/>".join(
-                    f"{item.nuclide} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
+                    f"{escape(item.nuclide)} {item.energy_keV:.2f} keV | drift {item.centroid_drift_keV:+.3f} keV | FWHM {item.fwhm_degradation_pct:+.2f}%"
                     for item in self.qa_monitor.status_snapshot()
                 )
                 or "No QA snapshot available."
@@ -1474,7 +1620,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 panel = bottom_widget.batch_queue_panel
                 if getattr(panel, "results", ()):
                     batch_rows = "<br/>".join(
-                        f"{result.label}: {result.peak_count} peaks, {result.backend}"
+                        f"{escape(result.label)}: {result.peak_count} peaks, {escape(result.backend)}"
                         for result in panel.results
                     )
                     aggregate_csv = (
@@ -1497,9 +1643,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "activity_table": activity_table,
                 "astm_status_table": astm_status_table,
                 "qa_status_snapshot": qa_status_snapshot,
-                "provenance": provenance,
+                "provenance": escape(provenance),
                 "batch_rows": batch_rows,
-                "aggregate_csv": aggregate_csv or "No batch CSV available.",
+                "aggregate_csv": escape(aggregate_csv) or "No batch CSV available.",
+                "run_snapshot": snapshot,
+                "run_parameters_json": json.dumps(snapshot["parameters"], indent=2),
             }
             return payload
 
@@ -1566,6 +1714,46 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 return
             self._qa_history_dialog = QAHistoryDialog(self.qa_monitor, parent=self)
             self._qa_history_dialog.show()
+
+        def _open_covariance_view(self) -> None:
+            if self._covariance_dialog is None:
+                self._covariance_dialog = CovarianceDialog(parent=self)
+            self._covariance_dialog.show()
+            self._covariance_dialog.raise_()
+            self._covariance_dialog.activateWindow()
+
+        def _open_irradiation_history(self) -> None:
+            if self._irradiation_history_dialog is None:
+                self._irradiation_history_dialog = IrradiationHistoryDialog(parent=self)
+                self._irradiation_history_dialog.historyChanged.connect(
+                    self._set_irradiation_history
+                )
+            self._irradiation_history_dialog.show()
+            self._irradiation_history_dialog.raise_()
+            self._irradiation_history_dialog.activateWindow()
+
+        def _set_irradiation_history(self, segments) -> None:
+            self._irradiation_segments = segments
+            if self._reaction_rate_dialog is not None:
+                self._reaction_rate_dialog._mark_pending()
+
+        def _open_reaction_rate(self) -> None:
+            if self._reaction_rate_dialog is None:
+                self._reaction_rate_dialog = ReactionRateDialog(
+                    history_provider=lambda: self._irradiation_segments,
+                    activity_provider=lambda: self.analysis_workspace.state.activity_results,
+                    parent=self,
+                )
+            self._reaction_rate_dialog.show()
+            self._reaction_rate_dialog.raise_()
+            self._reaction_rate_dialog.activateWindow()
+
+        def _open_spectrum_file_queue(self) -> None:
+            if self._spectrum_file_queue_dialog is None:
+                self._spectrum_file_queue_dialog = SpectrumFileQueueDialog(parent=self)
+            self._spectrum_file_queue_dialog.show()
+            self._spectrum_file_queue_dialog.raise_()
+            self._spectrum_file_queue_dialog.activateWindow()
 
         def _open_dashboard_tab(self) -> None:
             if hasattr(self, "central_tabs"):
@@ -1742,6 +1930,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _reset_analysis_workspace(self) -> None:
+            if not self._confirm_workspace_replacement():
+                return
             self.qa_monitor.clear_demo_history()
             self.analysis_workspace.set_state(
                 self._build_initial_workspace_state(include_example=False)
@@ -1856,20 +2046,42 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self._pu_isotopics_dialog.show()
 
+        def _calibration_target_is_current(self, target) -> bool:
+            document_id, spectrum_id, counts = target
+            document = self.analysis_workspace.document
+            record = document.spectrum_by_id(spectrum_id)
+            return (
+                document.document_id == document_id
+                and record is not None
+                and record.spectrum.counts is counts
+            )
+
         def _apply_calibration_workspace_result(
             self,
             spectrum,
             energy_fit,
             fwhm_fit,
-        ) -> None:
-            spectrum_id = self.analysis_workspace.document.active_spectrum_id
+            *,
+            target=None,
+        ) -> bool:
+            if target is not None and not self._calibration_target_is_current(target):
+                self.statusBar().showMessage(
+                    "Calibration source changed. Reopen calibration for the current spectrum.",
+                    6000,
+                )
+                return False
+            spectrum_id = (
+                target[1]
+                if target is not None
+                else self.analysis_workspace.document.active_spectrum_id
+            )
             workspace_spectrum = (
                 self.analysis_workspace.document.spectrum_by_id(spectrum_id)
                 if spectrum_id is not None
                 else None
             )
             if spectrum_id is None or workspace_spectrum is None:
-                return
+                return False
             existing_profile = (
                 self.analysis_workspace.document.detector_profile_by_id(
                     workspace_spectrum.detector_profile_id
@@ -1958,9 +2170,6 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             else:
                 command.redo()
             self._refresh_analysis_workspace_derivatives()
-            self.file_label.setText(
-                f"File: {spectrum.spectrum_id or 'workspace spectrum'}"
-            )
             message = (
                 f"Applied calibration order {energy_fit.order} "
                 f"(RMS {energy_fit.rms_keV:.4f} keV)"
@@ -1970,6 +2179,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.statusBar().showMessage(message, 6000)
             self.progress.setValue(72)
             self.progress.setFormat("Calibration applied")
+            return True
 
         def _refresh_analysis_workspace_derivatives(self) -> None:
             from fluxforge.core.analysis_workspace import (
@@ -1997,6 +2207,27 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def closeEvent(self, event) -> None:
+            if (
+                self._report_dialog is not None
+                and self._report_dialog.worker is not None
+            ):
+                self.statusBar().showMessage(
+                    "Report export is running. Close after it finishes."
+                )
+                event.ignore()
+                return
+            if (
+                self._spectrum_file_queue_dialog is not None
+                and self._spectrum_file_queue_dialog.worker is not None
+            ):
+                self.statusBar().showMessage(
+                    "Spectrum conversion is running. Close after it finishes."
+                )
+                event.ignore()
+                return
+            if not self._confirm_workspace_replacement():
+                event.ignore()
+                return
             self._save_layout()
             super().closeEvent(event)
 

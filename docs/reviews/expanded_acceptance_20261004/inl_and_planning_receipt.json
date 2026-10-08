@@ -1,0 +1,19 @@
+{
+  "git_head": "d017a7162d51d97ef3e50fac98a0c748337b9ccb",
+  "inl_script": "examples/RAFM_irradiation/compare_inl_workflow_to_qg.py",
+  "inl_log_sha256": "bc94fa350eab81495e405b6b4537cce66b747d787be7be34fb1294b9611ed0c4",
+  "inl_targets": [
+    "Co",
+    "Ti",
+    "Sc",
+    "Ni"
+  ],
+  "inl_exit_code": 0,
+  "inl_scope": "Conditional QG-derived calibration/count comparison; no absolute-efficiency uncertainty or neutron-flux qualification",
+  "planning_script": "examples/RAFM_irradiation/run_phase6_ldrd_worked_example.py",
+  "planning_summary_sha256": "95aabaef4163118ea5325cbcc3f65591481aa58fb61c24983591327590ab2e6e",
+  "planning_exit_code": 0,
+  "planning_basis": "historical_bundled_analysis_planning_demonstration",
+  "scientific_admission": false,
+  "accuracy_qualified": false
+}

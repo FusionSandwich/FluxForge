@@ -44,14 +44,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QGridLayout,
         QHBoxLayout,
         QLabel,
+        QScrollArea,
         QTabBar,
         QTabWidget,
         QTextBrowser,
         QVBoxLayout,
         QWidget,
+        Qt,
     )
 
-    class PredictiveDashboardPanel(QWidget):
+    class PredictiveDashboardPanel(QScrollArea):
         """Offline predictive dashboard derived from current spectra and QA history."""
 
         def __init__(
@@ -63,14 +65,33 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             parent=None,
         ) -> None:
             super().__init__(parent)
+            self.setObjectName("PredictiveDashboardScrollArea")
+            self.setWidgetResizable(True)
+            self.setMinimumHeight(260)
+            self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.qa_monitor = qa_monitor
             self._selection_state = SelectionState()
 
-            layout = QVBoxLayout(self)
+            content = QWidget(self)
+            content.setObjectName("PredictiveDashboardScrollContent")
+            self.setWidget(content)
+            layout = QVBoxLayout(content)
             layout.setContentsMargins(16, 16, 16, 16)
             layout.setSpacing(12)
+
+            title = QLabel("Count and QA Forecasts", content)
+            title.setObjectName("HeroHeader")
+            title.setWordWrap(True)
+            layout.addWidget(title)
+            subtitle = QLabel(
+                "Forecasts derived from the active spectrum and recorded QA history.",
+                content,
+            )
+            subtitle.setWordWrap(True)
+            subtitle.setObjectName("HeroSubhead")
+            layout.addWidget(subtitle)
 
             controls = QHBoxLayout()
             controls.addWidget(QLabel("Target ROI counts", self))
@@ -86,11 +107,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.metrics_browser = QTextBrowser(self)
             self.metrics_browser.setObjectName("PredictiveMetricsBrowser")
+            self.metrics_browser.setMinimumHeight(130)
             layout.addWidget(self.metrics_browser)
 
             if PYQTGRAPH_AVAILABLE:
                 self.count_rate_plot = pg.PlotWidget(self)
                 self.count_rate_plot.setObjectName("PredictiveCountRatePlot")
+                self.count_rate_plot.setMinimumHeight(160)
                 self.count_rate_plot.setBackground("#0f172a")
                 self.count_rate_plot.setLabel("left", "ROI cps")
                 self.count_rate_plot.setLabel("bottom", "History Index")
@@ -102,6 +125,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
                 self.dead_time_plot = pg.PlotWidget(self)
                 self.dead_time_plot.setObjectName("PredictiveDeadTimePlot")
+                self.dead_time_plot.setMinimumHeight(160)
                 self.dead_time_plot.setBackground("#0f172a")
                 self.dead_time_plot.setLabel("left", "Dead Time (%)")
                 self.dead_time_plot.setLabel("bottom", "History Index")
@@ -113,6 +137,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.summary_browser = QTextBrowser(self)
             self.summary_browser.setObjectName("PredictiveSummaryBrowser")
+            self.summary_browser.setMinimumHeight(100)
             layout.addWidget(self.summary_browser, 1)
 
             self.selection_bus.subscribe(self._selection_changed)
@@ -541,32 +566,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _build_dashboard_tab(self) -> QWidget:
-            widget = QWidget(self)
-            layout = QVBoxLayout(widget)
-            layout.setContentsMargins(24, 24, 24, 24)
-            layout.setSpacing(18)
-
-            title = QLabel("Count and QA Forecasts", widget)
-            title.setObjectName("HeroHeader")
-            layout.addWidget(title)
-
-            subtitle = QLabel(
-                "Forecasts derived from the active spectrum and recorded QA history.",
-                widget,
-            )
-            subtitle.setWordWrap(True)
-            subtitle.setObjectName("HeroSubhead")
-            layout.addWidget(subtitle)
-
             self.predictive_dashboard = PredictiveDashboardPanel(
                 selection_bus=self.selection_bus,
                 workspace_controller=self.workspace_controller,
                 qa_monitor=self.qa_monitor,
-                parent=widget,
+                parent=self,
             )
-            layout.addWidget(self.predictive_dashboard, 1)
-            layout.addStretch(1)
-            return widget
+            return self.predictive_dashboard
 
         def _sync_workspace_state(self, state) -> None:
             self._current_spectrum = self.workspace_controller.spectrum()
@@ -697,8 +703,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                         ),
                     )
                 )
+            first_nonempty_load = bool(traces) and not self.canvas._current_traces
             self.canvas.set_traces(traces)
-            self._apply_document_viewport()
+            self._apply_document_viewport(force=first_nonempty_load)
             self.canvas.set_peak_candidates(state.peaks)
             self._sync_analysis_overlays()
             self.canvas.set_cascade_sum_lines(state.cascade_sum_lines_keV)
@@ -768,7 +775,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             self.selection_bus.publish(reconciled)
 
-        def _apply_document_viewport(self) -> None:
+        def _apply_document_viewport(self, *, force: bool = False) -> None:
             """Reapply canonical viewport changes, including undo to no viewport."""
 
             if not PYQTGRAPH_AVAILABLE or not hasattr(self, "canvas"):
@@ -782,7 +789,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 or persisted_viewport.spectrum_id in {None, active_spectrum_id}
                 else None
             )
-            if (
+            if not force and (
                 viewport == self._last_canvas_viewport
                 and active_spectrum_id == self._last_canvas_spectrum_id
             ):

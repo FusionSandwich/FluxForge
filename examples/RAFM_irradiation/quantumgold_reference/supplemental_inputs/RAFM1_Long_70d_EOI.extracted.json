@@ -1,0 +1,727 @@
+{
+  "schema": "QG-older-unpaired-report-extraction-v1",
+  "source_sha256": "1a0b179b802e86e38498c866a8140eeda15f6ecf30e5ad0fd683030ed896427b",
+  "count_identity": "RAFM1_Long_70d_EOI_older_unpaired_report",
+  "identity_basis": "historical filename only; printed ID blank and File label truncated; no native/ASC pairing inferred",
+  "header_text": "ID:                                                                          \r\n\r\nFile: ong_70d_EOI.ANS   Date:  July 01, 2025 14:57:31\r\nLT:       3,600.00      RT:       3,848.07      DT:   6.4 %\r\n\r\nCalibrations:\r\n  Energy = -1.694E+00 +4.996E-01 * Ch  +6.710E-08 * Ch^2  (keV)\r\n  Efficiency = (Det. Model) * (C1 + C2*Log(E) + C3*Log(E)^2 + C4*Log(E)^3)\r\n    where Detector Model = A*Exp((-T1*U1-T2*U2-T3*U3-T4*U4-DL*U5) / Cos(AI))*\r\n                             (1-Exp(-DI*U5/Cos(AI)))\r\n    and E is Energy in keV\r\n      C1:             -2.026E+01\r\n      C2:             1.029E+01\r\n      C3:             -1.655E+00\r\n      C4:             8.666E-02\r\n\r\n    where the Ui are the appropriate linear mass absorption coefficients and\r\n      Geometry Factor (A):      3.48E-03    Al Window (T1):               1000.000 um\r\n      Detector Thickness (DI)   6.450 cm\r\n      Detector Dead Layer (DL): 700.000 um\r\n      Det. Incident Angle (AI): 0.000 deg\r\n\r\nAdditional Detector Parameters\r\n      Detector ID:              South       \r\n      Detector Material:        HpGe(P)     Detector Shape:               Coaxial\r\n      Detector Diameter:        6.000 cm    Source Dist.:                 25.000 cm\r\n      Well Depth:               5.060 cm    Well Diameter:                0.920 cm\r\n  Resolution = 1.389E+00 +7.800E-04 * E  +-4.072E-08 * E^2 \r\n      FWHM at 661.66 keV = 1.89 keV\r\nHardware Parameters\r\n  Hardware Device:           SYS8016:01 at Bus Address 0 Unit 0\r\n  Connected as Port:         0 using device handle  0 \r\n  Device type is             100\r\n  High Voltage:              1800, On       Bias Set Point:               1800\r\n  Bias Control Flags:        0xFF1\r\n  Amp Coarse Gain:           4              Amp Fine Gain:                1.000\r\n  Amp Shaping Type:          Unipolar Gaussian\r\n                                            Amp Shaping Time:             4.00 usec\r\n  Amp Pole Zero:             0.0 %\r\n  Amp Input Polarity:        Pos            Amp Pile Up Rejection:        Neg\r\n  Amplifier Control Flags:   0x8BD\r\n  ADC Group Size:            8,192          ADC Conversion Gain:          8,192\r\n  ADC Lower Level Disc:      0.95 %         ADC Upper Level Disc:         97.51 %\r\n                                            ADC Zero:                     0.05 %\r\n  Dead Time Correction Mode: Lowes          ADC Gate Mode:                Off\r\n  ADC Operation Mode:        PHA\r\n  ADC Conversion Mode:       Linear         ADC Pile Up Rejector:         Pos\r\n  ADC Sync Mode:             Internal       External ADC Control Word:    0x0\r\n  Stabilizers\r\n    Type    Status    Range   Offset   Start Ch    End Ch    Assoc. ROI\r\n    Gain   Off        \u00b112.5%    0.00         0         0         0\r\n    Gain   Off        \u00b112.5%    0.00         0         0         0\r\n\r\nLibrary: Nover24h.mdb\r\n\r\n\r\n\r\nLibrary efficiencies were ignored\r\n\r\nActivities reported as of Measurement Date.\r\n\r\n",
+  "activity_reference": "as printed Measurement Date; no EOI inferred from 70d filename",
+  "rows": [
+    {
+      "line_number": 1,
+      "original_line": "ID:                                                                          ",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 2,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 3,
+      "original_line": "File: ong_70d_EOI.ANS   Date:  July 01, 2025 14:57:31",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 4,
+      "original_line": "LT:       3,600.00      RT:       3,848.07      DT:   6.4 %",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 5,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 6,
+      "original_line": "Calibrations:",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 7,
+      "original_line": "  Energy = -1.694E+00 +4.996E-01 * Ch  +6.710E-08 * Ch^2  (keV)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 8,
+      "original_line": "  Efficiency = (Det. Model) * (C1 + C2*Log(E) + C3*Log(E)^2 + C4*Log(E)^3)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 9,
+      "original_line": "    where Detector Model = A*Exp((-T1*U1-T2*U2-T3*U3-T4*U4-DL*U5) / Cos(AI))*",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 10,
+      "original_line": "                             (1-Exp(-DI*U5/Cos(AI)))",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 11,
+      "original_line": "    and E is Energy in keV",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 12,
+      "original_line": "      C1:             -2.026E+01",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 13,
+      "original_line": "      C2:             1.029E+01",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 14,
+      "original_line": "      C3:             -1.655E+00",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 15,
+      "original_line": "      C4:             8.666E-02",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 16,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 17,
+      "original_line": "    where the Ui are the appropriate linear mass absorption coefficients and",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 18,
+      "original_line": "      Geometry Factor (A):      3.48E-03    Al Window (T1):               1000.000 um",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 19,
+      "original_line": "      Detector Thickness (DI)   6.450 cm",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 20,
+      "original_line": "      Detector Dead Layer (DL): 700.000 um",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 21,
+      "original_line": "      Det. Incident Angle (AI): 0.000 deg",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 22,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 23,
+      "original_line": "Additional Detector Parameters",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 24,
+      "original_line": "      Detector ID:              South       ",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 25,
+      "original_line": "      Detector Material:        HpGe(P)     Detector Shape:               Coaxial",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 26,
+      "original_line": "      Detector Diameter:        6.000 cm    Source Dist.:                 25.000 cm",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 27,
+      "original_line": "      Well Depth:               5.060 cm    Well Diameter:                0.920 cm",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 28,
+      "original_line": "  Resolution = 1.389E+00 +7.800E-04 * E  +-4.072E-08 * E^2 ",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 29,
+      "original_line": "      FWHM at 661.66 keV = 1.89 keV",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 30,
+      "original_line": "Hardware Parameters",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 31,
+      "original_line": "  Hardware Device:           SYS8016:01 at Bus Address 0 Unit 0",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 32,
+      "original_line": "  Connected as Port:         0 using device handle  0 ",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 33,
+      "original_line": "  Device type is             100",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 34,
+      "original_line": "  High Voltage:              1800, On       Bias Set Point:               1800",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 35,
+      "original_line": "  Bias Control Flags:        0xFF1",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 36,
+      "original_line": "  Amp Coarse Gain:           4              Amp Fine Gain:                1.000",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 37,
+      "original_line": "  Amp Shaping Type:          Unipolar Gaussian",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 38,
+      "original_line": "                                            Amp Shaping Time:             4.00 usec",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 39,
+      "original_line": "  Amp Pole Zero:             0.0 %",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 40,
+      "original_line": "  Amp Input Polarity:        Pos            Amp Pile Up Rejection:        Neg",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 41,
+      "original_line": "  Amplifier Control Flags:   0x8BD",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 42,
+      "original_line": "  ADC Group Size:            8,192          ADC Conversion Gain:          8,192",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 43,
+      "original_line": "  ADC Lower Level Disc:      0.95 %         ADC Upper Level Disc:         97.51 %",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 44,
+      "original_line": "                                            ADC Zero:                     0.05 %",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 45,
+      "original_line": "  Dead Time Correction Mode: Lowes          ADC Gate Mode:                Off",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 46,
+      "original_line": "  ADC Operation Mode:        PHA",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 47,
+      "original_line": "  ADC Conversion Mode:       Linear         ADC Pile Up Rejector:         Pos",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 48,
+      "original_line": "  ADC Sync Mode:             Internal       External ADC Control Word:    0x0",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 49,
+      "original_line": "  Stabilizers",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 50,
+      "original_line": "    Type    Status    Range   Offset   Start Ch    End Ch    Assoc. ROI",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 51,
+      "original_line": "    Gain   Off        \u00b112.5%    0.00         0         0         0",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 52,
+      "original_line": "    Gain   Off        \u00b112.5%    0.00         0         0         0",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 53,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 54,
+      "original_line": "Library: Nover24h.mdb",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 55,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 56,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 57,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 58,
+      "original_line": "Library efficiencies were ignored",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 59,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 60,
+      "original_line": "Activities reported as of Measurement Date.",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 61,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 62,
+      "original_line": "NUCLIDES ANALYZED",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 63,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 64,
+      "original_line": "Fe59       44.495 d   B                                Activity = 8.779 \u00b1 0.710 uCi",
+      "classification": "nuclide_summary",
+      "values": {
+        "nuclide": "Fe59",
+        "half_life_value": 44.495,
+        "half_life_unit": "d",
+        "activity": 8.779,
+        "activity_separator": "\u00b1",
+        "reported_error": 0.71,
+        "activity_unit": "uCi"
+      }
+    },
+    {
+      "line_number": 65,
+      "original_line": "  ROI        RAD      CENTER       GROSS              NET               ROI      Activity",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 66,
+      "original_line": "CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 67,
+      "original_line": "   143.4    1.02     142.74   266,654 \u00b1 516       7,778 \u00b1 1,196  Fe59@ 142.7       3.508",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 143.4,
+        "rad_int_printed": 1.02,
+        "center_energy_keV": 142.74,
+        "gross_counts": 266654.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 516.0,
+        "net_counts": 7778.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 1196.0,
+        "nuclide": "Fe59",
+        "assignment_energy_keV": 142.7,
+        "roi_activity_uCi": 3.508
+      }
+    },
+    {
+      "line_number": 68,
+      "original_line": "   192.4    3.08     192.37   214,527 \u00b1 463      36,747 \u00b1 1,050  Fe59@ 192.3       5.812",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 192.4,
+        "rad_int_printed": 3.08,
+        "center_energy_keV": 192.37,
+        "gross_counts": 214527.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 463.0,
+        "net_counts": 36747.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 1050.0,
+        "nuclide": "Fe59",
+        "assignment_energy_keV": 192.3,
+        "roi_activity_uCi": 5.812
+      }
+    },
+    {
+      "line_number": 69,
+      "original_line": "  1098.7   56.50    1098.73   305,378 \u00b1 553     279,499 \u00b1 809    Fe59@1099.2       8.945",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 1098.7,
+        "rad_int_printed": 56.5,
+        "center_energy_keV": 1098.73,
+        "gross_counts": 305378.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 553.0,
+        "net_counts": 279499.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 809.0,
+        "nuclide": "Fe59",
+        "assignment_energy_keV": 1099.2,
+        "roi_activity_uCi": 8.945
+      }
+    },
+    {
+      "line_number": 70,
+      "original_line": "  1290.9   43.20    1290.96   195,990 \u00b1 443     189,830 \u00b1 531    Fe59@1291.6       9.006",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 1290.9,
+        "rad_int_printed": 43.2,
+        "center_energy_keV": 1290.96,
+        "gross_counts": 195990.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 443.0,
+        "net_counts": 189830.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 531.0,
+        "nuclide": "Fe59",
+        "assignment_energy_keV": 1291.6,
+        "roi_activity_uCi": 9.006
+      }
+    },
+    {
+      "line_number": 71,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 72,
+      "original_line": "Cr51       27.703 d   B                                Activity = 180.7 \u00b1 7.096 uCi",
+      "classification": "nuclide_summary",
+      "values": {
+        "nuclide": "Cr51",
+        "half_life_value": 27.703,
+        "half_life_unit": "d",
+        "activity": 180.7,
+        "activity_separator": "\u00b1",
+        "reported_error": 7.096,
+        "activity_unit": "uCi"
+      }
+    },
+    {
+      "line_number": 73,
+      "original_line": "  ROI        RAD      CENTER       GROSS              NET               ROI      Activity",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 74,
+      "original_line": "CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 75,
+      "original_line": "   320.0    9.91     320.02 2,953,170 \u00b1 1,718 2,789,370 \u00b1 2,254  Cr51@ 320.1       180.7",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 320.0,
+        "rad_int_printed": 9.91,
+        "center_energy_keV": 320.02,
+        "gross_counts": 2953170.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 1718.0,
+        "net_counts": 2789370.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 2254.0,
+        "nuclide": "Cr51",
+        "assignment_energy_keV": 320.1,
+        "roi_activity_uCi": 180.7
+      }
+    },
+    {
+      "line_number": 76,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 77,
+      "original_line": "Sb124      60.200 d   B                                Activity = 4.06E-02 \u00b1 4.69E-03 uCi",
+      "classification": "nuclide_summary",
+      "values": {
+        "nuclide": "Sb124",
+        "half_life_value": 60.2,
+        "half_life_unit": "d",
+        "activity": 0.0406,
+        "activity_separator": "\u00b1",
+        "reported_error": 0.00469,
+        "activity_unit": "uCi"
+      }
+    },
+    {
+      "line_number": 78,
+      "original_line": "  ROI        RAD      CENTER       GROSS              NET               ROI      Activity",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 79,
+      "original_line": "CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 80,
+      "original_line": "   602.6   97.80     602.56    22,192 \u00b1 149       3,058 \u00b1 370    Sb124@ 602.8   3.28E-02",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 602.6,
+        "rad_int_printed": 97.8,
+        "center_energy_keV": 602.56,
+        "gross_counts": 22192.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 149.0,
+        "net_counts": 3058.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 370.0,
+        "nuclide": "Sb124",
+        "assignment_energy_keV": 602.8,
+        "roi_activity_uCi": 0.0328
+      }
+    },
+    {
+      "line_number": 81,
+      "original_line": "  1690.0   47.57    1690.19     1,072 \u00b1 33          910 \u00b1 56     Sb124@1691.0   4.55E-02",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 1690.0,
+        "rad_int_printed": 47.57,
+        "center_energy_keV": 1690.19,
+        "gross_counts": 1072.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 33.0,
+        "net_counts": 910.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 56.0,
+        "nuclide": "Sb124",
+        "assignment_energy_keV": 1691.0,
+        "roi_activity_uCi": 0.0455
+      }
+    },
+    {
+      "line_number": 82,
+      "original_line": "  2089.8    5.49    2090.33       145 \u00b1 12           77 \u00b1 27     Sb124@2090.9   3.50E-02",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 2089.8,
+        "rad_int_printed": 5.49,
+        "center_energy_keV": 2090.33,
+        "gross_counts": 145.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 12.0,
+        "net_counts": 77.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 27.0,
+        "nuclide": "Sb124",
+        "assignment_energy_keV": 2090.9,
+        "roi_activity_uCi": 0.035
+      }
+    },
+    {
+      "line_number": 83,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 84,
+      "original_line": "Co58       70.860 d   B                                Activity = 9.75E-02 \u00b1 9.69E-03 uCi",
+      "classification": "nuclide_summary",
+      "values": {
+        "nuclide": "Co58",
+        "half_life_value": 70.86,
+        "half_life_unit": "d",
+        "activity": 0.0975,
+        "activity_separator": "\u00b1",
+        "reported_error": 0.00969,
+        "activity_unit": "uCi"
+      }
+    },
+    {
+      "line_number": 85,
+      "original_line": "  ROI        RAD      CENTER       GROSS              NET               ROI      Activity",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 86,
+      "original_line": "CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 87,
+      "original_line": "   810.6   99.45     810.49    25,794 \u00b1 161       7,044 \u00b1 372    Co58@ 810.8    9.75E-02",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 810.6,
+        "rad_int_printed": 99.45,
+        "center_energy_keV": 810.49,
+        "gross_counts": 25794.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 161.0,
+        "net_counts": 7044.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 372.0,
+        "nuclide": "Co58",
+        "assignment_energy_keV": 810.8,
+        "roi_activity_uCi": 0.0975
+      }
+    },
+    {
+      "line_number": 88,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 89,
+      "original_line": "Mn54      312.120 d   B                                Activity = 0.912 \u00b1 7.95E-02 uCi",
+      "classification": "nuclide_summary",
+      "values": {
+        "nuclide": "Mn54",
+        "half_life_value": 312.12,
+        "half_life_unit": "d",
+        "activity": 0.912,
+        "activity_separator": "\u00b1",
+        "reported_error": 0.0795,
+        "activity_unit": "uCi"
+      }
+    },
+    {
+      "line_number": 90,
+      "original_line": "  ROI        RAD      CENTER       GROSS              NET               ROI      Activity",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 91,
+      "original_line": "CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 92,
+      "original_line": "   834.5   99.98     834.51   103,542 \u00b1 322      64,448 \u00b1 730    Mn54@ 834.8       0.912",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 834.5,
+        "rad_int_printed": 99.98,
+        "center_energy_keV": 834.51,
+        "gross_counts": 103542.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 322.0,
+        "net_counts": 64448.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 730.0,
+        "nuclide": "Mn54",
+        "assignment_energy_keV": 834.8,
+        "roi_activity_uCi": 0.912
+      }
+    },
+    {
+      "line_number": 93,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 94,
+      "original_line": "Co60        5.271 a   B                                Activity = 1.434 \u00b1 0.126 uCi",
+      "classification": "nuclide_summary",
+      "values": {
+        "nuclide": "Co60",
+        "half_life_value": 5.271,
+        "half_life_unit": "a",
+        "activity": 1.434,
+        "activity_separator": "\u00b1",
+        "reported_error": 0.126,
+        "activity_unit": "uCi"
+      }
+    },
+    {
+      "line_number": 95,
+      "original_line": "  ROI        RAD      CENTER       GROSS              NET               ROI      Activity",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 96,
+      "original_line": "CENTROID     INT       (keV )      (cnts)            (cnts)          ASSIGNMENT    (uCi)",
+      "classification": "header_or_other_preserved_text"
+    },
+    {
+      "line_number": 97,
+      "original_line": "  1172.6   99.85    1172.67    85,444 \u00b1 292      74,498 \u00b1 477    Co60@1173.2       1.423",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 1172.6,
+        "rad_int_printed": 99.85,
+        "center_energy_keV": 1172.67,
+        "gross_counts": 85444.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 292.0,
+        "net_counts": 74498.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 477.0,
+        "nuclide": "Co60",
+        "assignment_energy_keV": 1173.2,
+        "roi_activity_uCi": 1.423
+      }
+    },
+    {
+      "line_number": 98,
+      "original_line": "  1331.8   99.98    1331.82    72,841 \u00b1 270      68,904 \u00b1 376    Co60@1332.5       1.443",
+      "classification": "ROI",
+      "values": {
+        "roi_centroid_keV": 1331.8,
+        "rad_int_printed": 99.98,
+        "center_energy_keV": 1331.82,
+        "gross_counts": 72841.0,
+        "gross_separator": "\u00b1",
+        "gross_error_printed": 270.0,
+        "net_counts": 68904.0,
+        "net_separator": "\u00b1",
+        "net_error_printed": 376.0,
+        "nuclide": "Co60",
+        "assignment_energy_keV": 1332.5,
+        "roi_activity_uCi": 1.443
+      }
+    },
+    {
+      "line_number": 99,
+      "original_line": "",
+      "classification": "header_or_other_preserved_text"
+    }
+  ]
+}

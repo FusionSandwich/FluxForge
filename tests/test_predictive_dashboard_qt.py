@@ -27,7 +27,9 @@ def _qapp():
 def test_predictive_dashboard_shows_eta_dead_time_and_qa_forecast():
     _qapp()
     selection_bus = SelectionBus()
-    window = FluxForgeMainWindow(mode_manager=ModeManager(), selection_bus=selection_bus)
+    window = FluxForgeMainWindow(
+        mode_manager=ModeManager(), selection_bus=selection_bus, load_example=True
+    )
     window.analysis_workspace.replace_peaks(
         (
             PeakCandidate(

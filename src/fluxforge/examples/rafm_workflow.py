@@ -45,9 +45,12 @@ from fluxforge.data.rafm_decay import get_rafm_decay_entry
 from fluxforge.data.rafm_profile import load_rafm_profile
 from fluxforge.io.flux_wire import FluxWireData, read_processed_txt, read_raw_asc
 from fluxforge.io.spe import GammaSpectrum
-from fluxforge.physics.activation import activation_study_metrics
+from fluxforge.physics.activation import activation_study_metrics, count_decay_factor
 from fluxforge.physics.monitor_response import CoverLayer, MonitorResponseSpec
-from fluxforge.physics.operating_history import load_operating_history, history_rate_jacobian
+from fluxforge.physics.operating_history import (
+    load_operating_history,
+    history_rate_jacobian,
+)
 from fluxforge.uncertainty.reaction_rate_budget import (
     RateUncertaintyBudget,
     UncertaintyComponent,
@@ -253,6 +256,7 @@ def build_generic_gamma_library(
                     energy_keV=float(line["energy_keV"]),
                     intensity=float(line["intensity"]),
                     isotope=isotope,
+                    intensity_uncertainty=float(line.get("intensity_uncertainty", 0.0)),
                 )
             )
     deduped: List[GammaLine] = []
@@ -299,10 +303,13 @@ def prune_generic_targeted_lines(
     intensity_ratio: float,
 ) -> List[GammaLine]:
     """
-    Prune weak nearby nuisance lines from the generic RAFM targeted library.
+    Prune weak nearby lines of the same isotope from the targeted library.
 
     This is only intended for the targeted recovery pass. Exploratory peak
     search should remain free to discover lines outside this pruned set.
+    Emission probabilities can be compared only when activity is shared.
+    Different or unknown isotopes have unconstrained relative activities.
+    Pruning is a candidate heuristic, not evidence that a line is absent.
     """
     if neighbor_window_keV <= 0.0 or intensity_ratio <= 1.0:
         return list(gamma_lines)
@@ -313,6 +320,12 @@ def prune_generic_targeted_lines(
         suppressed = False
         for other in lines:
             if other is line:
+                continue
+            if (
+                not line.isotope
+                or not str(line.isotope).strip()
+                or other.isotope != line.isotope
+            ):
                 continue
             if abs(other.energy_keV - line.energy_keV) > neighbor_window_keV:
                 continue
@@ -446,11 +459,14 @@ def _parse_irradiation_history(
     """Parse schedule ``irradiation_history`` entries ({duration_s, relative_power})."""
     if not segments:
         return None
-    if any("duration_s" not in item or "relative_power" not in item for item in segments):
-        raise ValueError("History segments require explicit duration_s and relative_power")
+    if any(
+        "duration_s" not in item or "relative_power" not in item for item in segments
+    ):
+        raise ValueError(
+            "History segments require explicit duration_s and relative_power"
+        )
     return [
-        (float(item["duration_s"]), float(item["relative_power"]))
-        for item in segments
+        (float(item["duration_s"]), float(item["relative_power"])) for item in segments
     ]
 
 
@@ -491,7 +507,9 @@ def resolve_measurement_timing(
                 measurement_time=measurement_time,
                 decay_label=label,
                 schedule_source="sample_schedule.phase1",
-                irradiation_history=_parse_irradiation_history(phase.get("irradiation_history")),
+                irradiation_history=_parse_irradiation_history(
+                    phase.get("irradiation_history")
+                ),
                 irradiation_operating_log=phase.get("irradiation_operating_log"),
             )
 
@@ -519,12 +537,25 @@ def resolve_measurement_timing(
                 measurement_time=start_time,
                 decay_label=label,
                 schedule_source="sample_schedules.phase2",
-                irradiation_history=_parse_irradiation_history(phase2.get("irradiation_history")),
+                irradiation_history=_parse_irradiation_history(
+                    phase2.get("irradiation_history")
+                ),
                 irradiation_operating_log=phase2.get("irradiation_operating_log"),
             )
 
     if "RAFM-1" in stem_upper or "RAFM1" in stem_upper:
-        flux_wire_info = schedule.get("flux_wires", {}).get(stem)
+        wire_schedule = schedule.get("flux_wires", {})
+        canonical = normalize_pairing_key(stem, metadata.pairing_aliases)
+        candidates = [
+            key
+            for key in wire_schedule
+            if normalize_pairing_key(key, metadata.pairing_aliases) == canonical
+        ]
+        if len(candidates) > 1:
+            raise ValueError(
+                f"Ambiguous flux-wire schedule aliases for {stem!r}: {candidates}"
+            )
+        flux_wire_info = wire_schedule[candidates[0]] if candidates else None
         if flux_wire_info is not None:
             return TimingInfo(
                 sample_group="flux_wires",
@@ -546,7 +577,9 @@ def resolve_measurement_timing(
                 irradiation_history=_parse_irradiation_history(
                     flux_wire_info.get("irradiation_history")
                 ),
-                irradiation_operating_log=flux_wire_info.get("irradiation_operating_log"),
+                irradiation_operating_log=flux_wire_info.get(
+                    "irradiation_operating_log"
+                ),
             )
         return TimingInfo(
             sample_group="RAFM1",
@@ -573,6 +606,23 @@ def resolve_measurement_timing(
     )
 
 
+def read_qg_activity_reference(
+    path: Optional[Path], profile_name: str
+) -> Optional[FluxWireData]:
+    """Ignore paired text with no nuclide observations (e.g. an ASC export).
+
+    A filename match alone cannot supply comparison truth or count clocks.
+    The original pairing path remains in the sample artifact for review.
+    """
+    if path is None:
+        return None
+    report = read_processed_txt(path, profile_name=profile_name)
+    if not report.has_nuclides:
+        return None
+    report.sample_id = report.sample_id or path.stem
+    return report
+
+
 def report_count_real_time_s(config: Dict[str, Any], report: FluxWireData) -> float:
     """Count duration to apply to Quantum Gold report activities.
 
@@ -587,7 +637,11 @@ def report_count_real_time_s(config: Dict[str, Any], report: FluxWireData) -> fl
             "Set qg_report_activity_includes_count_decay in the workflow config "
             "(true if Quantum Gold already corrected decay during acquisition)"
         )
-    return 0.0 if declared else float(report.real_time)
+    if declared:
+        return 0.0
+    if not math.isfinite(report.real_time) or report.real_time <= 0:
+        raise ValueError("Uncorrected report activity requires positive real_time")
+    return float(report.real_time)
 
 
 def decay_correction_factor(
@@ -604,11 +658,7 @@ def decay_correction_factor(
     if half_life_s <= 0:
         return 1.0
     decay_constant = math.log(2.0) / half_life_s
-    live_term = 1.0
-    if count_real_time_s > 0:
-        denominator = -math.expm1(-decay_constant * count_real_time_s)
-        if denominator > 0:
-            live_term = decay_constant * count_real_time_s / denominator
+    live_term = 1.0 / count_decay_factor(half_life_s, count_real_time_s)
     exponent = decay_constant * (decay_time_s or 0.0)
     if exponent > 700.0:
         return float("inf")
@@ -624,9 +674,16 @@ def peak_to_dict(
 ) -> Dict[str, Any]:
     eoi_activity = None
     eoi_unc = None
-    if peak.isotope and timing.compare_eoi and timing.decay_time_s is not None:
+    if (
+        peak.isotope
+        and not peak.assignment_ambiguous
+        and timing.compare_eoi
+        and timing.decay_time_s is not None
+    ):
         half_life_s = half_life_map.get(peak.isotope, 0.0)
-        factor = decay_correction_factor(half_life_s, count_real_time_s, timing.decay_time_s)
+        factor = decay_correction_factor(
+            half_life_s, count_real_time_s, timing.decay_time_s
+        )
         if math.isfinite(factor):
             eoi_activity = peak.activity_bq * factor if peak.activity_bq > 0 else 0.0
             eoi_unc = peak.activity_unc_bq * factor if peak.activity_unc_bq > 0 else 0.0
@@ -666,9 +723,15 @@ def peak_to_dict(
         "fwhm_keV": float(peak.fwhm),
         "significance": float(peak.significance),
         "isotope": peak.isotope,
+        "assignment_ambiguous": peak.assignment_ambiguous,
+        "assignment_candidates": peak.to_dict()["assignment_candidates"],
+        "activity_estimation_state": peak.activity_estimation_state,
+        "assignment_nominal_fwhm_keV": peak.assignment_nominal_fwhm_keV,
         "efficiency": float(peak.efficiency),
-        "activity_bq": float(peak.activity_bq),
-        "activity_unc_bq": float(peak.activity_unc_bq),
+        "activity_bq": None if peak.assignment_ambiguous else float(peak.activity_bq),
+        "activity_unc_bq": (
+            None if peak.assignment_ambiguous else float(peak.activity_unc_bq)
+        ),
         "activity_correction_factor": float(
             getattr(peak, "activity_correction_factor", 1.0) or 1.0
         ),
@@ -692,6 +755,7 @@ def aggregate_isotope_results(
     for isotope, payload in activity_payload.items():
         result = {
             "activity_bq": float(payload.get("activity_bq", 0.0)),
+            "activity_reference": payload.get("activity_reference"),
             "activity_unc_bq": float(payload.get("activity_unc_bq", 0.0)),
             "activity_uci": float(payload.get("activity_uci", 0.0)),
             "activity_unc_uci": float(payload.get("activity_unc_uci", 0.0)),
@@ -735,7 +799,9 @@ def aggregate_isotope_results(
         )
         if timing.compare_eoi and timing.decay_time_s is not None:
             half_life_s = half_life_map.get(isotope, 0.0)
-            count_time = (count_real_time_by_isotope or {}).get(isotope, count_real_time_s)
+            count_time = (count_real_time_by_isotope or {}).get(
+                isotope, count_real_time_s
+            )
             factor = decay_correction_factor(
                 half_life_s, count_time, timing.decay_time_s
             )
@@ -869,7 +935,9 @@ def _peak_activity_for_qc(
         return None, None, stage
     if peak.isotope and timing.compare_eoi and timing.decay_time_s is not None:
         half_life_s = half_life_map.get(peak.isotope, 0.0)
-        factor = decay_correction_factor(half_life_s, count_real_time_s, timing.decay_time_s)
+        factor = decay_correction_factor(
+            half_life_s, count_real_time_s, timing.decay_time_s
+        )
         if math.isfinite(factor):
             activity *= factor
             activity_unc *= factor
@@ -935,7 +1003,9 @@ def build_fluxforge_line_consistency_rows(
         )
         mean_activity = float(np.mean(activities))
         median_activity = float(np.median(activities))
-        variance_activity = float(np.var(activities, ddof=1 if activities.size > 1 else 0))
+        variance_activity = float(
+            np.var(activities, ddof=1 if activities.size > 1 else 0)
+        )
         std_activity = float(np.sqrt(max(variance_activity, 0.0)))
         mad_activity = float(np.median(np.abs(activities - median_activity)))
         weighted_scatter = float(
@@ -948,10 +1018,14 @@ def build_fluxforge_line_consistency_rows(
         ):
             combined_unc = math.sqrt(activity_unc**2 + consensus_unc**2)
             line_consistency_en_score = (
-                (float(activity - consensus) / combined_unc) if combined_unc > 0.0 else None
+                (float(activity - consensus) / combined_unc)
+                if combined_unc > 0.0
+                else None
             )
             z_score_vs_all = (
-                float((activity - consensus) / combined_unc) if combined_unc > 0.0 else 0.0
+                float((activity - consensus) / combined_unc)
+                if combined_unc > 0.0
+                else 0.0
             )
 
             leave_one_out_consensus = None
@@ -1268,8 +1342,9 @@ def _qg_line_activity_bq(nuclide, peak):
     if not isinstance(unit, str):
         return None
     try:
-        return replace(nuclide, activity=float(peak.get("activity", 0.0)),
-                       activity_unit=unit).activity_bq
+        return replace(
+            nuclide, activity=float(peak.get("activity", 0.0)), activity_unit=unit
+        ).activity_bq
     except ValueError:
         return None
 
@@ -1299,11 +1374,19 @@ def qg_reference_peaks(reference_data: FluxWireData) -> List[Dict[str, Any]]:
                     "assignment": str(peak.get("assignment", "")),
                     "line_activity_bq": _qg_line_activity_bq(nuclide, peak),
                     "reported_line_activity": float(peak.get("activity", 0.0)),
-                    "reported_line_activity_unit": peak.get("activity_unit", nuclide.activity_unit),
-                    "line_activity_unit_basis": "ROI_column_header" if "activity_unit" in peak else "summary_unit_assumption",
+                    "reported_line_activity_unit": peak.get(
+                        "activity_unit", nuclide.activity_unit
+                    ),
+                    "line_activity_unit_basis": (
+                        "ROI_column_header"
+                        if "activity_unit" in peak
+                        else "summary_unit_assumption"
+                    ),
                     "reported_rad_int_text": peak.get("reported_rad_int_text"),
                     "reported_line_activity_text": peak.get("reported_activity_text"),
-                    "report_source_file": peak.get("source_file", reference_data.source_file),
+                    "report_source_file": peak.get(
+                        "source_file", reference_data.source_file
+                    ),
                     "report_source_sha256": peak.get("source_file_sha256"),
                     "report_source_line_number": peak.get("source_line_number"),
                     "report_source_line_text": peak.get("source_line_text"),
@@ -1400,6 +1483,7 @@ def reference_isotope_payload(
         )
         result = {
             "activity_bq": activity_bq,
+            "activity_reference": QG_REPORT_ACTIVITY_REFERENCE,
             "activity_unc_bq": abs(activity_bq) * rel_unc,
             "activity_uci": activity_bq / 3.7e4,
             "activity_unc_uci": (abs(activity_bq) * rel_unc) / 3.7e4,
@@ -1509,6 +1593,17 @@ def match_peak(
     ]
     if not candidates:
         return None, False
+    ambiguous = [peak for peak in candidates if peak.assignment_ambiguous]
+    if ambiguous:
+        # A reference within the admission window of an unresolved component
+        # cannot establish an isotope merely from a nearby exploratory label.
+        return (
+            min(
+                ambiguous,
+                key=lambda peak: abs(peak.energy_keV - reference_peak["energy_keV"]),
+            ),
+            False,
+        )
     candidates.sort(
         key=lambda peak: (
             0 if peak.isotope == reference_peak["isotope"] else 1,
@@ -1516,7 +1611,10 @@ def match_peak(
         )
     )
     best = candidates[0]
-    return best, best.isotope == reference_peak["isotope"]
+    return (
+        best,
+        not best.assignment_ambiguous and best.isotope == reference_peak["isotope"],
+    )
 
 
 def build_peak_comparison_records(
@@ -1584,6 +1682,8 @@ def build_peak_comparison_records(
             record.update(
                 {
                     "raw_isotope": match.isotope,
+                    "assignment_ambiguous": match.assignment_ambiguous,
+                    "assignment_candidates": match.to_dict()["assignment_candidates"],
                     "raw_energy_keV": float(match.energy_keV),
                     "raw_net_counts": raw_net_counts,
                     "raw_net_unc": raw_net_unc,
@@ -1681,7 +1781,11 @@ def build_line_diagnostic_records(
             "reference_gross_counts": float(ref_peak.get("gross_counts") or 0.0),
             "reference_gross_unc": float(ref_peak.get("gross_unc") or 0.0),
             "reference_line_activity_bq": ref_peak["line_activity_bq"],
-            "reference_line_activity_unc_bq": qg_line_activity_unc_bq if ref_peak["line_activity_bq"] is not None else None,
+            "reference_line_activity_unc_bq": (
+                qg_line_activity_unc_bq
+                if ref_peak["line_activity_bq"] is not None
+                else None
+            ),
             "reference_line_activity_uncertainty_basis": "counting-only proxy; full vendor uncertainty unqualified",
             "reference_header_activity_bq": float(
                 ref_peak.get("header_activity_bq") or 0.0
@@ -1699,26 +1803,53 @@ def build_line_diagnostic_records(
 
         # Keep both yield hypotheses and source QC independent of raw matching
         # and parity buckets. Neither QC outcome feeds runtime activities/rates.
-        row.update(qg_yield_diagnostic(ref_peak["isotope"], energy, ref_peak["rad_int_percent"]))
-        for name in ("reported_rad_int_text", "reported_line_activity", "reported_line_activity_text",
-                     "reported_line_activity_unit", "line_activity_unit_basis",
-                     "report_source_file", "report_source_sha256", "report_source_line_number",
-                     "report_source_line_text"):
+        row.update(
+            qg_yield_diagnostic(
+                ref_peak["isotope"], energy, ref_peak["rad_int_percent"]
+            )
+        )
+        for name in (
+            "reported_rad_int_text",
+            "reported_line_activity",
+            "reported_line_activity_text",
+            "reported_line_activity_unit",
+            "line_activity_unit_basis",
+            "report_source_file",
+            "report_source_sha256",
+            "report_source_line_number",
+            "report_source_line_text",
+        ):
             row[name] = ref_peak.get(name)
-        row["reference_implied_efficiency_basis"] = "legacy bundled-nearest yield convention; diagnostic only; vendor convention unverified"
+        row["reference_implied_efficiency_basis"] = (
+            "legacy bundled-nearest yield convention; diagnostic only; vendor convention unverified"
+        )
         for convention, probability in (
             ("percent", row["reference_rad_int_percent_assumption_fraction"]),
             ("fraction", row["reference_rad_int_fraction_assumption"]),
         ):
             row[f"reference_implied_efficiency_{convention}_assumption"] = (
-                float(ref_peak["net_counts"]) / (reference_data.live_time * qg_line_activity_bq * probability)
-                if qg_line_activity_bq > 0 and probability > 0 and reference_data.live_time > 0 else None)
+                float(ref_peak["net_counts"])
+                / (reference_data.live_time * qg_line_activity_bq * probability)
+                if qg_line_activity_bq > 0
+                and probability > 0
+                and reference_data.live_time > 0
+                else None
+            )
         header = float(ref_peak.get("header_activity_bq") or 0.0)
-        row["line_summary_relative_deviation"] = qg_line_activity_bq / header - 1 if header > 0 and qg_line_activity_bq > 0 else None
-        row["flag_line_summary_inconsistency"] = (row["line_summary_relative_deviation"] is not None and
-                                                   abs(row["line_summary_relative_deviation"]) > .25)
+        row["line_summary_relative_deviation"] = (
+            qg_line_activity_bq / header - 1
+            if header > 0 and qg_line_activity_bq > 0
+            else None
+        )
+        row["flag_line_summary_inconsistency"] = (
+            row["line_summary_relative_deviation"] is not None
+            and abs(row["line_summary_relative_deviation"]) > 0.25
+        )
         flags = []
-        if row["yield_qc_status"] in {"yield_convention_discrepancy", "yield_value_discrepancy"}:
+        if row["yield_qc_status"] in {
+            "yield_convention_discrepancy",
+            "yield_value_discrepancy",
+        }:
             flags.append(row["yield_qc_status"])
         elif row["yield_qc_status"] != "consistent_with_percent_assumption":
             flags.append("yield_reference_or_convention_unqualified")
@@ -1767,9 +1898,11 @@ def build_line_diagnostic_records(
         delta_activity = (
             raw_activity - qg_line_activity_bq if reference_activity_known else None
         )
-        combined_activity_unc = (math.sqrt(
-            max(raw_activity_unc**2 + qg_line_activity_unc_bq**2, 0.0)
-        ) if reference_activity_known else None)
+        combined_activity_unc = (
+            math.sqrt(max(raw_activity_unc**2 + qg_line_activity_unc_bq**2, 0.0))
+            if reference_activity_known
+            else None
+        )
 
         raw_branching = (
             float(match.gamma_line.intensity) if match.gamma_line is not None else None
@@ -1791,7 +1924,9 @@ def build_line_diagnostic_records(
             branching_ratio_delta = raw_branching - qg_rad_int_fraction
 
         diagnostic_bucket = "matched"
-        if not isotope_match:
+        if match.assignment_ambiguous:
+            diagnostic_bucket = "assignment_ambiguous"
+        elif not isotope_match:
             diagnostic_bucket = "isotope_mismatch"
         elif abs(delta_counts / float(ref_peak["net_counts"])) > count_limit or (
             combined_count_unc > 0.0
@@ -1811,7 +1946,12 @@ def build_line_diagnostic_records(
                 and abs(delta_activity / combined_activity_unc) > en_limit
             )
         ):
-            diagnostic_bucket = "efficiency_or_activity_conversion_bias"
+            diagnostic_bucket = (
+                "background_or_continuum_count_difference"
+                if raw_net_counts > 0
+                and abs(float(match.net_counts) / raw_net_counts - 1) > count_limit
+                else "efficiency_or_activity_conversion_bias"
+            )
 
         row.update(
             {
@@ -1819,6 +1959,14 @@ def build_line_diagnostic_records(
                 "raw_energy_keV": float(match.energy_keV),
                 "raw_net_counts": raw_net_counts,
                 "raw_net_unc": raw_net_unc,
+                # Retain legacy comparison aliases, but expose the distinct
+                # analysis counts that actually feed the activity calculation.
+                "comparison_net_counts": raw_net_counts,
+                "comparison_net_unc": raw_net_unc,
+                "activity_net_counts": float(match.net_counts),
+                "activity_net_unc": float(match.net_counts_unc),
+                "activity_count_basis": "analysis_net_counts",
+                "comparison_count_basis": "separate_report_comparison_counts",
                 "raw_gross_counts": raw_gross_counts,
                 "raw_gross_unc": raw_gross_unc,
                 "raw_background_adjusted_gross_counts": (
@@ -1849,19 +1997,30 @@ def build_line_diagnostic_records(
                     else None
                 ),
                 "energy_delta_keV": float(match.energy_keV - energy),
-                "raw_line_activity_bq": raw_activity,
-                "raw_line_activity_unc_bq": raw_activity_unc,
+                "raw_line_activity_bq": (
+                    None if match.assignment_ambiguous else raw_activity
+                ),
+                "raw_line_activity_unc_bq": (
+                    None if match.assignment_ambiguous else raw_activity_unc
+                ),
+                "assignment_ambiguous": match.assignment_ambiguous,
+                "activity_estimation_state": match.activity_estimation_state,
+                "comparison_stage": "measurement_time",
                 "relative_line_activity_error": (
                     delta_activity / qg_line_activity_bq
-                    if qg_line_activity_bq > 0.0
+                    if qg_line_activity_bq > 0.0 and not match.assignment_ambiguous
                     else None
                 ),
                 "line_activity_en_score": (
                     delta_activity / combined_activity_unc
-                    if combined_activity_unc is not None and combined_activity_unc > 0.0
+                    if combined_activity_unc is not None
+                    and combined_activity_unc > 0.0
+                    and not match.assignment_ambiguous
                     else None
                 ),
-                "raw_efficiency": float(match.efficiency),
+                "raw_efficiency": (
+                    None if match.assignment_ambiguous else float(match.efficiency)
+                ),
                 "efficiency_ratio_raw_over_qg_implied": efficiency_ratio,
                 "raw_branching_ratio": raw_branching,
                 "raw_branching_ratio_uncertainty": raw_branching_unc,
@@ -1874,8 +2033,10 @@ def build_line_diagnostic_records(
     qg_consistency_rows: List[Dict[str, Any]] = []
     for nuclide in reference_data.nuclides:
         line_activities_bq = [
-            value for peak in nuclide.peaks
-            if (value := _qg_line_activity_bq(nuclide, peak)) is not None and value > 0.0
+            value
+            for peak in nuclide.peaks
+            if (value := _qg_line_activity_bq(nuclide, peak)) is not None
+            and value > 0.0
         ]
         if not line_activities_bq:
             continue
@@ -1926,6 +2087,7 @@ def build_isotope_comparison_records(
             "isotope": nuclide.isotope,
             "reference_activity_bq": ref_bq,
             "reference_activity_unc_bq": ref_unc,
+            "comparison_stage": "measurement_time",
             "matched": nuclide.isotope in raw_isotopes,
         }
         if nuclide.isotope not in raw_isotopes:
@@ -1950,6 +2112,106 @@ def build_isotope_comparison_records(
     return rows, missing
 
 
+def build_measurement_time_audit(
+    line_rows, isotope_rows, qg_consistency_rows, fit_diagnostics=()
+):
+    """Describe report discrepancies without treating report values as truth.
+
+    Divide the line-activity ratio by the count ratio to cancel peak-area
+    differences. The remainder is a conversion diagnostic, not a calibrated
+    efficiency measurement. Multiple limitations may affect one specimen.
+    """
+    categories = set()
+    if fit_diagnostics:
+        categories.add("library_or_assignment_limited")
+    conversion_rows = []
+    for row in line_rows:
+        bucket = row.get("diagnostic_bucket")
+        if bucket in {"count_parity_failure", "missing_in_fluxforge"}:
+            categories.add("peak_area_limited")
+        if bucket in {
+            "assignment_ambiguous",
+            "isotope_mismatch",
+            "gamma_library_mismatch",
+        }:
+            categories.add("library_or_assignment_limited")
+        if bucket == "background_or_continuum_count_difference":
+            categories.add("background_or_continuum_limited")
+        if (
+            bucket == "efficiency_or_activity_conversion_bias"
+            and "activity_net_counts" not in row
+        ):
+            categories.add("activity_conversion_or_efficiency_limited")
+        comparison_n = row.get("comparison_net_counts", row.get("raw_net_counts"))
+        activity_n = row.get("activity_net_counts", row.get("raw_net_counts"))
+        if comparison_n is not None and activity_n is not None:
+            try:
+                if (
+                    float(comparison_n) > 0
+                    and abs(float(activity_n) / float(comparison_n) - 1) > 0.2
+                ):
+                    categories.add("background_or_continuum_limited")
+            except (ValueError, TypeError):
+                pass
+        values = [
+            row.get(key)
+            for key in (
+                "raw_line_activity_bq",
+                "reference_line_activity_bq",
+                "activity_net_counts",
+                "reference_net_counts",
+            )
+        ]
+        if "activity_net_counts" not in row:
+            values[2] = row.get("raw_net_counts")
+        try:
+            valid_conversion = all(
+                value is not None and math.isfinite(float(value)) and float(value) > 0
+                for value in values
+            )
+        except (ValueError, TypeError):
+            valid_conversion = False
+        if not valid_conversion and not row.get("assignment_ambiguous"):
+            categories.add("activity_evidence_incomplete")
+        if (
+            row.get("isotope_match")
+            and not row.get("assignment_ambiguous")
+            and valid_conversion
+        ):
+            raw_a, ref_a, raw_n, ref_n = map(float, values)
+            ratio = (raw_a / ref_a) / (raw_n / ref_n)
+            conversion_rows.append(
+                {
+                    "isotope": row["reference_isotope"],
+                    "energy_keV": row["reference_energy_keV"],
+                    "activity_conversion_ratio_raw_over_report": ratio,
+                    "count_basis": (
+                        "activity_net_counts"
+                        if "activity_net_counts" in row
+                        else "legacy_unseparated_counts"
+                    ),
+                }
+            )
+            if abs(ratio - 1.0) > 0.2:
+                categories.add("activity_conversion_or_efficiency_limited")
+    if any(row.get("flag_internal_inconsistency") for row in qg_consistency_rows):
+        categories.add("export_data_limited")
+    if not line_rows or any(not row.get("matched") for row in isotope_rows):
+        categories.add("activity_evidence_incomplete")
+    return {
+        "comparison_stage": "measurement_time",
+        "categories": sorted(categories) or ["no_flagged_discrepancy"],
+        "conversion_diagnostics": conversion_rows,
+        "eoi_parity": "not_evaluated_no_independent_eoi_reference",
+        "accuracy_qualified": False,
+        "limitations": [
+            "Categories describe differences against a processed report, not unique causal attribution.",
+            "EOI values are derived from measurement-time activities and timing; no independent EOI truth is available.",
+            "Efficiency, emission-probability, geometry and temporal background systematic budgets are not fully qualified.",
+        ],
+    }
+
+
 def build_validation_flags(
     sample_group: str,
     peak_rows: Sequence[Dict[str, Any]],
@@ -1959,19 +2221,55 @@ def build_validation_flags(
     fluxforge_consistency_rows: Sequence[Dict[str, Any]],
     measurement_qc_rows: Sequence[Dict[str, Any]],
     thresholds: Dict[str, Any],
+    *,
+    reference_used_for_analysis: bool = False,
+    fit_diagnostics: Sequence[Dict[str, Any]] = (),
 ) -> Dict[str, Any]:
     count_limit = float(thresholds.get("max_relative_count_error", 1.0))
     activity_limit = float(thresholds.get("max_relative_activity_error", 1.0))
     en_limit = float(thresholds.get("max_en_score", 999.0))
+    if not all(
+        math.isfinite(value) and value >= 0
+        for value in (count_limit, activity_limit, en_limit)
+    ):
+        raise ValueError("Comparison thresholds must be finite and nonnegative.")
+
+    def finite_metrics(row, names):
+        try:
+            return all(
+                row.get(name) is not None and math.isfinite(float(row[name]))
+                for name in names
+            )
+        except (ValueError, TypeError):
+            return False
+
+    incomplete_count_rows = [
+        row
+        for row in peak_rows
+        if row.get("matched")
+        and not finite_metrics(row, ("relative_count_error", "count_en_score"))
+    ]
+    incomplete_activity_rows = [
+        row
+        for row in isotope_rows
+        if row.get("matched")
+        and not finite_metrics(row, ("relative_activity_error", "activity_en_score"))
+    ]
 
     count_failures = [
         row
         for row in peak_rows
         if row.get("matched")
         and (
-            abs(float(row.get("relative_count_error") or 0.0)) > count_limit
-            or abs(float(row.get("count_en_score") or 0.0)) > en_limit
+            row.get("assignment_ambiguous", False)
             or not row.get("isotope_match", False)
+            or (
+                finite_metrics(row, ("relative_count_error", "count_en_score"))
+                and (
+                    abs(float(row["relative_count_error"])) > count_limit
+                    or abs(float(row["count_en_score"])) > en_limit
+                )
+            )
         )
     ]
     activity_failures = []
@@ -1980,9 +2278,10 @@ def build_validation_flags(
             row
             for row in isotope_rows
             if row.get("matched")
+            and finite_metrics(row, ("relative_activity_error", "activity_en_score"))
             and (
-                abs(float(row.get("relative_activity_error") or 0.0)) > activity_limit
-                or abs(float(row.get("activity_en_score") or 0.0)) > en_limit
+                abs(float(row["relative_activity_error"])) > activity_limit
+                or abs(float(row["activity_en_score"])) > en_limit
             )
         ]
 
@@ -1997,7 +2296,7 @@ def build_validation_flags(
         row for row in measurement_qc_rows if row.get("flag_review")
     ]
 
-    passed = not count_failures and not activity_failures
+    passed = not count_failures and not activity_failures and not fit_diagnostics
     if thresholds.get("fail_on_missing_peaks", True) and sample_group in {
         "RAFM1",
         "RAFM3",
@@ -2016,8 +2315,55 @@ def build_validation_flags(
     if thresholds.get("fail_on_measurement_qc", False):
         passed = passed and not measurement_qc_flags
 
+    evaluated = bool(peak_rows or isotope_rows or missing_peaks or missing_nuclides)
+    required_domains = ["counts"]
+    if sample_group in {"RAFM3", "RAFM4", "flux_wires"}:
+        required_domains.append("activities")
+    available_domains = []
+    if any(
+        row.get("matched")
+        and finite_metrics(row, ("relative_count_error", "count_en_score"))
+        for row in peak_rows
+    ):
+        available_domains.append("counts")
+    if any(
+        row.get("matched")
+        and finite_metrics(row, ("relative_activity_error", "activity_en_score"))
+        for row in isotope_rows
+    ):
+        available_domains.append("activities")
+    missing_domains = [
+        domain for domain in required_domains if domain not in available_domains
+    ]
+    incomplete = len(incomplete_count_rows) + len(incomplete_activity_rows)
+    comparison_passed = (
+        False
+        if not passed
+        else None if incomplete or missing_domains or not evaluated else True
+    )
     return {
-        "passed": passed,
+        # Reference reproduction can verify report import, but cannot validate
+        # raw recovery/activity estimates against the same copied quantities.
+        "passed": comparison_passed if not reference_used_for_analysis else None,
+        "comparison_passed": comparison_passed,
+        "comparison_basis": (
+            "not_evaluated"
+            if not evaluated
+            else (
+                "reference_reproduction"
+                if reference_used_for_analysis
+                else "raw_estimate_vs_report"
+            )
+        ),
+        "reference_used_for_analysis": bool(reference_used_for_analysis),
+        "incomplete_comparison_rows": incomplete,
+        "ambiguous_reference_assignments": sum(
+            bool(row.get("assignment_ambiguous")) for row in peak_rows
+        ),
+        "unidentifiable_fit_groups": len(fit_diagnostics),
+        "required_comparison_domains": required_domains,
+        "available_comparison_domains": available_domains,
+        "missing_comparison_domains": missing_domains,
         "count_failures": len(count_failures),
         "activity_failures": len(activity_failures),
         "line_consistency_failures": len(line_consistency_failures),
@@ -2027,13 +2373,86 @@ def build_validation_flags(
     }
 
 
+def summarize_validation_artifacts(
+    artifacts: Sequence[Dict[str, Any]],
+    *,
+    unmatched_qg: Sequence[Union[str, Path]] = (),
+) -> Dict[str, Any]:
+    """Keep failed, unchecked, and reference-reproduction runs distinct."""
+    failing = [
+        item["sample_id"]
+        for item in artifacts
+        if item["validation"].get("passed") is False
+    ]
+    unchecked = [
+        item["sample_id"]
+        for item in artifacts
+        if item["validation"].get("passed") is not True
+        and item["validation"].get("passed") is not False
+    ]
+    return {
+        "overall_passed": (
+            False
+            if failing
+            else None if unchecked or unmatched_qg or not artifacts else True
+        ),
+        "failing_samples": failing,
+        "unvalidated_samples": unchecked,
+        "unvalidated_reference_files": [str(path) for path in unmatched_qg],
+        "reference_reproduction_samples": [
+            item["sample_id"]
+            for item in artifacts
+            if item["validation"].get("comparison_basis") == "reference_reproduction"
+        ],
+    }
+
+
+def enforce_raw_comparison(summary: Dict[str, Any]) -> None:
+    """Require explicit successful comparisons when the caller enables a gate."""
+    if summary.get("overall_passed") is not True:
+        raise RuntimeError(
+            "RAFM raw comparison was not established or failed thresholds for: "
+            + ", ".join(
+                summary["failing_samples"]
+                + summary["unvalidated_samples"]
+                + summary.get("unvalidated_reference_files", [])
+            )
+        )
+
+
 def merge_detected_and_targeted_peaks(
     detected_peaks: Sequence[IdentifiedPeak],
     targeted_peaks: Sequence[IdentifiedPeak],
     config: Dict[str, Any],
+    fit_diagnostics: Sequence[Dict[str, Any]] = (),
 ) -> List[IdentifiedPeak]:
-    merged: List[IdentifiedPeak] = list(detected_peaks)
+    failed_windows = [
+        diagnostic["channel_window"]
+        for diagnostic in fit_diagnostics
+        if diagnostic.get("state") == "unidentifiable_joint_fit"
+    ]
+    # A failed joint estimate cannot be replaced by a provisional search label.
+    # The signed window observation remains available in the diagnostic.
+    merged: List[IdentifiedPeak] = [
+        peak
+        for peak in detected_peaks
+        if not any(lo <= peak.channel <= hi for lo, hi in failed_windows)
+    ]
     for targeted in targeted_peaks:
+        if targeted.assignment_ambiguous:
+            # An exploratory nearest-energy label must not overwrite a
+            # targeted unresolved-component result, even at higher SNR.
+            tolerance = min(
+                energy_tolerance(targeted.energy_keV, config),
+                0.5 * (targeted.assignment_nominal_fwhm_keV or targeted.fwhm),
+            )
+            merged = [
+                peak
+                for peak in merged
+                if abs(peak.energy_keV - targeted.energy_keV) > tolerance
+            ]
+            merged.append(targeted)
+            continue
         best_index: Optional[int] = None
         best_delta = float("inf")
         tolerance = energy_tolerance(targeted.energy_keV, config)
@@ -2349,6 +2768,8 @@ def write_sample_comparison_report(
     reference_data: Optional[FluxWireData],
     config: Dict[str, Any],
     output_path: Path,
+    validation: Optional[Dict[str, Any]] = None,
+    fit_diagnostics: Sequence[Dict[str, Any]] = (),
 ) -> None:
     lines = [
         f"Sample: {sample_id}",
@@ -2363,6 +2784,61 @@ def write_sample_comparison_report(
         "Peak-count parity convention: raw-spectrum local ROI counts for QG gross/net comparison; background-adjusted counts remain in the activity path",
         "",
     ]
+    if validation is not None:
+        basis = validation.get("comparison_basis", "not_evaluated")
+        lines.extend(
+            [
+                f"Comparison basis: {basis}",
+                "Raw comparison passed: "
+                + (
+                    "yes"
+                    if validation.get("passed") is True
+                    else (
+                        "no" if validation.get("passed") is False else "not established"
+                    )
+                ),
+            ]
+        )
+        if basis == "reference_reproduction":
+            lines.append(
+                "QG values were used in the analysis; agreement checks reference reproduction, not independent raw recovery or activity accuracy."
+            )
+        lines.append("")
+    lines.extend(
+        [
+            "Ambiguous observed components; isotope activities withheld",
+            "----------------------------------------------------------",
+        ]
+    )
+    ambiguous = [peak for peak in merged_peaks if peak.assignment_ambiguous]
+    for peak in ambiguous:
+        labels = ", ".join(
+            f"{line.isotope}@{line.energy_keV:.2f}"
+            for line in peak.assignment_candidates
+        )
+        lines.append(
+            f"- {peak.energy_keV:.2f} keV | net={peak.net_counts:.2f} +/- {peak.net_counts_unc:.2f} | candidates={labels} | {peak.activity_estimation_state}"
+        )
+    if not ambiguous:
+        lines.append("- none")
+    lines.append("")
+    for diagnostic in fit_diagnostics:
+        lines.append(
+            f"Unidentifiable joint fit: channels {diagnostic['channel_window']} | observed signed window counts={diagnostic['observed_signed_window_counts']:.2f} +/- {diagnostic['observed_window_count_std']:.2f}; no net peak area or isotope activity estimated | candidates={diagnostic['candidates']} | messages={diagnostic['fit_messages']}"
+        )
+    audit = build_measurement_time_audit(
+        line_rows, isotope_rows, qg_consistency_rows, fit_diagnostics
+    )
+    lines.extend(
+        [
+            "Measurement-time activity audit",
+            "-------------------------------",
+            "Categories: " + ", ".join(audit["categories"]),
+            "EOI parity: " + audit["eoi_parity"],
+            "Accuracy qualified: no (calibration and systematic budgets remain incomplete)",
+            "",
+        ]
+    )
     if reference_data is None:
         lines.extend(
             [
@@ -2500,6 +2976,11 @@ def write_sample_comparison_report(
     section_rows = []
     for row in line_rows:
         bucket = str(row.get("diagnostic_bucket") or "")
+        if bucket == "assignment_ambiguous":
+            section_rows.append(
+                f"- {row['reference_isotope']} @ {float(row['reference_energy_keV']):.2f} keV | bucket=assignment_ambiguous | activity not estimated"
+            )
+            continue
         if bucket in {"matched", "missing_in_fluxforge", "isotope_mismatch"}:
             continue
         section_rows.append(
@@ -2520,8 +3001,9 @@ def write_sample_comparison_report(
         f"percent hypothesis={row['reference_rad_int_percent_assumption_fraction']} photons/decay | "
         f"fraction hypothesis={row['reference_rad_int_fraction_assumption']} photons/decay | "
         f"bundled intensity={row.get('bundled_emission_probability')} photons/decay | report-only"
-        for row in line_rows if row.get("source_qc_bucket") and
-        row["source_qc_bucket"] != "no_flag_under_report_assumptions"
+        for row in line_rows
+        if row.get("source_qc_bucket")
+        and row["source_qc_bucket"] != "no_flag_under_report_assumptions"
     ]
     sections.append(("QG source QC (no activity or rate correction)", source_rows))
 
@@ -2535,9 +3017,7 @@ def write_sample_comparison_report(
             continue
         drift = row.get("all_vs_leave_one_out_relative_delta")
         drift_text = (
-            f" | all-vs-LOO drift={float(drift):+.3f}"
-            if drift is not None
-            else ""
+            f" | all-vs-LOO drift={float(drift):+.3f}" if drift is not None else ""
         )
         section_rows.append(
             f"- {row['isotope']} @ {float(row['energy_keV']):.2f} keV | "
@@ -2659,6 +3139,7 @@ def analyze_generic_sample(
         list(gamma_library),
         metadata.config,
     )
+    fit_diagnostics = []
     targeted_peaks = analyze_raw_spectrum_targeted(
         data=raw_data,
         expected_lines=targeted_gamma_library,
@@ -2689,6 +3170,8 @@ def analyze_generic_sample(
         counting_method=str(
             metadata.config.get("generic_targeted_counting_method", "iec_tiered")
         ),
+        fit_diagnostics=fit_diagnostics,
+        max_assignment_energy_delta_fwhm=1.0,
     )
     attenuation_config = _build_attenuation_sample_config(
         metadata.config, timing.sample_group, sample_id
@@ -2696,22 +3179,30 @@ def analyze_generic_sample(
     apply_activity_corrections(detected_peaks, attenuation_config)
     apply_activity_corrections(targeted_peaks, attenuation_config)
     peaks = merge_detected_and_targeted_peaks(
-        detected_peaks, targeted_peaks, metadata.config
+        detected_peaks, targeted_peaks, metadata.config, fit_diagnostics
     )
-    unidentified_peaks = [peak for peak in peaks if peak.isotope is None]
+    unidentified_peaks = [
+        peak
+        for peak in peaks
+        if peak.isotope is None and not peak.assignment_candidates
+    ]
     generic_method_key = (
         str(metadata.config.get("generic_targeted_counting_method", "iec_tiered"))
         .strip()
         .lower()
     )
+    generic_activities = combine_peak_activities(targeted_peaks)
+    for activity_row in generic_activities.values():
+        activity_row["activity_reference"] = "count_average_live_normalized"
     isotope_payload = aggregate_isotope_results(
-        combine_peak_activities(targeted_peaks),
+        generic_activities,
         half_lives,
         timing,
         adjusted.real_time,
         sample_mass_g=estimate_rafm_sample_mass_g(sample_id, metadata),
     )
     analysis_configuration = {
+        "max_assignment_energy_delta_fwhm": 1.0,
         "profile_name": metadata.config["profile_name"],
         "counting_method": str(
             metadata.config.get("generic_targeted_counting_method", "iec_tiered")
@@ -2784,17 +3275,21 @@ def analyze_generic_sample(
     missing_peaks: List[str] = []
     missing_nuclides: List[str] = []
     validation = {
-        "passed": True,
+        "passed": None,
+        "comparison_passed": None,
+        "comparison_basis": "not_evaluated",
+        "reference_used_for_analysis": False,
         "count_failures": 0,
         "activity_failures": 0,
         "missing_peaks": [],
         "missing_nuclides": [],
     }
-    if qg_path is not None:
-        reference_data = read_processed_txt(
-            qg_path, profile_name=metadata.config["profile_name"]
-        )
-        reference_data.sample_id = reference_data.sample_id or qg_path.stem
+    reference_data = read_qg_activity_reference(
+        qg_path, metadata.config["profile_name"]
+    )
+    if qg_path is not None and reference_data is None:
+        validation["reference_state"] = "unavailable_no_nuclide_observations"
+    if reference_data is not None:
         if generic_method_key in {
             "qg",
             "qg_hybrid",
@@ -2829,6 +3324,15 @@ def analyze_generic_sample(
             fluxforge_consistency_rows,
             measurement_qc_rows,
             metadata.config.get("validation_thresholds", {}),
+            reference_used_for_analysis=generic_method_key
+            in {
+                "qg",
+                "qg_hybrid",
+                "current_hybrid",
+                "quantumgold",
+                "quantum_gold",
+            },
+            fit_diagnostics=fit_diagnostics,
         )
 
     plot_spectrum_overlay(
@@ -2890,6 +3394,8 @@ def analyze_generic_sample(
         reference_data=reference_data,
         config=metadata.config,
         output_path=report_path,
+        validation=validation,
+        fit_diagnostics=fit_diagnostics,
     )
 
     artifact = {
@@ -2902,6 +3408,7 @@ def analyze_generic_sample(
         "timing": timing.to_dict(),
         "counts_csv": str(counts_csv),
         "n_detected_peaks": len(peaks),
+        "n_ambiguous_peaks": sum(peak.assignment_ambiguous for peak in peaks),
         "n_unidentified_peaks": len(unidentified_peaks),
         "comparison_report_txt": str(report_path),
         "line_diagnostics_csv": str(line_diagnostics_path),
@@ -2923,6 +3430,10 @@ def analyze_generic_sample(
         "fluxforge_line_consistency": fluxforge_consistency_rows,
         "measurement_qc": measurement_qc_rows,
         "validation": validation,
+        "targeted_fit_diagnostics": fit_diagnostics,
+        "measurement_time_audit": build_measurement_time_audit(
+            line_rows, isotope_rows, qg_consistency_rows, fit_diagnostics
+        ),
     }
     save_json(artifact, tree["artifacts"] / f"{raw_path.stem}.json")
     return artifact
@@ -2979,7 +3490,9 @@ def flux_wire_mass_mg(normalized_key: str, metadata: RAFMMetadata) -> Optional[f
         return None
     mass = row.get("mass_mg")
     if mass is None:
-        raise ValueError(f"flux_wire_metadata entry for {normalized_key!r} has no mass_mg")
+        raise ValueError(
+            f"flux_wire_metadata entry for {normalized_key!r} has no mass_mg"
+        )
     return float(mass)
 
 
@@ -2991,12 +3504,16 @@ def flux_wire_element_mass_fraction(row: Dict[str, Any]) -> Optional[float]:
     fraction = row.get("element_mass_fraction")
     if basis == "element_mass":
         if fraction is not None and float(fraction) != 1.0:
-            raise ValueError("element_mass must not receive another composition adjustment")
+            raise ValueError(
+                "element_mass must not receive another composition adjustment"
+            )
         return 1.0
     return fraction
 
 
-def flux_wire_specimen_mass_g(sample_key: str, metadata: RAFMMetadata) -> Optional[float]:
+def flux_wire_specimen_mass_g(
+    sample_key: str, metadata: RAFMMetadata
+) -> Optional[float]:
     """Do not present adjusted element mass as measured whole-specimen mass."""
     row = flux_wire_metadata_row(sample_key, metadata) or {}
     flux_wire_element_mass_fraction(row)
@@ -3012,26 +3529,45 @@ def build_flux_wire_reactions(
     isotope_payload: Dict[str, Dict[str, Any]],
     timing: TimingInfo,
     metadata: RAFMMetadata,
-    *, mode: Optional[str] = None,
+    *,
+    mode: Optional[str] = None,
 ) -> List[FluxWireReaction]:
-    mode = metadata.config.get("rate_construction_mode", "diagnostic") if mode is None else mode
+    mode = (
+        metadata.config.get("rate_construction_mode", "diagnostic")
+        if mode is None
+        else mode
+    )
     if mode not in {"diagnostic", "physical"}:
         raise ValueError("Rate construction mode must be diagnostic or physical")
     history = timing.irradiation_history
     log_binding = None
     if timing.irradiation_operating_log is not None:
         history, log_binding = load_operating_history(
-            timing.irradiation_operating_log, expected_end=timing.irradiation_end,
+            timing.irradiation_operating_log,
+            expected_end=timing.irradiation_end,
             expected_segments=history,
             expected_sample=sample_id,
             require_separability=mode == "physical",
         )
     if mode == "physical" and log_binding is None:
-        raise ValueError("Physical rate construction requires a complete irradiation operating log")
-    if mode == "physical" and (timing.irradiation_end is None or timing.irradiation_end.tzinfo is None):
-        raise ValueError("Physical rate construction requires a qualified timezone-bound EOI/log join")
-    if log_binding is not None and timing.irradiation_time_s is not None and not math.isclose(
-        float(timing.irradiation_time_s), sum(d for d, _ in history), rel_tol=0, abs_tol=1e-6
+        raise ValueError(
+            "Physical rate construction requires a complete irradiation operating log"
+        )
+    if mode == "physical" and (
+        timing.irradiation_end is None or timing.irradiation_end.tzinfo is None
+    ):
+        raise ValueError(
+            "Physical rate construction requires a qualified timezone-bound EOI/log join"
+        )
+    if (
+        log_binding is not None
+        and timing.irradiation_time_s is not None
+        and not math.isclose(
+            float(timing.irradiation_time_s),
+            sum(d for d, _ in history),
+            rel_tol=0,
+            abs_tol=1e-6,
+        )
     ):
         raise ValueError("Operating log duration disagrees with the schedule")
     reactions: List[FluxWireReaction] = []
@@ -3048,7 +3584,9 @@ def build_flux_wire_reactions(
         # time; measurement-time activity is never substituted for it.
         if payload.get("activity_eoi_bq") is None:
             if mode == "physical":
-                raise ValueError("Physical rate construction requires qualified EOI activity")
+                raise ValueError(
+                    "Physical rate construction requires qualified EOI activity"
+                )
             reactions.append(
                 FluxWireReaction(
                     sample_id=sample_id,
@@ -3073,7 +3611,9 @@ def build_flux_wire_reactions(
         if activity_unc_bq > 0.0:
             components.append(
                 UncertaintyComponent(
-                    "activity", base_relative_unc, None,
+                    "activity",
+                    base_relative_unc,
+                    None,
                     "reported activity uncertainty (composition not itemized)",
                     uncertainty_scope="reported_total_unknown",
                 )
@@ -3081,21 +3621,45 @@ def build_flux_wire_reactions(
         # Model terms are explicit, named components (never silent floors).
         model_terms: List[Tuple[str, float, float]] = []
         if reaction_id == "Ti-48(n,p)Sc-48":
-            model_terms.append((
-                "ti48_model",
-                float(metadata.config.get("ti48_model_relative_uncertainty_additional", 0.15)),
-                float(metadata.config.get("ti48_model_relative_uncertainty_floor", 0.20)),
-            ))
+            model_terms.append(
+                (
+                    "ti48_model",
+                    float(
+                        metadata.config.get(
+                            "ti48_model_relative_uncertainty_additional", 0.15
+                        )
+                    ),
+                    float(
+                        metadata.config.get(
+                            "ti48_model_relative_uncertainty_floor", 0.20
+                        )
+                    ),
+                )
+            )
         if "-cd-" in normalized_sample_id or "-cd-" in normalized_sample_key:
-            model_terms.append((
-                "cd_model",
-                float(metadata.config.get("cd_model_relative_uncertainty_additional", 0.20)),
-                float(metadata.config.get("cd_model_relative_uncertainty_floor", 0.25)),
-            ))
+            model_terms.append(
+                (
+                    "cd_model",
+                    float(
+                        metadata.config.get(
+                            "cd_model_relative_uncertainty_additional", 0.20
+                        )
+                    ),
+                    float(
+                        metadata.config.get("cd_model_relative_uncertainty_floor", 0.25)
+                    ),
+                )
+            )
         for name, additional, _ in model_terms:
             if additional > 0.0:
                 components.append(
-                    UncertaintyComponent(name, additional, None, f"config {name}_relative_uncertainty_additional", assumed=True)
+                    UncertaintyComponent(
+                        name,
+                        additional,
+                        None,
+                        f"config {name}_relative_uncertainty_additional",
+                        assumed=True,
+                    )
                 )
         floor = max((term[2] for term in model_terms), default=0.0)
         # Source components can be global, per-wire, or per observation. An
@@ -3103,33 +3667,67 @@ def build_flux_wire_reactions(
         # it is never added a second time. Coverage overlap is rejected below.
         declared = dict(metadata.config.get("rate_uncertainty_components", {}))
         declared.update(wire_metadata.get("rate_uncertainty_components", {}))
-        declared.update(metadata.config.get("rate_uncertainty_budgets", {}).get(
-            f"{sample_id}|{reaction_id}", {}))
+        declared.update(
+            metadata.config.get("rate_uncertainty_budgets", {}).get(
+                f"{sample_id}|{reaction_id}", {}
+            )
+        )
         for name, spec in declared.items():
-            kwargs = dict(source=spec.get("source", ""),
-                          correlation_group=spec.get("correlation_group"),
-                          uncertainty_scope=spec.get("uncertainty_scope", "unspecified"),
-                          covers=tuple(spec.get("covers", ())))
+            kwargs = dict(
+                source=spec.get("source", ""),
+                correlation_group=spec.get("correlation_group"),
+                uncertainty_scope=spec.get("uncertainty_scope", "unspecified"),
+                covers=tuple(spec.get("covers", ())),
+            )
             if "input_covariance" in spec:
                 sensitivity = spec.get("log_sensitivities")
                 names, units = spec.get("input_names"), spec.get("input_units")
                 if spec.get("kind") == "irradiation_history":
-                    if log_binding is not None and kwargs["correlation_group"] != log_binding["source_id"]:
-                        raise ValueError("History covariance source group disagrees with operating log")
+                    if (
+                        log_binding is not None
+                        and kwargs["correlation_group"] != log_binding["source_id"]
+                    ):
+                        raise ValueError(
+                            "History covariance source group disagrees with operating log"
+                        )
                     segments = history or [(float(timing.irradiation_time_s), 1.0)]
-                    sensitivity, calculated_names, calculated_units = history_rate_jacobian(half_life_s, segments)
+                    sensitivity, calculated_names, calculated_units = (
+                        history_rate_jacobian(half_life_s, segments)
+                    )
                     if names != calculated_names or units != calculated_units:
-                        raise ValueError("History covariance parameter names/units disagree with segments")
+                        raise ValueError(
+                            "History covariance parameter names/units disagree with segments"
+                        )
                 component = UncertaintyComponent.from_covariance(
-                    name, spec["input_covariance"], sensitivity, input_names=names,
-                    input_units=units, assumed=spec.get("assumed", False) or (spec.get("kind") == "irradiation_history" and log_binding is None),
+                    name,
+                    spec["input_covariance"],
+                    sensitivity,
+                    input_names=names,
+                    input_units=units,
+                    assumed=spec.get("assumed", False)
+                    or (
+                        spec.get("kind") == "irradiation_history"
+                        and log_binding is None
+                    ),
                     **kwargs,
                 )
             else:
-                component = (UncertaintyComponent(name, float(spec["relative"]), assumed=spec.get("assumed", False), **kwargs)
-                         if "relative" in spec else UncertaintyComponent.from_input(
-                             name, float(spec["standard_uncertainty"]),
-                             float(spec["log_sensitivity"]), assumed=spec.get("assumed", False), **kwargs))
+                component = (
+                    UncertaintyComponent(
+                        name,
+                        float(spec["relative"]),
+                        assumed=spec.get("assumed", False),
+                        **kwargs,
+                    )
+                    if "relative" in spec
+                    else UncertaintyComponent.from_input(
+                        name,
+                        float(spec["standard_uncertainty"]),
+                        float(spec["log_sensitivity"]),
+                        assumed=spec.get("assumed", False),
+                        **kwargs,
+                    )
+                )
             components = [c for c in components if c.name != name] + [component]
 
         current = math.sqrt(sum(c.relative**2 for c in components))
@@ -3141,7 +3739,9 @@ def build_flux_wire_reactions(
 
         isotope_fraction = get_isotope_fraction(reaction_id, sample_element or "")
         n_atoms = calculate_n_atoms(
-            sample_element, mass_mg=mass_mg, isotope_fraction=isotope_fraction,
+            sample_element,
+            mass_mg=mass_mg,
+            isotope_fraction=isotope_fraction,
             element_mass_fraction=element_mass_fraction,
         )
         irradiation_time_s = float(timing.irradiation_time_s or 0.0)
@@ -3159,17 +3759,36 @@ def build_flux_wire_reactions(
             else 0.0
         )
         budget = RateUncertaintyBudget(
-            row_id=f"{sample_id}|{reaction_id}", rate=rate, components=components,
-            diagnostic_assumptions=([] if log_binding else ["Irradiation chronology/history is not a complete operating log"]) +
-                ([] if log_binding and log_binding["local_spectrum_separability_qualified"] else ["Scalar history assumes a separable local spectrum and explicit reference-power normalization"]),
+            row_id=f"{sample_id}|{reaction_id}",
+            rate=rate,
+            components=components,
+            diagnostic_assumptions=(
+                []
+                if log_binding
+                else ["Irradiation chronology/history is not a complete operating log"]
+            )
+            + (
+                []
+                if log_binding and log_binding["local_spectrum_separability_qualified"]
+                else [
+                    "Scalar history assumes a separable local spectrum and explicit reference-power normalization"
+                ]
+            ),
             irradiation_log_binding=log_binding,
         )
         if mode == "physical":
             budget.require_complete()
             if any(c.assumed for c in components):
-                raise ValueError("Physical rate construction rejects assumed uncertainty components")
-            if any(c.uncertainty_scope in {"unspecified", "reported_total_unknown"} for c in components):
-                raise ValueError("Physical rate construction rejects unknown uncertainty coverage/conditioning")
+                raise ValueError(
+                    "Physical rate construction rejects assumed uncertainty components"
+                )
+            if any(
+                c.uncertainty_scope in {"unspecified", "reported_total_unknown"}
+                for c in components
+            ):
+                raise ValueError(
+                    "Physical rate construction rejects unknown uncertainty coverage/conditioning"
+                )
         reactions.append(
             FluxWireReaction(
                 sample_id=sample_id,
@@ -3230,13 +3849,9 @@ def analyze_flux_wire_sample(
         counts_csv,
     )
 
-    reference_data = (
-        read_processed_txt(qg_path, profile_name=metadata.config["profile_name"])
-        if qg_path
-        else None
+    reference_data = read_qg_activity_reference(
+        qg_path, metadata.config["profile_name"]
     )
-    if reference_data is not None:
-        reference_data.sample_id = reference_data.sample_id or qg_path.stem
 
     analysis = analyze_flux_wire_targeted(
         data=raw_data,
@@ -3288,6 +3903,8 @@ def analyze_flux_wire_sample(
     )
     apply_activity_corrections(analysis.peaks, attenuation_config)
     analysis.nuclide_activities = combine_peak_activities(analysis.peaks)
+    for activity_row in analysis.nuclide_activities.values():
+        activity_row["activity_reference"] = "count_average_live_normalized"
     method_key = (
         str(metadata.config.get("flux_wire_counting_method", "qg")).strip().lower()
     )
@@ -3307,6 +3924,9 @@ def analyze_flux_wire_sample(
             else:
                 rel_unc = 0.0
             analysis.nuclide_activities[nuclide.isotope]["activity_bq"] = activity_bq
+            analysis.nuclide_activities[nuclide.isotope][
+                "activity_reference"
+            ] = QG_REPORT_ACTIVITY_REFERENCE
             analysis.nuclide_activities[nuclide.isotope]["activity_unc_bq"] = (
                 abs(activity_bq) * rel_unc
             )
@@ -3402,12 +4022,17 @@ def analyze_flux_wire_sample(
     missing_peaks: List[str] = []
     missing_nuclides: List[str] = []
     validation = {
-        "passed": True,
+        "passed": None,
+        "comparison_passed": None,
+        "comparison_basis": "not_evaluated",
+        "reference_used_for_analysis": False,
         "count_failures": 0,
         "activity_failures": 0,
         "missing_peaks": [],
         "missing_nuclides": [],
     }
+    if qg_path is not None and reference_data is None:
+        validation["reference_state"] = "unavailable_no_nuclide_observations"
     if reference_data is not None:
         peak_rows, missing_peaks = build_peak_comparison_records(
             sample_id, analysis.peaks, reference_data, metadata.config
@@ -3431,6 +4056,15 @@ def analyze_flux_wire_sample(
             fluxforge_consistency_rows,
             measurement_qc_rows,
             metadata.config.get("validation_thresholds", {}),
+            reference_used_for_analysis=method_key
+            in {
+                "qg",
+                "qg_hybrid",
+                "current_hybrid",
+                "quantumgold",
+                "quantum_gold",
+            },
+            fit_diagnostics=analysis.fit_diagnostics,
         )
 
     plot_spectrum_overlay(
@@ -3455,7 +4089,11 @@ def analyze_flux_wire_sample(
         isotope_rows,
         tree["plots_comparisons"] / f"{raw_path.stem}_vs_qg.png",
     )
-    unidentified_peaks = [peak for peak in analysis.peaks if peak.isotope is None]
+    unidentified_peaks = [
+        peak
+        for peak in analysis.peaks
+        if peak.isotope is None and not peak.assignment_candidates
+    ]
     report_path = tree["reports"] / f"{raw_path.stem}_comparison.txt"
     line_diagnostics_path = (
         tree["tables"] / "line_diagnostics" / f"{raw_path.stem}_line_diagnostics.csv"
@@ -3493,6 +4131,8 @@ def analyze_flux_wire_sample(
         reference_data=reference_data,
         config=metadata.config,
         output_path=report_path,
+        validation=validation,
+        fit_diagnostics=analysis.fit_diagnostics,
     )
 
     artifact = {
@@ -3505,6 +4145,7 @@ def analyze_flux_wire_sample(
         "timing": timing.to_dict(),
         "counts_csv": str(counts_csv),
         "n_detected_peaks": len(analysis.peaks),
+        "n_ambiguous_peaks": sum(peak.assignment_ambiguous for peak in analysis.peaks),
         "n_unidentified_peaks": len(unidentified_peaks),
         "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
         "comparison_report_txt": str(report_path),
@@ -3521,7 +4162,7 @@ def analyze_flux_wire_sample(
             for peak in unidentified_peaks
         ],
         "isotopes": isotope_payload,
-        "reactions": [asdict(reaction) for reaction in reactions],
+        "reactions": reaction_rows_to_dicts(reactions),
         "peak_comparison": peak_rows,
         "isotope_comparison": isotope_rows,
         "line_diagnostics": line_rows,
@@ -3529,6 +4170,10 @@ def analyze_flux_wire_sample(
         "fluxforge_line_consistency": fluxforge_consistency_rows,
         "measurement_qc": measurement_qc_rows,
         "validation": validation,
+        "targeted_fit_diagnostics": analysis.fit_diagnostics,
+        "measurement_time_audit": build_measurement_time_audit(
+            line_rows, isotope_rows, qg_consistency_rows, analysis.fit_diagnostics
+        ),
     }
     save_json(artifact, tree["artifacts"] / f"{raw_path.stem}.json")
     return artifact
@@ -3796,15 +4441,33 @@ def reaction_rows_to_dicts(
         row.pop("uncertainty_budget", None)
         budget = reaction.uncertainty_budget
         row["rate_uncertainty_components"] = (
-            ";".join(f"{c.name}={c.relative:.4g}" for c in budget.components) if budget else ""
+            ";".join(f"{c.name}={c.relative:.4g}" for c in budget.components)
+            if budget
+            else ""
         )
         row["rate_uncertainty_missing"] = ";".join(budget.missing) if budget else ""
         row["rate_uncertainty_budget"] = asdict(budget) if budget else None
+        unavailable = (
+            reaction.rate_note
+            == "no end-of-irradiation activity (decay timing missing or non-finite)"
+        )
+        row["rate_status"] = "UNAVAILABLE" if unavailable else "DIAGNOSTIC"
+        if unavailable:
+            # Internal legacy placeholders never become measured zeros in exports.
+            for key in (
+                "activity_bq",
+                "activity_unc_bq",
+                "reaction_rate",
+                "reaction_rate_unc",
+                "n_atoms",
+            ):
+                row[key] = None
         rows.append(row)
     return rows
 
 
 _REACTION_ROW_EXTRA_KEYS = (
+    "rate_status",
     "rate_uncertainty_components",
     "rate_uncertainty_missing",
     "rate_uncertainty_budget",
@@ -3814,7 +4477,18 @@ _REACTION_ROW_EXTRA_KEYS = (
 
 def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
     """Rebuild a FluxWireReaction (with its uncertainty budget) from a row dict."""
-    data = {key: value for key, value in row.items() if key not in _REACTION_ROW_EXTRA_KEYS}
+    data = {
+        key: value for key, value in row.items() if key not in _REACTION_ROW_EXTRA_KEYS
+    }
+    if row.get("rate_status") == "UNAVAILABLE":
+        for key in (
+            "activity_bq",
+            "activity_unc_bq",
+            "reaction_rate",
+            "reaction_rate_unc",
+            "n_atoms",
+        ):
+            data[key] = 0.0
     reaction = FluxWireReaction(**data)
     # Accept both the serialized form and a raw ``asdict(reaction)`` payload.
     serialized = row.get("rate_uncertainty_budget") or row.get("uncertainty_budget")
@@ -3825,7 +4499,10 @@ def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
             row_id=serialized["row_id"],
             rate=float(serialized["rate"]),
             components=[UncertaintyComponent(**c) for c in serialized["components"]],
-            required=serialized.get("required", RateUncertaintyBudget.__dataclass_fields__["required"].default),
+            required=serialized.get(
+                "required",
+                RateUncertaintyBudget.__dataclass_fields__["required"].default,
+            ),
             diagnostic_assumptions=serialized.get("diagnostic_assumptions", []),
             irradiation_log_binding=serialized.get("irradiation_log_binding"),
         )
@@ -3834,7 +4511,9 @@ def reaction_from_row(row: Dict[str, Any]) -> FluxWireReaction:
 
 def csv_reaction_rows(rows: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Reaction rows without the nested budget (it has its own tables)."""
-    return [{k: v for k, v in row.items() if k != "rate_uncertainty_budget"} for row in rows]
+    return [
+        {k: v for k, v in row.items() if k != "rate_uncertainty_budget"} for row in rows
+    ]
 
 
 def write_rate_uncertainty_tables(
@@ -3846,11 +4525,16 @@ def write_rate_uncertainty_tables(
         for r in reactions
         if r.uncertainty_budget is not None and r.reaction_rate > 0
     ]
-    write_rows_csv(budget_table(budgets), tables_root / "flux_wire_rate_uncertainty_budget.csv")
+    write_rows_csv(
+        budget_table(budgets), tables_root / "flux_wire_rate_uncertainty_budget.csv"
+    )
     covariance = rate_covariance(budgets)
     write_rows_csv(
         [
-            {"row_id": budget.row_id, **{b.row_id: float(v) for b, v in zip(budgets, row)}}
+            {
+                "row_id": budget.row_id,
+                **{b.row_id: float(v) for b, v in zip(budgets, row)},
+            }
             for budget, row in zip(budgets, covariance)
         ],
         tables_root / "flux_wire_rate_covariance.csv",
@@ -3869,6 +4553,7 @@ def _qg_isotope_activity_payload(
         activity_bq = float(getattr(nuclide, "activity_bq", 0.0) or 0.0)
         payload[nuclide.isotope] = {
             "activity_bq": activity_bq,
+            "activity_reference": QG_REPORT_ACTIVITY_REFERENCE,
             "activity_unc_bq": (
                 activity_unc_uci * 3.7e4 if activity_unc_uci > 0.0 else 0.0
             ),
@@ -3922,7 +4607,9 @@ def cd_ratio_rows(
     configured_ranges = metadata.config.get("cd_ratio_expected_ranges", {})
     default_review_min = float(metadata.config.get("cd_ratio_default_review_min", 1.10))
 
-    def rates(artifact: Dict[str, Any]) -> Dict[str, Tuple[float, float, Optional[Dict[str, Any]]]]:
+    def rates(
+        artifact: Dict[str, Any]
+    ) -> Dict[str, Tuple[float, float, Optional[Dict[str, Any]]]]:
         return {
             str(row["reaction_id"]): (
                 float(row.get("reaction_rate") or 0.0),
@@ -3953,25 +4640,38 @@ def cd_ratio_rows(
             ratio = bare_rate / cd_rate if bare_rate > 0 and cd_rate > 0 else None
             shared_covariance = 0.0
             missing_uncertainty_components: List[str] = ["budget_unavailable"]
-            if ratio is not None and isinstance(bare_budget, dict) and isinstance(cd_budget, dict):
+            if (
+                ratio is not None
+                and isinstance(bare_budget, dict)
+                and isinstance(cd_budget, dict)
+            ):
                 budgets = [
                     RateUncertaintyBudget(
-                        row_id=str(budget["row_id"]), rate=rate,
-                        components=[UncertaintyComponent(**item) for item in budget["components"]],
+                        row_id=str(budget["row_id"]),
+                        rate=rate,
+                        components=[
+                            UncertaintyComponent(**item)
+                            for item in budget["components"]
+                        ],
                     )
                     for budget, rate in ((bare_budget, bare_rate), (cd_budget, cd_rate))
                 ]
                 shared_covariance = float(rate_covariance(budgets)[0, 1])
-                missing_uncertainty_components = sorted(set(budgets[0].missing + budgets[1].missing))
+                missing_uncertainty_components = sorted(
+                    set(budgets[0].missing + budgets[1].missing)
+                )
             if ratio is None:
                 ratio_unc = None
             else:
                 relative_variance = (
-                    (bare_unc / bare_rate) ** 2 + (cd_unc / cd_rate) ** 2
+                    (bare_unc / bare_rate) ** 2
+                    + (cd_unc / cd_rate) ** 2
                     - 2 * shared_covariance / (bare_rate * cd_rate)
                 )
                 if relative_variance < -1e-12:
-                    raise ValueError("Cd ratio component covariance exceeds marginal uncertainty")
+                    raise ValueError(
+                        "Cd ratio component covariance exceeds marginal uncertainty"
+                    )
                 ratio_unc = ratio * math.sqrt(max(relative_variance, 0.0))
             flag_review = ratio is None or (
                 (expected_min is not None and ratio < float(expected_min))
@@ -3994,7 +4694,9 @@ def cd_ratio_rows(
                     "cd_ratio": ratio,
                     "cd_ratio_unc": ratio_unc,
                     "shared_rate_covariance": shared_covariance,
-                    "missing_uncertainty_components": ";".join(missing_uncertainty_components),
+                    "missing_uncertainty_components": ";".join(
+                        missing_uncertainty_components
+                    ),
                     "basis": "per-target-atom EOI reaction rates",
                     "expected_cd_ratio_min": (
                         None if expected_min is None else float(expected_min)
@@ -4072,14 +4774,17 @@ def run_qg_benchmark(
                 "sample_group": timing.sample_group,
                 "n_isotopes": len(isotope_payload),
                 "n_reactions": len(reactions),
-                "reaction_rate_mass_metadata": flux_wire_metadata_row(sample_key, metadata),
+                "reaction_rate_mass_metadata": flux_wire_metadata_row(
+                    sample_key, metadata
+                ),
             }
         )
 
     write_rows_csv(sample_rows, tree["tables"] / "qg_samples.csv")
     write_rows_csv(isotope_rows, tree["tables"] / "qg_isotope_summary.csv")
     write_rows_csv(
-        csv_reaction_rows(reaction_rows), tree["tables"] / "flux_wire_reaction_rates.csv"
+        csv_reaction_rows(reaction_rows),
+        tree["tables"] / "flux_wire_reaction_rates.csv",
     )
     write_rate_uncertainty_tables(all_reactions, tree["tables"])
 
@@ -4117,6 +4822,16 @@ def run_qg_benchmark(
     return summary
 
 
+def optional_export_number(value: Any) -> Optional[float]:
+    """Read CSV nulls without manufacturing measured zeros."""
+    if value is None or value == "":
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("Non-finite numeric artifact value")
+    return number
+
+
 def compare_rafm_completion_results(
     raw_results_root: Path,
     qg_results_root: Path,
@@ -4148,14 +4863,18 @@ def compare_rafm_completion_results(
     for key in matched_keys:
         raw_row = raw_by_key[key]
         qg_row = qg_by_key[key]
-        raw_activity = float(raw_row.get("activity_bq") or 0.0)
-        qg_activity = float(qg_row.get("activity_bq") or 0.0)
-        raw_rate = float(raw_row.get("reaction_rate") or 0.0)
-        qg_rate = float(qg_row.get("reaction_rate") or 0.0)
+        raw_activity = optional_export_number(raw_row.get("activity_bq"))
+        qg_activity = optional_export_number(qg_row.get("activity_bq"))
+        raw_rate = optional_export_number(raw_row.get("reaction_rate"))
+        qg_rate = optional_export_number(qg_row.get("reaction_rate"))
         rel_activity = (
-            (raw_activity - qg_activity) / qg_activity if qg_activity else None
+            (raw_activity - qg_activity) / qg_activity
+            if raw_activity is not None and qg_activity
+            else None
         )
-        rel_rate = (raw_rate - qg_rate) / qg_rate if qg_rate else None
+        rel_rate = (
+            (raw_rate - qg_rate) / qg_rate if raw_rate is not None and qg_rate else None
+        )
         if rel_activity is not None:
             activity_errors.append(abs(rel_activity))
         if rel_rate is not None:
@@ -4206,31 +4925,42 @@ def compare_rafm_completion_results(
         "raw_results_root": str(raw_root),
         "qg_results_root": str(qg_root),
         "matched_reactions": len(matched_keys),
+        "valid_activity_comparisons": len(activity_errors),
+        "valid_rate_comparisons": len(rate_errors),
+        "activity_comparison_status": "AVAILABLE" if activity_errors else "UNAVAILABLE",
+        "rate_comparison_status": "AVAILABLE" if rate_errors else "UNAVAILABLE",
         "median_abs_activity_rel_error": (
-            float(np.median(activity_errors)) if activity_errors else 0.0
+            float(np.median(activity_errors)) if activity_errors else None
         ),
         "max_abs_activity_rel_error": (
-            float(np.max(activity_errors)) if activity_errors else 0.0
+            float(np.max(activity_errors)) if activity_errors else None
         ),
         "median_abs_rate_rel_error": (
-            float(np.median(rate_errors)) if rate_errors else 0.0
+            float(np.median(rate_errors)) if rate_errors else None
         ),
-        "max_abs_rate_rel_error": float(np.max(rate_errors)) if rate_errors else 0.0,
+        "max_abs_rate_rel_error": float(np.max(rate_errors)) if rate_errors else None,
         "shared_unfold_methods": shared_unfold_methods,
         "unfold_metrics": unfold_metrics,
         "comparison_root": str(compare_root),
     }
     save_json(summary, compare_root / "branch_comparison.json")
+
+    def display_metric(key: str) -> str:
+        value = summary[key]
+        return "UNAVAILABLE" if value is None else f"{value:.6g}"
+
     (compare_root / "branch_comparison.md").write_text(
         "\n".join(
             [
                 "# RAFM Branch Comparison",
                 "",
                 f"Matched reactions: {summary['matched_reactions']}",
-                f"Median |activity rel err|: {summary['median_abs_activity_rel_error']:.6g}",
-                f"Max |activity rel err|: {summary['max_abs_activity_rel_error']:.6g}",
-                f"Median |rate rel err|: {summary['median_abs_rate_rel_error']:.6g}",
-                f"Max |rate rel err|: {summary['max_abs_rate_rel_error']:.6g}",
+                f"Valid activity comparisons: {summary['valid_activity_comparisons']}",
+                f"Valid rate comparisons: {summary['valid_rate_comparisons']}",
+                f"Median |activity rel err|: {display_metric('median_abs_activity_rel_error')}",
+                f"Max |activity rel err|: {display_metric('max_abs_activity_rel_error')}",
+                f"Median |rate rel err|: {display_metric('median_abs_rate_rel_error')}",
+                f"Max |rate rel err|: {display_metric('max_abs_rate_rel_error')}",
             ]
         )
         + "\n",
@@ -4267,7 +4997,11 @@ def adapt_unfold_result(
         converged=False,
         method=method,
         initial_guess_source=initial_guess_source,
-        metadata={"diagnostic_only": True, "physical_validation": False, **(metadata_dict or {})},
+        metadata={
+            "diagnostic_only": True,
+            "physical_validation": False,
+            **(metadata_dict or {}),
+        },
     )
 
 
@@ -4292,8 +5026,10 @@ def method_overlay_plot(results: Dict[str, UnfoldingResult], output_path: Path) 
             or result.metadata.get("diagnostic_only")
             or not result.metadata.get("physical_validation")
             or any(key not in result.metadata for key in required)
-            or result.metadata["observation_ids"] != reference.metadata.get("observation_ids")
-            or result.metadata["uncertainty_model"] != reference.metadata.get("uncertainty_model")
+            or result.metadata["observation_ids"]
+            != reference.metadata.get("observation_ids")
+            or result.metadata["uncertainty_model"]
+            != reference.metadata.get("uncertainty_model")
             or not np.array_equal(result.energy_edges, reference.energy_edges)
             or not np.array_equal(result.response_matrix, reference.response_matrix)
             or not np.array_equal(result.measured_rates, reference.measured_rates)
@@ -4319,6 +5055,16 @@ def method_overlay_plot(results: Dict[str, UnfoldingResult], output_path: Path) 
     plt.close(fig)
 
 
+def _save_batch_unfolding_plot(plot, *args, **kwargs) -> None:
+    """Release only pyplot figures created by this batch export call."""
+    before = set(plt.get_fignums()) if HAS_MATPLOTLIB else set()
+    try:
+        plot(*args, **kwargs)
+    finally:
+        for number in (set(plt.get_fignums()) - before) if HAS_MATPLOTLIB else ():
+            plt.close(number)
+
+
 def save_unfolding_artifacts(
     result: UnfoldingResult,
     prior_flux: np.ndarray,
@@ -4334,7 +5080,9 @@ def save_unfolding_artifacts(
         "reactions_used": result.reactions_used,
         "measured_rates": result.measured_rates.tolist(),
         "predicted_rates": result.predicted_rates.tolist(),
-        "chi_squared": None if result.metadata.get("diagnostic_only") else result.chi_squared,
+        "chi_squared": (
+            None if result.metadata.get("diagnostic_only") else result.chi_squared
+        ),
         "iterations": result.iterations,
         "converged": result.converged,
         "initial_guess_source": result.initial_guess_source,
@@ -4356,7 +5104,8 @@ def save_unfolding_artifacts(
     write_rows_csv(table_rows, output_root / f"{slug}_measured_vs_predicted.csv")
 
     plots_root = output_root.parent / "plots" / "unfolding"
-    plot_spectrum_comparison(
+    _save_batch_unfolding_plot(
+        plot_spectrum_comparison,
         result,
         reference_flux=prior_flux,
         reference_label=reference_label or result.initial_guess_source,
@@ -4364,17 +5113,20 @@ def save_unfolding_artifacts(
         save_path=plots_root / f"{slug}_spectrum.png",
     )
     if np.any(result.flux_uncertainty > 0):
-        plot_spectrum_uncertainty_bands(
+        _save_batch_unfolding_plot(
+            plot_spectrum_uncertainty_bands,
             result,
             title=f"{result.method} uncertainty bands",
             save_path=plots_root / f"{slug}_uncertainty.png",
         )
-    plot_measured_vs_predicted(
+    _save_batch_unfolding_plot(
+        plot_measured_vs_predicted,
         result,
         title=f"{result.method} measured vs predicted reaction rates",
         save_path=plots_root / f"{slug}_measured_vs_predicted.png",
     )
-    plot_response_matrix(
+    _save_batch_unfolding_plot(
+        plot_response_matrix,
         result.response_matrix,
         result.energy_edges,
         result.reactions_used,
@@ -4425,7 +5177,8 @@ def run_flux_wire_unfolding(
     valid_reactions = [
         reaction
         for reaction in reactions
-        if reaction.reaction_rate > 0 and "Unknown(" not in reaction.reaction_id
+        if reaction.reaction_rate > 0
+        and "Unknown(" not in reaction.reaction_id
         and not (
             str(reaction.sample_id).lower().startswith("ni-rafm-1")
             and "ni-57" in reaction.reaction_id.lower()
@@ -4433,18 +5186,24 @@ def run_flux_wire_unfolding(
     ]
     if not valid_reactions:
         if excluded_reactions:
-            save_json({
-                "excluded_reactions": excluded_reactions,
-                "sensitivity_status": "not computed: no qualified physical inversion available",
-            }, output_root / "input_admission_review.json")
+            save_json(
+                {
+                    "excluded_reactions": excluded_reactions,
+                    "sensitivity_status": "not computed: no qualified physical inversion available",
+                },
+                output_root / "input_admission_review.json",
+            )
         return {}
-    save_json({
-        "included_observation_ids": [
-            f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
-        ],
-        "excluded_reactions": excluded_reactions,
-        "sensitivity_status": "not computed: no qualified physical inversion available",
-    }, output_root / "input_admission_review.json")
+    save_json(
+        {
+            "included_observation_ids": [
+                f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
+            ],
+            "excluded_reactions": excluded_reactions,
+            "sensitivity_status": "not computed: no qualified physical inversion available",
+        },
+        output_root / "input_admission_review.json",
+    )
 
     # Discrete binning is a per-reaction indicator, not an unfolded spectrum,
     # and is deliberately not produced or overlaid as a flux here.
@@ -4488,7 +5247,9 @@ def run_flux_wire_unfolding(
     )
     prior_gls = parse_prior_spectrum(prior_path, gls.energy_bounds_eV)
     save_unfolding_artifacts(
-        gls_result, prior_gls, output_root,
+        gls_result,
+        prior_gls,
+        output_root,
         reference_label="VITAMIN-J plot reference (not inversion prior)",
     )
 
@@ -4507,11 +5268,18 @@ def run_flux_wire_unfolding(
             budget = reaction.uncertainty_budget
             if budget is not None:
                 floor_component = floor_as_component(
-                    "iterative_rate_floor", budget.total_relative, min_relative_uncertainty,
-                    "explicit run_flux_wire_unfolding min_relative_uncertainty")
+                    "iterative_rate_floor",
+                    budget.total_relative,
+                    min_relative_uncertainty,
+                    "explicit run_flux_wire_unfolding min_relative_uncertainty",
+                )
                 budget = RateUncertaintyBudget(
-                    budget.row_id, budget.rate,
-                    list(budget.components) + ([floor_component] if floor_component else []), budget.required)
+                    budget.row_id,
+                    budget.rate,
+                    list(budget.components)
+                    + ([floor_component] if floor_component else []),
+                    budget.required,
+                )
             unfolder.add_reaction(
                 reaction=reaction.reaction_id,
                 activity_Bq=reaction.reaction_rate,
@@ -4533,13 +5301,17 @@ def run_flux_wire_unfolding(
                     if covered
                     else MonitorResponseSpec(
                         observation_id=f"{reaction.sample_id}|{reaction.reaction_id}",
-                        sample_id=reaction.sample_id, reaction=reaction.reaction_id)
+                        sample_id=reaction.sample_id,
+                        reaction=reaction.reaction_id,
+                    )
                 ),
             )
         prior_flux = parse_prior_spectrum(prior_path, unfolder.energy_edges)
         unfolder.set_initial_guess(prior_flux, source="VITAMIN-J prior")
         result = unfolder.unfold(method=method)
-        result.metadata["min_relative_uncertainty_applied"] = float(min_relative_uncertainty)
+        result.metadata["min_relative_uncertainty_applied"] = float(
+            min_relative_uncertainty
+        )
         result.metadata["excluded_reactions"] = excluded_reactions
         result.metadata["observation_ids"] = [
             f"{r.sample_id}|{r.reaction_id}" for r in valid_reactions
@@ -4558,9 +5330,13 @@ def run_flux_wire_unfolding(
         {
             "admitted": False,
             "reason": "Methods use different response operators, energy grids, priors, or nonconverged diagnostic results (#191)",
-            "methods": {name: {"converged": bool(item.converged),
-                               "diagnostic_only": bool(item.metadata.get("diagnostic_only"))}
-                        for name, item in iterative_results.items()},
+            "methods": {
+                name: {
+                    "converged": bool(item.converged),
+                    "diagnostic_only": bool(item.metadata.get("diagnostic_only")),
+                }
+                for name, item in iterative_results.items()
+            },
         },
         output_root / "method_overlay_review.json",
     )
@@ -4574,7 +5350,18 @@ def build_summary_markdown(
     lines = [
         "# RAFM Validation Summary",
         "",
-        f"Overall pass: {'yes' if summary['overall_passed'] else 'no'}",
+        "Overall raw comparison: "
+        + (
+            "passed configured thresholds"
+            if summary["overall_passed"] is True
+            else (
+                "failed configured thresholds"
+                if summary["overall_passed"] is False
+                else "not established"
+            )
+        ),
+        f"Reference reproduction samples: {len(summary.get('reference_reproduction_samples', []))}",
+        f"Samples without independent comparison: {len(summary.get('unvalidated_samples', []))}",
         f"Analyzed raw spectra: {summary['n_raw_analyzed']}",
         f"Matched raw/QG pairs: {summary['n_matched_pairs']}",
         f"Unmatched raw files: {len(summary['unmatched_raw'])}",
@@ -4592,6 +5379,9 @@ def build_summary_markdown(
             lines.append(f"- {item}")
     else:
         lines.append("- none")
+    lines.extend(["", "## Samples without independent comparison", ""])
+    unchecked = summary.get("unvalidated_samples", [])
+    lines.extend([f"- {item}" for item in unchecked] if unchecked else ["- none"])
     lines.extend(["", "## Unmatched raw files", ""])
     if summary["unmatched_raw"]:
         lines.extend(f"- {item}" for item in summary["unmatched_raw"])
@@ -4602,6 +5392,21 @@ def build_summary_markdown(
         lines.extend(f"- {item}" for item in summary["unmatched_qg"])
     else:
         lines.append("- none")
+    lines.extend(
+        [
+            "",
+            "## Measurement-time activity audit",
+            "",
+            "These comparisons concern measurement-time activities. Independent EOI parity is not evaluated; absolute accuracy is not qualified.",
+            "",
+        ]
+    )
+    for sample_id, audit in summary.get("measurement_time_audits", {}).items():
+        lines.append(
+            f"- {sample_id}: basis={audit['comparison_basis']}; "
+            f"stage={audit['comparison_stage']}; categories={', '.join(audit['categories'])}; "
+            f"EOI={audit['eoi_parity']}"
+        )
     lines.extend(["", "## Line Diagnostic Buckets", ""])
     if summary.get("line_diagnostic_buckets"):
         for bucket, count in summary["line_diagnostic_buckets"].items():
@@ -4622,7 +5427,20 @@ def run_rafm_validation(
     max_spectra: Optional[int] = None,
     flux_wire_counting_method: Optional[str] = None,
     generic_targeted_counting_method: Optional[str] = None,
+    background_spectrum_override: Optional[GammaSpectrum] = None,
 ) -> Dict[str, Any]:
+    if background_spectrum_override is not None:
+        live = float(background_spectrum_override.live_time)
+        real = float(background_spectrum_override.real_time)
+        if (
+            not math.isfinite(live)
+            or live <= 0
+            or not math.isfinite(real)
+            or real < live
+        ):
+            raise ValueError(
+                "Background override requires finite positive live time and real time >= live time"
+            )
     paths = default_paths(example_root, results_root=results_root)
     metadata = load_rafm_example_metadata(paths.example_root)
     if flux_wire_counting_method is not None:
@@ -4655,11 +5473,13 @@ def run_rafm_validation(
     )
 
     energy_override = workflow_profile_energy_calibration(metadata.config)
-    background_spectrum = read_raw_asc(
-        paths.background_path,
-        energy_calibration_override=energy_override,
-        profile_name=metadata.config["profile_name"],
-    ).spectrum
+    background_spectrum = background_spectrum_override
+    if background_spectrum is None:
+        background_spectrum = read_raw_asc(
+            paths.background_path,
+            energy_calibration_override=energy_override,
+            profile_name=metadata.config["profile_name"],
+        ).spectrum
     if background_spectrum is None:
         raise ValueError(
             f"Failed to load background spectrum from {paths.background_path}"
@@ -4744,7 +5564,8 @@ def run_rafm_validation(
         tree["tables"] / "flux_wire_count_disagreement_summary.md",
     )
     write_rows_csv(
-        csv_reaction_rows(reaction_rows), tree["tables"] / "flux_wire_reaction_rates.csv"
+        csv_reaction_rows(reaction_rows),
+        tree["tables"] / "flux_wire_reaction_rates.csv",
     )
     write_rate_uncertainty_tables(
         [reaction_from_row(row) for row in reaction_rows], tree["tables"]
@@ -4831,11 +5652,9 @@ def run_rafm_validation(
             save_path=tree["plots_comparisons"] / "validation_summary_table.png",
         )
 
-    failing_samples = [
-        artifact["sample_id"]
-        for artifact in artifacts
-        if not artifact["validation"].get("passed", True)
-    ]
+    validation_summary = summarize_validation_artifacts(
+        artifacts, unmatched_qg=unmatched_qg
+    )
     line_diagnostic_buckets: Dict[str, int] = {}
     for row in line_rows:
         bucket = row.get("diagnostic_bucket")
@@ -4850,16 +5669,22 @@ def run_rafm_validation(
         if bucket:
             source_qc_buckets[bucket] = source_qc_buckets.get(bucket, 0) + 1
     summary = {
-        "overall_passed": not failing_samples,
+        **validation_summary,
         "n_raw_analyzed": len(artifacts),
         "n_matched_pairs": sum(1 for _, qg, _ in pairs if qg is not None),
         "n_unmatched_raw": len(unmatched_raw),
         "n_unmatched_qg": len(unmatched_qg),
         "unmatched_raw": [str(path) for path in unmatched_raw],
         "unmatched_qg": [str(path) for path in unmatched_qg],
-        "failing_samples": failing_samples,
         "line_diagnostic_buckets": dict(sorted(line_diagnostic_buckets.items())),
         "qg_source_qc_buckets": dict(sorted(source_qc_buckets.items())),
+        "measurement_time_audits": {
+            artifact["sample_id"]: {
+                **artifact["measurement_time_audit"],
+                "comparison_basis": artifact["validation"]["comparison_basis"],
+            }
+            for artifact in artifacts
+        },
         "qg_internal_consistency_flags": int(
             sum(
                 1
@@ -4888,10 +5713,7 @@ def run_rafm_validation(
     save_json(summary, paths.results_root / "validation_summary.json")
     build_summary_markdown(summary, paths.results_root / "validation_summary.md")
 
-    if enforce_thresholds and failing_samples:
-        raise RuntimeError(
-            "RAFM validation thresholds were violated for: "
-            + ", ".join(failing_samples)
-        )
+    if enforce_thresholds:
+        enforce_raw_comparison(summary)
 
     return summary

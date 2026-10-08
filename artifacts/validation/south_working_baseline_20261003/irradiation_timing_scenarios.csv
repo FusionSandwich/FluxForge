@@ -1,0 +1,35 @@
+measurement_id,scenario,irradiation_start_unzoned,EOI_unzoned,irradiation_duration_s,cooling_to_count_start_s,clock_assumption,inferred_physical_event
+Co-Cd-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,2055322.0,shared_naive_local_clock,False
+Co-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,1986117.0,shared_naive_local_clock,False
+Cu-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,243636.0,shared_naive_local_clock,False
+In-Cd-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,232817.0,shared_naive_local_clock,False
+Ni-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,1965522.0,shared_naive_local_clock,False
+RAFM-A-15d,maintained_schedule,2025-08-04 13:00:00,2025-08-04 15:00:00,7200.0,1377400.0,shared_naive_local_clock,False
+RAFM-A-15d,RAFM4_advisor_correspondence_preferred_working_scenario,2025-08-05T10:28:00,2025-08-05T12:28:00,7200.0,1300120.0,shared_naive_local_clock,False
+RAFM-A-24hr,maintained_schedule,2025-07-31T09:17:18,2025-07-31T09:17:21,3.0,91972.0,shared_naive_local_clock,False
+RAFM-A-2hr,maintained_schedule,2025-07-31T09:17:18,2025-07-31T09:17:21,3.0,7099.0,shared_naive_local_clock,False
+RAFM-A-300s,maintained_schedule,2025-07-31T09:17:18,2025-07-31T09:17:21,3.0,360.0,shared_naive_local_clock,False
+RAFM-A-4d,maintained_schedule,2025-07-31T09:17:18,2025-07-31T09:17:21,3.0,341206.0,shared_naive_local_clock,False
+RAFM-B-15d,maintained_schedule,2025-08-04 13:00:00,2025-08-04 15:00:00,7200.0,1381531.0,shared_naive_local_clock,False
+RAFM-B-15d,RAFM4_advisor_correspondence_preferred_working_scenario,2025-08-05T10:28:00,2025-08-05T12:28:00,7200.0,1304251.0,shared_naive_local_clock,False
+RAFM-B-24hr,maintained_schedule,2025-07-31T09:30:33,2025-07-31T09:30:36,3.0,94803.0,shared_naive_local_clock,False
+RAFM-B-2hr,maintained_schedule,2025-07-31T09:30:33,2025-07-31T09:30:36,3.0,7222.0,shared_naive_local_clock,False
+RAFM-B-300s,maintained_schedule,2025-07-31T09:30:33,2025-07-31T09:30:36,3.0,360.0,shared_naive_local_clock,False
+RAFM-B-4d,maintained_schedule,2025-07-31T09:30:33,2025-07-31T09:30:36,3.0,344033.0,shared_naive_local_clock,False
+RAFM-C-15d,maintained_schedule,2025-08-04 13:00:00,2025-08-04 15:00:00,7200.0,1385628.0,shared_naive_local_clock,False
+RAFM-C-15d,RAFM4_advisor_correspondence_preferred_working_scenario,2025-08-05T10:28:00,2025-08-05T12:28:00,7200.0,1308348.0,shared_naive_local_clock,False
+RAFM-C-24hr,maintained_schedule,2025-07-31T09:44:59,2025-07-31T09:45:02,3.0,97565.0,shared_naive_local_clock,False
+RAFM-C-2hr,maintained_schedule,2025-07-31T09:44:59,2025-07-31T09:45:02,3.0,9645.0,shared_naive_local_clock,False
+RAFM-C-300s,maintained_schedule,2025-07-31T09:44:59,2025-07-31T09:45:02,3.0,360.0,shared_naive_local_clock,False
+RAFM-C-4d,maintained_schedule,2025-07-31T09:44:59,2025-07-31T09:45:02,3.0,346788.0,shared_naive_local_clock,False
+RAFM-N-15d,maintained_schedule,2025-08-04 13:00:00,2025-08-04 15:00:00,7200.0,1389711.0,shared_naive_local_clock,False
+RAFM-N-15d,RAFM4_advisor_correspondence_preferred_working_scenario,2025-08-05T10:28:00,2025-08-05T12:28:00,7200.0,1312431.0,shared_naive_local_clock,False
+RAFM-N-24hr,maintained_schedule,2025-07-31T09:55:32,2025-07-31T09:55:35,3.0,100557.0,shared_naive_local_clock,False
+RAFM-N-2hr,maintained_schedule,2025-07-31T09:55:32,2025-07-31T09:55:35,3.0,9996.0,shared_naive_local_clock,False
+RAFM-N-300s,maintained_schedule,2025-07-31T09:55:32,2025-07-31T09:55:35,3.0,360.0,shared_naive_local_clock,False
+RAFM-N-4d,maintained_schedule,2025-07-31T09:55:32,2025-07-31T09:55:35,3.0,349778.0,shared_naive_local_clock,False
+Sc-Cd-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,1970481.0,shared_naive_local_clock,False
+Sc-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,1977517.0,shared_naive_local_clock,False
+Ti-RAFM-1,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,673471.0,shared_naive_local_clock,False
+Ti-RAFM-1a,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,688049.0,shared_naive_local_clock,False
+Ti-RAFM-1b,maintained_schedule,2025-08-04T13:00:00,2025-08-04T15:00:00,7200.0,758981.0,shared_naive_local_clock,False

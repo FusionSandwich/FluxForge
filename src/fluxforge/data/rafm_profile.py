@@ -29,7 +29,14 @@ class RAFMProfile:
         base = (
             repo_root if repo_root is not None else Path(__file__).resolve().parents[3]
         )
-        return (base / self.background_relative_path).resolve()
+        source_path = (base / self.background_relative_path).resolve()
+        if source_path.is_file() or repo_root is not None:
+            return source_path
+        return (
+            Path(__file__).resolve().parent
+            / "backgrounds"
+            / Path(self.background_relative_path).name
+        )
 
 
 def _load_profile_payload() -> Dict[str, Any]:

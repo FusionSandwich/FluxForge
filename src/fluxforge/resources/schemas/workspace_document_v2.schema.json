@@ -70,8 +70,9 @@
         "real_time", "start_time", "spectrum_id", "detector_id", "calibration",
         "source_type", "device_id", "device_label", "gps", "metadata"
       ],
+      "allOf": [{"if": {"required": ["metadata"], "properties": {"metadata": {"required": ["operation"], "properties": {"operation": {"enum": ["subtract_measured_background", "subtract", "add", "moving_average"]}}}}}, "then": {}, "else": {"properties": {"counts": {"$ref": "#/$defs/nonNegativeNumberArray"}}}}],
       "properties": {
-        "counts": {"$ref": "#/$defs/nonNegativeNumberArray"},
+        "counts": {"$ref": "#/$defs/numberArray"},
         "counts_uncertainty": {
           "anyOf": [{"$ref": "#/$defs/nonNegativeNumberArray"}, {"type": "null"}]
         },
@@ -87,7 +88,8 @@
         "device_id": {"type": "string"},
         "device_label": {"type": "string"},
         "gps": {"$ref": "#/$defs/jsonObject"},
-        "metadata": {"$ref": "#/$defs/jsonObject"}
+        "metadata": {"$ref": "#/$defs/jsonObject"},
+        "counts_covariance": {"anyOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["format", "shape", "row", "col", "data"], "properties": {"format": {"const": "coo"}, "shape": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 0}}, "row": {"type": "array", "items": {"type": "integer", "minimum": 0}}, "col": {"type": "array", "items": {"type": "integer", "minimum": 0}}, "data": {"$ref": "#/$defs/numberArray"}}}]}
       }
     },
     "workspaceSpectrum": {

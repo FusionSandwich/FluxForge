@@ -130,10 +130,11 @@ if (
             on_apply: (
                 Callable[
                     [GammaSpectrum, EnergyCalibrationFit, FWHMCalibrationFit | None],
-                    None,
+                    bool | None,
                 ]
                 | None
             ) = None,
+            publish_selection: bool = True,
             parent=None,
         ) -> None:
             super().__init__(parent)
@@ -150,6 +151,7 @@ if (
                 library_manager=self.library_manager,
             )
             self.on_apply = on_apply
+            self._publish_selection = publish_selection
             self._syncing_energy_table = False
             self._syncing_fwhm_table = False
             self._syncing_deviation_table = False
@@ -224,7 +226,11 @@ if (
             splitter.setChildrenCollapsible(False)
             root.addWidget(splitter, 1)
 
-            plots_panel = QWidget(splitter)
+            plots_panel = QWidget()
+            plots_scroll = QScrollArea(splitter)
+            plots_scroll.setObjectName("CalibrationPlotsScrollArea")
+            plots_scroll.setWidgetResizable(True)
+            plots_scroll.setWidget(plots_panel)
             plots_layout = QVBoxLayout(plots_panel)
             plots_layout.setContentsMargins(0, 0, 0, 0)
             plots_layout.setSpacing(12)
@@ -635,9 +641,9 @@ if (
             self.close_button.setObjectName("CloseCalibrationDialogButton")
             self.close_button.clicked.connect(self.close)
             action_row.addWidget(self.close_button)
-            controls_layout.addLayout(action_row)
+            root.addLayout(action_row)
 
-            splitter.addWidget(plots_panel)
+            splitter.addWidget(plots_scroll)
             splitter.addWidget(controls_scroll)
             splitter.setStretchFactor(0, 3)
             splitter.setStretchFactor(1, 2)
@@ -1022,6 +1028,7 @@ if (
         ) -> pg.PlotWidget:
             widget = pg.PlotWidget(self)
             widget.setObjectName(object_name)
+            widget.setMinimumHeight(180)
             catalog_pyqtgraph_export_action(widget, object_name)
             widget.showGrid(x=True, y=True, alpha=0.12)
             widget.setMenuEnabled(False)
@@ -2363,19 +2370,24 @@ if (
                 calibration=calibration,
                 energies=None,
             )
-            self.selection_bus.publish(
-                self.selection_bus.state.__class__(
-                    peak_energy_keV=self.selection_bus.state.peak_energy_keV,
-                    roi_bounds_keV=self.selection_bus.state.roi_bounds_keV,
-                    nuclide=self.selection_bus.state.nuclide,
-                    reference_lines_keV=tuple(
-                        point.reference_energy_keV
-                        for point in self._read_energy_points()
+            if self.on_apply is not None:
+                if self.on_apply(updated_spectrum, self._energy_fit, self._fwhm_fit) is False:
+                    self.energy_summary.setText(
+                        "Calibration source changed. Reopen calibration before applying."
+                    )
+                    return
+            if self._publish_selection:
+                self.selection_bus.publish(
+                    self.selection_bus.state.__class__(
+                        peak_energy_keV=self.selection_bus.state.peak_energy_keV,
+                        roi_bounds_keV=self.selection_bus.state.roi_bounds_keV,
+                        nuclide=self.selection_bus.state.nuclide,
+                        reference_lines_keV=tuple(
+                            point.reference_energy_keV
+                            for point in self._read_energy_points()
+                        ),
                     ),
                 )
-            )
-            if self.on_apply is not None:
-                self.on_apply(updated_spectrum, self._energy_fit, self._fwhm_fit)
             self._spectrum = updated_spectrum
             self.energy_summary.setText(
                 self.energy_summary.text()

@@ -51,7 +51,9 @@ def test_main_window_opens_qa_history_and_exports_csv(tmp_path):
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt module-3 workspace dependencies are unavailable.",
 )
-def test_main_window_opens_report_export_and_writes_html(tmp_path):
+def test_main_window_opens_report_export_and_writes_html(
+    tmp_path, wait_for_report_export
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(),
@@ -64,7 +66,7 @@ def test_main_window_opens_report_export_and_writes_html(tmp_path):
     dialog = window._report_dialog
     dialog.path_input.setText(str(tmp_path / "report.html"))
     QTest.mouseClick(dialog.export_button, Qt.LeftButton)
-    _qapp().processEvents()
+    wait_for_report_export(dialog)
 
     assert dialog.last_export_path is not None
     assert dialog.last_export_path.exists()
@@ -77,7 +79,9 @@ def test_main_window_opens_report_export_and_writes_html(tmp_path):
     not (QT_AVAILABLE and PYQTGRAPH_AVAILABLE),
     reason="Qt module-3 workspace dependencies are unavailable.",
 )
-def test_main_window_report_export_dialog_writes_pdf(tmp_path, monkeypatch):
+def test_main_window_report_export_dialog_writes_pdf(
+    tmp_path, monkeypatch, wait_for_report_export
+):
     _qapp()
     window = FluxForgeMainWindow(
         mode_manager=ModeManager(), selection_bus=SelectionBus()
@@ -97,7 +101,7 @@ def test_main_window_report_export_dialog_writes_pdf(tmp_path, monkeypatch):
     dialog.path_input.setText(str(tmp_path / "report.html"))
     dialog._sync_pdf_status()
     QTest.mouseClick(dialog.pdf_button, Qt.LeftButton)
-    _qapp().processEvents()
+    wait_for_report_export(dialog)
 
     assert dialog.last_pdf_export_path is not None
     assert dialog.last_pdf_export_path.exists()

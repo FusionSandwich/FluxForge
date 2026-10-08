@@ -1,0 +1,51 @@
+{
+  "_metadata": {
+    "description": "Nominal example wire masses, dimensions and purity retained for compatibility. These are not measured UWNR or INL RAFM sample properties.",
+    "usage": "Masses require explicit allow_default_mass=True; use specimen metadata for physical analysis.",
+    "scientific_admission": false
+  },
+  "samples": {
+    "Co": {
+      "mass_mg": 10.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999
+    },
+    "Cu": {
+      "mass_mg": 20.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999
+    },
+    "Sc": {
+      "mass_mg": 5.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.999
+    },
+    "In": {
+      "mass_mg": 20.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999
+    },
+    "Ti": {
+      "mass_mg": 15.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999
+    },
+    "Ni": {
+      "mass_mg": 15.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999
+    },
+    "Fe": {
+      "mass_mg": 20.0,
+      "diameter_mm": 0.5,
+      "length_mm": 5.0,
+      "purity": 0.9999
+    }
+  }
+}

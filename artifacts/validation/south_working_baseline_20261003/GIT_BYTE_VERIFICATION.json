@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "input_pins_verified_in_staged_git_blobs": [
+    "inputs/South Small Vial 25cm.csv",
+    "inputs/QG_EFFECTIVE_EFFICIENCY.json",
+    "inputs/chronology_join_receipt.json",
+    "inputs/count_metadata_matrix_32_2026-09-27.json",
+    "inputs/report_roi_rows.csv",
+    "inputs/reported_summary_rows.json",
+    "inputs/reconstruct_qg_efficiency_original.py",
+    "inputs/SC48_QUANTITATIVE_DIAGNOSTIC.json",
+    "inputs/uwHPGeDimensions.xlsx.txt",
+    "inputs/geomEffUWHPGe.xlsx.txt",
+    "inputs/uwHPGeModeling.pptx.txt",
+    "inputs/detector_archive_inventory.json",
+    "inputs/uwHPGeDimensions.xlsx"
+  ],
+  "line_ending_conversion_disabled_for_package": true
+}

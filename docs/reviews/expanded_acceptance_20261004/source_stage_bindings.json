@@ -1,0 +1,451 @@
+{
+  "state": "SOURCE_BOUND_STAGE_ONLY",
+  "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+  "observed": {
+    "physical_counts": 32,
+    "original_ANS": 32,
+    "original_ASC": 30,
+    "original_QG_reports": 31,
+    "extracted_ROI_rows": 288,
+    "extracted_nuclide_summaries": 88
+  },
+  "bindings": [
+    {
+      "measurement_id": "Co-Cd-RAFM-1",
+      "specimen": "Co-Cd-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Co-Cd-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Co-Cd-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "Co-Cd-RAFM-1",
+      "specimen": "Co-Cd-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Co-Cd-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Co-Cd-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Co-RAFM-1",
+      "specimen": "Co-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Co-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Co-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "Co-RAFM-1",
+      "specimen": "Co-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Co-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Co-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Cu-Cd-RAFM-1",
+      "specimen": "Cu-Cd-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Cu-Cd-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Cu-Cd-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Cu-RAFM-1",
+      "specimen": "Cu-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Cu-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Cu-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "Cu-RAFM-1",
+      "specimen": "Cu-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Cu-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Cu-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Fe-Cd-RAFM-1",
+      "specimen": "Fe-Cd-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Fe-Cd-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Fe-Cd-RAFM-1_0cm.txt"
+    },
+    {
+      "measurement_id": "In-Cd-RAFM-1",
+      "specimen": "In-Cd-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/In-Cd-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/In-Cd-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "In-Cd-RAFM-1",
+      "specimen": "In-Cd-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/In-Cd-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/In-Cd-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Ni-RAFM-1",
+      "specimen": "Ni-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ni-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Ni-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "Ni-RAFM-1",
+      "specimen": "Ni-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ni-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Ni-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "RAFM-A-15d",
+      "specimen": "RAFM4-A",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-A-15d.ASC",
+      "staged": "raw_gamma_spec/RAFM4/RAFM4-A_15dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-A-15d",
+      "specimen": "RAFM4-A",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-A-15d.txt",
+      "staged": "QG_processed_gamma_data/RAFM4/RAFM4-A_15dEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-A-24hr",
+      "specimen": "RAFM3-A",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-A-24hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-A_24hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-A-24hr",
+      "specimen": "RAFM3-A",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-A-24hr.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-A_24hrEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-A-2hr",
+      "specimen": "RAFM3-A",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-A-2hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-A_2hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-A-300s",
+      "specimen": "RAFM3-A",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-A-300s.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-A_300sEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-A-300s",
+      "specimen": "RAFM3-A",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-A-300s.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-A_300sEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-A-4d",
+      "specimen": "RAFM3-A",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-A-4d.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-A_4dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-A-4d",
+      "specimen": "RAFM3-A",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-A-4d.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-A_4dEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-B-15d",
+      "specimen": "RAFM4-B",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-B-15d.ASC",
+      "staged": "raw_gamma_spec/RAFM4/RAFM4-B_15dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-B-15d",
+      "specimen": "RAFM4-B",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-B-15d.txt",
+      "staged": "QG_processed_gamma_data/RAFM4/RAFM4-B_15dEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-B-24hr",
+      "specimen": "RAFM3-B",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-B-24hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-B_24hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-B-24hr",
+      "specimen": "RAFM3-B",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-B-24hr.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-B_24hrEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-B-2hr",
+      "specimen": "RAFM3-B",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-B-2hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-B_2hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-B-2hr",
+      "specimen": "RAFM3-B",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-B-2hr.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-B_2hrEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-B-300s",
+      "specimen": "RAFM3-B",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-B-300s.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-B_300sEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-B-300s",
+      "specimen": "RAFM3-B",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-B-300s.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-B_300sEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-B-4d",
+      "specimen": "RAFM3-B",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-B-4d.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-B_4dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-B-4d",
+      "specimen": "RAFM3-B",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-B-4d.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-B_4dEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-C-15d",
+      "specimen": "RAFM4-C",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-C-15d.ASC",
+      "staged": "raw_gamma_spec/RAFM4/RAFM4-C_15dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-C-15d",
+      "specimen": "RAFM4-C",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-C-15d.txt",
+      "staged": "QG_processed_gamma_data/RAFM4/RAFM4-C_15dEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-C-24hr",
+      "specimen": "RAFM3-C",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-C-24hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-C_24hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-C-24hr",
+      "specimen": "RAFM3-C",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-C-24hr.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-C_24hrEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-C-2hr",
+      "specimen": "RAFM3-C",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-C-2hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-C_2hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-C-2hr",
+      "specimen": "RAFM3-C",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-C-2hr.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-C_2hrEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-C-300s",
+      "specimen": "RAFM3-C",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-C-300s.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-C_300sEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-C-300s",
+      "specimen": "RAFM3-C",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-C-300s.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-C_300sEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-C-4d",
+      "specimen": "RAFM3-C",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-C-4d.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-C_4dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-C-4d",
+      "specimen": "RAFM3-C",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-C-4d.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-C_4dEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-N-15d",
+      "specimen": "RAFM4-N",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-N-15d.ASC",
+      "staged": "raw_gamma_spec/RAFM4/RAFM4-N_15dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-N-15d",
+      "specimen": "RAFM4-N",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-N-15d.txt",
+      "staged": "QG_processed_gamma_data/RAFM4/RAFM4-N_15dEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-N-24hr",
+      "specimen": "RAFM3-N",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-N-24hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-N_24hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-N-24hr",
+      "specimen": "RAFM3-N",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-N-24hr.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-N_24hrEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-N-2hr",
+      "specimen": "RAFM3-N",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-N-2hr.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-N_2hrEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-N-2hr",
+      "specimen": "RAFM3-N",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-N-2hr.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-N_2hrEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-N-300s",
+      "specimen": "RAFM3-N",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-N-300s.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-N_300sEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-N-300s",
+      "specimen": "RAFM3-N",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-N-300s.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-N_300sEOI.txt"
+    },
+    {
+      "measurement_id": "RAFM-N-4d",
+      "specimen": "RAFM3-N",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/RAFM-N-4d.ASC",
+      "staged": "raw_gamma_spec/RAFM3/RAFM3-N_4dEOI.ASC"
+    },
+    {
+      "measurement_id": "RAFM-N-4d",
+      "specimen": "RAFM3-N",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/RAFM-N-4d.txt",
+      "staged": "QG_processed_gamma_data/RAFM3/RAFM3-N_4dEOI.txt"
+    },
+    {
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "specimen": "Sc-Cd-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Sc-Cd-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Sc-Cd-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "specimen": "Sc-Cd-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Sc-Cd-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Sc-Cd-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Sc-RAFM-1",
+      "specimen": "Sc-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Sc-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Sc-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "Sc-RAFM-1",
+      "specimen": "Sc-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Sc-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Sc-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1",
+      "specimen": "Ti-RAFM-1",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ti-RAFM-1.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Ti-RAFM-1_25cm.ASC"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1",
+      "specimen": "Ti-RAFM-1",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Ti-RAFM-1_25cm.txt"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1a",
+      "specimen": "Ti-RAFM-1a",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ti-RAFM-1a.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Ti-RAFM-1a_25cm.ASC"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1a",
+      "specimen": "Ti-RAFM-1a",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1a.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Ti-RAFM-1a_25cm.txt"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1b",
+      "specimen": "Ti-RAFM-1b",
+      "kind": "ASC",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/ASC/Ti-RAFM-1b.ASC",
+      "staged": "raw_gamma_spec/flux_wires/Ti-RAFM-1b_25cm.ASC"
+    },
+    {
+      "measurement_id": "Ti-RAFM-1b",
+      "specimen": "Ti-RAFM-1b",
+      "kind": "QG_report",
+      "source": "examples/RAFM_irradiation/quantumgold_reference/originals/QG_report/Ti-RAFM-1b.txt",
+      "staged": "QG_processed_gamma_data/flux_wires/Ti-RAFM-1b_25cm.txt"
+    }
+  ],
+  "native_only_counts": [
+    "Cu-Cd-RAFM-1",
+    "Fe-Cd-RAFM-1"
+  ],
+  "missing_QG_reports": [
+    "RAFM-A-2hr"
+  ],
+  "reference_reproduction_executed": false,
+  "raw_analysis_executed": false,
+  "accuracy_qualified": false
+}

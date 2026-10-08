@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>{{ title }}</title>
+    <title>{{ title | e }}</title>
     <style>
       body { font-family: "IBM Plex Sans", sans-serif; margin: 24px; color: #10253c; }
       section { margin-bottom: 20px; padding: 16px; border: 1px solid #d8e3ec; border-radius: 14px; }
@@ -10,7 +10,8 @@
     </style>
   </head>
   <body>
-    <h1>{{ title }}</h1>
+    <h1>{{ title | e }}</h1>
+    {% include 'run_snapshot.html.j2' %}
     <section><h2>ASTM Status Table</h2><div>{{ astm_status_table }}</div></section>
     <section><h2>QA Status Snapshot</h2><div>{{ qa_status_snapshot }}</div></section>
     <section><h2>Peak Table</h2><div>{{ peak_table }}</div></section>

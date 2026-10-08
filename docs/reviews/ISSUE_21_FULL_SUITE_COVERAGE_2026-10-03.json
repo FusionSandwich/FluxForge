@@ -1,0 +1,129 @@
+{
+  "schema": "fluxforge.conda.full_suite_coverage.v1",
+  "frozen_commit": "36ed262f5fba11c6f9c92d1d182de977b11b565e",
+  "source_sha256": "f63ade36065bde45c9627f7ce54d2afabcd1da8554d907b1a5e8f4d664ef2483",
+  "collected": 2081,
+  "counts": {
+    "passed": 2052,
+    "skipped": 26,
+    "failed": 3
+  },
+  "missing": [],
+  "original_run_interrupted": true,
+  "single_revision_suite_passed": false,
+  "failures": [
+    "tests/test_gui_desktop_native.py::test_native_desktop_gui_workflow_generates_evidence",
+    "tests/test_reference_parity_runner.py::test_reference_parity_suite_runs_all_fixture_families",
+    "tests/test_reference_parity_runner.py::test_reference_parity_suite_supports_scope_and_fixture_filters"
+  ],
+  "skips": [
+    {
+      "nodeid": "tests/test_atomic_session_save.py::test_parent_directory_sync_failure_reports_that_replace_completed",
+      "reason": "Skipped: parent fsync is POSIX-specific"
+    },
+    {
+      "nodeid": "tests/test_tensorflow_env.py::test_tensorflow_cuda_library_dirs_discovered",
+      "reason": "Skipped: No pip-installed NVIDIA CUDA libraries are available in this workspace."
+    },
+    {
+      "nodeid": "tests/test_tensorflow_env.py::test_tensorflow_cuda_runtime_updates_ld_library_path",
+      "reason": "Skipped: No pip-installed NVIDIA CUDA libraries are available in this workspace."
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestOpenMCStatepoint::test_statepoint_exists",
+      "reason": "Skipped: OpenMC example statepoint.0250.h5 is not available in this workspace"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestOpenMCStatepoint::test_read_statepoint_info",
+      "reason": "Skipped: OpenMC example statepoint.0250.h5 is not available in this workspace"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestOpenMCStatepoint::test_read_tally_7114_flux",
+      "reason": "Skipped: OpenMC example statepoint.0250.h5 is not available in this workspace"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestOpenMCStatepoint::test_read_tally_7124_photon",
+      "reason": "Skipped: OpenMC example statepoint.0250.h5 is not available in this workspace"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestOpenMCStatepoint::test_read_tally_7134_heating",
+      "reason": "Skipped: OpenMC example statepoint.0250.h5 is not available in this workspace"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestOpenMCStatepoint::test_extract_flux_spectrum",
+      "reason": "Skipped: OpenMC example statepoint.0250.h5 is not available in this workspace"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestMCNPHDF5::test_runtpe_exists",
+      "reason": "Skipped: Real MCNP runtpe fixture unavailable; mandatory format contracts run separately"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestMCNPHDF5::test_read_mesh_tally_structure",
+      "reason": "Skipped: Real MCNP runtpe fixture unavailable; mandatory format contracts run separately"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestMCNPHDF5::test_extract_mesh_tally_85114",
+      "reason": "Skipped: Real MCNP runtpe fixture unavailable; mandatory format contracts run separately"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestMCNPHDF5::test_compute_volume_averaged_spectrum",
+      "reason": "Skipped: Real MCNP runtpe fixture unavailable; mandatory format contracts run separately"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestMCNPInputParser::test_mcnp_input_exists",
+      "reason": "Skipped: Real MCNP model fixture unavailable; mandatory parser contracts run separately"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestMCNPInputParser::test_parse_mcnp_input",
+      "reason": "Skipped: Real MCNP model fixture unavailable; mandatory parser contracts run separately"
+    },
+    {
+      "nodeid": "tests/test_transport_io.py::TestMCNPInputParser::test_material_density_extraction",
+      "reason": "Skipped: Real MCNP model fixture unavailable; mandatory parser contracts run separately"
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_gravel_matches_neutron_reference_with_same_tolerance[constant-0.2]",
+      "reason": "Skipped: Local Neutron-Unfolding reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_gravel_matches_neutron_reference_with_same_tolerance[true-0.8]",
+      "reason": "Skipped: Local Neutron-Unfolding reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_mlem_matches_neutron_reference_with_same_tolerance[constant-0.2]",
+      "reason": "Skipped: Local Neutron-Unfolding reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_mlem_matches_neutron_reference_with_same_tolerance[true-0.8]",
+      "reason": "Skipped: Local Neutron-Unfolding reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_gravel_unfolder_matches_neutron_reference",
+      "reason": "Skipped: Local Neutron-Unfolding reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_neutron_ibu_matches_local_pyunfold_reference[0]",
+      "reason": "Skipped: Local pyunfold reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_neutron_ibu_matches_local_pyunfold_reference[1]",
+      "reason": "Skipped: Local pyunfold reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_neutron_ibu_matches_local_pyunfold_reference[2]",
+      "reason": "Skipped: Local pyunfold reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_neutron_ibu_matches_local_pyunfold_reference[3]",
+      "reason": "Skipped: Local pyunfold reference repo is unavailable."
+    },
+    {
+      "nodeid": "tests/test_unfolding_reference_parity.py::test_neutron_ibu_matches_local_pyunfold_reference[4]",
+      "reason": "Skipped: Local pyunfold reference repo is unavailable."
+    }
+  ],
+  "followups": {
+    "reference_parity": "Passed on updated authoring branch after tolerance-field mapping fix.",
+    "legacy_desktop": "Passed using existing Windows CI event mode; physical coordinate timeout retained."
+  }
+}
