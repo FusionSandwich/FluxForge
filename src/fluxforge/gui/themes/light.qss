@@ -36,8 +36,8 @@ QToolBar#PrimaryToolbar {
   background-color: rgba(255, 255, 255, 0.80);
   border: 1px solid rgba(91, 101, 118, 0.14);
   border-radius: 16px;
-  margin: 12px;
-  padding: 10px 14px;
+  margin: 6px;
+  padding: 6px 14px;
   spacing: 8px;
 }
 

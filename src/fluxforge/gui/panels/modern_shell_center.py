@@ -350,6 +350,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.standards_banner = QLabel(widget)
             self.standards_banner.setObjectName("StandardsBanner")
+            self.standards_banner.setWordWrap(True)
             self.standards_banner.setVisible(False)
             layout.addWidget(self.standards_banner)
 
@@ -854,7 +855,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             locked = state.mode is GUIMode.STANDARDS and state.standard
             self.standards_banner.setVisible(bool(locked))
             if locked:
-                self.standards_banner.setText(
+                self.standards_banner.setText(f"Standards: {state.standard} (locked)")
+                self.standards_banner.setToolTip(
                     f"Standards mode locked to {state.standard}. Alternate methods remain available in Expert mode."
                 )
 
