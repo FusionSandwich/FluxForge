@@ -204,7 +204,7 @@ def test_qt_recorded_settings_follow_acquisition_identity():
         window._load_example_workspace()
         assert window.analysis_workspace.document.active_spectrum_id == spectrum_id
         assert not dialog.instrument_inputs["amplifier_gain"].text()
-        assert not dialog._instrument_overrides.get(spectrum_id)
+        assert not any(dialog._instrument_overrides.get(spectrum_id, {}).values())
         dialog.reject()
         assert dialog._workspace_controller is None
     finally:
