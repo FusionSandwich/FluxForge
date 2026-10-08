@@ -34,6 +34,25 @@ from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
 from fluxforge.core.unfolding_inputs import require_nonnegative
 
 
+def _unavailable_uncertainty(reason: str) -> dict:
+    return {
+        "uncertainty_status": "unavailable",
+        "uncertainty_qualified": False,
+        "uncertainty_unavailable_reason": reason,
+    }
+
+
+def _unqualify_poisson_fallback(result):
+    result.uncertainty = None
+    result.covariance = None
+    result.diagnostics.update(
+        _unavailable_uncertainty(
+            "Poisson RMLE changed estimator to a Gaussian fallback; estimator-specific propagation and fallback selection are unqualified"
+        )
+    )
+    return result
+
+
 class RegularizationType(Enum):
     """Types of regularization."""
 
@@ -183,7 +202,7 @@ class UnfoldingResult:
     """
 
     solution: np.ndarray
-    uncertainty: np.ndarray
+    uncertainty: Optional[np.ndarray]
     covariance: Optional[np.ndarray] = None
     chi_squared: float = 0.0
     n_iterations: int = 0
@@ -560,12 +579,14 @@ def poisson_rmle_unfolding(
                 "poisson_fallback": True,
                 "poisson_diagnostics": diagnostics,
             }
-            return fallback
+            return _unqualify_poisson_fallback(fallback)
 
-        # Uncertainty: optional Monte Carlo resampling
+        # Sampling remains diagnostic: model, estimator-selection and replicate
+        # qualification do not yet support publishing bin uncertainty.
         if config.mc_samples and config.mc_samples > 0:
             rng = np.random.default_rng(config.random_seed)
             samples = []
+            failed_replicates = 0
             for _ in range(int(config.mc_samples)):
                 y_s = rng.poisson(np.maximum(y, 0.0))
                 tmp_spec = SpectrumData(
@@ -599,11 +620,17 @@ def poisson_rmle_unfolding(
                     initial_solution=None,
                 )
                 tmp = poisson_rmle_unfolding(tmp_spec, tmp_response, tmp_cfg)
+                failed_replicates += int(
+                    not tmp.converged or bool(tmp.diagnostics.get("poisson_fallback"))
+                )
                 samples.append(tmp.solution)
-            sample_arr = np.vstack(samples)
-            mu_unc = np.std(sample_arr, axis=0)
+            diagnostics["mc_replicates_completed"] = len(samples)
+            diagnostics["mc_nonconverged_or_fallback_replicates"] = failed_replicates
+            reason = "Monte Carlo model, replicate convergence, estimator selection and full-bin identifiability are unqualified; no bin uncertainty is published"
         else:
-            mu_unc = np.maximum(0.1 * mu_hat, config.eps)
+            reason = "Poisson RMLE estimator-specific uncertainty propagation is not implemented; no default percentage uncertainty is assigned"
+        mu_unc = None
+        diagnostics.update(_unavailable_uncertainty(reason))
 
         return UnfoldingResult(
             solution=mu_hat,
@@ -639,7 +666,7 @@ def poisson_rmle_unfolding(
             "poisson_fallback": True,
             "poisson_error": repr(exc),
         }
-        return fallback
+        return _unqualify_poisson_fallback(fallback)
 
 
 def create_gaussian_response_matrix(
@@ -850,9 +877,22 @@ def rmle_unfolding(
         G = H_inv @ R.T @ W.T @ W
         solution_cov = G @ data_cov @ G.T
         solution_unc = np.sqrt(np.diag(solution_cov))
+        if not (
+            np.all(np.isfinite(solution_cov)) and np.all(np.isfinite(solution_unc))
+        ):
+            raise ValueError("Gaussian linear covariance is not finite")
+        covariance_scale = float(np.max(np.abs(solution_cov)))
+        if covariance_scale:
+            eigenvalues = np.linalg.eigvalsh(solution_cov / covariance_scale)
+            if np.min(eigenvalues) < -np.finfo(float).eps * max(n_bins, 1) * np.max(
+                np.abs(eigenvalues)
+            ):
+                raise ValueError(
+                    "Gaussian linear covariance is not positive semidefinite"
+                )
     except Exception:
         solution_cov = None
-        solution_unc = solution * 0.1  # Default 10% uncertainty
+        solution_unc = None
 
     return UnfoldingResult(
         solution=solution,
@@ -865,6 +905,17 @@ def rmle_unfolding(
         converged=converged,
         diagnostics=merge_flux_diagnostics(
             {
+                **(
+                    _unavailable_uncertainty(
+                        "Gaussian RMLE linear covariance computation failed; no default percentage uncertainty is assigned"
+                    )
+                    if solution_cov is None
+                    else {
+                        "uncertainty_status": "conditional_linear_proxy",
+                        "uncertainty_qualified": False,
+                        "uncertainty_scope": "Fixed-response linear propagation only; positivity and automatic parameter selection are not propagated",
+                    }
+                ),
                 "regularization_type": regularization.value,
                 "param_selection": param_selection.value,
                 "n_channels": n_channels,
@@ -872,9 +923,7 @@ def rmle_unfolding(
             },
             solution,
             negative_policy=(
-                "enforced_nonnegative"
-                if enforce_positivity
-                else "preserved_for_review"
+                "enforced_nonnegative" if enforce_positivity else "preserved_for_review"
             ),
             nonnegativity_enforced=bool(enforce_positivity),
         ),

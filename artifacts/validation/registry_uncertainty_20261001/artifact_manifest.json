@@ -1,0 +1,14 @@
+{
+  "schema": "registry-uncertainty-artifact-manifest-v1",
+  "runtime_commit": "b465604d8a364dce1fae4f5ba0d648cc540c0b94",
+  "scientific_admission": false,
+  "sha256": {
+    ".gitattributes": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992",
+    "acceptance.json": "310e14a477845d7e04604ba5bbf8024a75b693b972c8cbc47fd715443625e408",
+    "affected_tests.txt": "0aaa2cbefeddc2bd65b8955d232a3c74f082741168fc3f2a4ca6e8d768c2b649",
+    "gravel_unavailable_export.json": "c669e3d2f5dc893da5b932163f45a31c07e90fe802f3abe21870f608aceb73b4",
+    "maxed_unavailable_export.json": "e2cfce5f96760b1729d24f995263d3ad975b0faee9fbd8923d01e838deec15d2",
+    "README.md": "f36907e1027a596e4f5c8502c7c74cd9a1843721ec353851a460ac1979b3c44f",
+    "receipt.json": "52f384c163a7ea60a440ae8ce96b1396ae41219ad74bde28f9f2067784bb5918"
+  }
+}

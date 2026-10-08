@@ -247,12 +247,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             intro.setWordWrap(True)
             layout.addWidget(intro)
 
-            action_row = QHBoxLayout()
-            action_row.setSpacing(8)
+            actions = QVBoxLayout()
+            actions.setSpacing(8)
             self.auto_find_button = QPushButton("Auto Find Peaks", self)
             self.auto_find_button.setObjectName("AutoFindPeaksButton")
             self.auto_find_button.clicked.connect(self.run_auto_peak_search)
-            action_row.addWidget(self.auto_find_button)
+            actions.addWidget(self.auto_find_button)
 
             self.peak_search_selector = MethodSelectorWidget(
                 self.registries.peak_search_methods,
@@ -268,34 +268,33 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.peak_search_selector.combo.currentIndexChanged.connect(
                 self._peak_search_method_changed
             )
-            action_row.addWidget(self.peak_search_selector, 1)
+            actions.addWidget(self.peak_search_selector)
 
             self.match_button = QPushButton("Bayesian Match", self)
             self.match_button.setObjectName("BayesianMatchPeaksButton")
             self.match_button.clicked.connect(self.run_bayesian_match)
-            action_row.addWidget(self.match_button)
+            actions.addWidget(self.match_button)
 
             self.ml_button = QPushButton("ML Peak Analysis", self)
             self.ml_button.setObjectName("MlPeakAnalysisButton")
             self.ml_button.clicked.connect(self.run_ml_peak_analysis)
-            action_row.addWidget(self.ml_button)
+            actions.addWidget(self.ml_button)
 
             self.pin_button = QPushButton("Pin Selected Nuclide", self)
             self.pin_button.setObjectName("PeakTablePinNuclideButton")
             self.pin_button.clicked.connect(self._pin_selected_nuclide)
-            action_row.addWidget(self.pin_button)
+            actions.addWidget(self.pin_button)
 
             self.tag_button = QPushButton("Tag Selected Peak", self)
             self.tag_button.setObjectName("PeakTableTagPeakButton")
             self.tag_button.clicked.connect(self._tag_selected_peak)
-            action_row.addWidget(self.tag_button)
+            actions.addWidget(self.tag_button)
 
             self.clear_button = QPushButton("Clear Peaks", self)
             self.clear_button.setObjectName("PeakTableClearPeaksButton")
             self.clear_button.clicked.connect(self._clear_peaks)
-            action_row.addWidget(self.clear_button)
-            action_row.addStretch(1)
-            layout.addLayout(action_row)
+            actions.addWidget(self.clear_button)
+            layout.addLayout(actions)
 
             self.table = QTableWidget(0, len(self.HEADERS), self)
             self.table.setObjectName("PeakTableWidget")

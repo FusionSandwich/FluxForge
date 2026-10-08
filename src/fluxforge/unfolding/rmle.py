@@ -21,6 +21,7 @@ from fluxforge.unfolding.base import (
     UnfoldingMethodDefinition,
     UnfoldingResult,
     validate_unfolding_inputs,
+    unavailable_uncertainty_metadata,
 )
 
 
@@ -53,9 +54,9 @@ class RMLEUnfolder(UnfoldingMethod):
         return UnfoldingMethodDefinition(
             key="rmle",
             label="RMLE",
-            summary="Regularized maximum-likelihood unfolding with automatic lambda selection and visible uncertainty bands.",
+            summary="Regularized maximum-likelihood unfolding with automatic lambda selection; estimator uncertainty is unavailable.",
             convergence_metric="chi_squared",
-            supports_uncertainties=True,
+            supports_uncertainties=False,
             can_produce_negative_bins=False,
             method_category="recommended_default",
         )
@@ -80,9 +81,11 @@ class RMLEUnfolder(UnfoldingMethod):
         regularization_strength = float(
             kwargs.get("regularization_strength", self.regularization_strength)
         )
-        regularization_key = str(
-            kwargs.get("regularization_type", self.regularization_type)
-        ).strip().lower()
+        regularization_key = (
+            str(kwargs.get("regularization_type", self.regularization_type))
+            .strip()
+            .lower()
+        )
         auto_regularization = bool(
             kwargs.get("auto_regularization", self.auto_regularization)
         )
@@ -159,7 +162,9 @@ class RMLEUnfolder(UnfoldingMethod):
                 initial_solution=seeded_initial_flux,
             ),
         )
-        predicted_measurements = response_array @ np.asarray(solution.solution, dtype=float)
+        predicted_measurements = response_array @ np.asarray(
+            solution.solution, dtype=float
+        )
         refold_error = float(
             np.linalg.norm(predicted_measurements - measured_array)
             / max(np.linalg.norm(measured_array), 1e-12)
@@ -197,7 +202,7 @@ class RMLEUnfolder(UnfoldingMethod):
                     break
 
         flux = np.asarray(solution.solution, dtype=float)
-        uncertainties = np.asarray(solution.uncertainty, dtype=float)
+        uncertainties = None
         predicted_measurements = response_array @ flux
         residuals = (
             np.asarray(solution.residuals, dtype=float)
@@ -211,6 +216,18 @@ class RMLEUnfolder(UnfoldingMethod):
             convergence_history=(float(solution.reduced_chi_squared),),
             method_used=self.definition().label,
             parameters_used={
+                **unavailable_uncertainty_metadata(
+                    "RMLE",
+                    response_array,
+                    converged=bool(solution.converged),
+                    measurement_uncertainty=uncertainty_array,
+                ),
+                "backend_uncertainty_status": solution.diagnostics.get(
+                    "uncertainty_status", "unqualified"
+                ),
+                "backend_uncertainty_unavailable_reason": solution.diagnostics.get(
+                    "uncertainty_unavailable_reason"
+                ),
                 "max_iterations": max_iterations,
                 "tolerance": tolerance,
                 "regularization_type": poisson_penalty.value,
@@ -218,9 +235,7 @@ class RMLEUnfolder(UnfoldingMethod):
                 "auto_regularization": auto_regularization,
                 "auto_regularization_refined": auto_regularization_refined,
                 "enforce_positivity": enforce_positivity,
-                "rmle_backend": str(
-                    solution.diagnostics.get("solver", "poisson_rmle")
-                ),
+                "rmle_backend": str(solution.diagnostics.get("solver", "poisson_rmle")),
                 "used_measurement_uncertainty": uncertainty_array is not None,
                 "used_initial_flux": seeded_initial_flux is not None,
                 "parameter_selection": param_selection.value,

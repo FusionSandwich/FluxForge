@@ -8,7 +8,7 @@ import numpy as np
 
 from fluxforge.solvers.rmle import tikhonov_matrix
 from fluxforge.unfolding.base import (
-    estimate_unfolding_uncertainties,
+    unavailable_uncertainty_metadata,
     UnfoldingMethod,
     UnfoldingMethodDefinition,
     UnfoldingResult,
@@ -41,7 +41,7 @@ class MLSeedUnfolder(UnfoldingMethod):
             label="ML Seed",
             summary="Fast seed approximation for standalone review or warm-starting GRAVEL/RMLE.",
             convergence_metric="refold_error",
-            supports_uncertainties=True,
+            supports_uncertainties=False,
             can_produce_negative_bins=False,
             method_category="user_selected",
         )
@@ -127,7 +127,8 @@ class MLSeedUnfolder(UnfoldingMethod):
         predicted_measurements = response_array @ flux
         residuals = measured_array - predicted_measurements
         chi_squared = float(
-            np.dot(residuals / sigma, residuals / sigma) / max(measured_array.size - 1, 1)
+            np.dot(residuals / sigma, residuals / sigma)
+            / max(measured_array.size - 1, 1)
         )
         refold_error = float(
             np.linalg.norm(residuals) / max(np.linalg.norm(measured_array), floor)
@@ -135,25 +136,16 @@ class MLSeedUnfolder(UnfoldingMethod):
         confidence_score = float(
             np.clip(
                 1.0
-                / (
-                    1.0
-                    + (4.0 * refold_error)
-                    + (0.5 * max(chi_squared - 1.0, 0.0))
-                ),
+                / (1.0 + (4.0 * refold_error) + (0.5 * max(chi_squared - 1.0, 0.0))),
                 0.0,
                 1.0,
             )
         )
         accepted = confidence_score >= confidence_threshold
-        uncertainties = estimate_unfolding_uncertainties(
-            response_array,
-            measured=measured_array,
-            measurement_uncertainty=uncertainty_array,
-        )
 
         return UnfoldingResult(
             flux=flux,
-            uncertainties=uncertainties,
+            uncertainties=None,
             convergence_history=tuple(convergence_history),
             method_used=self.definition().label,
             parameters_used={
@@ -166,7 +158,12 @@ class MLSeedUnfolder(UnfoldingMethod):
                 "accepted": accepted,
                 "used_initial_flux": initial_flux is not None,
                 "used_measurement_uncertainty": uncertainty_array is not None,
-                "uncertainty_estimator": "pseudo_inverse",
+                **unavailable_uncertainty_metadata(
+                    self.definition().label,
+                    response_array,
+                    converged=accepted,
+                    measurement_uncertainty=uncertainty_array,
+                ),
                 "refold_error": refold_error,
             },
             method_category=self.definition().method_category,

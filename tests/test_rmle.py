@@ -398,8 +398,10 @@ class TestPoissonRMLEUnfolding:
             spectrum=spectrum, response=response, config=cfg
         )
         assert result.converged or result.diagnostics.get("poisson_fallback") is True
-        assert np.all(result.uncertainty >= 0)
-        assert np.any(result.uncertainty > 0)
+        assert result.uncertainty is None
+        assert result.covariance is None
+        assert result.diagnostics["uncertainty_qualified"] is False
+        assert result.diagnostics["uncertainty_unavailable_reason"]
 
     def test_poisson_mc_response_sampler_supported(self):
         """Response-operator resampling should be supported and recorded in diagnostics."""
@@ -445,8 +447,10 @@ class TestPoissonRMLEUnfolding:
         )
         assert result.diagnostics.get("mc_samples") == 10
         assert result.diagnostics.get("mc_response_sampling") is True
-        assert np.all(result.uncertainty >= 0)
-        assert np.any(result.uncertainty > 0)
+        assert result.uncertainty is None
+        assert result.covariance is None
+        assert result.diagnostics["uncertainty_qualified"] is False
+        assert result.diagnostics["uncertainty_unavailable_reason"]
 
 
 class TestLambdaSelection:

@@ -178,11 +178,34 @@ UNFOLD_RESULT_SCHEMA: Dict[str, Any] = {
     "title": "UnfoldResult",
     "type": "object",
     "required": ["schema", "flux", "boundaries_eV", "provenance"],
+    "allOf": [
+        {
+            "if": {
+                "required": ["covariance"],
+                "properties": {"covariance": {"type": "null"}},
+            },
+            "then": {
+                "required": ["diagnostics"],
+                "properties": {
+                    "diagnostics": {
+                        "type": "object",
+                        "required": ["uncertainty_unavailable_reason"],
+                        "properties": {
+                            "uncertainty_unavailable_reason": {
+                                "type": "string",
+                                "pattern": "\\S",
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    ],
     "properties": {
         "schema": {"const": _schema_id("unfold_result")},
         "flux": {"type": "array", "items": {"type": "number"}},
         "covariance": {
-            "type": "array",
+            "type": ["array", "null"],
             "items": {"type": "array", "items": {"type": "number"}},
         },
         "chi2": {"type": "number"},
@@ -389,6 +412,21 @@ def validate_artifact(
     for key in required:
         if key not in payload:
             errors.append(f"Missing required field: {key}.")
+    if (
+        schema_id == _schema_id("unfold_result")
+        and "covariance" in payload
+        and payload["covariance"] is None
+    ):
+        diagnostics = payload.get("diagnostics")
+        reason = (
+            diagnostics.get("uncertainty_unavailable_reason")
+            if isinstance(diagnostics, dict)
+            else None
+        )
+        if not isinstance(reason, str) or not reason.strip():
+            errors.append(
+                "Unavailable unfolding covariance requires a recorded reason."
+            )
 
     provenance = payload.get("provenance")
     if provenance is None:

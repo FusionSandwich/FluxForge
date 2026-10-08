@@ -339,12 +339,19 @@ def make_unfold_result(
     boundaries_eV: List[float],
     reactions: List[str],
     flux: List[float],
-    covariance: List[List[float]],
+    covariance: Optional[List[List[float]]],
     chi2: float,
     method: str,
     diagnostics: Optional[Dict[str, Any]] = None,
     source_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
+    reason = (
+        diagnostics.get("uncertainty_unavailable_reason")
+        if isinstance(diagnostics, dict)
+        else None
+    )
+    if covariance is None and not (isinstance(reason, str) and reason.strip()):
+        raise ValueError("Unavailable unfolding covariance requires a recorded reason")
     units = {"flux": "a.u.", "covariance": "a.u.^2", "boundaries_eV": "eV"}
     definitions = {
         "flux": "group-integrated flux per energy bin",
@@ -378,7 +385,7 @@ def write_unfold_result(
     boundaries_eV: List[float],
     reactions: List[str],
     flux: List[float],
-    covariance: List[List[float]],
+    covariance: Optional[List[List[float]]],
     chi2: float,
     method: str,
     diagnostics: Optional[Dict[str, Any]] = None,
