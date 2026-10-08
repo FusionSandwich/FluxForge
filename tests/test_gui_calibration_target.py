@@ -143,6 +143,7 @@ def test_main_window_can_shrink_to_laptop_width(window):
         assert button.isVisible() and window.rect().contains(center)
         assert window.childAt(center) is button
 
+    assert window.findChild(QPushButton, "SpectrumZoomOutButton").text() == "Zoom \u2212"
     full_text = "Library: " + "long_source_identifier_" * 8
     window.library_label.setText(full_text)
     QApplication.instance().processEvents()

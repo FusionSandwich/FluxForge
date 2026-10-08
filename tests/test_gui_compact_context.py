@@ -48,7 +48,22 @@ def test_context_scrolls_on_720_pixel_desktop():
             context.viewport(), context.analysis_summary.rect().bottomLeft()
         )
         assert context.viewport().rect().contains(point)
-        assert window.central_tabs.canvas.plot.height() > 100
+        canvas = window.central_tabs.canvas
+        assert canvas.plot.height() > 100
+        canvas.status_label.setText("Long acquisition metadata " * 30)
+        app.processEvents()
+        assert window.width() <= 1280 and window.height() <= 720
+        assert canvas.plot.height() > 100
+        window.central_tabs.setCurrentIndex(1)
+        app.processEvents()
+        forecasts = window.central_tabs.currentWidget()
+        assert isinstance(forecasts, QScrollArea)
+        assert window.height() <= 720
+        forecasts.ensureWidgetVisible(window.central_tabs.predictive_dashboard.target_counts_spin)
+        point = window.central_tabs.predictive_dashboard.target_counts_spin.mapTo(
+            forecasts.viewport(), window.central_tabs.predictive_dashboard.target_counts_spin.rect().center()
+        )
+        assert forecasts.viewport().rect().contains(point)
     finally:
         window.close()
         app.processEvents()

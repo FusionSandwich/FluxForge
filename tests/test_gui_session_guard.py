@@ -50,6 +50,8 @@ def window():
             roi_id="unsaved",
             spectrum_id=window.analysis_workspace.document.active_spectrum_id,
             signal_range=(100.0, 200.0),
+            left_background_range=(80.0, 90.0),
+            right_background_range=(210.0, 220.0),
         )
     )
     assert window._document_dirty

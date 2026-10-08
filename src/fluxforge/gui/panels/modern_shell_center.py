@@ -44,6 +44,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QGridLayout,
         QHBoxLayout,
         QLabel,
+        QScrollArea,
+        Qt,
         QTabBar,
         QTabWidget,
         QTextBrowser,
@@ -541,7 +543,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _build_dashboard_tab(self) -> QWidget:
-            widget = QWidget(self)
+            scroll = QScrollArea(self)
+            scroll.setObjectName("ForecastScrollArea")
+            scroll.setWidgetResizable(True)
+            scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            widget = QWidget(scroll)
+            scroll.setWidget(widget)
             layout = QVBoxLayout(widget)
             layout.setContentsMargins(24, 24, 24, 24)
             layout.setSpacing(18)
@@ -566,7 +573,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
             layout.addWidget(self.predictive_dashboard, 1)
             layout.addStretch(1)
-            return widget
+            return scroll
 
         def _sync_workspace_state(self, state) -> None:
             self._current_spectrum = self.workspace_controller.spectrum()

@@ -135,20 +135,18 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.header_label.setObjectName("CanvasHeader")
             header.addWidget(self.header_label)
 
-            header.addStretch(1)
-
             self.status_label = QLabel("No spectrum loaded", self)
             self.status_label.setObjectName("CanvasMeta")
-            self.status_label.setWordWrap(True)
-            self.status_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-            header.addWidget(self.status_label)
+            self.status_label.setWordWrap(False)
+            self.status_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+            header.addWidget(self.status_label, 1)
 
             self.crosshair_readout = QLabel("x -- | y --", self)
             self.crosshair_readout.setObjectName("SpectrumCrosshairReadout")
-            self.crosshair_readout.setWordWrap(True)
-            self.crosshair_readout.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+            self.crosshair_readout.setWordWrap(False)
+            self.crosshair_readout.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
             self.crosshair_readout.setVisible(False)
-            header.addWidget(self.crosshair_readout)
+            header.addWidget(self.crosshair_readout, 1)
 
             shell.addLayout(header)
             header = QHBoxLayout()
@@ -212,6 +210,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.plot = pg.PlotWidget(self)
             self.plot.setObjectName("SpectrumPlot")
+            self.plot.setMinimumHeight(120)
             self.plot.setBackground("#0f172a")
             self.plot.showGrid(x=True, y=True, alpha=0.14)
             self.plot.setMenuEnabled(False)
@@ -388,6 +387,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 f"{len(values):,} channels · {len(self.buffer.levels)} LOD levels · "
                 f"{visible_labels}"
             )
+            self.status_label.setToolTip(self.status_label.text())
             if self._annotation_specs:
                 self.set_annotation_lines(self._annotation_specs)
 
@@ -1396,6 +1396,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.crosshair_readout.setText(
                 f"x {float(data_position.x()):.3f} | y {float(data_position.y()):.3f}"
             )
+            self.crosshair_readout.setToolTip(self.crosshair_readout.text())
 
         def clear(self) -> None:
             self._viewport_commit_timer.stop()
@@ -1413,6 +1414,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.set_peak_candidates(())
             self.set_peak_residuals((), visible=False)
             self.status_label.setText("No spectrum loaded")
+            self.status_label.setToolTip(self.status_label.text())
             self._roi_region.setVisible(False)
             self.roi_button.setChecked(False)
 
