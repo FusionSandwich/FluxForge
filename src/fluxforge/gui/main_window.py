@@ -89,6 +89,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from PySide6.QtWidgets import QMessageBox
     from fluxforge.gui.theme_manager import load_stylesheet, resolve_theme
     from fluxforge.gui.widgets import HardwareLedWidget, ModeSwitcherWidget
+    from fluxforge.gui.widgets.eliding_label import ElidingLabel
 
 
 @dataclass(frozen=True)
@@ -161,7 +162,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         ) -> None:
             super().__init__(parent)
             self.setObjectName("FluxForgeMainWindow")
-            self.setWindowTitle("FluxForge — HPGe Analysis")
+            self.setWindowTitle("FluxForge — HPGe Analysis[*]")
             self.resize(1560, 980)
 
             self.settings = settings or QSettings(self.ORGANIZATION, self.APPLICATION)
@@ -834,12 +835,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.setObjectName("FluxForgeStatusBar")
             self.setStatusBar(status)
 
-            self.cursor_label = QLabel("Cursor: --", self)
-            self.file_label = QLabel("File: none", self)
-            self.mode_label = QLabel("Mode: Expert", self)
-            self.library_label = QLabel("Library: bundled gamma", self)
-            self.renderer_label = QLabel("Renderer: PyQtGraph", self)
-            self.predictive_label = QLabel("Predictive: --", self)
+            self.cursor_label = ElidingLabel("Cursor: --", self)
+            self.file_label = ElidingLabel("File: none", self)
+            self.mode_label = ElidingLabel("Mode: Expert", self)
+            self.library_label = ElidingLabel("Library: bundled gamma", self)
+            self.renderer_label = ElidingLabel("Renderer: PyQtGraph", self)
+            self.predictive_label = ElidingLabel("Predictive: --", self)
             self.progress = QProgressBar(self)
             self.progress.setObjectName("StatusProgress")
             self.progress.setMaximumWidth(180)
@@ -1011,6 +1012,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         def _load_example_workspace(self) -> None:
             """Load the bundled deterministic HPGe example on explicit request."""
 
+            if not self._confirm_workspace_replacement():
+                return
             self.qa_monitor.seed_demo_history()
             self.analysis_workspace.set_document(
                 AnalysisWorkspaceController(
@@ -1026,6 +1029,27 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             self._refresh_analysis_workspace_derivatives()
             self.file_label.setText("File: bundled HPGe example")
             self.statusBar().showMessage("Bundled HPGe example loaded", 4000)
+
+        def _confirm_workspace_replacement(self) -> bool:
+            document = self.analysis_workspace.document
+            if not self._document_dirty or not (
+                document.spectra
+                or document.rois
+                or document.peaks
+                or document.detector_profiles
+                or document.pinned_nuclides
+            ):
+                return True
+            choice = QMessageBox.question(
+                self,
+                "Unsaved session",
+                "Save changes to the current session before continuing?",
+                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
+                QMessageBox.Save,
+            )
+            if choice == QMessageBox.Save:
+                return self.save_session()
+            return choice == QMessageBox.Discard
 
         def _open_dialog_path(self, filename: str) -> None:
             try:
@@ -1248,12 +1272,14 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 if forecast.eta_seconds and forecast.eta_seconds > 60.0
                 else f"{int(round(forecast.eta_seconds or 0.0))}s"
             )
-            qa_text = (
-                f"QA {int(round(recalibration.days_until_recalibration))}d"
-                if recalibration is not None
-                and recalibration.days_until_recalibration is not None
-                else "QA stable"
-            )
+            if recalibration is None:
+                qa_text = "QA no history"
+            elif recalibration.predicted_recalibration_at is None:
+                qa_text = "QA no projected trigger"
+            else:
+                qa_text = (
+                    f"QA target {recalibration.predicted_recalibration_at:%Y-%m-%d}"
+                )
             self.predictive_label.setText(f"Predictive: ETA {eta_text} | {qa_text}")
 
         def open_path(self, path: str | Path) -> None:
@@ -1262,6 +1288,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             source = Path(path)
             if source.suffix.lower() == ".ffs":
                 session = read_ffs_session(source)
+                if not self._confirm_workspace_replacement():
+                    return
                 self.analysis_workspace.set_document(session.document)
                 self._session_path = source.resolve()
                 self._session_device_snapshot = deepcopy(session.device_snapshot)
@@ -1315,7 +1343,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             dialog = getattr(self, "_calibration_dialog", None)
             if dialog is not None:
                 target = getattr(dialog, "workspace_target", None)
-                if target is not None and not self._calibration_target_is_current(target):
+                if target is not None and not self._calibration_target_is_current(
+                    target
+                ):
                     dialog.close()
                     self._calibration_dialog = None
             viewport = document.viewport_by_id("primary-spectrum")
@@ -1902,6 +1932,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _reset_analysis_workspace(self) -> None:
+            if not self._confirm_workspace_replacement():
+                return
             self.qa_monitor.clear_demo_history()
             self.analysis_workspace.set_state(
                 self._build_initial_workspace_state(include_example=False)
@@ -2041,7 +2073,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
                 )
                 return False
             spectrum_id = (
-                target[1] if target is not None
+                target[1]
+                if target is not None
                 else self.analysis_workspace.document.active_spectrum_id
             )
             workspace_spectrum = (
@@ -2177,12 +2210,24 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         def closeEvent(self, event) -> None:
             if (
+                self._report_dialog is not None
+                and self._report_dialog.worker is not None
+            ):
+                self.statusBar().showMessage(
+                    "Report export is running. Close after it finishes."
+                )
+                event.ignore()
+                return
+            if (
                 self._spectrum_file_queue_dialog is not None
                 and self._spectrum_file_queue_dialog.worker is not None
             ):
                 self.statusBar().showMessage(
                     "Spectrum conversion is running. Close after it finishes."
                 )
+                event.ignore()
+                return
+            if not self._confirm_workspace_replacement():
                 event.ignore()
                 return
             self._save_layout()

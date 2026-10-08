@@ -34,6 +34,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
         from fluxforge.gui.qt_compat import (
             QAction,
+            QGridLayout,
             QHBoxLayout,
             QInputDialog,
             QLabel,
@@ -125,28 +126,31 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             shell = QVBoxLayout(self)
             shell.setContentsMargins(0, 0, 0, 0)
-            shell.setSpacing(12)
+            shell.setSpacing(10)
 
             header = QHBoxLayout()
             header.setContentsMargins(0, 0, 0, 0)
 
             self.header_label = QLabel("Live spectrum canvas", self)
             self.header_label.setObjectName("CanvasHeader")
+            self.header_label.setWordWrap(True)
             header.addWidget(self.header_label)
 
             header.addStretch(1)
 
             self.status_label = QLabel("No spectrum loaded", self)
             self.status_label.setObjectName("CanvasMeta")
+            self.status_label.setWordWrap(True)
             header.addWidget(self.status_label)
 
             self.crosshair_readout = QLabel("x -- | y --", self)
             self.crosshair_readout.setObjectName("SpectrumCrosshairReadout")
+            self.crosshair_readout.setWordWrap(True)
             self.crosshair_readout.setVisible(False)
             header.addWidget(self.crosshair_readout)
 
             shell.addLayout(header)
-            header = QHBoxLayout()
+            header = QGridLayout()
             header.setContentsMargins(0, 0, 0, 0)
 
             self.crosshair_button = QPushButton("Crosshair", self)
@@ -156,7 +160,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Show exact spectrum coordinates under the mouse pointer."
             )
             self.crosshair_button.toggled.connect(self._crosshair_button_toggled)
-            header.addWidget(self.crosshair_button)
+            header.addWidget(self.crosshair_button, 0, 0)
 
             self.roi_button = QPushButton("Select ROI", self)
             self.roi_button.setObjectName("SpectrumSelectRoiButton")
@@ -166,12 +170,12 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "persisted ROI with background sidebands."
             )
             self.roi_button.toggled.connect(self._set_roi_visible)
-            header.addWidget(self.roi_button)
+            header.addWidget(self.roi_button, 0, 1)
 
             self.clear_roi_button = QPushButton("Clear ROI", self)
             self.clear_roi_button.setObjectName("SpectrumClearRoiButton")
             self.clear_roi_button.clicked.connect(self._clear_roi)
-            header.addWidget(self.clear_roi_button)
+            header.addWidget(self.clear_roi_button, 0, 2)
 
             self.zoom_in_button = QPushButton("Zoom +", self)
             self.zoom_in_button.setObjectName("SpectrumZoomInButton")
@@ -179,7 +183,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Zoom into the center of the current spectrum view."
             )
             self.zoom_in_button.clicked.connect(lambda: self._zoom_view(0.65))
-            header.addWidget(self.zoom_in_button)
+            header.addWidget(self.zoom_in_button, 1, 0)
 
             self.zoom_out_button = QPushButton("Zoom −", self)
             self.zoom_out_button.setObjectName("SpectrumZoomOutButton")
@@ -187,7 +191,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "Zoom out from the center of the current spectrum view."
             )
             self.zoom_out_button.clicked.connect(lambda: self._zoom_view(1.5))
-            header.addWidget(self.zoom_out_button)
+            header.addWidget(self.zoom_out_button, 1, 1)
 
             self.reset_view_button = QPushButton("Reset View", self)
             self.reset_view_button.setObjectName("SpectrumResetViewButton")
@@ -196,13 +200,14 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
                 "left-drag to pan."
             )
             self.reset_view_button.clicked.connect(self.reset_view)
-            header.addWidget(self.reset_view_button)
-            header.addStretch(1)
+            header.addWidget(self.reset_view_button, 1, 2)
 
             shell.addLayout(header)
 
             self.plot = pg.PlotWidget(self)
             self.plot.setObjectName("SpectrumPlot")
+            # Dock size hints must not squeeze the primary spectrum into a strip.
+            self.plot.setMinimumHeight(128)
             self.plot.setBackground("#0f172a")
             self.plot.showGrid(x=True, y=True, alpha=0.14)
             self.plot.setMenuEnabled(False)

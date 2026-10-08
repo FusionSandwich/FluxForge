@@ -13,9 +13,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from fluxforge.gui.panels.modern_shell_shared import (
         selection_summary as _selection_summary,
     )
-    from fluxforge.gui.qt_compat import QLabel, QVBoxLayout, QWidget
+    from fluxforge.gui.qt_compat import QLabel, QScrollArea, Qt, QVBoxLayout, QWidget
 
-    class ToolContextPanel(QWidget):
+    class ToolContextPanel(QScrollArea):
         """Right-side live analysis context."""
 
         def __init__(
@@ -26,11 +26,20 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             parent=None,
         ) -> None:
             super().__init__(parent)
+            self.setObjectName("ToolContextScrollArea")
+            self.setWidgetResizable(True)
+            self.setMinimumWidth(220)
+            # Keep diagnostic text readable when docks are squeezed. Unusually
+            # long source names still need an accessible horizontal scrollbar.
+            self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
             self.mode_manager = mode_manager
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
 
-            layout = QVBoxLayout(self)
+            content = QWidget(self)
+            content.setObjectName("ToolContextScrollContent")
+            self.setWidget(content)
+            layout = QVBoxLayout(content)
             layout.setContentsMargins(16, 16, 16, 16)
             layout.setSpacing(12)
 
@@ -124,12 +133,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             ):
                 reason = str(invalidation.get("reason") or "scientific edit")
                 invalidation_line = f"\nAnalysis status: re-run required ({reason})"
+            roi_description = (
+                f"{roi.roi_bounds_keV[0]:.2f}-{roi.roi_bounds_keV[1]:.2f} keV"
+                if roi is not None
+                else "not run"
+            )
             self.analysis_summary.setText(
                 (
-                    f"Efficiency calibration: {'ready' if efficiency is not None else 'not fitted'}\n"
+                    "Efficiency calibration: "
+                    f"{'ready' if efficiency is not None else 'not fitted'}\n"
                     f"Activity results: {len(state.activity_results)}\n"
-                    f"ROI analysis: "
-                    f"{f'{roi.roi_bounds_keV[0]:.2f}-{roi.roi_bounds_keV[1]:.2f} keV' if roi is not None else 'not run'}"
+                    f"ROI analysis: {roi_description}"
                     f"{invalidation_line}"
                 )
             )
