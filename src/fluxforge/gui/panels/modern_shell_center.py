@@ -67,6 +67,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             super().__init__(parent)
             self.setObjectName("PredictiveDashboardScrollArea")
             self.setWidgetResizable(True)
+            self.setMinimumHeight(260)
             self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
