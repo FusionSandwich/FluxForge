@@ -9,16 +9,16 @@ pytest.importorskip("PySide6")
 pytest.importorskip("pyqtgraph")
 from PySide6.QtGui import QCloseEvent  # noqa: E402
 from PySide6.QtWidgets import QApplication, QMessageBox  # noqa: E402
-from fluxforge.core.workspace_document import (
+from fluxforge.core.workspace_document import (  # noqa: E402
     AnalysisROI,
     WorkspaceDocument,
-)  # noqa: E402
+)
 from fluxforge.gui import FluxForgeMainWindow, ModeManager, SelectionBus  # noqa: E402
-from fluxforge.io import (
+from fluxforge.io import (  # noqa: E402
     FluxForgeSession,
     read_ffs_session,
     write_ffs_session,
-)  # noqa: E402
+)
 
 
 class MemorySettings:
@@ -50,6 +50,8 @@ def window():
             roi_id="unsaved",
             spectrum_id=window.analysis_workspace.document.active_spectrum_id,
             signal_range=(100.0, 200.0),
+            left_background_range=(80.0, 100.0),
+            right_background_range=(200.0, 220.0),
         )
     )
     assert window._document_dirty
