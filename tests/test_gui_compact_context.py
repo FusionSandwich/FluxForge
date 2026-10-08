@@ -49,6 +49,18 @@ def test_context_scrolls_on_720_pixel_desktop():
         )
         assert context.viewport().rect().contains(point)
         assert window.central_tabs.canvas.plot.height() > 100
+        window.central_tabs.setCurrentIndex(1)
+        app.processEvents()
+        dashboard = window.central_tabs.predictive_dashboard
+        assert isinstance(dashboard, QScrollArea)
+        assert dashboard.verticalScrollBar().maximum() > 0
+        dashboard.ensureWidgetVisible(dashboard.summary_browser)
+        app.processEvents()
+        point = dashboard.summary_browser.mapTo(
+            dashboard.viewport(), dashboard.summary_browser.rect().bottomLeft()
+        )
+        assert dashboard.viewport().rect().contains(point)
+        assert dashboard.count_rate_plot.height() >= 160
     finally:
         window.close()
         app.processEvents()

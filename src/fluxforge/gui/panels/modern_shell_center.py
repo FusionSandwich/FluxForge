@@ -44,14 +44,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QGridLayout,
         QHBoxLayout,
         QLabel,
+        QScrollArea,
         QTabBar,
         QTabWidget,
         QTextBrowser,
         QVBoxLayout,
         QWidget,
+        Qt,
     )
 
-    class PredictiveDashboardPanel(QWidget):
+    class PredictiveDashboardPanel(QScrollArea):
         """Offline predictive dashboard derived from current spectra and QA history."""
 
         def __init__(
@@ -63,12 +65,18 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             parent=None,
         ) -> None:
             super().__init__(parent)
+            self.setObjectName("PredictiveDashboardScrollArea")
+            self.setWidgetResizable(True)
+            self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.selection_bus = selection_bus
             self.workspace_controller = workspace_controller
             self.qa_monitor = qa_monitor
             self._selection_state = SelectionState()
 
-            layout = QVBoxLayout(self)
+            content = QWidget(self)
+            content.setObjectName("PredictiveDashboardScrollContent")
+            self.setWidget(content)
+            layout = QVBoxLayout(content)
             layout.setContentsMargins(16, 16, 16, 16)
             layout.setSpacing(12)
 
@@ -86,11 +94,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.metrics_browser = QTextBrowser(self)
             self.metrics_browser.setObjectName("PredictiveMetricsBrowser")
+            self.metrics_browser.setMinimumHeight(130)
             layout.addWidget(self.metrics_browser)
 
             if PYQTGRAPH_AVAILABLE:
                 self.count_rate_plot = pg.PlotWidget(self)
                 self.count_rate_plot.setObjectName("PredictiveCountRatePlot")
+                self.count_rate_plot.setMinimumHeight(160)
                 self.count_rate_plot.setBackground("#0f172a")
                 self.count_rate_plot.setLabel("left", "ROI cps")
                 self.count_rate_plot.setLabel("bottom", "History Index")
@@ -102,6 +112,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
                 self.dead_time_plot = pg.PlotWidget(self)
                 self.dead_time_plot.setObjectName("PredictiveDeadTimePlot")
+                self.dead_time_plot.setMinimumHeight(160)
                 self.dead_time_plot.setBackground("#0f172a")
                 self.dead_time_plot.setLabel("left", "Dead Time (%)")
                 self.dead_time_plot.setLabel("bottom", "History Index")
@@ -113,6 +124,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.summary_browser = QTextBrowser(self)
             self.summary_browser.setObjectName("PredictiveSummaryBrowser")
+            self.summary_browser.setMinimumHeight(100)
             layout.addWidget(self.summary_browser, 1)
 
             self.selection_bus.subscribe(self._selection_changed)
