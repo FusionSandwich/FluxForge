@@ -81,6 +81,18 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             layout.setContentsMargins(16, 16, 16, 16)
             layout.setSpacing(12)
 
+            title = QLabel("Count and QA Forecasts", content)
+            title.setObjectName("HeroHeader")
+            title.setWordWrap(True)
+            layout.addWidget(title)
+            subtitle = QLabel(
+                "Forecasts derived from the active spectrum and recorded QA history.",
+                content,
+            )
+            subtitle.setWordWrap(True)
+            subtitle.setObjectName("HeroSubhead")
+            layout.addWidget(subtitle)
+
             controls = QHBoxLayout()
             controls.addWidget(QLabel("Target ROI counts", self))
             self.target_counts_spin = QDoubleSpinBox(self)
@@ -554,32 +566,13 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             )
 
         def _build_dashboard_tab(self) -> QWidget:
-            widget = QWidget(self)
-            layout = QVBoxLayout(widget)
-            layout.setContentsMargins(24, 24, 24, 24)
-            layout.setSpacing(18)
-
-            title = QLabel("Count and QA Forecasts", widget)
-            title.setObjectName("HeroHeader")
-            layout.addWidget(title)
-
-            subtitle = QLabel(
-                "Forecasts derived from the active spectrum and recorded QA history.",
-                widget,
-            )
-            subtitle.setWordWrap(True)
-            subtitle.setObjectName("HeroSubhead")
-            layout.addWidget(subtitle)
-
             self.predictive_dashboard = PredictiveDashboardPanel(
                 selection_bus=self.selection_bus,
                 workspace_controller=self.workspace_controller,
                 qa_monitor=self.qa_monitor,
-                parent=widget,
+                parent=self,
             )
-            layout.addWidget(self.predictive_dashboard, 1)
-            layout.addStretch(1)
-            return widget
+            return self.predictive_dashboard
 
         def _sync_workspace_state(self, state) -> None:
             self._current_spectrum = self.workspace_controller.spectrum()
