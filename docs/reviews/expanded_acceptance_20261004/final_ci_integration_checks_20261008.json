@@ -1,0 +1,32 @@
+{
+  "committed_test_fix_revision": "26ea1cde029828fd7fe86897b155ad34f61dd383",
+  "execution": "Test fixes exercised before commit; final signature formatting only. Latest CI verifies committed head.",
+  "package_sources_unchanged": true,
+  "checks": {
+    "final_module3_async_20261008": {
+      "passed": 10,
+      "skipped": 0,
+      "xml_sha256": "29dd2bf36cd600fa10a3e605cee269c61fcabf307824140506a0b47257ceeff9"
+    },
+    "final_headless_reporting_20261008": {
+      "passed": 48,
+      "skipped": 3,
+      "xml_sha256": "171da7d595fdf7e4834ff2b6e636ab511c82c707cb38d2f0b4b5a30ef82b9a74"
+    }
+  },
+  "headless_scope": "Subprocess import hook makes PySide6 unavailable; only three GUI tests skip",
+  "superseded_ci": {
+    "run_id": 37728038506,
+    "commit": "15aef430dc22ad427c0e634ad61026cd7d913de8",
+    "failed_jobs": [
+      "core-analysis",
+      "Modern GUI Smoke (ubuntu-latest)",
+      "Modern GUI Smoke (windows-latest)"
+    ],
+    "causes": [
+      "Qt wait fixture imported a missing optional dependency before the GUI test could skip",
+      "Older Module3 test asserted output before asynchronous export finished"
+    ]
+  },
+  "scientific_acceptance_complete": false
+}

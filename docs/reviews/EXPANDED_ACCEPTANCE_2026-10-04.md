@@ -183,3 +183,13 @@ those scopes. Luna did not independently rerun the tests. Numerical package
 sources remain byte-identical to the 30-acquisition replay at `d017a71`; seven
 subsequent package changes are confined to GUI files. The source bridge binds
 those GUI bytes and retains the original replay revision and 3/26/1 outcomes.
+
+The subsequent CI run at `15aef43` exposed two test-only integration omissions:
+the optional Qt wait fixture imported Qt before a GUI test could skip in a
+headless environment, and older Module 3 HTML/PDF tests asserted output before
+the new export worker finished. `26ea1cd` makes QtTest optional and waits for
+worker completion while preserving the existing output/preview assertions.
+All 10 Module 3 GUI tests pass locally. A subprocess with Qt deliberately
+unavailable passes 48 reporting/provenance/parity checks and skips exactly three
+GUI tests. Luna reviewed these fixes without finding a blocker; package GUI and
+numerical sources remain unchanged. The failed CI run remains explicitly recorded.

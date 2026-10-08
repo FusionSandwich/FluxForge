@@ -26,6 +26,10 @@
       "bytes": 1182,
       "sha256": "5e2cf0cf799d1eeb2500ff95cdfb071a7403af6fdb6f24fa480932fda3a38552"
     },
+    "final_ci_integration_checks_20261008.json": {
+      "bytes": 1190,
+      "sha256": "dc7e949699fc52039823e7d9d2dcc68de6fb50069e1662b753b8c861e0115aa8"
+    },
     "final_gui_checks_20261008.json": {
       "bytes": 1279,
       "sha256": "5253e1d5ad8212f556a52570b8a353e78d5b48bc8bfe26c8247b9ed4f51deb3e"
@@ -77,6 +81,10 @@
     "luna_compact_final_review.md": {
       "bytes": 1223,
       "sha256": "7f4d6bbfb12e6081bc627a0a4ebf8a1beff2d651772249c8cc1eb1d410600ac9"
+    },
+    "luna_final_async_test_integration_review.md": {
+      "bytes": 978,
+      "sha256": "1aead6b465fcaead2158be7ddf4642f5d16edc29d0da1cd0d070faf7804b94c7"
     },
     "luna_final_provenance_fix_review.md": {
       "bytes": 1293,
