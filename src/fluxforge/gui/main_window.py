@@ -89,6 +89,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
     from PySide6.QtWidgets import QMessageBox
     from fluxforge.gui.theme_manager import load_stylesheet, resolve_theme
     from fluxforge.gui.widgets import HardwareLedWidget, ModeSwitcherWidget
+    from fluxforge.gui.widgets.eliding_label import ElidingLabel
 
 
 @dataclass(frozen=True)
@@ -834,12 +835,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.setObjectName("FluxForgeStatusBar")
             self.setStatusBar(status)
 
-            self.cursor_label = QLabel("Cursor: --", self)
-            self.file_label = QLabel("File: none", self)
-            self.mode_label = QLabel("Mode: Expert", self)
-            self.library_label = QLabel("Library: bundled gamma", self)
-            self.renderer_label = QLabel("Renderer: PyQtGraph", self)
-            self.predictive_label = QLabel("Predictive: --", self)
+            self.cursor_label = ElidingLabel("Cursor: --", self)
+            self.file_label = ElidingLabel("File: none", self)
+            self.mode_label = ElidingLabel("Mode: Expert", self)
+            self.library_label = ElidingLabel("Library: bundled gamma", self)
+            self.renderer_label = ElidingLabel("Renderer: PyQtGraph", self)
+            self.predictive_label = ElidingLabel("Predictive: --", self)
             self.progress = QProgressBar(self)
             self.progress.setObjectName("StatusProgress")
             self.progress.setMaximumWidth(180)
