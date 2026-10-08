@@ -207,7 +207,7 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.plot = pg.PlotWidget(self)
             self.plot.setObjectName("SpectrumPlot")
             # Dock size hints must not squeeze the primary spectrum into a strip.
-            self.plot.setMinimumHeight(160)
+            self.plot.setMinimumHeight(128)
             self.plot.setBackground("#0f172a")
             self.plot.showGrid(x=True, y=True, alpha=0.14)
             self.plot.setMenuEnabled(False)
