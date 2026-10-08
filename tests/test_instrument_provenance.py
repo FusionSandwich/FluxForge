@@ -158,6 +158,7 @@ def test_qt_large_campaign_keeps_missing_settings_readable_and_complete(tmp_path
 
 def test_qt_instructional_bundle_requires_all_spectra_and_preserves_settings_on_switch(
     tmp_path,
+    wait_for_report_export,
 ):
     pytest.importorskip("PySide6")
     pytest.importorskip("pyqtgraph")
@@ -178,6 +179,7 @@ def test_qt_instructional_bundle_requires_all_spectra_and_preserves_settings_on_
         dialog.path_input.setText(str(tmp_path / "instructional.html"))
         dialog.instructional_check.setChecked(True)
         dialog.generate_report()
+        wait_for_report_export(dialog)
         assert dialog.last_bundle_path is None
         assert not (tmp_path / "instructional.zip").exists()
         assert "Instructional" in dialog.export_status.text()
@@ -193,6 +195,7 @@ def test_qt_instructional_bundle_requires_all_spectra_and_preserves_settings_on_
         window.analysis_workspace.select_spectrum(records[0].spectrum_id)
         assert dialog.instrument_inputs["amplifier_gain"].text() == "1"
         dialog.generate_report()
+        wait_for_report_export(dialog)
         assert dialog.last_bundle_path is not None, dialog.export_status.text()
         with ZipFile(dialog.last_bundle_path) as archive:
             snapshot = json.loads(archive.read("snapshot.json"))
@@ -210,3 +213,53 @@ def test_qt_instructional_bundle_requires_all_spectra_and_preserves_settings_on_
     finally:
         dialog.close()
         window.close()
+
+
+def test_qt_recorded_settings_follow_acquisition_identity():
+    pytest.importorskip("PySide6")
+    pytest.importorskip("pyqtgraph")
+    from fluxforge.core.workspace_document import CalibrationModel
+    from fluxforge.gui import FluxForgeMainWindow, ModeManager, SelectionBus
+    from fluxforge.gui.qt_compat import QApplication
+
+    class MemorySettings:
+        def __init__(self):
+            self.values = {}
+
+        def value(self, key, default=None):
+            return self.values.get(key, default)
+
+        def setValue(self, key, value):
+            self.values[key] = value
+
+        def sync(self):
+            pass
+
+    app = QApplication.instance() or QApplication([])
+    settings = MemorySettings()
+    window = FluxForgeMainWindow(
+        settings=settings,
+        mode_manager=ModeManager(settings=settings),
+        selection_bus=SelectionBus(),
+        load_example=True,
+    )
+    window._open_report_export()
+    dialog = window._report_dialog
+    try:
+        spectrum_id = window.analysis_workspace.document.active_spectrum_id
+        dialog.instrument_inputs["amplifier_gain"].setText("42")
+        window.analysis_workspace.apply_calibration(
+            spectrum_id,
+            CalibrationModel(model_key="polynomial", coefficients=(0.5, 1.0)),
+        )
+        assert dialog.instrument_inputs["amplifier_gain"].text() == "42"
+        window._load_example_workspace()
+        assert window.analysis_workspace.document.active_spectrum_id == spectrum_id
+        assert not dialog.instrument_inputs["amplifier_gain"].text()
+        assert not dialog._instrument_overrides.get(spectrum_id)
+        dialog.reject()
+        assert dialog._workspace_controller is None
+    finally:
+        dialog.close()
+        window.close()
+        app.processEvents()

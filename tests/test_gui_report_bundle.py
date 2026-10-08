@@ -105,7 +105,7 @@ def test_bundle_rejects_tampered_plot_and_failed_pdf_before_creating_output(
 
 
 def test_qt_generate_report_preserves_view_and_captures_tables_once(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, wait_for_report_export
 ):
     pytest.importorskip("PySide6")
     pytest.importorskip("pyqtgraph")
@@ -141,6 +141,7 @@ def test_qt_generate_report_preserves_view_and_captures_tables_once(
         monkeypatch.setattr(dialog, "context_factory", counted_factory)
         dialog.path_input.setText(str(tmp_path / "run.html"))
         QTest.mouseClick(dialog.generate_button, Qt.LeftButton)
+        wait_for_report_export(dialog)
         assert dialog.last_bundle_path is not None, dialog.export_status.text()
         assert len(captures) == 1
         assert canvas.viewport_state().to_dict() == before
@@ -172,6 +173,7 @@ def test_qt_generate_report_preserves_view_and_captures_tables_once(
             == captures[0]["run_snapshot"]["workspace"]
         )
         QTest.mouseClick(dialog.generate_button, Qt.LeftButton)
+        wait_for_report_export(dialog)
         assert dialog.last_bundle_path is None
         assert "failed" in dialog.export_status.text()
         dialog.close()
@@ -179,7 +181,9 @@ def test_qt_generate_report_preserves_view_and_captures_tables_once(
         window.close()
 
 
-def test_html_preview_and_export_use_one_context_capture(tmp_path):
+def test_html_preview_and_export_use_one_context_capture(
+    tmp_path, wait_for_report_export
+):
     pytest.importorskip("PySide6")
     from fluxforge.gui.dialogs.report_export_dialog import ReportExportDialog
     from fluxforge.gui.qt_compat import QApplication
@@ -198,6 +202,7 @@ def test_html_preview_and_export_use_one_context_capture(tmp_path):
         contexts.clear()
         dialog.path_input.setText(str(tmp_path / "report.html"))
         dialog.export_html()
+        wait_for_report_export(dialog)
         app.processEvents()
         assert len(contexts) == 1
         assert "Capture 0" in dialog.preview.toPlainText()

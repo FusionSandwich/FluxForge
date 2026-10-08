@@ -205,7 +205,7 @@ jobs:
         run: pytest -q tests/test_modern_gui_shell.py tests/test_project_tracker_assets.py
 
       - name: Supported GUI workflow regressions
-        run: pytest -q tests/test_production_gui_mode.py tests/test_gui_consolidation.py
+        run: pytest -q tests/test_production_gui_mode.py tests/test_gui_consolidation.py tests/test_gui_compact_context.py
 
       - name: Analysis workspace core helper tests
         run: |
@@ -270,7 +270,7 @@ jobs:
       - name: Current Qt consolidation and report bundle tests
         run: |
           pytest -q tests/test_gui_consolidation.py
-          pytest -q tests/test_gui_report_bundle.py tests/test_instrument_provenance.py
+          pytest -q tests/test_gui_report_bundle.py tests/test_instrument_provenance.py tests/test_gui_report_worker.py tests/test_gui_session_guard.py
 
   external-reference-parity:
     runs-on: ubuntu-latest

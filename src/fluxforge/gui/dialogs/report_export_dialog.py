@@ -15,6 +15,7 @@ from fluxforge.reporting.instrument_provenance import (
 import json
 
 if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
+    from PySide6.QtCore import QThread, Signal
     from fluxforge.gui.qt_compat import (
         QComboBox,
         QCheckBox,
@@ -25,6 +26,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
         QLabel,
         QLineEdit,
         QPushButton,
+        QProgressBar,
         QTextBrowser,
         QVBoxLayout,
     )
@@ -32,8 +34,48 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
 
 if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
 
+    class _ReportExportWorker(QThread):
+        """Render an isolated snapshot; never access a Qt widget from this thread."""
+
+        def __init__(
+            self, engine, template, context, operation, path, include_pdf, parent
+        ):
+            super().__init__(parent)
+            self.engine = engine
+            self.template = template
+            self.context = context
+            self.operation = operation
+            self.path = path
+            self.include_pdf = include_pdf
+            self.output = None
+            self.html = None
+            self.error = None
+
+        def run(self):
+            try:
+                self.html = self.engine.render(self.template, self.context).html
+                if self.operation == "bundle":
+                    self.output = self.engine.export_bundle(
+                        self.template,
+                        self.context,
+                        self.path,
+                        include_pdf=self.include_pdf,
+                    )
+                elif self.operation == "pdf":
+                    self.output = self.engine.export_pdf(
+                        self.template, self.context, self.path
+                    )
+                else:
+                    self.output = self.engine.export_html(
+                        self.template, self.context, self.path
+                    )
+            except Exception as exc:
+                self.error = str(exc)
+
     class ReportExportDialog(QDialog):
         """Preview and export bundled Jinja2 reports."""
+
+        export_finished = Signal(bool)
 
         def __init__(
             self,
@@ -54,6 +96,9 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             self.last_context = None
             self._instrument_spectrum_id = None
             self._instrument_overrides = {}
+            self._instrument_sources = {}
+            self._instrument_document_id = None
+            self.worker = None
 
             root = QVBoxLayout(self)
             root.setContentsMargins(16, 16, 16, 16)
@@ -148,6 +193,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             self.export_status.setObjectName("ReportExportStatus")
             self.export_status.setWordWrap(True)
             root.addWidget(self.export_status)
+            self.export_progress = QProgressBar(self)
+            self.export_progress.setObjectName("ReportExportProgress")
+            self.export_progress.setRange(0, 0)
+            self.export_progress.hide()
+            root.addWidget(self.export_progress)
 
             self.pdf_status = QLabel(self)
             self.pdf_status.setObjectName("ReportPdfStatus")
@@ -183,6 +233,8 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             )
 
         def render_preview(self) -> None:
+            if self.worker is not None:
+                return
             if not self.engine.template_backend_available():
                 self.preview.setPlainText(
                     "HTML report rendering requires the optional reporting extra "
@@ -282,15 +334,53 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             )
 
         def _on_document_changed(self, document) -> None:
+            sources = {
+                item.spectrum_id: item.spectrum.counts for item in document.spectra
+            }
+            if document.document_id != self._instrument_document_id:
+                changed = set(self._instrument_sources)
+            else:
+                changed = {
+                    key
+                    for key, counts in self._instrument_sources.items()
+                    if sources.get(key) is not counts
+                }
+            for key in changed:
+                self._instrument_overrides.pop(key, None)
+            if self._instrument_spectrum_id in changed:
+                for editor in self.instrument_inputs.values():
+                    editor.clear()
+                self._instrument_spectrum_id = None
+            self._instrument_sources = sources
+            self._instrument_document_id = document.document_id
             self._bind_instrument_inputs(document.active_spectrum_id)
 
-        def closeEvent(self, event) -> None:
+        def _detach_workspace(self):
             if self._workspace_controller is not None:
                 self._workspace_controller.unsubscribe_document(
                     self._on_document_changed
                 )
                 self._workspace_controller = None
+
+        def closeEvent(self, event) -> None:
+            if self.worker is not None:
+                self.export_status.setText(
+                    "Report export is running. Close after it finishes."
+                )
+                event.ignore()
+                return
+            self._detach_workspace()
             super().closeEvent(event)
+
+        def done(self, result):
+            # Escape/accept/reject bypass closeEvent in QDialog.
+            if self.worker is not None:
+                self.export_status.setText(
+                    "Report export is running. Close after it finishes."
+                )
+                return
+            self._detach_workspace()
+            super().done(result)
 
         def _show_context(self, context: dict[str, object]) -> None:
             rendered = self.engine.render(self.current_template_name(), context)
@@ -307,49 +397,90 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
             return path.with_suffix(suffix) if suffix is not None else path
 
         def export_html(self) -> None:
-            if not self.engine.template_backend_available():
-                return
-            self.last_export_path = None
-            try:
-                context = self._capture_context()
-                self.last_export_path = self.engine.export_html(
-                    self.current_template_name(), context, self._output_path()
-                )
-                self._show_context(context)
-                self.export_status.setText(f"Exported HTML: {self.last_export_path}")
-            except (OSError, RuntimeError, KeyError, ValueError) as exc:
-                self.export_status.setText(f"HTML export failed: {exc}")
+            self._start_export("html")
 
         def export_pdf(self) -> None:
-            if not self.engine.template_backend_available():
-                return
-            self.last_pdf_export_path = None
-            try:
-                context = self._capture_context()
-                self.last_pdf_export_path = self.engine.export_pdf(
-                    self.current_template_name(), context, self._output_path(".pdf")
-                )
-                self._show_context(context)
-                self.export_status.setText(f"Exported PDF: {self.last_pdf_export_path}")
-            except (OSError, RuntimeError, KeyError, ValueError) as exc:
-                self.export_status.setText(f"PDF export failed: {exc}")
+            self._start_export("pdf")
 
         def generate_report(self) -> None:
-            self.last_bundle_path = None
+            self._start_export("bundle")
+
+        def _start_export(self, operation):
+            if self.worker is not None or not self.engine.template_backend_available():
+                return
+            attributes = {
+                "html": "last_export_path",
+                "pdf": "last_pdf_export_path",
+                "bundle": "last_bundle_path",
+            }
+            setattr(self, attributes[operation], None)
             try:
-                context = self._capture_context()
-                self.last_bundle_path = self.engine.export_bundle(
-                    self.current_template_name(),
-                    context,
-                    self._output_path(".zip"),
-                    include_pdf=self.bundle_pdf_check.isChecked(),
+                template = self.current_template_name()
+                path = self._output_path(
+                    {"html": None, "pdf": ".pdf", "bundle": ".zip"}[operation]
                 )
-                self._show_context(context)
-                self.export_status.setText(
-                    f"Generated report bundle: {self.last_bundle_path}"
+                # Widget/table/plot capture belongs on the GUI thread. The worker
+                # receives a detached value and the path/options from this click.
+                context = self._capture_context()
+                self.worker = _ReportExportWorker(
+                    self.engine,
+                    template,
+                    context,
+                    operation,
+                    path,
+                    self.bundle_pdf_check.isChecked(),
+                    self,
                 )
             except (OSError, RuntimeError, KeyError, ValueError) as exc:
-                self.export_status.setText(f"Report bundle failed: {exc}")
+                self.export_status.setText(f"Report {operation} export failed: {exc}")
+                return
+            for control in self._export_controls():
+                control.setEnabled(False)
+            self.export_progress.show()
+            self.export_status.setText("Exporting the captured report…")
+            self.worker.finished.connect(self._finish_export)
+            self.worker.start()
+
+        def _export_controls(self):
+            return (
+                self.template_combo,
+                self.path_input,
+                self.render_button,
+                self.export_button,
+                self.pdf_button,
+                self.generate_button,
+                self.bundle_pdf_check,
+                self.instructional_check,
+                *self.instrument_inputs.values(),
+            )
+
+        def _finish_export(self):
+            worker = self.worker
+            if worker is None:
+                return
+            self.worker = None
+            self.export_progress.hide()
+            for control in self._export_controls():
+                control.setEnabled(True)
+            self._sync_template_status()
+            self._sync_pdf_status()
+            if worker.error is not None:
+                self.export_status.setText(
+                    f"Report {worker.operation} export failed: {worker.error}"
+                )
+            else:
+                attribute, label = {
+                    "html": ("last_export_path", "Exported HTML"),
+                    "pdf": ("last_pdf_export_path", "Exported PDF"),
+                    "bundle": ("last_bundle_path", "Generated report bundle"),
+                }[worker.operation]
+                setattr(self, attribute, worker.output)
+                self.last_context = worker.context
+                self.preview.setHtml(worker.html)
+                self.export_status.setText(f"{label}: {worker.output}")
+            succeeded = worker.error is None
+            worker.deleteLater()
+            self.export_finished.emit(succeeded)
 
         def _sync_template_status(self) -> None:
             available = self.engine.template_backend_available()
