@@ -3,7 +3,7 @@
 from fluxforge.gui.qt_compat import QT_AVAILABLE
 
 if QT_AVAILABLE:  # pragma: no cover - optional GUI dependency
-    from PySide6.QtWidgets import QStylePainter
+    from PySide6.QtGui import QPainter
     from fluxforge.gui.qt_compat import QLabel, Qt
 
     class ElidingLabel(QLabel):
@@ -29,21 +29,16 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI dependency
             return size
 
         def paintEvent(self, event):
-            painter = QStylePainter(self)
+            painter = QPainter(self)
             rect = self.contentsRect().adjusted(
                 self.margin(), self.margin(), -self.margin(), -self.margin()
             )
             text = self.fontMetrics().elidedText(
                 self.text(), Qt.ElideMiddle, max(0, rect.width())
             )
-            painter.drawItemText(
-                rect,
-                self.alignment().value,
-                self.palette(),
-                self.isEnabled(),
-                text,
-                self.foregroundRole(),
-            )
+            painter.setPen(self.palette().color(self.foregroundRole()))
+            painter.drawText(rect, self.alignment().value, text)
+            painter.end()
 
 else:
 
