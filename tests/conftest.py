@@ -42,7 +42,7 @@ def discard_unsaved_test_workspaces(monkeypatch):
 @pytest.fixture
 def wait_for_report_export():
     from time import monotonic
-    from PySide6.QtTest import QTest
+    QTest = pytest.importorskip("PySide6.QtTest").QTest
 
     def wait(dialog, timeout_seconds=30):
         deadline = monotonic() + timeout_seconds
