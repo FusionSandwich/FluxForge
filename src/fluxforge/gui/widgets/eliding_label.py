@@ -9,6 +9,10 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI dependency
     class ElidingLabel(QLabel):
         """Retain full text for tooltips/accessibility; paint an ellipsis to fit."""
 
+        def __init__(self, text="", parent=None):
+            super().__init__(parent)
+            self.setText(text)
+
         def setText(self, text):
             super().setText(text)
             self.setToolTip(text)
@@ -34,7 +38,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI dependency
             )
             painter.drawItemText(
                 rect,
-                int(self.alignment()),
+                self.alignment().value,
                 self.palette(),
                 self.isEnabled(),
                 text,
