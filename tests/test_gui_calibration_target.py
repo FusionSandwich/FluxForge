@@ -133,3 +133,18 @@ def test_main_window_can_shrink_to_laptop_width(window):
     window.show()
     QApplication.instance().processEvents()
     assert window.width() <= 1280
+    from PySide6.QtWidgets import QPushButton
+
+    for name in ("SpectrumCrosshairButton", "SpectrumSelectRoiButton",
+                 "SpectrumClearRoiButton", "SpectrumZoomInButton",
+                 "SpectrumZoomOutButton", "SpectrumResetViewButton"):
+        button = window.findChild(QPushButton, name)
+        center = button.mapTo(window, button.rect().center())
+        assert button.isVisible() and window.rect().contains(center)
+        assert window.childAt(center) is button
+
+    full_text = "Library: " + "long_source_identifier_" * 8
+    window.library_label.setText(full_text)
+    QApplication.instance().processEvents()
+    assert window.width() <= 1280
+    assert window.library_label.text() == window.library_label.toolTip() == full_text

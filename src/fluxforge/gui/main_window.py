@@ -80,6 +80,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
         QProgressBar,
         QPushButton,
         QSettings,
+        QSizePolicy,
         QStatusBar,
         QToolBar,
         QToolButton,
@@ -142,6 +143,18 @@ def modern_gui_unavailable_message() -> str:
 
 
 if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
+
+    class _StatusLabel(QLabel):
+        """Keep full status text accessible without forcing a wide window."""
+
+        def __init__(self, text, parent):
+            super().__init__(text, parent)
+            self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+            self.setToolTip(text)
+
+        def setText(self, text):
+            super().setText(text)
+            self.setToolTip(text)
 
     class FluxForgeMainWindow(QMainWindow):
         """Dockable analyst workspace for HPGe and neutron-spectrum workflows."""
@@ -834,12 +847,12 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             status.setObjectName("FluxForgeStatusBar")
             self.setStatusBar(status)
 
-            self.cursor_label = QLabel("Cursor: --", self)
-            self.file_label = QLabel("File: none", self)
-            self.mode_label = QLabel("Mode: Expert", self)
-            self.library_label = QLabel("Library: bundled gamma", self)
-            self.renderer_label = QLabel("Renderer: PyQtGraph", self)
-            self.predictive_label = QLabel("Predictive: --", self)
+            self.cursor_label = _StatusLabel("Cursor: --", self)
+            self.file_label = _StatusLabel("File: none", self)
+            self.mode_label = _StatusLabel("Mode: Expert", self)
+            self.library_label = _StatusLabel("Library: bundled gamma", self)
+            self.renderer_label = _StatusLabel("Renderer: PyQtGraph", self)
+            self.predictive_label = _StatusLabel("Predictive: --", self)
             self.progress = QProgressBar(self)
             self.progress.setObjectName("StatusProgress")
             self.progress.setMaximumWidth(180)
@@ -854,11 +867,11 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             status.addWidget(self.cursor_label, 1)
             status.addWidget(self.file_label, 1)
-            status.addPermanentWidget(self.mode_label)
-            status.addPermanentWidget(self.library_label)
+            status.addPermanentWidget(self.mode_label, 1)
+            status.addPermanentWidget(self.library_label, 2)
             if self.developer_tools:
-                status.addPermanentWidget(self.renderer_label)
-            status.addPermanentWidget(self.predictive_label)
+                status.addPermanentWidget(self.renderer_label, 1)
+            status.addPermanentWidget(self.predictive_label, 1)
             status.addPermanentWidget(self.progress)
             if self.developer_tools:
                 status.addPermanentWidget(self.hardware_led)

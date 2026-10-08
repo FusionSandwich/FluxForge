@@ -39,6 +39,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional dependency branch
             QLabel,
             QMenu,
             QPushButton,
+            QSizePolicy,
             QVBoxLayout,
             QWidget,
         )
@@ -138,10 +139,14 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
 
             self.status_label = QLabel("No spectrum loaded", self)
             self.status_label.setObjectName("CanvasMeta")
+            self.status_label.setWordWrap(True)
+            self.status_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
             header.addWidget(self.status_label)
 
             self.crosshair_readout = QLabel("x -- | y --", self)
             self.crosshair_readout.setObjectName("SpectrumCrosshairReadout")
+            self.crosshair_readout.setWordWrap(True)
+            self.crosshair_readout.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
             self.crosshair_readout.setVisible(False)
             header.addWidget(self.crosshair_readout)
 
@@ -172,6 +177,10 @@ if PYQTGRAPH_AVAILABLE:  # pragma: no cover - optional dependency branch
             self.clear_roi_button.setObjectName("SpectrumClearRoiButton")
             self.clear_roi_button.clicked.connect(self._clear_roi)
             header.addWidget(self.clear_roi_button)
+            header.addStretch(1)
+            shell.addLayout(header)
+            header = QHBoxLayout()
+            header.setContentsMargins(0, 0, 0, 0)
 
             self.zoom_in_button = QPushButton("Zoom +", self)
             self.zoom_in_button.setObjectName("SpectrumZoomInButton")
