@@ -253,11 +253,7 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
                 workspace = snapshot["workspace"]
                 active = workspace.get("active_spectrum_id")
                 self._bind_instrument_inputs(active)
-                if active is not None:
-                    self._instrument_overrides[active] = {
-                        name: editor.text()
-                        for name, editor in self.instrument_inputs.items()
-                    }
+                self._save_instrument_inputs(active)
                 provenance = instrument_provenance(
                     workspace,
                     self._instrument_overrides,
@@ -319,11 +315,17 @@ if QT_AVAILABLE:  # pragma: no cover - optional GUI branch
                     )
             return context
 
+        def _save_instrument_inputs(self, spectrum_id) -> None:
+            if spectrum_id is None:
+                return
+            values = {name: self.instrument_inputs[name].text() for name in SETTING_FIELDS}
+            if any(value.strip() for value in values.values()):
+                self._instrument_overrides[spectrum_id] = values
+            else:
+                self._instrument_overrides.pop(spectrum_id, None)
+
         def _bind_instrument_inputs(self, active) -> None:
-            if self._instrument_spectrum_id is not None:
-                self._instrument_overrides[self._instrument_spectrum_id] = {
-                    name: self.instrument_inputs[name].text() for name in SETTING_FIELDS
-                }
+            self._save_instrument_inputs(self._instrument_spectrum_id)
             if active != self._instrument_spectrum_id:
                 restored = self._instrument_overrides.get(active, {})
                 for name, editor in self.instrument_inputs.items():

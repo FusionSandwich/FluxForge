@@ -253,6 +253,19 @@ def test_qt_recorded_settings_follow_acquisition_identity():
             CalibrationModel(model_key="polynomial", coefficients=(0.5, 1.0)),
         )
         assert dialog.instrument_inputs["amplifier_gain"].text() == "42"
+        from dataclasses import replace
+        document = window.analysis_workspace.document
+        original = document.spectrum_by_id(spectrum_id)
+        replacement = replace(original, spectrum=replace(
+            original.spectrum, counts=original.spectrum.counts.copy()
+        ))
+        window.analysis_workspace.set_document(replace(document, spectra=tuple(
+            replacement if item.spectrum_id == spectrum_id else item
+            for item in document.spectra
+        )))
+        assert not dialog.instrument_inputs["amplifier_gain"].text()
+        assert not dialog._instrument_overrides.get(spectrum_id)
+        dialog.instrument_inputs["amplifier_gain"].setText("55")
         window._load_example_workspace()
         assert window.analysis_workspace.document.active_spectrum_id == spectrum_id
         assert not dialog.instrument_inputs["amplifier_gain"].text()
