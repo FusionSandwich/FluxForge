@@ -108,6 +108,42 @@ class PortableQGExampleTests(unittest.TestCase):
             driver.run_raw_comparison(self.copy,output,'Ti-RAFM-1')
         self.assertFalse(output.exists())
 
+    def test_south_native_background_is_source_bound_and_changes_raw_result(self):
+        north = driver.run_raw_comparison(
+            REPO, Path(self.tmp.name)/'north_background', 'Co-Cd-RAFM-1',
+            background_mode='north_historical')
+        south = driver.run_raw_comparison(
+            REPO, Path(self.tmp.name)/'south_background', 'Co-Cd-RAFM-1',
+            background_mode='south_native')
+        self.assertEqual(south['background_details']['detector'], 'South')
+        self.assertEqual(south['background_details']['source_sha256'],
+                         '96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344')
+        self.assertEqual(south['background_details']['live_time_s'], 14400.0)
+        self.assertEqual(south['background_details']['total_counts'], 543427)
+        self.assertEqual(south['background_details']['QG_background_match'], 'UNKNOWN')
+        self.assertEqual(north['background_details']['detector'], 'North')
+        self.assertNotEqual(north['background_source_sha256'], south['background_source_sha256'])
+        self.assertNotEqual(north['selected_raw_activities']['Co60']['activity_bq'],
+                            south['selected_raw_activities']['Co60']['activity_bq'])
+        self.assertEqual(north['QG_reference_activities_Bq'], south['QG_reference_activities_Bq'])
+
+    def test_south_native_source_tamper_is_rejected(self):
+        path = self.copy/'examples/RAFM_irradiation/quantumgold_reference/supplemental_inputs/South 4hr Background Terminal.ANS'
+        original = path.read_bytes()
+        try:
+            path.write_bytes(original[:-1] + bytes([original[-1] ^ 1]))
+            with self.assertRaisesRegex(ValueError, 'Supplemental source hash/size mismatch'):
+                driver.verify_inputs(self.copy, self.copy/MANIFEST)
+        finally:
+            path.write_bytes(original)
+
+    def test_south_background_mode_cannot_be_silently_ignored_by_replay(self):
+        result = subprocess.run([sys.executable, str(REPO/SCRIPT), '--verify-only',
+                                 '--background-mode', 'south_native'],
+                                capture_output=True, text=True, timeout=60)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('requires --raw-sample', result.stderr)
+
     def test_recovered_curve_must_match_original_percent_export(self):
         original = Path(self.tmp.name)/'original_export.csv'
         derived = Path(self.tmp.name)/'derived_curve.csv'

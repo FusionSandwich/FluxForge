@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import datetime, timedelta
 import hashlib
 from importlib import metadata as distribution_metadata
 import importlib.util
@@ -485,12 +486,15 @@ class SouthWorkingCurve:
 
 def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
                        efficiency_mode: str = 'south_recovered',
-                       counting_method: str = 'iec_tiered') -> dict:
+                       counting_method: str = 'iec_tiered',
+                       background_mode: str = 'north_historical') -> dict:
     """One source-bound South 25 cm monitor reduction, independent of QG activity."""
     if counting_method not in ('iec_tiered', 'covell', 'gilmore'):
         raise ValueError('Raw comparison requires iec_tiered, covell, or gilmore counting')
     if efficiency_mode not in ('south_recovered', 'legacy_profile'):
         raise ValueError('Unknown raw efficiency mode')
+    if background_mode not in ('north_historical', 'south_native'):
+        raise ValueError('Unknown raw background mode')
     checked = verify_inputs(repo, repo/'examples/RAFM_irradiation/quantumgold_reference/manifest.json')
     manifest = checked['manifest']
     rows = [row for row in manifest['measurements'] if row['measurement_id'] == measurement_id]
@@ -513,6 +517,8 @@ def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
         analyze_flux_wire_targeted, build_gamma_library, get_expected_isotopes)
     from fluxforge.examples import rafm_workflow as workflow
     from fluxforge.io.flux_wire import read_processed_txt, read_raw_asc
+    from fluxforge.io.spe import GammaSpectrum
+    import numpy as np
 
     runtime = bound_path(repo, manifest['runtime_root'])
     metadata = workflow.load_rafm_example_metadata(runtime)
@@ -524,11 +530,59 @@ def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
         raise ValueError('ASC spectrum could not be parsed')
     raw_data.sample_id = row['workflow_stem']
     raw_data.spectrum.spectrum_id = row['workflow_stem']
-    background = read_raw_asc(runtime/'background.ASC',
-                              energy_calibration_override=energy_override,
-                              profile_name=metadata.config['profile_name']).spectrum
-    if background is None:
-        raise ValueError('Historical North background could not be parsed')
+    if background_mode == 'north_historical':
+        background_path = runtime/'background.ASC'
+        background_blob = background_path.read_bytes()
+        background = read_raw_asc(background_path,
+                                  energy_calibration_override=energy_override,
+                                  profile_name=metadata.config['profile_name']).spectrum
+        if background is None:
+            raise ValueError('Historical North background could not be parsed')
+        background_details = dict(mode=background_mode, detector='North',
+                                  source_sha256=hashlib.sha256(background_blob).hexdigest(),
+                                  calibration='historical workflow override',
+                                  QG_background_match='UNKNOWN')
+    else:
+        supplement = json.loads((repo/'examples/RAFM_irradiation/quantumgold_reference/'
+                                 'supplemental_inputs/manifest.json').read_text(encoding='utf-8'))
+        pins = [item for item in supplement['resources']
+                if item['role'] == 'recovered_South_native_background_not_ASC']
+        if len(pins) != 1:
+            raise ValueError('South native background source identity is ambiguous')
+        pin = pins[0]
+        background_path = bound_path(repo, pin['path'])
+        background_blob = background_path.read_bytes()
+        if len(background_blob) != pin['bytes'] or hashlib.sha256(background_blob).hexdigest() != pin['sha256']:
+            raise ValueError('South native background source hash/size mismatch')
+        if len(background_blob) != 36616 or b'South 4 hr background terminal' not in background_blob[:1548]:
+            raise ValueError('Unexpected South native background layout or identity')
+        coefficients = struct.unpack_from('<3f', background_blob, 424)
+        live_s = struct.unpack_from('<d', background_blob, 104)[0]
+        real_s = struct.unpack_from('<d', background_blob, 96)[0]
+        serial_day = struct.unpack_from('<d', background_blob, 80)[0]
+        if live_s != 14400.0 or not live_s <= real_s < 14500 or not 40000 < serial_day < 50000:
+            raise ValueError('Unexpected South native background timing')
+        counts = np.asarray(struct.unpack_from('<8192I', background_blob, 1548), dtype=float)
+        channels = np.arange(8192)
+        energies = coefficients[0] + coefficients[1]*channels + coefficients[2]*channels**2
+        if not np.all(np.diff(energies) > 0) or int(counts.sum()) != 543427:
+            raise ValueError('Unexpected South native background channels or calibration')
+        start = datetime(1899, 12, 30) + timedelta(days=serial_day)
+        background = GammaSpectrum(counts=counts, channels=channels, energies=energies,
+                                   live_time=live_s, real_time=real_s, start_time=start,
+                                   spectrum_id='South 4 hr background terminal', detector_id='South',
+                                   calibration={'energy': list(coefficients)},
+                                   metadata={'source_file': pin['path'], 'source_sha256': pin['sha256']})
+        background_details = dict(mode=background_mode, detector='South',
+                                  source_sha256=pin['sha256'], source_path=pin['path'],
+                                  native_payload_offset=1548, channel_count=8192,
+                                  energy_polynomial_keV=list(coefficients),
+                                  live_time_s=live_s, real_time_s=real_s,
+                                  start_time_unzoned=start.isoformat(),
+                                  total_counts=int(counts.sum()),
+                                  calibration='native hash-bound polynomial; core linear count interpolation',
+                                  QG_background_match='UNKNOWN',
+                                  temporal_applicability='UNRESOLVED')
     curve_path = bound_path(repo, manifest['baseline_root'])/'south_25cm_recovered_curve.csv'
     curve = SouthWorkingCurve(curve_path)
     curve.verify_source_export(bound_path(repo, manifest['baseline_root'] +
@@ -618,8 +672,10 @@ def run_raw_comparison(repo: Path, output: Path, measurement_id: str,
                    raw_source_sha256=next(item['sha256'] for item in manifest['resources']
                                           if item['path'] == row['files']['ASC']),
                    channel_array_sha256=row['channel_array_sha256'],
-                   background_source_sha256=hashlib.sha256((runtime/'background.ASC').read_bytes()).hexdigest(),
-                   background_basis='historical bundled North background; South applicability unresolved',
+                   background_source_sha256=background_details['source_sha256'],
+                   background_basis=('historical bundled North background' if background_mode == 'north_historical'
+                                     else 'recovered native South detector scenario; applicability unresolved'),
+                   background_details=background_details,
                    energy_scope_keV=[curve.energy_min_keV, curve.energy_max_keV],
                    unsupported_energy_policy='outside positive adjacent brackets excluded from line analysis',
                    excluded_expected_lines=excluded_expected_lines,
@@ -656,13 +712,18 @@ def main() -> int:
                         default='south_recovered')
     parser.add_argument('--counting-method', choices=['iec_tiered','covell','gilmore'],
                         default='iec_tiered')
+    parser.add_argument('--background-mode', choices=['north_historical','south_native'],
+                        default='north_historical')
     args = parser.parse_args()
     if args.raw_sample and args.verify_only:
         parser.error('--raw-sample and --verify-only are separate modes')
     if args.raw_sample and not args.output:
         parser.error('--raw-sample requires --output')
+    if not args.raw_sample and args.background_mode != 'north_historical':
+        parser.error('--background-mode south_native requires --raw-sample')
     result = (run_raw_comparison(REPO, args.output, args.raw_sample,
-                                 args.efficiency_mode, args.counting_method)
+                                 args.efficiency_mode, args.counting_method,
+                                 args.background_mode)
               if args.raw_sample else run(REPO, args.output, args.verify_only))
     print(json.dumps({k:v for k,v in result.items() if not k.endswith('workflow_summary')}, indent=2))
     return 0

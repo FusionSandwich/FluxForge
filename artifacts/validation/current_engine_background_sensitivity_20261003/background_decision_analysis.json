@@ -1,0 +1,111 @@
+{
+  "status": "READ_ONLY_CONDITIONAL_DIAGNOSTIC",
+  "provenance": {
+    "comparison_sha256": "e35d11061dda3257a8874de0cdebfae59261276f00b30e49ea49d2347771034f",
+    "forensics_sha256": "ad52409728f7ab47ae5a26c34099ebf8e239aaf173c8f69946c7a38127905dc2",
+    "original_CoCd_ANS_sha256": "d04a65ed6052a08b831788a63e89f2eb291b5de4905357de2227e7a845f90ce7",
+    "engine_commit": "a7bcc680d1f5e06b1d9dae405241fc380087ca2b",
+    "input_tree_sha256": "45803d05cfe2c49aa541c9bfc2079d441feb9c7978e81a6a68a732fedc0fdfe1"
+  },
+  "matched_activity_rows": 81,
+  "median_abs_south_over_north_minus_one": 0.0011805001190730025,
+  "rows_with_abs_south_north_shift_below_5pct": 66,
+  "rows_with_abs_south_north_shift_above_10pct": 9,
+  "rows_with_abs_south_north_shift_above_20pct": 6,
+  "low_background_leverage_rows": {
+    "count": 66,
+    "median_abs_south_QG_relative_difference": 0.49553747314080543,
+    "count_with_abs_south_QG_difference_above_20pct": 49
+  },
+  "largest_south_north_shifts": [
+    {
+      "sample_id": "RAFM3-C_300sEOI",
+      "isotope": "Mn56",
+      "sample_group": "RAFM3",
+      "south_over_north_minus_one": -0.33685738448940417,
+      "south_over_qg_minus_one": -0.21711072001442178
+    },
+    {
+      "sample_id": "Ti-RAFM-1_25cm",
+      "isotope": "Sc46",
+      "sample_group": "flux_wires",
+      "south_over_north_minus_one": -0.2631006642160937,
+      "south_over_qg_minus_one": -0.2746014824264227
+    },
+    {
+      "sample_id": "RAFM4-C_15dEOI",
+      "isotope": "Co60",
+      "sample_group": "RAFM4",
+      "south_over_north_minus_one": 0.23530637866748205,
+      "south_over_qg_minus_one": -0.028275183349038446
+    },
+    {
+      "sample_id": "Ti-RAFM-1a_25cm",
+      "isotope": "Sc46",
+      "sample_group": "flux_wires",
+      "south_over_north_minus_one": -0.2326878694351705,
+      "south_over_qg_minus_one": -0.23931357378566054
+    },
+    {
+      "sample_id": "RAFM3-A_4dEOI",
+      "isotope": "Cr51",
+      "sample_group": "RAFM3",
+      "south_over_north_minus_one": -0.21552298339208642,
+      "south_over_qg_minus_one": 0.32342743660682416
+    },
+    {
+      "sample_id": "Ti-RAFM-1b_25cm",
+      "isotope": "Sc46",
+      "sample_group": "flux_wires",
+      "south_over_north_minus_one": -0.20568061077688915,
+      "south_over_qg_minus_one": -0.19691708767558502
+    },
+    {
+      "sample_id": "RAFM3-N_300sEOI",
+      "isotope": "Al28",
+      "sample_group": "RAFM3",
+      "south_over_north_minus_one": 0.19270579405176202,
+      "south_over_qg_minus_one": -0.9928386721284403
+    },
+    {
+      "sample_id": "Co-Cd-RAFM-1_25cm",
+      "isotope": "Co60",
+      "sample_group": "flux_wires",
+      "south_over_north_minus_one": -0.14021516464649542,
+      "south_over_qg_minus_one": -0.42828214723473146
+    },
+    {
+      "sample_id": "RAFM4-B_15dEOI",
+      "isotope": "Co60",
+      "sample_group": "RAFM4",
+      "south_over_north_minus_one": 0.11643439159129487,
+      "south_over_qg_minus_one": 0.12048775549116386
+    },
+    {
+      "sample_id": "RAFM3-A_24hrEOI",
+      "isotope": "Mn56",
+      "sample_group": "RAFM3",
+      "south_over_north_minus_one": 0.08441174285855335,
+      "south_over_qg_minus_one": 0.2628969552753915
+    }
+  ],
+  "CoCd_source_calibration": {
+    "original_ANS_energy_coefficients": [
+      -1.69438636302948,
+      0.49962061643600464,
+      6.709741739996389e-08
+    ],
+    "workflow_profile_energy_coefficients": [
+      -1.694,
+      0.4996,
+      6.71e-08
+    ],
+    "converted_ASC_header_energy_coefficients": [
+      0.541,
+      0.498,
+      2.605e-07
+    ],
+    "interpretation": "Original ANS supports the workflow profile at printed precision; the converted ASC header differs and is not an independent calibration correction."
+  },
+  "qualification": "All differences are descriptive comparisons of the existing conditional engine replay, not evidence that either measured background is physically applicable or that QG activity is a calibration truth."
+}

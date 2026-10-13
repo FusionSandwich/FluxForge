@@ -1,0 +1,352 @@
+{
+  "status": "COMPLETED",
+  "engine_lineage": "historical portable e5b8621 plus PR230 South scenario changes",
+  "does_not_evaluate_current_engine": "4615e61 validation engine",
+  "eligible_measurements": 7,
+  "comparisons": [
+    {
+      "measurement_id": "Co-Cd-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Co60",
+          "north_Bq": 233.2020484727521,
+          "south_Bq": 224.19851938885932,
+          "QG_report_Bq": 234.95,
+          "south_over_north": 0.9613917238598152,
+          "south_over_QG": 0.9542392823530935,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "raw_source_sha256": "7482016df6c9d370b68e5d5646cd64c5fa74def9fe586e58d19d89dab0c87cba",
+      "channel_array_sha256": "2c7659f28eaba8764c5209a9b1e4f5819f32490928cba62bfcc0e5f7cb908ce4",
+      "dataset_identity": {
+        "status": "SOURCE_BOUND",
+        "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+        "revision": null
+      },
+      "engine_identity": {
+        "status": "IDENTIFIED_BY_CONTENT",
+        "source_sha256": "1893676ad594240c3e867678475efdaf7958e1ef469b71c3980b01bcd5c3f7ba",
+        "revision": null,
+        "file_count": 286,
+        "scope": "pyproject.toml, portable replay driver, complete src/fluxforge tree",
+        "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+      },
+      "counting_method": "iec_tiered",
+      "selected_efficiency_source": {
+        "model": "recovered_South_small_vial_25cm",
+        "source_sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d",
+        "source_path": "south_25cm_recovered_curve.csv",
+        "export_unit_assumption": "percent",
+        "applied_unit": "fraction",
+        "energy_range_keV": [
+          57.0,
+          1999.0
+        ],
+        "positive_bracket_segments": 1,
+        "interpolation": "linear within positive adjacent brackets only",
+        "calibration_uncertainty": "unknown; not treated as zero"
+      }
+    },
+    {
+      "measurement_id": "Co-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Co60",
+          "north_Bq": 2054.8185726654438,
+          "south_Bq": 2051.0119234287363,
+          "QG_report_Bq": 2035.0,
+          "south_over_north": 0.9981474523895462,
+          "south_over_QG": 1.007868267041148,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "raw_source_sha256": "6d45b8934ee303b17c0d3b41ad160d355cb0ae6a2a0fa2b6b2c9e14ce963e719",
+      "channel_array_sha256": "9064fa682eaabd27ec5a89e23dd8a8f89c1ee079d0df2d7502904613659a80df",
+      "dataset_identity": {
+        "status": "SOURCE_BOUND",
+        "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+        "revision": null
+      },
+      "engine_identity": {
+        "status": "IDENTIFIED_BY_CONTENT",
+        "source_sha256": "1893676ad594240c3e867678475efdaf7958e1ef469b71c3980b01bcd5c3f7ba",
+        "revision": null,
+        "file_count": 286,
+        "scope": "pyproject.toml, portable replay driver, complete src/fluxforge tree",
+        "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+      },
+      "counting_method": "iec_tiered",
+      "selected_efficiency_source": {
+        "model": "recovered_South_small_vial_25cm",
+        "source_sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d",
+        "source_path": "south_25cm_recovered_curve.csv",
+        "export_unit_assumption": "percent",
+        "applied_unit": "fraction",
+        "energy_range_keV": [
+          57.0,
+          1999.0
+        ],
+        "positive_bracket_segments": 1,
+        "interpolation": "linear within positive adjacent brackets only",
+        "calibration_uncertainty": "unknown; not treated as zero"
+      }
+    },
+    {
+      "measurement_id": "Cu-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Cu64",
+          "north_Bq": 3210834.193244286,
+          "south_Bq": 3210840.011466946,
+          "QG_report_Bq": 3172380.0,
+          "south_over_north": 1.0000018120595178,
+          "south_over_QG": 1.0121233936246434,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "raw_source_sha256": "f1405d23ae991c92e0190e6deb8a56721ea65d8eae3cc754db95170eabb373cd",
+      "channel_array_sha256": "cd5e41300b617b2aedcbe5c6b32ef758cb1d96461e5734b344b136f754fdbddb",
+      "dataset_identity": {
+        "status": "SOURCE_BOUND",
+        "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+        "revision": null
+      },
+      "engine_identity": {
+        "status": "IDENTIFIED_BY_CONTENT",
+        "source_sha256": "1893676ad594240c3e867678475efdaf7958e1ef469b71c3980b01bcd5c3f7ba",
+        "revision": null,
+        "file_count": 286,
+        "scope": "pyproject.toml, portable replay driver, complete src/fluxforge tree",
+        "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+      },
+      "counting_method": "iec_tiered",
+      "selected_efficiency_source": {
+        "model": "recovered_South_small_vial_25cm",
+        "source_sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d",
+        "source_path": "south_25cm_recovered_curve.csv",
+        "export_unit_assumption": "percent",
+        "applied_unit": "fraction",
+        "energy_range_keV": [
+          57.0,
+          1999.0
+        ],
+        "positive_bracket_segments": 1,
+        "interpolation": "linear within positive adjacent brackets only",
+        "calibration_uncertainty": "unknown; not treated as zero"
+      }
+    },
+    {
+      "measurement_id": "In-Cd-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "In114m",
+          "north_Bq": 209907.2769682267,
+          "south_Bq": 209907.34914976996,
+          "QG_report_Bq": 219706.0,
+          "south_over_north": 1.0000003438734677,
+          "south_over_QG": 0.9554010775753505,
+          "QG_time_and_background_harmonized": false
+        },
+        {
+          "isotope": "In115m",
+          "north_Bq": 12456.666897659918,
+          "south_Bq": 12456.656071720263,
+          "QG_report_Bq": 11988.0,
+          "south_over_north": 0.9999991309120053,
+          "south_over_QG": 1.039093766409765,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "raw_source_sha256": "09fe25806f2abd1b25cf475511bae06c10ec8722568dd84df27eaef9457b0a35",
+      "channel_array_sha256": "87c2876936b8e9405d4304dfe54cd222c51a58059e521ddc6c81edc214afe4ef",
+      "dataset_identity": {
+        "status": "SOURCE_BOUND",
+        "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+        "revision": null
+      },
+      "engine_identity": {
+        "status": "IDENTIFIED_BY_CONTENT",
+        "source_sha256": "1893676ad594240c3e867678475efdaf7958e1ef469b71c3980b01bcd5c3f7ba",
+        "revision": null,
+        "file_count": 286,
+        "scope": "pyproject.toml, portable replay driver, complete src/fluxforge tree",
+        "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+      },
+      "counting_method": "iec_tiered",
+      "selected_efficiency_source": {
+        "model": "recovered_South_small_vial_25cm",
+        "source_sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d",
+        "source_path": "south_25cm_recovered_curve.csv",
+        "export_unit_assumption": "percent",
+        "applied_unit": "fraction",
+        "energy_range_keV": [
+          57.0,
+          1999.0
+        ],
+        "positive_bracket_segments": 1,
+        "interpolation": "linear within positive adjacent brackets only",
+        "calibration_uncertainty": "unknown; not treated as zero"
+      }
+    },
+    {
+      "measurement_id": "Ni-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Co58",
+          "north_Bq": 46749.86145461942,
+          "south_Bq": 46749.89050754603,
+          "QG_report_Bq": 45880.0,
+          "south_over_north": 1.0000006214548172,
+          "south_over_QG": 1.0189601244016135,
+          "QG_time_and_background_harmonized": false
+        },
+        {
+          "isotope": "Ni57",
+          "north_Bq": 126.73009042912774,
+          "south_Bq": 121.22519747457412,
+          "QG_report_Bq": null,
+          "south_over_north": 0.956562068756416,
+          "south_over_QG": null,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "raw_source_sha256": "294a2d0a67421fd380f41b73dca1f9385c02e77598ca4ab491070ba03f282ed9",
+      "channel_array_sha256": "fa330355be9a5474729b973f48332f89c3fa100aea175845b5f587f0b4495487",
+      "dataset_identity": {
+        "status": "SOURCE_BOUND",
+        "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+        "revision": null
+      },
+      "engine_identity": {
+        "status": "IDENTIFIED_BY_CONTENT",
+        "source_sha256": "1893676ad594240c3e867678475efdaf7958e1ef469b71c3980b01bcd5c3f7ba",
+        "revision": null,
+        "file_count": 286,
+        "scope": "pyproject.toml, portable replay driver, complete src/fluxforge tree",
+        "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+      },
+      "counting_method": "iec_tiered",
+      "selected_efficiency_source": {
+        "model": "recovered_South_small_vial_25cm",
+        "source_sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d",
+        "source_path": "south_25cm_recovered_curve.csv",
+        "export_unit_assumption": "percent",
+        "applied_unit": "fraction",
+        "energy_range_keV": [
+          57.0,
+          1999.0
+        ],
+        "positive_bracket_segments": 1,
+        "interpolation": "linear within positive adjacent brackets only",
+        "calibration_uncertainty": "unknown; not treated as zero"
+      }
+    },
+    {
+      "measurement_id": "Sc-Cd-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Sc46",
+          "north_Bq": 161092.23910791456,
+          "south_Bq": 161092.2123548267,
+          "QG_report_Bq": 159063.0,
+          "south_over_north": 0.9999998339268981,
+          "south_over_QG": 1.01275728708013,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "raw_source_sha256": "de34fe43e4511141491327b31f9caca69b6039b7e0785f0d7938b89633b76ef2",
+      "channel_array_sha256": "2b85d4511ea3151aa1782867e984ae22465470508a11a17b6385dde9313e9648",
+      "dataset_identity": {
+        "status": "SOURCE_BOUND",
+        "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+        "revision": null
+      },
+      "engine_identity": {
+        "status": "IDENTIFIED_BY_CONTENT",
+        "source_sha256": "1893676ad594240c3e867678475efdaf7958e1ef469b71c3980b01bcd5c3f7ba",
+        "revision": null,
+        "file_count": 286,
+        "scope": "pyproject.toml, portable replay driver, complete src/fluxforge tree",
+        "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+      },
+      "counting_method": "iec_tiered",
+      "selected_efficiency_source": {
+        "model": "recovered_South_small_vial_25cm",
+        "source_sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d",
+        "source_path": "south_25cm_recovered_curve.csv",
+        "export_unit_assumption": "percent",
+        "applied_unit": "fraction",
+        "energy_range_keV": [
+          57.0,
+          1999.0
+        ],
+        "positive_bracket_segments": 1,
+        "interpolation": "linear within positive adjacent brackets only",
+        "calibration_uncertainty": "unknown; not treated as zero"
+      }
+    },
+    {
+      "measurement_id": "Sc-RAFM-1",
+      "isotopes": [
+        {
+          "isotope": "Sc46",
+          "north_Bq": 1593121.285143126,
+          "south_Bq": 1593121.3088955933,
+          "QG_report_Bq": 1607650.0,
+          "south_over_north": 1.0000000149093904,
+          "south_over_QG": 0.9909627772808717,
+          "QG_time_and_background_harmonized": false
+        }
+      ],
+      "north_background_hash": "505565653785c1e704f175e32e09ae1d69352fd5c891ff413f5acda29f633374",
+      "south_background_hash": "96f2e47eb2edc68db227157aa08c601be6cd0ec4e46f1abfa114d46e2d509344",
+      "raw_source_sha256": "65998ce95453b126a6471f54b9e81fbbaddb4f545b26695a19eb4d471672be90",
+      "channel_array_sha256": "a4e7e11046066e7a05ad5ab65c73742f4a5850d11aa08535bacc299aaf5fb1e6",
+      "dataset_identity": {
+        "status": "SOURCE_BOUND",
+        "source_manifest_sha256": "68105c616c3e154861251816e195cb959bd4a8e88625605c7718956400823fda",
+        "revision": null
+      },
+      "engine_identity": {
+        "status": "IDENTIFIED_BY_CONTENT",
+        "source_sha256": "1893676ad594240c3e867678475efdaf7958e1ef469b71c3980b01bcd5c3f7ba",
+        "revision": null,
+        "file_count": 286,
+        "scope": "pyproject.toml, portable replay driver, complete src/fluxforge tree",
+        "algorithm": "SHA-256 over sorted relative path and file bytes, length-prefixed"
+      },
+      "counting_method": "iec_tiered",
+      "selected_efficiency_source": {
+        "model": "recovered_South_small_vial_25cm",
+        "source_sha256": "4fae95213fed15e3de6f66566270b0c2d8c2e03361a1091f8a806a2420e7e86d",
+        "source_path": "south_25cm_recovered_curve.csv",
+        "export_unit_assumption": "percent",
+        "applied_unit": "fraction",
+        "energy_range_keV": [
+          57.0,
+          1999.0
+        ],
+        "positive_bracket_segments": 1,
+        "interpolation": "linear within positive adjacent brackets only",
+        "calibration_uncertainty": "unknown; not treated as zero"
+      }
+    }
+  ],
+  "scope": "source-bound original ASC 25cm monitors, excluding missing ASC and Ti/Sc48 ambiguity",
+  "reference_used_for_analysis": false,
+  "QG_background_match": "UNKNOWN",
+  "QG_time_harmonized": false
+}
