@@ -12,6 +12,14 @@ from fluxforge.solvers.mcmc import (
     mcmc_unfold,
     mcmc_convergence_diagnostic,
 )
+from fluxforge.solvers.parametric import (
+    GaussianResponseModel,
+    Parameter,
+    ParametricProblem,
+    ParametricSolution,
+    integrate_spectrum,
+    parametric_unfold,
+)
 from fluxforge.solvers.regularized import (
     RegularizedSolution,
     regularized_unfold,
@@ -48,6 +56,12 @@ __all__ = [
     "MCMCSolution",
     "mcmc_unfold",
     "mcmc_convergence_diagnostic",
+    "GaussianResponseModel",
+    "Parameter",
+    "ParametricProblem",
+    "ParametricSolution",
+    "integrate_spectrum",
+    "parametric_unfold",
     "RegularizedSolution",
     "regularized_unfold",
     "gradient_descent_regularized",
