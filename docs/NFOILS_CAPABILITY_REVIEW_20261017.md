@@ -90,3 +90,18 @@ demonstrated out-of-sample measured-count prediction, or a reproducible physical
 failure diagnosis. GLS, GRAVEL/MLEM, Bayesian parametric inference, Poisson fitting
 and Gaussian conditional prediction are established prior art. The new synthetic
 checks establish bounded software behavior only.
+
+## GitHub CI follow-up
+
+The first PR's workflow run `39007745987` exposes two failures outside its
+MCMC-only change: the RAFM workflow summary test reaches an existing report with
+no positive real count time, and the Linux GUI process aborts during interpreter
+shutdown after all 29 selected assertions pass (`bool_dealloc`, exit 134).
+Windows GUI smoke, external-reference parity and optional ML checks passed in
+that run. These failures are not waived, and a green full-workflow result is not
+claimed. The missing report-clock semantics must not be guessed to make CI pass.
+
+The final PR gives the new activation/inference contract suite its own CI job
+so a prior RAFM failure cannot prevent those checks from executing. Existing
+workflow jobs and their failure behavior remain in place. See the PR checks
+for the current remote result; the source-hashed receipt records local tests only.

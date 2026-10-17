@@ -134,9 +134,22 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
+  activation-inference-contracts:
+    name: Activation and inference contracts
+    runs-on: ubuntu-latest
+    env:
+      MPLBACKEND: Agg
+      PYTHONPATH: src
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install capability test dependencies
+        run: python -m pip install -e '.[dev]'
       - name: Parametric inference and predictive-count contracts
-        env:
-          PYTHONPATH: src
         run: |
           pytest -q \
             tests/test_mcmc.py \
