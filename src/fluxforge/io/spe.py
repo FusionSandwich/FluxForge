@@ -11,6 +11,7 @@ This is a standalone implementation that does not require PyNE.
 from __future__ import annotations
 
 import re
+import hashlib
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -212,7 +213,9 @@ class GammaSpectrum:
             if np.isscalar(energy):
                 return _invert_scalar(float(energy))
             values = np.asarray(energy, dtype=float)
-            return np.asarray([_invert_scalar(float(value)) for value in values], dtype=int)
+            return np.asarray(
+                [_invert_scalar(float(value)) for value in values], dtype=int
+            )
 
         if len(coeffs) == 2:
             # Linear: E = a0 + a1*ch => ch = (E - a0) / a1
@@ -818,28 +821,94 @@ def read_multiple_spe(
     list of GammaSpectrum or GammaSpectrum
         Parsed spectra (or summed if sum_spectra=True)
     """
+    if sum_spectra:
+        identities = [Path(fp).resolve() for fp in filepaths]
+        if len(set(identities)) != len(identities):
+            raise ValueError("Cannot sum repeated paths to the same acquisition")
     spectra = [read_spe_file(fp) for fp in filepaths]
 
     if sum_spectra and len(spectra) > 0:
-        # Sum counts, add times
+        # Never silently drop counts from a mismatched spectrum or adopt an
+        # unrelated calibration. Resampling requires a separate explicit step.
         total_counts = np.zeros_like(spectra[0].counts)
+        total_variance = np.zeros_like(total_counts)
         total_live = 0.0
         total_real = 0.0
+        source_records = []
+        total_covariance = None
+        if any(sp.counts_covariance is not None for sp in spectra):
+            from scipy.sparse import csr_matrix, diags
 
-        for sp in spectra:
-            if len(sp.counts) == len(total_counts):
-                total_counts += sp.counts
+            total_covariance = csr_matrix((len(total_counts), len(total_counts)))
+
+        for fp, sp in zip(filepaths, spectra):
+            if (
+                sp.counts.shape != total_counts.shape
+                or not np.array_equal(sp.channels, spectra[0].channels)
+                or not np.array_equal(sp.energies, spectra[0].energies)
+                or sp.detector_id != spectra[0].detector_id
+            ):
+                raise ValueError(
+                    "Summed spectra require identical native grids and detector"
+                )
+            if (
+                not np.isfinite(sp.counts).all()
+                or np.any(sp.counts < 0)
+                or np.any(sp.counts != np.floor(sp.counts))
+            ):
+                raise ValueError(
+                    "Summed raw spectra require nonnegative integer counts"
+                )
+            if (
+                not np.isfinite([sp.live_time, sp.real_time]).all()
+                or sp.live_time < 0
+                or sp.real_time < sp.live_time
+            ):
+                raise ValueError("Acquisition times must satisfy 0 <= live <= real")
+            total_counts += sp.counts
+            total_variance += np.asarray(sp.counts_uncertainty) ** 2
+            if total_covariance is not None:
+                total_covariance += (
+                    sp.counts_covariance
+                    if sp.counts_covariance is not None
+                    else diags(np.asarray(sp.counts_uncertainty) ** 2)
+                )
             total_live += sp.live_time
             total_real += sp.real_time
+            source_records.append(
+                {
+                    "path": str(fp),
+                    "sha256": hashlib.sha256(Path(fp).read_bytes()).hexdigest(),
+                    "start_time": sp.start_time.isoformat() if sp.start_time else None,
+                    "live_time_s": sp.live_time,
+                    "real_time_s": sp.real_time,
+                }
+            )
+        if len({row["sha256"] for row in source_records}) != len(source_records):
+            raise ValueError(
+                "Cannot sum duplicate byte copies as independent acquisitions"
+            )
 
         return GammaSpectrum(
             counts=total_counts,
+            counts_uncertainty=np.sqrt(total_variance),
+            counts_covariance=total_covariance,
             channels=spectra[0].channels.copy(),
+            energies=(
+                spectra[0].energies.copy() if spectra[0].energies is not None else None
+            ),
             live_time=total_live,
             real_time=total_real,
             spectrum_id="summed_spectrum",
+            detector_id=spectra[0].detector_id,
             calibration=spectra[0].calibration.copy(),
-            metadata={"source_files": [str(fp) for fp in filepaths]},
+            metadata={
+                "source_files": [str(fp) for fp in filepaths],
+                "acquisition_intervals": source_records,
+                "count_clock_model": "sum_of_acquisition_intervals",
+                "single_contiguous_acquisition": False,
+                "physical_qualified": False,
+            },
         )
 
     return spectra

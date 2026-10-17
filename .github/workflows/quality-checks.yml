@@ -138,7 +138,7 @@ jobs:
         env:
           PYTHONPATH: src
         run: |
-          pytest -q tests/test_mcmc.py tests/test_mcmc_target_measure.py tests/test_parametric_unfolding.py tests/test_count_prediction_benchmark.py
+          pytest -q tests/test_mcmc.py tests/test_mcmc_target_measure.py tests/test_parametric_unfolding.py tests/test_count_prediction_benchmark.py tests/test_activation_interoperability.py
 
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
