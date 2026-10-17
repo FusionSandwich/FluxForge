@@ -134,11 +134,30 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
-      - name: MCMC target-distribution regression tests
-        env:
-          PYTHONPATH: src
+  activation-inference-contracts:
+    name: Activation and inference contracts
+    runs-on: ubuntu-latest
+    env:
+      MPLBACKEND: Agg
+      PYTHONPATH: src
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install capability test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Parametric inference and predictive-count contracts
         run: |
-          pytest -q tests/test_mcmc.py tests/test_mcmc_target_measure.py tests/test_parametric_unfolding.py tests/test_count_prediction_benchmark.py tests/test_activation_interoperability.py
+          pytest -q \
+            tests/test_mcmc.py \
+            tests/test_mcmc_target_measure.py \
+            tests/test_parametric_unfolding.py \
+            tests/test_count_prediction_benchmark.py \
+            tests/test_activation_interoperability.py \
+            tests/test_sandy_response.py
 
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
