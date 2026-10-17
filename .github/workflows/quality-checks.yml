@@ -134,6 +134,12 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
+      - name: MCMC target-distribution regression tests
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q tests/test_mcmc.py tests/test_mcmc_target_measure.py
+
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
