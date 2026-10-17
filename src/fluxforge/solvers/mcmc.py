@@ -6,7 +6,7 @@ of the neutron flux spectrum given response matrix and measurements.
 Features:
 - Log-normal proposal distribution (preserves positivity)
 - Configurable prior (uniform or smoothness-regularized)
-- Burn-in and thinning for statistically independent samples
+- Burn-in and thinning (retained samples may remain autocorrelated)
 - Posterior statistics (mean, credible intervals)
 """
 
@@ -15,7 +15,7 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass, field
-from typing import Any, List, Optional, Tuple, Callable
+from typing import Any, List, Optional
 
 from fluxforge.core.unfolding_diagnostics import merge_flux_diagnostics
 from fluxforge.core.unfolding_inputs import require_nonnegative
@@ -123,6 +123,7 @@ def _propose_flux(
     current: Vector,
     step_size: float = 0.1,
     floor: float = 1e-20,
+    rng: Optional[random.Random] = None,
 ) -> Vector:
     """Propose new flux using log-normal random walk.
 
@@ -130,12 +131,23 @@ def _propose_flux(
     log(phi_new) = log(phi_old) + epsilon
     where epsilon ~ N(0, step_size^2)
     """
+    generator = rng if rng is not None else random
     proposal = []
     for phi in current:
-        log_phi = math.log(max(phi, floor))
-        log_phi_new = log_phi + random.gauss(0, step_size)
-        proposal.append(math.exp(log_phi_new))
+        # Clamping the current state here would break the log-normal kernel.
+        log_phi_new = math.log(phi) + generator.gauss(0, step_size)
+        try:
+            proposal.append(math.exp(log_phi_new))
+        except OverflowError:
+            proposal.append(float("inf"))
     return proposal
+
+
+def _log_proposal_ratio(current: Vector, proposed: Vector) -> float:
+    """log q(current|proposed) / q(proposed|current) in linear-flux measure."""
+    if any(not math.isfinite(p) or p <= 0 for p in proposed):
+        return float("-inf")
+    return sum(math.log(p) - math.log(c) for c, p in zip(current, proposed))
 
 
 def _compute_percentile(samples: List[Vector], percentile: float, group: int) -> float:
@@ -171,7 +183,9 @@ def mcmc_unfold(
     Samples from the posterior distribution:
         P(phi | y) ∝ P(y | phi) * P(phi)
 
-    where P(y | phi) is the Gaussian likelihood and P(phi) is the prior.
+    where P(y | phi) is the Gaussian likelihood and P(phi) is a density
+    with respect to linear group flux. The log-normal proposal includes its
+    Hastings correction. Neither acceptance nor thinning establishes mixing.
 
     Parameters
     ----------
@@ -229,9 +243,7 @@ def mcmc_unfold(
     if initial_flux is not None:
         initial_array = require_nonnegative("initial_flux", initial_flux).reshape(-1)
         if initial_array.size != response_array.shape[1]:
-            raise ValueError(
-                "initial_flux length must match the response column count"
-            )
+            raise ValueError("initial_flux length must match the response column count")
 
     uncertainty_array = None
     if measurement_uncertainty is not None:
@@ -246,13 +258,32 @@ def mcmc_unfold(
 
     response = response_array.astype(float).tolist()
     measurements = measurements_array.astype(float).tolist()
-    initial_flux = None if initial_array is None else initial_array.astype(float).tolist()
+    initial_flux = (
+        None if initial_array is None else initial_array.astype(float).tolist()
+    )
     measurement_uncertainty = (
         None if uncertainty_array is None else uncertainty_array.astype(float).tolist()
     )
 
-    if seed is not None:
-        random.seed(seed)
+    for name, value in (("n_samples", n_samples), ("thin", thin)):
+        if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+            raise ValueError(f"{name} must be a positive integer")
+    if isinstance(burn_in, bool) or not isinstance(burn_in, int):
+        raise ValueError("burn_in must be an integer")
+    if not 0 <= burn_in < n_samples:
+        raise ValueError("burn_in must satisfy 0 <= burn_in < n_samples")
+    if 0 in response_array.shape:
+        raise ValueError("response must have at least one row and column")
+    if uncertainty_array is not None and (uncertainty_array <= 0).any():
+        raise ValueError("measurement_uncertainty must be strictly positive")
+    for name, value in (("step_size", step_size), ("floor", floor)):
+        if not math.isfinite(value) or value <= 0:
+            raise ValueError(f"{name} must be finite and positive")
+    if not math.isfinite(smoothness_weight) or smoothness_weight < 0:
+        raise ValueError("smoothness_weight must be finite and nonnegative")
+    if not math.isfinite(target_acceptance) or not 0 < target_acceptance < 1:
+        raise ValueError("target_acceptance must be between zero and one")
+    rng = random.Random(seed)
 
     n_groups = len(response[0])
     n_meas = len(measurements)
@@ -262,13 +293,19 @@ def mcmc_unfold(
         current_flux = [max(x, floor) for x in initial_flux]
     else:
         avg_meas = sum(measurements) / len(measurements)
-        current_flux = [avg_meas / n_groups for _ in range(n_groups)]
+        current_flux = [max(avg_meas / n_groups, floor) for _ in range(n_groups)]
 
     # Select prior function
     if prior == "uniform":
-        log_prior_fn = lambda phi: _log_prior_uniform(phi, floor)
+
+        def log_prior_fn(phi):
+            return _log_prior_uniform(phi, floor)
+
     elif prior == "smoothness":
-        log_prior_fn = lambda phi: _log_prior_smoothness(phi, smoothness_weight, floor)
+
+        def log_prior_fn(phi):
+            return _log_prior_smoothness(phi, smoothness_weight, floor)
+
     else:
         raise ValueError(f"Unknown prior: {prior}. Use 'uniform' or 'smoothness'")
 
@@ -293,20 +330,23 @@ def mcmc_unfold(
         n_total += 1
 
         # Propose new flux
-        proposed_flux = _propose_flux(current_flux, current_step, floor)
+        proposed_flux = _propose_flux(current_flux, current_step, floor, rng=rng)
 
         # Compute log-posterior for proposal
-        proposed_log_lik = _log_likelihood(
-            response, proposed_flux, measurements, measurement_uncertainty, floor
-        )
-        proposed_log_prior = log_prior_fn(proposed_flux)
-        proposed_log_post = proposed_log_lik + proposed_log_prior
+        proposal_ratio = _log_proposal_ratio(current_flux, proposed_flux)
+        proposed_log_post = float("-inf")
+        if math.isfinite(proposal_ratio):
+            proposed_log_lik = _log_likelihood(
+                response, proposed_flux, measurements, measurement_uncertainty, floor
+            )
+            proposed_log_prior = log_prior_fn(proposed_flux)
+            proposed_log_post = proposed_log_lik + proposed_log_prior
 
         # Metropolis acceptance ratio (in log space)
-        log_alpha = proposed_log_post - current_log_post
+        log_alpha = proposed_log_post - current_log_post + proposal_ratio
 
         # Accept or reject
-        if math.log(random.random()) < log_alpha:
+        if math.log(max(rng.random(), 1e-300)) < log_alpha:
             current_flux = proposed_flux
             current_log_post = proposed_log_post
             n_accepted += 1
@@ -320,13 +360,15 @@ def mcmc_unfold(
                 current_step *= 0.8
                 if verbose:
                     print(
-                        f"  MCMC iter {i}: Reducing step to {current_step:.4f} (accept rate {recent_rate:.2%})"
+                        f"  MCMC iter {i}: Reducing step to {current_step:.4f} "
+                        f"(accept rate {recent_rate:.2%})"
                     )
             elif recent_rate > target_acceptance + 0.1:
                 current_step *= 1.2
                 if verbose:
                     print(
-                        f"  MCMC iter {i}: Increasing step to {current_step:.4f} (accept rate {recent_rate:.2%})"
+                        f"  MCMC iter {i}: Increasing step to {current_step:.4f} "
+                        f"(accept rate {recent_rate:.2%})"
                     )
 
         # Store sample after burn-in with thinning
@@ -336,7 +378,8 @@ def mcmc_unfold(
         if verbose and i % 1000 == 0:
             rate = n_accepted / n_total if n_total > 0 else 0
             print(
-                f"  MCMC iter {i}/{n_samples}: accept_rate = {rate:.2%}, log_post = {current_log_post:.2f}"
+                f"  MCMC iter {i}/{n_samples}: accept_rate = {rate:.2%}, "
+                f"log_post = {current_log_post:.2f}"
             )
 
     # Compute posterior statistics
@@ -373,7 +416,8 @@ def mcmc_unfold(
 
     if verbose:
         print(
-            f"  MCMC complete: {n_samples_kept} samples, accept_rate = {n_accepted/n_total:.2%}, chi2/dof = {chi2_per_dof:.4f}"
+            f"  MCMC complete: {n_samples_kept} samples, "
+            f"accept_rate = {n_accepted/n_total:.2%}, chi2/dof = {chi2_per_dof:.4f}"
         )
 
     return MCMCSolution(
@@ -392,6 +436,14 @@ def mcmc_unfold(
                 "prior": prior,
                 "adaptive_step": bool(adaptive_step),
                 "target_acceptance": float(target_acceptance),
+                "posterior_measure": "linear_group_flux",
+                "proposal_hastings_correction": True,
+                "measurement_uncertainty_scope": (
+                    "supplied_diagonal_only"
+                    if measurement_uncertainty is not None
+                    else "assumed_ten_percent_diagnostic"
+                ),
+                "physical_qualified": False,
             },
             posterior_mean,
             negative_policy="proposal_preserves_positivity",
