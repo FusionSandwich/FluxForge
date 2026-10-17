@@ -477,8 +477,8 @@ def parse_gendf(gendf_path: Path) -> Tuple[np.ndarray, Dict[int, np.ndarray]]:
     """
     Parse GENDF (group-averaged cross section) file.
 
-    This is a simplified parser for the most common case.
-    Full ENDF-6 parsing would require a more comprehensive implementation.
+    Requires optional SANDY for actual labelled GENDF parsing. Missing parser
+    support or malformed output raises instead of returning empty success.
 
     Parameters
     ----------
@@ -492,31 +492,9 @@ def parse_gendf(gendf_path: Path) -> Tuple[np.ndarray, Dict[int, np.ndarray]]:
     cross_sections : dict
         Dictionary mapping MT number to group cross sections (barns).
     """
-    # GENDF format is complex; this is a placeholder for basic parsing
-    # In practice, use openmc.data or sandy to parse properly
+    from fluxforge.data.sandy_response import read_sandy_gendf
 
-    group_boundaries = np.array([])
-    cross_sections = {}
-
-    try:
-        with open(gendf_path, "r") as f:
-            content = f.read()
-
-        # Parse group structure from MF1/MT451
-        # Parse cross sections from MF3
-        # This requires proper ENDF-6 parsing
-
-        # For now, return empty with warning
-        import warnings
-
-        warnings.warn(
-            "GENDF parsing is limited; consider using openmc.data for full support"
-        )
-
-    except Exception as e:
-        raise ValueError(f"Failed to parse GENDF: {e}")
-
-    return group_boundaries, cross_sections
+    return read_sandy_gendf(gendf_path)
 
 
 def check_njoy_available(executable: str = "njoy") -> Tuple[bool, str]:

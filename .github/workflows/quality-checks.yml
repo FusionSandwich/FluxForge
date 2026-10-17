@@ -134,11 +134,17 @@ jobs:
             tests/test_cli_app.py \
             -W error::matplotlib.MatplotlibDeprecationWarning
 
-      - name: MCMC target-distribution regression tests
+      - name: Parametric inference and predictive-count contracts
         env:
           PYTHONPATH: src
         run: |
-          pytest -q tests/test_mcmc.py tests/test_mcmc_target_measure.py tests/test_parametric_unfolding.py tests/test_count_prediction_benchmark.py tests/test_activation_interoperability.py
+          pytest -q \
+            tests/test_mcmc.py \
+            tests/test_mcmc_target_measure.py \
+            tests/test_parametric_unfolding.py \
+            tests/test_count_prediction_benchmark.py \
+            tests/test_activation_interoperability.py \
+            tests/test_sandy_response.py
 
   modern-native-gui:
     name: Modern GUI Smoke (${{ matrix.os }})
